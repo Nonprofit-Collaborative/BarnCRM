@@ -6,9 +6,14 @@
 clearing out what should not be there: a test load, a list of contacts a partner sent twice,
 last year's event sign-ups.
 
+To delete the records a file lists by their record IDs instead, use **Load one object** with
+**Delete by record ID** on the Import tab ([Importing](importing.md), section 9). It needs
+**Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
+
 Before anything is deleted, BarnCRM counts the records that match and shows the first five by
 name, with the kinds of related records Salesforce deletes with them. You type that number to
-confirm. The delete then runs in the background, in chunks of up to 200 records, and the page
+confirm. The delete then runs in the background, in chunks of up to 200 records (the **Bulk
+chunk size** setting in BarnCRM Settings, Import), and the page
 shows its progress.
 
 Every deleted record is listed in the import journal, so an undo can bring them back from the
@@ -28,7 +33,8 @@ refused is listed with the reason; the rest are still deleted.
    even BarnCRM Admin**: assign the **BarnCRM Bulk Delete** permission set to the few people
    who should have it (Setup, Users, choose the person, Permission Set Assignments), with
    **BarnCRM Find and Export** if they do not have it already. Neither grants access to any
-   record.
+   record. Seeing the list of recent bulk deletes, and undoing one, needs only **Bulk Delete
+   Records**, as does deleting by file from the Import tab.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk delete run limit**
    (default 10,000). A bulk delete that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
@@ -48,13 +54,19 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 3. Press **Preview**. BarnCRM says how many records match, for example 112, shows the first five
    by name, and lists what is deleted with each one (for a contact, for example, its
    household memberships if your org deletes them with the contact).
-4. Type `112` into **Type the number of records to confirm**, then press **Delete 112
+4. Optional, and recommended: press **Download these records first**. BarnCRM reads all 112
+   records, with every field you can see, and saves them as a CSV file (the same format as
+   Find's export). Nothing is deleted. Keep the file: it is your copy if a record is ever needed
+   after the Recycle Bin has emptied. Related records deleted with them are not in it.
+5. Type `112` into **Type the number of records to confirm**, then press **Delete 112
    records**.
-5. The progress bar shows the chunks done. When it finishes, the panel says how many records
+6. The progress bar shows the chunks done. When it finishes, the panel says how many records
    were deleted, how many no longer matched the query and how many were refused, with the
    reason for each refusal.
-6. To undo it, find the job under **Recent bulk deletes** on the **Bulk Update** tab, press
-   **Undo**, type the number, and confirm. The records come back from the Recycle Bin.
+7. To undo it, find the job under **Data jobs** on the **Data Manager** tab, press
+   **Undo**, type the number, and confirm. The records come back from the Recycle Bin. The list
+   shows your own bulk deletes. Someone who manages BarnCRM Settings can tick **Show everyone's
+   jobs** to see and undo anyone's.
 
 ## 4. What can and cannot be deleted
 
@@ -65,6 +77,8 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   the detail records of a master-detail relationship (for example, every line of a record that
   owns its lines), and a few standard ones (deleting an account deletes its contacts). The
   preview lists these kinds of record. The undo brings them back with their parent.
+- **Emptied households are kept.** Deleting people never deletes their household, even with
+  **Delete empty households** on, so the undo can bring them back into it.
 - **Objects BarnCRM keeps itself** cannot be bulk deleted: imports and their journal, import
   templates, the error log, settings and setting changes, automation settings, rollup
   definitions, duplicate dismissals, saved queries, household membership rows (use the
@@ -91,14 +105,23 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   Bin (after 15 days, by somebody emptying it, or because the bin was full) is gone for good;
   the undo counts these in the job's run log. A record somebody already restored is left as it
   is.
+- **The job was stopped part way.** A job stopped in Setup, or by Salesforce, deleted the
+  records of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** still
+  offers to bring back exactly those records. A job also stops when your access to the object
+  is taken away while it runs; the run log says why, and the records it had not reached are
+  left as they were. When Salesforce stopped part of the job, the run log also says how many
+  of the confirmed records were not reached.
+- **Undo is refused in Import.** A bulk delete is undone from the bulk delete history, which
+  brings the records back from the Recycle Bin; the import's own Undo refuses it.
 
 ## Field reference
 
 | Where | Field | What it holds |
 |---|---|---|
-| Import (data job) | Operation | Delete for a bulk delete. |
-| Import (data job) | Bulk Update Definition | The query and the confirmed count a bulk delete ran with. |
-| Import (data job) | Row Count | How many records matched when the bulk delete started. |
-| Import (data job) | Rows Deleted | How many records the bulk delete deleted. |
-| Import (data job) | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
+| Data Job | Operation | Delete for a bulk delete. |
+| Data Job | Bulk Update Definition | The query and the confirmed count a bulk delete ran with. |
+| Data Job | Row Count | How many records matched when the bulk delete started. |
+| Data Job | Rows Deleted | How many records the bulk delete deleted. |
+| Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk delete run limit | The most records one bulk delete may delete. Default 10,000, at most 48,000. |
+| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a bulk update or bulk delete handles. Default and highest 200, lowest 10. |

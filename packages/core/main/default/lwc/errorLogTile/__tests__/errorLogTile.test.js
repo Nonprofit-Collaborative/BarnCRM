@@ -2,6 +2,24 @@ import { createElement } from 'lwc';
 import ErrorLogTile from 'c/errorLogTile';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/ErrorLogController.getTile',
@@ -16,7 +34,7 @@ jest.mock('@salesforce/apex/ErrorLogController.acknowledge', () => ({ default: j
   virtual: true
 });
 
-jest.mock('@salesforce/label/c.Core_ErrorLogTile_NewCount', () => ({ default: 'new' }), {
+jest.mock('@salesforce/label/c.Core_ErrorLogTile_NewCount', () => ({ default: '{0} new' }), {
   virtual: true
 });
 
@@ -110,6 +128,14 @@ describe('c-error-log-tile', () => {
     expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('0 new');
   });
 
+  it('says there are more when the count stopped at its cap', async () => {
+    const element = createComponent();
+    getTile.emit({ ...TILE, newCount: 999, newCountCapped: true });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('999+ new');
+  });
+
   it('disables the action for a person who may only read', async () => {
     const element = createComponent();
     getTile.emit({ ...TILE, canUpdate: false });
@@ -129,18 +155,46 @@ describe('c-error-log-tile', () => {
     );
   });
 
-  it('opens the entry itself', async () => {
+  it('opens the entry itself as a page outside a console', async () => {
     const element = createComponent();
     getTile.emit(TILE);
     await flush();
 
     const openButtons = element.shadowRoot.querySelectorAll('.open-entry-button');
     expect(openButtons.length).toBe(2);
-    expect(openButtons[0].dataset.entry).toBe(ENTRY.recordId);
-    // The navigation stub records nothing, so this asserts the click is wired and safe.
     openButtons[0].click();
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('3 new');
+
+    expect(openSubtab).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__recordPage',
+      attributes: { recordId: ENTRY.recordId, objectApiName: 'Error_Log__c', actionName: 'view' }
+    });
+  });
+
+  it('opens the entry as a subtab in a console', async () => {
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    const element = createComponent();
+    getTile.emit(TILE);
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    element.shadowRoot.querySelectorAll('.open-entry-button')[0].click();
+    await flush();
+    await flush();
+
+    expect(openSubtab).toHaveBeenCalledWith('tab0', {
+      pageReference: {
+        type: 'standard__recordPage',
+        attributes: {
+          recordId: ENTRY.recordId,
+          objectApiName: 'Error_Log__c',
+          actionName: 'view'
+        }
+      },
+      focus: true
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('announces an error rather than showing it in color alone', async () => {

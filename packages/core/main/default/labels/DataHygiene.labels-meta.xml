@@ -5,8 +5,8 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data hygiene page title.</shortDescription>
-        <value>Data hygiene</value>
+        <shortDescription>Data hygiene checks: card title in Org Optimizer's Data quality section.</shortDescription>
+        <value>Data quality</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_Intro</fullName>
@@ -47,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Button that opens a check in Find.</shortDescription>
         <value>Open in Find</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_OpenInFindNamed</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Accessible name of the Open in Find button, {0} is the check.</shortDescription>
-        <value>Open {0} in Find</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_RecordsFound</fullName>
@@ -231,5 +223,53 @@
         <protected>false</protected>
         <shortDescription>Check detail: failed verification.</shortDescription>
         <value>Default addresses an address verification app marked Failed. Without such an app this is always 0.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_UnreachableTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: people nobody can reach.</shortDescription>
+        <value>People with no way to reach them</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_UnreachableDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: people nobody can reach.</shortDescription>
+        <value>Living people with no email, no phone, no mobile and no mailing city or postal code. Nothing you send can reach them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_DeceasedTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: deceased people who can still be emailed.</shortDescription>
+        <value>Deceased people who can still be emailed</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_DeceasedDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: deceased people who can still be emailed.</shortDescription>
+        <value>People marked Deceased who have an email address and are not opted out of email. Tick Email Opt Out so no message goes to them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NotUpdatedTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: people not changed for years; {0} is the years.</shortDescription>
+        <value>People not changed in {0} years</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NotUpdatedDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: people not changed for years.</shortDescription>
+        <value>People nobody has changed for the number of years set in BarnCRM Settings (General). Review them before you decide to archive or delete any.</value>
     </labels>
 </CustomLabels>

@@ -34,4 +34,12 @@
     <field>Help_Path__c</field>
     <value xsi:type="xsd:string">receipts.md</value>
   </values>
+  <values>
+    <field>Min_Value__c</field>
+    <value xsi:type="xsd:double">1</value>
+  </values>
+  <values>
+    <field>Max_Value__c</field>
+    <value xsi:type="xsd:double">999999999</value>
+  </values>
 </CustomMetadata>

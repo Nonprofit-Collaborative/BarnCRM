@@ -6,10 +6,12 @@
  * against. A module that is not installed simply does not resolve, and every caller here
  * copes with the empty list.
  *
- * Loading is one module at a time on purpose. A queueable may enqueue one job, so Core's
- * last stage starts the first module and each module's own last job calls `startAfter` with
- * its name, which starts the module after it. With one module shipped that call is a no-op,
- * and it is what keeps a second module from needing a change in Core.
+ * Loading is one module at a time on purpose. Core's stage batch finishes by starting the
+ * first module, and each module's own load finishes by calling `startAfter` with its name,
+ * which starts the module after it. With one module shipped that call is a no-op, and it is
+ * what keeps a second module from needing a change in Core. A module runs its stages through
+ * SampleDataStageBatch (see SampleDataStages), because a queueable chain stops after five
+ * jobs in Developer Edition, trial and scratch orgs.
  */
 @NamespaceAccessible
 public with sharing class SampleDataModules {
@@ -89,9 +91,17 @@ public with sharing class SampleDataModules {
         return counts;
     }
 
+    /** Starts the module at this place in the load order, or ends the load when none is left. */
     private static void start(Integer index) {
         List<SampleDataModule> modules = installed();
-        if (index < 0 || index >= modules.size()) {
+        if (index >= modules.size()) {
+            // The load has ended. Start the Rollup Queue for any totals of the people and gifts
+            // it saved that are still pending; it starts nothing when none are (R-RQ3).
+            RollupService.startQueuedRecalculation();
+            SampleDataLoader.notifyLoadFinished();
+            return;
+        }
+        if (index < 0) {
             return;
         }
         modules[index].enqueueLoad();
@@ -105,14 +115,7 @@ public with sharing class SampleDataModules {
      */
     @TestVisible
     private static SampleDataModule resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type moduleType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (moduleType == null) {
-            moduleType = Type.forName(className);
-        }
+        Type moduleType = NamespaceUtil.resolveType(className);
         if (moduleType == null) {
             return null;
         }

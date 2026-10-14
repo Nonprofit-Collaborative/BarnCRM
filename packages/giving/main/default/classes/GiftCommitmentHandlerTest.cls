@@ -1,7 +1,7 @@
 /**
  * Tests for the Gift handler that applies a gift to the payment it fulfills.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftCommitmentHandler')
 private class GiftCommitmentHandlerTest {
     /**
      * A gift saves only when there is a default fund to allocate it to (R-GA2).

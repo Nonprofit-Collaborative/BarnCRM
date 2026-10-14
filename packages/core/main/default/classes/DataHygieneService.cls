@@ -23,6 +23,14 @@ public with sharing class DataHygieneService {
     public static final String ADDRESSES_WITHOUT_OWNER = 'addresses_without_owner';
     public static final String DEFAULT_ADDRESSES_INCOMPLETE = 'default_addresses_incomplete';
     public static final String DEFAULT_ADDRESSES_FAILED = 'default_addresses_failed_verification';
+    public static final String PEOPLE_UNREACHABLE = 'people_unreachable';
+    public static final String DECEASED_STILL_EMAILED = 'deceased_still_emailed';
+    public static final String PEOPLE_NOT_UPDATED = 'people_not_updated';
+
+    /** Years without a change before a person counts as not updated, when nothing is set. */
+    public static final Integer DEFAULT_STALE_YEARS = 5;
+    public static final Integer MIN_STALE_YEARS = 1;
+    public static final Integer MAX_STALE_YEARS = 20;
 
     /** The checks, in the order the page lists them. */
     public static final List<String> CHECK_KEYS = new List<String>{
@@ -31,7 +39,10 @@ public with sharing class DataHygieneService {
         MEMBERSHIPS_WITHOUT_PERSON,
         ADDRESSES_WITHOUT_OWNER,
         DEFAULT_ADDRESSES_INCOMPLETE,
-        DEFAULT_ADDRESSES_FAILED
+        DEFAULT_ADDRESSES_FAILED,
+        PEOPLE_UNREACHABLE,
+        DECEASED_STILL_EMAILED,
+        PEOPLE_NOT_UPDATED
     };
 
     private static final Integer ROWS_SHOWN = QueryCompiler.DEFAULT_ROWS;
@@ -85,6 +96,14 @@ public with sharing class DataHygieneService {
                 result.count = count(document);
                 result.canOpenInFind = true;
             }
+            // A household that is also a Nonprofit Cloud household keeps its members there, so
+            // it reads as empty here, and deleting it would delete its native group (ADR-0036).
+            if (
+                key == HOUSEHOLDS_WITHOUT_MEMBERS &&
+                OrgShapeDetector.detect().hasNativeHouseholdGroups == true
+            ) {
+                result.note = System.Label.Core_DataHygiene_NativeHouseholdsListed;
+            }
             result.countLabel = countLabel(result.count);
         } catch (QueryCompiler.QueryCompilerException refused) {
             result.errorMessage = refused.getMessage();
@@ -93,6 +112,9 @@ public with sharing class DataHygieneService {
         } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
             result.errorMessage = refused.getMessage();
         } catch (System.QueryException noAccess) {
+            // Usually the user-mode refusal of a field or object, but a timeout on a large
+            // count reads the same way, so it is logged for whoever looks into it.
+            ErrorLogger.log(noAccess, 'Data hygiene check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_NoAccess;
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, 'Data hygiene check ' + key);
@@ -119,6 +141,12 @@ public with sharing class DataHygieneService {
             document = defaultAddressesIncomplete();
         } else if (key == DEFAULT_ADDRESSES_FAILED) {
             document = defaultAddressesFailed();
+        } else if (key == PEOPLE_UNREACHABLE) {
+            document = peopleUnreachable();
+        } else if (key == DECEASED_STILL_EMAILED) {
+            document = deceasedStillEmailed();
+        } else if (key == PEOPLE_NOT_UPDATED) {
+            document = peopleNotUpdated();
         } else {
             throw new DataHygieneException(System.Label.Core_DataHygiene_UnknownCheck);
         }
@@ -264,6 +292,80 @@ public with sharing class DataHygieneService {
         );
     }
 
+    /**
+     * A living person with no email, no phone and no mailing city or postal code: nobody can
+     * reach them. The mailing fields are where the default address is written (R-AD3).
+     */
+    private static Map<String, Object> peopleUnreachable() {
+        return document(
+            Contact.SObjectType,
+            new List<String>{ 'Name', name(Contact.CreatedDate) },
+            new List<Object>{
+                condition(1, name(Contact.Deceased__c), 'equals', false),
+                condition(2, name(Contact.Email), 'is null', null),
+                condition(3, name(Contact.Phone), 'is null', null),
+                condition(4, name(Contact.MobilePhone), 'is null', null),
+                condition(5, name(Contact.MailingCity), 'is null', null),
+                condition(6, name(Contact.MailingPostalCode), 'is null', null)
+            },
+            null
+        );
+    }
+
+    /** A person marked deceased who has an email and has not been opted out of email. */
+    private static Map<String, Object> deceasedStillEmailed() {
+        return document(
+            Contact.SObjectType,
+            new List<String>{ 'Name', name(Contact.Email), name(Contact.CreatedDate) },
+            new List<Object>{
+                condition(1, name(Contact.Deceased__c), 'equals', true),
+                condition(2, name(Contact.Email), 'is not null', null),
+                condition(3, name(Contact.HasOptedOutOfEmail), 'equals', false)
+            },
+            null
+        );
+    }
+
+    /**
+     * A person nobody has changed for the years set in BarnCRM Settings: a candidate for
+     * review or archiving. The cut-off is written into the document when it is built.
+     */
+    private static Map<String, Object> peopleNotUpdated() {
+        Datetime cutoff = Datetime.now().addYears(-staleYears());
+        return document(
+            Contact.SObjectType,
+            new List<String>{ 'Name', name(Contact.LastModifiedDate), name(Contact.CreatedDate) },
+            new List<Object>{
+                condition(
+                    1,
+                    name(Contact.LastModifiedDate),
+                    'less than',
+                    cutoff.formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'')
+                )
+            },
+            null
+        );
+    }
+
+    /**
+     * Years without a change before a person counts as not updated, from BarnCRM Settings.
+     * Empty reads as the default; a value out of range reads as the nearest end (D-40).
+     */
+    public static Integer staleYears() {
+        Object configured = SettingsService.hasKey('Stale_Record_Years__c')
+            ? SettingsService.getValue('Stale_Record_Years__c')
+            : null;
+        if (configured == null) {
+            return DEFAULT_STALE_YEARS;
+        }
+        try {
+            Integer years = Decimal.valueOf(String.valueOf(configured)).intValue();
+            return Math.max(MIN_STALE_YEARS, Math.min(years, MAX_STALE_YEARS));
+        } catch (Exception ignored) {
+            return DEFAULT_STALE_YEARS;
+        }
+    }
+
     /** The address and whose it is. */
     private static List<String> addressColumns() {
         return new List<String>{
@@ -335,31 +437,10 @@ public with sharing class DataHygieneService {
      * counts them (ADR-0048), each read capped.
      */
     private static Integer countJunctionPeopleWithoutHousehold() {
-        Set<Id> personTypes = personRecordTypeIds();
-        Set<Id> excluded = new Set<Id>(personTypes);
-        Id householdType = HouseholdService.householdRecordTypeId();
-        if (householdType != null) {
-            excluded.add(householdType);
-        }
-        Integer found = HouseholdOrphanSelector.countContactsWithoutMembership(
-            excluded,
+        return HouseholdOrphanSelector.countPeopleWithoutMembership(
+            HouseholdService.householdRecordTypeId(),
             COUNT_CAP + 1
         );
-        if (!personTypes.isEmpty() && found <= COUNT_CAP) {
-            found += HouseholdOrphanSelector.countPersonAccountsWithoutMembership(
-                personTypes,
-                COUNT_CAP + 1
-            );
-        }
-        return found;
-    }
-
-    private static Set<Id> personRecordTypeIds() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        return shape == null ||
-            shape.personAccountRecordTypeIds == null
-            ? new Set<Id>()
-            : shape.personAccountRecordTypeIds;
     }
 
     private static String title(String key) {
@@ -369,7 +450,13 @@ public with sharing class DataHygieneService {
             MEMBERSHIPS_WITHOUT_PERSON => System.Label.Core_DataHygiene_MembershipsTitle,
             ADDRESSES_WITHOUT_OWNER => System.Label.Core_DataHygiene_OwnerlessTitle,
             DEFAULT_ADDRESSES_INCOMPLETE => System.Label.Core_DataHygiene_IncompleteTitle,
-            DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedTitle
+            DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedTitle,
+            PEOPLE_UNREACHABLE => System.Label.Core_DataHygiene_UnreachableTitle,
+            DECEASED_STILL_EMAILED => System.Label.Core_DataHygiene_DeceasedTitle,
+            PEOPLE_NOT_UPDATED => String.format(
+                System.Label.Core_DataHygiene_NotUpdatedTitle,
+                new List<Object>{ staleYears() }
+            )
         };
         if (!titles.containsKey(key)) {
             throw new DataHygieneException(System.Label.Core_DataHygiene_UnknownCheck);
@@ -388,7 +475,10 @@ public with sharing class DataHygieneService {
                 MEMBERSHIPS_WITHOUT_PERSON => System.Label.Core_DataHygiene_MembershipsDetail,
                 ADDRESSES_WITHOUT_OWNER => System.Label.Core_DataHygiene_OwnerlessDetail,
                 DEFAULT_ADDRESSES_INCOMPLETE => System.Label.Core_DataHygiene_IncompleteDetail,
-                DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedDetail
+                DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedDetail,
+                PEOPLE_UNREACHABLE => System.Label.Core_DataHygiene_UnreachableDetail,
+                DECEASED_STILL_EMAILED => System.Label.Core_DataHygiene_DeceasedDetail,
+                PEOPLE_NOT_UPDATED => System.Label.Core_DataHygiene_NotUpdatedDetail
             }
             .get(key);
     }

@@ -35,7 +35,9 @@ public with sharing class ImportTemplateSelector {
                 Target_Object__c,
                 Load_Operation__c,
                 Load_Match_Field__c,
-                Lookup_Not_Found__c
+                Lookup_Not_Found__c,
+                Related_Object__c,
+                Related_Parent_Field__c
             FROM Import_Template__c
             WHERE Active__c = TRUE
             WITH USER_MODE
@@ -76,7 +78,9 @@ public with sharing class ImportTemplateSelector {
                 Target_Object__c,
                 Load_Operation__c,
                 Load_Match_Field__c,
-                Lookup_Not_Found__c
+                Lookup_Not_Found__c,
+                Related_Object__c,
+                Related_Parent_Field__c
             FROM Import_Template__c
             WHERE Id = :templateId
             WITH USER_MODE

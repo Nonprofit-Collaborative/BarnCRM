@@ -20,6 +20,19 @@
  * accessors on TriggerHandler, which is the contract every packaged handler is written to.
  */
 public with sharing class RelationshipMaintenanceHandler extends TriggerHandler {
+    /**
+     * Set by a test to make the upkeep fail, so the report a person sees can be exercised:
+     * the upkeep runs in system mode (PEOPLE-26), so no user's access makes it fail.
+     */
+    @TestVisible
+    private static Exception upkeepFailureForTest;
+
+    private static void failWhenAskedForTest() {
+        if (upkeepFailureForTest != null) {
+            throw upkeepFailureForTest;
+        }
+    }
+
     public override void afterInsert() {
         ensure((List<Relationship__c>) newRecords(), 'RelationshipMaintenanceHandler.afterInsert');
     }
@@ -30,9 +43,15 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.syncReciprocals(records, oldRecordsById());
         } catch (Exception thrown) {
-            report(thrown, records, 'RelationshipMaintenanceHandler.afterUpdate');
+            reportFailure(
+                thrown,
+                records,
+                'RelationshipMaintenanceHandler.afterUpdate',
+                Label.Core_Relationship_SyncFailed
+            );
         }
     }
 
@@ -42,17 +61,34 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.deleteReciprocals(deleted);
         } catch (Exception thrown) {
-            report(thrown, deleted, 'RelationshipMaintenanceHandler.afterDelete');
+            reportFailure(
+                thrown,
+                deleted,
+                'RelationshipMaintenanceHandler.afterDelete',
+                Label.Core_Relationship_SyncFailed
+            );
         }
     }
 
     public override void afterUndelete() {
-        ensure(
-            (List<Relationship__c>) newRecords(),
-            'RelationshipMaintenanceHandler.afterUndelete'
-        );
+        List<Relationship__c> restored = (List<Relationship__c>) newRecords();
+        if (restored == null || restored.isEmpty()) {
+            return;
+        }
+        try {
+            failWhenAskedForTest();
+            RelationshipService.restoreReciprocals(restored);
+        } catch (Exception thrown) {
+            reportFailure(
+                thrown,
+                restored,
+                'RelationshipMaintenanceHandler.afterUndelete',
+                Label.Core_Relationship_SyncFailed
+            );
+        }
     }
 
     private void ensure(List<Relationship__c> records, String context) {
@@ -60,24 +96,10 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.ensureReciprocals(records);
         } catch (Exception thrown) {
-            report(thrown, records, context);
-        }
-    }
-
-    /**
-     * The relationship specific message, rather than the dispatcher's general one, so a person
-     * reading the error knows which part of the save failed. The exception is recorded in the
-     * Error Log first (R-E1), and a record already carrying a message that tells the person
-     * what to change is left alone.
-     */
-    private void report(Exception thrown, List<Relationship__c> records, String context) {
-        ErrorLogger.log(thrown, context);
-        for (Relationship__c record : records) {
-            if (!record.hasErrors()) {
-                record.addError(Label.Core_Relationship_SyncFailed);
-            }
+            reportFailure(thrown, records, context, Label.Core_Relationship_SyncFailed);
         }
     }
 }

@@ -1,122 +1,103 @@
 <template>
-    <div class="slds-var-p-around_medium">
-        <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
-        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+    <lightning-card title={labels.title} icon-name="standard:dashboard">
+        <div class="slds-var-p-horizontal_medium">
+            <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
-        <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
-        </template>
-        <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
-        </template>
-
-        <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
-            <p>
-                <strong>{labels.lastRunTitle}:</strong>
-                <template lwc:if={lastRun}>
-                    <lightning-formatted-date-time
-                        data-id="last-run"
-                        value={lastRun}
-                        year="numeric"
-                        month="short"
-                        day="2-digit"
-                        hour="2-digit"
-                        minute="2-digit"
-                    ></lightning-formatted-date-time>
-                </template>
-                <template lwc:else>
-                    <span data-id="never-run">{labels.neverRun}</span>
-                </template>
-            </p>
-            <template lwc:if={lastRunSummary}>
-                <p class="slds-text-body_small" data-id="last-run-summary">{lastRunSummary}</p>
-            </template>
-            <p data-id="schedule-message">{scheduleMessage}</p>
-            <template lwc:if={nextRunAt}>
-                <p class="slds-text-body_small" data-id="next-run">
-                    <lightning-formatted-date-time
-                        value={nextRunAt}
-                        year="numeric"
-                        month="short"
-                        day="2-digit"
-                        hour="2-digit"
-                        minute="2-digit"
-                    ></lightning-formatted-date-time>
+            <template lwc:if={errorMessage}>
+                <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+                    {errorMessage}
                 </p>
             </template>
-            <div class="slds-var-m-top_x-small">
-                <lightning-button
-                    data-id="schedule-button"
-                    label={scheduleButtonLabel}
-                    disabled={busy}
-                    onclick={handleSchedule}
-                ></lightning-button>
-                <lightning-button
-                    class="slds-var-m-left_x-small"
-                    data-id="run-now"
-                    label={labels.runNow}
-                    disabled={busy}
-                    onclick={handleRunNow}
-                ></lightning-button>
-            </div>
+            <template lwc:if={noticeMessage}>
+                <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
+                    {noticeMessage}
+                </p>
+            </template>
+
+            <lightning-layout multiple-rows vertical-align="end">
+                <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                    <lightning-combobox
+                        data-id="object"
+                        label={labels.chooseLabel}
+                        placeholder={labels.choosePlaceholder}
+                        options={objectOptions}
+                        value={objectName}
+                        disabled={pickerDisabled}
+                        onchange={handleObject}
+                    ></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                    <lightning-button-group>
+                        <lightning-button
+                            data-id="count-again"
+                            label={labels.countAgain}
+                            disabled={countAgainDisabled}
+                            onclick={handleCountAgain}
+                        ></lightning-button>
+                        <lightning-button
+                            data-id="save"
+                            label={labels.save}
+                            variant="brand"
+                            disabled={saveDisabled}
+                            onclick={handleSave}
+                        ></lightning-button>
+                    </lightning-button-group>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <template lwc:if={showProgress}>
+                <div class="slds-var-m-vertical_small" data-id="progress">
+                    <lightning-progress-bar value={progressValue} size="medium"></lightning-progress-bar>
+                    <p class="slds-text-body_small slds-var-m-top_xx-small" role="status" aria-live="polite">
+                        {progressText}
+                    </p>
+                </div>
+            </template>
+
+            <template lwc:if={tooLargeMessage}>
+                <p class="slds-var-m-vertical_small" data-id="too-large">{tooLargeMessage}</p>
+            </template>
+            <template lwc:if={hasNoRecords}>
+                <p class="slds-var-m-vertical_small" data-id="no-records">{labels.noRecords}</p>
+            </template>
+            <template lwc:if={hasNoFields}>
+                <p class="slds-var-m-vertical_small" data-id="no-fields">{labels.noFields}</p>
+            </template>
+
+            <template lwc:if={hasRows}>
+                <template lwc:if={previousTakenAt}>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="compared">
+                        {labels.comparedWith}
+                        <lightning-formatted-date-time
+                            value={previousTakenAt}
+                            year="numeric"
+                            month="short"
+                            day="2-digit"
+                            hour="2-digit"
+                            minute="2-digit"
+                        ></lightning-formatted-date-time>
+                    </p>
+                </template>
+                <template lwc:if={showNeverSaved}>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="never-saved">
+                        {labels.neverSaved}
+                    </p>
+                </template>
+                <lightning-datatable
+                    data-id="results"
+                    key-field="key"
+                    data={rows}
+                    columns={columns}
+                    hide-checkbox-column
+                    sorted-by={sortedBy}
+                    sorted-direction={sortedDirection}
+                    onsort={handleSort}
+                ></lightning-datatable>
+            </template>
+
+            <template lwc:if={notCountedMessage}>
+                <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
+            </template>
         </div>
-
-        <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.chooseTitle}</h3>
-        <lightning-dual-listbox
-            data-id="objects"
-            label={labels.chooseLabel}
-            source-label={labels.available}
-            selected-label={labels.counted}
-            options={objectOptions}
-            value={selected}
-            onchange={handleObjectsChange}
-        ></lightning-dual-listbox>
-        <lightning-button
-            class="slds-var-m-top_x-small"
-            data-id="save"
-            label={labels.save}
-            variant="brand"
-            disabled={busy}
-            onclick={handleSave}
-        ></lightning-button>
-
-        <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.resultsTitle}</h3>
-        <lightning-combobox
-            data-id="results-object"
-            label={labels.showResultsFor}
-            options={trackedOptions}
-            value={resultsObject}
-            onchange={handleResultsObject}
-        ></lightning-combobox>
-        <template lwc:if={hasRows}>
-            <template lwc:if={previousTakenAt}>
-                <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="compared">
-                    {labels.comparedWith}
-                    <lightning-formatted-date-time
-                        value={previousTakenAt}
-                        year="numeric"
-                        month="short"
-                        day="2-digit"
-                    ></lightning-formatted-date-time>
-                </p>
-            </template>
-            <lightning-datatable
-                data-id="results"
-                key-field="key"
-                data={rows}
-                columns={columns}
-                hide-checkbox-column
-                sorted-by={sortedBy}
-                sorted-direction={sortedDirection}
-                onsort={handleSort}
-            ></lightning-datatable>
-        </template>
-        <template lwc:elseif={resultsObject}>
-            <p class="slds-var-m-top_x-small" data-id="no-results">{labels.noResults}</p>
-        </template>
-    </div>
+    </lightning-card>
 </template>

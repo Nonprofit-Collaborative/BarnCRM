@@ -21,18 +21,32 @@ public with sharing class HouseholdNamingBatch implements Database.Batchable<SOb
     public void execute(Database.BatchableContext context, List<SObject> scope) {
         Set<Id> householdIds = new Map<Id, SObject>(scope).keySet();
         householdsRead += householdIds.size();
-        // One predicate query for the whole scope, never one per household.
-        Set<Id> nativeHouseholds = HouseholdSelector.nativeHouseholdAccountsAmong(householdIds);
-        Set<Id> eligible = new Set<Id>(householdIds);
-        eligible.removeAll(nativeHouseholds);
+        // applyNaming leaves out the native households, asking once for the whole scope, and
+        // says which they were.
+        Set<Id> nativeHouseholds = new Set<Id>();
+        householdsChanged += HouseholdNamingService.applyNaming(householdIds, nativeHouseholds);
         householdsSkippedNative += nativeHouseholds.size();
-        householdsChanged += HouseholdNamingService.applyNaming(eligible);
     }
 
+    /**
+     * The counts stay on the job (read, rewritten, and left alone because the household is a
+     * native Nonprofit Cloud one) so that the settings page can report what happened, and the
+     * person who started the recompute is told (Q-04).
+     */
     public void finish(Database.BatchableContext context) {
-        // Counts stay on the job (read, rewritten, and left alone because the household is a
-        // native Nonprofit Cloud one) so that the settings page can report what happened;
-        // there is nothing further to do once the batch is done.
-        return;
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            System.Label.Core_JobNotice_HouseholdNaming,
+            false,
+            String.format(
+                System.Label.Core_JobNotice_HouseholdNamingBody,
+                new List<Object>{
+                    householdsRead.format(),
+                    householdsChanged.format(),
+                    householdsSkippedNative.format()
+                }
+            ),
+            JobNotifier.SECTION_HOUSEHOLDS
+        );
     }
 }

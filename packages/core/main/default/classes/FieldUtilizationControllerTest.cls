@@ -1,14 +1,30 @@
 /**
- * FieldUtilizationController: the Field Utilization page of the settings console. Every change
- * needs Manage BarnCRM Settings, and the results compare the latest run with the one before.
+ * FieldUtilizationController and FieldUtilizationService: the Field Utilization tab counts one
+ * object on demand, a chunk of fields per call, and saves the counts only when asked
+ * (canonical model Section 29F, R-FU1 to R-FU8).
+ *
+ * Counting tests run as Maria, a Standard User holding only BarnCRM Admin, so the user-mode
+ * counts and writes prove what that permission set grants. Duplicate Dismissal has a single
+ * countable field, so its counts do not depend on the org's other fields.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FieldUtilizationController')
 private class FieldUtilizationControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )
         .getName();
     private static final String REASON = Duplicate_Dismissal__c.Reason__c.getDescribe().getName();
+    private static final String PHONE = Account.Phone.getDescribe().getName();
+    // Not named ACCOUNT: Apex names are case-insensitive, so that would shadow the Account type.
+    private static final String ACCOUNT_TYPE = Account.SObjectType.getDescribe(
+            SObjectDescribeOptions.DEFERRED
+        )
+        .getName();
 
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
@@ -31,125 +47,265 @@ private class FieldUtilizationControllerTest {
         return rows;
     }
 
-    /** One run, synchronously, as the batch would do it. */
-    private static void countNow(Datetime takenAt) {
-        FieldUtilizationService.Plan planned = FieldUtilizationService.plan(
-            new List<String>{ DISMISSAL },
-            null
-        );
-        List<Field_Utilization_Snapshot__c> rows = new List<Field_Utilization_Snapshot__c>();
-        for (FieldUtilizationService.Item item : planned.items) {
-            rows.addAll(
-                FieldUtilizationService.count(item, planned.totals.get(item.objectName), takenAt)
-            );
-        }
-        FieldUtilizationService.save(rows);
+    private static FieldUtilizationController.Chunk countOne(String objectName, String field) {
+        return FieldUtilizationController.countFields(objectName, new List<String>{ field });
     }
 
-    private static String messageOf(Exception caught) {
-        return caught.getMessage();
+    private static Map<String, FieldUtilizationController.CountRow> byRecordType(
+        List<FieldUtilizationController.CountRow> rows
+    ) {
+        Map<String, FieldUtilizationController.CountRow> found = new Map<String, FieldUtilizationController.CountRow>();
+        for (FieldUtilizationController.CountRow row : rows) {
+            found.put(row.recordType, row);
+        }
+        return found;
+    }
+
+    private static String refusalOf(String objectName, List<String> fields) {
+        try {
+            FieldUtilizationController.countFields(objectName, fields);
+        } catch (AuraHandledException caught) {
+            return caught.getMessage();
+        }
+        return null;
     }
 
     @IsTest
-    static void aSecondRunShowsTheChangeSinceTheFirst() {
+    static void everyFilledValueIsCountedAcross200Records() {
         System.runAs(TestUsers.admin()) {
-            FieldUtilizationController.Results results;
+            FieldUtilizationController.Plan planned;
+            FieldUtilizationController.Chunk chunk;
             System.runAs(maria()) {
-                List<Duplicate_Dismissal__c> rows = insertDismissals(200, 100);
-                countNow(System.now().addDays(-7));
-                for (Integer i = 100; i < 150; i++) {
-                    rows[i].Reason__c = 'Different people';
-                }
-                update rows;
-                countNow(System.now());
-
+                insertDismissals(200, 120);
                 Test.startTest();
-                results = FieldUtilizationController.getResults(DISMISSAL);
+                planned = FieldUtilizationController.getPlan(DISMISSAL);
+                chunk = countOne(DISMISSAL, REASON);
                 Test.stopTest();
             }
 
-            Assert.isNotNull(results.previousTakenAt, 'The run before is found.');
-            FieldUtilizationController.FieldRow reasonRow;
-            for (FieldUtilizationController.FieldRow row : results.rows) {
-                if (row.fieldName == REASON) {
-                    reasonRow = row;
-                }
+            Assert.areEqual(200, planned.total, 'The plan counts the records first.');
+            Assert.isFalse(planned.tooLarge, 'Well under the size limit.');
+            Assert.areEqual(FieldUtilizationService.CHUNK_SIZE, planned.chunkSize, 'Full chunks.');
+            Set<String> planFields = new Set<String>();
+            for (FieldUtilizationController.FieldInfo info : planned.fields) {
+                planFields.add(info.fieldName);
             }
-            Assert.isNotNull(reasonRow, 'Reason is in the latest results.');
-            Assert.areEqual(150, reasonRow.filled, 'Filled in the latest run.');
-            Assert.areEqual(200, reasonRow.total, 'Records looked at.');
-            Assert.areEqual(75.0, reasonRow.percent, 'The latest share, as a percentage.');
-            Assert.areEqual(25.0, reasonRow.change, 'Up 25 points since the run before.');
+            Assert.isTrue(planFields.contains(REASON), 'Reason is to be counted.');
+            Assert.isFalse(
+                planFields.contains(Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getName()),
+                'A field required on every record is always filled, so it is not counted (R-FU2).'
+            );
+            Assert.areEqual(1, chunk.rows.size(), 'No record types, so one row per field.');
+            Assert.areEqual(120, chunk.rows[0].filled, 'Every filled Reason is counted.');
+            Assert.areEqual(200, chunk.rows[0].total, 'Every dismissal is looked at.');
+            Assert.areEqual(60.0, chunk.rows[0].percent, 'As a percentage.');
+            Assert.areEqual('', chunk.rows[0].recordTypeLabel, 'No record type to name.');
+            Assert.isFalse(chunk.rows[0].sampled, 'A text field is counted, not sampled.');
+            Assert.isTrue(chunk.failed.isEmpty(), 'Nothing failed.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Field_Utilization_Snapshot__c],
+                'Counting stores nothing until the counts are saved.'
+            );
         }
     }
 
     @IsTest
-    static void theFirstRunHasNoChangeToShow() {
+    static void eachRecordTypeIsCountedOnItsOwn() {
         System.runAs(TestUsers.admin()) {
-            FieldUtilizationController.Results results;
+            FieldUtilizationController.Chunk chunk;
             System.runAs(maria()) {
-                insertDismissals(200, 50);
-                countNow(System.now());
-                results = FieldUtilizationController.getResults(DISMISSAL);
+                List<Account> accounts = new List<Account>();
+                for (Integer i = 0; i < 100; i++) {
+                    Account organization = AddressTestDataFactory.newOrganization('Barn Org ' + i);
+                    organization.Phone = i < 80 ? '555-0100' : null;
+                    accounts.add(organization);
+                    Account household = HouseholdTestDataFactory.newHousehold(
+                        'The Barn ' + i + ' Family'
+                    );
+                    household.Phone = i < 20 ? '555-0199' : null;
+                    accounts.add(household);
+                }
+                insert accounts;
+                Test.startTest();
+                chunk = countOne(ACCOUNT_TYPE, PHONE);
+                Test.stopTest();
             }
 
-            Assert.isNull(results.previousTakenAt, 'There is no earlier run.');
-            Assert.areEqual(1, results.rows.size(), 'One countable field.');
-            Assert.areEqual(25.0, results.rows[0].percent, '50 of 200.');
-            Assert.isNull(results.rows[0].change, 'No change without a run to compare with.');
+            Map<String, FieldUtilizationController.CountRow> rows = byRecordType(chunk.rows);
+            Assert.areEqual(80, rows.get('Organization').filled, 'Organizations with a phone.');
+            Assert.areEqual(100, rows.get('Organization').total, 'Every organization.');
+            Assert.areEqual(20, rows.get('Household').filled, 'Households with a phone.');
+            Assert.areEqual(100, rows.get('Household').total, 'Every household.');
+            Assert.isFalse(
+                String.isBlank(rows.get('Household').recordTypeLabel),
+                'The record type is shown by its label.'
+            );
         }
     }
 
     @IsTest
-    static void savingObjectsKeepsWhatDescribeKnowsAndRefusesTheRest() {
+    static void aLongTextFieldIsSampledOnRecentRecords() {
         System.runAs(TestUsers.admin()) {
-            FieldUtilizationController.PageView view;
+            String description = Account.Description.getDescribe().getName();
+            FieldUtilizationController.Chunk chunk;
+            System.runAs(maria()) {
+                List<Account> accounts = new List<Account>();
+                for (Integer i = 0; i < 200; i++) {
+                    Account organization = AddressTestDataFactory.newOrganization('Barn Org ' + i);
+                    organization.Description = i < 50 ? 'Funds the after school program.' : null;
+                    accounts.add(organization);
+                }
+                insert accounts;
+                Test.startTest();
+                chunk = countOne(ACCOUNT_TYPE, description);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(1, chunk.rows.size(), 'Only organizations exist: one row.');
+            Assert.isTrue(chunk.rows[0].sampled, 'A long text field is sampled.');
+            Assert.areEqual(
+                FieldUtilizationService.SAMPLE_SIZE,
+                chunk.rows[0].total,
+                'Sample size.'
+            );
+            Assert.areEqual(50, chunk.rows[0].filled, 'Every filled description in the sample.');
+        }
+    }
+
+    @IsTest
+    static void anObjectOverTheSizeLimitIsNotCounted() {
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationService.sizeLimit = 100;
+            FieldUtilizationController.Plan planned;
             String refusal;
             System.runAs(maria()) {
-                view = FieldUtilizationController.saveObjects(
-                    new List<String>{ DISMISSAL, DISMISSAL }
-                );
-                try {
-                    FieldUtilizationController.saveObjects(
-                        new List<String>{ 'Not_A_Real_Object__c' }
-                    );
-                } catch (AuraHandledException caught) {
-                    refusal = messageOf(caught);
-                }
+                insertDismissals(200, 200);
+                planned = FieldUtilizationController.getPlan(DISMISSAL);
+                refusal = refusalOf(DISMISSAL, new List<String>{ REASON });
             }
 
+            Assert.isTrue(planned.tooLarge, 'The plan says the object is too large (R-FU5).');
+            Assert.isTrue(planned.fields.isEmpty(), 'No field is offered for counting.');
             Assert.areEqual(
-                new List<String>{ DISMISSAL },
-                view.tracked,
-                'Saved once, as describe names it.'
+                String.format(
+                    System.Label.Core_FieldUtilization_TooLarge,
+                    new List<Object>{ Integer.valueOf(100).format() }
+                ),
+                refusal,
+                'A count call is refused too.'
             );
+        }
+    }
+
+    @IsTest
+    static void savedCountsComeBackAsThePreviousCount() {
+        System.runAs(TestUsers.admin()) {
+            Integer saved;
+            FieldUtilizationController.Plan planned;
+            System.runAs(maria()) {
+                insertDismissals(200, 100);
+                FieldUtilizationController.Chunk chunk = countOne(DISMISSAL, REASON);
+                Test.startTest();
+                saved = FieldUtilizationController.saveCounts(DISMISSAL, chunk.rows);
+                planned = FieldUtilizationController.getPlan(DISMISSAL);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(1, saved, 'One row saved.');
+            List<Field_Utilization_Snapshot__c> rows = [
+                SELECT Field_Name__c, Field_Label__c, Filled_Count__c, Record_Count__c, Taken_At__c
+                FROM Field_Utilization_Snapshot__c
+            ];
+            Assert.areEqual(REASON, rows[0].Field_Name__c, 'The field, by API name.');
+            Assert.areEqual(
+                Duplicate_Dismissal__c.Reason__c.getDescribe().getLabel(),
+                rows[0].Field_Label__c,
+                'The label comes from describe.'
+            );
+            Assert.areEqual(100, rows[0].Filled_Count__c, 'Filled.');
+            Assert.isNotNull(rows[0].Taken_At__c, 'Stamped when saved.');
+            Assert.areEqual(rows[0].Taken_At__c, planned.previousTakenAt, 'The latest save.');
+            Assert.areEqual(1, planned.previous.size(), 'Its rows come back.');
+            Assert.areEqual(50.0, planned.previous[0].percent, '100 of 200.');
+            Assert.areEqual(REASON + '|', planned.previous[0].key, 'Keyed like a count row.');
+        }
+    }
+
+    @IsTest
+    static void saveLeavesOutRowsDescribeDoesNotKnowAndCapsFilled() {
+        System.runAs(TestUsers.admin()) {
+            Integer saved;
+            System.runAs(maria()) {
+                List<FieldUtilizationController.CountRow> rows = new List<FieldUtilizationController.CountRow>();
+                rows.add(row(REASON, '', 250, 200));
+                rows.add(row('Not_A_Field__c', '', 1, 2));
+                rows.add(row(REASON, 'Not_A_Record_Type', 1, 2));
+                rows.add(row(REASON, '', 0, 0));
+                saved = FieldUtilizationController.saveCounts(DISMISSAL, rows);
+            }
+
+            Assert.areEqual(1, saved, 'Only the row describe knows, with records, is saved.');
+            Field_Utilization_Snapshot__c only = [
+                SELECT Filled_Count__c, Record_Count__c
+                FROM Field_Utilization_Snapshot__c
+            ];
+            Assert.areEqual(200, only.Filled_Count__c, 'Never above the record count.');
+        }
+    }
+
+    private static FieldUtilizationController.CountRow row(
+        String fieldName,
+        String recordType,
+        Integer filled,
+        Integer total
+    ) {
+        FieldUtilizationController.CountRow sent = new FieldUtilizationController.CountRow();
+        sent.fieldName = fieldName;
+        sent.recordType = recordType;
+        sent.filled = filled;
+        sent.total = total;
+        sent.sampled = false;
+        return sent;
+    }
+
+    @IsTest
+    static void unknownObjectsAndOversizedChunksAreRefused() {
+        System.runAs(TestUsers.admin()) {
+            String unknown;
+            String oversized;
+            System.runAs(maria()) {
+                unknown = refusalOf('Not_A_Real_Object__c', new List<String>{ 'Name' });
+                List<String> tooMany = new List<String>();
+                for (Integer i = 0; i <= FieldUtilizationService.CHUNK_SIZE; i++) {
+                    tooMany.add('Field_' + i + '__c');
+                }
+                oversized = refusalOf(DISMISSAL, tooMany);
+            }
+
             Assert.areEqual(
                 String.format(
                     System.Label.Core_FieldUtilization_UnknownObject,
                     new List<Object>{ 'Not_A_Real_Object__c' }
                 ),
-                refusal,
-                'An object describe does not know is refused by name (R-FU1).'
+                unknown,
+                'An object describe does not offer is refused by name (R-FU1).'
             );
             Assert.areEqual(
-                DISMISSAL,
-                BarnCRM_Settings__c.getOrgDefaults().Field_Utilization_Objects__c,
-                'The refused save changed nothing.'
+                System.Label.Core_FieldUtilization_UnexpectedError,
+                oversized,
+                'More fields than one chunk is refused.'
             );
         }
     }
 
     @IsTest
-    static void someoneWithoutThePermissionCannotChangeAnything() {
+    static void someoneWithoutThePermissionCannotCount() {
         System.runAs(TestUsers.admin()) {
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
             String refusal;
             System.runAs(david) {
-                try {
-                    FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
-                } catch (AuraHandledException caught) {
-                    refusal = messageOf(caught);
-                }
+                refusal = refusalOf(DISMISSAL, new List<String>{ REASON });
             }
 
             Assert.areEqual(
@@ -161,91 +317,18 @@ private class FieldUtilizationControllerTest {
     }
 
     @IsTest
-    static void anAdministratorCanScheduleAndStopTheWeeklyCount() {
+    static void thePickerOffersWhatFindOffersButNotTheSnapshots() {
         System.runAs(TestUsers.admin()) {
-            FieldUtilizationController.PageView started;
-            FieldUtilizationController.PageView stopped;
-            // The running user's profile, as the seasonal swap's test does: scheduling Apex is
-            // what this test proves, not what a Standard User profile allows.
-            User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
-                'Maria',
-                new List<String>{ 'BarnCRM_Admin' }
-            );
-            System.runAs(admin) {
-                Test.startTest();
-                started = FieldUtilizationController.setSchedule(true);
-                stopped = FieldUtilizationController.setSchedule(false);
-                Test.stopTest();
-            }
-
-            Assert.isTrue(started.scheduled, 'Schedule actually schedules it.');
-            Assert.isNotNull(started.nextRunAt, 'And says when it next runs.');
-            Assert.isFalse(stopped.scheduled, 'Stop actually stops it.');
-        }
-    }
-
-    @IsTest
-    static void countNowNeedsSomethingChosen() {
-        System.runAs(TestUsers.admin()) {
-            String refusal;
+            List<FieldUtilizationController.Option> options;
             System.runAs(maria()) {
-                try {
-                    FieldUtilizationController.runNow();
-                } catch (AuraHandledException caught) {
-                    refusal = messageOf(caught);
-                }
-            }
-
-            Assert.areEqual(
-                System.Label.Core_FieldUtilization_NothingChosen,
-                refusal,
-                'Nothing to count.'
-            );
-        }
-    }
-
-    @IsTest
-    static void countNowCountsTheChosenObjects() {
-        System.runAs(TestUsers.admin()) {
-            System.runAs(maria()) {
-                insertDismissals(200, 10);
-                FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
-                Test.startTest();
-                FieldUtilizationController.runNow();
-                Test.stopTest();
-            }
-
-            Assert.areEqual(
-                10,
-                [
-                    SELECT Filled_Count__c
-                    FROM Field_Utilization_Snapshot__c
-                    WHERE Field_Name__c = :REASON
-                ]
-                .Filled_Count__c,
-                'Count now ran the count over the saved objects.'
-            );
-        }
-    }
-
-    @IsTest
-    static void thePickerOffersPeopleAccountsAndCustomObjectsButNotTheSnapshots() {
-        System.runAs(TestUsers.admin()) {
-            FieldUtilizationController.PageView view;
-            System.runAs(maria()) {
-                view = FieldUtilizationController.getView();
+                options = FieldUtilizationController.listObjects();
             }
 
             Set<String> offered = new Set<String>();
-            for (FieldUtilizationController.Option option : view.choosable) {
+            for (FieldUtilizationController.Option option : options) {
                 offered.add(option.value);
             }
-            Assert.isTrue(
-                offered.contains(
-                    Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-                ),
-                'Account.'
-            );
+            Assert.isTrue(offered.contains(ACCOUNT_TYPE), 'Account.');
             Assert.isTrue(
                 offered.contains(
                     Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
@@ -262,8 +345,43 @@ private class FieldUtilizationControllerTest {
                 ),
                 'Never its own snapshots.'
             );
-            Assert.isTrue(view.canManage, 'Maria holds Manage BarnCRM Settings.');
-            Assert.isFalse(view.scheduled, 'Nothing schedules the count on install.');
+            Assert.isFalse(
+                offered.contains(
+                    BarnCRM_Settings__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getName()
+                ),
+                'Never a custom setting.'
+            );
+        }
+    }
+
+    @IsTest
+    static void formulaCheckboxAndAutomaticFieldsAreLeftOut() {
+        System.runAs(TestUsers.admin()) {
+            Set<String> counted = FieldUtilizationService.countableFieldsByName(
+                    Field_Utilization_Snapshot__c.SObjectType.getDescribe(
+                        SObjectDescribeOptions.DEFERRED
+                    )
+                )
+                .keySet();
+            Assert.isTrue(
+                counted.contains(
+                    Field_Utilization_Snapshot__c.Field_Name__c.getDescribe().getName()
+                ),
+                'Text.'
+            );
+            Assert.isFalse(
+                counted.contains(
+                    Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe().getName()
+                ),
+                'Formula.'
+            );
+            Assert.isFalse(
+                counted.contains(Field_Utilization_Snapshot__c.Sampled__c.getDescribe().getName()),
+                'Checkbox.'
+            );
+            Assert.isFalse(counted.contains('Name'), 'Auto number.');
+            Assert.isFalse(counted.contains('Id'), 'Identifier.');
         }
     }
 }

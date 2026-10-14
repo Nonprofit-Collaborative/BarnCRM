@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkUpdateController')
 private class BulkUpdateControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,
@@ -66,7 +71,7 @@ private class BulkUpdateControllerTest {
             );
             System.runAs(david) {
                 System.Assert.isFalse(FindController.getPage().canBulkUpdate, 'Not offered');
-                BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage();
+                BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage(false);
                 System.Assert.isFalse(page.allowed, 'Find alone does not open bulk update');
                 System.Assert.isTrue(page.jobs.isEmpty(), 'The tab lists nothing for them');
                 try {
@@ -82,7 +87,10 @@ private class BulkUpdateControllerTest {
             }
             System.runAs(maria()) {
                 System.Assert.isTrue(FindController.getPage().canBulkUpdate, 'Offered to an admin');
-                System.Assert.isTrue(BulkUpdateController.getPage().allowed, 'Listed for an admin');
+                System.Assert.isTrue(
+                    BulkUpdateController.getPage(false).allowed,
+                    'Listed for an admin'
+                );
             }
 
         }
@@ -92,11 +100,18 @@ private class BulkUpdateControllerTest {
     static void thePermissionSetsAloneReadAJobAndItsRefusals() {
         System.runAs(TestUsers.admin()) {
             makeVolunteers(1);
-            Import_Batch__c job = BulkUpdateService.createJob(
-                BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
-                1,
-                1
+            User bea = TestDataFactory.createUser(
+                'Bea',
+                new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
             );
+            Import_Batch__c job;
+            System.runAs(bea) {
+                job = BulkUpdateService.createJob(
+                    BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
+                    1,
+                    1
+                );
+            }
             Contact person = [SELECT Id FROM Contact LIMIT 1];
             ImportJournalService.write(
                 job.Id,
@@ -111,14 +126,14 @@ private class BulkUpdateControllerTest {
                 Completed_At__c = Datetime.now(),
                 Rows_Rejected__c = 1
             );
-            User bea = TestDataFactory.createUser(
-                'Bea',
-                new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
-            );
 
             BulkUpdateController.JobView view;
             System.runAs(bea) {
-                System.Assert.areEqual(1, BulkUpdateController.getPage().jobs.size(), 'Listed');
+                System.Assert.areEqual(
+                    1,
+                    BulkUpdateController.getPage(false).jobs.size(),
+                    'Listed'
+                );
                 view = BulkUpdateController.getJob(job.Id);
             }
             System.Assert.areEqual(1, view.failed, 'The refusal is counted');
@@ -195,6 +210,45 @@ private class BulkUpdateControllerTest {
                     );
                 }
                 BulkUpdateController.undo(jobId, 200);
+            }
+            Test.stopTest();
+
+            System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
+        }
+    }
+
+    /** Aborted after its chunk ran: the finish never counted what it saved. */
+    @IsTest
+    static void anAbortedJobAsksForTheNumberItSavedAndUndoesIt() {
+        System.runAs(TestUsers.admin()) {
+            ImportEntityProcessors.noneForTest = true;
+            makeVolunteers(200);
+            User maria = maria();
+            Id jobId;
+            System.runAs(maria) {
+                jobId = BulkUpdateService.createJob(
+                        BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
+                        200,
+                        200
+                    )
+                    .Id;
+                BulkUpdateBatch job = new BulkUpdateBatch(jobId);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+            }
+
+            Test.startTest();
+            System.runAs(maria) {
+                BulkUpdateController.JobView aborted = BulkUpdateController.getJob(jobId);
+                System.Assert.areEqual(ImportBatchService.STATUS_FAILED, aborted.status);
+                System.Assert.areEqual(0, aborted.updated, 'Never counted');
+                System.Assert.isTrue(aborted.canUndo, 'Undo is still offered');
+                System.Assert.areEqual(200, aborted.updatesToUndo, 'Counted from the journal');
+                BulkUpdateController.undo(jobId, aborted.updatesToUndo);
             }
             Test.stopTest();
 

@@ -187,6 +187,19 @@ public with sharing class AutomationControl {
         } catch (Exception failed) {
             ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
         }
+        startWaitingRollups();
+    }
+
+    /**
+     * Totals queued during the pause wait for a processor that the pause stopped from starting
+     * (ROLLUPS-7). Resuming starts it; a failure is logged, never in the way of the resume.
+     */
+    private static void startWaitingRollups() {
+        try {
+            RollupQueue.processPending();
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
+        }
     }
 
     /**
@@ -210,16 +223,18 @@ public with sharing class AutomationControl {
      */
     @NamespaceAccessible
     public static Boolean resumeExpiredPause(Datetime expectedEnd) {
-        Datetime stored = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
+        BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
+        Datetime stored = locked?.Automation_Paused_Until__c;
         if (stored == null || stored > System.now()) {
             return false;
         }
         if (expectedEnd != null && !sameSecond(stored, expectedEnd)) {
             return false;
         }
-        AutomationSettingsWriter.savePausedUntil(null);
-        SettingsService.clearCache();
-        SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
+        AutomationSettingsWriter.savePausedUntil(locked, null);
+        SettingsService.clearCaches();
+        SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(stored), '');
+        startWaitingRollups();
         return true;
     }
 
@@ -262,13 +277,15 @@ public with sharing class AutomationControl {
         requirePermission();
         // Read under the lock the save below also takes, so the audit row's old value is the
         // one stored, not one another person replaced a moment ago.
-        Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
-        AutomationSettingsWriter.savePausedUntil(until);
-        SettingsService.clearCache();
+        BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
+        Datetime previous = locked?.Automation_Paused_Until__c;
+        AutomationSettingsWriter.savePausedUntil(locked, until);
+        SettingsService.clearCaches();
+        // asText: the one way a value is written in Recent changes (ADMIN-20).
         SettingsService.logChange(
             PAUSE_SETTING_NAME,
-            previous == null ? '' : String.valueOf(previous),
-            until == null ? '' : String.valueOf(until)
+            SettingsService.asText(previous),
+            SettingsService.asText(until)
         );
         return until;
     }
@@ -419,7 +436,7 @@ public with sharing class AutomationControl {
         if (modulesOff.isEmpty()) {
             return;
         }
-        for (Automation_Registry__mdt entry : shippedRegistry()) {
+        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
             if (
                 String.isNotBlank(entry.Module__c) &&
                 String.isNotBlank(entry.DeveloperName) &&

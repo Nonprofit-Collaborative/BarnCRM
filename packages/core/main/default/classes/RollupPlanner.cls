@@ -221,7 +221,8 @@ public with sharing class RollupPlanner {
             try {
                 Schema.SObjectField targetField = writableTarget(definition, targetFieldMap);
                 String targetFilter = RollupFilterParser.toWhereClause(
-                    definition.Target_Filter_JSON__c
+                    definition.Target_Filter_JSON__c,
+                    targetType
                 );
                 List<SourceQuery> planned = queriesFor(definition);
                 Integer index = result.definitions.size();
@@ -342,10 +343,13 @@ public with sharing class RollupPlanner {
         return String.join(parts, '.');
     }
 
-    /** The filter and the fiscal window, as `RollupAdapter` builds them for the vendored engine. */
+    /** The filter and the fiscal window of one definition, as one WHERE clause. */
     private static String whereClauseFor(Rollup_Definition__c definition) {
         List<String> fragments = new List<String>();
-        String filterClause = RollupFilterParser.toWhereClause(definition.Filter_JSON__c);
+        String filterClause = RollupFilterParser.toWhereClause(
+            definition.Filter_JSON__c,
+            SettingsService.typeByName(definition.Source_Object__c)
+        );
         if (String.isNotBlank(filterClause)) {
             fragments.add('(' + filterClause + ')');
         }

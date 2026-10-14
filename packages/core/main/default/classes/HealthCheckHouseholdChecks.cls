@@ -36,6 +36,36 @@ public with sharing class HealthCheckHouseholdChecks {
         }
     }
 
+    /** Relationships whose person on either side was deleted (PEOPLE-19). */
+    public class RelationshipsWithoutPersonCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            return orphanFinding(
+                'relationships_without_person',
+                PersonLinkOrphanSelector.countRelationships(countCap + 1),
+                PersonLinkOrphanSelector.relationships(LINKS_SHOWN),
+                System.Label.Core_HealthCheck_RelationshipsNoPersonTitle,
+                System.Label.Core_HealthCheck_RelationshipsNoPersonDetail,
+                HealthCheckService.SEVERITY_WARNING,
+                false
+            );
+        }
+    }
+
+    /** Affiliations whose person was deleted (PEOPLE-19). */
+    public class AffiliationsWithoutPersonCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            return orphanFinding(
+                'affiliations_without_person',
+                PersonLinkOrphanSelector.countAffiliations(countCap + 1),
+                PersonLinkOrphanSelector.affiliations(LINKS_SHOWN),
+                System.Label.Core_HealthCheck_AffiliationsNoPersonTitle,
+                System.Label.Core_HealthCheck_AffiliationsNoPersonDetail,
+                HealthCheckService.SEVERITY_WARNING,
+                false
+            );
+        }
+    }
+
     private static HealthCheckService.Finding peopleWithoutHouseholdFinding() {
         Id householdType = HouseholdService.householdRecordTypeId();
         BarnCRM_Settings__c settings = SettingsService.getSettings();
@@ -47,16 +77,16 @@ public with sharing class HealthCheckHouseholdChecks {
         List<SObject> first = new List<SObject>();
         String detail;
         if (HouseholdService.isJunctionMode()) {
-            Set<Id> personTypes = personRecordTypeIds();
+            Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
             Set<Id> excluded = new Set<Id>(personTypes);
             excluded.add(householdType);
-            count = HouseholdOrphanSelector.countContactsWithoutMembership(excluded, countCap + 1);
+            // Counted as the data hygiene console counts them, one rule for both.
+            count = HouseholdOrphanSelector.countPeopleWithoutMembership(
+                householdType,
+                countCap + 1
+            );
             first.addAll(HouseholdOrphanSelector.contactsWithoutMembership(excluded, LINKS_SHOWN));
             if (!personTypes.isEmpty()) {
-                count += HouseholdOrphanSelector.countPersonAccountsWithoutMembership(
-                    personTypes,
-                    countCap + 1
-                );
                 if (first.size() < LINKS_SHOWN) {
                     first.addAll(
                         HouseholdOrphanSelector.personAccountsWithoutMembership(
@@ -78,7 +108,8 @@ public with sharing class HealthCheckHouseholdChecks {
             first,
             System.Label.Core_HealthCheck_PeopleWithoutHouseholdTitle,
             detail,
-            HealthCheckService.SEVERITY_WARNING
+            HealthCheckService.SEVERITY_WARNING,
+            true
         );
     }
 
@@ -100,14 +131,16 @@ public with sharing class HealthCheckHouseholdChecks {
             first,
             System.Label.Core_HealthCheck_EmptyHouseholdsTitle,
             System.Label.Core_HealthCheck_EmptyHouseholdsDetail,
-            HealthCheckService.SEVERITY_INFO
+            HealthCheckService.SEVERITY_INFO,
+            true
         );
     }
 
     /**
      * One finding for a count of orphans, or null when there are none. No fix: the links are
      * the records to open. In an org that also has Nonprofit Cloud households the detail says
-     * that some may belong to one, because BarnCRM cannot see that membership (R-H12).
+     * that some may belong to one, because BarnCRM cannot see that membership (R-H12); that
+     * note is left off the person-link findings, which are about BarnCRM's own records.
      */
     private static HealthCheckService.Finding orphanFinding(
         String key,
@@ -115,7 +148,8 @@ public with sharing class HealthCheckHouseholdChecks {
         List<SObject> first,
         String title,
         String detail,
-        String severity
+        String severity,
+        Boolean mayBeNativeHousehold
     ) {
         if (count == null || count <= 0) {
             return null;
@@ -135,7 +169,7 @@ public with sharing class HealthCheckHouseholdChecks {
                     new List<Object>{ String.valueOf(first.size()) }
                 );
         }
-        if (hasNativeHouseholds()) {
+        if (mayBeNativeHousehold && hasNativeHouseholds()) {
             text += ' ' + System.Label.Core_HealthCheck_OrphansNativeNote;
         }
         List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
@@ -150,14 +184,6 @@ public with sharing class HealthCheckHouseholdChecks {
                 HealthCheckService.CATEGORY_SETTINGS
             )
             .withLinks(links);
-    }
-
-    private static Set<Id> personRecordTypeIds() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        return shape == null ||
-            shape.personAccountRecordTypeIds == null
-            ? new Set<Id>()
-            : shape.personAccountRecordTypeIds;
     }
 
     private static Boolean hasNativeHouseholds() {

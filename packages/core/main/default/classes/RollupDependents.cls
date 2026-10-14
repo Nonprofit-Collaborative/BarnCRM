@@ -170,7 +170,7 @@ public without sharing class RollupDependents {
         );
         for (Rollup_Definition__c definition : definitions) {
             marked.add(
-                definition.Target_Object__c,
+                definition,
                 RollupChanges.targetsOf(RollupChanges.pathOf(definition), sourceType, rows)
             );
         }

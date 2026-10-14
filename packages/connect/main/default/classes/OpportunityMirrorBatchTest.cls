@@ -6,7 +6,7 @@
  * Opportunity is written and read through describe here too, so this class compiles where it
  * does not exist; there each test checks that nothing happened and stops.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OpportunityMirrorBatch')
 private class OpportunityMirrorBatchTest {
     private static final String LOG_CONTEXT = 'Opportunity mirror: run';
     // detection-only: read by name so this class compiles where Opportunity does not exist

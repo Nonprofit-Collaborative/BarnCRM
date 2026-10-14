@@ -59,6 +59,15 @@ public with sharing class QueryCompiler {
         if (raw == null) {
             throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
         }
+        try {
+            return read(raw);
+        } catch (TypeException wrongShape) {
+            // A part of the right name but the wrong shape, such as "orderBy": ["Name"].
+            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+        }
+    }
+
+    private static QueryDocument read(Map<String, Object> raw) {
         Object version = raw.get('version');
         if (version != null && String.valueOf(version) != String.valueOf(SUPPORTED_VERSION)) {
             throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
@@ -158,6 +167,35 @@ public with sharing class QueryCompiler {
     }
 
     /**
+     * One page of the Ids the document's filter matches, in Id order, after the last Id already
+     * read: the document's own columns, order and row count are ignored (R-BD8).
+     */
+    public static Compiled compileIdPage(String queryJson, Id afterId, Integer pageSize) {
+        QueryDocument document = parse(queryJson);
+        document.fields = new List<String>{ 'Id' };
+        document.children.clear();
+        Compiled compiled = selectAndWhere(document, afterId, null);
+        compiled.binds.put('pageSize', pageSize);
+        compiled.soql += ' ORDER BY Id LIMIT :pageSize';
+        compiled.display += ' ORDER BY Id LIMIT ' + pageSize;
+        return compiled;
+    }
+
+    /**
+     * An export to Files (R-SQ12): the document's filter and columns, without its related lists,
+     * in Id order, at most `rowLimit` rows, so the server never reads past the export limit.
+     */
+    public static Compiled compileServerExport(String queryJson, Integer rowLimit) {
+        QueryDocument document = parse(queryJson);
+        document.children.clear();
+        Compiled compiled = selectAndWhere(document, null, null);
+        compiled.binds.put('exportLimit', rowLimit);
+        compiled.soql += ' ORDER BY Id LIMIT :exportLimit';
+        compiled.display += ' ORDER BY Id LIMIT ' + rowLimit;
+        return compiled;
+    }
+
+    /**
      * The document's filter over other fields of its object, for bulk update (C-35, R-BU1): the
      * document's own columns, order and row count are ignored. With `onlyIds`, only those
      * records; the caller adds any order and row count.
@@ -178,7 +216,11 @@ public with sharing class QueryCompiler {
      * (a count reads one query row per record, R-BU2).
      */
     public static Integer count(String queryJson, Integer atMost) {
-        Compiled compiled = selectAndWhere(parse(queryJson), null, null);
+        return count(selectAndWhere(parse(queryJson), null, null), atMost);
+    }
+
+    /** As `count`, from a query already compiled, so it is not read and checked again. */
+    public static Integer count(Compiled compiled, Integer atMost) {
         Map<String, Object> binds = new Map<String, Object>(compiled.binds);
         binds.put('countLimit', atMost);
         return Database.countQueryWithBinds(
@@ -262,11 +304,17 @@ public with sharing class QueryCompiler {
         return compiled;
     }
 
-    /** A field path checked against the running user's describe, or a refusal naming it. */
-    private static Schema.DescribeFieldResult resolve(String objectName, String path) {
+    /**
+     * A field path checked against the running user's describe, or a refusal naming it (cut to
+     * 80 characters). One check for the filter, the sort, the summary and the related columns.
+     */
+    public static Schema.DescribeFieldResult resolve(String objectName, String path) {
         if (String.isBlank(path) || !FIELD_PATH.matcher(path).matches()) {
             throw new QueryCompilerException(
-                String.format(System.Label.Core_Filter_ErrorUnknownField, new List<Object>{ path })
+                String.format(
+                    System.Label.Core_Filter_ErrorUnknownField,
+                    new List<Object>{ String.valueOf(path).abbreviate(80) }
+                )
             );
         }
         try {

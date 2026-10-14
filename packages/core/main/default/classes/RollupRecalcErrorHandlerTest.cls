@@ -3,8 +3,13 @@
  * R-R14). Core holds no giving objects, so the run counts people onto their organization, as
  * `RollupFullRecalcBatchTest` does.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupRecalcErrorHandler')
 private class RollupRecalcErrorHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c peopleCount() {
         Rollup_Definition__c definition = new Rollup_Definition__c(
             Name = 'People per organization',

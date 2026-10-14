@@ -2,8 +2,10 @@
  * The Rollup Queue (canonical model Section 14A) and the one processor that works through it
  * (rollup proposal D4, Part 2 section 4, "Parent queue").
  *
- * A save whose totals are too many to recalculate in the same save, or that is already running in
- * the background, writes the target records here with `add` and returns (R-R4). The processor, a
+ * A save writes the target records its change marked here with `add` and returns (R-R4): every
+ * save by default, and with Rollup Processing set to In the save, a save whose totals are too
+ * many to recalculate in it or that is already running in the background (ADR-0098 async
+ * rollups). The processor, a
  * Queueable, reads the due entries, merges and sorts their identifiers, recalculates a slice
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
@@ -32,6 +34,7 @@ public without sharing class RollupQueue implements Queueable {
     private static final String CLASS_NAME = 'RollupQueue';
     private static final String SEPARATOR = ',';
     private static final Integer LAST_ERROR_LENGTH = 32768;
+    private static final Integer DEFINITION_IDS_LENGTH = 32768;
 
     /** The longest delay the platform accepts for a queued job, in minutes. */
     private static final Integer LONGEST_DELAY_MINUTES = 10;
@@ -55,6 +58,14 @@ public without sharing class RollupQueue implements Queueable {
     /** Set once a processor is queued, or is this job, so one transaction asks for one only. */
     private static Boolean processorRequested = false;
 
+    /** How many Rollup_Queue_Ready__e this transaction published: one at most. */
+    @TestVisible
+    private static Integer readyEventsPublished = 0;
+
+    /** Test seam: true or false stands in for `System.isQueueable()`; null reads the platform. */
+    @TestVisible
+    private static Boolean queueableForTest;
+
     private final Integer sliceSize;
 
     public RollupQueue() {
@@ -75,9 +86,32 @@ public without sharing class RollupQueue implements Queueable {
      * @param idsByTarget the target records, by target entity API name
      */
     public static void add(Map<String, Set<Id>> idsByTarget) {
+        add(idsByTarget, null);
+    }
+
+    /**
+     * As above, naming the definitions to recalculate for each target entity's records, so the
+     * processor runs only those (ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`).
+     *
+     * @param idsByTarget the target records, by target entity API name
+     * @param definitionIdsByTarget the definitions, by the same names; a missing or empty set
+     *        means every active definition on the entity
+     */
+    public static void add(
+        Map<String, Set<Id>> idsByTarget,
+        Map<String, Set<Id>> definitionIdsByTarget
+    ) {
         List<Rollup_Queue__c> entries = new List<Rollup_Queue__c>();
         for (String target : idsByTarget == null ? new Set<String>() : idsByTarget.keySet()) {
-            entries.addAll(entriesFor(target, idsByTarget.get(target), 0, null));
+            entries.addAll(
+                entriesFor(
+                    target,
+                    idsByTarget.get(target),
+                    0,
+                    null,
+                    definitionIdsByTarget == null ? null : definitionIdsByTarget.get(target)
+                )
+            );
         }
         insertEntries(entries);
     }
@@ -95,6 +129,18 @@ public without sharing class RollupQueue implements Queueable {
         Map<Id, String> messageById,
         Integer attemptsSoFar
     ) {
+        retryLater(targetObject, messageById, attemptsSoFar, null);
+    }
+
+    /**
+     * As above, for these definitions only; null means every active definition on the entity.
+     */
+    public static void retryLater(
+        String targetObject,
+        Map<Id, String> messageById,
+        Integer attemptsSoFar,
+        Set<Id> definitionIds
+    ) {
         if (messageById == null || messageById.isEmpty()) {
             return;
         }
@@ -107,7 +153,8 @@ public without sharing class RollupQueue implements Queueable {
                 targetObject,
                 messageById.keySet(),
                 (attemptsSoFar == null ? 0 : attemptsSoFar) + 1,
-                message
+                message,
+                definitionIds
             )
         );
     }
@@ -116,7 +163,8 @@ public without sharing class RollupQueue implements Queueable {
         String targetObject,
         Set<Id> ids,
         Integer attempts,
-        String lastError
+        String lastError,
+        Set<Id> definitionIds
     ) {
         List<Rollup_Queue__c> entries = new List<Rollup_Queue__c>();
         if (String.isBlank(targetObject) || ids == null) {
@@ -129,25 +177,45 @@ public without sharing class RollupQueue implements Queueable {
             }
         }
         sorted.sort();
+        String definitions = joinedDefinitionIds(definitionIds);
         for (Integer start = 0; start < sorted.size(); start += IDS_PER_ENTRY) {
             List<String> chunk = new List<String>();
             for (Integer i = start; i < Math.min(start + IDS_PER_ENTRY, sorted.size()); i++) {
                 chunk.add(sorted[i]);
             }
-            entries.add(entry(targetObject, chunk, attempts, lastError));
+            entries.add(entry(targetObject, chunk, attempts, lastError, definitions));
         }
         return entries;
+    }
+
+    /**
+     * The definitions as an entry holds them, or null for every definition: none named, or
+     * more than the attribute holds.
+     */
+    private static String joinedDefinitionIds(Set<Id> definitionIds) {
+        if (definitionIds == null || definitionIds.isEmpty() || definitionIds.contains(null)) {
+            return null;
+        }
+        List<String> sorted = new List<String>();
+        for (Id definitionId : definitionIds) {
+            sorted.add(String.valueOf(definitionId));
+        }
+        sorted.sort();
+        String joined = String.join(sorted, SEPARATOR);
+        return joined.length() > DEFINITION_IDS_LENGTH ? null : joined;
     }
 
     private static Rollup_Queue__c entry(
         String targetObject,
         List<String> ids,
         Integer attempts,
-        String lastError
+        String lastError,
+        String definitionIds
     ) {
         return new Rollup_Queue__c(
             Target_Object__c = targetObject,
             Record_Ids__c = String.join(ids, SEPARATOR),
+            Definition_Ids__c = definitionIds,
             Record_Count__c = ids.size(),
             Attempts__c = attempts,
             Status__c = attempts >= MAX_ATTEMPTS ? STATUS_FAILED : STATUS_PENDING,
@@ -193,9 +261,34 @@ public without sharing class RollupQueue implements Queueable {
         }
         if (!failed.isEmpty()) {
             Database.update(failed, AccessLevel.SYSTEM_MODE);
+        }
+        // Retry also starts entries still Pending that no processor is coming for.
+        processPending();
+        return failed.size();
+    }
+
+    /**
+     * Starts a processor when Pending entries wait and none is queued (ROLLUPS-7). A save that
+     * could not queue a job (its allowance used, or automation paused) leaves its entries for the
+     * next save that does; the nightly run, the end of a pause and Retry call this so they never
+     * wait for one.
+     *
+     * @return true when Pending entries were found
+     */
+    public static Boolean processPending() {
+        Boolean pending =
+            [
+                SELECT Id
+                FROM Rollup_Queue__c
+                WHERE Status__c = :STATUS_PENDING
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ]
+            .size() > 0;
+        if (pending) {
             requestProcessor();
         }
-        return failed.size();
+        return pending;
     }
 
     private static void insertEntries(List<Rollup_Queue__c> entries) {
@@ -210,13 +303,71 @@ public without sharing class RollupQueue implements Queueable {
      * Queues a processor unless one already waits to start: a waiting one reads every entry
      * committed by the time it starts. When the transaction can queue no more jobs, the entries
      * wait for the next save that queues one, or for the nightly run.
+     *
+     * Never from inside a Queueable (R-RQ3). A Queueable may queue one job, and the job running
+     * may need that one job for its own next step: the sample data load and the household soft
+     * credit recompute chain themselves after saving gifts and people, and so may a subscriber's
+     * integration. Taking it stopped the sample data load with "Too many queueable jobs added to
+     * the queue: 2". There the transaction publishes one Rollup_Queue_Ready__e instead, after
+     * commit, and its subscriber starts the processor (ADR-0100).
      */
     private static void requestProcessor() {
         if (processorRequested || AutomationControl.isPaused()) {
             return;
         }
+        if (inQueueable()) {
+            announceReady();
+            return;
+        }
+        startProcessor();
+    }
+
+    /**
+     * Publishes one Rollup_Queue_Ready__e per transaction. It is published after commit, so a
+     * job that rolls back announces nothing, and it takes no queueable job. If it cannot be
+     * published the entries wait for a later processor or the nightly run, as before.
+     */
+    private static void announceReady() {
+        if (readyEventsPublished > 0) {
+            return;
+        }
+        readyEventsPublished++;
+        Database.SaveResult result = EventBus.publish(new Rollup_Queue_Ready__e());
+        if (!result.isSuccess()) {
+            ErrorLogger.logMessage(
+                result.getErrors()[0].getMessage(),
+                'RollupQueue.announceReady',
+                'Warning'
+            );
+        }
+    }
+
+    /** Whether this transaction is a Queueable job, whose one chained job is not the engine's. */
+    private static Boolean inQueueable() {
+        return queueableForTest == null ? System.isQueueable() : queueableForTest;
+    }
+
+    /**
+     * Starts a processor now when entries are pending and none waits to start. For a background
+     * job that saved records the engine queued, called when the job has no next step of its own,
+     * so its totals catch up within minutes instead of waiting for the nightly run.
+     */
+    public static void startProcessor() {
+        if (processorRequested || AutomationControl.isPaused()) {
+            return;
+        }
         processorRequested = true;
         if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+            return;
+        }
+        Integer pending = [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :STATUS_PENDING
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (pending == 0) {
             return;
         }
         Integer waiting = [
@@ -249,12 +400,23 @@ public without sharing class RollupQueue implements Queueable {
         drain.held.addAll(slice.entries);
         Integer failed = 0;
         for (String target : slice.idsByTarget.keySet()) {
-            RollupEngine.Result result = RollupEngine.recalculate(
-                slice.idsByTarget.get(target),
-                SettingsService.typeByName(target)
-            );
+            Set<Id> definitionIds = slice.definitionIdsFor(target);
+            RollupEngine.Result result = definitionIds == null
+                ? RollupEngine.recalculate(
+                      slice.idsByTarget.get(target),
+                      SettingsService.typeByName(target)
+                  )
+                : RollupEngine.recalculate(
+                      slice.idsByTarget.get(target),
+                      RollupSelector.selectActiveByIds(definitionIds)
+                  );
             if (!result.failed.isEmpty()) {
-                retryLater(target, result.failed, slice.attemptsByTarget.get(target));
+                retryLater(
+                    target,
+                    result.failed,
+                    slice.attemptsByTarget.get(target),
+                    definitionIds
+                );
                 failed += result.failed.size();
             }
         }
@@ -272,7 +434,9 @@ public without sharing class RollupQueue implements Queueable {
             );
         }
         drain.finished = true;
-        chainIfMoreDue(this.sliceSize);
+        // A run that finished doubles a halved slice back towards the default (ROLLUPS-11), so
+        // one heavy record does not leave the rest of the backlog draining one at a time.
+        chainIfMoreDue(Math.min(defaultSliceSize, this.sliceSize * 2));
     }
 
     /** What one run takes: the identifiers by target entity, and what becomes of each entry. */
@@ -286,6 +450,29 @@ public without sharing class RollupQueue implements Queueable {
         public List<Rollup_Queue__c> finished = new List<Rollup_Queue__c>();
         /** Entries larger than the slice: rewritten with the identifiers left over. */
         public List<Rollup_Queue__c> remainders = new List<Rollup_Queue__c>();
+        /** The definitions the entries taken name, by target entity. */
+        public Map<String, Set<Id>> definitionIdsByTarget = new Map<String, Set<Id>>();
+        /** Target entities with an entry that names none, so every definition runs. */
+        public Set<String> everyDefinition = new Set<String>();
+
+        /** The definitions to run for this target entity, or null for every one. */
+        public Set<Id> definitionIdsFor(String target) {
+            return this.everyDefinition.contains(target)
+                ? null
+                : this.definitionIdsByTarget.get(target);
+        }
+
+        public void addDefinitions(String target, Rollup_Queue__c entry) {
+            List<Id> named = idsIn(entry.Definition_Ids__c);
+            if (named.isEmpty()) {
+                this.everyDefinition.add(target);
+                return;
+            }
+            if (!this.definitionIdsByTarget.containsKey(target)) {
+                this.definitionIdsByTarget.put(target, new Set<Id>());
+            }
+            this.definitionIdsByTarget.get(target).addAll(named);
+        }
     }
 
     /**
@@ -329,6 +516,7 @@ public without sharing class RollupQueue implements Queueable {
             }
             slice.entries.add(entry);
             slice.idsByTarget.put(target, merged);
+            slice.addDefinitions(target, entry);
             Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
             Integer highest = slice.attemptsByTarget.get(target);
             slice.attemptsByTarget.put(
@@ -341,11 +529,15 @@ public without sharing class RollupQueue implements Queueable {
 
     /** The identifiers an entry holds; anything that is not one is dropped. */
     public static List<Id> idsOf(Rollup_Queue__c entry) {
+        return idsIn(entry.Record_Ids__c);
+    }
+
+    private static List<Id> idsIn(String joined) {
         List<Id> ids = new List<Id>();
-        if (String.isBlank(entry.Record_Ids__c)) {
+        if (String.isBlank(joined)) {
             return ids;
         }
-        for (String part : entry.Record_Ids__c.split(SEPARATOR)) {
+        for (String part : joined.split(SEPARATOR)) {
             try {
                 ids.add(Id.valueOf(part.trim()));
             } catch (Exception notAnId) {
@@ -358,7 +550,7 @@ public without sharing class RollupQueue implements Queueable {
     private static List<Rollup_Queue__c> selectDue(Integer maxEntries) {
         Datetime now = Datetime.now();
         return [
-            SELECT Id, Target_Object__c, Record_Ids__c, Attempts__c
+            SELECT Id, Target_Object__c, Record_Ids__c, Definition_Ids__c, Attempts__c
             FROM Rollup_Queue__c
             WHERE
                 Status__c = :STATUS_PENDING

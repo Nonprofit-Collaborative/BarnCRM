@@ -10,13 +10,17 @@ change our settings?" in a few seconds.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
-One thing they do not do yet. A role today carries what Core provides, and nothing a
+One thing they do not do. A role carries what Core provides, and nothing a
 module adds: a module ships its own permission sets (Giving, for example, ships **Giving
-Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. Until the
-Module Manager in version 0.7 joins the two up, somebody with a role sees households and
-people but nothing the module adds, and a Salesforce administrator has to assign the
+Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. The
+[Module Manager](module-manager.md) does not join them up either: turning a module on gives
+the module's admin set (for Giving, **Giving Admin**) only to you, the person who turned it
+on. Anyone else with a role sees households and people but nothing the module adds until a
+Salesforce administrator assigns the
 module's permission set in Setup alongside the role. That is the one place BarnCRM still sends
-you to Setup for access, and it is a gap rather than a design.
+you to Setup for access, and it is a gap rather than a design. Until then, a Salesforce user
+access policy can add the module's permission set for you: see
+[Automatic access](automatic-access.md).
 
 BarnCRM Core ships four roles. The Fundraising Staff role comes with the Giving module,
 so it is listed only where Giving is installed, which makes five:
@@ -24,7 +28,7 @@ so it is listed only where Giving is installed, which makes five:
 | Role | Who it is for | What it gives |
 |---|---|---|
 | BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings |
-| Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving |
+| Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
 | Program Staff | Program and services staff | Day to day work with people, households, and program records |
 | Volunteer Coordinator | Whoever schedules and tracks volunteers | Day to day work with people, households, and volunteer records |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
@@ -38,7 +42,7 @@ to, not through the record it is about.
 | Person | What they hold | Can they open a receipt PDF |
 |---|---|---|
 | Maria, who configures BarnCRM | BarnCRM Admin, plus Giving Admin | Yes |
-| David, who enters the gifts | Fundraising Staff, plus Giving Staff | Yes |
+| David, who enters the gifts | Fundraising Staff, which includes Giving Staff | Yes |
 | Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
 | Priya, who coordinates volunteers | Volunteer Coordinator, and no Giving set | No |
 | Sam, in programs | Program Staff, and no Giving set | No |
@@ -118,6 +122,11 @@ new tab. The address it opens is:
 
 Create the user with a Salesforce Platform or Salesforce license, save, then come back to
 Access and search for their name.
+
+If you add people often, you can skip the second step: a Salesforce user access policy can
+give every new user with your staff profile a BarnCRM role the moment the user is created.
+The **Set up automatic access** link at the bottom of the Access page opens
+[Automatic access](automatic-access.md), which has the exact policy to create in Setup.
 
 ## Common mistakes
 

@@ -103,6 +103,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-04 | [Automation control](automation-control.md) | Core | v0.1 |
 | C-05 | [Error Log](error-log.md) | Core | v0.1 |
 | C-06 | [Access](access.md) | Core (the Fundraising Staff role comes with Giving) | v0.1 |
+| Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Giving | Core quality pass |
 | C-01 Household model | [households.md](households.md) | Core | v0.1 |
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core | v0.1 |
 | C-07 | [Coexistence mode](coexistence-mode.md) | Core | v0.1 |
@@ -147,15 +148,18 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Connect | v0.6 |
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Connect | v0.6 |
 | X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Connect | v0.6 |
-| X-03 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Connect | v0.7 |
+| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Connect | v0.7 |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Connect | v0.6 |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving | v0.6 |
 | UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | 1.x (built ahead) |
+| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) | not scheduled (owner decision 2026-10-13) |
 | C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
 | Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
+| Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core | Core quality pass |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
+| Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core | Core quality pass |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core | v0.9 |
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core | v0.6 |

@@ -7,7 +7,6 @@
  * here is the authorization for everything the runs do afterwards.
  */
 public with sharing class GivingJobsController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Giving nightly jobs page';
 
     /**
@@ -161,7 +160,7 @@ public with sharing class GivingJobsController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission(EDIT_PERMISSION);
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

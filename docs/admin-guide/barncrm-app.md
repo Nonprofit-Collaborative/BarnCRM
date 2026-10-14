@@ -26,7 +26,9 @@ person what they can act on:
 
 | Part of the home page | Who sees it |
 |---|---|
-| **Welcome to BarnCRM**, the **New household** button, and the paused automation banner | Everyone |
+| **What's new in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
+| **Welcome to BarnCRM** and the paused automation banner | Everyone |
+| **New household** button | People who can create accounts with the Household record type |
 | **Setup checklist** (or the **Setup complete** tile once it is finished) | Administrators |
 | **Health Check** | Administrators |
 | **Errors to review** | Administrators |
@@ -39,7 +41,32 @@ person what they can act on:
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
 **New household** button, and the quick links. They are not shown a checklist they cannot
-finish or an error count for a log they cannot open.
+finish or an error count for a log they cannot open. The page does not work those numbers
+out for staff at all, so it loads faster for them; if you edit the page to show an
+administrator tile to staff, it shows nothing to count.
+
+## How records open: tabs in a console
+
+The BarnCRM app is a console app, shown with a blue barn logo in the app launcher. Instead of
+replacing the page each time you click, it keeps the records you are working on open side by
+side in tabs across the top.
+
+- **Households, organizations, people and Error Log entries open in their own tab** (a
+  workspace tab). Open three households and you have three tabs; click one to go back to it.
+- **The records that belong to one of them open inside its tab** (a subtab):
+  - an address opens under its household,
+  - a relationship or an affiliation opens under the person it belongs to,
+  - a household member row opens under its household.
+
+  If that link is blank (for example an address that belongs to a person, not a household),
+  the record opens in its own tab instead.
+- **Pages such as Find, Data Manager and BarnCRM Settings open as tabs too.** Choose them from
+  the navigation menu (the arrow next to the app name). Addresses, Relationships, Affiliations
+  and Household Members are at the end of that menu. Import and Bulk Update are not in the
+  menu: open them from **Data Manager** (see [Data Manager](data-manager.md)).
+- **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
+  still there when you come back.
+- **On a phone**, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
 
 ## A five-minute walkthrough
 
@@ -64,8 +91,9 @@ Admin role.
 5. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
    step done: it moves the step out of the way and offers it to you again next time. The
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-6. Below the checklist, the **Health Check** lists anything BarnCRM found in your org that
-   needs attention, with a button to fix it where it can. The full guide is
+6. Below the checklist, **Health Check** shows its last result: when it last ran and how
+   many findings it had. Click **Run now** to check the org again and see every finding,
+   with a button to fix it where it can. The full guide is
    [health-check.md](health-check.md).
 7. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.
@@ -89,6 +117,25 @@ whether anything went wrong.
 
 When every step is done, the checklist collapses to a small **Setup complete** tile, and
 the welcome sentence points at the tabs instead of the checklist.
+
+## Working in console tabs
+
+When the app you are in is a console app (tabs across the top, each holding its own
+subtabs), BarnCRM pages use those tabs instead of replacing the page you are on:
+
+- A record you open from a BarnCRM panel opens as a subtab of the tab you are in. That
+  covers the household link on a person, a record a Health Check finding names, a record
+  in a duplicate suggestion, and an entry in the Error Log tile. Hold Ctrl (Cmd on a Mac)
+  while clicking to open the record in a new browser tab instead.
+- **BarnCRM Settings**, **Import**, **Find** and **Rollup Builder** name their tab for what
+  is on screen, for example "BarnCRM Settings: Households", "Import: donors.csv",
+  "Find: Contact" or "Rollup Builder: Household total giving", with the page's own icon.
+- After **Merge** or **Split** in Household Merge and Split, the household's tab refreshes
+  in place, and a split opens the other household as a subtab beside it.
+
+In a standard (non-console) app, and in an org that uses another app, these pages work
+exactly as before: records open as pages and nothing is renamed. There is nothing to turn
+on.
 
 ## Rearranging the home page
 
@@ -126,6 +173,14 @@ compare it with the page that came with the package.
 - **Reading the checklist as a one-time task.** When every step is done the checklist
   collapses to a small **Setup complete** tile with a **Reopen setup** button. Re-run it
   whenever your organization changes: a new fiscal year, a new staff member, a new address.
+- **Expecting a record to replace the page.** In the console, a record opens in a tab and
+  the page you were on stays open in its own tab. If the screen feels crowded, close the tabs
+  you have finished with.
+- **Updating an org that already had the BarnCRM app without tabs.** Salesforce will not
+  switch an existing app to console tabs during a deployment. Before deploying, open Setup,
+  **App Manager**, click the arrow next to **BarnCRM**, choose **Edit**, then under **App
+  Options** set **Navigation Style** to **Console Navigation** and save. A new installation
+  needs nothing.
 - **Assuming an empty Errors tile means nothing failed.** The tile counts errors with the
   status **New**. If someone has already marked an error Acknowledged or Resolved, it
   stops counting. Open the Error Log tab to see everything.

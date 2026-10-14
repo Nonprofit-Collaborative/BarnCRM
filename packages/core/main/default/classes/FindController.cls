@@ -15,17 +15,8 @@ public with sharing class FindController {
     public static final String PERMISSION = 'Find_And_Export_Records';
     public static final Integer DEFAULT_EXPORT_LIMIT = 50000;
     public static final Integer MAX_EXPORT_LIMIT = 500000;
-    private static final Integer MAX_SAVED_QUERIES = 500;
-    private static final Set<String> SYSTEM_SUFFIXES = new Set<String>{
-        '__mdt',
-        '__e',
-        '__share',
-        '__history',
-        '__feed',
-        '__changeevent',
-        '__x',
-        '__b'
-    };
+    @TestVisible
+    private static Integer maxSavedQueries = 500;
 
     /** One choice in a list. */
     public class Option {
@@ -69,6 +60,9 @@ public with sharing class FindController {
         /** Whether the person may also bulk delete the results (C-37, R-BD6). */
         @AuraEnabled
         public Boolean canBulkDelete;
+        /** The query a save wrote, so the page keeps that one open; empty otherwise. */
+        @AuraEnabled
+        public String savedId;
     }
 
     /** The rows a query returned and the SOQL it ran, for display only. */
@@ -194,6 +188,136 @@ public with sharing class FindController {
         }
     }
 
+    /** One file an export to Files wrote (R-SQ12). */
+    public class ExportFile {
+        @AuraEnabled
+        public String documentId;
+        @AuraEnabled
+        public String title;
+        @AuraEnabled
+        public Integer size;
+    }
+
+    /** An export to Files: its job, how far it is, and the files written so far (R-SQ12). */
+    public class ServerExport {
+        @AuraEnabled
+        public String jobId;
+        @AuraEnabled
+        public String tag;
+        @AuraEnabled
+        public String status;
+        @AuraEnabled
+        public Boolean done = false;
+        @AuraEnabled
+        public Boolean failed = false;
+        @AuraEnabled
+        public Integer chunksDone;
+        @AuraEnabled
+        public Integer chunksTotal;
+        @AuraEnabled
+        public Integer rowLimit;
+        @AuraEnabled
+        public List<ExportFile> files = new List<ExportFile>();
+    }
+
+    private static final Pattern EXPORT_TAG = Pattern.compile('[0-9a-f]{6}');
+    private static final Set<String> FINISHED_JOB = new Set<String>{
+        'Completed',
+        'Failed',
+        'Aborted'
+    };
+
+    /**
+     * Starts an export to Files of the query (R-SQ12), at most the export row limit, with the
+     * column labels the page shows (`labelsJson`, a map of field path to label). The query is
+     * compiled first, so one that would not run is refused before the job starts.
+     */
+    @AuraEnabled
+    public static ServerExport startServerExport(String queryJson, String labelsJson) {
+        try {
+            requirePermission();
+            Integer rowLimit = exportLimit();
+            QueryCompiler.compileServerExport(queryJson, rowLimit);
+            Map<String, String> labels = new Map<String, String>();
+            if (String.isNotBlank(labelsJson)) {
+                Map<String, Object> given = (Map<String, Object>) JSON.deserializeUntyped(
+                    labelsJson
+                );
+                for (String path : given.keySet()) {
+                    labels.put(path, String.valueOf(given.get(path)).left(255));
+                }
+            }
+            String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
+            Id jobId = Database.executeBatch(
+                new FindExportBatch(queryJson, labels, tag, rowLimit),
+                FindExportBatch.SCOPE
+            );
+            return serverExport(jobId, tag);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Export a Find query to Files');
+        }
+    }
+
+    /** How far an export to Files the person started is, and the files it has written. */
+    @AuraEnabled
+    public static ServerExport serverExportStatus(String jobId, String tag) {
+        try {
+            requirePermission();
+            if (String.isBlank(tag) || !EXPORT_TAG.matcher(tag).matches()) {
+                throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+            }
+            return serverExport(Id.valueOf(jobId), tag);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Read an export to Files');
+        }
+    }
+
+    /**
+     * The job, read in system mode but only when the person started it, and the person's own
+     * files whose title carries the export's tag.
+     */
+    private static ServerExport serverExport(Id jobId, String tag) {
+        ServerExport view = new ServerExport();
+        view.jobId = jobId;
+        view.tag = tag;
+        view.rowLimit = exportLimit();
+        Id me = UserInfo.getUserId();
+        List<AsyncApexJob> jobs = [
+            SELECT Status, JobItemsProcessed, TotalJobItems, NumberOfErrors
+            FROM AsyncApexJob
+            WHERE Id = :jobId AND CreatedById = :me
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (jobs.isEmpty()) {
+            throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+        }
+        view.status = jobs[0].Status;
+        view.chunksDone = jobs[0].JobItemsProcessed;
+        view.chunksTotal = jobs[0].TotalJobItems;
+        view.done = FINISHED_JOB.contains(view.status);
+        view.failed =
+            (view.done && view.status != 'Completed') ||
+            (jobs[0].NumberOfErrors != null &&
+            jobs[0].NumberOfErrors > 0);
+        String titles = '%-' + tag + '-part-%';
+        for (ContentVersion version : [
+            SELECT ContentDocumentId, Title, ContentSize
+            FROM ContentVersion
+            WHERE Title LIKE :titles AND IsLatest = TRUE AND OwnerId = :me
+            WITH USER_MODE
+            ORDER BY CreatedDate, Id
+            LIMIT 200
+        ]) {
+            ExportFile file = new ExportFile();
+            file.documentId = version.ContentDocumentId;
+            file.title = version.Title;
+            file.size = version.ContentSize;
+            view.files.add(file);
+        }
+        return view;
+    }
+
     /** One export page in Id order, after the last Id the browser has read (R-SQ3). */
     @AuraEnabled
     public static QueryResult exportPage(String queryJson, String afterId) {
@@ -244,7 +368,10 @@ public with sharing class FindController {
                 Database.update(query, AccessLevel.USER_MODE);
             }
             SavedQuerySharingWriter.setShared(new Map<Id, Boolean>{ query.Id => shared == true });
-            return currentPage();
+            FindPage page = currentPage();
+            // Names are not unique, so the page is told which query was written.
+            page.savedId = query.Id;
+            return page;
         } catch (Exception caught) {
             throw asUserError(caught, 'Save a Find query');
         }
@@ -285,29 +412,46 @@ public with sharing class FindController {
         page.exportPageSize = QueryCompiler.EXPORT_PAGE_SIZE;
         page.canBulkUpdate = BulkUpdateController.hasPermission();
         page.canBulkDelete = BulkDeleteController.hasPermission();
-        List<SavedQueryView> mine = new List<SavedQueryView>();
-        List<SavedQueryView> others = new List<SavedQueryView>();
+        // The person's own first, read on their own, so other people's shared queries never
+        // push one of theirs past the cap; others fill what is left of it.
         Id me = UserInfo.getUserId();
+        page.savedQueries = new List<SavedQueryView>();
         for (Saved_Query__c query : [
             SELECT Id, Name, Object_Name__c, Query_JSON__c, Shared__c, OwnerId, Owner.Name
             FROM Saved_Query__c
+            WHERE OwnerId = :me
             WITH USER_MODE
             ORDER BY Name
-            LIMIT :MAX_SAVED_QUERIES
+            LIMIT :maxSavedQueries
         ]) {
-            SavedQueryView view = new SavedQueryView();
-            view.recordId = query.Id;
-            view.name = query.Name;
-            view.objectName = query.Object_Name__c;
-            view.queryJson = query.Query_JSON__c;
-            view.shared = query.Shared__c;
-            view.mine = query.OwnerId == me;
-            view.ownerName = query.Owner?.Name;
-            (view.mine ? mine : others).add(view);
+            page.savedQueries.add(savedQueryView(query, true));
         }
-        page.savedQueries = new List<SavedQueryView>(mine);
-        page.savedQueries.addAll(others);
+        Integer room = maxSavedQueries - page.savedQueries.size();
+        if (room > 0) {
+            for (Saved_Query__c query : [
+                SELECT Id, Name, Object_Name__c, Query_JSON__c, Shared__c, OwnerId, Owner.Name
+                FROM Saved_Query__c
+                WHERE OwnerId != :me
+                WITH USER_MODE
+                ORDER BY Name
+                LIMIT :room
+            ]) {
+                page.savedQueries.add(savedQueryView(query, false));
+            }
+        }
         return page;
+    }
+
+    private static SavedQueryView savedQueryView(Saved_Query__c query, Boolean mine) {
+        SavedQueryView view = new SavedQueryView();
+        view.recordId = query.Id;
+        view.name = query.Name;
+        view.objectName = query.Object_Name__c;
+        view.queryJson = query.Query_JSON__c;
+        view.shared = query.Shared__c;
+        view.mine = mine;
+        view.ownerName = query.Owner?.Name;
+        return view;
     }
 
     private static Saved_Query__c requireOwn(String recordId) {
@@ -329,22 +473,11 @@ public with sharing class FindController {
         return found[0];
     }
 
-    private static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
-        if (
-            !objectDescribe.isAccessible() ||
-            !objectDescribe.isQueryable() ||
-            objectDescribe.isCustomSetting() ||
-            objectDescribe.isDeprecatedAndHidden()
-        ) {
-            return false;
-        }
-        String name = objectDescribe.getName().toLowerCase();
-        for (String suffix : SYSTEM_SUFFIXES) {
-            if (name.endsWith(suffix)) {
-                return false;
-            }
-        }
-        return true;
+    /** Whether an object is offered for querying; field utilization offers objects by it too. */
+    public static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
+        return objectDescribe.isAccessible() &&
+            objectDescribe.isQueryable() &&
+            !QueryFieldCatalog.isSystemObject(objectDescribe);
     }
 
     private static void requirePermission() {

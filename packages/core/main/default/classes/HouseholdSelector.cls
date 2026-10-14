@@ -52,6 +52,13 @@ public with sharing class HouseholdSelector {
     @TestVisible
     private static Set<Id> accountsWithNativeDependentsOverride;
 
+    /**
+     * Set only by tests, so the duplicate scan and the household merge can be shown refusing a
+     * Nonprofit Cloud household on an org where the native object does not exist.
+     */
+    @TestVisible
+    private static Set<Id> accountsWithNativeHouseholdGroupsOverride;
+
     @NamespaceAccessible
     public static List<Contact> getContactsByHouseholdIds(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
@@ -104,10 +111,6 @@ public with sharing class HouseholdSelector {
         ];
     }
 
-    /**
-     * People with the record type of the account they belong to, so that a caller can tell
-     * a household from an organization without a second query.
-     */
     /**
      * The household's contacts as a screen may see them: object access checked, and every
      * field the running user cannot read stripped out (ADR-0021).
@@ -163,6 +166,10 @@ public with sharing class HouseholdSelector {
         return (List<Household_Member__c>) readableRecords(records, describe);
     }
 
+    /**
+     * People with the record type of the account they belong to, so that a caller can tell
+     * a household from an organization without a second query.
+     */
     @NamespaceAccessible
     public static List<Contact> getContactsWithHouseholds(Set<Id> contactIds) {
         if (contactIds == null || contactIds.isEmpty()) {
@@ -270,31 +277,6 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Adds the accounts that have at least one row of this object hanging off them. An object
-     * the org does not have adds nothing, because an object that is not there is not a
-     * dependency.
-     *
-     * Existence is the only question asked. Whether the running user may read the object is
-     * deliberately not asked, because the query runs in system mode and the answer must
-     * describe the org rather than the reader. Gating this on the reader's own access would
-     * reintroduce the exact failure the guard exists to prevent: an administrator without the
-     * Group Membership permission set would find the probe skipped, the household would read
-     * as safe, and the cascade would happen anyway.
-     *
-     * One residual risk stays, and it is worth naming rather than hiding. Schema.getGlobalDescribe
-     * is itself filtered by the running user's permission set licences, so an object the user is
-     * not licensed for can be absent from the map even though the org has it. Apex offers no
-     * unfiltered alternative here short of querying EntityDefinition, which would have to match
-     * with LIKE rather than an equality filter to be permission neutral. If a native household is
-     * ever destroyed despite this guard, that is the first thing to check.
-     *
-     * A probe that fails for any other reason is treated as though every account given were
-     * dependent. Not being able to answer is not the same as answering no, and the cost of
-     * the two mistakes is not the same: refusing to delete leaves a tidy-up undone and says
-     * so in the log, while deleting on a probe that never ran destroys the native household
-     * this guard was added to protect.
-     */
-    /**
      * Of these Accounts, the ones that already carry a native Nonprofit Cloud household
      * group or native membership rows: the single predicate every mutual exclusion guard
      * asks (product-plan Section 11.2 item 9), built on `getAccountsWithNativeDependents`
@@ -310,10 +292,45 @@ public with sharing class HouseholdSelector {
         if (accountIds == null || accountIds.isEmpty()) {
             return new Set<Id>();
         }
-        if (OrgShapeDetector.detect().hasNativeHouseholdGroups != true) {
+        if (OrgShapeDetector.hasNativeHouseholdGroups() != true) {
             return new Set<Id>();
         }
         return getAccountsWithNativeDependents(accountIds);
+    }
+
+    /**
+     * Of these Accounts, the ones that carry a native Nonprofit Cloud household group: what the
+     * duplicate scan, the Duplicates panel and the household merge ask before proposing or
+     * merging a household (ADR-0036 applied to merges). A merge deletes one Account, and a group
+     * whose master-detail parent it is would go with it or be moved onto the other, and that
+     * group is not BarnCRM's to change.
+     *
+     * Native membership rows are deliberately not asked about, unlike
+     * `getAccountsWithNativeDependents`: with Contacts to Multiple Accounts on, every household
+     * with a member has direct native membership rows, so asking would refuse every merge.
+     *
+     * The same probe as the delete guard, with the same answer when it cannot run: every
+     * account given is treated as carrying a group, so nothing is merged on a guess.
+     */
+    @NamespaceAccessible
+    public static Set<Id> accountsWithNativeHouseholdGroups(Set<Id> accountIds) {
+        if (accountsWithNativeHouseholdGroupsOverride != null) {
+            return accountsWithNativeHouseholdGroupsOverride;
+        }
+        Set<Id> grouped = new Set<Id>();
+        if (accountIds == null || accountIds.isEmpty()) {
+            return grouped;
+        }
+        if (OrgShapeDetector.detect().hasNativeHouseholdGroups != true) {
+            return grouped;
+        }
+        addNativeDependents(
+            grouped,
+            NATIVE_HOUSEHOLD_GROUP,
+            NATIVE_HOUSEHOLD_GROUP_QUERY,
+            accountIds
+        );
+        return grouped;
     }
 
     /**
@@ -354,6 +371,31 @@ public with sharing class HouseholdSelector {
         }
     }
 
+    /**
+     * Adds the accounts that have at least one row of this object hanging off them. An object
+     * the org does not have adds nothing, because an object that is not there is not a
+     * dependency.
+     *
+     * Existence is the only question asked. Whether the running user may read the object is
+     * deliberately not asked, because the query runs in system mode and the answer must
+     * describe the org rather than the reader. Gating this on the reader's own access would
+     * reintroduce the exact failure the guard exists to prevent: an administrator without the
+     * Group Membership permission set would find the probe skipped, the household would read
+     * as safe, and the cascade would happen anyway.
+     *
+     * One residual risk stays, and it is worth naming rather than hiding. Schema.getGlobalDescribe
+     * is itself filtered by the running user's permission set licences, so an object the user is
+     * not licensed for can be absent from the map even though the org has it. Apex offers no
+     * unfiltered alternative here short of querying EntityDefinition, which would have to match
+     * with LIKE rather than an equality filter to be permission neutral. If a native household is
+     * ever destroyed despite this guard, that is the first thing to check.
+     *
+     * A probe that fails for any other reason is treated as though every account given were
+     * dependent. Not being able to answer is not the same as answering no, and the cost of
+     * the two mistakes is not the same: refusing to delete leaves a tidy-up undone and says
+     * so in the log, while deleting on a probe that never ran destroys the native household
+     * this guard was added to protect.
+     */
     private static void addNativeDependents(
         Set<Id> dependent,
         String objectName,
@@ -378,13 +420,18 @@ public with sharing class HouseholdSelector {
      * The households a merge compares, with every field the comparison offers a choice
      * about: the wording, the primary contact, the anniversary, and the address a letter
      * is sent to.
+     *
+     * A display read (ADR-0021), but stripped rather than `WITH USER_MODE`, which refuses
+     * the whole query when a single field is unreadable. The comparison leaves out a field
+     * the person cannot read, so somebody without access to, say, the anniversary still
+     * gets the merge screen. Sharing still applies: the class is `with sharing`.
      */
     @NamespaceAccessible
     public static List<Account> getHouseholdsForMerge(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
             return new List<Account>();
         }
-        return [
+        List<Account> records = [
             SELECT
                 Id,
                 Name,
@@ -403,9 +450,10 @@ public with sharing class HouseholdSelector {
                 BillingCountry
             FROM Account
             WHERE Id IN :householdIds
-            WITH USER_MODE
+            WITH SYSTEM_MODE
             LIMIT 100
         ];
+        return (List<Account>) readableRecords(records, Schema.SObjectType.Account);
     }
 
     /**
@@ -587,5 +635,43 @@ public with sharing class HouseholdSelector {
                 WITH SYSTEM_MODE
             ]
         );
+    }
+
+    /**
+     * The households among these that any contact at all points at, whether or not the
+     * running user can see that contact.
+     *
+     * The guard before an emptied household is deleted in contact mode. The member reads
+     * above honour sharing, so with a private Contact sharing model a household can look
+     * empty to somebody who cannot see the other people in it, and deleting it would take
+     * those people's household away. Only which households are occupied is answered, never
+     * who is in them, so nothing hidden reaches the user.
+     */
+    @NamespaceAccessible
+    public static Set<Id> householdsWithAnyContact(Set<Id> householdIds) {
+        return new OccupancyReader().householdsWithAnyContact(householdIds);
+    }
+
+    /**
+     * Reads across sharing (ADR-0021 category 2: package upkeep must not depend on what the
+     * saving user can see) and answers ids only.
+     */
+    private without sharing class OccupancyReader {
+        Set<Id> householdsWithAnyContact(Set<Id> householdIds) {
+            Set<Id> result = new Set<Id>();
+            if (householdIds == null || householdIds.isEmpty()) {
+                return result;
+            }
+            for (AggregateResult row : [
+                SELECT AccountId
+                FROM Contact
+                WHERE AccountId IN :householdIds
+                WITH SYSTEM_MODE
+                GROUP BY AccountId
+            ]) {
+                result.add((Id) row.get('AccountId'));
+            }
+            return result;
+        }
     }
 }

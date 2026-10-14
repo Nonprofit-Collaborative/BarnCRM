@@ -3,14 +3,21 @@
  * MailingStreet, HasOptedOutOfEmail) lands in the account's person fields, and the next load
  * of the same file finds the people it made by the same key (R-IB12).
  *
- * These tests need an org with person accounts, and every one returns early, on purpose,
- * where the org has none: the Platform-only shape Core must also run on (ADR-0013) has no
- * person fields to write or read, so there is nothing true to assert there. The person
+ * These tests need person accounts the running user can create, and return early where
+ * there are none, for one of two reasons PersonAccountTestShape checks and logs: the
+ * Platform-only shape Core must also run on (ADR-0013) has no person fields at all, and an
+ * org that has them may give the user none of its person record types (a Nonprofit Cloud
+ * trial), which is an org setup gap and means these tests did not run there. The person
  * fields are named only as text and read through dynamic SOQL, so this class compiles on
- * that shape too (plan Section 4.2).
+ * the Platform-only shape too (plan Section 4.2).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor, ApexClass:ImportMatcher')
 private class ImportPersonAccountTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 
@@ -21,7 +28,7 @@ private class ImportPersonAccountTest {
      * nobody, which noPersonTypeGivenToTheUserCreatesNobodyAndSaysWhy proves.
      */
     private static Boolean orgHasPersonAccounts() {
-        return personFieldsExist() && OrgShapeDetector.creatablePersonRecordTypeId() != null;
+        return PersonAccountTestShape.skipReason() == null && personFieldsExist();
     }
 
     private static Boolean personFieldsExist() {
@@ -91,7 +98,7 @@ private class ImportPersonAccountTest {
     static void aPersonAccountGetsTheEmailAddressAndOptOuts() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person fields exist to be written.
+                // No person fields to write: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -134,7 +141,11 @@ private class ImportPersonAccountTest {
     static void noPersonTypeGivenToTheUserCreatesNobodyAndSaysWhy() {
         System.runAs(TestUsers.admin()) {
             if (!personFieldsExist()) {
-                // Platform-only shape (ADR-0013): no person fields exist to be written.
+                Assert.areEqual(
+                    PersonAccountTestShape.NO_PERSON_ACCOUNTS,
+                    PersonAccountTestShape.skipReason(),
+                    'Only an org that does not store people as accounts lacks the person fields'
+                );
                 return;
             }
             OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
@@ -160,7 +171,7 @@ private class ImportPersonAccountTest {
     static void loadingTheFileAgainMatchesThePersonByEmail() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person accounts to match.
+                // No person accounts to match: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -193,7 +204,7 @@ private class ImportPersonAccountTest {
     static void loadingTheFileAgainMatchesThePersonByNameAndPostalCode() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person accounts to match.
+                // No person accounts to match: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -218,7 +229,7 @@ private class ImportPersonAccountTest {
     static void aDryRunRemembersAPersonAccountItWouldCreate() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person account would be created.
+                // No person account to create: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -250,7 +261,7 @@ private class ImportPersonAccountTest {
     static void aPersonAccountWithOnlyABillingPostalCodeIsFound() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person accounts to match.
+                // No person accounts to match: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -292,7 +303,7 @@ private class ImportPersonAccountTest {
     static void aChunkOfTwoHundredPersonAccountsLoadsAndIsFoundAgain() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person accounts to create.
+                // No person accounts to create: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
@@ -349,7 +360,7 @@ private class ImportPersonAccountTest {
     static void aPostalCodeTheUserCannotReadIsNamedWhileTheOtherStillMatches() {
         System.runAs(TestUsers.admin()) {
             if (!orgHasPersonAccounts()) {
-                // Platform-only shape (ADR-0013): no person accounts to match.
+                // No person accounts to match: the reason is checked and logged by PersonAccountTestShape.
                 return;
             }
             User reader = new User(
@@ -416,6 +427,52 @@ private class ImportPersonAccountTest {
                 ImportMatcher.unreadableFields(),
                 'Only the billing postal code is named: the mailing one was readable and used.'
             );
+        }
+    }
+
+    /**
+     * A row that gives only a second person points at them through the person account lookup:
+     * an Account Id in the Contact lookup would fail the row's save and leave it Pending.
+     */
+    @IsTest
+    static void aRowWithOnlyASecondPersonPointsAtThem() {
+        System.runAs(TestUsers.admin()) {
+            if (!orgHasPersonAccounts()) {
+                // Platform-only shape (ADR-0013): no person accounts to create.
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            ImportMapping secondOnly = new ImportMapping();
+            secondOnly.columns.add(new ImportMapping.Column('First 2', 'Contact2.FirstName'));
+            secondOnly.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
+            secondOnly.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
+            template = ImportTestDataFactory.template(
+                secondOnly.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            template.Person_Mode__c = ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS;
+            update template;
+            batch = ImportTestDataFactory.batch(template);
+            ImportTestDataFactory.rows(
+                batch,
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'First 2' => 'Ben',
+                        'Last 2' => 'Okafor',
+                        'Email 2' => 'ben@example.org'
+                    }
+                }
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
+            Assert.areEqual(1, outcome.created, 'The row created Ben: ' + outcome.notes);
+            Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, 'Saved as such.');
+            Assert.isNotNull(row.Person_2_Account__c, 'Pointing at Ben.');
+            Assert.isNull(row.Contact_2__c, 'Not through the Contact lookup.');
         }
     }
 }

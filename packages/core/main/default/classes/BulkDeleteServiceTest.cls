@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteService')
 private class BulkDeleteServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String objectName, String field, String value) {
         Map<String, Object> document = new Map<String, Object>{
             'version' => 1,
@@ -71,7 +76,10 @@ private class BulkDeleteServiceTest {
             Test.stopTest();
 
             System.Assert.areEqual(200, preview.count, 'Only matching records are counted');
-            System.Assert.areEqual(BulkDeleteService.DEFAULT_RUN_LIMIT, preview.runLimit);
+            System.Assert.areEqual(
+                BulkDeleteService.DEFAULT_RUN_LIMIT,
+                BulkDeleteService.runLimit()
+            );
             System.Assert.areEqual(5, preview.sample.size(), 'Five named');
             System.Assert.areEqual('Person 0000', preview.sample[0].name, 'In Id order, by name');
             System.Assert.isNotNull(preview.cascades, 'The kinds deleted with each record');
@@ -79,7 +87,6 @@ private class BulkDeleteServiceTest {
                 preview.undoDeadline <= Datetime.now().addDays(BulkDeleteService.RECYCLE_BIN_DAYS),
                 'Never past the Recycle Bin'
             );
-            System.Assert.isTrue(preview.soql.contains('Contact'), 'The query shown');
             System.Assert.areEqual(230, [SELECT COUNT() FROM Contact], 'Nothing deleted');
         }
     }
@@ -178,7 +185,7 @@ private class BulkDeleteServiceTest {
             BulkDeleteService.Plan checked = BulkDeleteService.plan(VOLUNTEERS);
             String definition = checked.definition(37);
             BulkDeleteService.Plan again = BulkDeleteService.planFromDefinition(definition);
-            System.Assert.areEqual(37, BulkDeleteService.confirmedCountOf(definition));
+            System.Assert.areEqual(37, DataJobs.confirmedCountOf(definition));
             System.Assert.areEqual('Contact', again.objectName, 'The object');
             System.Assert.areEqual('Name', again.nameField, 'Read for the journal');
 

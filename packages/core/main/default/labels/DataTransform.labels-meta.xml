@@ -5,7 +5,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: more steps than one value may have</shortDescription>
+        <shortDescription>Column changes: more steps than one value may have; {0} is the most</shortDescription>
         <value>A value can have at most {0} changes.</value>
     </labels>
     <labels>
@@ -13,7 +13,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: a step names no change BarnCRM knows</shortDescription>
+        <shortDescription>Column changes: a step names no known change; {0} is the step</shortDescription>
         <value>"{0}" is not a change BarnCRM knows. Remove it and choose one from the list.</value>
     </labels>
     <labels>
@@ -37,7 +37,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: add other columns names none or too many</shortDescription>
+        <shortDescription>Column changes: add other columns needs 1 to {0} columns; {0} the most</shortDescription>
         <value>Add other columns needs between one and {0} columns.</value>
     </labels>
     <labels>
@@ -61,7 +61,47 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: a column&apos;s changes cannot be saved</shortDescription>
+        <shortDescription>Import wizard: column changes not saved; {0} column, {1} the reason</shortDescription>
         <value>The changes to column {0} cannot be saved. {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorNeedsPairs</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: map values has no usable rows; {0} is the most rows</shortDescription>
+        <value>Map values needs 1 to {0} rows, each with the value to look for (at most 255 characters).</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorNeedsTest</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: if then has no test</shortDescription>
+        <value>If, then needs a test: equals, contains or is empty.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorPart</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: keep part has no separator or part; {0} is the top part</shortDescription>
+        <value>Keep part needs a separator (at most 10 characters) and a part from 1 to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorCount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: first or last characters has no count; {0} is the most</shortDescription>
+        <value>First or last characters needs a number of characters from 1 to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorShift</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: shift a date has no amount or unit</shortDescription>
+        <value>Shift a date needs days or months and a whole number of them (at most 36600 days or 1200 months either way).</value>
     </labels>
 </CustomLabels>

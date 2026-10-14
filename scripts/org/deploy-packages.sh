@@ -6,11 +6,10 @@
 # WHY IN STAGES. The first deploy this project ever attempted sent all 982 components in one
 # request and came back with UNKNOWN_EXCEPTION, zero components deployed, zero component
 # errors, and a Salesforce ErrorId. A failure with no component attached tells you nothing
-# about which of 982 things caused it. Deploying the vendored tree separately from
-# BarnCRM's own source, and Core before Giving, means the next such failure names a stage.
+# about which of 982 things caused it. Deploying Core before Giving means the next such
+# failure names a stage.
 #
-# It also matches how the packages actually depend on each other: the vendored engine is
-# self contained, Core does not call it yet, and Giving depends on Core.
+# It also matches how the packages actually depend on each other: Giving depends on Core.
 #
 # WHY CORE IS SEVERAL STAGES. docs/contributor-guide/ci.md records this same failure
 # hitting the undivided Core stage four times across four separate runs before 2026-09-09:
@@ -92,11 +91,22 @@
 # POLL_SECONDS sets the report interval. `sf` is found on PATH, so a fake one can drive this
 # logic in a test.
 #
+# WHAT THE STAGES COST, AND THE SWITCHES TO MEASURE IT. About 36 stages, each followed by the
+# pause, is about 9 minutes of sleep per run plus the submit and poll overhead of every stage.
+# The two faults that justified the split have since been explained by real defects (the
+# Account to Import_Batch__c order, which the order below fixes, and the unparseable custom
+# metadata of 2026-09-22), so both are worth undoing once a run proves it safe:
+# STAGE_PAUSE_SECONDS=0 drops the pause, and DATA_MODEL_STAGES=combined deploys every Core
+# object in one request, falling back to one object per stage only when that request fails
+# with no component error (the platform's opaque UNKNOWN_EXCEPTION). Neither is the default
+# until a gate run with each has been timed: see docs/contributor-guide/ci.md, "Faster deploys".
+#
 # Exit codes: 0 = every stage deployed, non-zero = the first stage that failed.
 
 set -uo pipefail
 
 STAGE_PAUSE_SECONDS="${STAGE_PAUSE_SECONDS:-15}"
+DATA_MODEL_STAGES="${DATA_MODEL_STAGES:-per-object}"
 STALL_SECONDS="${STALL_SECONDS:-300}"
 POLL_SECONDS="${POLL_SECONDS:-15}"
 DEPLOY_WAIT_MINUTES="${DEPLOY_WAIT_MINUTES:-30}"
@@ -114,6 +124,10 @@ shift || true
 
 CORE_ONLY=0
 [[ "${1:-}" == "--core-only" ]] && CORE_ONLY=1
+if [[ ! "$DATA_MODEL_STAGES" =~ ^(per-object|combined)$ ]]; then
+  echo "DATA_MODEL_STAGES must be per-object or combined, not ${DATA_MODEL_STAGES}." >&2
+  exit 1
+fi
 
 # Run a command with its output in a file, abandoning it (and the node process under the
 # sf wrapper) after $1 seconds. On 2026-09-24 a single `sf project deploy report` call hung
@@ -323,7 +337,22 @@ deploy_stage() {
   return 0
 }
 
-deploy_stage "the vendored rollup engine" "packages/core/vendor" || exit $?
+# Every folder under Core's main/default has to be named by a stage below. A folder no stage
+# names never reaches the org, so nothing that depends on it is ever tested: Core's flows went
+# undeployed this way until 2026-10-13.
+CORE_DIR="packages/core/main/default"
+CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
+  classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
+  tabs quickActions lwc prompts flows)
+unstaged=()
+for dir in "$CORE_DIR"/*/; do
+  dir="$(basename "$dir")"
+  [[ " ${CORE_STAGED[*]} " == *" ${dir} "* ]] || unstaged+=("$dir")
+done
+if [[ ${#unstaged[@]} -gt 0 ]]; then
+  echo "No deploy stage names ${CORE_DIR}/${unstaged[*]}. Add it to a stage and to CORE_STAGED." >&2
+  exit 1
+fi
 
 # One stage per object, not a file-count split. The two-way file-count split this replaced
 # produced the same two groups every run, since only file content had been changing, not
@@ -372,9 +401,28 @@ PYEOF
   echo "Could not work out a deploy order for ${OBJECTS_DIR}." >&2
   exit 1
 fi
-while IFS= read -r object; do
-  deploy_stage "Core (data model, ${object})" "${OBJECTS_DIR}/${object}/" || exit $?
-done <<< "$OBJECT_ORDER"
+deploy_objects_one_by_one() {
+  local object
+  while IFS= read -r object; do
+    deploy_stage "Core (data model, ${object})" "${OBJECTS_DIR}/${object}/" || return $?
+  done <<< "$OBJECT_ORDER"
+}
+if [[ "$DATA_MODEL_STAGES" == "combined" ]]; then
+  # One request for every object. A failure that names components is a real error and stops
+  # the run; one that names none is the opaque platform fault, so the objects go again one by one.
+  if ! deploy_stage "Core (data model, every object in one request)" "$OBJECTS_DIR"; then
+    errors="$(sf project deploy report --job-id "$JOB_ID" --target-org "$ALIAS" --json 2> /dev/null \
+      | jq -r '.result.numberComponentErrors // 0' 2> /dev/null)"
+    [[ "$errors" =~ ^[0-9]+$ ]] || errors=1
+    if [[ -z "$JOB_ID" || "${errors:-0}" -gt 0 ]]; then
+      exit 1
+    fi
+    echo "== The one-request data model deploy failed with no component error. Falling back to one object per stage =="
+    deploy_objects_one_by_one || exit $?
+  fi
+else
+  deploy_objects_one_by_one || exit $?
+fi
 # One stage per config directory, not one stage for all four. Every object deployed clean
 # individually (the finding the per-object split above was designed to produce), so the very
 # next stage in line, the four config directories deployed together, is what hit the platform
@@ -389,11 +437,15 @@ deploy_stage "Core (data model, custom metadata)" "packages/core/main/default/cu
 deploy_stage "Core (data model, labels)" "packages/core/main/default/labels" || exit $?
 deploy_stage "Core (data model, static resources and custom permissions)" \
   "packages/core/main/default/staticresources" \
-  "packages/core/main/default/customPermissions" || exit $?
+  "packages/core/main/default/customPermissions" \
+  "packages/core/main/default/notificationtypes" || exit $?
 deploy_stage "Core (Apex)" \
   "packages/core/main/default/classes" \
   "packages/core/main/default/triggers" || exit $?
+# After Apex, which a flow can call, and before the UI, which can launch a flow.
+deploy_stage "Core (flows)" "packages/core/main/default/flows" || exit $?
 deploy_stage "Core (UI and permissions)" \
+  "packages/core/main/default/contentassets" \
   "packages/core/main/default/permissionsets" \
   "packages/core/main/default/permissionsetgroups" \
   "packages/core/main/default/layouts" \
@@ -401,7 +453,8 @@ deploy_stage "Core (UI and permissions)" \
   "packages/core/main/default/applications" \
   "packages/core/main/default/tabs" \
   "packages/core/main/default/quickActions" \
-  "packages/core/main/default/lwc" || exit $?
+  "packages/core/main/default/lwc" \
+  "packages/core/main/default/prompts" || exit $?
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
   deploy_stage "Giving" "packages/giving" || exit $?

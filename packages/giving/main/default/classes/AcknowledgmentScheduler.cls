@@ -43,14 +43,14 @@ public with sharing class AcknowledgmentScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(JOB_NAME, NIGHTLY_CRON, new AcknowledgmentScheduler());
+        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new AcknowledgmentScheduler());
     }
 
     /** Stops the nightly send. The queue stays exactly as it is. */
     public static void stop() {
         Id existing = scheduledJobId();
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 
@@ -61,38 +61,11 @@ public with sharing class AcknowledgmentScheduler implements Schedulable {
 
     /** When the nightly send is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
-        Id jobId = scheduledJobId();
-        if (jobId == null) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT NextFireTime
-            FROM CronTrigger
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].NextFireTime;
+        return ScheduledJobSelector.nextFireTime(JOB_NAME);
     }
 
+    // Core's one lookup for every BarnCRM scheduled job, read once per transaction (ADMIN-11).
     private static Id scheduledJobId() {
-        List<CronJobDetail> details = [
-            SELECT Id
-            FROM CronJobDetail
-            WHERE Name = :JOB_NAME AND JobType = '7'
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        if (details.isEmpty()) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT Id
-            FROM CronTrigger
-            WHERE CronJobDetailId = :details[0].Id
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].Id;
+        return ScheduledJobSelector.triggerIdByName(JOB_NAME);
     }
 }

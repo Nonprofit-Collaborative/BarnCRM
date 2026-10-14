@@ -6,8 +6,13 @@
  * assert what Core does with them: it starts the first one, it starts the one after a named
  * module, and it asks each of them for its own count and its own removal.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataModules')
 private class SampleDataModulesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     private class StubModule implements SampleDataModule {
         private final String name;
         private Integer loaded;
@@ -84,7 +89,7 @@ private class SampleDataModulesTest {
             System.assertEquals(
                 false,
                 second.loadStarted,
-                'the second waits: a queueable may only enqueue one job, so each module starts the next'
+                'the second waits: modules load one at a time, so each module starts the next'
             );
         }
     }

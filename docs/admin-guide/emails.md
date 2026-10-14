@@ -25,6 +25,12 @@ If you never fill any of them in, nothing changes: the ordinary email box keeps 
 you type in it, exactly as it did before. The copying only starts on a person once you have
 chosen a preferred email for that person.
 
+The copying has its own switches on the Automation page (BarnCRM Settings, Automation):
+**Copy preferred email on a person**, and, for people held as accounts, **Copy preferred
+email, person accounts**. Both are on by default. They are separate from the
+household upkeep rows, so switching household upkeep off does not stop the copy. Switch a
+copy row off only if you want the ordinary email box left exactly as typed.
+
 Who can do what comes from the permission set somebody already holds:
 
 | Permission set | What they can do with the three addresses |

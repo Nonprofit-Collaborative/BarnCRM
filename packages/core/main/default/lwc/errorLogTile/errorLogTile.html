@@ -5,7 +5,7 @@
         </span>
 
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
                     role="alert"
@@ -19,13 +19,13 @@
                 </div>
             </template>
 
-            <template if:true={isReadOnly}>
+            <template lwc:if={isReadOnly}>
                 <p class="slds-text-body_small slds-var-m-bottom_small" data-id="read-only-notice">
                     {labels.readOnly}
                 </p>
             </template>
 
-            <template if:true={isEmpty}>
+            <template lwc:if={isEmpty}>
                 <p data-id="empty-state">{labels.empty}</p>
             </template>
 

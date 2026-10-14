@@ -69,6 +69,20 @@ describe('c-hub-setup', () => {
     expect(element.shadowRoot.querySelector('c-setup-assistant')).not.toBeNull();
   });
 
+  it('waits for the home model, so a finished setup never loads the assistant', async () => {
+    const getState = require('@salesforce/apex/SetupAssistantController.getState').default;
+    const element = build();
+    await settle();
+
+    expect(element.shadowRoot.querySelector('c-setup-assistant')).toBeNull();
+
+    getHomeModel.emit({ stepsCompleted: 2, stepsTotal: 2 });
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="reopen-setup"]')).not.toBeNull();
+    expect(getState).not.toHaveBeenCalled();
+  });
+
   it('follows the assistant progress without reloading the page', async () => {
     const element = build();
     getHomeModel.emit({ stepsCompleted: 1, stepsTotal: 2 });

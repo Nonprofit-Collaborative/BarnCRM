@@ -2,7 +2,7 @@
  * Maria opens the console and changes a setting. David opens the same page without the
  * Manage BarnCRM Settings permission and gets a read-only view that names the permission.
  */
-@IsTest
+@IsTest(critical=true)
 private class SettingsControllerTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';
@@ -87,19 +87,7 @@ private class SettingsControllerTest {
     }
 
     private static User buildDavid() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        return new User(
-            FirstName = 'David',
-            LastName = 'Okonkwo',
-            Alias = 'david',
-            Email = 'david.barncrm@example.com',
-            Username = 'david.barncrm.' + DateTime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'david');
     }
 
     @IsTest
@@ -120,6 +108,15 @@ private class SettingsControllerTest {
                 model.sections.size(),
                 'Sections with something to show appear; Giving is not installed'
             );
+            // The rows arrive Households first; the console lists sections as
+            // SettingSections.all() does, so it opens on General.
+            Assert.areEqual(
+                SettingSections.GENERAL,
+                model.sections[0].name,
+                'The console opens on General'
+            );
+            Assert.areEqual(SettingSections.HOUSEHOLDS, model.sections[1].name, 'Then Households');
+            Assert.areEqual(SettingSections.AUTOMATION, model.sections[2].name, 'Then Automation');
             Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
             for (SettingsController.SectionModel section : model.sections) {
                 byName.put(section.name, section);
@@ -224,6 +221,29 @@ private class SettingsControllerTest {
             );
             Assert.areEqual(2, bySection.size(), 'Searching a section name finds everything in it');
             Assert.areEqual(0, nothing.size(), 'An empty search asks for nothing');
+        }
+    }
+
+    @IsTest
+    static void searchNeverListsARowThePageHides() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+
+            Test.startTest();
+            List<SettingsController.SearchHit> hits = SettingsController.search('grant program');
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    Assert.areNotEqual(
+                        'Default_Grant_Program__c',
+                        setting.key,
+                        'The page hides a row whose module is not installed'
+                    );
+                }
+            }
+            Assert.isTrue(hits.isEmpty(), 'So search does not offer it either: ' + hits);
         }
     }
 
@@ -404,6 +424,42 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void recentChangesNameASettingByItsLabel() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            insert new List<Setting_Change__c>{
+                new Setting_Change__c(
+                    Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.' + TEXT_KEY,
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now()
+                ),
+                new Setting_Change__c(
+                    Setting_Name__c = 'Health Check: Create the missing rollups',
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now().addMinutes(-1)
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Set<String> names = new Set<String>();
+            for (SettingsController.ChangeModel change : changes) {
+                names.add(change.settingName);
+            }
+            Assert.isTrue(
+                names.contains('Household name pattern'),
+                'A setting reads as its label, not its API name: ' + names
+            );
+            Assert.isTrue(
+                names.contains('Health Check: Create the missing rollups'),
+                'A row that is not a setting reads as it was stored: ' + names
+            );
+        }
+    }
+
+    @IsTest
     static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
@@ -453,6 +509,51 @@ private class SettingsControllerTest {
             );
             Assert.isNotNull(rows[1].options[0].label, 'Each choice carries the label Setup shows');
             Assert.isNotNull(rows[1].options[0].value, 'Each choice stores its developer name');
+        }
+    }
+
+    @IsTest
+    static void setupChecksSayWhetherEachPrerequisiteIsMet() {
+        System.runAs(TestUsers.admin()) {
+            Integer barnMonth = FiscalYearSelector.settingsFiscalYearStartMonth();
+            FiscalYearSelector.orgStartMonthOverridden = true;
+            FiscalYearSelector.orgStartMonthOverride = barnMonth;
+            SettingsController.emailAllowedOverride = true;
+            Map<String, Boolean> met = SettingsController.getSetupChecks();
+
+            FiscalYearSelector.orgStartMonthOverride = Math.mod(barnMonth, 12) + 1;
+            SettingsController.emailAllowedOverride = false;
+            Map<String, Boolean> unmet = SettingsController.getSetupChecks();
+
+            Assert.isTrue(met.get(SettingsController.CHECK_FISCAL_YEAR), 'Same month is done');
+            Assert.isTrue(met.get(SettingsController.CHECK_EMAIL), 'Email allowed is done');
+            Assert.isFalse(unmet.get(SettingsController.CHECK_FISCAL_YEAR), 'Months differ');
+            Assert.isFalse(unmet.get(SettingsController.CHECK_EMAIL), 'Email blocked');
+        }
+    }
+
+    @IsTest
+    static void aSetupCheckThatCannotBeReadIsLeftOut() {
+        System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.orgStartMonthOverridden = true;
+            FiscalYearSelector.orgStartMonthOverride = null;
+            SettingsController.emailAllowedOverride = true;
+            Map<String, Boolean> checks = SettingsController.getSetupChecks();
+
+            Assert.isFalse(
+                checks.containsKey(SettingsController.CHECK_FISCAL_YEAR),
+                'An unreadable fiscal year is no answer, so the note shows its instruction only'
+            );
+            Assert.isTrue(
+                checks.containsKey(SettingsController.CHECK_EMAIL),
+                'The other check still answers'
+            );
+
+            SettingsController.emailAllowedOverride = null;
+            Assert.isNotNull(
+                SettingsController.getSetupChecks(),
+                'Asking this org itself whether it may send email never fails the page'
+            );
         }
     }
 }

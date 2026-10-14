@@ -37,7 +37,14 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
         if (householdIds == null || householdIds.isEmpty()) {
             return;
         }
-        List<Id> pending = new List<Id>(householdIds);
+        // A household with no gifts has no credits to put right, and its next gift credits its
+        // members when it is saved. Leaving those out keeps the job's slot free: loading people
+        // into new households (the sample data load is a chain of jobs) queued a recompute that
+        // had nothing to do and took the one job the load needed for its next step.
+        List<Id> pending = new List<Id>(GiftLookupSelector.selectHouseholdsWithGifts(householdIds));
+        if (pending.isEmpty()) {
+            return;
+        }
         if (pending.size() > HOUSEHOLDS_PER_TRANSACTION_CAP) {
             // A bulk load of people is the case this bounds. Recrediting every household it
             // touches would chain a job per household for as long as the load ran, so past this
@@ -97,6 +104,10 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
             Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()
         ) {
             System.enqueueJob(new HouseholdSoftCreditRecompute(remaining));
+        } else if (remaining.isEmpty()) {
+            // The chain has ended. The rollup engine queued the soft credit totals without
+            // taking this job's one chained job, so they are calculated now.
+            RollupService.startQueuedRecalculation();
         }
     }
 

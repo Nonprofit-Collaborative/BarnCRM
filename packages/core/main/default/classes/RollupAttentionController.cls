@@ -36,6 +36,9 @@ public with sharing class RollupAttentionController {
         public Boolean canManage { get; set; }
         @AuraEnabled
         public String waiting { get; set; }
+        /** Whether any record waits in the queue, for the Start now button. */
+        @AuraEnabled
+        public Boolean hasWaiting { get; set; }
         @AuraEnabled
         public List<FailedRecord> failed { get; set; }
         @AuraEnabled
@@ -49,8 +52,8 @@ public with sharing class RollupAttentionController {
     public static Attention getAttention() {
         try {
             Attention attention = new Attention();
-            attention.canManage = FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
-            attention.waiting = waiting();
+            attention.canManage = BarnCRMPermissions.canManageSettings();
+            fillWaiting(attention);
             attention.failed = failedRecords();
             attention.nightlyScheduled = RollupScheduler.isScheduled();
             attention.lastRun = lastRun(RollupFullRecalcBatch.progress());
@@ -69,7 +72,7 @@ public with sharing class RollupAttentionController {
     @AuraEnabled
     public static Attention retry(List<Id> entryIds) {
         try {
-            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+            if (!BarnCRMPermissions.canManageSettings()) {
                 throw new RollupService.RollupServiceException(
                     Label.Core_Rollups_ErrorNoPermission
                 );
@@ -83,8 +86,30 @@ public with sharing class RollupAttentionController {
         }
     }
 
+    /**
+     * Recalculates the waiting records now (ADR-0098 async rollups): starts a queue processor
+     * when none is coming for them, for example after a save that could not start one. The
+     * records are recalculated within a minute, in the background.
+     *
+     * @return the list, read again
+     */
+    @AuraEnabled
+    public static Attention processNow() {
+        try {
+            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_Rollups_ErrorNoPermission
+                );
+            }
+            RollupQueue.processPending();
+            return getAttention();
+        } catch (Exception caught) {
+            throw asUserError(caught);
+        }
+    }
+
     /** "1,204 records waiting, oldest 3 minutes ago", or that nothing is waiting. */
-    private static String waiting() {
+    private static void fillWaiting(Attention attention) {
         AggregateResult totals = [
             SELECT SUM(Record_Count__c) records, MIN(CreatedDate) oldest
             FROM Rollup_Queue__c
@@ -93,11 +118,13 @@ public with sharing class RollupAttentionController {
         ];
         Decimal records = (Decimal) totals.get('records');
         Datetime oldest = (Datetime) totals.get('oldest');
-        if (records == null || records == 0 || oldest == null) {
-            return Label.Core_RollupBuilder_NothingWaiting;
+        attention.hasWaiting = !(records == null || records == 0 || oldest == null);
+        if (!attention.hasWaiting) {
+            attention.waiting = Label.Core_RollupBuilder_NothingWaiting;
+            return;
         }
         Long minutes = (Datetime.now().getTime() - oldest.getTime()) / 60000;
-        return String.format(
+        attention.waiting = String.format(
             Label.Core_RollupBuilder_Waiting,
             new List<String>{ records.format(), minutes.format() }
         );

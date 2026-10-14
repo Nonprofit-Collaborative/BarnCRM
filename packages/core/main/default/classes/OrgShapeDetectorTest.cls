@@ -6,8 +6,13 @@
  * detect() itself is tested against the real org, which is the only honest way to know that
  * the describe calls work where Core has to run.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OrgShapeDetector')
 private class OrgShapeDetectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     // Held as text here for the same reason it is held as text in OrgShapeSelector: these
     // tests have to pass on a Platform-only org, where the object does not exist, so they may
     // not compile against it either.
@@ -394,6 +399,87 @@ private class OrgShapeDetectorTest {
         }
     }
 
+    // ------------------------------------------------- one facet at a time (PEOPLE-36)
+
+    @IsTest
+    static void eachFacetFollowsATestsShape() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
+            Id personType = Id.valueOf('012000000000999');
+            shape.personAccountRecordTypeIds = new Set<Id>{ personType };
+            shape.hasNativeHouseholdGroups = false;
+            OrgShapeDetector.overrideShape = shape;
+
+            Assert.isTrue(OrgShapeDetector.hasPersonAccounts(), 'The shape says person accounts');
+            Assert.areEqual(
+                new Set<Id>{ personType },
+                OrgShapeDetector.personAccountRecordTypeIds(),
+                'The shape\'s person types'
+            );
+            Assert.isFalse(
+                OrgShapeDetector.hasNativeHouseholdGroups(),
+                'The shape says no native households'
+            );
+        }
+    }
+
+    @IsTest
+    static void theFacetsAgreeWithTheWholeShape() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Boolean hasPeople = OrgShapeDetector.hasPersonAccounts();
+            Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
+            Boolean hasNative = OrgShapeDetector.hasNativeHouseholdGroups();
+
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            OrgShapeDetector.OrgShape whole = OrgShapeDetector.detect();
+
+            Assert.areEqual(whole.hasPersonAccounts, hasPeople, 'Person accounts, either way');
+            Assert.areEqual(whole.personAccountRecordTypeIds, personTypes, 'Person types');
+            Assert.areEqual(whole.hasNativeHouseholdGroups, hasNative, 'Native households');
+        }
+    }
+
+    @IsTest
+    static void theNativeFacetAsksForOneRowAndTreatsUnknownAsYes() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'None found is no');
+            Assert.isFalse(
+                OrgShapeSelector.anyNativeHouseholdGroup(),
+                'The one-row probe answers no'
+            );
+
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = null;
+            OrgShapeSelector.failNativeHouseholdGroupProbe = true;
+            Assert.isNull(OrgShapeSelector.anyNativeHouseholdGroup(), 'A failed probe cannot tell');
+            Assert.isTrue(
+                OrgShapeDetector.hasNativeHouseholdGroups(),
+                'Unknown is assumed to be yes (ADR-0036)'
+            );
+        }
+    }
+
+    @IsTest
+    static void theNativeFacetIsAskedOncePerTransaction() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
+            Assert.isTrue(OrgShapeDetector.hasNativeHouseholdGroups(), 'Found');
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Assert.isTrue(
+                OrgShapeDetector.hasNativeHouseholdGroups(),
+                'The answer is cached for the transaction'
+            );
+            OrgShapeDetector.reset();
+            Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'A reset asks again');
+        }
+    }
+
     private static Boolean noneAvailable(Set<Id> recordTypeIds) {
         Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(
                 SObjectDescribeOptions.DEFERRED
@@ -417,5 +503,23 @@ private class OrgShapeDetectorTest {
         shape.hasPersonAccounts = hasPersonAccounts;
         shape.hasIndustriesNonprofit = hasIndustriesNonprofit;
         return shape;
+    }
+
+    @IsTest
+    static void personRecordTypeIdsReadsTheDetectedShape() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
+            Id typeId = Id.valueOf('012000000000999');
+            shape.personAccountRecordTypeIds = new Set<Id>{ typeId };
+            OrgShapeDetector.overrideShape = shape;
+
+            Assert.isTrue(OrgShapeDetector.personRecordTypeIds().contains(typeId));
+
+            OrgShapeDetector.overrideShape = shapeWith(false, false, false);
+            Assert.isTrue(
+                OrgShapeDetector.personRecordTypeIds().isEmpty(),
+                'Never null, empty without person types.'
+            );
+        }
     }
 }

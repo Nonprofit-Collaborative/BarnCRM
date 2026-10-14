@@ -3,7 +3,7 @@
  * gifts already locked by a closed period that nothing has marked posted, and the two receipt
  * findings that moved here from Core with C-29 (ADR-0059) with the assertions they had there.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckGivingChecks')
 private class HealthCheckGivingChecksTest {
     private static User jen() {
         return TestDataFactory.createUser(

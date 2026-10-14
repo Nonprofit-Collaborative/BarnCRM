@@ -4,8 +4,13 @@
  * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). No other package is
  * present in Core's tests, so a stub extension is injected by class name.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdDependentsExtensions')
 private class HouseholdDependentsExtensionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String GIVING = 'GivingHouseholdDependentsExtension';
 
     /** Answers that every household in `credited` still has records credited to it. */

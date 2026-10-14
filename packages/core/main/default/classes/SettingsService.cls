@@ -20,10 +20,9 @@ public with sharing class SettingsService {
         )
         .getLocalName();
 
-    private static final String CACHE_PARTITION = 'local.BarnCRMSettings';
-    private static final String CACHE_KEY = 'orgDefaults';
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
+    private static final String NUMBER_TYPE = 'Number';
     public static final String RECORD = 'Record';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 
@@ -49,7 +48,8 @@ public with sharing class SettingsService {
      */
     private static final Map<Schema.SObjectField, Boolean> SHIPPED_DEFAULTS = new Map<Schema.SObjectField, Boolean>{
         BarnCRM_Settings__c.Relationship_Auto_Reciprocal__c => true,
-        BarnCRM_Settings__c.Auto_Create_Households__c => true
+        BarnCRM_Settings__c.Auto_Create_Households__c => true,
+        BarnCRM_Settings__c.Job_Notifications__c => true
     };
 
     private static BarnCRM_Settings__c cachedSettings;
@@ -62,22 +62,16 @@ public with sharing class SettingsService {
     }
 
     /**
-     * The org-level Core settings record, from the static cache, then the org cache, then the
-     * platform. Never null: an org that has never saved gets an empty record carrying the
-     * shipped defaults (see `SHIPPED_DEFAULTS`).
+     * The org-level Core settings record, from the static cache, then the platform. Never null:
+     * an org that has never saved gets an empty record carrying the shipped defaults (see
+     * `SHIPPED_DEFAULTS`). `getOrgDefaults()` costs no query: the platform serves custom
+     * settings from its own cache across transactions and refreshes it when a save commits.
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c getSettings() {
-        if (cachedSettings != null) {
-            return cachedSettings;
+        if (cachedSettings == null) {
+            cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
         }
-        BarnCRM_Settings__c fromCache = readCache();
-        if (fromCache != null) {
-            cachedSettings = fromCache;
-            return cachedSettings;
-        }
-        cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
-        writeCache(cachedSettings);
         return cachedSettings;
     }
 
@@ -134,7 +128,7 @@ public with sharing class SettingsService {
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c saveValues(Map<String, Object> values) {
-        applyValues(CORE_SETTINGS_OBJECT, values, true);
+        applyValues(CORE_SETTINGS_OBJECT, values, true, true);
         return getSettings();
     }
 
@@ -145,17 +139,27 @@ public with sharing class SettingsService {
      */
     @NamespaceAccessible
     public static SObject saveValues(String settingsObject, Map<String, Object> values) {
-        return applyValues(settingsObject, values, true);
+        return applyValues(settingsObject, values, true, true);
     }
 
     /**
-     * Saves one value the package itself owns, such as the setup checklist progress,
-     * which has no Setting Definition row because it is not an editable setting.
+     * Saves one value the package itself owns, such as the modules turned off, which has no
+     * Setting Definition row because it is not edited on the settings page. Audited.
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c saveSystemValue(String key, Object value) {
-        applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false);
+        applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false, true);
         return getSettings();
+    }
+
+    /**
+     * Saves the package's own bookkeeping, such as how far the setup checklist has got, in one
+     * write and with no audit row (ADMIN-20). A checklist click is not a settings change, and
+     * auditing it pushed real changes out of the Recent changes list.
+     */
+    @NamespaceAccessible
+    public static void saveBookkeeping(Map<String, Object> values) {
+        applyValues(CORE_SETTINGS_OBJECT, values, false, false);
     }
 
     /**
@@ -170,7 +174,8 @@ public with sharing class SettingsService {
     private static SObject applyValues(
         String settingsObject,
         Map<String, Object> values,
-        Boolean requireDefinition
+        Boolean requireDefinition,
+        Boolean audit
     ) {
         Schema.SObjectType type = settingsType(settingsObject);
         if (values == null || values.isEmpty()) {
@@ -192,8 +197,7 @@ public with sharing class SettingsService {
                 throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
             }
             Object oldValue = record.get(token);
-            Object newValue = coerce(values.get(key), field);
-            checkAllowedValue(definition, newValue);
+            Object newValue = checkedValue(values.get(key), field, definition);
             String oldText = asText(oldValue);
             String newText = asText(newValue);
             if (oldText.equals(newText)) {
@@ -202,6 +206,9 @@ public with sharing class SettingsService {
             refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
             refuseIfDigestRecipientsAreNotUsers(token, newText);
             changed.put(token, newValue);
+            if (!audit) {
+                continue;
+            }
             changes.add(
                 new Setting_Change__c(
                     Setting_Name__c = objectName + '.' + localName,
@@ -212,11 +219,13 @@ public with sharing class SettingsService {
                 )
             );
         }
-        if (changes.isEmpty()) {
+        if (changed.isEmpty()) {
             return record;
         }
         SettingsWriter.saveOrgDefault(type, storedRecord, changed);
-        Database.insert(changes, AccessLevel.USER_MODE);
+        if (!changes.isEmpty()) {
+            Database.insert(changes, AccessLevel.USER_MODE);
+        }
         clearCaches();
         return orgDefault(type);
     }
@@ -261,6 +270,36 @@ public with sharing class SettingsService {
     }
 
     /**
+     * The value read in the field's type and checked against its row. A value that cannot be
+     * used is refused with a message that names the setting, as the admin guide promises
+     * (ADMIN-21): with a whole section saved at once, "one of the values" is not enough.
+     */
+    private static Object checkedValue(
+        Object rawValue,
+        Schema.DescribeFieldResult field,
+        Setting_Definition__mdt definition
+    ) {
+        try {
+            Object newValue = coerce(rawValue, field);
+            checkAllowedValue(definition, newValue);
+            return newValue;
+        } catch (SettingsException refused) {
+            if (refused.getMessage() != System.Label.Core_Settings_InvalidValueError) {
+                throw refused;
+            }
+            String name = definition != null && String.isNotBlank(definition.MasterLabel)
+                ? definition.MasterLabel
+                : field.getLabel();
+            throw new SettingsException(
+                String.format(
+                    System.Label.Core_Settings_ErrorForSetting,
+                    new List<Object>{ name, refused.getMessage() }
+                )
+            );
+        }
+    }
+
+    /**
      * A picklist row may only be set to one of the choices it ships, so a direct call to the
      * controller cannot store a value the console would never offer.
      */
@@ -274,6 +313,10 @@ public with sharing class SettingsService {
         }
         if (RECORD_TYPE_LIST.equalsIgnoreCase(definition.Data_Type__c)) {
             checkRecordTypes(definition, String.valueOf(newValue));
+            return;
+        }
+        if (NUMBER_TYPE.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkRange(definition, newValue);
             return;
         }
         if (
@@ -295,6 +338,33 @@ public with sharing class SettingsService {
             }
         }
         throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+    }
+
+    /**
+     * A number row is refused outside the range its definition ships, whoever saves it, so the
+     * console never shows a value as saved that its reader would clamp (ADMIN-27).
+     */
+    private static void checkRange(Setting_Definition__mdt definition, Object newValue) {
+        Decimal candidate;
+        try {
+            candidate = Decimal.valueOf(String.valueOf(newValue));
+        } catch (TypeException notANumber) {
+            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        }
+        Decimal low = definition.Min_Value__c;
+        Decimal high = definition.Max_Value__c;
+        if ((low != null && candidate < low) || (high != null && candidate > high)) {
+            throw new SettingsException(
+                String.format(
+                    System.Label.Core_Settings_NumberOutOfRange,
+                    new List<Object>{
+                        definition.MasterLabel,
+                        low == null ? '' : low.stripTrailingZeros().toPlainString(),
+                        high == null ? '' : high.stripTrailingZeros().toPlainString()
+                    }
+                )
+            );
+        }
     }
 
     /** A Record row holds the Id of a record of its own object, and nothing else (ADR-0074). */
@@ -335,7 +405,10 @@ public with sharing class SettingsService {
         if (type == null) {
             return chosen;
         }
-        for (Schema.RecordTypeInfo info : type.getDescribe().getRecordTypeInfos()) {
+        for (
+            Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getRecordTypeInfos()
+        ) {
             if (info.isActive() && !info.isMaster()) {
                 chosen.add(info);
             }
@@ -345,7 +418,9 @@ public with sharing class SettingsService {
 
     /**
      * The org-level record of the given settings object, never null, read once per transaction
-     * per object so a console holding many modules' settings does not query per row.
+     * per object so a console holding many modules' settings does not query per row. A never
+     * saved object reads as its first save would store it, so a checkbox that ships on reads
+     * as on (ADMIN-4).
      */
     private static SObject orgDefault(Schema.SObjectType type) {
         if (isCoreSettings(type)) {
@@ -356,7 +431,7 @@ public with sharing class SettingsService {
             return cachedOrgDefaults.get(name);
         }
         SObject record = SettingsRecordSelector.getOrgDefault(type);
-        SObject resolved = record == null ? type.newSObject() : record;
+        SObject resolved = record == null ? firstSaveRecord(type) : record;
         cachedOrgDefaults.put(name, resolved);
         return resolved;
     }
@@ -492,70 +567,41 @@ public with sharing class SettingsService {
     /** Settings objects already described and found to be hierarchy settings, this transaction. */
     private static Set<Schema.SObjectType> checkedSettingsTypes = new Set<Schema.SObjectType>();
 
-    /** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
-    private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
-
     private static String objectName(String settingsObject) {
         return String.isBlank(settingsObject) ? CORE_SETTINGS_OBJECT : settingsObject.trim();
     }
 
     /**
-     * The object with this API name, whether or not a namespace is in front of it. Metadata rows
-     * name objects without a prefix, and a packaged org's describe keys carry one, so an exact
-     * match is tried first and then a match on the part after the namespace.
+     * The object a metadata row names, BarnCRM's own before any other of the same name, cached
+     * per transaction. See `NamespaceUtil.objectType`.
      */
     @NamespaceAccessible
     public static Schema.SObjectType typeByName(String apiName) {
-        if (String.isBlank(apiName)) {
-            return null;
-        }
-        String cacheKey = apiName.trim().toLowerCase();
-        if (!typesByName.containsKey(cacheKey)) {
-            typesByName.put(cacheKey, describeTypeByName(apiName.trim()));
-        }
-        return typesByName.get(cacheKey);
+        return NamespaceUtil.objectType(apiName);
     }
 
-    private static Schema.SObjectType describeTypeByName(String name) {
-        Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
-        Schema.SObjectType type = globals.get(name);
-        if (type != null) {
-            return type;
-        }
-        String suffix = '__' + name.toLowerCase();
-        for (String key : globals.keySet()) {
-            if (key.toLowerCase().endsWith(suffix)) {
-                return globals.get(key);
-            }
-        }
-        return null;
-    }
-
+    /**
+     * The settings objects the shipped rows name. Read from the short fields, which costs no
+     * query, because a module's save asks this every time it reads one of its settings.
+     */
     private static Set<String> registeredObjects() {
         Set<String> names = new Set<String>();
-        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAllShortFields()) {
             names.add(objectName(definition.Settings_Object__c).toLowerCase());
         }
         return names;
     }
 
     /**
-     * Forgets the cached settings, so the next read comes from the platform. Every writer of a
-     * settings object, in any package, calls this after it writes.
+     * Forgets the cached settings, so the next read in this transaction comes from the platform.
+     * Every writer of a settings object, in any package, calls this after it writes. Nothing is
+     * cached across transactions here: the platform's own custom settings cache already serves
+     * `getOrgDefaults()` without a query (ADR-0094).
      */
     @NamespaceAccessible
     public static void clearCaches() {
         cachedSettings = null;
         cachedOrgDefaults.clear();
-        Cache.OrgPartition partition = partition();
-        if (partition == null) {
-            return;
-        }
-        try {
-            partition.remove(CACHE_KEY);
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'BarnCRM Settings cache');
-        }
     }
 
     /** The shipped rows for one settings object, by the key each one edits. */
@@ -705,48 +751,18 @@ public with sharing class SettingsService {
         return String.valueOf(value);
     }
 
-    private static Cache.OrgPartition partition() {
-        try {
-            return Cache.Org.getPartition(CACHE_PARTITION);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static BarnCRM_Settings__c readCache() {
-        Cache.OrgPartition partition = partition();
-        if (partition == null) {
-            return null;
-        }
-        try {
-            return (BarnCRM_Settings__c) partition.get(CACHE_KEY);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static void writeCache(BarnCRM_Settings__c record) {
-        Cache.OrgPartition partition = partition();
-        if (partition == null || record == null) {
-            return;
-        }
-        try {
-            partition.put(CACHE_KEY, record);
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'BarnCRM Settings cache');
-        }
-    }
-
     @NamespaceAccessible
     public static final String COEXISTENCE_MODE_DEFAULT = 'Standalone';
     @NamespaceAccessible
     public static final String MEMBERSHIP_MODE_DEFAULT = 'Contact';
 
+    @TestVisible
     private static final Set<String> COEXISTENCE_MODES = new Set<String>{
         'Standalone',
         'NPSP',
         'NonprofitCloud'
     };
+    @TestVisible
     private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 
     private static String storedOrDefault(String stored, Set<String> allowed, String fallback) {
@@ -771,37 +787,6 @@ public with sharing class SettingsService {
         Database.insert(change, AccessLevel.USER_MODE);
     }
 
-    /**
-     * Checks a value on its way in. Anything outside the allowed list is refused with a message
-     * the console can show.
-     */
-    @NamespaceAccessible
-    public static String validated(String value, Set<String> allowed) {
-        if (allowed == null || String.isBlank(value) || !allowed.contains(value)) {
-            throw new SettingsServiceException(Label.Core_Settings_ModeValueInvalid);
-        }
-        return value;
-    }
-
-    /**
-     * Alias kept for callers written against the Core-only service (C-04). Clears every
-     * cached settings record, whichever package owns the object.
-     */
-    @NamespaceAccessible
-    public static void clearCache() {
-        clearCaches();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> coexistenceModes() {
-        return COEXISTENCE_MODES.clone();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> membershipModes() {
-        return MEMBERSHIP_MODES.clone();
-    }
-
     @NamespaceAccessible
     public static String coexistenceMode() {
         return storedOrDefault(
@@ -818,9 +803,5 @@ public with sharing class SettingsService {
             MEMBERSHIP_MODES,
             MEMBERSHIP_MODE_DEFAULT
         );
-    }
-
-    @NamespaceAccessible
-    public class SettingsServiceException extends Exception {
     }
 }

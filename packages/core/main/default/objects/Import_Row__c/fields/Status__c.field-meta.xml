@@ -40,6 +40,11 @@
         <default>false</default>
         <label>Skipped</label>
       </value>
+      <value>
+        <fullName>Retried</fullName>
+        <default>false</default>
+        <label>Retried</label>
+      </value>
     </valueSetDefinition>
   </valueSet>
 </CustomField>

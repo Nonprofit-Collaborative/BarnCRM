@@ -64,8 +64,8 @@ You need the Connect module and a Salesforce edition with Opportunities (Sales C
 Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has none, and the
 Opportunity mirror page says so.
 
-1. Give yourself the **Opportunity Mirror** permission set. Until the Module Manager arrives,
-   module permission sets are assigned in Setup.
+1. Give yourself the **Opportunity Mirror** permission set, in Setup: the roles on the Access
+   page do not include a module's permission sets.
 2. Open **BarnCRM Settings**, choose **Giving**, and set **Opportunity mirror direction**.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of

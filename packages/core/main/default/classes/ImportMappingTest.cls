@@ -3,12 +3,16 @@
  * that refuses a mapping which identifies nobody.
  */
 // runs-as: deploying user (pure logic: parses and checks a mapping document, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:ImportMapping')
 private class ImportMappingTest {
     @IsTest
     static void parsesAMappingDocument() {
         ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
-        Assert.areEqual(1, mapping.version, 'The shipped document is version one.');
+        Assert.areEqual(
+            DataTransform.DOCUMENT_VERSION,
+            mapping.version,
+            'A new document carries the current version (ADR-0112).'
+        );
         Assert.areEqual(5, mapping.columns.size(), 'Every column is read.');
         Assert.areEqual(
             'Contact1.Email',

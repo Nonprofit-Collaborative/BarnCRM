@@ -5,8 +5,13 @@
  * month unless she holds Override Posting Lock, in which case the reopening is written down.
  * David, on the staff permission sets, can read the date and change nothing.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccountingPeriodController')
 private class AccountingPeriodControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',

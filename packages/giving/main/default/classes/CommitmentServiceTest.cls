@@ -3,7 +3,7 @@
  * what happens to it when gifts arrive, when the schedule changes, and when the daily job
  * runs (G-07).
  */
-@IsTest
+@IsTest(testFor='ApexClass:CommitmentService')
 private class CommitmentServiceTest {
     /**
      * A gift saves only when there is a default fund to allocate it to (R-GA2).

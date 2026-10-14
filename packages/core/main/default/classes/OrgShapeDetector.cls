@@ -81,6 +81,13 @@ public with sharing class OrgShapeDetector {
         }
     }
 
+    /** Account record types that are person types. Empty unless Person Accounts are enabled. */
+    public static Set<Id> personRecordTypeIds() {
+        // The cheap read: no full detect(), and never null.
+        Set<Id> personTypes = personAccountRecordTypeIds();
+        return personTypes == null ? new Set<Id>() : personTypes;
+    }
+
     /**
      * What this org looks like, computed once per transaction.
      */
@@ -98,10 +105,8 @@ public with sharing class OrgShapeDetector {
         shape.hasNpsp = hasObjectWithPrefix(objectNames, NPSP_PREFIX.toLowerCase());
         shape.hasIndustriesNonprofit = objectNames.contains(INDUSTRIES_GIFT_OBJECT.toLowerCase());
         shape.hasSalesCloudObjects = objectNames.contains(SALES_CLOUD_OBJECT.toLowerCase());
-        shape.hasPersonAccounts = accountFieldNames().contains(PERSON_ACCOUNT_FIELD.toLowerCase());
-        if (shape.hasPersonAccounts == true) {
-            shape.personAccountRecordTypeIds = OrgShapeSelector.personTypeRecordTypeIds();
-        }
+        shape.hasPersonAccounts = hasPersonAccounts();
+        shape.personAccountRecordTypeIds = personAccountRecordTypeIds();
         // Asked on its own, never inferred from the fundraising objects above: the native
         // household group is an Industries common object that the Fundraising licence does
         // not gate, so an org can have it without having any of them. A null count is the
@@ -118,6 +123,70 @@ public with sharing class OrgShapeDetector {
         return shape;
     }
 
+    // One facet at a time, for the callers on a save path that need one answer and not the
+    // whole shape: detect() costs two global describes, a record type query and the native
+    // household probe, and these cost one cached describe, plus one small query each where
+    // the facet needs it. Each follows a test's override shape and reuses a shape already
+    // detected in this transaction.
+    private static Boolean cachedHasPersonAccounts;
+    private static Set<Id> cachedPersonTypes;
+    private static Boolean cachedHasNativeHouseholdGroups;
+
+    /** Whether this org stores people as accounts: one Account field describe, cached. */
+    public static Boolean hasPersonAccounts() {
+        if (overrideShape != null) {
+            return overrideShape.hasPersonAccounts == true;
+        }
+        if (cachedShape != null) {
+            return cachedShape.hasPersonAccounts == true;
+        }
+        if (cachedHasPersonAccounts == null) {
+            cachedHasPersonAccounts = Account.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .fields.getMap()
+                .containsKey(PERSON_ACCOUNT_FIELD.toLowerCase());
+        }
+        return cachedHasPersonAccounts;
+    }
+
+    /** Every Account record type that is a person type; empty, with no query, without them. */
+    public static Set<Id> personAccountRecordTypeIds() {
+        if (overrideShape != null) {
+            return overrideShape.personAccountRecordTypeIds == null
+                ? new Set<Id>()
+                : overrideShape.personAccountRecordTypeIds;
+        }
+        if (cachedShape != null) {
+            return cachedShape.personAccountRecordTypeIds;
+        }
+        if (cachedPersonTypes == null) {
+            cachedPersonTypes = hasPersonAccounts()
+                ? OrgShapeSelector.personTypeRecordTypeIds()
+                : new Set<Id>();
+        }
+        return cachedPersonTypes;
+    }
+
+    /**
+     * Whether this org already has native Nonprofit Cloud households, asked as "is there
+     * one" (a single row) rather than counted. Unknown is treated as yes, as detect() does
+     * (ADR-0036).
+     */
+    public static Boolean hasNativeHouseholdGroups() {
+        if (overrideShape != null) {
+            return overrideShape.hasNativeHouseholdGroups == true;
+        }
+        if (cachedShape != null) {
+            return cachedShape.hasNativeHouseholdGroups == true;
+        }
+        if (cachedHasNativeHouseholdGroups == null) {
+            Boolean found = OrgShapeSelector.anyNativeHouseholdGroup();
+            cachedHasNativeHouseholdGroups = found == null || found;
+        }
+        return cachedHasNativeHouseholdGroups;
+    }
+
     /**
      * The person account record type the running user creates a new person with, or null when
      * none is available to them.
@@ -132,7 +201,7 @@ public with sharing class OrgShapeDetector {
      * every time. Not cached: the describe follows System.runAs.
      */
     public static Id creatablePersonRecordTypeId() {
-        Set<Id> personTypes = detect().personAccountRecordTypeIds;
+        Set<Id> personTypes = personAccountRecordTypeIds();
         if (personTypes == null || personTypes.isEmpty()) {
             return null;
         }
@@ -187,14 +256,6 @@ public with sharing class OrgShapeDetector {
         return names;
     }
 
-    private static Set<String> accountFieldNames() {
-        Set<String> names = new Set<String>();
-        for (String fieldName : Schema.SObjectType.Account.fields.getMap().keySet()) {
-            names.add(fieldName.toLowerCase());
-        }
-        return names;
-    }
-
     private static Boolean hasObjectWithPrefix(Set<String> objectNames, String prefix) {
         for (String objectName : objectNames) {
             if (objectName.startsWith(prefix)) {
@@ -208,5 +269,8 @@ public with sharing class OrgShapeDetector {
     private static void reset() {
         overrideShape = null;
         cachedShape = null;
+        cachedHasPersonAccounts = null;
+        cachedPersonTypes = null;
+        cachedHasNativeHouseholdGroups = null;
     }
 }

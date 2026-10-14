@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Related_Object__c</fullName>
+  <description>The API name of the object a one-object template also creates related records of from the same rows; empty for none (canonical model R-IT17).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The object whose records each row also creates, linked to the row's parent.</inlineHelpText>
+  <label>Related Object</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

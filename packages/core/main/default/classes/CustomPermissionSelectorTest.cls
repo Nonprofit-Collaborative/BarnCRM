@@ -6,8 +6,13 @@
  * against a permission Core does ship, granted to a user the test creates, which is the only
  * way to prove the four queries actually find a holder and name them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CustomPermissionSelector')
 private class CustomPermissionSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A developer name deliberately belonging to no package in this repository. */
     private static final String ABSENT_PERMISSION = 'No_Package_Ships_This_Permission';
 

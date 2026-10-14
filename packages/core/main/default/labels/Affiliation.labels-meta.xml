@@ -46,7 +46,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the list of affiliations could not be read</shortDescription>
-        <value>BarnCRM could not read these affiliations. The Error Log has the details.</value>
+        <value>BarnCRM could not read these affiliations. Refresh the page, and if it happens again ask your administrator to check that you can read affiliations.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Affiliation_Loading</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Affiliation card: what a screen reader hears while the card loads</shortDescription>
+        <value>Loading affiliations</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimaryButton</fullName>
@@ -62,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the primary organization could not be changed</shortDescription>
-        <value>BarnCRM could not make that the primary affiliation. The Error Log has the details.</value>
+        <value>BarnCRM could not make that the primary affiliation. Check that you can edit affiliations, and if it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimarySuccess</fullName>
@@ -81,14 +89,6 @@
         <value>no role</value>
     </labels>
     <labels>
-        <fullName>Core_Affiliation_NotFound</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: the affiliation asked for is not there any more</shortDescription>
-        <value>That affiliation is no longer on file. Refresh the page.</value>
-    </labels>
-    <labels>
         <fullName>Core_Affiliation_OrganizationRequired</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -101,7 +101,7 @@
         <categories>Relationships</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save refused: dates overlap an affiliation on file; names it</shortDescription>
+        <shortDescription>Save refused, dates overlap; {0} person, {1} org, {2} role, {3} record</shortDescription>
         <value>{0} already has an affiliation with {1} as {2} covering those dates. Open {3} to change it.</value>
     </labels>
     <labels>

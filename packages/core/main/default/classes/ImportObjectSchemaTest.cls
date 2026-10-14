@@ -6,8 +6,13 @@
  * Runs as a minimal-profile user holding only BarnCRM Admin, since what describe answers is
  * that user's access.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectSchema')
 private class ImportObjectSchemaTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in
         // for an org's own object with an External ID, which Core does not otherwise have.
@@ -110,14 +115,17 @@ private class ImportObjectSchemaTest {
             Assert.isTrue(ImportObjectSchema.leavesLookupEmpty(load), 'Leave it empty.');
             Assert.isFalse(ImportObjectSchema.leavesLookupEmpty(people), 'Reject is the default.');
             Assert.areEqual(
-                new List<String>{ ImportObjectSchema.OPERATION_UPDATE },
+                new List<String>{
+                    ImportObjectSchema.OPERATION_UPDATE,
+                    ImportObjectSchema.OPERATION_UPDATE_BY_FIELD
+                },
                 ImportObjectSchema.operationsFor(Contact.SObjectType),
-                'People load by Update only.'
+                'People load by the two updates only.'
             );
             Assert.areEqual(
-                3,
+                4,
                 ImportObjectSchema.operationsFor(Affiliation__c.SObjectType).size(),
-                'Any other object has all three.'
+                'Any other object has all four.'
             );
         }
     }
@@ -207,8 +215,8 @@ private class ImportObjectSchemaTest {
                 'The name field.'
             );
             Assert.isNull(
-                ImportObjectSchema.parentField(Account.SObjectType, 'Phone'),
-                'A field that does not name one record.'
+                ImportObjectSchema.parentField(Account.SObjectType, 'Anniversary__c'),
+                'A field that is not text, an email or a phone.'
             );
         }
     }

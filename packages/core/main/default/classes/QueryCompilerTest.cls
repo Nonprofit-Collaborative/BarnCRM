@@ -4,8 +4,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QueryCompiler')
 private class QueryCompilerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String filter, String orderBy, Object rowLimit) {
         Map<String, Object> document = new Map<String, Object>{
             'version' => 1,
@@ -92,6 +97,51 @@ private class QueryCompilerTest {
         }
     }
 
+    /**
+     * The escaped % and _ of a "contains" value match only themselves in the database, not
+     * any text and any one character.
+     */
+    @IsTest
+    static void containsMatchesPercentAndUnderscoreLiterally() {
+        System.runAs(TestUsers.admin()) {
+            List<Error_Log__c> logs = new List<Error_Log__c>();
+            for (
+                String context : new List<String>{ 'Save 50%_off', 'Save 50 xoff', 'Save 50%xoff' }
+            ) {
+                logs.add(
+                    new Error_Log__c(
+                        Timestamp__c = System.now(),
+                        Context__c = context,
+                        Message__c = 'A test entry.',
+                        Severity__c = 'Error',
+                        Status__c = 'New'
+                    )
+                );
+            }
+            insert logs;
+            String containsFilter = JSON.serialize(
+                new Map<String, Object>{
+                    'version' => 1,
+                    'conditions' => new List<Object>{
+                        new Map<String, Object>{
+                            'id' => 1,
+                            'field' => 'Context__c',
+                            'operator' => 'contains',
+                            'value' => '50%_'
+                        }
+                    }
+                }
+            );
+
+            List<SObject> rows = QueryCompiler.run(
+                QueryCompiler.compile(query(containsFilter, null, 200))
+            );
+
+            System.Assert.areEqual(1, rows.size(), 'Only the literal match: ' + rows);
+            System.Assert.areEqual('Save 50%_off', rows[0].get('Context__c'));
+        }
+    }
+
     @IsTest
     static void exportPagesInIdOrderAfterTheLastIdRead() {
         System.runAs(TestUsers.admin()) {
@@ -112,6 +162,50 @@ private class QueryCompilerTest {
                 QueryCompiler.compileExportPage(document, lastRead)
                     .soql.endsWith('WHERE Id > :afterId ORDER BY Id LIMIT :pageSize'),
                 'Export pages order by Id, whatever the grid order is'
+            );
+        }
+    }
+
+    @IsTest
+    static void aCompiledQueryCountsWithoutCompilingAgain() {
+        System.runAs(TestUsers.admin()) {
+            makeLogs(200, 20);
+            String document = query(ERRORS_ONLY, null, 10);
+            QueryCompiler.Compiled compiled = QueryCompiler.compileSelection(
+                document,
+                new Set<String>{ 'Id' },
+                null
+            );
+            System.Assert.areEqual(
+                QueryCompiler.count(document, 1000),
+                QueryCompiler.count(compiled, 1000),
+                'The same count from the document or its compiled query'
+            );
+            System.Assert.areEqual(150, QueryCompiler.count(compiled, 150), 'Capped the same');
+        }
+    }
+
+    @IsTest
+    static void aMalformedPathIsRefusedNamingItsFirstEightyCharacters() {
+        System.runAs(TestUsers.admin()) {
+            String path = 'Message__c; ' + 'x'.repeat(200);
+            try {
+                QueryCompiler.resolve('Error_Log__c', path);
+                System.Assert.fail('A malformed path is refused');
+            } catch (QueryCompiler.QueryCompilerException refused) {
+                System.Assert.areEqual(
+                    String.format(
+                        System.Label.Core_Filter_ErrorUnknownField,
+                        new List<Object>{ path.abbreviate(80) }
+                    ),
+                    refused.getMessage(),
+                    'Filter, sort, summary and related columns share one refusal'
+                );
+            }
+            System.Assert.areEqual(
+                'Message__c',
+                QueryCompiler.resolve('Error_Log__c', 'Message__c').getName(),
+                'A readable field resolves'
             );
         }
     }
@@ -173,7 +267,15 @@ private class QueryCompilerTest {
                     null,
                     null
                 ),
-                'future version' => '{"version": 2, "object": "Error_Log__c", "fields": ["Name"]}'
+                'future version' => '{"version": 2, "object": "Error_Log__c", "fields": ["Name"]}',
+                // The right part with the wrong shape is refused, not a type error.
+                'sort by a bare name' => query(null, '["Context__c"]', null),
+                'object as a list' => '{"version": 1, "object": ["Error_Log__c"], "fields": ["Name"]}',
+                'conditions as names' => query(
+                    '{"version": 1, "conditions": ["Context__c"]}',
+                    null,
+                    null
+                )
             };
             for (String reason : refused.keySet()) {
                 try {

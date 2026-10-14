@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ErrorRetryNotOpen</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: the import cannot take a retry of its rejected rows</shortDescription>
+        <value>Only a finished file import with rejected rows can retry them, and not while a preview or commit is running.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRetryOtherUser</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: only the person who committed the import may retry its rows</shortDescription>
+        <value>Only the person who committed this import can retry its rejected rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRetryTooLarge</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: the fixed rows file is over the retry row cap; {0} is the cap</shortDescription>
+        <value>A retry takes up to {0} fixed rows. Import a larger file as a new import.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RetryHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: heading over the retry box on the results step</shortDescription>
+        <value>Retry fixed rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RetryHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: help under the retry heading</shortDescription>
+        <value>Fix the rejected rows in the downloaded file and upload it here. The fixed rows are previewed, then committed into this import, so one undo removes both.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RetryFileLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: label of the fixed rows file input</shortDescription>
+        <value>File of fixed rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RetryColumnsMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import retry: the fixed rows file lacks columns of the original; {0} lists them</shortDescription>
+        <value>The fixed rows file is missing these columns of the original file: {0}</value>
+    </labels>
+</CustomLabels>

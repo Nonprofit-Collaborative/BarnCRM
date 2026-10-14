@@ -8,7 +8,7 @@
         disabled={disabled}
         onclick={handleToggle}
     ></lightning-button>
-    <template if:true={open}>
+    <template lwc:if={open}>
         <div id="query-text" class="slds-var-m-top_x-small">
             <lightning-textarea
                 data-id="text"
@@ -17,7 +17,7 @@
                 value={text}
                 onchange={handleTextChange}
             ></lightning-textarea>
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div class="slds-text-color_error slds-var-m-top_xx-small" role="alert" data-id="text-error">
                     {errorMessage}
                 </div>

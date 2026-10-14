@@ -6,7 +6,7 @@
  * the org's business, so the answer is stubbed; one test asks the platform itself. The 200-row
  * case runs as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportDuplicateRuleMatcher')
 private class ImportDuplicateRuleMatchTest {
     private static final Integer MANY = 200;
 
@@ -300,6 +300,210 @@ private class ImportDuplicateRuleMatchTest {
                 );
             }
 
+        }
+    }
+
+    private static DuplicateRule rule(String objectName, String subtype, Boolean active) {
+        Map<String, Object> fields = new Map<String, Object>{
+            'attributes' => new Map<String, Object>{ 'type' => 'DuplicateRule' },
+            'SobjectType' => objectName,
+            'IsActive' => active
+        };
+        if (subtype != null) {
+            fields.put('SobjectSubtype', subtype);
+        }
+        return (DuplicateRule) JSON.deserialize(JSON.serialize(fields), DuplicateRule.class);
+    }
+
+    /**
+     * A person account rule is a rule on Account with the person account subtype: it answers for
+     * person accounts only, so an organization with only that rule switched on is not asked
+     * about, and no error is logged for every chunk.
+     */
+    @IsTest
+    static void aPersonAccountRuleIsNoAnswerForAnOrganization() {
+        System.runAs(TestUsers.admin()) {
+            DuplicateSelector.rulesOverride = new List<DuplicateRule>{
+                rule('Account', DuplicateSelector.PERSON_ACCOUNT_SUBTYPE, true),
+                rule('Contact', null, false)
+            };
+            Assert.isFalse(
+                ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType),
+                'No rule for organizations and households'
+            );
+            Assert.isTrue(
+                ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType, true),
+                'The person account rule answers for person accounts'
+            );
+            Assert.isFalse(
+                ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType),
+                'An inactive rule is no rule'
+            );
+            List<SObject> organizations = new List<SObject>();
+            for (Integer index = 0; index < MANY; index++) {
+                organizations.add(
+                    ImportDuplicateRuleMatcher.probe(
+                        Account.SObjectType,
+                        new Map<String, String>{ 'Name' => 'Springfield Club ' + index },
+                        organizationType()
+                    )
+                );
+            }
+            Assert.isNull(
+                ImportDuplicateRuleMatcher.matchesFor(organizations, null),
+                'The rule alone decides'
+            );
+            Assert.areEqual(0, ImportDuplicateRuleMatcher.calls, 'The matcher is not asked');
+            Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'Nothing is logged');
+
+            DuplicateSelector.rulesOverride.add(rule('Account', 'None', true));
+            Assert.isTrue(
+                ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType),
+                'An Account rule with no subtype answers for organizations'
+            );
+            Assert.isFalse(
+                ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType, true),
+                'Only Account has person accounts'
+            );
+        }
+    }
+
+    /**
+     * The scan's households pass starts only for a rule that compares organizations and
+     * households; a person account rule alone gives it nothing to ask.
+     */
+    @IsTest
+    static void aPersonAccountRuleAloneStartsNoHouseholdsPass() {
+        System.runAs(TestUsers.admin()) {
+            DuplicateSelector.rulesOverride = new List<DuplicateRule>{
+                rule('Account', DuplicateSelector.PERSON_ACCOUNT_SUBTYPE, true),
+                rule('Contact', null, true)
+            };
+            Set<String> both = new Set<String>{ 'Account', 'Contact' };
+            Assert.areEqual(
+                new Set<String>{ 'Contact' },
+                DuplicateSelector.objectsWithActiveRules(both),
+                'Only the people pass has a rule to run'
+            );
+
+            DuplicateSelector.rulesOverride.add(rule('Account', 'None', true));
+            Assert.areEqual(
+                both,
+                DuplicateSelector.objectsWithActiveRules(both),
+                'An Account rule with no subtype starts the households pass'
+            );
+        }
+    }
+
+    /**
+     * In an org with person accounts a contact the rules match may be the contact half of a
+     * person account, which a contact import never takes as its person. The filter is added
+     * only there, for contacts only.
+     */
+    @IsTest
+    static void aContactMatchIsNeverThePersonHalfOfAnAccount() {
+        System.runAs(TestUsers.admin()) {
+            String plain = ImportDuplicateRuleMatcher.visibleQuery(
+                Contact.SObjectType,
+                false,
+                false
+            );
+            String withPeople = ImportDuplicateRuleMatcher.visibleQuery(
+                Contact.SObjectType,
+                false,
+                true
+            );
+            Assert.isTrue(
+                withPeople.startsWith(plain + ' AND '),
+                'Contacts are filtered where person accounts exist: ' + withPeople
+            );
+            Assert.areEqual(
+                ImportDuplicateRuleMatcher.visibleQuery(Account.SObjectType, true, false),
+                ImportDuplicateRuleMatcher.visibleQuery(Account.SObjectType, true, true),
+                'Accounts are filtered by record type, as before'
+            );
+        }
+    }
+
+    /**
+     * Canary: the platform's own matcher finds a person already there through the standard
+     * contact rule, which every new org has switched on. Skipped, and says so in the debug
+     * log, where that rule is off. The debug line records what one chunk of 200 probes costs
+     * (ADR-0081): matcher calls, queries and CPU time.
+     */
+    @IsTest
+    static void theStandardContactRuleFindsThePersonAlreadyThere() {
+        System.runAs(TestUsers.admin()) {
+            if (
+                !DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' })
+                    .containsKey('Standard_Contact_Duplicate_Rule')
+            ) {
+                System.debug(
+                    LoggingLevel.WARN,
+                    'Canary skipped: the standard contact rule is off.'
+                );
+                return;
+            }
+            Contact existing = new Contact(
+                FirstName = 'Canary',
+                LastName = 'Matchtest',
+                Email = 'canary.matchtest@example.org'
+            );
+            insert existing;
+            List<SObject> probes = new List<SObject>();
+            probes.add(
+                ImportDuplicateRuleMatcher.probe(
+                    Contact.SObjectType,
+                    new Map<String, String>{
+                        'FirstName' => 'Canary',
+                        'LastName' => 'Matchtest',
+                        'Email' => 'canary.matchtest@example.org'
+                    },
+                    null
+                )
+            );
+            for (Integer index = 1; index < MANY; index++) {
+                probes.add(
+                    ImportDuplicateRuleMatcher.probe(
+                        Contact.SObjectType,
+                        new Map<String, String>{
+                            'FirstName' => 'Nobody',
+                            'LastName' => 'Unmatched ' + index,
+                            'Email' => 'unmatched' +
+                            index +
+                            '@example.org'
+                        },
+                        null
+                    )
+                );
+            }
+
+            Test.startTest();
+            Integer queriesBefore = Limits.getQueries();
+            Integer cpuBefore = Limits.getCpuTime();
+            List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, null);
+            String cost =
+                'ADR-0081 cost for ' +
+                MANY +
+                ' probes: matcher calls ' +
+                ImportDuplicateRuleMatcher.calls +
+                ', queries ' +
+                (Limits.getQueries() - queriesBefore) +
+                ', CPU ms ' +
+                (Limits.getCpuTime() - cpuBefore);
+            System.debug(LoggingLevel.WARN, cost);
+            Test.stopTest();
+
+            Assert.isNotNull(found, 'The rules were asked: ' + cost);
+            Assert.areEqual(MANY, found.size(), 'One answer per probe');
+            Assert.areEqual(1, found[0].size(), 'The person already there: ' + cost);
+            Assert.areEqual(existing.Id, found[0][0].Id);
+            Assert.isTrue(found[1].isEmpty(), 'Nobody else matched');
+            Assert.areEqual(
+                MANY / ImportDuplicateRuleMatcher.MAX_RECORDS_PER_CALL,
+                ImportDuplicateRuleMatcher.calls,
+                '50 probes a call'
+            );
         }
     }
 

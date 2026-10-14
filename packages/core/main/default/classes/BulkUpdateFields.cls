@@ -36,6 +36,9 @@ public with sharing class BulkUpdateFields {
         Schema.DisplayType.CURRENCY,
         Schema.DisplayType.PERCENT
     };
+    /** The words a step result may be for a ticked and an unticked checkbox. */
+    private static final Set<String> CHECKED_WORDS = new Set<String>{ 'true', 'yes', '1' };
+    private static final Set<String> UNCHECKED_WORDS = new Set<String>{ 'false', 'no', '0' };
     /** Types a bulk update can write a value of. The undo puts each of them back typed. */
     private static final Set<Schema.DisplayType> WRITABLE = new Set<Schema.DisplayType>{
         Schema.DisplayType.STRING,
@@ -298,6 +301,31 @@ public with sharing class BulkUpdateFields {
         }
     }
 
+    /**
+     * A stored value as the text a transform step reads, in the form `fromText` reads back, so
+     * a step that changes nothing gives the same value back: a date as `yyyy-MM-dd`, a date and
+     * time as `yyyy-MM-dd HH:mm:ss` in the person's own time zone (which `Datetime.valueOf`
+     * reads), and a number without exponent. Decided by the field's type, never by
+     * `instanceof`, because in Apex a Date is also an instance of Datetime. Null stays null.
+     */
+    public static String toText(Schema.DescribeFieldResult field, Object value) {
+        if (value == null) {
+            return null;
+        }
+        Schema.DisplayType kind = field == null ? null : field.getType();
+        if (kind == Schema.DisplayType.DATE) {
+            Date day = (Date) value;
+            return String.valueOf(day);
+        }
+        if (kind == Schema.DisplayType.DATETIME) {
+            return ((Datetime) value).format('yyyy-MM-dd HH:mm:ss');
+        }
+        if (NUMBERS.contains(kind) && value instanceof Decimal) {
+            return ((Decimal) value).toPlainString();
+        }
+        return String.valueOf(value);
+    }
+
     /** Whether a target may be changed with transform steps: any writable type but a lookup (R-BU7). */
     public static Boolean canTransform(Schema.DescribeFieldResult field) {
         return WRITABLE.contains(field.getType()) &&
@@ -307,17 +335,27 @@ public with sharing class BulkUpdateFields {
     /**
      * The text a transform produced, as the field's own type, read as an import reads a cell
      * (R-BU7): blank clears the field (a checkbox reads it as false), a checkbox takes true, yes
-     * or 1, a number keeps only its digits, point and minus sign. Unlike an import, a result the
-     * field cannot take is never shortened or guessed: it is refused, naming the field and the
-     * value, so the record is journaled as Failed rather than saved wrong.
+     * or 1 and false, no or 0, a number keeps only its digits, point and minus sign. Unlike an
+     * import, a result the field cannot take is never shortened or guessed: it is refused,
+     * naming the field and the value, so the record is journaled as Failed rather than saved
+     * wrong. That includes a checkbox result that is none of those words.
      */
     public static Object fromText(Schema.DescribeFieldResult field, String text) {
         Schema.DisplayType kind = field.getType();
         if (kind == Schema.DisplayType.BOOLEAN) {
-            String flag = text == null ? '' : text.trim();
-            return 'true'.equalsIgnoreCase(flag) ||
-                'yes'.equalsIgnoreCase(flag) ||
-                '1'.equals(flag);
+            String flag = text == null ? '' : text.trim().toLowerCase();
+            if (CHECKED_WORDS.contains(flag)) {
+                return true;
+            }
+            if (String.isBlank(flag) || UNCHECKED_WORDS.contains(flag)) {
+                return false;
+            }
+            throw new BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorStepResult,
+                    new List<Object>{ field.getLabel(), text.abbreviate(80) }
+                )
+            );
         }
         if (String.isBlank(text)) {
             if (!field.isNillable()) {
@@ -339,7 +377,12 @@ public with sharing class BulkUpdateFields {
         try {
             switch on kind {
                 when INTEGER {
-                    return Integer.valueOf(text.replaceAll('[^0-9\\-]', ''));
+                    // The point is kept, so "1,250.00" is 1250 and "12.5" is refused, not 125.
+                    Decimal whole = Decimal.valueOf(text.replaceAll('[^0-9\\.\\-]', ''));
+                    if (whole.stripTrailingZeros().scale() > 0) {
+                        throw refused;
+                    }
+                    return whole.intValue();
                 }
                 when DOUBLE, CURRENCY, PERCENT {
                     return Decimal.valueOf(text.replaceAll('[^0-9\\.\\-]', ''));

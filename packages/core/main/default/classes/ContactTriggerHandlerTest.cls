@@ -1,8 +1,13 @@
 /**
  * The household upkeep that happens when a person is saved, changed, deleted, or restored.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ContactTriggerHandler')
 private class ContactTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void changingASurnameRenamesTheHousehold() {
         System.runAs(TestUsers.admin()) {
@@ -57,21 +62,32 @@ private class ContactTriggerHandlerTest {
     }
 
     @IsTest
-    static void deletingTheLastMemberTidiesTheHouseholdAway() {
+    static void deletingTheLastMemberKeepsTheHouseholdSoTheyCanBeRestored() {
         System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            Assert.isTrue(settings.Delete_Empty_Households__c, 'The tidy-up is on');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert maria;
             Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
-
-            Test.startTest();
             delete maria;
-            Test.stopTest();
-
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Account WHERE Id = :household],
-                'The empty household went too'
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'The household is kept, recounted to nobody, because Maria was deleted, not moved'
+            );
+
+            Test.startTest();
+            undelete maria;
+            Test.stopTest();
+
+            Account restored = [SELECT Member_Count__c FROM Account WHERE Id = :household];
+            Assert.areEqual(1, restored.Member_Count__c, 'Maria is a member again');
+            Assert.areEqual(
+                household,
+                [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,
+                'Maria came back into her household'
             );
         }
     }
@@ -124,8 +140,9 @@ private class ContactTriggerHandlerTest {
                 [SELECT Member_Count__c FROM Account WHERE Id = :fromHousehold].Member_Count__c,
                 'The household Maria left counts nobody'
             );
+            // Wei is that household's primary contact, so his surname comes first (R-H5).
             Assert.areEqual(
-                'Garcia and Lee Household',
+                'Lee and Garcia Household',
                 [SELECT Name FROM Account WHERE Id = :toHousehold].Name,
                 'The household Maria joined lists both surnames'
             );
@@ -168,7 +185,7 @@ private class ContactTriggerHandlerTest {
     }
 
     @IsTest
-    static void deletingTheLastMemberInJunctionModeTidiesTheHouseholdAway() {
+    static void deletingTheLastMemberInJunctionModeKeepsTheHouseholdForTheUndelete() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -179,11 +196,7 @@ private class ContactTriggerHandlerTest {
                 WHERE Contact__c = :maria.Id
             ]
             .Household__c;
-
-            Test.startTest();
             delete maria;
-            Test.stopTest();
-
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :household],
@@ -191,8 +204,27 @@ private class ContactTriggerHandlerTest {
             );
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Account WHERE Id = :household],
-                'The household nobody is left in is tidied away'
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'The household is kept, recounted to nobody, because Maria was deleted, not moved'
+            );
+
+            Test.startTest();
+            undelete maria;
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household AND Contact__c = :maria.Id
+                ],
+                'Her membership came back into the kept household'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'She is counted again'
             );
         }
     }
@@ -261,6 +293,68 @@ private class ContactTriggerHandlerTest {
                 2,
                 [SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
                 'The household counts the restored person again'
+            );
+        }
+    }
+
+    @IsTest
+    static void correctingOnlyTheCaseOfASurnameRenamesTheHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact person = HouseholdTestDataFactory.newContact('Mr.', 'Sean', 'Mcdonald');
+            insert person;
+            Id household = [SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId;
+
+            Test.startTest();
+            update new Contact(Id = person.Id, LastName = 'McDonald');
+            Test.stopTest();
+
+            Account saved = [
+                SELECT Name, Household_Formal_Greeting__c
+                FROM Account
+                WHERE Id = :household
+            ];
+            Assert.isTrue(
+                'The McDonald Family'.equals(saved.Name),
+                'A case-only correction reaches the household name: ' + saved.Name
+            );
+            Assert.isTrue(
+                saved.Household_Formal_Greeting__c.contains('McDonald'),
+                'And the greeting: ' + saved.Household_Formal_Greeting__c
+            );
+        }
+    }
+
+    @IsTest
+    static void changingEmployerAndSurnameTogetherInJunctionModeRenamesTheHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account employer = new Account(Name = 'Riverside Library');
+            insert new List<Account>{ household, employer };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = maria.Id,
+                Start_Date__c = Date.today()
+            );
+
+            Test.startTest();
+            // One save that both changes her employer (her account in junction mode) and
+            // her surname: the second change used to be skipped because of the first.
+            update new Contact(Id = maria.Id, AccountId = employer.Id, LastName = 'Garcia-Lee');
+            Test.stopTest();
+
+            Assert.areEqual(
+                'The Garcia-Lee Family',
+                [SELECT Name FROM Account WHERE Id = :household.Id].Name,
+                'The household she belongs to follows the surname'
+            );
+            Assert.areEqual(
+                'Riverside Library',
+                [SELECT Name FROM Account WHERE Id = :employer.Id].Name,
+                'The employer is not a household and is left alone'
             );
         }
     }

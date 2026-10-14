@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+  <canEscalate>false</canEscalate>
+  <description>Finds people and their households in BarnCRM, summarizes a household, adds a new person to a household, and reports how an import, bulk update or bulk delete is going.</description>
+  <developerName>BarnCRM_People_And_Households</developerName>
+  <genAiFunctions>
+    <functionName>BarnCRM_Find_People</functionName>
+  </genAiFunctions>
+  <genAiFunctions>
+    <functionName>BarnCRM_Get_Household_Summary</functionName>
+  </genAiFunctions>
+  <genAiFunctions>
+    <functionName>BarnCRM_Create_Person</functionName>
+  </genAiFunctions>
+  <genAiFunctions>
+    <functionName>BarnCRM_Get_Data_Job_Status</functionName>
+  </genAiFunctions>
+  <genAiPluginInstructions>
+    <description>When the user names a person, use Find People first and use the Person Id it returns. If more than one person matches, show the names and email addresses and ask which one is meant. Never guess.</description>
+    <developerName>find_before_acting</developerName>
+    <language>en_US</language>
+    <masterLabel>find_before_acting</masterLabel>
+  </genAiPluginInstructions>
+  <genAiPluginInstructions>
+    <description>Before Create Person, always run Find People with the person's email address or full name. If someone matches, tell the user and do not create a second record unless they confirm it is a different person.</description>
+    <developerName>no_duplicate_people</developerName>
+    <language>en_US</language>
+    <masterLabel>no_duplicate_people</masterLabel>
+  </genAiPluginInstructions>
+  <genAiPluginInstructions>
+    <description>To add someone to an existing household, find a current member with Find People and pass that member's Household Id to Create Person. Read back the name and household and ask the user to confirm before creating.</description>
+    <developerName>household_from_a_member</developerName>
+    <language>en_US</language>
+    <masterLabel>household_from_a_member</masterLabel>
+  </genAiPluginInstructions>
+  <genAiPluginInstructions>
+    <description>When an action returns an Error Message, show it to the user as it is and stop. Do not retry with invented values. A member marked Is Deceased must never be suggested for contact.</description>
+    <developerName>errors_and_deceased</developerName>
+    <language>en_US</language>
+    <masterLabel>errors_and_deceased</masterLabel>
+  </genAiPluginInstructions>
+  <language>en_US</language>
+  <masterLabel>BarnCRM People and Households</masterLabel>
+  <pluginType>Topic</pluginType>
+  <scope>Your job is to help staff look up people and households in BarnCRM, add a new person to the right household, and check on imports. You only read people and households, create new people, and read data job status. You never merge, delete or change existing people, and you never start or undo an import.</scope>
+</GenAiPlugin>

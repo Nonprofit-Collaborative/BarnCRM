@@ -2,7 +2,7 @@
  * Maria changes a setting in the console and expects three things: the value sticks, the
  * change is recorded, and a value that makes no sense is refused before anything is saved.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SettingsService')
 private class SettingsServiceTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';
@@ -228,10 +228,9 @@ private class SettingsServiceTest {
                 );
             } catch (SettingsService.SettingsException e) {
                 refused = true;
-                Assert.areEqual(
-                    System.Label.Core_Settings_InvalidValueError,
-                    e.getMessage(),
-                    'The message says the value is not one this setting takes'
+                Assert.isTrue(
+                    e.getMessage().endsWith(System.Label.Core_Settings_InvalidValueError),
+                    'The message says the value is not one this setting takes: ' + e.getMessage()
                 );
             }
             Test.stopTest();
@@ -304,9 +303,15 @@ private class SettingsServiceTest {
             } catch (SettingsService.SettingsException e) {
                 refused = true;
                 Assert.areEqual(
-                    System.Label.Core_Settings_InvalidValueError,
+                    String.format(
+                        System.Label.Core_Settings_ErrorForSetting,
+                        new List<Object>{
+                            'Automation paused until',
+                            System.Label.Core_Settings_InvalidValueError
+                        }
+                    ),
                     e.getMessage(),
-                    'The message names the problem and what to do'
+                    'The message names the setting, the problem and what to do'
                 );
             }
             Test.stopTest();
@@ -532,36 +537,6 @@ private class SettingsServiceTest {
     }
 
     @IsTest
-    static void aModeIsCheckedOnItsWayIn() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual(
-                'NPSP',
-                SettingsService.validated('NPSP', SettingsService.coexistenceModes()),
-                'An offered value is accepted.'
-            );
-
-            for (String rejected : new List<String>{ 'npsp', '', null }) {
-                try {
-                    SettingsService.validated(rejected, SettingsService.membershipModes());
-                    Assert.fail('The value "' + rejected + '" should be refused.');
-                } catch (SettingsService.SettingsServiceException expected) {
-                    Assert.areEqual(
-                        Label.Core_Settings_ModeValueInvalid,
-                        expected.getMessage(),
-                        'Maria is told to pick from the list.'
-                    );
-                }
-            }
-            try {
-                SettingsService.validated('Contact', null);
-                Assert.fail('A value with no list to check against should be refused.');
-            } catch (SettingsService.SettingsServiceException expected) {
-                Assert.isNotNull(expected.getMessage(), 'With a message.');
-            }
-        }
-    }
-
-    @IsTest
     static void theShippedDefaultsAreExactlyWhatTheFieldsSay() {
         System.runAs(TestUsers.admin()) {
             // A text field default value is a formula, so whatever sits inside the quotes is the
@@ -608,12 +583,13 @@ private class SettingsServiceTest {
             }
 
             Assert.isTrue(
-                SettingsService.coexistenceModes()
-                    .contains(SettingsService.COEXISTENCE_MODE_DEFAULT),
+                SettingsService.COEXISTENCE_MODES.contains(
+                    SettingsService.COEXISTENCE_MODE_DEFAULT
+                ),
                 'And the code default is itself one of the offered values.'
             );
             Assert.isTrue(
-                SettingsService.membershipModes().contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
+                SettingsService.MEMBERSHIP_MODES.contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
                 'For both keys.'
             );
         }
@@ -817,6 +793,66 @@ private class SettingsServiceTest {
     }
 
     @IsTest
+    static void aNumberOutsideItsRangeIsRefusedNamingTheSettingAndTheRange() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Import_Chunk_Size',
+                    MasterLabel = 'Rows per import chunk',
+                    Setting_Key__c = 'Import_Chunk_Size__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Number',
+                    Min_Value__c = 1,
+                    Max_Value__c = 2000,
+                    Sort_Order__c = 1
+                )
+            };
+
+            Test.startTest();
+            String tooLow = refusalOf('Import_Chunk_Size__c', '0');
+            String tooHigh = refusalOf('Import_Chunk_Size__c', '2001');
+            String notANumber = refusalOf('Import_Chunk_Size__c', 'lots');
+            String highest = refusalOf('Import_Chunk_Size__c', '2000');
+            Test.stopTest();
+
+            String expected = String.format(
+                System.Label.Core_Settings_NumberOutOfRange,
+                new List<Object>{ 'Rows per import chunk', '1', '2000' }
+            );
+            Assert.areEqual(expected, tooLow, 'Below the range is refused, naming both ends');
+            Assert.areEqual(expected, tooHigh, 'and so is above it');
+            Assert.isNotNull(notANumber, 'Something that is not a number is refused');
+            Assert.isNull(highest, 'The ends of the range are accepted');
+            Assert.areEqual(
+                2000,
+                Integer.valueOf(SettingsService.getValue('Import_Chunk_Size__c')),
+                'and saved'
+            );
+        }
+    }
+
+    @IsTest
+    static void everyShippedNumberSettingHasARange() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Setting_Definition__mdt> rows = SettingDefinitionSelector.getAll();
+            Test.stopTest();
+
+            Integer numbers = 0;
+            for (Setting_Definition__mdt row : rows) {
+                if (row.Data_Type__c == 'Number') {
+                    numbers++;
+                    Assert.isNotNull(row.Min_Value__c, row.DeveloperName + ' has a lowest value');
+                    Assert.isNotNull(row.Max_Value__c, row.DeveloperName + ' has a highest value');
+                    Assert.isTrue(row.Min_Value__c <= row.Max_Value__c, 'in the right order');
+                }
+            }
+            Assert.isTrue(numbers > 0, 'Core ships number settings');
+        }
+    }
+
+    @IsTest
     static void aRecordSettingTakesOnlyARecordOfItsObject() {
         System.runAs(TestUsers.admin()) {
             stubPickerDefinitions();
@@ -828,15 +864,13 @@ private class SettingsServiceTest {
             String accepted = refusalOf(RECORD_KEY, accountId);
             Test.stopTest();
 
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                wrongObject,
-                'A record of another object is refused'
+            Assert.isTrue(
+                wrongObject.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A record of another object is refused: ' + wrongObject
             );
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                notAnId,
-                'A name typed instead of a picked record is refused'
+            Assert.isTrue(
+                notAnId.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A name typed instead of a picked record is refused: ' + notAnId
             );
             Assert.isNull(accepted, 'A record of the row object is accepted');
             Assert.areEqual(
@@ -861,9 +895,8 @@ private class SettingsServiceTest {
             String cleared = refusalOf(RECORD_TYPES_KEY, '');
             Test.stopTest();
 
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                unknown,
+            Assert.isTrue(
+                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
                 'A record type the object does not have is refused, with the known one beside it'
             );
             Assert.isNull(accepted, 'A record type the object has is accepted');

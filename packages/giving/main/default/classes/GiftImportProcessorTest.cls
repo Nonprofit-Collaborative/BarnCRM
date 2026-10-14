@@ -6,8 +6,13 @@
  * Each test drives Core's row processor, which finds this package's processor by name, the
  * way a real import does.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportProcessorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

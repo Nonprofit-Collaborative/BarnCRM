@@ -4,8 +4,16 @@
  * (`ParentId`) and affiliations up to an organization or a person's household; the giving cases
  * are in Giving's regression suite.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupChanges')
 private class RollupChangesTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static Account organization(String name) {
         return new Account(
             Name = name,
@@ -58,6 +66,49 @@ private class RollupChangesTest {
     private static Set<Id> markedAccounts(RollupChanges.Marked marked) {
         Set<Id> ids = marked.idsByTarget.get('account');
         return ids == null ? new Set<Id>() : ids;
+    }
+
+    /**
+     * ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`: a save names the
+     * definitions that marked each target, so only those are recalculated.
+     */
+    @IsTest
+    static void aSaveNamesOnlyTheDefinitionsThatMarkedATarget() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c children = definition('Account', 'ParentId', null);
+            children.Id = FakeIds.of(Rollup_Definition__c.SObjectType, 1);
+            Rollup_Definition__c staff = definition('Contact', 'AccountId', null);
+            staff.Id = FakeIds.of(Rollup_Definition__c.SObjectType, 2);
+            Account child = organization('Child');
+            child.Id = fakeId(Account.SObjectType);
+            child.ParentId = FakeIds.of(Account.SObjectType, 2);
+
+            RollupChanges.Marked marked = RollupChanges.forSave(
+                'Account',
+                new List<SObject>{ child },
+                null,
+                false,
+                new List<Rollup_Definition__c>{ children, staff }
+            );
+            Rollup_Definition__c unsaved = definition('Account', 'ParentId', null);
+            RollupChanges.Marked byUnsaved = RollupChanges.forSave(
+                'Account',
+                new List<SObject>{ child },
+                null,
+                false,
+                new List<Rollup_Definition__c>{ unsaved }
+            );
+
+            Assert.areEqual(
+                new List<Rollup_Definition__c>{ children },
+                marked.definitionsFor('Account'),
+                'An account save marks the parent for the child count, never the staff count'
+            );
+            Assert.isNull(
+                byUnsaved.definitionsFor('Account'),
+                'A definition with no id cannot be named, so every definition runs'
+            );
+        }
     }
 
     @IsTest
@@ -250,13 +301,9 @@ private class RollupChangesTest {
             Account nolan = household('The Nolan Family');
             Account riverbend = organization('Riverbend');
             insert new List<Account>{ nolan, riverbend };
-            Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan');
-            insert ana;
-            insert new Household_Member__c(
-                Household__c = nolan.Id,
-                Contact__c = ana.Id,
-                Account__c = riverbend.Id
-            );
+            // A membership names one person, a contact or an account, never both: this one
+            // names the account side, the field the definition totals into.
+            insert new Household_Member__c(Household__c = nolan.Id, Account__c = riverbend.Id);
             List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
                 definition('Household_Member__c', 'Account__c', null)
             };

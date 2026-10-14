@@ -5,8 +5,13 @@
  * The job's passes chain from one another's finish, which a test runs only once, so the
  * delete passes are driven here through the job's own start query, one pass after another.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportUndoService, ApexClass:ImportUndoBatch')
 private class ImportUndoTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Batch__c committedBatch() {
         // Core's undo is tested on its own: a module installed in the test org is not asked.
         ImportEntityProcessors.noneForTest = true;

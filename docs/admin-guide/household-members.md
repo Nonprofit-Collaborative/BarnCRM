@@ -41,7 +41,8 @@ Two actions sit on each row:
 - **Make primary** turns that person into the household's primary contact. It is hidden on
   the person who already is.
 - **Move to another household** takes that person out of this household and into one you
-  choose. It only appears where a move can actually be carried out: a person your org
+  choose. In the flexible way of belonging only their membership in this household ends:
+  a child who also belongs to another parent's household stays in that one. It only appears where a move can actually be carried out: a person your org
   stores as an account can only be moved in the flexible way of belonging, so in the simple
   way the button is not offered on them.
 
@@ -54,9 +55,13 @@ An **Add member** button sits below the list.
 - In the simple way of belonging it opens the same new contact form you would use anywhere
   else in the org, with this household already filled in.
 - In the flexible way of belonging it offers two ways to add someone. **Add someone already
-  in Salesforce** searches by name as you type and lists matches to add with one click. **Or
+  in Salesforce** searches by name as you type and lists matches to add with one click. In
+  an org that stores people as person accounts, each such person is listed once, as their
+  person account, and joins the household that way. **Or
   add someone new** takes a salutation, first name and last name and creates the person as
   it joins them. Either way the list refreshes to show the new member once it is added.
+  Where your org stores people as accounts (person accounts) and you can create one, the new
+  person is created as a person account; otherwise as a contact.
 
 ### The primary contact in the simple way of belonging
 
@@ -64,6 +69,11 @@ In the simple way (one household per person, the shipped default), the primary c
 the **Primary Contact** field on the household itself. The panel reads that field and badges
 the matching person. **Make primary** writes that field, using your own access to the
 household, so it succeeds exactly when you could have edited the field by hand.
+
+The primary contact has to be in the household. Typing somebody from another household into
+the field is refused with "The Primary Contact has to be somebody in this household."
+Clearing the field is always allowed. A household BarnCRM creates for a new person names that
+person its primary contact.
 
 ### The primary contact in the flexible way of belonging
 
@@ -86,8 +96,23 @@ Open any person and the **Household** panel shows the household's name as a link
 people are in it, and the formal greeting, so you can check how a letter to that household
 will open without leaving the person's record. Click the name to open the household.
 
+The panel is on the contact page BarnCRM ships. Where your org stores people as person
+accounts, add it to the person account page yourself, because BarnCRM ships no page for
+them:
+
+1. Open a person account, click the gear icon, and choose **Edit Page**.
+2. Drag **Household of Person** from the custom components onto the page.
+3. If the same page is also used for organizations, select the component, click **Add
+   Filter** under **Set Component Visibility**, and show it only when **Is Person Account**
+   equals **True**. On an organization the panel has no person to look up and would only
+   say the record is not in a household.
+4. Save, and activate the page for the person account record type if it is new.
+
 In the flexible way of belonging a person can be in more than one household (a child of
 divorced parents, for example). The panel then lists each household they belong to.
+Wherever BarnCRM has to pick one household for such a person (totals rolled up to "their
+household", an import, a donation match), it picks the one they are the primary member of,
+and when they are primary in none, the one they joined first.
 
 When the person is not in any household, the panel says **This person is not in a
 household yet**. In the simple way that means the person has no household filled in, or the
@@ -131,6 +156,21 @@ manages access, or ask them to make the change.
 Your org uses the flexible way of belonging, where the field follows whoever is marked
 primary on the household's members. Use **Make primary** on the **Household Members** panel
 instead; the field updates on its own.
+
+**"A membership record I made by hand, or loaded, was refused."**
+In the flexible way, a membership record names exactly one person: a contact or a person
+account, never both and never neither. A person can also have only one current membership
+in a household, so a second one for the same person and household is refused with "This
+person is already a current member of this household." Edit the membership they already
+have instead. An ended membership beside a current one is history and is kept.
+
+**"Ticking Is Primary on a membership was refused."**
+A household has one primary member. Saving a membership record that would give it a second
+one is refused with "This household already has a primary member." Use **Make primary** on
+the **Household Members** panel, which moves the mark in one step. A load of many records
+(Data Loader, an import) is not refused: if it leaves a household with two primaries, the
+first in member order is used as the Primary Contact and nothing else is changed, so you
+can choose with **Make primary** afterward.
 
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account

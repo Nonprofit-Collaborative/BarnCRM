@@ -32,14 +32,15 @@ There is no exemption marker. The `// detection-only:` marker `check-standard-ob
 honors exists for string constants, which this check already accepts; anything it would
 still find is a compile-time reference, which no marker makes safe.
 
-The vendored rollup engine (packages/*/vendor) is third party source and is not scanned.
-
 Exit code 1 on any reference found.
 """
 
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from apex_source import strip  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PACKAGES = os.path.join(ROOT, "packages")
@@ -72,48 +73,10 @@ SCHEMA_IMPORT = re.compile(r"""['"]@salesforce/schema/([^'"]+)['"]""")
 FIELD_NAME_ATTR = re.compile(r"""\bfield-name\s*=\s*["']([^"']+)["']""")
 
 
-def strip_apex(source):
-    """Blanks comments and string literals, keeping line breaks so line numbers hold."""
-    out = []
-    i = 0
-    n = len(source)
-    while i < n:
-        c = source[i]
-        nxt = source[i + 1] if i + 1 < n else ""
-        if c == "/" and nxt == "/":
-            while i < n and source[i] != "\n":
-                out.append(" ")
-                i += 1
-        elif c == "/" and nxt == "*":
-            out.append("  ")
-            i += 2
-            while i < n and not (source[i] == "*" and i + 1 < n and source[i + 1] == "/"):
-                out.append("\n" if source[i] == "\n" else " ")
-                i += 1
-            out.append("  ")
-            i += 2
-        elif c == "'":
-            out.append(" ")
-            i += 1
-            while i < n and source[i] != "'":
-                if source[i] == "\\" and i + 1 < n:
-                    out.append("  ")
-                    i += 2
-                    continue
-                out.append("\n" if source[i] == "\n" else " ")
-                i += 1
-            out.append(" ")
-            i += 1
-        else:
-            out.append(c)
-            i += 1
-    return "".join(out)
-
-
 def apex_findings(path, text):
     findings = []
     raw_lines = text.split("\n")
-    for number, line in enumerate(strip_apex(text).split("\n"), start=1):
+    for number, line in enumerate(strip(text).split("\n"), start=1):
         name = PERSON_FIELD.search(line)
         if name:
             findings.append(
@@ -162,7 +125,7 @@ def xml_findings(path, text):
 def scan(root):
     findings = []
     for directory, subdirs, files in os.walk(root):
-        subdirs[:] = sorted(d for d in subdirs if d not in ("vendor", "node_modules", "__tests__"))
+        subdirs[:] = sorted(d for d in subdirs if d not in ("node_modules", "__tests__"))
         parts = directory.replace(os.sep, "/").split("/")
         for name in sorted(files):
             if " 2." in name:

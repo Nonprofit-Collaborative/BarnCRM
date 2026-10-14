@@ -13,8 +13,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
-        <componentName>importHistory</componentName>
-        <identifier>importHistory1</identifier>
+        <componentInstanceProperties>
+          <name>kinds</name>
+          <value>Import</value>
+        </componentInstanceProperties>
+        <componentName>dataJobHistory</componentName>
+        <identifier>dataJobHistory1</identifier>
       </componentInstance>
     </itemInstances>
     <name>main</name>

@@ -8,7 +8,7 @@
  * They compose HTML and read it. PDF bytes are not asserted anywhere, for the reason ADR-0016
  * gives: they cannot be, so the manual visual check is part of the definition of done instead.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptContentBuilder')
 private class ReceiptContentRulesTest {
     private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
 

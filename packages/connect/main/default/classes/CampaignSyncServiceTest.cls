@@ -7,7 +7,7 @@
  * Campaign does not exist; on such an org every test checks that the sync did nothing and
  * stops (R-CS1).
  */
-@IsTest
+@IsTest(testFor='ApexClass:CampaignSyncService')
 private class CampaignSyncServiceTest {
     @TestSetup
     static void setup() {

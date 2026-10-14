@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindInlineEditService')
 private class FindInlineEditServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<Contact> makePeople(Integer count) {
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;

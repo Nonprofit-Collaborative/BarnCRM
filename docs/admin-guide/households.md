@@ -73,7 +73,9 @@ a member.
 The walkthrough reads the same in the flexible way of belonging, with one difference at
 step 3: the household is not shown in the household field on the person, because in that
 mode membership is a record of its own. Open the household from the **Households** tab, or
-from the Household panel on the person, and everything from step 4 on is identical.
+from the Household panel on the person, and everything from step 4 on is identical. (On a
+person account the panel is there once you add it to the page: see "The Household panel on
+a person" in [Household members](household-members.md).)
 
 One thing the tidy-up will not do: it never deletes a household that something outside
 BarnCRM still points at, even when the setting is on and nobody is left in it. It
@@ -90,6 +92,11 @@ and notices your org is shaped that way. It does that only when nobody has chose
 belonging yet: if you chose the simple way on purpose, because your org has Person Accounts
 switched on but stores everyone as a contact, an install or upgrade leaves your choice
 alone, and Health Check warns you if people stored as accounts appear later.
+
+In the flexible way a contact's account can be an employer, so it is not the household by
+itself. When you save a new contact whose account is a household, though, BarnCRM joins them
+to that household with a membership record, so they are counted and named there and are not
+given a second household. A contact saved against an organization is not joined to it.
 
 Automatic creation is the same setting and the same behavior as anywhere else. When "create
 a household automatically" is on, saving a new person creates their household and the
@@ -127,6 +134,10 @@ were made in.
 **"I deleted the last person and the household is still there."**
 Either "Delete a household once it is empty" is off, or BarnCRM deliberately
 left that one alone.
+
+Deleting people never deletes their household; moving them out still tidies it away.
+Deleting the household too would empty those people out of the Recycle Bin, and you could not
+restore them. If you meant to remove both, delete the household by hand.
 
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want

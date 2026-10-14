@@ -1,0 +1,158 @@
+<template>
+    <template lwc:if={visible}>
+        <lightning-card title={heading} icon-name="standard:data_integration_hub">
+            <lightning-button slot="actions" data-id="refresh" label={labels.refresh} onclick={handleRefresh}></lightning-button>
+            <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+                <template lwc:if={busy}>
+                    <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+                </template>
+                <template lwc:if={showIntro}>
+                    <p class="slds-var-m-bottom_small" data-id="intro">{introText}</p>
+                </template>
+
+                <template lwc:if={hasError}>
+                    <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                        <span data-id="error-message">{errorMessage}</span>
+                    </div>
+                </template>
+                <template lwc:if={hasNotice}>
+                    <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small" role="status" aria-live="polite">
+                        <span data-id="notice-message">{noticeMessage}</span>
+                    </div>
+                </template>
+
+                <template lwc:if={isImportUndo}>
+                    <section class="slds-box slds-var-m-bottom_medium" data-id="import-undo-box">
+                        <h3 class="slds-text-heading_small slds-var-m-bottom_small">{importConfirmTitle}</h3>
+                        <template lwc:if={importPreview}>
+                            <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_small">
+                                <template for:each={importCounts} for:item="count">
+                                    <div
+                                        key={count.key}
+                                        class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-text-align_center"
+                                        data-id={count.key}
+                                    >
+                                        <p class="slds-text-heading_medium">{count.value}</p>
+                                        <p class="slds-text-body_small">{count.label}</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <lightning-button label={labels.cancel} onclick={handleUndoCancel} data-id="undo-cancel"></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="destructive"
+                            label={labels.importConfirmButton}
+                            disabled={importConfirmDisabled}
+                            onclick={handleImportUndoConfirm}
+                            data-id="import-undo-start"
+                        ></lightning-button>
+                    </section>
+                </template>
+
+                <template lwc:if={isBulkUndo}>
+                    <section class="slds-box slds-var-m-bottom_medium" data-id="bulk-undo-box">
+                        <p class="slds-var-m-bottom_x-small" data-id="undo-line">{bulkUndoLine}</p>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <lightning-input
+                                    data-id="undo-confirm"
+                                    label={labels.typeToConfirm}
+                                    value={undoText}
+                                    onchange={handleUndoText}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-no-flex">
+                                <lightning-button label={labels.cancel} onclick={handleUndoCancel}></lightning-button>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    data-id="bulk-undo-start"
+                                    variant="destructive"
+                                    label={bulkUndoButton}
+                                    disabled={bulkUndoDisabled}
+                                    onclick={handleBulkUndoConfirm}
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </section>
+                </template>
+
+                <template lwc:if={showFilter}>
+                    <lightning-combobox
+                        class="slds-var-m-bottom_small slds-size_1-of-1 slds-medium-size_4-of-12"
+                        data-id="filter"
+                        label={labels.show}
+                        value={filter}
+                        options={filterOptions}
+                        onchange={handleFilter}
+                    ></lightning-combobox>
+                </template>
+                <template lwc:if={canSeeEveryone}>
+                    <lightning-input
+                        type="checkbox"
+                        data-id="everyone"
+                        class="slds-var-m-bottom_small"
+                        label={labels.everyone}
+                        checked={everyone}
+                        onchange={handleEveryone}
+                    ></lightning-input>
+                </template>
+
+                <template lwc:if={loading}>
+                    <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+                </template>
+                <template lwc:elseif={hasRows}>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={rows} for:item="row">
+                            <li key={row.key} class="slds-item" data-id="job-row" data-kind={row.kind}>
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <div class="slds-col">
+                                        <p class="slds-text-title_bold">{row.title}</p>
+                                        <p class="slds-text-body_small">{row.summary}</p>
+                                        <template lwc:if={row.startedAt}>
+                                            <p class="slds-text-body_small">
+                                                {labels.started}
+                                                <lightning-formatted-date-time
+                                                    class="slds-var-m-left_xx-small"
+                                                    value={row.startedAt}
+                                                    year="numeric"
+                                                    month="short"
+                                                    day="numeric"
+                                                    hour="2-digit"
+                                                    minute="2-digit"
+                                                ></lightning-formatted-date-time>
+                                            </p>
+                                        </template>
+                                        <template lwc:if={row.showDeadline}>
+                                            <p class="slds-text-body_small">
+                                                {labels.undoUntil}
+                                                <lightning-formatted-date-time
+                                                    class="slds-var-m-left_xx-small"
+                                                    value={row.undoDeadline}
+                                                    year="numeric"
+                                                    month="short"
+                                                    day="numeric"
+                                                ></lightning-formatted-date-time>
+                                            </p>
+                                        </template>
+                                    </div>
+                                    <template lwc:if={row.canUndo}>
+                                        <lightning-button
+                                            data-id={row.id}
+                                            label={labels.undo}
+                                            disabled={busy}
+                                            onclick={handleUndo}
+                                        ></lightning-button>
+                                    </template>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small" data-id="no-jobs">{labels.empty}</p>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+</template>

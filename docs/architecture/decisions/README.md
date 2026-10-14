@@ -94,13 +94,36 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0082](0082-barncrm-owns-its-rollup-engine.md) | BarnCRM owns its rollup engine (supersedes ADR-0015, amends ADR-0011) | Accepted (owner decision) |
 | [0084](0084-gift-entry-pays-a-scheduled-payment.md) | Gift entry screens suggest the scheduled payment a gift pays, and a person decides | Accepted (owner decision) |
 | [0085](0085-custom-metadata-manager-edits-only-types-read-directly.md) | The custom metadata manager edits only types BarnCRM reads directly, and never a shipped row | Accepted (owner, as recommended) |
-| [0086](0086-field-utilization-ships-in-core.md) | Field utilization ships in Core, counts in user mode, and keeps weekly snapshots | Accepted (builder decision, as recommended) |
+| [0086](0086-field-utilization-ships-in-core.md) | Field utilization ships in Core, counts in user mode, and keeps weekly snapshots | Accepted (builder decision, as recommended); superseded in part by ADR-0101 (field utilization on demand) |
 | [0087](0087-whats-new-from-packaged-release-notes.md) | What's new is read from packaged release notes and remembered per person | Accepted (builder decision) |
-| [0088](0088-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Proposed (builder decision) |
+| [0088](0088-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Accepted |
 | [0089](0089-interaction-notes-are-completed-tasks.md) | Interaction notes are completed tasks logged through one packaged action | Accepted (builder decision) |
 | [0090](0090-flow-templates-which-automations-get-one.md) | Flow templates: which automations get one, how they are named, and what they leave out (applies ADR-0040) | Accepted (builder decision) |
-| [0091](0091-bulk-delete-from-a-find-query-with-undelete.md) | Bulk delete runs from a Find query, as the user, and is undone by undelete | Proposed (builder decision) |
+| [0091](0091-bulk-delete-from-a-find-query-with-undelete.md) | Bulk delete runs from a Find query, as the user, and is undone by undelete | Accepted |
 | [0092](0092-merge-survivors-recalculated-after-the-merge.md) | Merge survivors' real-time totals are recalculated just after the merge | Accepted (builder decision) |
+| [0093](0093-record-reads-through-lightning-data-service.md) | Simple record reads in LWCs go through Lightning Data Service, not Apex | Proposed (builder decision) |
+| [0094](0094-no-platform-cache-partition.md) | Configuration reads use the platform's own caches; Core ships no Platform Cache partition (amends ADR-0006 decision 1) | Accepted (builder decision) |
+| [0095](0095-user-access-policies-documented-not-packaged.md) | User access policies are documented definitions, not packaged components | Proposed (builder decision) |
+| [0096](0096-in-app-guidance-prompts.md) | First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup | Proposed (builder decision) |
+| [0097](0097-record-pages-own-their-actions-and-lists.md) | Every packaged record page places its own actions, and Giving's own pages their own related lists (amends ADR-0043) | Accepted (builder decision) |
+| [0098](0098-real-time-rollups-recalculated-just-after-the-save.md) | Real-time rollups are recalculated just after the save, by default (modifies ADR-0082 decision 4) | Proposed (builder decision) |
+| [0099](0099-rollups-recalculate-only-what-a-save-changed.md) | A save recalculates only the rollups its change can affect (narrows ADR-0082 decision 2) | Accepted (owner decision D-48) |
+| [0100](0100-rollup-queue-ready-event-from-queueable-jobs.md) | A platform event starts the Rollup Queue after a save inside a Queueable | Accepted (builder decision) |
+| [0101](0101-field-utilization-on-demand.md) | Field utilization runs on demand in Org Optimizer (supersedes ADR-0086 in part) | Accepted (owner decision) |
+| [0102](0102-barncrm-app-is-a-console-app.md) | The BarnCRM app is a Lightning console app with a packaged logo | Accepted (owner request) |
+| [0103](0103-org-optimizer-and-data-manager-pages.md) | Org Optimizer and Data Manager pages | Accepted (owner decisions) |
+| [0104](0104-agent-ready-core-actions.md) | Core ships four agent-ready Flow actions, and no agent metadata | Accepted (builder decision, Q-14 approved by the owner) |
+| [0105](0105-health-check-reschedules-jobs-of-deactivated-owners.md) | Health Check reschedules jobs whose owner was deactivated (amends ADR-0048, extends ADR-0075) | Accepted (builder decision) |
+| [0106](0106-health-check-on-home-shows-the-last-result.md) | Health Check on Home shows the last result, with Run now | Accepted (owner approved) |
+| [0107](0107-a-persons-household-and-primary-contact-in-both-modes.md) | A person's household, and the Primary Contact, in both membership modes | Accepted (owner default, D-85) |
+| [0108](0108-a-second-primary-is-refused-on-a-single-save.md) | A second primary member is refused on a single save, and tolerated in a load (builds on ADR-0044) | Accepted (owner default, D-85) |
+| [0109](0109-relationship-mirror-upkeep-in-system-mode.md) | Relationship and affiliation upkeep run in system mode (extends ADR-0021) | Accepted (owner decision D-85) |
+| [0110](0110-erase-a-person-anonymizes-in-place.md) | Erase a person anonymizes the record in place, as the user, with a module seam | Proposed (builder decision) |
+| [0111](0111-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Proposed (builder decision) |
+| [0112](0112-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
+| [0113](0113-import-row-rules.md) | Import row rules: skip rows and one row per key decided at staging, and empty cells that clear a field only where a column says so | Proposed (builder decision) |
+| [0114](0114-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
+| [0115](0115-find-export-to-files.md) | Find's export to Files is a Batch Apex job that writes CSV parts the person owns | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

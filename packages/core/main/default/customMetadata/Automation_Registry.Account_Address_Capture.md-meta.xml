@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">When a household or an organization is created with an address already filled in, keeps that address on file as its first address so nothing typed by staff or loaded by an import is lost.</value>
+        <value xsi:type="xsd:string">When a household or an organization is created with an address already filled in, keeps that address on file as its first address so nothing typed by staff or loaded by an import is lost. For a person held as an account, the mailing address is kept on file as their own address when they are saved with one and whenever it changes.</value>
     </values>
     <values>
         <field>Enabled_By_Default__c</field>

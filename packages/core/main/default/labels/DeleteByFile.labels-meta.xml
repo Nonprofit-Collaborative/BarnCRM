@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ErrorDeleteNeedsPermission</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete by file: no Bulk Delete Records permission</shortDescription>
+        <value>Deleting by record ID needs the Bulk Delete Records permission. Ask your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorDeleteNeedsConfirm</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete by file: commit refused, confirm the count instead</shortDescription>
+        <value>This mapping deletes records. Type the number of records to confirm, then press Delete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorDeleteCountDiffers</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete by file: typed count is not the matched count. {0} is the count.</shortDescription>
+        <value>Type {0}, the number of records the dry run found, to confirm. Nothing was deleted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorNotDeleteByFile</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete by file: the import does not delete by record ID</shortDescription>
+        <value>This import does not delete records by record ID.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationDelete</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load operation option: delete by record ID</shortDescription>
+        <value>Delete by record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadDeleteHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load operation help: delete by record ID</shortDescription>
+        <value>Deletes the record whose Salesforce record ID is in the row, as a bulk delete does: dry run first, then type the number of records to confirm. Only the ID column is read. Risk: every record the file names is deleted, with the related records Salesforce deletes with it; undo from the Bulk Update tab within 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_FileIntro</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete by file panel: what it does.</shortDescription>
+        <value>Delete every record this dry run found, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from the Bulk Update tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
+    </labels>
+</CustomLabels>

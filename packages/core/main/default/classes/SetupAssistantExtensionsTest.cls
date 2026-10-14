@@ -3,8 +3,13 @@
  * name that is not in the org, or a class that is not an extension, is treated as no module
  * at all, so the assistant still opens.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SetupAssistantExtensions')
 private class SetupAssistantExtensionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aClassThatIsNotInTheOrgIsNoExtension() {
         System.runAs(TestUsers.admin()) {

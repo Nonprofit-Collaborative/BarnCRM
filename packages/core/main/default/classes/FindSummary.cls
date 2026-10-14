@@ -10,9 +10,6 @@
 public with sharing class FindSummary {
     public static final Integer MAX_RECORDS = 20000;
     public static final Integer MAX_GROUPS = 2000;
-    private static final Pattern FIELD_PATH = Pattern.compile(
-        '^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-    );
     private static final Map<String, String> SOQL_BY_FUNCTION = new Map<String, String>{
         'count' => 'COUNT',
         'sum' => 'SUM',
@@ -79,7 +76,7 @@ public with sharing class FindSummary {
             ? null
             : groupingField(records.objectName, groupPath);
 
-        if (QueryCompiler.count(queryJson, MAX_RECORDS + 1) > MAX_RECORDS) {
+        if (QueryCompiler.count(records, MAX_RECORDS + 1) > MAX_RECORDS) {
             throw new QueryCompiler.QueryCompilerException(
                 String.format(
                     System.Label.Core_Find_ErrorSummaryTooMany,
@@ -124,7 +121,7 @@ public with sharing class FindSummary {
             }
             SummaryLine line = new SummaryLine();
             Object grouped = groupPath == null ? null : row.get('grp');
-            line.groupValue = grouped == null ? null : String.valueOf(grouped);
+            line.groupValue = groupText(groupField, grouped);
             line.groupLabel = line.groupValue == null
                 ? null
                 : (labelByValue.containsKey(line.groupValue)
@@ -136,10 +133,25 @@ public with sharing class FindSummary {
         return result;
     }
 
+    /**
+     * A group's value as text. A date is cast first: an untyped date written as text gains a
+     * time of day ("2026-01-05 00:00:00"), the trap FilterValueBinder notes too.
+     */
+    @TestVisible
+    private static String groupText(Schema.DescribeFieldResult field, Object grouped) {
+        if (grouped == null) {
+            return null;
+        }
+        if (field != null && field.getType() == Schema.DisplayType.DATE) {
+            return String.valueOf((Date) grouped);
+        }
+        return String.valueOf(grouped);
+    }
+
     /** The field a sum, lowest or highest measures, or a refusal naming it. */
     private static String measuredField(String objectName, String function, Object rawPath) {
         String path = rawPath == null ? '' : String.valueOf(rawPath);
-        Schema.DescribeFieldResult field = resolve(objectName, path);
+        Schema.DescribeFieldResult field = QueryCompiler.resolve(objectName, path);
         Schema.DisplayType type = field.getType();
         Boolean fits = function == 'sum'
             ? NUMBERS.contains(type)
@@ -156,7 +168,7 @@ public with sharing class FindSummary {
     }
 
     private static Schema.DescribeFieldResult groupingField(String objectName, String path) {
-        Schema.DescribeFieldResult field = resolve(objectName, path);
+        Schema.DescribeFieldResult field = QueryCompiler.resolve(objectName, path);
         if (!field.isGroupable()) {
             throw new QueryCompiler.QueryCompilerException(
                 String.format(
@@ -166,22 +178,6 @@ public with sharing class FindSummary {
             );
         }
         return field;
-    }
-
-    private static Schema.DescribeFieldResult resolve(String objectName, String path) {
-        if (!FIELD_PATH.matcher(path).matches()) {
-            throw new QueryCompiler.QueryCompilerException(
-                String.format(
-                    System.Label.Core_Filter_ErrorUnknownField,
-                    new List<Object>{ path.abbreviate(80) }
-                )
-            );
-        }
-        try {
-            return QueryFieldCatalog.resolvePath(objectName, path);
-        } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
-            throw new QueryCompiler.QueryCompilerException(refused.getMessage());
-        }
     }
 
     private static Map<String, String> picklistLabels(Schema.DescribeFieldResult field) {

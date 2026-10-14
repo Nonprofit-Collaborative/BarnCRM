@@ -1,4 +1,5 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
 import GiftRefund from 'c/giftRefund';
 import getGiftSummary from '@salesforce/apex/GiftController.getGiftSummary';
 import refundGift from '@salesforce/apex/GiftController.refund';
@@ -62,14 +63,13 @@ describe('c-gift-refund', () => {
     getGiftSummary.emit({ remainingAmount: 150, fullyReversed: false });
     await flush();
 
-    const toast = jest.fn();
-    element.addEventListener('lightning__showtoast', toast);
+    const toast = jest.spyOn(Toast, 'show');
     find(element, 'confirm').click();
     await flush();
 
     expect(refundGift).not.toHaveBeenCalled();
     expect(toast).toHaveBeenCalled();
-    expect(toast.mock.calls[0][0].detail.variant).toBe('error');
+    expect(toast.mock.calls[0][0].variant).toBe('error');
   });
 
   it('records a refund of the amount David typed', async () => {
@@ -126,8 +126,7 @@ describe('c-gift-refund', () => {
     getGiftSummary.emit({ remainingAmount: 50, fullyReversed: false });
     await flush();
 
-    const toast = jest.fn();
-    element.addEventListener('lightning__showtoast', toast);
+    const toast = jest.spyOn(Toast, 'show');
     find(element, 'reason').dispatchEvent(
       new CustomEvent('change', { detail: { value: 'Too much' } })
     );
@@ -136,7 +135,7 @@ describe('c-gift-refund', () => {
     await flush();
 
     expect(toast).toHaveBeenCalled();
-    expect(toast.mock.calls[0][0].detail.message).toContain('larger than the amount left');
+    expect(toast.mock.calls[0][0].label).toContain('larger than the amount left');
   });
 
   it('says so when the gift cannot be read', async () => {

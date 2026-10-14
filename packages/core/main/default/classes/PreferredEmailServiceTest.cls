@@ -1,8 +1,13 @@
 /**
  * The standard email being kept in step with the address a person chose (R-C6).
  */
-@IsTest
+@IsTest(testFor='ApexClass:PreferredEmailService')
 private class PreferredEmailServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String PERSONAL = 'maria.garcia@example.org';
     private static final String WORK = 'mgarcia@springfieldfoodbank.example.org';
 
@@ -175,6 +180,75 @@ private class PreferredEmailServiceTest {
                 PERSONAL,
                 [SELECT Personal_Email__c FROM Account WHERE Id = :household.Id].Personal_Email__c,
                 'The account saved with its addresses and nothing was refused'
+            );
+        }
+    }
+
+    // ----------------------------------------------------------- its own automation row (PEOPLE-28)
+
+    private static final String HOUSEHOLD_ROW = 'ContactTriggerHandler';
+    private static final String PREFERRED_EMAIL_ROW = 'Preferred_Email_Contact';
+
+    private static List<Contact> twoHundredWhoPreferWork() {
+        List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Emailer');
+        for (Integer i = 0; i < people.size(); i++) {
+            people[i].Work_Email__c = 'person' + i + '@example.org';
+            people[i].Preferred_Email__c = 'Work';
+        }
+        return people;
+    }
+
+    private static Integer copied(List<Contact> people) {
+        Integer count = 0;
+        for (Contact person : [SELECT Email, Work_Email__c FROM Contact WHERE Id IN :people]) {
+            if (person.Email == person.Work_Email__c) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @IsTest
+    static void switchingHouseholdAutomationOffStillCopiesThePreferredEmail() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            TestDataFactory.insertAutomationSettings(
+                new Map<String, Boolean>{ HOUSEHOLD_ROW => false, PREFERRED_EMAIL_ROW => true }
+            );
+            List<Contact> people = twoHundredWhoPreferWork();
+
+            Test.startTest();
+            insert people;
+            Test.stopTest();
+
+            Assert.areEqual(200, copied(people), 'The copy has its own switch, which is on.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
+                'And household upkeep really was off: nobody was given a household.'
+            );
+        }
+    }
+
+    @IsTest
+    static void switchingThePreferredEmailRowOffStopsTheCopy() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            TestDataFactory.insertAutomationSettings(
+                new Map<String, Boolean>{ HOUSEHOLD_ROW => true, PREFERRED_EMAIL_ROW => false }
+            );
+            List<Contact> people = twoHundredWhoPreferWork();
+
+            Test.startTest();
+            insert people;
+            update people;
+            Test.stopTest();
+
+            Assert.areEqual(0, copied(people), 'With its own row off nothing is copied.');
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
+                'Household upkeep still ran: everybody has a household.'
             );
         }
     }

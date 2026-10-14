@@ -18,14 +18,6 @@
  */
 @NamespaceAccessible
 public with sharing class ImportUndoService {
-    /** AsyncApexJob statuses that mean a job has not finished yet. */
-    private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
-        'Holding',
-        'Queued',
-        'Preparing',
-        'Processing'
-    };
-
     /** Whether an undo job is queued or running, asked once per transaction. */
     private static Boolean undoJobRunning;
 
@@ -83,17 +75,30 @@ public with sharing class ImportUndoService {
         if (batch == null) {
             return view;
         }
+        // A bulk delete is undone by undeleting, from the Bulk Update tab; this undo would only
+        // mark it Undone and bring nothing back (R-BD5).
+        if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
+            view.reason = Label.Core_Import_UndoErrorBulkDelete;
+            return view;
+        }
         countTagged(batch.Id, view);
-        view.updates = ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT);
         // A bulk update journals a Failed entry for each record it could not save, which has
-        // nothing to put back, so its count is the records it saved (R-BU5). A job the platform
-        // stopped before its finish counted them keeps the journal's count.
-        if (
-            BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) &&
-            batch.Rows_Updated__c != null &&
-            batch.Rows_Updated__c > 0
-        ) {
-            view.updates = batch.Rows_Updated__c.intValue();
+        // nothing to put back, so its count is the records it saved (R-BU5). A job aborted or
+        // stopped before its finish counted them is counted from its Updated entries.
+        if (BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)) {
+            view.updates = batch.Rows_Updated__c != null &&
+                batch.Rows_Updated__c > 0
+                ? batch.Rows_Updated__c.intValue()
+                : ImportJournalService.actionCount(
+                      batch.Id,
+                      ImportJournalService.PHASE_COMMIT,
+                      ImportJournalService.ACTION_UPDATED
+                  );
+        } else {
+            view.updates = ImportJournalService.entryCount(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT
+            );
         }
         if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
             view.reason = Label.Core_Import_UndoErrorNothingToUndo;
@@ -156,21 +161,8 @@ public with sharing class ImportUndoService {
     /**
      * Closes an undo: its status, and one line added to the run log saying who ran it, when,
      * and what it deleted, kept and put back. Called from the job's last finish, in system
-     * mode over fields the package owns (ADR-0021).
-     */
-    @NamespaceAccessible
-    public static void finish(
-        Id batchId,
-        Integer countedAtStart,
-        Integer restored,
-        Boolean failed
-    ) {
-        finish(batchId, countedAtStart, restored, failed, 0);
-    }
-
-    /**
-     * The same, for an undo that also deleted journaled creations (R-IJ3): `createdGone` is how
-     * many of them are no longer there, so the ones left are the ones kept.
+     * mode over fields the package owns (ADR-0021). `createdGone` is how many journaled
+     * creations the undo deleted (R-IJ3), so the ones left are the ones kept.
      */
     @NamespaceAccessible
     public static void finish(
@@ -186,7 +178,7 @@ public with sharing class ImportUndoService {
             left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
             Integer counted = countedAtStart == null ? 0 : countedAtStart;
             Import_Batch__c batch = [
-                SELECT Id, Run_Log__c
+                SELECT Id, Run_Log__c, Operation__c
                 FROM Import_Batch__c
                 WHERE Id = :batchId
                 WITH SYSTEM_MODE
@@ -210,6 +202,22 @@ public with sharing class ImportUndoService {
                 ? ImportBatchService.STATUS_UNDO_FAILED
                 : ImportBatchService.STATUS_UNDONE;
             Database.update(batch, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
+                    ? Label.Core_JobNotice_BulkUpdateUndo
+                    : Label.Core_JobNotice_ImportUndo,
+                failed == true,
+                String.format(
+                    Label.Core_JobNotice_ImportUndoBody,
+                    new List<Object>{
+                        Math.max(counted - left.total, 0).format(),
+                        left.total.format(),
+                        (restored == null ? 0 : restored).format()
+                    }
+                ),
+                batchId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'ImportUndoService.finish', batchId);
         }
@@ -223,23 +231,37 @@ public with sharing class ImportUndoService {
      */
     @NamespaceAccessible
     public static String refusal(Import_Batch__c batch) {
+        return refusal(batch, null);
+    }
+
+    /**
+     * As above, for a batch whose effective status the caller has already worked out, so the
+     * job is not asked about twice; a null status is worked out here.
+     */
+    @NamespaceAccessible
+    public static String refusal(Import_Batch__c batch, String knownStatus) {
         if (batch == null) {
             return Label.Core_Import_ErrorBatchGone;
         }
         if (batch.Is_Dry_Run__c == true) {
             return Label.Core_Import_UndoErrorDryRun;
         }
-        String status = effectiveStatus(batch);
+        String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
         if (
             ImportBatchService.STATUS_UNDOING.equals(status) ||
             ImportBatchService.STATUS_UNDONE.equals(status)
         ) {
             return Label.Core_Import_UndoErrorAlreadyUndone;
         }
+        // A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
+        // retry's staging and finished preview can be undone like the commit (R-IB17).
         if (
             !(ImportBatchService.STATUS_COMPLETE.equals(status) ||
+            ImportBatchService.STATUS_TRIAL_COMPLETE.equals(status) ||
             ImportBatchService.STATUS_FAILED.equals(status) ||
-            ImportBatchService.STATUS_UNDO_FAILED.equals(status)) ||
+            ImportBatchService.STATUS_UNDO_FAILED.equals(status) ||
+            ImportBatchService.STATUS_RETRYING.equals(status) ||
+            ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(status)) ||
             batch.Undo_Deadline__c == null ||
             (batch.Completed_At__c == null &&
             !ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
@@ -262,6 +284,15 @@ public with sharing class ImportUndoService {
      */
     @NamespaceAccessible
     public static String effectiveStatus(Import_Batch__c batch) {
+        return effectiveStatus(batch, null);
+    }
+
+    /**
+     * As `effectiveStatus`, with whether the batch's own job is running when the caller has
+     * already read it (`ImportBatchService.isRunning(batch, job)`); null to read it here.
+     */
+    @NamespaceAccessible
+    public static String effectiveStatus(Import_Batch__c batch, Boolean jobRunning) {
         if (batch == null) {
             return null;
         }
@@ -273,7 +304,7 @@ public with sharing class ImportUndoService {
         if (
             (ImportBatchService.STATUS_DRY_RUN.equals(batch.Status__c) ||
             ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c)) &&
-            !ImportBatchService.isRunning(batch)
+            !(jobRunning != null ? jobRunning : ImportBatchService.isRunning(batch))
         ) {
             return ImportBatchService.STATUS_FAILED;
         }
@@ -288,7 +319,7 @@ public with sharing class ImportUndoService {
      */
     private static Boolean isUndoJobRunning() {
         if (undoJobRunning == null) {
-            Set<String> running = RUNNING_JOB_STATUSES;
+            Set<String> running = ImportBatchService.RUNNING_JOB_STATUSES;
             Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
             undoJobRunning = ![
                     SELECT Id

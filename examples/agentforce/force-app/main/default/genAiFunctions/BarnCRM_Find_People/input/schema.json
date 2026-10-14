@@ -1,0 +1,21 @@
+{
+  "required": ["searchText"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "searchText": {
+      "title": "Search Text",
+      "description": "Required. Part of a person's name (at least two characters, for example Garcia or Maria Gar), or a whole email address. An email address is matched exactly, ignoring case.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isUserInput": true
+    },
+    "maxResults": {
+      "title": "Maximum Results",
+      "description": "Optional. The most people to return, from 1 to 25. 10 when left empty.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

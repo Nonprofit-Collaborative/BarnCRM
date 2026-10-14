@@ -2,8 +2,13 @@
  * The checks an inbound gift passes before any query (X-03, ADR-0051), the gift it becomes, and
  * the HTTP status each answer is given. Nothing here touches the database.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InboundGiftRequest')
 private class InboundGiftRequestTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static InboundGift gift(String externalId, Decimal amount) {
         InboundGift request = new InboundGift();
         request.externalId = externalId;

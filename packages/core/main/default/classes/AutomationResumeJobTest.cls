@@ -6,8 +6,13 @@
  * Scheduled Apex runs at `Test.stopTest()` whatever its cron expression says, which is what lets
  * these tests run the job without waiting for it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AutomationResumeJob')
 private class AutomationResumeJobTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User barnCrmAdmin() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }

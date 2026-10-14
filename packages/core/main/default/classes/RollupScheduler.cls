@@ -24,8 +24,33 @@ public with sharing class RollupScheduler implements Schedulable {
     /** Two in the morning, which is after the day's data entry and before the day's reporting. */
     private static final String NIGHTLY_CRON = '0 0 2 * * ?';
 
+    /**
+     * True for the one run Recalculate all sets up for tonight, which covers every definition;
+     * the nightly job covers Scheduled and Both only. Null on a job scheduled before this field.
+     */
+    private Boolean everyDefinition = false;
+
+    /** The nightly job. */
+    public RollupScheduler() {
+        this(false);
+    }
+
+    /** The nightly job, or with `everyDefinition` the one run Recalculate all sets up tonight. */
+    public RollupScheduler(Boolean everyDefinition) {
+        this.everyDefinition = everyDefinition == true;
+    }
+
+    /**
+     * The nightly run, and a processor for Rollup Queue entries no save started one for
+     * (ROLLUPS-7), so a queued total never waits longer than a night.
+     */
     public void execute(SchedulableContext context) {
-        RollupService.startNightlyRun();
+        if (this.everyDefinition == true) {
+            RollupService.startFullRunOfEveryDefinition();
+        } else {
+            RollupService.startNightlyRun();
+        }
+        RollupQueue.processPending();
     }
 
     /** Starts the nightly run, or does nothing when it is already scheduled. */
@@ -34,14 +59,14 @@ public with sharing class RollupScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(jobNameInUse, NIGHTLY_CRON, new RollupScheduler());
+        return ScheduledJobSelector.schedule(jobNameInUse, NIGHTLY_CRON, new RollupScheduler());
     }
 
     /** Stops the nightly run. */
     public static void stop() {
         Id existing = scheduledJobId();
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 
@@ -52,20 +77,21 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /**
      * Sets up one run for the coming 2:00 AM in the running user's time zone, for Recalculate
-     * all when the nightly run is not scheduled (slice S12). The job carries the night's date
-     * in its name, so asking twice sets up one run.
+     * all when the nightly run is not scheduled (slice S12). Like Recalculate all, it covers
+     * every active definition. The job carries the night's date in its name, so asking twice
+     * sets up one run.
      */
     public static Id scheduleTonight() {
         Date night = Integer.valueOf(Datetime.now().format('H')) < 2
             ? Date.today()
             : Date.today().addDays(1);
         String name = jobNameInUse + ' ' + String.valueOf(night);
-        Id existing = jobIdNamed(name);
+        Id existing = ScheduledJobSelector.triggerIdByName(name);
         if (existing != null) {
             return existing;
         }
         String cron = '0 0 2 ' + night.day() + ' ' + night.month() + ' ? ' + night.year();
-        return System.schedule(name, cron, new RollupScheduler());
+        return ScheduledJobSelector.schedule(name, cron, new RollupScheduler(true));
     }
 
     /** True when the nightly run is scheduled. */
@@ -75,42 +101,11 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /** When the nightly run is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
-        Id jobId = scheduledJobId();
-        if (jobId == null) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT NextFireTime
-            FROM CronTrigger
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].NextFireTime;
+        return ScheduledJobSelector.nextFireTime(jobNameInUse);
     }
 
+    // One lookup for every scheduled job, read once per transaction (ADMIN-11).
     private static Id scheduledJobId() {
-        return jobIdNamed(jobNameInUse);
-    }
-
-    private static Id jobIdNamed(String name) {
-        List<CronJobDetail> details = [
-            SELECT Id
-            FROM CronJobDetail
-            WHERE Name = :name AND JobType = '7'
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        if (details.isEmpty()) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT Id
-            FROM CronTrigger
-            WHERE CronJobDetailId = :details[0].Id
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].Id;
+        return ScheduledJobSelector.triggerIdByName(jobNameInUse);
     }
 }

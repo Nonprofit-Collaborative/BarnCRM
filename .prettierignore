@@ -18,10 +18,3 @@ packages/**/lwc/**/*.html
 # size (see data/sample/README.md); not hand-authored source.
 packages/core/main/default/staticresources/SampleData.json
 packages/giving/main/default/staticresources/GivingSampleData.json
-
-# Vendored third party source: apex-rollup, see packages/core/vendor/apex-rollup/VENDOR.md.
-# Upstream formats with its own Prettier configuration. Running ours over the vendored tree
-# rewrites about 25,000 lines, which turns every future upstream diff into noise and makes
-# re-applying the local patches by hand impractical. Everything else under packages/core is
-# formatted normally.
-packages/core/vendor/

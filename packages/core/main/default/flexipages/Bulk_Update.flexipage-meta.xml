@@ -6,14 +6,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
-        <componentName>bulkUpdateHistory</componentName>
-        <identifier>bulkUpdateHistory1</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>bulkDeleteHistory</componentName>
-        <identifier>bulkDeleteHistory1</identifier>
+        <componentInstanceProperties>
+          <name>kinds</name>
+          <value>Update,Delete</value>
+        </componentInstanceProperties>
+        <componentName>dataJobHistory</componentName>
+        <identifier>dataJobHistory1</identifier>
       </componentInstance>
     </itemInstances>
     <name>main</name>

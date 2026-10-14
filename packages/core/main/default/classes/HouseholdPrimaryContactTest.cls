@@ -6,8 +6,13 @@
  * changes it, a person stored as an account is named by their person contact, and a hand
  * edit is refused. In contact mode the field stays the mark people set.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeService, ApexClass:HouseholdService')
 private class HouseholdPrimaryContactTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account household(String name) {
         Account record = HouseholdTestDataFactory.newHousehold(name);
         insert record;
@@ -164,12 +169,12 @@ private class HouseholdPrimaryContactTest {
     @IsTest
     static void aRealPersonAccountIsItsNewHouseholdsPrimaryContact() {
         System.runAs(TestUsers.admin()) {
-            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
-            if (personType == null) {
+            if (PersonAccountTestShape.skipReason() != null) {
                 // Proven on every shape by the test above; this one needs real person accounts,
-                // of a record type the running user is given.
+                // of a record type the running user is given. The reason is checked and logged.
                 return;
             }
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
             BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
                 HouseholdTestDataFactory.MODE_JUNCTION
             );
@@ -211,6 +216,10 @@ private class HouseholdPrimaryContactTest {
         }
     }
 
+    /**
+     * The bulk path (ADR-0108): a save of many rows, as a data load makes, is let through
+     * with two primaries, and settled the existing way.
+     */
     @IsTest
     static void withTwoPrimariesTheFirstInMemberOrderIsMirroredAndTheRowsAreLeftAlone() {
         System.runAs(TestUsers.admin()) {
@@ -233,6 +242,118 @@ private class HouseholdPrimaryContactTest {
                 [SELECT COUNT() FROM Household_Member__c WHERE Is_Primary__c = TRUE],
                 'Which of the two is right is a decision somebody makes, so no row is changed'
             );
+        }
+    }
+
+    /**
+     * R-M3, ADR-0108: one person's save that adds a second current primary to a household is
+     * refused, with a message pointing to Make primary.
+     */
+    @IsTest
+    static void aSingleSaveAddingASecondPrimaryIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            insert membership(smiths.Id, john.Id, 'Head', true);
+
+            Test.startTest();
+            Database.SaveResult result = Database.insert(
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', true),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'A second primary is refused');
+            Assert.areEqual(
+                Label.Core_Households_ErrorSecondPrimary,
+                result.getErrors()[0].getMessage(),
+                'The refusal says where to make the change instead'
+            );
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'John is still the primary');
+        }
+    }
+
+    /**
+     * R-M3, ADR-0108: ticking Is Primary on a second member by hand is refused the same way,
+     * and ticking it where nobody else holds it is allowed.
+     */
+    @IsTest
+    static void markingASecondMemberPrimaryByHandIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', false);
+            Household_Member__c janes = membership(smiths.Id, jane.Id, 'Spouse or Partner', false);
+            insert new List<Household_Member__c>{ johns, janes };
+
+            Test.startTest();
+            update new Household_Member__c(Id = johns.Id, Is_Primary__c = true);
+            Database.SaveResult result = Database.update(
+                new Household_Member__c(Id = janes.Id, Is_Primary__c = true),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'Jane cannot be made a second primary by hand');
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'John became the primary');
+        }
+    }
+
+    /**
+     * R-M3, ADR-0108: an ended primary does not count, so a new primary is allowed.
+     */
+    @IsTest
+    static void anEndedPrimaryDoesNotBlockANewOne() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
+            johns.Start_Date__c = Date.today().addYears(-2);
+            johns.End_Date__c = Date.today().addDays(-1);
+            insert johns;
+
+            Test.startTest();
+            insert membership(smiths.Id, jane.Id, 'Spouse or Partner', true);
+            Test.stopTest();
+
+            Assert.areEqual(jane.Id, primaryContactOf(smiths.Id), 'Jane is the primary now');
+        }
+    }
+
+    /**
+     * ADR-0108: one row arriving through a load (the APIs, the Bulk API, background Apex) is
+     * let through as before, so an import never newly fails.
+     */
+    @IsTest
+    static void aSecondPrimaryArrivingThroughALoadIsLetThrough() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            insert membership(smiths.Id, john.Id, 'Head', true);
+
+            Test.startTest();
+            HouseholdMemberTriggerHandler.quiddityOverride = Quiddity.BULK_API;
+            insert membership(smiths.Id, jane.Id, 'Spouse or Partner', true);
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Household_Member__c WHERE Is_Primary__c = TRUE],
+                'The loaded row is saved as it came'
+            );
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'Head comes first (R-H5)');
         }
     }
 

@@ -31,6 +31,9 @@ does not fit in any scratch org. Run it in two tiers:
 Tier 1 is the v0.11 exit evidence unless the owner provides a tier 2 org. Report the
 extrapolation, not a pass, for anything only tier 1 measured.
 
+On tier 2, also read Salesforce Scale Center and run ApexGuru for the run window; see
+[ApexGuru and Scale Center](apexguru-and-scale-center.md).
+
 ### Data shape
 
 Generate CSV files with a script under `scripts/data/` (not committed with real names: use
@@ -53,7 +56,7 @@ first error.
 | Household naming | **Recompute all households** on the household naming settings (`HouseholdNamingBatch`) | Completes; names match the naming preview for a sample |
 | Duplicate scan | **Scan for duplicates** (`DuplicateScanBatch`) | Completes; no batch reported as not checked; no CPU limit errors on the largest match groups |
 | Donor levels and acknowledgments | `DonorLevelBatch` and `AcknowledgmentBatch`, started from anonymous Apex with `Database.executeBatch` if the scheduler is not due | Complete with no failed batches |
-| Field utilization | `FieldUtilizationBatch`, the same way | Completes |
+| Field utilization | Org Optimizer, Field utilization section, choose the gift object and Contact (`FieldUtilizationController`, 10 fields per call above 100,000 records) | Each call returns in under 30 seconds; no limit errors |
 | Import | Import wizard with a 250k-row file on tier 2 (a 25k-row file on tier 1), contacts plus gifts | Completes; rows processed per minute recorded; undo of the whole batch (`ImportUndoBatch`) completes |
 | Interactive pages | Open a household with 30 members, a contact with 500 gifts, the Giving dashboard, Find with a broad search | Each page usable in under 5 seconds; no `Too many query rows` error |
 
@@ -90,3 +93,22 @@ component that should not appear on a phone gets `formFactor` limits in its
 
 Also check every LWC at a 320 px wide viewport in a desktop browser (responsive mode), since
 that catches most layout faults before a device is needed.
+
+### Static audit of Core components (2026-10-13, no org)
+
+Read from the source; the device run above still has to confirm it.
+
+- **Form factors.** No Core `.js-meta.xml` declares `supportedFormFactors`, so each component
+  supports what its page type supports: the six record panels (address, affiliation,
+  household members, household of a person, relationships, merge and split) can be placed on
+  a phone record page, and the admin pages are app or home pages. Nothing needed limiting.
+- **Layout.** No Core component sets a pixel width or inline style. The one fixed grid that
+  squeezed a control on a phone, the pause length picker on the Automation page, now stacks
+  below the medium breakpoint. Wide tables sit in `slds-scrollable_x`.
+- **Accessibility.** Every table has a name (`aria-label` from its heading label) and column
+  headers with `scope="col"`; icon buttons and icons carry alternative text; no clickable
+  `div` or `span`; status and errors use `role="status"`, `role="alert"` or `aria-live`.
+  Import results now announce their counts as a run finishes.
+- **Left for later, with the reason.** The merge comparison table has no name yet, and the
+  Access page Remove button gives the person's name only as a `title`: both components are
+  being changed on the Q-05 and Q-07 branches, so they follow once those land.

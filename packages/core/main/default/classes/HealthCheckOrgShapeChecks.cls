@@ -224,11 +224,13 @@ public with sharing class HealthCheckOrgShapeChecks {
                 );
         }
 
-        Integer asAccounts = CoexistenceService.countPeopleStoredAsAccounts();
+        Integer asAccounts = CoexistenceService.countPeopleStoredAsAccounts(
+            OrgShapeSelector.NATIVE_COUNT_CAP + 1
+        );
         if (asAccounts <= 0) {
             return null;
         }
-        List<Object> count = new List<Object>{ String.valueOf(asAccounts) };
+        List<Object> count = new List<Object>{ cappedCount(asAccounts) };
         return new HealthCheckService.Finding(
                 'membership_mode_people_as_accounts',
                 String.format(System.Label.Core_HealthCheck_PeopleAsAccountsTitle, count),
@@ -331,7 +333,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         String detail = shape.nativeHouseholdGroupCount != null
             ? String.format(
                   System.Label.Core_HealthCheck_NativeHouseholdsDetail,
-                  new List<Object>{ String.valueOf(shape.nativeHouseholdGroupCount) }
+                  new List<Object>{ cappedCount(shape.nativeHouseholdGroupCount) }
               )
             : System.Label.Core_HealthCheck_NativeHouseholdsUnknownDetail;
         return new HealthCheckService.Finding(
@@ -394,22 +396,10 @@ public with sharing class HealthCheckOrgShapeChecks {
         return connectInstalled;
     }
 
-    /**
-     * Whether an Apex class of this name is visible: in this package's namespace first, then
-     * with none (today, and unmanaged deploys). A class name is not an API name, so the prefix
-     * goes in without its `__` (dynamic-apex.md section 3).
-     */
+    /** Whether an Apex class of this name is visible (`NamespaceUtil.resolveType`). */
     @TestVisible
     private static Boolean classExists(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type found = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (found == null) {
-            found = Type.forName(className);
-        }
-        return found != null;
+        return NamespaceUtil.resolveType(className) != null;
     }
 
     private static HealthCheckService.Finding multiCurrencyFinding(
@@ -426,5 +416,21 @@ public with sharing class HealthCheckOrgShapeChecks {
             HealthCheckService.SEVERITY_WARNING,
             HealthCheckService.CATEGORY_LICENSES
         );
+    }
+
+    /**
+     * A count as a finding shows it. The counts stop one above the cap (a large org is not
+     * counted row by row), and a count past the cap reads "More than" the cap.
+     */
+    @TestVisible
+    private static String cappedCount(Integer count) {
+        Integer cap = OrgShapeSelector.NATIVE_COUNT_CAP;
+        if (count != null && count > cap) {
+            return String.format(
+                System.Label.Core_HealthCheck_OrphansMoreThan,
+                new List<Object>{ cap.format() }
+            );
+        }
+        return String.valueOf(count);
     }
 }

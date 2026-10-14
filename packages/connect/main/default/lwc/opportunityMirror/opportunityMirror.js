@@ -46,6 +46,9 @@ import differenceCountAll from '@salesforce/label/c.Connect_OpportunityMirror_Di
 import lastRun from '@salesforce/label/c.Connect_OpportunityMirror_LastRun';
 import noLastRun from '@salesforce/label/c.Connect_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Connect_OpportunityMirror_Loading';
+import noteWhat from '@salesforce/label/c.Connect_SetupNote_Mirror_What';
+import noteWhy from '@salesforce/label/c.Connect_SetupNote_Mirror_Why';
+import noteWhere from '@salesforce/label/c.Connect_SetupNote_Mirror_Where';
 
 const GIFTS_TO_OPPORTUNITIES = 'GiftsToOpportunities';
 const OFF = 'Off';
@@ -68,6 +71,9 @@ function isoDate(date) {
  * the reconciliation of a date range.
  */
 export default class OpportunityMirror extends LightningElement {
+  /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
+  setupNotes = [{ key: 'opportunityAccess', what: noteWhat, why: noteWhy, where: noteWhere }];
+
   labels = {
     loading,
     title,

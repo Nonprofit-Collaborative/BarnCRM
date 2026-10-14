@@ -46,8 +46,32 @@ public with sharing class RollupSelector {
         ];
     }
 
-    /** Every definition, read as the package, for the engine. */
+    /**
+     * The engine's read of every definition, kept for the rest of the transaction (ROLLUPS-5):
+     * one gift save used to read the definitions about six times, once per target entity and
+     * once per trigger. Every save or delete of a definition clears it (`RollupDefinitionTrigger`,
+     * whatever automation is switched off), so a definition saved earlier in a transaction is
+     * the one a later record save in it runs.
+     */
+    private static List<Rollup_Definition__c> cachedAll;
+
+    /** Forgets the cached definitions; the next engine read queries them again. */
+    public static void clearCache() {
+        cachedAll = null;
+    }
+
+    /**
+     * Every definition, read as the package, for the engine. Read once per transaction; each
+     * caller gets its own list, and no caller changes the records in it.
+     */
     public static List<Rollup_Definition__c> selectAll() {
+        if (cachedAll == null) {
+            cachedAll = queryAll();
+        }
+        return cachedAll.clone();
+    }
+
+    private static List<Rollup_Definition__c> queryAll() {
         return [
             SELECT
                 Id,
@@ -78,27 +102,6 @@ public with sharing class RollupSelector {
         ];
     }
 
-    /** The active definitions whose source entity is the one that just changed. */
-    public static List<Rollup_Definition__c> selectActiveForSource(
-        String sourceObject,
-        Set<String> modes
-    ) {
-        if (String.isBlank(sourceObject) || modes == null || modes.isEmpty()) {
-            return new List<Rollup_Definition__c>();
-        }
-        List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
-        for (Rollup_Definition__c definition : selectAll()) {
-            if (
-                definition.Active__c == true &&
-                sourceObject.equalsIgnoreCase(definition.Source_Object__c) &&
-                modes.contains(definition.Mode__c)
-            ) {
-                matching.add(definition);
-            }
-        }
-        return matching;
-    }
-
     /** The active definitions whose target entity is this one, for a merge of its records. */
     public static List<Rollup_Definition__c> selectActiveForTarget(
         String targetObject,
@@ -114,6 +117,23 @@ public with sharing class RollupSelector {
                 targetObject.equalsIgnoreCase(definition.Target_Object__c) &&
                 modes.contains(definition.Mode__c)
             ) {
+                matching.add(definition);
+            }
+        }
+        return matching;
+    }
+
+    /**
+     * The active definitions among these, for a queue entry that names the definitions that
+     * queued it; one switched off or deleted since is left out.
+     */
+    public static List<Rollup_Definition__c> selectActiveByIds(Set<Id> definitionIds) {
+        List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
+        if (definitionIds == null || definitionIds.isEmpty()) {
+            return matching;
+        }
+        for (Rollup_Definition__c definition : selectAll()) {
+            if (definition.Active__c == true && definitionIds.contains(definition.Id)) {
                 matching.add(definition);
             }
         }

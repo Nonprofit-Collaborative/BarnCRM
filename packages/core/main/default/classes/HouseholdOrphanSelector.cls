@@ -15,18 +15,74 @@
  * every list is short. People stored as accounts are recognised by the record types the org
  * describes as person types, passed in by the caller from OrgShapeDetector, so no person
  * account field is referenced here and Core still compiles on a Platform-only org (ADR-0013).
+ *
+ * A person who has been erased is never counted as having no household: erasing them takes
+ * them out of it on purpose (canonical model R-ER9).
  */
 public with sharing class HouseholdOrphanSelector {
+    /** The most erased people left out; erasures are rare, and the ids are never shown. */
+    private static final Integer ERASED_READ_CAP = 10000;
+
+    private static Set<Id> erased;
+
+    /**
+     * Every person an Erasure record names, read once per transaction. System mode, because
+     * the ids only leave people out of a count the user is shown in user mode, and the person
+     * running Health Check need not be able to read the erasure audit (ADR-0021).
+     */
+    private static Set<Id> erasedPeople() {
+        if (erased == null) {
+            erased = new Set<Id>();
+            for (Erasure__c erasure : [
+                SELECT Contact__c, Person_Account__c
+                FROM Erasure__c
+                WHERE Contact__c != NULL OR Person_Account__c != NULL
+                WITH SYSTEM_MODE
+                ORDER BY CreatedDate DESC
+                LIMIT :ERASED_READ_CAP
+            ]) {
+                erased.add(
+                    erasure.Contact__c != null ? erasure.Contact__c : erasure.Person_Account__c
+                );
+            }
+        }
+        return erased;
+    }
+
+    /**
+     * Junction mode: the people in no household, contacts and person accounts together, as
+     * Health Check and the data hygiene console both count them. Stops at `cap`: the person
+     * accounts are not counted once the contacts alone reach it.
+     */
+    public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        Set<Id> excluded = new Set<Id>(personTypes);
+        if (householdRecordTypeId != null) {
+            excluded.add(householdRecordTypeId);
+        }
+        Integer found = countContactsWithoutMembership(excluded, cap);
+        if (!personTypes.isEmpty() && found < cap) {
+            found += countPersonAccountsWithoutMembership(personTypes, cap);
+        }
+        return found;
+    }
+
     /** Contact mode: contacts with no account at all. */
     public static Integer countContactsWithoutAccount(Integer cap) {
-        return [SELECT COUNT() FROM Contact WHERE AccountId = NULL WITH USER_MODE LIMIT :cap];
+        return [
+            SELECT COUNT()
+            FROM Contact
+            WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
+            WITH USER_MODE
+            LIMIT :cap
+        ];
     }
 
     public static List<Contact> contactsWithoutAccount(Integer howMany) {
         return [
             SELECT Id, Name
             FROM Contact
-            WHERE AccountId = NULL
+            WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
             WITH USER_MODE
             ORDER BY CreatedDate, Id
             LIMIT :howMany
@@ -55,6 +111,7 @@ public with sharing class HouseholdOrphanSelector {
                     FROM Household_Member__c
                     WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
                 )
+                AND Id NOT IN :erasedPeople()
                 AND (AccountId = NULL
                 OR Account.RecordTypeId NOT IN :excludedAccountTypes)
             WITH USER_MODE
@@ -76,6 +133,7 @@ public with sharing class HouseholdOrphanSelector {
                     FROM Household_Member__c
                     WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
                 )
+                AND Id NOT IN :erasedPeople()
                 AND (AccountId = NULL
                 OR Account.RecordTypeId NOT IN :excludedAccountTypes)
             WITH USER_MODE
@@ -95,6 +153,7 @@ public with sharing class HouseholdOrphanSelector {
             FROM Account
             WHERE
                 RecordTypeId IN :personRecordTypeIds
+                AND Id NOT IN :erasedPeople()
                 AND Id NOT IN (
                     SELECT Account__c
                     FROM Household_Member__c
@@ -115,6 +174,7 @@ public with sharing class HouseholdOrphanSelector {
             FROM Account
             WHERE
                 RecordTypeId IN :personRecordTypeIds
+                AND Id NOT IN :erasedPeople()
                 AND Id NOT IN (
                     SELECT Account__c
                     FROM Household_Member__c

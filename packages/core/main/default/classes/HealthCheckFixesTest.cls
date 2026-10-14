@@ -9,8 +9,13 @@
  * org it runs in happens to have. Import templates are the one exception: their shipped rows
  * are read as shipped, and Core ships two, which the test says before it relies on them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckService, ApexClass:HealthCheckController')
 private class HealthCheckFixesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String TEST_JOB_NAME = 'BarnCRM Rollups (HealthCheckFixesTest)';
 
     private static Rollup_Definition_Default__mdt memberCountDefault(String mode) {
@@ -447,6 +452,87 @@ private class HealthCheckFixesTest {
                 );
             }
 
+        }
+    }
+
+    /** A user who has left: inactive, so a job they own has stopped running. */
+    private static Id inactiveUserId() {
+        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
+        User gone = new User(
+            FirstName = 'Former',
+            LastName = 'Scheduler',
+            Alias = 'formsch',
+            Email = 'former.scheduler.barncrm@example.com',
+            Username = 'former.scheduler.barncrm.' + Datetime.now().getTime() + '@example.com',
+            ProfileId = standard.Id,
+            TimeZoneSidKey = 'America/New_York',
+            LocaleSidKey = 'en_US',
+            EmailEncodingKey = 'UTF-8',
+            LanguageLocaleKey = 'en_US',
+            IsActive = false
+        );
+        insert gone;
+        return gone.Id;
+    }
+
+    @IsTest
+    static void jobsOfADeactivatedOwnerAreScheduledAgainAndTheRestNamedAsStopped() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+            Id gone = inactiveUserId();
+            String otherJob = 'BarnCRM Fix test job';
+            ErrorDigestScheduler.start();
+            ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
+            NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.ErrorDigestJob() };
+            ScheduledJobSelector.ownerOverride = gone;
+            ScheduledJobSelector.forget();
+            String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
+
+            System.runAs(maria) {
+                List<String> scope = HealthCheckService.fixScope(fixKey);
+                Assert.isTrue(
+                    scope.contains(otherJob),
+                    'The job of the deactivated owner is named'
+                );
+
+                // No startTest: the scheduled run must not execute inside the test.
+                HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
+
+                Assert.isTrue(
+                    report.fixOutcome.contains(ErrorDigestScheduler.JOB_NAME),
+                    'A job Health Check schedules is said to be scheduled: ' + report.fixOutcome
+                );
+                Assert.isTrue(
+                    report.fixOutcome.contains(
+                        String.format(
+                            System.Label.Core_HealthCheck_FixStoppedOnly,
+                            new List<Object>{ otherJob }
+                        )
+                    ),
+                    'A job it never schedules is said to be stopped only: ' + report.fixOutcome
+                );
+                Assert.areEqual(
+                    1,
+                    [
+                        SELECT COUNT()
+                        FROM Setting_Change__c
+                        WHERE
+                            Setting_Name__c = :('Health Check: ' +
+                            System.Label.Core_HealthCheck_InactiveOwnerJobsFix)
+                    ],
+                    'The fix is recorded in the settings change history'
+                );
+            }
+            ScheduledJobSelector.ownerOverride = null;
+            ScheduledJobSelector.forget();
+            Assert.isNull(
+                ScheduledJobSelector.triggerIdByName(otherJob),
+                'The unknown job was stopped'
+            );
+            Assert.isNotNull(
+                ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME),
+                'The known job runs again'
+            );
         }
     }
 

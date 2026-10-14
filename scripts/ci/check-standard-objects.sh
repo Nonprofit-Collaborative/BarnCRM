@@ -77,16 +77,6 @@ PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case
 NPC_PATTERN='\b(PartyRelationshipGroup|PartyRoleRelation|AccountAccountRelation|AccountContactRelation|ContactContactRelation|ContactPointAddress|ContactPointEmail|ContactPointPhone|ContactPointConsent|PersonLifeEvent|GiftTransactionDesignation|GiftDesignation|GiftDefaultDesignation|GiftCommitment|GiftCommitmentSchedule|GiftSoftCredit|GiftTribute|GiftRefund|GiftEntry|GiftBatch|OutreachSourceCode|OutreachSummary|DonorGiftSummary|ProgramEnrollment|BenefitAssignment|BenefitDisbursement|RecordAggregationDefinition)\b'
 NPC_INCLUDES=(--include='*.cls' --include='*.trigger' --include='*.xml')
 
-# The vendored rollup engine is third party source, not ours to rewrite line by line, and it
-# names ContactPointAddress and Individual in its own test classes, so it is excluded from
-# this half of the check. It is not left unguarded: scripts/ci/check-object-allowlist.py
-# covers the vendored tree with an allowlist, so every standard object it names is listed
-# with a reason and a new one arriving with an upstream upgrade fails the build. The
-# evidence that those objects are present on the Platform-only shape is in
-# packages/core/vendor/apex-rollup/VENDOR.md, "Platform-only deployability of the vendored
-# tests".
-NPC_EXCLUDE_DIR='vendor'
-
 MARKER='// detection-only:'
 TEMPLATE_HEADINGS='/customMetadata/Import_Template_Default.'
 
@@ -99,7 +89,7 @@ for DIR in "${DIRS[@]}"; do
   [[ -d "$DIR" ]] || continue
   MATCHES=$(grep -rnwE "$PATTERN" "$DIR" --include='*' --exclude='README.md' 2>/dev/null || true)
   NPC_MATCHES=$(grep -rnwE "$NPC_PATTERN" "$DIR" "${NPC_INCLUDES[@]}" \
-    --exclude='README.md' --exclude-dir="$NPC_EXCLUDE_DIR" 2>/dev/null || true)
+    --exclude='README.md' 2>/dev/null || true)
   if [[ -n "$NPC_MATCHES" ]]; then
     MATCHES=$(printf '%s\n%s' "$MATCHES" "$NPC_MATCHES")
   fi

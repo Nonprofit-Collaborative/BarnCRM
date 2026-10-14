@@ -21,7 +21,15 @@ public with sharing class OrgShapeSelector {
     // because the group is an Industries common object that the Fundraising licence does not
     // gate.
     private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so Health Check can tell an administrator whether this org already models households natively
-    private static final String NATIVE_HOUSEHOLD_GROUP_COUNT_QUERY = 'SELECT COUNT() FROM PartyRelationshipGroup WHERE Type = \'Household\''; // detection-only: counts the org's native households, the only native indicator that an Account is a Nonprofit Cloud household
+    // Capped: rows a COUNT() matches count toward the 50,000 query row limit, and that limit
+    // cannot be caught, so an uncapped count would fail every transaction that detects the
+    // org shape in an org with more native households than that. Health Check says "more
+    // than" the cap (NATIVE_COUNT_CAP).
+    private static final String NATIVE_HOUSEHOLD_GROUP_COUNT_QUERY = 'SELECT COUNT() FROM PartyRelationshipGroup WHERE Type = \'Household\' LIMIT 1001'; // detection-only: counts the org's native households, the only native indicator that an Account is a Nonprofit Cloud household
+    private static final String NATIVE_HOUSEHOLD_GROUP_ANY_QUERY = 'SELECT Id FROM PartyRelationshipGroup WHERE Type = \'Household\' LIMIT 1'; // detection-only: whether the org has any native household at all, one row
+
+    /** The native household count stops one above this, and Health Check says "more than". */
+    public static final Integer NATIVE_COUNT_CAP = 1000;
 
     /**
      * Set only by tests, so that a counted answer can be exercised on an org where the object
@@ -80,6 +88,20 @@ public with sharing class OrgShapeSelector {
      * HouseholdSelector.getAccountsWithNativeDependents and is not duplicated here.
      */
     public static Integer nativeHouseholdGroupCount() {
+        return probeNativeHouseholdGroups(false);
+    }
+
+    /**
+     * Whether the org has any native household at all: true, false, or null when that could
+     * not be told, on the same terms as the count. One row, for the save paths that only need
+     * to know whether to be careful.
+     */
+    public static Boolean anyNativeHouseholdGroup() {
+        Integer found = probeNativeHouseholdGroups(true);
+        return found == null ? null : found > 0;
+    }
+
+    private static Integer probeNativeHouseholdGroups(Boolean anyIsEnough) {
         try {
             if (failNativeHouseholdGroupProbe == true) {
                 throw new QueryException('Injected probe failure, tests only.');
@@ -90,6 +112,11 @@ public with sharing class OrgShapeSelector {
             Schema.SObjectType groupType = Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
             if (groupType == null || !groupType.getDescribe().isAccessible()) {
                 return null;
+            }
+            if (anyIsEnough) {
+                // detection-only: one row, read from the literal above
+                return Database.query(NATIVE_HOUSEHOLD_GROUP_ANY_QUERY, AccessLevel.USER_MODE)
+                    .size();
             }
             // detection-only: the count itself, read from the literal above and never built by concatenation
             return Database.countQuery(NATIVE_HOUSEHOLD_GROUP_COUNT_QUERY, AccessLevel.USER_MODE);

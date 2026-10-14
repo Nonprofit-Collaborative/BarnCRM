@@ -3,7 +3,7 @@
   <fullName>Import_Batch__c</fullName>
   <description>The upload this row came from.</description>
   <externalId>false</externalId>
-  <label>Import</label>
+  <label>Data Job</label>
   <referenceTo>Import_Batch__c</referenceTo>
   <relationshipLabel>Import Rows</relationshipLabel>
   <relationshipName>Import_Rows</relationshipName>

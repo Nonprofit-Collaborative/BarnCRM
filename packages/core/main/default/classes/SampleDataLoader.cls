@@ -14,7 +14,8 @@
  * present, and refuses to start while a load is still running. Because a synchronous
  * transaction cannot safely insert every household, organization, and contact (the
  * household naming and greeting triggers run on every contact insert), load() only
- * starts the queueable chain and returns immediately; call status() to track progress.
+ * starts the stage batch (SampleDataStageBatch over SampleDataLoadStages) and returns
+ * immediately; call status() to track progress.
  * remove() runs synchronously; a few hundred deletes are well within limits for one
  * transaction, and it too refuses while a load is running so the chain cannot insert
  * contacts against households that have just been deleted.
@@ -23,7 +24,7 @@
  * boundary, and the queueables log their own async failures.
  */
 public with sharing class SampleDataLoader {
-    /** Contacts inserted per contact-stage chunk (see SampleDataContactQueueable). */
+    /** Contacts inserted per contact stage (see SampleDataLoadStages). */
     public static final Integer CONTACT_CHUNK_SIZE = 100;
 
     /** Injected by the tests in place of the static resource body. */
@@ -106,16 +107,55 @@ public with sharing class SampleDataLoader {
             throw new SampleDataException(Label.Core_SampleData_AlreadyLoaded);
         }
         // Parsed here so a malformed payload fails in front of the admin, with a readable
-        // message, instead of inside a queueable the card can only report as "not loaded".
+        // message, instead of inside a batch the card can only report as "not loaded".
         SampleDataSet.parse(getSampleDataJson());
-        System.enqueueJob(new SampleDataLoadQueueable());
+        SampleDataStageBatch.start(new SampleDataLoadStages());
     }
 
     /**
-     * Whether a stage of the load may queue the next one. The platform refuses a queueable
-     * that queues another inside an Apex test (it throws "Maximum stack depth has been
-     * reached"), so there the chain stops after the job the test started, and each stage is
-     * tested by calling it directly. Everywhere else the chain always continues.
+     * Tells the person who loaded the sample data that the whole load, every module's included,
+     * is in, with Core's counts (Q-04). Called once, when no module is left to start.
+     */
+    public static void notifyLoadFinished() {
+        String body;
+        try {
+            SampleDataSelector selector = new SampleDataSelector();
+            body = String.format(
+                Label.Core_JobNotice_SampleDataBody,
+                new List<Object>{
+                    selector.countSampleHouseholds().format(),
+                    selector.countSampleContacts().format(),
+                    selector.countSampleOrganizations().format()
+                }
+            );
+        } catch (Exception notCounted) {
+            // The counts are a courtesy: a load that is in must never be undone by counting it.
+            ErrorLogger.log(notCounted, JobNotifier.LOG_CONTEXT);
+        }
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            Label.Core_JobNotice_SampleData,
+            false,
+            body,
+            JobNotifier.SECTION_GENERAL
+        );
+    }
+
+    /** Tells the person who loaded the sample data that a stage of the load stopped (Q-04). */
+    public static void notifyLoadStopped() {
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            Label.Core_JobNotice_SampleData,
+            true,
+            Label.Core_JobNotice_SampleDataStoppedBody,
+            JobNotifier.SECTION_GENERAL
+        );
+    }
+
+    /**
+     * Whether the load may run past its first stage. An Apex test may run only one execute
+     * of a batch, so there the stage batch runs the first stage alone, and each stage and
+     * hand-off is tested by calling it directly. Everywhere else every stage runs.
      */
     public static Boolean mayQueueNextStage() {
         return !Test.isRunningTest();

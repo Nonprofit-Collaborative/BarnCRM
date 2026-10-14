@@ -8,8 +8,13 @@
  * are created here the way Core's loader creates them: flagged as sample data and carrying
  * the generator key the payload names them by.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingSampleData')
 private class GivingSampleDataTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String PERSON_KEY = 'H001-1';
     private static final String SECOND_PERSON_KEY = 'H002-1';
     private static final String ORGANIZATION_KEY = 'O001';
@@ -164,7 +169,50 @@ private class GivingSampleDataTest {
         return JSON.serialize(root);
     }
 
-    /** Runs both load stages in order, the way the chain does in an org. */
+    @IsTest
+    static void testStagesRunInOrderThroughTheStageBatch() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            GivingSampleData.jsonOverride = buildJson();
+            GivingSampleDataStages stages = new GivingSampleDataStages();
+
+            Test.startTest();
+            Integer stageCount = stages.stageCount();
+            for (Integer stage = 0; stage < stageCount; stage++) {
+                stages.runStage(stage);
+            }
+            stages.finish();
+            Test.stopTest();
+
+            System.assertEquals(2, stageCount, 'one reference data stage and one gift chunk');
+            System.assertEquals(
+                5,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'the gift stage reads the funds and appeals the reference stage kept for it'
+            );
+        }
+    }
+
+    @IsTest
+    static void testEnqueueLoadStartsTheStageBatch() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            GivingSampleData.jsonOverride = buildJson();
+
+            Test.startTest();
+            new GivingSampleData().enqueueLoad();
+            Test.stopTest();
+
+            // A test context runs one execute of a batch, which is the reference data stage.
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
+                'the stage batch runs the reference data stage first'
+            );
+        }
+    }
+
+    /** Runs both load stages in order, the way the stage batch does in an org. */
     private static GivingSampleDataSet loadEverything() {
         GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
         Map<String, Id> idsByKey = GivingSampleDataLoader.loadReferenceData(data);

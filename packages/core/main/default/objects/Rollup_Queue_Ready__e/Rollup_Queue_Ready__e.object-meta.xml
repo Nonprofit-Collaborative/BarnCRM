@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    Says that a save inside a Queueable job left Rollup Queue entries waiting. Published once per
+    transaction, after commit, so the job keeps its one chained job; the subscriber starts the
+    queue processor (canonical model rule R-RQ3). Carries no data: the entries are the record.
+  </description>
+  <eventType>HighVolume</eventType>
+  <label>Rollup Queue Ready</label>
+  <pluralLabel>Rollup Queue Ready Events</pluralLabel>
+  <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

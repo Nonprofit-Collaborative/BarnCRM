@@ -3,8 +3,13 @@
  * administrators unless somebody is listed, and a listed address that is not a user's is refused
  * when the setting is saved.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorDigestRecipients')
 private class ErrorDigestRecipientsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }

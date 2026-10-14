@@ -6,8 +6,13 @@
  * Both tests run as a user on the Minimum Access profile holding BarnCRM Admin, so what is
  * proved is what the permission set grants, not what a system administrator profile allows.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor, ApexClass:ImportMapping')
 private class ImportFieldAccessTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

@@ -13,8 +13,24 @@
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Access page: confirmation shown after a role is given</shortDescription>
+        <shortDescription>Access page: after a role is given; {0} person, {1} role</shortDescription>
         <value>{0} now has the {1} role.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AutomaticAccessHelp</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: text before the link to the automatic access guide</shortDescription>
+        <value>Add people often? A user access policy, created once in Setup, can give each new user a role for you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AutomaticAccessLink</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: link that opens the automatic access guide page</shortDescription>
+        <value>Set up automatic access</value>
     </labels>
     <labels>
         <fullName>Core_Access_CancelButton</fullName>
@@ -29,7 +45,7 @@
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Access page: question asked before a role is given</shortDescription>
+        <shortDescription>Access page: asked before a role is given; {0} person, {1} role</shortDescription>
         <value>Give {0} the {1} role?</value>
     </labels>
     <labels>
@@ -45,7 +61,7 @@
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Access page: question asked before a role is removed</shortDescription>
+        <shortDescription>Access page: asked before a role is removed; {0} person, {1} role</shortDescription>
         <value>Remove the {1} role from {0}? Any other role they hold stays in place.</value>
     </labels>
     <labels>
@@ -189,7 +205,7 @@
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Access page: confirmation shown after a role is removed</shortDescription>
+        <shortDescription>Access page: after a role is removed; {0} person, {1} role</shortDescription>
         <value>{0} no longer has the {1} role.</value>
     </labels>
     <labels>
@@ -269,7 +285,7 @@
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Error Log warning: the installer was not given the admin role</shortDescription>
+        <shortDescription>Error Log: installer not given the admin role; {0} is the attempts</shortDescription>
         <value>Warning: the BarnCRM Admin role was still being prepared after {0} attempts, so it was not given to the person who installed BarnCRM. They already have the BarnCRM Admin permission set, so BarnCRM Settings works. To finish, open BarnCRM Settings, then Access, and give them the BarnCRM Admin role.</value>
     </labels>
 </CustomLabels>

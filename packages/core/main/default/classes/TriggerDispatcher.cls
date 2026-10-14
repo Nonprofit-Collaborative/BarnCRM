@@ -9,8 +9,8 @@
  *
  * The dispatcher reads the shipped registry for that object, in execution order, and runs each
  * handler it names (ADR-0017). A module ships its handler class and its registry record and
- * never edits another feature's trigger. The `run(TriggerHandler)` overload stays for tests and
- * for an object with exactly one handler.
+ * never edits another feature's trigger. The `run(TriggerHandler, Context)` overload runs one
+ * handler with no registry row, for tests.
  *
  * Before it invokes anything, the dispatcher asks three questions in order: is this handler
  * bypassed for this transaction, is all automation paused for the org, and is this automation
@@ -38,9 +38,6 @@
  */
 @NamespaceAccessible
 public with sharing class TriggerDispatcher {
-    private static String resolvedNamespace;
-    private static Boolean namespaceResolved = false;
-
     @NamespaceAccessible
     public class TriggerDispatcherException extends Exception {
     }
@@ -107,14 +104,6 @@ public with sharing class TriggerDispatcher {
                 run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true);
             }
         }
-    }
-
-    @NamespaceAccessible
-    public static void run(TriggerHandler handler) {
-        if (!Trigger.isExecuting) {
-            return;
-        }
-        run(handler, currentContext());
     }
 
     @NamespaceAccessible
@@ -234,10 +223,7 @@ public with sharing class TriggerDispatcher {
             skip(className, objectApiName);
             return null;
         }
-        Type handlerType = Type.forName(packageNamespace(), className);
-        if (handlerType == null) {
-            handlerType = Type.forName(className);
-        }
+        Type handlerType = NamespaceUtil.resolveType(className);
         if (handlerType == null) {
             skip(className, objectApiName);
             return null;
@@ -265,20 +251,6 @@ public with sharing class TriggerDispatcher {
             'Trigger dispatch: ' + objectApiName,
             ErrorLogger.SEVERITY_WARNING
         );
-    }
-
-    /**
-     * The namespace this package is running under, so that a handler in another package under
-     * the same namespace can be found by name. Empty while the namespace is deferred.
-     */
-    private static String packageNamespace() {
-        if (namespaceResolved) {
-            return resolvedNamespace;
-        }
-        String qualifiedName = String.valueOf(new TriggerDispatcher()).substringBefore(':');
-        resolvedNamespace = qualifiedName.contains('.') ? qualifiedName.substringBefore('.') : null;
-        namespaceResolved = true;
-        return resolvedNamespace;
     }
 
     private static Id firstRecordId(Context context) {

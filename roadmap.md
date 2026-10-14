@@ -2,15 +2,47 @@
 
 Purpose: planned work with status. Mirrors Section 6 of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-13 (main at PR #219, squash fe05faa3). #219 landed batches 2 to 6, the Rollup Builder, test self-containment, v0.11 hardening, security follow-ups, C-37 part 2 and ADR-0092; PRs #201 to #218 are closed as landed. "Built" means built on a branch or open PR, not merged.
+Status as of 2026-10-13 (main at PR #222, squash 55e6b3d9). #219 landed batches 2 to 6, the Rollup Builder, test self-containment, v0.11 hardening, security follow-ups, C-37 part 2 and ADR-0092; PRs #201 to #218 are closed as landed. `main` deployed to `barn-npc` 2026-10-13 and passes. "Built" means built on a branch or open PR, not merged.
 
-## Near-term queue
+## Near-term queue (plan 6.0, owner decisions 2026-10-13)
 
-1. Rollup S9: comparison run (`RollupEngineComparison`, sample data, `oi-test`, from main), then land `feature/rollup-s9-remove-vendored` (not landed).
-2. Deploy to `barn-npc` (approved now that the batches, Builder and test self-containment are in main), assign BarnCRM permission sets, run tests.
-3. Then C-38 scheduled imports, rollup S14 (unbuilt; only if the scale test needs it), S15 to S17 (S16 coverage confirmed on `barn-npc`).
-5. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
-6. Real deploy to `mwdbdevsb`: on hold (owner, 2026-10-12).
+1. Core quality pass (D-38, D-39): test, optimize, improve and simplify existing Core without removing functionality, before the non-core modules. Built in parallel:
+   - Seven Core reviews; findings become fix batches.
+   - Q-01 to Q-14 platform features (D-39; table below), branches `feature/q-NN-<slug>`.
+   - SLDS 2 linter gate (PR #223; every component passes).
+   - Console app with an app icon (`feature/console-app-icon`).
+   - Field utilization on demand from its own tab (D-37, `feature/field-utilization-on-demand`).
+   - Test self-containment (`fix/tests-self-contained`).
+   - Rollup S9 after a clean engine comparison run (`feature/rollup-s9-remove-vendored`, not landed); S14 only if the scale test needs it; S15 to S17 spike.
+   - Inventory of unfinished Core work, under way (D-47): duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38).
+   - Find, bulk update and duplicates fix batch, in progress.
+   - Approved review recommendations (D-48): rollups recalculate only definitions that marked a target (ADR needed); fiscal-window rollups in the nightly run; Recalculate now checks budget and queues; import commit runs the previewed template; organizations only for passing rows; people import reads values like Load one object; bulk delete undo covers deleted empty households; Health Check on Home shows last result plus Run now; one shared LWC helper module; faster test runs; namespace-safe object resolution.
+   - Affiliations in Core people imports, restored (D-49; C-32).
+   - Data tools parity (D-50): Data Manager hub with one job history and Undo; Org Optimizer (Data Hygiene relabeled; Duplicates moved from Settings; Field utilization embedded only there); full results file; trial import then the rest in the same job; delete from a file of IDs; more transform steps; lookups and update matching on any Text, Email or Phone field; skip rows and one row per key; empty cells clear the field (off by default, journaled); delimiter and worksheet choice; download before delete; retry rejects into the same job; server-side export (C-36 remainder); parent and child loads. Not approved: seeding templates, files import. C-38 stays on hold.
+   - Import tab label "Import", reached from Data Manager; Import and Bulk Update leave the navigation; Find stays (D-51).
+   - Erase a person in Core, with a Giving extension (D-52).
+   - Shipped import templates added at install and on upgrade (D-55).
+2. On hold: C-38 scheduled imports and connections, until Brandon is ready to start the next version (D-39).
+3. After the Core quality pass: the non-core modules, in plan Section 6 order.
+4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
+5. Real deploy to `mwdbdevsb`: on hold (owner, 2026-10-12).
+
+| ID | Platform feature (Core quality pass, D-39) | Status |
+|---|---|---|
+| Q-01 | Real-time rollups off the save transaction | Started 2026-10-13 |
+| Q-02 | RunRelevantTests and `isCritical`/`testFor` for fast gates | Started 2026-10-13 |
+| Q-03 | Apex Cursors for large-volume jobs (also removes the 200-row import exceptions cap) | Started 2026-10-13 |
+| Q-04 | Custom Notifications when long jobs finish | Started 2026-10-13 |
+| Q-05 | `lightning/modal`, toast, alert and confirm | Started 2026-10-13 |
+| Q-06 | GraphQL and Lightning Data Service reads | Started 2026-10-13 |
+| Q-07 | Workspace API in the console app | Started 2026-10-13 |
+| Q-08 | Dynamic Forms, Related Lists and Actions on every record page | Started 2026-10-13 |
+| Q-09 | User Access Policies | Started 2026-10-13 |
+| Q-10 | In-App Guidance | Started 2026-10-13 |
+| Q-11 | Platform Cache | Started 2026-10-13 |
+| Q-12 | Scratch org snapshots (Dev Hub snapshot `BarnPA` from `oi-pa` approved, D-46) | Started 2026-10-13 |
+| Q-13 | ApexGuru and Scale Center | Started 2026-10-13 |
+| Q-14 | Agentforce-ready invocable actions (optional; approved) | Started 2026-10-13 |
 
 ## Iterations
 
@@ -46,11 +78,11 @@ Status as of 2026-10-13 (main at PR #219, squash fe05faa3). #219 landed batches 
 | Gift keeps its household | D-20 | Landing (ADR-0070, ADR-0071) |
 | Pledge payment picker in gift entry (G-25) | D-17 | Landing (ADR-0084) |
 | CMDT Manager (plan 6.1 item 9) | D-25 | Landing (ADR-0085) |
-| Field utilization (plan 6.1 item 10) | D-26 | Landing (ADR-0086); register `FieldUtilizationJob` in `NightlyJobs` next |
+| Field utilization (plan 6.1 item 10) | D-26, D-37 | In main (ADR-0086); on-demand rework from its own tab on `feature/field-utilization-on-demand` (D-37); `NightlyJobs` registration dropped |
 | Tests run as permission-set users | D-33 | Landing; proof run without BarnCRM permission sets, then drop the assignment from `run-org-tests.sh` |
-| "Data jobs" relabel | ADR-0047 | Not done |
+| "Data Jobs" relabel (Title Case) | ADR-0047, D-45 | Not done |
 | Namespace registration, first package version | D-01, ADR-0001 | Deferred |
 
 ## Post-1.0 (plan 6.1, parked)
 
-Memberships (G-22), Events, public volunteer sign-up (V-09), processor webhooks (X-08), donor scoring maturity and portfolios, multi-currency, AI-readiness pack, localization, CMDT Manager (landing), Analytics module (field utilization landing), data management 2 (C-36 and C-37 part 1 moved to v0.7 and landing; bulk delete next), scheduled imports and connections (C-38).
+Memberships (G-22), Events, public volunteer sign-up (V-09), processor webhooks (X-08), donor scoring maturity and portfolios, multi-currency, AI-readiness pack, localization, CMDT Manager (landing), Analytics module (field utilization landing), data management 2 (C-36 and C-37 part 1 moved to v0.7 and landing; bulk delete next), scheduled imports and connections (C-38; on hold until Brandon starts the next version, D-39).

@@ -88,7 +88,13 @@ personal data, or any LWC that renders text. The last full pass was the v0.11 ha
 
 | Item | Where | Why it is open |
 | ---- | ----- | -------------- |
-| `Error_Log_Event__e` readable by Staff and Read Only | BarnCRM Staff and Read Only permission sets | Check in an org whether publishing needs Read; if not, remove it |
-| Error Log sharing model is Read/Write | `Error_Log__c` | Could be Read: writes are system mode and Staff cannot edit any field |
-| Inbound gift REST endpoint has no custom permission | `InboundGiftResource`, `InboundGiftAction` | Relies on class access through the Inbound Gift API permission set plus user-mode CRUD; say so in the review submission |
+| Error Log sharing model is Read/Write | `Error_Log__c` | Owner decision; the recommended default is to keep Read/Write. Every packaged set has View All on the object, so the sharing model only decides who may edit, and only BarnCRM Admin has Edit. Read would break **Mark as seen** (`ErrorLogController.acknowledge`, a user-mode update) on entries owned by someone else, which is most of them, since the event subscriber writes them. Moving to Read needs either Modify All for BarnCRM Admin (which also grants Delete) or a system-mode acknowledge |
+| Inbound gift REST endpoint has no custom permission | `InboundGiftResource`, `InboundGiftAction` | Relies on class access (the Inbound Gift API set for the endpoint, the Record Inbound Gift Action set for the action) plus user-mode CRUD; say so in the review submission |
+| Core agent-ready actions have no custom permission | `FindPeopleAction`, `GetHouseholdSummaryAction`, `CreatePersonAction`, `GetDataJobStatusAction` | Global invocables (ADR-0104, agent-ready Core actions): user-mode reads and writes, Create Person checks household edit access; class access granted by BarnCRM Staff and Admin (all four) and Read Only (Find People, Get Household Summary); say so in the review submission |
 | After-save flow updates its own record | `Template_Relationship_Reciprocal` | Code Analyzer SameRecordUpdate. Cannot move to before-save: it writes the Id of a record it creates in the same run, which exists only after save |
+
+Closed since the v0.11 pass:
+
+| Item | What was done |
+| ---- | ------------- |
+| `Error_Log_Event__e` readable by Staff and Read Only | Kept (2026-10-13). The org refuses Create on a platform event without Read ("Permission Create Error_Log_Event__e depends on permission(s): Read Error_Log_Event__e"), and publishing needs Create, so every packaged set that publishes holds both |

@@ -11,8 +11,13 @@
  * These tests have not been executed: no Salesforce org exists in this environment. What a
  * real install has still to confirm is named in ADR-0029.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingPostInstall')
 private class GivingPostInstallTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void installingGivingCreatesTheGivingTotals() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -87,6 +92,42 @@ private class GivingPostInstallTest {
             Assert.isFalse(
                 afterUpgrade.Active__c,
                 'A rollup the admin switched off stays off across an upgrade (R-R6).'
+            );
+        }
+    }
+
+    /**
+     * Installing Giving adds its import templates, the migration mappings among them, and an
+     * upgrade keeps one the administrator edited and adds none twice (D-41).
+     */
+    @IsTest
+    static void installingGivingAddsItsImportTemplatesOnce() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
+            Test.testInstall(handler, null);
+            Import_Template__c npsp = [
+                SELECT Id, Name
+                FROM Import_Template__c
+                WHERE Template_Key__c = 'npsp_contacts'
+                WITH SYSTEM_MODE
+            ];
+            Integer afterInstall = [SELECT COUNT() FROM Import_Template__c WITH SYSTEM_MODE];
+            npsp.Name = 'NPSP contacts, our way';
+            update as system npsp;
+
+            Test.startTest();
+            Test.testInstall(handler, new Version(1, 0), true);
+            Test.stopTest();
+
+            Assert.areEqual(
+                afterInstall,
+                [SELECT COUNT() FROM Import_Template__c WITH SYSTEM_MODE],
+                'An upgrade adds no second copy.'
+            );
+            Assert.areEqual(
+                'NPSP contacts, our way',
+                [SELECT Name FROM Import_Template__c WHERE Id = :npsp.Id WITH SYSTEM_MODE].Name,
+                'And keeps the name the admin gave it.'
             );
         }
     }

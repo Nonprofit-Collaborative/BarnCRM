@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import FORM_FACTOR from '@salesforce/client/formFactor';
 
 import CONTROL_TOTAL from '@salesforce/schema/Gift_Batch__c.Control_Total__c';
@@ -534,7 +534,7 @@ export default class GiftBatchEntry extends LightningElement {
   }
 
   toast(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ title: message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 }
 

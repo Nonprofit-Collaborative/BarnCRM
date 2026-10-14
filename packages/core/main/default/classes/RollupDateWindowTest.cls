@@ -3,8 +3,13 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupDateWindow')
 private class RollupDateWindowTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void fiscalYearWindowsResolveAgainstOrgFiscalSettings() {
         System.runAs(TestUsers.admin()) {

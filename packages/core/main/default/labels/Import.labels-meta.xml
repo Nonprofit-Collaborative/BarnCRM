@@ -85,7 +85,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row: its new person is on an earlier row that did not save</shortDescription>
+        <shortDescription>Import row: earlier row's same new person failed; {0} the reason</shortDescription>
         <value>An earlier row of this file names the same new person, and they could not be saved: {0}</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: columns staged but not loaded, list of entities</shortDescription>
+        <shortDescription>Import run log: columns staged, not loaded; {0} lists the entities</shortDescription>
         <value>These columns were kept with each row but not loaded, because nothing in this org loads them yet: {0}.</value>
     </labels>
     <labels>
@@ -141,7 +141,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a mapped attribute the object does not have</shortDescription>
+        <shortDescription>Import run log: a mapped attribute the org lacks; {0} the attribute</shortDescription>
         <value>The mapping refers to {0}, which this org does not have. Those values were skipped.</value>
     </labels>
     <labels>
@@ -149,7 +149,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a mapped field the importing user cannot edit</shortDescription>
+        <shortDescription>Import run log: a mapped field the user cannot edit; {0} the field</shortDescription>
         <value>Not loaded: you do not have access to {0}. Those values were skipped. Ask your administrator for edit access to the field, then import the file again.</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a matching field the importing user cannot read</shortDescription>
+        <shortDescription>Import run log: a matching field the user cannot read; {0} the field</shortDescription>
         <value>Not matched on {0}: you do not have access to it, so nobody could be found by it, and a person your org holds only by that field counts as new. Ask your administrator for access to the field before you import.</value>
     </labels>
     <labels>
@@ -165,7 +165,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a value the field would not take</shortDescription>
+        <shortDescription>Import run log: a value the field refused; {0} field, {1} the value</shortDescription>
         <value>{0} would not accept the value &quot;{1}&quot;. Those values were skipped.</value>
     </labels>
     <labels>
@@ -173,7 +173,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a checkbox value that is neither yes nor no</shortDescription>
+        <shortDescription>Import run log: checkbox value not yes or no; {0} row, {1} column, {2} value</shortDescription>
         <value>Row {0}: &quot;{2}&quot; in the {1} column is not a yes or no value, so that checkbox was left as it was. The rest of the row was used. Correct the cell and import again.</value>
     </labels>
     <labels>
@@ -205,8 +205,216 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: one chunk failed, with its number and reason</shortDescription>
+        <shortDescription>Import run log: one chunk failed; {0} chunk number, {1} the reason</shortDescription>
         <value>Chunk {0} failed and its rows were rejected: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRowsRemoved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a pass refused because the nightly cleanup removed the batch rows</shortDescription>
+        <value>The rows of this import were removed because it finished longer ago than BarnCRM keeps them. Upload the file again to run it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRowsNotRemoved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: rows cleanup could not delete; {0} is the count, {1} first reason</shortDescription>
+        <value>The import row cleanup could not remove {0} rows. The first: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetHouseholdField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, a household field; {0} is the field</shortDescription>
+        <value>Household: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAffiliationField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, an affiliation field; {0} is the field</shortDescription>
+        <value>Affiliation: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, a person&apos;s title, such as Ms.</shortDescription>
+        <value>title</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeFirstName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, first name</shortDescription>
+        <value>first name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeLastName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, last name</shortDescription>
+        <value>last name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeFullName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, a whole name in one column</shortDescription>
+        <value>full name in one column</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeEmail</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, email</shortDescription>
+        <value>email</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributePhone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, phone</shortDescription>
+        <value>phone</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeJobTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, job title</shortDescription>
+        <value>job title</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeStreet</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, street</shortDescription>
+        <value>street</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeCity</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, city</shortDescription>
+        <value>city</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeState</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, state or province</shortDescription>
+        <value>state or province</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributePostalCode</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, postal code</shortDescription>
+        <value>postal code</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeCountry</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, country</shortDescription>
+        <value>country</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, name</shortDescription>
+        <value>name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeWebsite</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, website</shortDescription>
+        <value>website</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeRole</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, an affiliation&apos;s role</shortDescription>
+        <value>role</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OriginalTooLargeToKeep</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the original file is too large to keep with the import</shortDescription>
+        <value>This file is larger than 2.5 MB, so it imports without a copy of the original kept with the import.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OriginalNotKept</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the original file was not kept; {0} is the reason</shortDescription>
+        <value>The original file was not kept with the import: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRowsNotSaved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: rows not saved; {0} is the count, {1} the first row, {2} its reason</shortDescription>
+        <value>{0} rows could not record their result, so they still show an earlier one. The first was row {1}: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogNotesCut</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: more notes than the run log keeps</shortDescription>
+        <value>There were more notes than the run log keeps. The rest were left out.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorEntitiesNotLoaded</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row error: module columns not loaded; {0} is the module, {1} the reason</shortDescription>
+        <value>The people on this row were saved, but its {0} columns were not loaded: {1}. Import this row again once the problem is fixed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorStagingClosed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: rows added after the import has run</shortDescription>
+        <value>Rows can be added to an import only before its preview starts. Start a new import for these rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRowTooLong</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a file row is too long to stage; {0} is the row number</shortDescription>
+        <value>Row {0} of the file is too long to import (over 32,768 characters). A quotation mark that is never closed is the usual cause. Fix the row in your spreadsheet and upload the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_CardTitle</fullName>
@@ -263,6 +471,14 @@
         <protected>false</protected>
         <shortDescription>Import wizard: step six heading</shortDescription>
         <value>Results</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TabLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: console tab name, before the file name</shortDescription>
+        <value>Import</value>
     </labels>
     <labels>
         <fullName>Core_Import_NextButton</fullName>
@@ -326,7 +542,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what kind of file to upload</shortDescription>
-        <value>A CSV file or an Excel workbook (.xlsx) whose first row is the column headings. Only the first sheet of a workbook is read.</value>
+        <value>A CSV or other text file (columns separated by commas, semicolons, tabs or pipes) or an Excel workbook (.xlsx) whose first row is the column headings. You can choose the separator or the sheet on the next step.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ColumnHeader</fullName>
@@ -505,6 +721,22 @@
         <value>Every row went through.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_RejectedShownOf</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: rejected rows table; {0} rows shown, {1} rows rejected</shortDescription>
+        <value>Showing the first {0} of {1} rejected rows. Select Download exceptions to get all of them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ExceptionsCapped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import exceptions file capped; {0} rows in the file, {1} rows rejected</shortDescription>
+        <value>The exceptions file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again to get the rest.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_ReadOnlyMessage</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -557,8 +789,16 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a new household could not be tagged</shortDescription>
+        <shortDescription>Import run log: a new household was not tagged; {0} the reason</shortDescription>
         <value>A household this import created could not be marked with the import, so an undo will not remove it: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_UndoErrorBulkDelete</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import undo: refused for a bulk delete</shortDescription>
+        <value>This is a bulk delete. Undo it from Recent bulk deletes on the Bulk Update tab, which brings the records back from the Recycle Bin.</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoErrorDryRun</fullName>
@@ -589,7 +829,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import undo: refused after the deadline</shortDescription>
+        <shortDescription>Import undo: refused after the deadline; {0} is the deadline</shortDescription>
         <value>The time to undo this import ended on {0}. The records it created are ordinary records now; delete any you do not want by hand.</value>
     </labels>
     <labels>
@@ -605,7 +845,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import undo: refused because the count changed</shortDescription>
+        <shortDescription>Import undo: count changed; {0} confirmed, {1} carrying the mark now</shortDescription>
         <value>You confirmed {0} records, but {1} now carry this import's mark. Nothing was deleted. Look at the new count and confirm again.</value>
     </labels>
     <labels>
@@ -685,7 +925,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the undo line</shortDescription>
+        <shortDescription>Import undo log: {0} person, {1} time, {2} deleted, {3} kept, {4} put back</shortDescription>
         <value>Undone by {0} on {1}: {2} records deleted, {3} kept, {4} values put back.</value>
     </labels>
     <labels>
@@ -711,30 +951,6 @@
         <protected>false</protected>
         <shortDescription>Import history: card title</shortDescription>
         <value>Recent imports</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_HistoryEmpty</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: nothing imported yet</shortDescription>
-        <value>Nothing has been imported yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_HistoryUndoUntil</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: before the undo deadline</shortDescription>
-        <value>Can be undone until</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: the undo button</shortDescription>
-        <value>Undo</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoConfirmHeading</fullName>
@@ -783,14 +999,6 @@
         <protected>false</protected>
         <shortDescription>Import history: the button that starts the undo</shortDescription>
         <value>Undo this import</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoCancelButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: leave the undo</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoStarted</fullName>
@@ -877,7 +1085,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: row control total agrees</shortDescription>
+        <shortDescription>Import run log: row control total agrees; {0} is the row count</shortDescription>
         <value>Control total: the file has {0} rows, as expected.</value>
     </labels>
     <labels>
@@ -885,7 +1093,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: row control total differs</shortDescription>
+        <shortDescription>Import run log: row control total differs; {0} rows, {1} expected</shortDescription>
         <value>Control total: the file has {0} rows, but {1} were expected. The import is refused until they agree.</value>
     </labels>
     <labels>
@@ -893,7 +1101,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: amount control total agrees</shortDescription>
+        <shortDescription>Import run log: amount control total agrees; {0} is the total</shortDescription>
         <value>Control total: the file's gift amounts add up to {0}, as expected.</value>
     </labels>
     <labels>
@@ -901,7 +1109,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: amount control total differs</shortDescription>
+        <shortDescription>Import run log: amount control total differs; {0} total, {1} expected</shortDescription>
         <value>Control total: the file's gift amounts add up to {0}, but {1} was expected. The import is refused until they agree.</value>
     </labels>
     <labels>
@@ -1077,7 +1285,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a field that cannot be matched on was chosen</shortDescription>
+        <shortDescription>Import error: a field that cannot be matched on; {0} is the field</shortDescription>
         <value>{0} cannot be used to match. Choose a field marked External ID or Unique that holds text or an email.</value>
     </labels>
     <labels>
@@ -1085,7 +1293,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the chosen matching field no longer qualifies</shortDescription>
+        <shortDescription>Import run log: matching field no longer qualifies; {0} the field</shortDescription>
         <value>Nobody was matched on {0}: the field is gone, is no longer marked External ID or Unique, or you may not read it. Choose another field and dry run again.</value>
     </labels>
     <labels>
@@ -1093,7 +1301,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a value for every row would name one person</shortDescription>
+        <shortDescription>Import error: a value for every row names one person; {0} the field</shortDescription>
         <value>A value for every row cannot give a person's name, email or matching ID, because every row would then be the same person. Remove the value for {0} and try again.</value>
     </labels>
     <labels>
@@ -1245,7 +1453,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, a first person's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the first person; {0} is the field</shortDescription>
         <value>Person: {0}</value>
     </labels>
     <labels>
@@ -1253,7 +1461,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, a second person's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the second person; {0} is the field</shortDescription>
         <value>Second person: {0}</value>
     </labels>
     <labels>
@@ -1261,7 +1469,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, an organization's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the organization; {0} is the field</shortDescription>
         <value>Organization: {0}</value>
     </labels>
     <labels>
@@ -1269,7 +1477,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a record ID column holds something that is not an ID</shortDescription>
+        <shortDescription>Import error: a record ID column holds a non-ID; {0} is the value</shortDescription>
         <value>"{0}" is not a Salesforce record ID. Fix the ID, or set its column to Do not load, then import the row again.</value>
     </labels>
     <labels>
@@ -1277,7 +1485,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a person's record ID belongs to another kind of record</shortDescription>
+        <shortDescription>Import error: a person's record ID is another kind; {0} is the ID</shortDescription>
         <value>The ID {0} is not a person. Map the column to the right record ID, or fix the ID, then import the row again.</value>
     </labels>
     <labels>
@@ -1285,7 +1493,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: an organization's record ID belongs to another kind of record</shortDescription>
+        <shortDescription>Import error: an organization's record ID is another kind; {0} the ID</shortDescription>
         <value>The ID {0} is not an organization. Map the column to the right record ID, or fix the ID, then import the row again.</value>
     </labels>
     <labels>
@@ -1293,7 +1501,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: no visible record has the record ID the row gives</shortDescription>
+        <shortDescription>Import error: no visible record has the row's ID; {0} is the ID</shortDescription>
         <value>No record with the ID {0} was found that you can see. A row with an ID never creates a record: check the ID and your access to it, then import the row again.</value>
     </labels>
     <labels>

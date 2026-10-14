@@ -1,0 +1,126 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "jobId": {
+      "title": "Data Job Id",
+      "description": "The job's record id.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": false,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "name": {
+      "title": "Name",
+      "description": "The job's name, as shown on the import results screen.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "operation": {
+      "title": "Operation",
+      "description": "What the job does: Import, Update (a bulk update) or Delete (a bulk delete).",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "status": {
+      "title": "Status",
+      "description": "One of: Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed. Dry run and Committing mean it is still running.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "isDryRun": {
+      "title": "Is Dry Run",
+      "description": "True when the job only checked the rows and saved nothing.",
+      "lightning:type": "lightning__booleanType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "fileName": {
+      "title": "File Name",
+      "description": "The name of the file imported, if any.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "rowCount": {
+      "title": "Row Count",
+      "description": "How many rows the job has.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "rowsCreated": {
+      "title": "Rows Created",
+      "description": "How many rows created a record.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "rowsUpdated": {
+      "title": "Rows Updated",
+      "description": "How many rows updated a record.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "rowsMatched": {
+      "title": "Rows Matched",
+      "description": "How many rows matched an existing record and changed nothing.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "rowsRejected": {
+      "title": "Rows Rejected",
+      "description": "How many rows were refused. The reasons are on the import results screen.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "startedAt": {
+      "title": "Started At",
+      "description": "When the job started.",
+      "lightning:type": "lightning__dateTimeStringType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "completedAt": {
+      "title": "Completed At",
+      "description": "When the job finished. Empty while it is running.",
+      "lightning:type": "lightning__dateTimeStringType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "undoDeadline": {
+      "title": "Undo Deadline",
+      "description": "Until when the job can still be undone on the import results screen. Empty when it cannot be undone.",
+      "lightning:type": "lightning__dateTimeStringType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "errorMessage": {
+      "title": "Error Message",
+      "description": "Empty when the job was found. Otherwise why not, in plain words to show the user.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

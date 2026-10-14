@@ -25,7 +25,54 @@ public with sharing class QueryFieldCatalog {
         Schema.DisplayType.ANYTYPE
     };
 
+    /**
+     * Name endings of the platform's own tables: sharing, field history, feeds, change events
+     * (standard ones such as AccountShare as well as custom ones), metadata types, platform
+     * events, external and big objects.
+     */
+    private static final Set<String> SYSTEM_SUFFIXES = new Set<String>{
+        'share',
+        'history',
+        'feed',
+        'changeevent',
+        '__mdt',
+        '__e',
+        '__x',
+        '__b'
+    };
+
     private static final Pattern NAME = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*$');
+
+    /**
+     * Describes already read in this transaction, by running user and lower-cased object name,
+     * so one compile describes each object once however many paths cross it. Keyed by user
+     * because what a user may read differs, and a test can run as several.
+     */
+    private static Map<String, Schema.DescribeSObjectResult> objectsRead = new Map<String, Schema.DescribeSObjectResult>();
+    /** Each object's readable single-parent lookups by lower-cased relationship name. */
+    private static Map<String, Map<String, Schema.DescribeFieldResult>> lookupsRead = new Map<String, Map<String, Schema.DescribeFieldResult>>();
+
+    private static String cacheKey(String objectApiName) {
+        return UserInfo.getUserId() + ':' + objectApiName.toLowerCase();
+    }
+
+    /**
+     * Whether an object is one of the platform's own tables or settings rather than records
+     * people keep, so Find offers it neither as a query's object nor as related records. One
+     * rule for both lists.
+     */
+    public static Boolean isSystemObject(Schema.DescribeSObjectResult described) {
+        if (described.isCustomSetting() || described.isDeprecatedAndHidden()) {
+            return true;
+        }
+        String lowerName = described.getName().toLowerCase();
+        for (String suffix : SYSTEM_SUFFIXES) {
+            if (lowerName.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** One field, as the builder offers it. */
     public class FieldInfo {
@@ -40,6 +87,12 @@ public with sharing class QueryFieldCatalog {
         public Boolean filterable;
         @AuraEnabled
         public Boolean sortable;
+        /** Whether a summary may group by the field (SOQL GROUP BY). */
+        @AuraEnabled
+        public Boolean groupable;
+        /** Whether a summary may total, or take the lowest or highest of, the field. */
+        @AuraEnabled
+        public Boolean aggregatable;
         /** The parent object of a lookup with exactly one parent type; empty otherwise. */
         @AuraEnabled
         public String referenceTo;
@@ -112,6 +165,10 @@ public with sharing class QueryFieldCatalog {
         if (String.isBlank(objectApiName) || !NAME.matcher(objectApiName).matches()) {
             throw unknownObject(objectApiName);
         }
+        String key = cacheKey(objectApiName);
+        if (objectsRead.containsKey(key)) {
+            return objectsRead.get(key);
+        }
         List<Schema.DescribeSObjectResult> found;
         try {
             found = Schema.describeSObjects(
@@ -124,6 +181,7 @@ public with sharing class QueryFieldCatalog {
         if (found.isEmpty() || !found[0].isAccessible() || !found[0].isQueryable()) {
             throw unknownObject(objectApiName);
         }
+        objectsRead.put(key, found[0]);
         return found[0];
     }
 
@@ -159,18 +217,26 @@ public with sharing class QueryFieldCatalog {
         Schema.DescribeSObjectResult objectDescribe,
         String relationshipName
     ) {
-        for (Schema.SObjectField field : objectDescribe.fields.getMap().values()) {
-            Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
-            if (
-                fieldDescribe.getRelationshipName() != null &&
-                fieldDescribe.getRelationshipName().equalsIgnoreCase(relationshipName) &&
-                fieldDescribe.getReferenceTo().size() == 1 &&
-                fieldDescribe.isAccessible()
-            ) {
-                return fieldDescribe;
+        String key = cacheKey(objectDescribe.getName());
+        Map<String, Schema.DescribeFieldResult> lookups = lookupsRead.get(key);
+        if (lookups == null) {
+            // Every field is looked at once per object, not once per path that crosses it.
+            lookups = new Map<String, Schema.DescribeFieldResult>();
+            for (Schema.SObjectField field : objectDescribe.fields.getMap().values()) {
+                Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
+                String name = fieldDescribe.getRelationshipName();
+                if (
+                    name != null &&
+                    fieldDescribe.getReferenceTo().size() == 1 &&
+                    fieldDescribe.isAccessible() &&
+                    !lookups.containsKey(name.toLowerCase())
+                ) {
+                    lookups.put(name.toLowerCase(), fieldDescribe);
+                }
             }
+            lookupsRead.put(key, lookups);
         }
-        return null;
+        return relationshipName == null ? null : lookups.get(relationshipName.toLowerCase());
     }
 
     private static Boolean isOffered(Schema.DescribeFieldResult fieldDescribe) {
@@ -184,6 +250,8 @@ public with sharing class QueryFieldCatalog {
         info.dataType = String.valueOf(fieldDescribe.getType()).toLowerCase();
         info.filterable = fieldDescribe.isFilterable();
         info.sortable = fieldDescribe.isSortable();
+        info.groupable = fieldDescribe.isGroupable();
+        info.aggregatable = fieldDescribe.isAggregatable();
         List<Schema.SObjectType> parents = fieldDescribe.getReferenceTo();
         if (parents.size() == 1 && fieldDescribe.getRelationshipName() != null) {
             info.referenceTo = parents[0].getDescribe().getName();

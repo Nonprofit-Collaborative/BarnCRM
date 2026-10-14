@@ -8,9 +8,29 @@
  * A pattern is a sentence with blanks in it. The blanks are {FirstName}, {LastName} and
  * {Salutation}. The {!Token} spelling is accepted as an alias so that a pattern copied
  * from a formula keeps working.
+ *
+ * The words BarnCRM adds to a stored name or greeting ("and", the list separator, "the late",
+ * "Household", the placeholder name) are custom labels read in the org's default language,
+ * not the language of whoever saved (owner decision, 2026-10-13): otherwise the same household
+ * would be renamed into another language each time someone else saved it. See storedLabel.
  */
 @NamespaceAccessible
 public with sharing class HouseholdNamingService {
+    /** The package namespace, or empty while it is deferred; derived, never hard-coded. */
+    private static final String LABEL_NAMESPACE = HouseholdNamingService.class
+            .getName()
+            .contains('.')
+        ? HouseholdNamingService.class.getName().substringBefore('.')
+        : '';
+
+    /**
+     * Injected by the tests, which cannot add a translation: label values by language and
+     * name ("de|Core_Households_Conjunction"). When set, a key it lacks reads as a missing
+     * translation.
+     */
+    @TestVisible
+    private static Map<String, String> translationsForTest;
+
     private static final String TOKEN_FIRST_NAME = '{FirstName}';
     private static final String TOKEN_LAST_NAME = '{LastName}';
     private static final String TOKEN_SALUTATION = '{Salutation}';
@@ -49,7 +69,9 @@ public with sharing class HouseholdNamingService {
         if (surnames.size() > 1) {
             // Differing surnames read badly through a pattern, so they are listed instead:
             // "Garcia and Lee Household", "Garcia, Lee, and Smith Household".
-            return joinNames(surnames) + ' ' + Label.Core_Households_NameSuffix;
+            return joinNames(surnames) +
+                ' ' +
+                storedLabel('Core_Households_NameSuffix', Label.Core_Households_NameSuffix);
         }
         String normalized = normalize(usable);
         Boolean perPerson =
@@ -115,7 +137,9 @@ public with sharing class HouseholdNamingService {
                 continue;
             }
             if (person.isDeceased == true) {
-                part = Label.Core_Households_LatePrefix + ' ' + part;
+                // One label holding the whole phrase, so a translation can put the name first.
+                part = storedLabel('Core_Households_LateName', Label.Core_Households_LateName)
+                    .replace('{0}', part);
             }
             parts.add(part);
         }
@@ -155,7 +179,7 @@ public with sharing class HouseholdNamingService {
         String salutations =
             first.salutation +
             ' ' +
-            Label.Core_Households_Conjunction +
+            storedLabel('Core_Households_Conjunction', Label.Core_Households_Conjunction) +
             ' ' +
             second.salutation;
         // A formal greeting uses the name on the record, not the name a person prefers.
@@ -168,65 +192,51 @@ public with sharing class HouseholdNamingService {
      * Recomputes and saves the name and both greetings for each household given, skipping
      * every household whose wording a person has taken over. Returns how many households
      * were changed. R-H8 and R-H14.
+     *
+     * Membership upkeep does not come through here: HouseholdService.afterMembershipChange
+     * reads a household once and saves its count, primary and wording together, with the
+     * same `Wording`. This is for the callers that change only the wording: the batch after
+     * a pattern changes, and a household whose custom name box is cleared.
      */
     @NamespaceAccessible
     public static Integer applyNaming(Set<Id> householdIds) {
+        return applyNaming(householdIds, null);
+    }
+
+    /**
+     * The same, adding to `skippedNative` (when given) the households left alone because
+     * they carry a native Nonprofit Cloud household group: mutual exclusion (product-plan
+     * Section 11.2 item 9), BarnCRM never rewrites the wording of an Account somebody else's
+     * household model owns.
+     */
+    @NamespaceAccessible
+    public static Integer applyNaming(Set<Id> householdIds, Set<Id> skippedNative) {
         if (applying || householdIds == null || householdIds.isEmpty()) {
             return 0;
         }
         applying = true;
         Integer changed = 0;
         try {
-            BarnCRM_Settings__c settings = SettingsService.getSettings();
-            Boolean includeDeceased =
-                settings != null &&
-                settings.Include_Deceased_In_Name__c == true;
-            String namePattern = settings == null ? null : settings.Household_Name_Pattern__c;
-            String formalPattern = settings == null ? null : settings.Formal_Greeting_Pattern__c;
-            String informalPattern = settings == null
-                ? null
-                : settings.Informal_Greeting_Pattern__c;
-            Id recordTypeId = HouseholdService.householdRecordTypeId();
+            Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(householdIds);
+            if (skippedNative != null) {
+                skippedNative.addAll(natives);
+            }
+            Set<Id> namable = new Set<Id>(householdIds);
+            namable.removeAll(natives);
+            Wording wording = new Wording();
             Map<Id, List<HouseholdService.Person>> membersByHousehold = HouseholdService.getMembers(
-                householdIds
+                namable
             );
             // R-H5 reads the primary from the mode's own source of truth: the membership rows
             // in junction mode (getMembers has already flagged it), the field in contact mode.
             Boolean primaryFromField = !HouseholdService.isJunctionMode();
             List<Account> updates = new List<Account>();
-            for (Account household : HouseholdSelector.getHouseholdsByIds(householdIds)) {
-                if (household.Custom_Name__c == true) {
-                    continue;
-                }
-                if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
-                    continue;
-                }
+            for (Account household : HouseholdSelector.getHouseholdsByIds(namable)) {
+                Account change = new Account(Id = household.Id);
+                Id primaryId = primaryFromField ? household.Primary_Contact__c : null;
                 List<HouseholdService.Person> members = membersByHousehold.get(household.Id);
-                if (members == null) {
-                    members = new List<HouseholdService.Person>();
-                }
-                if (primaryFromField) {
-                    markPrimary(members, household.Primary_Contact__c);
-                }
-                String name = computeName(members, namePattern, includeDeceased);
-                if (String.isBlank(name)) {
-                    name = Label.Core_Households_NamePlaceholder;
-                }
-                String formal = computeFormalGreeting(members, formalPattern, includeDeceased);
-                String informal = computeInformalGreeting(members, informalPattern);
-                Boolean hasChanges =
-                    differs(household.Name, name) ||
-                    differs(household.Household_Formal_Greeting__c, formal) ||
-                    differs(household.Household_Informal_Greeting__c, informal);
-                if (hasChanges) {
-                    updates.add(
-                        new Account(
-                            Id = household.Id,
-                            Name = name,
-                            Household_Formal_Greeting__c = formal,
-                            Household_Informal_Greeting__c = informal
-                        )
-                    );
+                if (wording.apply(household, members, primaryId, change)) {
+                    updates.add(change);
                 }
             }
             if (!updates.isEmpty()) {
@@ -241,6 +251,76 @@ public with sharing class HouseholdNamingService {
             applying = false;
         }
         return changed;
+    }
+
+    /**
+     * The org's naming settings, read once for a pass over many households, and the one
+     * place a household's saved wording is compared with what its members now call for.
+     */
+    @NamespaceAccessible
+    public class Wording {
+        private Id recordTypeId = HouseholdService.householdRecordTypeId();
+        private Boolean includeDeceased = false;
+        private String namePattern;
+        private String formalPattern;
+        private String informalPattern;
+
+        @NamespaceAccessible
+        public Wording() {
+            BarnCRM_Settings__c settings = SettingsService.getSettings();
+            if (settings != null) {
+                includeDeceased = settings.Include_Deceased_In_Name__c == true;
+                namePattern = settings.Household_Name_Pattern__c;
+                formalPattern = settings.Formal_Greeting_Pattern__c;
+                informalPattern = settings.Informal_Greeting_Pattern__c;
+            }
+        }
+
+        /**
+         * Puts the name and both greetings the members call for on `target`, when any of
+         * them differs from what `household` holds, and says whether it did. A household
+         * whose wording a person has taken over, or an account that is not a household, is
+         * never changed. `primaryId` marks the primary member in contact mode, where the
+         * household field holds it; in junction mode the members already carry the flag and
+         * it is null.
+         */
+        @NamespaceAccessible
+        public Boolean apply(
+            Account household,
+            List<HouseholdService.Person> members,
+            Id primaryId,
+            Account target
+        ) {
+            if (household.Custom_Name__c == true) {
+                return false;
+            }
+            if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
+                return false;
+            }
+            if (members == null) {
+                members = new List<HouseholdService.Person>();
+            }
+            markPrimary(members, primaryId);
+            String name = computeName(members, namePattern, includeDeceased);
+            if (String.isBlank(name)) {
+                name = storedLabel(
+                    'Core_Households_NamePlaceholder',
+                    Label.Core_Households_NamePlaceholder
+                );
+            }
+            String formal = computeFormalGreeting(members, formalPattern, includeDeceased);
+            String informal = computeInformalGreeting(members, informalPattern);
+            Boolean hasChanges =
+                differs(household.Name, name) ||
+                differs(household.Household_Formal_Greeting__c, formal) ||
+                differs(household.Household_Informal_Greeting__c, informal);
+            if (hasChanges) {
+                target.Name = name;
+                target.Household_Formal_Greeting__c = formal;
+                target.Household_Informal_Greeting__c = informal;
+            }
+            return hasChanges;
+        }
     }
 
     // ------------------------------------------------------------------ helpers
@@ -315,6 +395,37 @@ public with sharing class HouseholdNamingService {
         return result;
     }
 
+    /**
+     * A label that ends up in a stored name or greeting, in the org's default language. Falls
+     * back to the label as the running user reads it when the org language cannot be read or
+     * the platform cannot give the label in it.
+     *
+     * @param name the label's API name, without a namespace
+     * @param fallback the same label read the ordinary way (Label.X)
+     * @return the label's value
+     */
+    @NamespaceAccessible
+    public static String storedLabel(String name, String fallback) {
+        String language = OrgLanguageSelector.defaultLanguage();
+        if (String.isBlank(language)) {
+            return fallback;
+        }
+        try {
+            if (translationsForTest != null) {
+                String key = language + '|' + name;
+                return translationsForTest.containsKey(key)
+                    ? translationsForTest.get(key)
+                    : fallback;
+            }
+            String value = System.Label.get(LABEL_NAMESPACE, name, language);
+            return String.isBlank(value) ? fallback : value;
+        } catch (Exception unavailable) {
+            // Deliberate: a label the platform cannot give in the org language (for example an
+            // unknown language key) is not worth failing a save over; the ordinary label is used.
+            return fallback;
+        }
+    }
+
     private static String joinNames(List<String> parts) {
         if (parts.isEmpty()) {
             return null;
@@ -322,7 +433,10 @@ public with sharing class HouseholdNamingService {
         if (parts.size() == 1) {
             return parts[0];
         }
-        String conjunction = Label.Core_Households_Conjunction;
+        String conjunction = storedLabel(
+            'Core_Households_Conjunction',
+            Label.Core_Households_Conjunction
+        );
         if (parts.size() == 2) {
             return parts[0] + ' ' + conjunction + ' ' + parts[1];
         }
@@ -330,7 +444,8 @@ public with sharing class HouseholdNamingService {
         for (Integer i = 0; i < parts.size() - 1; i++) {
             leading.add(parts[i]);
         }
-        String separator = Label.Core_Households_ListSeparator + ' ';
+        String separator =
+            storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
         return String.join(leading, separator) +
             separator +
             conjunction +

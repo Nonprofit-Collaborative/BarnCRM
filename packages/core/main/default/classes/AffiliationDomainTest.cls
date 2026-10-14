@@ -4,8 +4,13 @@
  * NOT EXECUTED. No Salesforce org exists in the environment these were written in, so every
  * assertion here is unverified.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AffiliationDomain')
 private class AffiliationDomainTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void refusesAnAffiliationWithNoPerson() {
         System.runAs(TestUsers.admin()) {
@@ -162,6 +167,46 @@ private class AffiliationDomainTest {
                 reloaded.Is_Primary__c,
                 'And a former affiliation is never the primary one'
             );
+        }
+    }
+
+    /**
+     * PEOPLE-23. Two overlapping affiliations loaded before the rule existed: editing one
+     * without touching what the rule reads goes through, and moving its dates is still checked.
+     */
+    @IsTest
+    static void anEditThatLeavesTheRoleAndDatesAloneIsNotRefusedForAnOldOverlap() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            Affiliation__c first = RelationshipTestDataFactory.affiliation(
+                people[0],
+                orgs[0],
+                'Board member'
+            );
+            Affiliation__c second = RelationshipTestDataFactory.affiliation(
+                people[0],
+                orgs[0],
+                'Board member'
+            );
+            AutomationControl.bypass(AffiliationService.VALIDATION_AUTOMATION_NAME);
+            insert new List<Affiliation__c>{ first, second };
+            AutomationControl.clearBypass(AffiliationService.VALIDATION_AUTOMATION_NAME);
+
+            Test.startTest();
+            Database.SaveResult described = Database.update(
+                new Affiliation__c(Id = first.Id, Description__c = 'Chairs the finance committee'),
+                false
+            );
+            Database.SaveResult redated = Database.update(
+                new Affiliation__c(Id = first.Id, Start_Date__c = Date.today().addYears(-1)),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isTrue(described.isSuccess(), 'A description edit is not the overlap');
+            Assert.isFalse(redated.isSuccess(), 'A date change is still checked');
         }
     }
 }

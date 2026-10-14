@@ -1,8 +1,13 @@
 /**
  * Tests for UserSelector: the search box behind "Find a person" on the Access page.
  */
-@IsTest
+@IsTest(testFor='ApexClass:UserSelector')
 private class UserSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /**
      * Inserts one active user.
      *
@@ -11,7 +16,6 @@ private class UserSelectorTest {
      * @return the inserted user
      */
     private static User insertUser(String firstName, String lastName) {
-        Profile standardProfile = leastPrivilegedStandardProfile();
         String suffix = String.valueOf(Math.abs(Crypto.getRandomLong()));
         User person = new User(
             FirstName = firstName,
@@ -19,7 +23,7 @@ private class UserSelectorTest {
             Alias = 'oi' + suffix.right(6),
             Email = firstName.toLowerCase() + '.' + suffix + '@example.invalid',
             Username = firstName.toLowerCase() + '.' + suffix + '@barncrm.test.invalid',
-            ProfileId = standardProfile.Id,
+            ProfileId = TestUsers.standardProfileId(),
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
             EmailEncodingKey = 'UTF-8',
@@ -121,35 +125,5 @@ private class UserSelectorTest {
             Assert.areEqual(david.Id, found[0].Id, 'The wrong person came back.');
             Assert.areEqual(0, none.size(), 'Asking about nobody should return nothing.');
         }
-    }
-
-    /**
-     * Finds a profile that grants no more than an ordinary staff member needs, so that a
-     * test user built from it genuinely lacks the permissions the Access page checks.
-     * Standard User is named first because "any profile whose UserType is Standard" also
-     * matches System Administrator, which would silently disarm the denied-user tests.
-     *
-     * @return the profile every test user in this class is built from
-     */
-    private static Profile leastPrivilegedStandardProfile() {
-        // Profile.Name is the translated label, so this first lookup misses in an org that
-        // is not in English. That is what the fallback below is for.
-        List<Profile> named = [SELECT Id, Name FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        if (!named.isEmpty()) {
-            return named[0];
-        }
-        List<Profile> fallback = [
-            SELECT Id, Name
-            FROM Profile
-            WHERE UserType = 'Standard' AND Name != 'System Administrator'
-            ORDER BY Name
-            LIMIT 1
-        ];
-        Assert.isFalse(
-            fallback.isEmpty(),
-            'This org has no standard profile other than System Administrator, so the tests ' +
-            'cannot build a user who lacks the Access page permissions.'
-        );
-        return fallback[0];
     }
 }

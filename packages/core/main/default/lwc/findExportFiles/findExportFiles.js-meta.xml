@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Find's export to Files: starts the server export, follows it, and lists the CSV files it
+    wrote (canonical model R-SQ12). Used by findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

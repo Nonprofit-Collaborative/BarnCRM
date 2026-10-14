@@ -67,7 +67,102 @@ public with sharing class RollupFilterParser {
      * is empty. The caller joins the result with any other fragment it has.
      */
     public static String toWhereClause(String filterDocument) {
-        return compile(filterDocument, null);
+        return compile(filterDocument, null, null);
+    }
+
+    /**
+     * The same, for conditions on this entity: a value shaped like a date is written as a date
+     * only when its attribute is a date or a date and time, and quoted as text otherwise, so
+     * `2026-01-01` in a text attribute is compared as text (ROLLUPS-15).
+     */
+    public static String toWhereClause(String filterDocument, Schema.SObjectType entity) {
+        return compile(filterDocument, null, entity);
+    }
+
+    /**
+     * Whether a filter document compares a date with today: is this year, is last year or is in
+     * the last N days. Such a total changes as the date moves on, with no record saved
+     * (ROLLUPS-8). A document that cannot be read compares nothing.
+     */
+    public static Boolean usesRelativeDate(String filterDocument) {
+        if (String.isBlank(filterDocument)) {
+            return false;
+        }
+        try {
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+                filterDocument
+            );
+            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+                String operator = ((String) ((Map<String, Object>) rawCondition).get('operator'))
+                    ?.toLowerCase()
+                    ?.trim();
+                if (DATE_LITERAL_BY_OPERATOR.containsKey(operator) || operator == LAST_N_DAYS) {
+                    return true;
+                }
+            }
+        } catch (Exception unreadable) {
+            return false;
+        }
+        return false;
+    }
+
+    /** One `equals` or `not equals` test of a text attribute, for evaluation in Apex. */
+    public class TextEquality {
+        public String field;
+        public Boolean negated;
+        public String value;
+    }
+
+    /**
+     * A document's conditions when every one is `equals` or `not equals` a text value on a text or
+     * picklist attribute of this entity and they are all joined by AND, or null for any other
+     * shape. The engine then tests target records it has already read instead of querying them
+     * again (ROLLUPS-12); anything else keeps its query.
+     */
+    public static List<TextEquality> textEqualities(
+        String filterDocument,
+        Schema.SObjectType entity
+    ) {
+        if (String.isBlank(filterDocument) || entity == null) {
+            return null;
+        }
+        List<TextEquality> equalities = new List<TextEquality>();
+        try {
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+                filterDocument
+            );
+            if (String.isNotBlank((String) parsed.get('logic'))) {
+                return null;
+            }
+            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+                Map<String, Object> condition = (Map<String, Object>) rawCondition;
+                String field = (String) condition.get('field');
+                String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
+                Object value = condition.get('value');
+                Schema.DisplayType type = String.isBlank(field) ||
+                    !FIELD_NAME.matcher(field).matches()
+                    ? null
+                    : typeAt(entity, field);
+                if (
+                    (operator != 'equals' &&
+                    operator != 'not equals') ||
+                    !(value instanceof String) ||
+                    String.isBlank((String) value) ||
+                    (type != Schema.DisplayType.STRING &&
+                    type != Schema.DisplayType.PICKLIST)
+                ) {
+                    return null;
+                }
+                TextEquality equality = new TextEquality();
+                equality.field = field.trim();
+                equality.negated = operator == 'not equals';
+                equality.value = (String) value;
+                equalities.add(equality);
+            }
+        } catch (Exception unreadable) {
+            return null;
+        }
+        return equalities.isEmpty() ? null : equalities;
     }
 
     /**
@@ -91,11 +186,15 @@ public with sharing class RollupFilterParser {
         String filterDocument,
         FilterValueBinder binder
     ) {
-        binder.clause = compile(filterDocument, binder);
+        binder.clause = compile(filterDocument, binder, null);
         return binder;
     }
 
-    private static String compile(String filterDocument, FilterValueBinder binder) {
+    private static String compile(
+        String filterDocument,
+        FilterValueBinder binder,
+        Schema.SObjectType entity
+    ) {
         if (String.isBlank(filterDocument)) {
             return '';
         }
@@ -105,6 +204,22 @@ public with sharing class RollupFilterParser {
         } catch (Exception parseFailure) {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
         }
+        if (parsed == null) {
+            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+        try {
+            return compile(parsed, binder, entity);
+        } catch (TypeException wrongShape) {
+            // A part of the right name but the wrong shape, such as "conditions": ["Name"].
+            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+    }
+
+    private static String compile(
+        Map<String, Object> parsed,
+        FilterValueBinder binder,
+        Schema.SObjectType entity
+    ) {
         Integer version = parsed.get('version') == null
             ? SUPPORTED_VERSION
             : Integer.valueOf(parsed.get('version'));
@@ -125,7 +240,7 @@ public with sharing class RollupFilterParser {
             String conditionId = condition.get('id') == null
                 ? String.valueOf(fallbackId)
                 : String.valueOf(condition.get('id'));
-            String clause = renderCondition(condition, binder);
+            String clause = renderCondition(condition, binder, entity);
             clauseByConditionId.put(conditionId, clause);
             inOrder.add(clause);
         }
@@ -168,7 +283,11 @@ public with sharing class RollupFilterParser {
      * running user's describe and every value becomes a bind variable; without one, values are
      * escaped literals for the rollup engine.
      */
-    private static String renderCondition(Map<String, Object> condition, FilterValueBinder binder) {
+    private static String renderCondition(
+        Map<String, Object> condition,
+        FilterValueBinder binder,
+        Schema.SObjectType entity
+    ) {
         String fieldName = (String) condition.get('field');
         String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
         if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
@@ -192,27 +311,113 @@ public with sharing class RollupFilterParser {
             return fieldName + ' ' + comparison + ' null';
         }
         Object rawValue = condition.get('value');
+        // Described only when a value could be read as a date, so a status filter costs nothing.
+        Boolean datesAsText = entity != null && looksLikeADate(rawValue)
+            ? isNotADate(entity, fieldName)
+            : false;
         if (LIST_OPERATORS.contains(operator)) {
             List<Object> values = rawValue instanceof List<Object>
                 ? (List<Object>) rawValue
                 : new List<Object>{ rawValue };
             List<String> rendered = new List<String>();
             for (Object value : values) {
-                rendered.add(renderValue(value));
+                rendered.add(renderValue(value, datesAsText));
             }
             return fieldName + ' ' + comparison + ' (' + String.join(rendered, ',') + ')';
         }
+        // What the administrator typed is matched as typed: % and _ are not wildcards.
         if (operator == 'contains' || operator == 'does not contain') {
-            return fieldName +
-                ' ' +
-                comparison +
-                ' ' +
-                renderValue('%' + String.valueOf(rawValue) + '%');
+            return fieldName + ' ' + comparison + ' ' + likeValue('%' + escapeLike(rawValue) + '%');
         }
         if (operator == 'starts with') {
-            return fieldName + ' ' + comparison + ' ' + renderValue(String.valueOf(rawValue) + '%');
+            return fieldName + ' ' + comparison + ' ' + likeValue(escapeLike(rawValue) + '%');
         }
-        return fieldName + ' ' + comparison + ' ' + renderValue(rawValue);
+        return fieldName + ' ' + comparison + ' ' + renderValue(rawValue, datesAsText);
+    }
+
+    /** A value for LIKE with its own backslashes, % and _ escaped, so they match themselves. */
+    private static String escapeLike(Object rawValue) {
+        return String.valueOf(rawValue)
+            .replace('\\', '\\\\')
+            .replace('%', '\\%')
+            .replace('_', '\\_');
+    }
+
+    /**
+     * A LIKE pattern, already escaped, quoted as text. Only quotes are escaped here:
+     * String.escapeSingleQuotes also doubles backslashes, which turns \% back into a wildcard.
+     */
+    private static String likeValue(String pattern) {
+        return '\'' + pattern.replace('\'', '\\\'') + '\'';
+    }
+
+    /**
+     * True when the attribute is known and is not a date or a date and time, so a value shaped
+     * like a date is text there. Unknown (no entity, or a path this cannot follow) keeps the
+     * rendering every filter had before.
+     */
+    private static Boolean looksLikeADate(Object rawValue) {
+        for (
+            Object value : rawValue instanceof List<Object>
+                ? (List<Object>) rawValue
+                : new List<Object>{ rawValue }
+        ) {
+            String text = value instanceof String ? (String) value : null;
+            if (
+                text != null &&
+                (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Boolean isNotADate(Schema.SObjectType entity, String fieldName) {
+        Schema.DisplayType type = typeAt(entity, fieldName);
+        return type != null &&
+            type != Schema.DisplayType.DATE &&
+            type != Schema.DisplayType.DATETIME;
+    }
+
+    /** The type of an attribute or a path such as `Gift__r.Status__c`, or null when unknown. */
+    private static Schema.DisplayType typeAt(Schema.SObjectType entity, String path) {
+        if (entity == null) {
+            return null;
+        }
+        List<String> parts = path.split('\\.');
+        Schema.SObjectType current = entity;
+        for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
+            current = referencedThrough(current, parts[i]);
+        }
+        if (current == null) {
+            return null;
+        }
+        Schema.SObjectField field = current.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .fields.getMap()
+            .get(parts[parts.size() - 1].toLowerCase());
+        return field == null ? null : field.getDescribe().getType();
+    }
+
+    private static Schema.SObjectType referencedThrough(
+        Schema.SObjectType entity,
+        String relationshipName
+    ) {
+        for (
+            Schema.SObjectField field : entity.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .fields.getMap()
+                .values()
+        ) {
+            Schema.DescribeFieldResult describe = field.getDescribe();
+            if (
+                describe.getType() == Schema.DisplayType.REFERENCE &&
+                relationshipName.equalsIgnoreCase(describe.getRelationshipName()) &&
+                !describe.getReferenceTo().isEmpty()
+            ) {
+                return describe.getReferenceTo()[0];
+            }
+        }
+        return null;
     }
 
     /** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
@@ -230,11 +435,11 @@ public with sharing class RollupFilterParser {
     }
 
     /**
-     * Numbers, booleans, dates and datetimes go in unquoted, because both the engine's query and
-     * its in-memory evaluator read them that way. Everything else is a string: it is quoted and
-     * escaped, which is the only place an administrator's typing reaches a query.
+     * Numbers, booleans, dates and datetimes go in unquoted, because the engine's query reads them
+     * that way. Everything else is a string: it is quoted and escaped, which is the only place an
+     * administrator's typing reaches a query.
      */
-    private static String renderValue(Object value) {
+    private static String renderValue(Object value, Boolean datesAsText) {
         if (value == null) {
             return 'null';
         }
@@ -248,7 +453,10 @@ public with sharing class RollupFilterParser {
             return String.valueOf(value);
         }
         String text = String.valueOf(value);
-        if (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches()) {
+        if (
+            datesAsText != true &&
+            (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
+        ) {
             return text;
         }
         return '\'' + String.escapeSingleQuotes(text) + '\'';

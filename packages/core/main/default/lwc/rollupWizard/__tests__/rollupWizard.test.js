@@ -87,7 +87,8 @@ async function build(draft) {
   ]);
   getSourceFields.mockResolvedValue([
     { value: 'Amount__c', label: 'Amount', type: 'currency' },
-    { value: 'Gift_Date__c', label: 'Gift Date', type: 'date' }
+    { value: 'Gift_Date__c', label: 'Gift Date', type: 'date' },
+    { value: 'Received_At__c', label: 'Received At', type: 'datetime' }
   ]);
   preview.mockResolvedValue({ maintains: 'This rollup will maintain about 1,204 records.' });
   const element = createElement('c-rollup-wizard', { is: RollupWizard });
@@ -150,6 +151,14 @@ describe('c-rollup-wizard', () => {
     await next(element);
     expect(query(element, 'error-message')).not.toBeNull();
     expect(query(element, 'order-by')).not.toBeNull();
+  });
+
+  it('measures a fiscal year window on date fields only', async () => {
+    const element = await build({ ...DRAFT, fiscalYearAware: true, fiscalYearOffset: 0 });
+    await next(element);
+    await next(element);
+    const offered = query(element, 'window-date').options.map((option) => option.value);
+    expect(offered).toEqual(['Gift_Date__c']);
   });
 
   it('saves the draft and reports the notice', async () => {

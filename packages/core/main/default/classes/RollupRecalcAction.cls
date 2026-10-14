@@ -10,28 +10,33 @@
  *
  * The Flow runs one interview per record, and the platform hands the interviews of one save to
  * this action together, so a bulk save is still one call here, recalculated or queued as one.
+ *
+ * Global, with its request: in a managed package only a global invocable action appears in a
+ * subscriber's Flow Builder, so a customer's copy of the template could not otherwise call it.
+ * Global is permanent once a managed version is released: the class, `Request`, its three
+ * variables and `recalculate` can then never be removed or change signature.
  */
-public with sharing class RollupRecalcAction {
+global with sharing class RollupRecalcAction {
     /** One record a Flow saw change. */
-    public class Request {
+    global class Request {
         @InvocableVariable(
             label='Record'
             description='The record that was created, updated or is being deleted.'
             required=true
         )
-        public SObject record;
+        global SObject record;
 
         @InvocableVariable(
             label='Record before the change'
             description='The record as it was before an update, so a record moved to another parent leaves the old total. Leave empty for a new record.'
         )
-        public SObject priorRecord;
+        global SObject priorRecord;
 
         @InvocableVariable(
             label='Record is being deleted'
             description='True in a flow that starts when a record is deleted. Its totals are recalculated once the delete is done.'
         )
-        public Boolean deleting;
+        global Boolean deleting;
     }
 
     /**
@@ -44,7 +49,7 @@ public with sharing class RollupRecalcAction {
         description='Keeps every BarnCRM rollup that counts this record up to date. Use it in a record-triggered flow on an object BarnCRM does not update by itself.'
         category='BarnCRM'
     )
-    public static void recalculate(List<Request> requests) {
+    global static void recalculate(List<Request> requests) {
         Map<String, Batch> batches = new Map<String, Batch>();
         for (Request request : requests == null ? new List<Request>() : requests) {
             if (request == null || request.record == null) {

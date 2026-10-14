@@ -1,7 +1,11 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
+import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRecommendedMode';
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
@@ -18,6 +22,9 @@ import CONFIRM_INTRO from '@salesforce/label/c.Core_HealthCheck_ConfirmIntro';
 import CONFIRM_MODE_DETAIL from '@salesforce/label/c.Core_HealthCheck_ConfirmModeDetail';
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
 import INTRO from '@salesforce/label/c.Core_HealthCheck_Intro';
+import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
+import NEVER_RUN from '@salesforce/label/c.Core_HealthCheck_NeverRun';
+import RUN_NOW from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import LOAD_FAILED from '@salesforce/label/c.Core_HealthCheck_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_HealthCheck_Loading';
 import NO_FINDINGS from '@salesforce/label/c.Core_HealthCheck_NoFindings';
@@ -56,26 +63,29 @@ const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
  * ADR-0048). A fix that only opens a page runs at once, because opening a page changes
  * nothing.
  *
- * The confirm box is a dialog: opening it moves focus into it and scrolls it into view,
- * because on a long report it appears far above the button that opened it; Escape or Cancel
- * closes it and returns focus to that button. The fix request carries the finding's fix
- * scope, so Apex runs it only if it would still change exactly what the box showed. When a
+ * The confirmation is a platform modal (c/barnConfirmModal), so it opens over the report
+ * wherever the button is, traps focus, and on Escape or Cancel closes and returns focus to
+ * that button. The fix request carries the finding's fix scope, so Apex runs it only if it
+ * would still change exactly what the dialog showed. When a
  * fix fails for any reason the panel runs Health Check again, so what it shows is current.
+ *
+ * With lastResultFirst set (BarnCRM Home sets it), the panel does not run Health Check when it
+ * opens: it shows when Health Check last ran in full and how many findings it had, and its
+ * button reads Run now (ADMIN-7). Any page that wants that behavior sets the same property.
  */
 export default class HealthCheckPanel extends NavigationMixin(LightningElement) {
+  /** Show the last stored result and Run now, instead of running every check on open. */
+  @api lastResultFirst = false;
+
   report;
+  lastRun;
   loading = false;
   errorMessage;
-  pendingFix;
   fixOutcome;
-  focusConfirmOnRender = false;
-  returnFocusTo;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   labels = {
-    confirmHeading: CONFIRM_HEADING,
-    confirmIntro: CONFIRM_INTRO,
-    confirm: CONFIRM,
-    cancel: CANCEL,
     title: TITLE,
     intro: INTRO,
     rerun: RERUN,
@@ -85,32 +95,53 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     loading: LOADING,
     noFindings: NO_FINDINGS,
     currentMode: CURRENT_MODE,
-    recommendedMode: RECOMMENDED_MODE
+    recommendedMode: RECOMMENDED_MODE,
+    lastRun: LAST_RUN,
+    neverRun: NEVER_RUN
   };
 
   connectedCallback() {
-    this.load();
+    if (this.lastResultFirst) {
+      this.loadLastRun();
+    } else {
+      this.load();
+    }
   }
 
-  renderedCallback() {
-    if (this.focusConfirmOnRender) {
-      const dialog = this.template.querySelector('[data-id="confirm"]');
-      if (dialog) {
-        this.focusConfirmOnRender = false;
-        if (typeof dialog.scrollIntoView === 'function') {
-          dialog.scrollIntoView({ block: 'center' });
-        }
-        dialog.focus();
-      }
+  /** Read the last stored result without running any check. */
+  async loadLastRun() {
+    this.loading = true;
+    this.errorMessage = undefined;
+    try {
+      this.lastRun = await getLastRun();
+    } catch (error) {
+      this.lastRun = undefined;
+      this.errorMessage = this.messageFrom(error);
+    } finally {
+      this.loading = false;
     }
-    if (this.returnFocusTo && !this.pendingFix) {
-      const selector = this.returnFocusTo;
-      this.returnFocusTo = undefined;
-      const trigger = this.template.querySelector(selector);
-      if (trigger) {
-        trigger.focus();
-      }
-    }
+  }
+
+  /** The last result shows until a full report replaces it. */
+  get showLastRun() {
+    return this.lastResultFirst && !this.hasReport && !this.loading && !this.errorMessage;
+  }
+
+  get hasLastRun() {
+    return !!(this.lastRun && this.lastRun.ranAt);
+  }
+
+  get lastRunAt() {
+    return this.hasLastRun ? this.lastRun.ranAt : undefined;
+  }
+
+  get lastRunResult() {
+    return this.hasLastRun ? this.lastRun.result : '';
+  }
+
+  /** Run now before the first full run where the last result shows; Re-run after. */
+  get rerunLabel() {
+    return this.lastResultFirst && !this.hasReport ? RUN_NOW : RERUN;
   }
 
   /** Run Health Check again. Also the Re-run button's handler. */
@@ -236,46 +267,37 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
   }
 
   handleUseRecommended() {
-    this.openConfirm(
-      {
-        target: ACTION_RECOMMENDED_MODE,
-        title: USE_RECOMMENDED,
-        detail: CONFIRM_MODE_DETAIL.replace('{0}', this.currentModeLabel).replace(
-          '{1}',
-          this.recommendedModeLabel
-        )
-      },
-      '[data-id="use-recommended"]'
-    );
+    return this.confirmFix({
+      target: ACTION_RECOMMENDED_MODE,
+      title: USE_RECOMMENDED,
+      detail: CONFIRM_MODE_DETAIL.replace('{0}', this.currentModeLabel).replace(
+        '{1}',
+        this.recommendedModeLabel
+      )
+    });
   }
 
-  /** Show the confirm box for a fix, and move focus into it once it has rendered. */
-  openConfirm(pending, triggerSelector) {
+  /**
+   * Show what a fix will do in a confirm dialog, and run it only when the viewer confirms.
+   * Cancel, Escape and the close button run nothing.
+   */
+  async confirmFix(pending) {
     this.fixOutcome = undefined;
-    this.pendingFix = pending;
-    this.returnFocusTo = triggerSelector;
-    this.focusConfirmOnRender = true;
-  }
-
-  handleCancelFix() {
-    this.pendingFix = undefined;
-  }
-
-  handleConfirmKeydown(event) {
-    if (event.key === 'Escape' || event.key === 'Esc') {
-      event.preventDefault();
-      this.handleCancelFix();
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: CONFIRM_HEADING,
+      message: CONFIRM_INTRO,
+      details: [pending.title, pending.detail],
+      confirmLabel: CONFIRM,
+      cancelLabel: CANCEL
+    });
+    if (confirmed) {
+      this.runFix(pending);
     }
   }
 
   /** Run the fix the viewer has just seen described and confirmed. */
-  handleConfirmFix() {
-    const pending = this.pendingFix;
-    this.pendingFix = undefined;
-    this.returnFocusTo = undefined;
-    if (!pending) {
-      return;
-    }
+  runFix(pending) {
     if (pending.target === ACTION_RECOMMENDED_MODE) {
       this.runAction(applyRecommendedMode);
       return;
@@ -293,6 +315,14 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
   }
 
   /** The finding a Fix button belongs to, so the confirm box can repeat what it says. */
+  /** In a console a record a finding names opens as a subtab, so the report stays open. */
+  handleFindingLink(event) {
+    const url = event.currentTarget.getAttribute('href');
+    followLinkInWorkspace(this, event, { url }, () =>
+      this[NavigationMixin.Navigate]({ type: 'standard__webPage', attributes: { url } })
+    );
+  }
+
   findingFor(key) {
     const findings = (this.report && this.report.findings) || [];
     return findings.find((finding) => finding.key === key);
@@ -317,15 +347,12 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
         this.load();
         return;
       }
-      this.openConfirm(
-        {
-          target,
-          title: finding.title,
-          detail: finding.detail,
-          scope: finding.fixScope
-        },
-        `[data-id="fix"][data-key="${key}"]`
-      );
+      this.confirmFix({
+        target,
+        title: finding.title,
+        detail: finding.detail,
+        scope: finding.fixScope
+      });
       return;
     }
     if (target.startsWith('/')) {

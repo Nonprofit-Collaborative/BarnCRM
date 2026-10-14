@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-12.
+Last refreshed from BMemory 2026-10-13 (through D-86).
 
 ## Decision log (plan Section 12)
 
@@ -41,8 +41,61 @@ Last refreshed from BMemory 2026-10-12.
 | D-31 | 2026-10-12 | Rollup operations: count distinct its own operation, delimiter picklist, Any and None read no field, count distinct into plain numbers only, unfit target refused |
 | D-32 | 2026-10-12 | Rollup Builder estimate uses 1,650 records a minute until measured; S14 only if the scale test needs it |
 | D-33 | 2026-10-12 | Tests run as a permission-set user (`TestUsers`, on the running user's profile), checked by `check-tests-run-as.py` |
+| D-34 | 2026-10-13 | C-37 part 2: bulk delete run limit default 10,000 (at most 48,000); `Bulk_Delete_Records` only in its own `BarnCRM_Bulk_Delete` permission set; undo until the earlier of the import undo window and 15 days; bulk update refuses a transform result the field cannot take (ADR-0091) |
+| D-35 | 2026-10-13 | Merge survivors' real-time totals recalculated by a queueable just after the merge (ADR-0092) |
+| D-36 | 2026-10-13 | Import uses a Person Account record type available to the running user; with none, it creates nobody and logs one note (#221) |
+| D-37 | 2026-10-13 | Field utilization runs on demand from its own Field Utilization tab; no scheduled job, history or tracked list (supersedes those parts of ADR-0086 and D-26; ADR on `feature/field-utilization-on-demand`) |
+| D-38 | 2026-10-13 | Priority: a Core quality pass (test, optimize, improve, simplify, nothing removed) comes before C-38 and the non-core modules |
+| D-39 | 2026-10-13 | All 14 recommended platform features join the Core quality pass as Q-01 to Q-14, built in parallel now (`feature/q-NN-<slug>`; Q-14 optional, approved); C-38 on hold until Brandon is ready to start the next version |
+| D-40 | 2026-10-13 | Error Log entries older than 180 days deleted; staged import rows purged 90 days after their job finishes; both adjustable in BarnCRM Settings; every number setting has a minimum and a maximum |
+| D-41 | 2026-10-13 | (affiliation part reversed by D-49) Affiliations stay out of Core imports (spec and admin guide corrected; amends C-32); import templates shipped in later versions added to existing orgs on upgrade, not only through Health Check |
+| D-42 | 2026-10-13 | "What's new" entries (C-27) refreshed from the release notes as part of each release |
+| D-43 | 2026-10-13 | The 9 components used only inside the BarnCRM Settings console are no longer offered in App Builder |
+| D-44 | 2026-10-13 | Fundraising Staff permission set group includes Giving Staff (closes plan 11.2 item 12) |
+| D-45 | 2026-10-13 | The renamed import tab reads "Data Jobs" in Title Case (amends ADR-0047 wording) |
+| D-46 | 2026-10-13 | Dev Hub snapshot `BarnPA` from `oi-pa` approved (Q-12) |
+| D-47 | 2026-10-13 | Duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38); inventory under way |
+| D-48 | 2026-10-13 | Core review recommendations approved: rollups recalculate only definitions that marked a target (ADR needed; narrows ADR-0082 decision 2); Instantly-mode fiscal-window rollups in the nightly run; Recalculate now checks budget and queues; import commit runs the previewed template; organizations created only for passing rows; people import reads values like Load one object; bulk delete undo covers deleted empty households; Health Check on Home shows last result plus Run now; one shared LWC helper module; faster test runs; namespace-safe object resolution. Code coverage still checked automatically on every gate, read via ApexCodeCoverageAggregate |
+| D-49 | 2026-10-13 | Affiliations return to Core imports: a people import links each person to the organization on their row by an affiliation. Reverses the affiliation part of D-41; plan Section 4.9 and C-32 restored |
+| D-50 | 2026-10-13 | Data tools parity (D-13 still holds): Data Manager hub with one job history and Undo; Org Optimizer page (Data Hygiene relabeled; Overview, Data quality, Duplicates moved from Settings, Field utilization embedded only here, Health Check on demand, Errors, Storage and limits, Unused setup admin-only, Automation and jobs); full results file; trial import (default 25 rows, a setting, per-file override, rest in the same job and undo); delete from a file of IDs; more transform steps; lookups and update matching on any Text, Email or Phone field; skip rows and one row per key; empty cells clear the field (off by default, journaled); delimiter and worksheet choice; download before delete; retry rejects into the same job; server-side export (C-36 remainder, in v1); parent and child loads. Not approved: seeding templates, files import. Scheduling and connectors stay C-38 on hold |
+| D-51 | 2026-10-13 | Import tab label is "Import" (amends D-45 for the tab), reached from Data Manager; Import and Bulk Update leave the app navigation; Find stays; job object label stays "Data Job" |
+| D-52 | 2026-10-13 | Erase a person (right to be forgotten) built in Core, with a Giving extension for gifts and receipts |
+| D-53 | 2026-10-13 | Commitment page: Clone and Printable View stay off |
+| D-54 | 2026-10-13 | Program Staff and Volunteer Coordinator groups get their module permission sets when those modules ship |
+| D-55 | 2026-10-13 | Shipped import templates added at install and on upgrade (closes Section 11.2 item 14) |
+| D-56 | 2026-10-13 | Org gates may batch several PRs into one combined org run and deploy only changed metadata; every test that would have run still runs |
+| D-57 | 2026-10-13 | Console app: on oi-test, oi-pa and barn-core Claude deletes and redeploys the app; on barn-npc and mwdbdevsb the owner switches Navigation Style to Console in App Manager |
+| D-58 | 2026-10-13 | Logo: blue barn icon approved as is, replacing red #B3261E: walls #00A8D9 (the blue in the Blue Bottle Coffee logo file), roof and app header #007A9E (4.91:1 against white); set on feature/console-app-icon at 4047fc85 |
+| D-59 | 2026-10-13 | Console tab icons: keep the page icons set by Q-07 |
+| D-60 | 2026-10-13 | Q-11: no Platform Cache for now; revisit after security review |
+| D-61 | 2026-10-13 | Q-09: user access policies documented with samples, not packaged |
+| D-62 | 2026-10-13 | Setup prerequisites: avoid Setup changes; when a feature needs one, the matching BarnCRM Settings section shows an instruction for it. Q-10 tips are turned off in Setup under this rule |
+| D-63 | 2026-10-13 | Field utilization on demand: no 13-month auto-cleanup, no Health Check entry for the old job |
+| D-64 | 2026-10-13 | ADR-0088 and ADR-0091 accepted; rollup S16 and S17 deferred to after v1; per-automation switch end date stays; neutral labels and one app stay |
+| D-65 | 2026-10-13 | Coverage gate measures BarnCRM classes at 75% total and per class (not org-wide); the 23 low classes held at current figures until tests lift them |
+| D-66 | 2026-10-13 | Q-05: confirm buttons Cancel then action; message-only toasts show the text as the bold main line; Health Check finding title not bold in the confirm |
+| D-67 | 2026-10-13 | Q-04: job finish notifications on by default |
+| D-68 | 2026-10-13 | The four Q-14 agent-ready actions get access through packaged permission sets and/or groups, not a manual Setup step |
+| D-69 | 2026-10-13 | Q-14 scope: the four action classes are global (permanent once managed); no Update Person action (standard Update Record covers it); starting or committing imports from an assistant is out of scope |
+| D-70 | 2026-10-13 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures still logged (Q-06) |
+| D-71 | 2026-10-13 | Rollup totals recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256); modifies ADR-0082 decision 4 via a new ADR written on that branch (number assigned at merge) |
+| D-72 | 2026-10-13 | RollupRecalcAction is global so subscriber Flow Builder can use it (permanent once managed) |
+| D-73 | 2026-10-13 | (amended by D-83: InboundGiftAction lives in Connect, which depends on Giving, so Giving's sets cannot grant it) Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 |
+| D-74 | 2026-10-13 | Setup notes for Giving and Connect shown on each module's own page, using Core's note component (keeps ADR-0020) |
+| D-75 | 2026-10-13 | (reversed by D-82) The Bulk Update and Bulk Delete sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17) |
+| D-76 | 2026-10-13 | All BarnCRM triggers declare all seven contexts, with a CI check, after PR #229 merges (PLATFORM-18) |
+| D-77 | 2026-10-13 | The unused label Giving_SoftCredit_Duplicate is deleted as a leftover |
+| D-78 | 2026-10-13 | Error_Log__c sharing stays Read/Write (all sets have View All; only Admin can edit; Read would break Mark as seen on others' entries) |
+| D-79 | 2026-10-13 | Stored household names use the org default language for joining words ("and", list separator, "the late"), not the saving user's language |
+| D-80 | 2026-10-13 | Plan corrections applied (closes Section 11.2 item 27): v0.3 row without NPSP import templates (v0.5); one test org, not four org shapes; TestDataFactory is @NamespaceAccessible (ADR-0017); X-07 at v0.6; D-14 cites ADR-0053 and ADR-0054; C-25 note says built, in main; 11.3 item 6 release note done (v0.7-draft-advanced-find.md); v0.11 accessibility, mobile and translation built, not merged (PRs #273 to #276), device mobile run open. Section 4.1 Nonprofit Hub entry still open |
+| D-81 | 2026-09-23, numbered 2026-10-13 | Suites and packaging: Impact Suite (Core plus Giving, other modules offered) and Community Suite (Core alone); one install to start, guided installs after; Core neutral; unlocked now, managed at listing |
+| D-82 | 2026-10-13 | D-75 reversed: the Bulk Update and Bulk Delete sets keep their own data job read grants (moving them would let Find and Export holders read every data job and the undo journal) |
+| D-83 | 2026-10-13 | Connect's Record Inbound Gift action gets its own small permission set granting only that action (amends D-73) |
+| D-84 | 2026-10-13 | Working agreement: present only Core findings and decisions until the owner starts the modules; module notes go in plan Section 11.5, grouped by module. Goal now: Core v1.0 complete |
+| D-85 | 2026-10-13 | Working agreement: implement recommendations and tell the owner what is being changed, unless really important or contrary to his instructions. Module reviews or audits already in flight can finish; their findings are not processed with him now unless they relate to Core |
+| D-86 | 2026-10-13 | Erase a person: the preview lists activities and files for manual deletion (not erased automatically); Health Check skips erased people; PR #282 accepted at its size |
 
-D-25 to D-33 were accepted under the owner's standing instruction "proceed as recommended" (2026-10-12); the owner may amend them.
+D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
 ## Open questions still open (plan Section 11.2)
 
@@ -50,8 +103,8 @@ D-25 to D-33 were accepted under the owner's standing instruction "proceed as re
 - 3: Dev Hub type (Partner Business Org or Developer Edition with a planned migration).
 - 4: Steward entity.
 - 7: Telemetry (C-26): resolved 2026-10-12, deferred indefinitely (D-24).
-- 12: Remove the three permission set groups that contain only the staff set before the first package version.
-- 14: Shipped import templates copied at install or at first use.
+- 12: Permission set groups that contain only the staff set: resolved 2026-10-13, Fundraising Staff includes Giving Staff (D-44).
+- 14: Shipped import templates: resolved 2026-10-13, added at install and on upgrade (D-55).
 - 16: Per-automation switches: optional end date or stay off until turned on.
 - 19 to 22: Opportunity mirror defaults (NPSP mode direction, deleted gift, double thanks, record-type filter).
 - 23: A separate nonprofit app in Giving.
@@ -61,7 +114,7 @@ D-25 to D-33 were accepted under the owner's standing instruction "proceed as re
 
 ## Parking lot (plan Section 11.3)
 
-Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopts the C-37 transforms, then bulk delete; "Data jobs" relabel; `FieldUtilizationJob` in `NightlyJobs`; test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks during the `barn-npc` deploy; `mwdbdevsb` real validation on hold.
+Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopting the C-37 transforms, then bulk delete (done, #219); "Data Jobs" relabel (Title Case, D-45); `FieldUtilizationJob` in `NightlyJobs` (dropped, D-37); test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks for `barn-npc` (`main` deployed there 2026-10-13 and passes; confirm the rest by hand); `mwdbdevsb` real validation on hold.
 
 ## Working agreements (owner instructions)
 

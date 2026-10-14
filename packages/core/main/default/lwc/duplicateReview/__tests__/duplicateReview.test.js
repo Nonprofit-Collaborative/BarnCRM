@@ -5,6 +5,7 @@ import startScan from '@salesforce/apex/DuplicateController.startScan';
 import dismissSuggestion from '@salesforce/apex/DuplicateController.dismiss';
 import previewMerge from '@salesforce/apex/DuplicateController.previewMerge';
 import mergeHouseholds from '@salesforce/apex/DuplicateController.mergeHouseholds';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock('@salesforce/apex/DuplicateController.getView', () => ({ default: jest.fn() }), {
   virtual: true
@@ -253,6 +254,35 @@ describe('c-duplicate-review', () => {
     });
   });
 
+  it('shows the preview of the latest choice when an earlier one answers last', async () => {
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR] }));
+    previewMerge.mockResolvedValueOnce({ fields: [] });
+    q(element, 'merge-button').click();
+    await flush();
+    let answerSlow;
+    previewMerge.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answerSlow = resolve;
+      })
+    );
+    previewMerge.mockResolvedValueOnce({
+      fields: [{ fieldName: 'Phone', label: 'Phone', survivorValue: 'B', inConflict: true }]
+    });
+    const choice = q(element, 'keep-choice');
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: HOUSEHOLD_B } }));
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: HOUSEHOLD_A } }));
+    await flush();
+    answerSlow({ fields: [] });
+    await flush();
+    expect(qa(element, 'conflict')).toHaveLength(1);
+  });
+
+  it('offers no second scan while one is running', async () => {
+    const element = await mount(viewWith({ scanRunning: true }));
+    expect(q(element, 'scan-button').disabled).toBe(true);
+    expect(q(element, 'scan-running')).not.toBeNull();
+  });
+
   it('opens the dismiss box as a labelled region and moves focus to its heading', async () => {
     const element = await mount(viewWith({ suggestions: [PEOPLE_PAIR] }));
     q(element, 'dismiss-button').click();
@@ -279,5 +309,29 @@ describe('c-duplicate-review', () => {
     document.body.appendChild(element);
     await flush();
     expect(q(element, 'error').textContent).toContain('c.Core_Duplicates_ErrorUnexpected');
+  });
+
+  it('lets the browser open a suggested record outside a console', async () => {
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 1 }));
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    qa(element, 'record-link')[0].dispatchEvent(event);
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+  });
+
+  it('opens a suggested record as a subtab in a console', async () => {
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 1 }));
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    qa(element, 'record-link')[1].dispatchEvent(event);
+    await flush();
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', { recordId: HOUSEHOLD_B, focus: true });
   });
 });

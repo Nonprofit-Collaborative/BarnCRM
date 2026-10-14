@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A yes or no confirmation in a platform modal with the caller's own button labels, used by
+    household merge and split, access, household naming, sample data and Health Check fixes.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

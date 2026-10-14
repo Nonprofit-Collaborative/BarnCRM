@@ -1,7 +1,7 @@
 import { TextDecoder as NodeTextDecoder, TextEncoder as NodeTextEncoder } from 'util';
 import { deflateRawSync, inflateRawSync } from 'zlib';
 import { Buffer } from 'buffer';
-import { readXlsx, isXlsx, serialToDate, MAX_PART_BYTES } from '../xlsx';
+import { readXlsx, readSheetNames, isXlsx, serialToDate, MAX_PART_BYTES } from '../xlsx';
 
 global.TextDecoder = global.TextDecoder || NodeTextDecoder;
 const encoder = new NodeTextEncoder();
@@ -143,6 +143,34 @@ describe('the workbook reader', () => {
       readXlsx(zip(workbook(), { declaredSize: MAX_PART_BYTES + 1 }), { inflate: counting })
     ).rejects.toMatchObject({ reason: 'tooLarge' });
     expect(inflated).toBe(false);
+  });
+
+  describe('a workbook with several sheets', () => {
+    function twoSheets() {
+      return {
+        ...workbook(),
+        'xl/workbook.xml': `<?xml version="1.0"?><workbook xmlns="${MAIN}" xmlns:r="${REL}"><sheets><sheet name="Read me" sheetId="1" r:id="rId4"/><sheet name="Donors" sheetId="2" r:id="rId1"/></sheets></workbook>`,
+        'xl/_rels/workbook.xml.rels': `<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId4" Type="${REL}/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId2" Type="${REL}/sharedStrings" Target="sharedStrings.xml"/><Relationship Id="rId3" Type="${REL}/styles" Target="styles.xml"/></Relationships>`,
+        'xl/worksheets/sheet2.xml': `<?xml version="1.0"?><worksheet xmlns="${MAIN}"><sheetData><row r="1"><c r="A1" t="inlineStr"><is><t>About this export</t></is></c></row></sheetData></worksheet>`
+      };
+    }
+
+    it('lists the sheets in tab order', async () => {
+      expect(await readSheetNames(zip(twoSheets()), { inflate })).toEqual(['Read me', 'Donors']);
+    });
+
+    it('reads the first sheet unless another is named', async () => {
+      const first = await readXlsx(zip(twoSheets()), { inflate });
+      expect(first).toEqual([['About this export']]);
+      const chosen = await readXlsx(zip(twoSheets()), { inflate, sheet: 'Donors' });
+      expect(chosen[0]).toEqual(['Last Name', 'Email', 'Gift Date', 'Amount']);
+    });
+
+    it('refuses a sheet name the workbook does not have', async () => {
+      await expect(readXlsx(zip(twoSheets()), { inflate, sheet: 'Gone' })).rejects.toMatchObject({
+        reason: 'notAWorkbook'
+      });
+    });
   });
 
   it('knows a workbook by its name', () => {

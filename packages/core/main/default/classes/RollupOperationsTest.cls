@@ -8,8 +8,16 @@
  * which is registered for instant totals by `Core_Rollups_Contact`. These tests have not been
  * executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupOperationsTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE_EACH = 20;
 

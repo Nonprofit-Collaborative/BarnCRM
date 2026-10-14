@@ -18,13 +18,13 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
-    /** Records a chunk saves, so one journal page holds one chunk (R-IJ1). */
-    public static final Integer MAX_CHUNK = 200;
     /** The run limit's default and highest value (R-BU2). */
     public static final Integer MAX_RUN_LIMIT = 48000;
     /** Query rows left free for the reads around a count. */
     private static final Integer COUNT_MARGIN = 100;
-    private static final Integer DEFINITION_VERSION = 1;
+    /** Version 2: a change with steps may use every DataTransform operation (ADR-0112). */
+    private static final Integer DEFINITION_VERSION = DataTransform.DOCUMENT_VERSION;
+    private static final String RECORD_TYPE_FIELD = 'RecordTypeId';
 
     /** One change, as checked: the field it writes and the value or field it takes. */
     public class Change {
@@ -43,9 +43,15 @@ public with sharing class BulkUpdateService {
         /**
          * The value this change gives one record. A transform's result is typed for the
          * target; a result the target cannot take is refused for this record alone, with a
-         * `BulkUpdateException` whose message is the reason (R-BU7).
+         * `BulkUpdateException` whose message is the reason (R-BU7). So is a household's
+         * Account Name, which household naming keeps (R-H8), as an import refuses it.
          */
         public Object newValueFor(SObject record) {
+            if (keptOnRecord(record)) {
+                throw new BulkUpdateFields.BulkUpdateException(
+                    System.Label.Core_BulkUpdate_ErrorHouseholdName
+                );
+            }
             if (action == ACTION_COPY) {
                 return record.get(source.getName());
             }
@@ -54,17 +60,30 @@ public with sharing class BulkUpdateService {
                 for (Schema.DescribeFieldResult other : otherFields) {
                     others.put(
                         DataTransform.key(other.getName()),
-                        text(record.get(other.getName()))
+                        BulkUpdateFields.toText(other, record.get(other.getName()))
                     );
                 }
                 String result = DataTransform.apply(
                     steps,
-                    text(record.get(target.getName())),
+                    BulkUpdateFields.toText(target, record.get(target.getName())),
                     others
                 );
                 return BulkUpdateFields.fromText(target, result);
             }
             return action == ACTION_CLEAR ? null : value;
+        }
+
+        /** Whether this change's field is one this record keeps for itself. */
+        private Boolean keptOnRecord(SObject record) {
+            if (record.getSObjectType() != Account.SObjectType) {
+                return false;
+            }
+            Object recordType = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
+            return DataProtectedFields.isProtectedOnRecord(
+                Account.SObjectType,
+                target.getName(),
+                (Id) recordType
+            );
         }
 
         public Map<String, Object> toMap() {
@@ -97,6 +116,15 @@ public with sharing class BulkUpdateService {
             Set<String> names = new Set<String>();
             for (Change change : changes) {
                 names.add(change.target.getName());
+                // A household's name is kept by household naming: the record type tells.
+                if (
+                    objectType == Account.SObjectType &&
+                    'Name'.equalsIgnoreCase(change.target.getName()) &&
+                    Schema.SObjectType.Account.fields.getMap()
+                        .containsKey(RECORD_TYPE_FIELD.toLowerCase())
+                ) {
+                    names.add(RECORD_TYPE_FIELD);
+                }
                 if (change.source != null) {
                     names.add(change.source.getName());
                 }
@@ -153,11 +181,7 @@ public with sharing class BulkUpdateService {
         @AuraEnabled
         public Integer count;
         @AuraEnabled
-        public Integer runLimit;
-        @AuraEnabled
         public String objectLabel;
-        @AuraEnabled
-        public String soql;
         @AuraEnabled
         public List<SampleRecord> sample = new List<SampleRecord>();
     }
@@ -190,14 +214,6 @@ public with sharing class BulkUpdateService {
             JSON.serialize(definition.get('query')),
             (List<Object>) definition.get('changes')
         );
-    }
-
-    /** The confirmed count a job's definition holds. */
-    public static Integer confirmedCountOf(String definitionJson) {
-        Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-            definitionJson
-        );
-        return Integer.valueOf(definition.get('confirmedCount'));
     }
 
     private static Plan plan(String queryJson, List<Object> rawChanges) {
@@ -330,11 +346,6 @@ public with sharing class BulkUpdateService {
         return change;
     }
 
-    /** A stored value as the text a transform step reads; null stays null. */
-    public static String text(Object value) {
-        return value == null ? null : String.valueOf(value);
-    }
-
     // -------------------------------------------------------------------------------------
     // Preview
     // -------------------------------------------------------------------------------------
@@ -351,17 +362,17 @@ public with sharing class BulkUpdateService {
         if (result.count > ceiling) {
             throw new BulkUpdateFields.BulkUpdateException(overLimit(ceiling));
         }
-        result.runLimit = ceiling;
         result.objectLabel = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
             .getLabelPlural();
         Set<String> fields = checked.readFields();
-        String nameField = nameField(checked.objectType);
+        String nameField = DataJobs.nameField(
+            checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+        );
         if (nameField != null) {
             fields.add(nameField);
         }
         QueryCompiler.Compiled sample = QueryCompiler.compileSelection(queryJson, fields, null);
         sample.binds.put('sampleSize', SAMPLE_SIZE);
-        result.soql = sample.display;
         for (
             SObject record : Database.queryWithBinds(
                 sample.soql + ' ORDER BY Id LIMIT :sampleSize',
@@ -396,10 +407,8 @@ public with sharing class BulkUpdateService {
      * returned, so the caller can say which limit it passed.
      */
     public static Integer countWithin(Plan checked, Integer ceiling) {
-        Integer headroom = Limits.getLimitQueryRows() - Limits.getQueryRows() - COUNT_MARGIN;
-        Integer cap = Math.min(ceiling + 1, headroom);
-        Integer count = QueryCompiler.count(checked.queryJson, cap);
-        if (count >= cap && cap <= ceiling) {
+        Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
+        if (count == null) {
             throw new BulkUpdateFields.BulkUpdateException(
                 System.Label.Core_BulkUpdate_ErrorTooManyToCount
             );
@@ -447,13 +456,7 @@ public with sharing class BulkUpdateService {
             );
         }
         Import_Batch__c job = createJob(checked, count, confirmedCount);
-        Id jobId = Database.executeBatch(new BulkUpdateBatch(job.Id), MAX_CHUNK);
-        job.Job_Id__c = jobId;
-        Database.update(
-            new Import_Batch__c(Id = job.Id, Job_Id__c = jobId),
-            AccessLevel.SYSTEM_MODE
-        );
-        return job;
+        return DataJobs.launch(new BulkUpdateBatch(job.Id), job);
     }
 
     /**
@@ -473,7 +476,7 @@ public with sharing class BulkUpdateService {
             Rows_Updated__c = 0,
             Rows_Matched__c = 0,
             Rows_Rejected__c = 0,
-            Chunk_Size__c = MAX_CHUNK,
+            Chunk_Size__c = DataJobs.chunkSize(),
             Started_At__c = now,
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),
@@ -495,18 +498,12 @@ public with sharing class BulkUpdateService {
 
     /** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BU2). */
     public static Integer runLimit() {
-        Object configured = SettingsService.hasKey('Bulk_Update_Run_Limit__c')
-            ? SettingsService.getValue('Bulk_Update_Run_Limit__c')
-            : null;
-        if (configured == null) {
-            return MAX_RUN_LIMIT;
-        }
-        try {
-            Integer records = Decimal.valueOf(String.valueOf(configured)).intValue();
-            return Math.max(1, Math.min(records, MAX_RUN_LIMIT));
-        } catch (Exception ignored) {
-            return MAX_RUN_LIMIT;
-        }
+        return DataJobs.wholeNumberSetting(
+            'Bulk_Update_Run_Limit__c',
+            MAX_RUN_LIMIT,
+            1,
+            MAX_RUN_LIMIT
+        );
     }
 
     public static String overLimit(Integer ceiling) {
@@ -514,20 +511,5 @@ public with sharing class BulkUpdateService {
             System.Label.Core_BulkUpdate_ErrorOverLimit,
             new List<Object>{ ceiling.format() }
         );
-    }
-
-    /** The object's name field, when the person may read it, for the sample. */
-    private static String nameField(Schema.SObjectType type) {
-        for (
-            Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .fields.getMap()
-                .values()
-        ) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            if (field.isNameField() && field.isAccessible()) {
-                return field.getName();
-            }
-        }
-        return null;
     }
 }

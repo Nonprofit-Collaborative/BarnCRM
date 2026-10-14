@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Record Inbound Gift Action</label>
+  <description>
+    For a flow or AI assistant's user: runs the Record Inbound Gift action and nothing else. Assign
+    with Giving Staff, which grants the records a gift needs.
+  </description>
+  <classAccesses>
+    <apexClass>InboundGiftAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+</PermissionSet>

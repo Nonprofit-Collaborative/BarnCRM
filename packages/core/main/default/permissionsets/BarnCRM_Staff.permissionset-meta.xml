@@ -19,10 +19,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AddressController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AddressSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -55,6 +51,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>CreatePersonAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>CustomPermissionSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -75,7 +75,19 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FindPeopleAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FiscalYearSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetDataJobStatusAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetHouseholdSummaryAction</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -123,10 +135,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>HubErrorCountSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>ModuleDetectionService</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -164,10 +172,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>QueryFieldCatalog</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -716,6 +720,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Import_Batch__c.Retry_After_Row__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Import_Batch__c.Row_Count__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -757,6 +766,16 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Batch__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Template_Snapshot_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Trial_Rows__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -832,6 +851,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Related_Status__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1065,6 +1089,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Error_Log_Event__e</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Rollup_Queue_Ready__e</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

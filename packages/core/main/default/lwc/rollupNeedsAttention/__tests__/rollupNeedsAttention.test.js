@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import RollupNeedsAttention from 'c/rollupNeedsAttention';
 import getAttention from '@salesforce/apex/RollupAttentionController.getAttention';
 import retry from '@salesforce/apex/RollupAttentionController.retry';
+import processNow from '@salesforce/apex/RollupAttentionController.processNow';
 
 jest.mock(
   '@salesforce/apex/RollupAttentionController.getAttention',
@@ -9,6 +10,12 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/RollupAttentionController.retry', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/RollupAttentionController.processNow', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupBuilder_Started', () => ({ default: 'Started.' }), {
   virtual: true
 });
 jest.mock(
@@ -97,5 +104,20 @@ describe('c-rollup-needs-attention', () => {
     const readOnly = await build({ ...ATTENTION, canManage: false, nightlyScheduled: true });
     expect(query(readOnly, 'retry-all')).toBeNull();
     expect(query(readOnly, 'nightly-off')).toBeNull();
+  });
+
+  it('starts the waiting records now, and offers Start now only when some wait', async () => {
+    processNow.mockResolvedValue({ ...ATTENTION, hasWaiting: false });
+    const element = await build({ ...ATTENTION, hasWaiting: true });
+
+    query(element, 'start-now').click();
+    await flush();
+
+    expect(processNow).toHaveBeenCalledTimes(1);
+    expect(query(element, 'notice').textContent).toBe('Started.');
+    expect(query(element, 'start-now')).toBeNull();
+
+    const readOnly = await build({ ...ATTENTION, hasWaiting: true, canManage: false });
+    expect(query(readOnly, 'start-now')).toBeNull();
   });
 });

@@ -1,8 +1,13 @@
 /**
  * An appeal hierarchy is shallow and it never loops (R-AP2).
  */
-@IsTest
+@IsTest(testFor='ApexClass:AppealTriggerHandler')
 private class AppealTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void anAppealCannotBeItsOwnParent() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

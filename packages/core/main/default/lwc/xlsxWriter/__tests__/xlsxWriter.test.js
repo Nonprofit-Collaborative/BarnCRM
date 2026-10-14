@@ -4,10 +4,11 @@ import {
   CELL_TYPES,
   columnName,
   crc32,
+  MAX_CELL_TEXT,
+  sheetChunks,
   sheetXml,
   toSerial,
-  writeXlsx,
-  xlsxFileName
+  writeXlsx
 } from 'c/xlsxWriter';
 // The import wizard's reader reads back what the writer wrote.
 import { readXlsx } from '../../importWizard/xlsx';
@@ -36,12 +37,35 @@ describe('c/xlsxWriter', () => {
 
   it('computes the zip checksum', () => {
     expect(crc32(new NodeTextEncoder().encode('123456789'))).toBe(0xcbf43926);
+    const encoder = new NodeTextEncoder();
+    expect(crc32(encoder.encode('6789'), crc32(encoder.encode('12345')))).toBe(0xcbf43926);
   });
 
-  it('turns dates into Excel serials', () => {
+  it('turns dates into Excel serials, and date-times as the clock reads in a time zone', () => {
     expect(toSerial('1900-03-01', CELL_TYPES.DATE)).toBe(61);
     expect(toSerial('2026-10-12', CELL_TYPES.DATE)).toBe(46307);
     expect(toSerial('not a date', CELL_TYPES.DATE)).toBeNull();
+    const noonUtc = '2026-01-05T12:00:00.000Z';
+    expect(toSerial(noonUtc, CELL_TYPES.DATETIME, 'UTC')).toBe(46027.5);
+    // Los Angeles is eight hours behind UTC in January: 4 in the morning.
+    expect(toSerial(noonUtc, CELL_TYPES.DATETIME, 'America/Los_Angeles')).toBeCloseTo(
+      46027 + 4 / 24,
+      9
+    );
+    expect(toSerial('not a time', CELL_TYPES.DATETIME, 'UTC')).toBeNull();
+  });
+
+  it('encodes the sheet a piece at a time, the same bytes as one string', () => {
+    const rows = [];
+    for (let index = 0; index < 200; index++) {
+      rows.push([`Person ${index}`, index, '2026-01-31', true]);
+    }
+    const chunks = sheetChunks(COLUMNS, rows, 'UTC', 500);
+    expect(chunks.length).toBeGreaterThan(10);
+    const decoder = new NodeTextDecoder();
+    expect(chunks.map((chunk) => decoder.decode(chunk)).join('')).toBe(
+      sheetXml(COLUMNS, rows, 'UTC')
+    );
   });
 
   it('writes numbers, booleans and dates as values and escapes text', () => {
@@ -66,6 +90,25 @@ describe('c/xlsxWriter', () => {
     expect(xml).toContain('<c r="A3" t="inlineStr"><is><t xml:space="preserve">+1</t>');
   });
 
+  it('cuts text to what one Excel cell holds, never splitting a character', () => {
+    const cellText = (xml, reference) =>
+      xml
+        .split(`<c r="${reference}" t="inlineStr"><is><t xml:space="preserve">`)[1]
+        .split('</t>')[0];
+    const long = 'x'.repeat(MAX_CELL_TEXT + 100);
+    // An emoji (two code units) straddling the limit is dropped whole.
+    const straddling = `${'y'.repeat(MAX_CELL_TEXT - 1)}\u{1F600}z`;
+    const xml = sheetXml(COLUMNS, [
+      [long, null, null, null],
+      [straddling, null, null, null],
+      ['short', null, null, null]
+    ]);
+    expect(MAX_CELL_TEXT).toBe(32767);
+    expect(cellText(xml, 'A2')).toHaveLength(MAX_CELL_TEXT);
+    expect(cellText(xml, 'A3')).toBe('y'.repeat(MAX_CELL_TEXT - 1));
+    expect(cellText(xml, 'A4')).toBe('short');
+  });
+
   it('writes a workbook the import reader reads back, deflated and stored', async () => {
     const rows = [];
     for (let index = 0; index < 200; index++) {
@@ -81,11 +124,5 @@ describe('c/xlsxWriter', () => {
       expect(read[1]).toEqual(['Person 0', '0', '2026-01-31', 'TRUE']);
       expect(read[200]).toEqual(['Person 199', '1990', '2026-01-31', 'FALSE']);
     }
-  });
-
-  it('names the file after the object and the day', () => {
-    expect(xlsxFileName('Gift__c', new Date('2026-10-12T10:00:00Z'))).toBe(
-      'Gift__c-2026-10-12.xlsx'
-    );
   });
 });

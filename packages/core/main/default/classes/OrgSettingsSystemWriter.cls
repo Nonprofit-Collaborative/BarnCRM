@@ -80,7 +80,7 @@ public without sharing class OrgSettingsSystemWriter {
                 updateKeys(type, lockStored(type).Id, values);
             }
         }
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
     }
 
     /**

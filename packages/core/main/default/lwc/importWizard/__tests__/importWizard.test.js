@@ -8,8 +8,9 @@ import createBatch from '@salesforce/apex/ImportController.createBatch';
 import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
+import startTrial from '@salesforce/apex/ImportController.startTrial';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
-import getRows from '@salesforce/apex/ImportController.getRows';
+import getRowPage from '@salesforce/apex/ImportController.getRowPage';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
 import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
@@ -17,8 +18,30 @@ import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObj
 import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
+import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFields';
+import getRelatedOptions from '@salesforce/apex/ImportController.getRelatedOptions';
+import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
+import openRetry from '@salesforce/apex/ImportController.openRetry';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+import { readSheetNames, readXlsx } from '../xlsx';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
+
+// Real label values, so a test can see a column target built from its two labels.
+jest.mock(
+  '@salesforce/label/c.Core_Import_TargetSecondPersonField',
+  () => ({ default: 'Second person: {0}' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_Import_TargetOrganizationField',
+  () => ({ default: 'Organization: {0}' }),
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -44,13 +67,16 @@ jest.mock('@salesforce/apex/ImportController.startDryRun', () => ({ default: jes
 jest.mock('@salesforce/apex/ImportController.startCommit', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/ImportController.startTrial', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/ImportController.getBatch', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.saveRecurring', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/ImportController.getRows', () => ({ default: jest.fn() }), {
+jest.mock('@salesforce/apex/ImportController.getRowPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getEntityTargets', () => ({ default: jest.fn() }), {
@@ -73,11 +99,33 @@ jest.mock('@salesforce/apex/ImportController.getObjectFields', () => ({ default:
 jest.mock('@salesforce/apex/ImportController.getKeyFields', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/ImportController.getRowMatchFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getRelatedOptions', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getRelatedFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: jest.fn() }), {
   virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.openRetry', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+// The workbook reader runs for real (jsdom has no DecompressionStream, so a real workbook
+// cannot be opened here); a test that needs sheets gives their contents once.
+jest.mock('../xlsx', () => {
+  const actual = jest.requireActual('../xlsx');
+  return {
+    ...actual,
+    readSheetNames: jest.fn((...args) => actual.readSheetNames(...args)),
+    readXlsx: jest.fn((...args) => actual.readXlsx(...args))
+  };
 });
 
 const TEMPLATE = {
@@ -104,7 +152,21 @@ const DRY_RUN_BATCH = {
   runLog: 'Dry run. Nothing was written.'
 };
 
+const EMPTY_PAGE = { cursor: null, rows: [], nextIndex: 0, total: 0, hasMore: false };
+
 const FILE_TEXT = 'Last Name,Email,Notes\nRamirez,ana@example.org,vip\nOkafor,ben@example.org,';
+
+/** The fixed columns of a people file, as the server lists them (ImportFieldCatalog). */
+const FIXED_TARGETS = [
+  { value: 'Contact1.FirstName', label: 'Person: first name' },
+  { value: 'Contact1.LastName', label: 'Person: last name' },
+  { value: 'Contact1.Email', label: 'Person: email' },
+  { value: 'Contact1.Phone', label: 'Person: phone' },
+  { value: 'Contact1.MailingCity', label: 'Person: city' },
+  { value: 'Contact2.Email', label: 'Second person: email' },
+  { value: 'Organization.Name', label: 'Organization: name' },
+  { value: 'Affiliation.Role__c', label: 'Affiliation: role' }
+];
 
 /**
  * Lets every pending promise and rerender settle. Several turns, because reading a file goes
@@ -123,9 +185,12 @@ function render() {
 }
 
 /** Feeds the wizard a file the way the browser's file input does. */
-async function chooseFile(element, text = FILE_TEXT, name = 'donors.csv') {
+async function chooseFile(element, text = FILE_TEXT, name = 'donors.csv', size = undefined) {
   const input = element.shadowRoot.querySelector('[data-id="file"]');
   const file = new File([text], name, { type: 'text/csv' });
+  if (size !== undefined) {
+    Object.defineProperty(file, 'size', { value: size });
+  }
   Object.defineProperty(input, 'files', { value: [file], configurable: true });
   input.dispatchEvent(new CustomEvent('change'));
   await flush();
@@ -155,9 +220,9 @@ describe('the import wizard', () => {
     startDryRun.mockResolvedValue(DRY_RUN_BATCH);
     startCommit.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Complete', isDryRun: false });
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
-    getRows.mockResolvedValue([]);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
     getEntityTargets.mockResolvedValue([]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
     getChangedValues.mockResolvedValue([]);
     previewChanges.mockResolvedValue({ problems: [], samples: [] });
   });
@@ -175,6 +240,15 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
       { label: 'Generic contact list', value: 'a01' }
     ]);
+  });
+
+  it('asks for the templates, columns and match fields together, not one after another', async () => {
+    getTemplates.mockReturnValue(new Promise(() => {}));
+    render();
+    await flush();
+    expect(getTemplates).toHaveBeenCalledTimes(1);
+    expect(getEntityTargets).toHaveBeenCalledTimes(1);
+    expect(getMatchFields).toHaveBeenCalledTimes(1);
   });
 
   it('tells a user without the permission who to ask', async () => {
@@ -247,6 +321,27 @@ describe('the import wizard', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows).toHaveLength(3);
     expect(rows[0].textContent).toContain('Last Name');
+    expect(
+      element.shadowRoot.querySelector('[data-id="columns-table"]').getAttribute('aria-label')
+    ).toBe('c.Core_Import_StepColumns');
+    // Outside a console the tab is left as it is.
+    expect(setTabLabel).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the file being imported', async () => {
+    const element = render();
+    EnclosingTabId.emit('tab0');
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'standard:file', {
+      iconAlt: 'c.Core_Import_TabLabel'
+    });
+
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel: donors.csv');
   });
 
   it('shows the first values of each column beside the choice', async () => {
@@ -283,6 +378,100 @@ describe('the import wizard', () => {
       'c.Core_Import_XlsxUnreadable'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
+  });
+
+  it('reads a semicolon file by its own separator and offers to change it', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'Last Name;Email;Notes\nRamirez;ana@example.org;vip', 'eu.csv');
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    const picker = element.shadowRoot.querySelector('[data-id="delimiter"]');
+    expect(picker.value).toBe(';');
+    expect(picker.options.map((option) => option.value)).toEqual([',', ';', '\t', '|']);
+    expect(element.shadowRoot.querySelector('[data-id="sheet"]')).toBeNull();
+  });
+
+  it('reads the file again when the separator is changed, and back', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="delimiter"]');
+    expect(picker.value).toBe(',');
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: ';' } }));
+    await flush();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain('Last Name,Email,Notes');
+    expect(suggestMapping).toHaveBeenLastCalledWith({
+      templateId: 'a01',
+      headers: ['Last Name,Email,Notes']
+    });
+    element.shadowRoot
+      .querySelector('[data-id="delimiter"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: ',' } }));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+  });
+
+  it('offers the sheets of a workbook that has several, and reads the one chosen', async () => {
+    readSheetNames
+      .mockResolvedValueOnce(['Read me', 'Donors'])
+      .mockResolvedValueOnce(['Read me', 'Donors']);
+    readXlsx
+      .mockResolvedValueOnce([['About this export'], ['Exported 1 October']])
+      .mockResolvedValueOnce([
+        ['Last Name', 'Email'],
+        ['Ramirez', 'ana@example.org']
+      ]);
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'zip bytes', 'donors.xlsx');
+    const picker = element.shadowRoot.querySelector('[data-id="sheet"]');
+    expect(picker.value).toBe('Read me');
+    expect(picker.options).toEqual([
+      { label: 'Read me', value: 'Read me' },
+      { label: 'Donors', value: 'Donors' }
+    ]);
+    expect(element.shadowRoot.querySelector('[data-id="delimiter"]')).toBeNull();
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Donors' } }));
+    await flush();
+    expect(readXlsx).toHaveBeenLastCalledWith(expect.anything(), { sheet: 'Donors' });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].textContent).toContain('Last Name');
+  });
+
+  it('shows no columns and will not go on when the chosen sheet has no rows', async () => {
+    readSheetNames
+      .mockResolvedValueOnce(['Donors', 'Empty'])
+      .mockResolvedValueOnce(['Donors', 'Empty']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Last Name', 'Email'],
+        ['Ramirez', 'ana@example.org']
+      ])
+      .mockResolvedValueOnce([['Last Name']]);
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'zip bytes', 'donors.xlsx');
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
+    element.shadowRoot
+      .querySelector('[data-id="sheet"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Empty' } }));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'c.Core_Import_NoHeaderRow'
+    );
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(true);
   });
 
   it('explains what the chosen matching rule risks', async () => {
@@ -423,6 +612,50 @@ describe('the import wizard', () => {
     input.value = value;
     input.dispatchEvent(new CustomEvent('change'));
   }
+
+  it('offers the fixed columns the server lists, with its labels', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    expect(picker.options).toEqual(
+      expect.arrayContaining([
+        { value: 'Contact1.LastName', label: 'Person: last name' },
+        { value: 'Affiliation.Role__c', label: 'Affiliation: role' }
+      ])
+    );
+  });
+
+  it('imports a file too large to keep without its original, and says so', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, FILE_TEXT, 'donors.csv', 3000000);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(saveFile).not.toHaveBeenCalled();
+    expect(createBatch.mock.calls[0][0].fileId).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="original-not-kept"]').textContent).toContain(
+      'c.Core_Import_OriginalTooLargeToKeep'
+    );
+  });
+
+  it('says when the original could not be kept, and imports anyway', async () => {
+    saveFile.mockRejectedValue({ body: { message: 'Heap too large' } });
+    const element = await toMatchingStep();
+    click(element, 'dry-run');
+    await flush();
+    expect(createBatch).toHaveBeenCalled();
+    // The label mock has no {0} to fill; the real label carries the reason.
+    expect(element.shadowRoot.querySelector('[data-id="original-not-kept"]').textContent).toContain(
+      'c.Core_Import_OriginalNotKept'
+    );
+  });
 
   it('sends the control totals with the batch, and none when the boxes are empty', async () => {
     let element = await toMatchingStep();
@@ -582,6 +815,7 @@ describe('the import wizard', () => {
 
   it('asks for the ID field under External ID, and warns when no column holds it', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: []
     });
@@ -604,6 +838,7 @@ describe('the import wizard', () => {
 
   it('offers each ID field as a column for either person and the organization', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: [{ value: 'Charity_Number__c', label: 'Charity Number' }]
     });
@@ -625,6 +860,7 @@ describe('the import wizard', () => {
 
   it('offers record ID columns and the org own fields, each once', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: [],
       personFields: [
@@ -685,6 +921,15 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
   });
 
+  it('shows each matching rule by its label and stores the rule name', async () => {
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="rule"]').options).toEqual([
+      { label: 'c.Core_Import_RuleEmailExact', value: 'Email exact' },
+      { label: 'c.Core_Import_RuleNamePostalCode', value: 'Name plus postal code' },
+      { label: 'c.Core_Import_RuleExternalId', value: 'External ID' }
+    ]);
+  });
+
   it('offers the organization rule only where the file names an organization', async () => {
     let element = await toMatchingStep();
     expect(element.shadowRoot.querySelector('[data-id="organization-rule"]')).toBeNull();
@@ -703,6 +948,10 @@ describe('the import wizard', () => {
     element = await toMatchingStep();
     const rule = element.shadowRoot.querySelector('[data-id="organization-rule"]');
     expect(rule.value).toBe('Name exact');
+    expect(rule.options.map((option) => option.label)).toEqual([
+      'c.Core_Import_RuleNameExact',
+      'c.Core_Import_RuleExternalId'
+    ]);
     expect(element.shadowRoot.querySelector('[data-id="organization-rule-help"]').textContent).toBe(
       'c.Core_Import_OrganizationNameHelp'
     );
@@ -827,8 +1076,42 @@ describe('the import wizard', () => {
     ]);
   });
 
+  it('starts from the rows to load the mapping holds and sends the ones settled on', async () => {
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [{ source: 'Last Name', target: 'Contact1.LastName' }],
+        uniqueBy: ['Email']
+      })
+    );
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const panel = element.shadowRoot.querySelector('[data-id="row-rules"]');
+    expect(panel.uniqueBy).toEqual(['Email']);
+    expect(panel.columnNames).toEqual(['Last Name', 'Email', 'Notes']);
+    expect(element.shadowRoot.querySelector('[data-id="blank-clears"]')).toBeNull();
+    const skipRows = [{ column: 'Notes', test: 'contains', text: 'test' }];
+    panel.dispatchEvent(new CustomEvent('change', { detail: { skipRows, uniqueBy: [] } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+    expect(sent.skipRows).toEqual(skipRows);
+    expect(sent.uniqueBy).toBeUndefined();
+  });
+
   it('sends the duplicate rules choice, and warns when no rule is switched on', async () => {
-    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: false });
+    getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
+      contact: [],
+      account: [],
+      contactRules: false
+    });
     const element = await toMatchingStep();
     const box = element.shadowRoot.querySelector('[data-id="duplicate-rules"]');
     expect(box.checked).toBe(false);
@@ -846,10 +1129,30 @@ describe('the import wizard', () => {
 
   it('starts with the duplicate rules choice the mapping holds', async () => {
     getTemplates.mockResolvedValue([{ ...TEMPLATE, useDuplicateRules: true }]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: true });
+    getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
+      contact: [],
+      account: [],
+      contactRules: true
+    });
     const element = await toMatchingStep();
     expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]').checked).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
+  });
+
+  it('warns for person accounts when only an organization rule is switched on', async () => {
+    getTemplates.mockResolvedValue([
+      { ...TEMPLATE, personMode: 'Person Accounts', useDuplicateRules: true }
+    ]);
+    getMatchFields.mockResolvedValue({
+      contact: [],
+      account: [],
+      contactRules: true,
+      accountRules: true,
+      personAccountRules: false
+    });
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).not.toBeNull();
   });
 
   it('shows the values a finished dry run changed', async () => {
@@ -869,6 +1172,315 @@ describe('the import wizard', () => {
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  describe('the exceptions file', () => {
+    const RealBlob = global.Blob;
+    let written;
+
+    /** A cursor of `total` rejected rows, served from whatever start index is asked for. */
+    function serveRejected(total) {
+      getRowPage.mockImplementation(({ cursor, startIndex, pageSize }) => {
+        const rows = [];
+        for (let i = startIndex; i < Math.min(startIndex + pageSize, total); i++) {
+          rows.push({
+            id: `r${i}`,
+            rowNumber: i + 2,
+            status: 'Rejected',
+            errorMessage: 'Last name is missing.',
+            values: JSON.stringify({
+              'Last Name': i === 0 ? '=HYPERLINK("x")' : `Person ${i}`,
+              Email: '',
+              Notes: i === 1 ? '-25.00' : 'n'
+            })
+          });
+        }
+        const nextIndex = startIndex + rows.length;
+        return Promise.resolve({
+          cursor: cursor || { token: 'cursor-1' },
+          rows,
+          nextIndex,
+          total,
+          hasMore: nextIndex < total
+        });
+      });
+    }
+
+    beforeEach(() => {
+      written = undefined;
+      global.Blob = function CapturingBlob(parts, options) {
+        written = parts.join('');
+        return new RealBlob(parts, options);
+      };
+      global.URL.createObjectURL = jest.fn(() => 'blob:exceptions');
+      global.URL.revokeObjectURL = jest.fn();
+      jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      jest.useFakeTimers({ doNotFake: ['setTimeout', 'nextTick', 'queueMicrotask'] });
+    });
+
+    afterEach(() => {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+      jest.useRealTimers();
+    });
+
+    async function toFinishedDryRun(rejected) {
+      getBatch.mockResolvedValue({ ...DRY_RUN_BATCH, rejected });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      jest.advanceTimersByTime(3000);
+      await flush();
+      return element;
+    }
+
+    it('holds every rejected row, read page by page through one cursor', async () => {
+      serveRejected(1250);
+      const element = await toFinishedDryRun(1250);
+      const results = element.shadowRoot.querySelector('[data-id="results"]');
+      expect(results.rejectedRows).toHaveLength(200);
+      getRowPage.mockClear();
+
+      click(element, 'download');
+      await flush();
+
+      // A fresh cursor, then the same one handed back from where each page ended.
+      expect(getRowPage.mock.calls.map(([args]) => [args.startIndex, args.cursor])).toEqual([
+        [0, null],
+        [500, { token: 'cursor-1' }],
+        [1000, { token: 'cursor-1' }]
+      ]);
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toHaveLength(1251);
+      expect(lines[0]).toBe('﻿Row,Last Name,Email,Notes,Reason');
+      // The shared writer defuses a formula and leaves a negative amount alone.
+      expect(lines[1]).toBe('2,"\'=HYPERLINK(""x"")",,n,Last name is missing.');
+      expect(lines[2]).toBe('3,Person 1,,-25.00,Last name is missing.');
+      expect(lines[1250].startsWith('1251,Person 1249,')).toBe(true);
+      expect(global.URL.createObjectURL).toHaveBeenCalledTimes(1);
+      expect(element.shadowRoot.querySelector('[data-id="message"]')).toBeNull();
+    });
+
+    it('says so when the file holds fewer rows than were rejected', async () => {
+      serveRejected(3);
+      const element = await toFinishedDryRun(5);
+      click(element, 'download');
+      await flush();
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'c.Core_Import_ExceptionsCapped'
+      );
+    });
+
+    it('reports a failed read in words and saves no file', async () => {
+      serveRejected(2);
+      const element = await toFinishedDryRun(2);
+      getRowPage.mockRejectedValue({ body: { message: 'Cursor expired.' } });
+      click(element, 'download');
+      await flush();
+      expect(written).toBeUndefined();
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'Cursor expired.'
+      );
+    });
+
+    it('never reads the file again from the top when a page does not move forward', async () => {
+      serveRejected(2);
+      const element = await toFinishedDryRun(2);
+      getRowPage.mockClear();
+      getRowPage.mockResolvedValue({
+        cursor: { token: 'cursor-1' },
+        rows: [{ id: 'r0', rowNumber: 2, errorMessage: 'Bad.', values: '{}' }],
+        nextIndex: 0,
+        total: 2,
+        hasMore: true
+      });
+      click(element, 'download');
+      await flush();
+      expect(getRowPage).toHaveBeenCalledTimes(1);
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(2);
+    });
+  });
+
+  describe('the results file', () => {
+    const RealBlob = global.Blob;
+    let written;
+    let fileName;
+
+    /** Every row of the import, each with what became of it. */
+    function serveAll(total) {
+      getRowPage.mockImplementation(({ cursor, startIndex, pageSize, status }) => {
+        const rows = [];
+        for (let i = startIndex; i < Math.min(startIndex + pageSize, total); i++) {
+          const rejected = i === total - 1;
+          rows.push({
+            id: `r${i}`,
+            rowNumber: i + 2,
+            status: rejected ? 'Rejected' : 'Created',
+            errorMessage: rejected ? 'Last name is missing.' : undefined,
+            person1Id: rejected ? undefined : `003${i}`,
+            householdId: rejected ? undefined : `a0H${i}`,
+            resultingRecordId: rejected ? undefined : `a0S${i}`,
+            values: JSON.stringify({ 'Last Name': `Person ${i}`, Email: '', Notes: 'n' })
+          });
+        }
+        const nextIndex = startIndex + rows.length;
+        return Promise.resolve({
+          cursor: cursor || { token: `cursor-${status || 'all'}` },
+          rows,
+          nextIndex,
+          total,
+          hasMore: nextIndex < total
+        });
+      });
+    }
+
+    beforeEach(() => {
+      written = undefined;
+      fileName = undefined;
+      global.Blob = function CapturingBlob(parts, options) {
+        written = parts.join('');
+        return new RealBlob(parts, options);
+      };
+      global.URL.createObjectURL = jest.fn(() => 'blob:results');
+      global.URL.revokeObjectURL = jest.fn();
+      jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function capture() {
+        fileName = this.download;
+      });
+    });
+
+    afterEach(() => {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+    });
+
+    async function toCommitted(rowCount) {
+      startCommit.mockResolvedValue({
+        ...DRY_RUN_BATCH,
+        status: 'Complete',
+        isDryRun: false,
+        rowCount
+      });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      element.shadowRoot.querySelector('[data-id="commit"]').click();
+      await flush();
+      return element;
+    }
+
+    it('holds every row with its outcome, the records it became, and its reason', async () => {
+      serveAll(700);
+      const element = await toCommitted(700);
+      getRowPage.mockClear();
+      click(element, 'download-results');
+      await flush();
+
+      // Every row, not only one status, through one cursor.
+      expect(getRowPage.mock.calls.map(([args]) => [args.status, args.startIndex])).toEqual([
+        [null, 0],
+        [null, 500]
+      ]);
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toHaveLength(701);
+      expect(lines[0]).toBe(
+        '﻿c.Core_Import_ResultsRow,c.Core_Import_ResultsOutcome,' +
+          'c.Core_Import_ResultsPersonId,c.Core_Import_ResultsSecondPersonId,' +
+          'c.Core_Import_ResultsHouseholdId,c.Core_Import_ResultsOrganizationId,' +
+          'c.Core_Import_ResultsModuleRecordId,c.Core_Import_ResultsReason,' +
+          'Last Name,Email,Notes'
+      );
+      expect(lines[1]).toBe('2,Created,0030,,a0H0,,a0S0,,Person 0,,n');
+      expect(lines[700]).toBe('701,Rejected,,,,,,Last name is missing.,Person 699,,n');
+      expect(fileName).toBe('IB-000001-results.csv');
+      expect(element.shadowRoot.querySelector('[data-id="message"]')).toBeNull();
+    });
+
+    it('says so when the file holds fewer rows than the import', async () => {
+      serveAll(3);
+      const element = await toCommitted(5);
+      click(element, 'download-results');
+      await flush();
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'c.Core_Import_ResultsCapped'
+      );
+    });
+  });
+
+  describe('trying the first rows', () => {
+    const PREVIEWED = { ...DRY_RUN_BATCH, rowCount: 300, defaultTrialRows: 25 };
+
+    async function toPreview() {
+      startDryRun.mockResolvedValue(PREVIEWED);
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      return element;
+    }
+
+    it('offers the org size, imports that many first rows, and shows the results', async () => {
+      startTrial.mockResolvedValue({ ...PREVIEWED, status: 'Committing', isFinished: false });
+      const element = await toPreview();
+      const rows = element.shadowRoot.querySelector('[data-id="trial-rows"]');
+      expect(rows.value).toBe('25');
+      click(element, 'trial-button');
+      await flush();
+      expect(startTrial).toHaveBeenCalledWith({ batchId: 'a02', rowCount: 25 });
+      expect(startCommit).not.toHaveBeenCalled();
+      expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
+    });
+
+    it('takes a size typed for this file, and refuses one out of range', async () => {
+      startTrial.mockResolvedValue({ ...PREVIEWED, status: 'Committing', isFinished: false });
+      const element = await toPreview();
+      const rows = element.shadowRoot.querySelector('[data-id="trial-rows"]');
+      rows.value = '0';
+      rows.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial-button"]').disabled).toBe(true);
+      rows.value = '10';
+      rows.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      click(element, 'trial-button');
+      await flush();
+      expect(startTrial).toHaveBeenCalledWith({ batchId: 'a02', rowCount: 10 });
+    });
+
+    it('is not offered while the preview cannot be imported', async () => {
+      startDryRun.mockResolvedValue({ ...PREVIEWED, controlTotalsAgree: false });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial"]')).toBeNull();
+    });
+
+    it('after the trial, says what is left and imports it into the same import', async () => {
+      startTrial.mockResolvedValue({
+        ...PREVIEWED,
+        status: 'Trial complete',
+        isDryRun: false,
+        isFinished: true,
+        trialRows: 25
+      });
+      startCommit.mockResolvedValue({
+        ...PREVIEWED,
+        status: 'Committing',
+        isDryRun: false,
+        isFinished: false,
+        trialRows: 25
+      });
+      const element = await toPreview();
+      click(element, 'trial-button');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial-done"]').textContent).toContain(
+        'c.Core_Import_TrialDone'
+      );
+      click(element, 'remaining-button');
+      await flush();
+      expect(startCommit).toHaveBeenCalledWith({ batchId: 'a02' });
+      expect(element.shadowRoot.querySelector('[data-id="remaining"]')).toBeNull();
+    });
   });
 });
 
@@ -890,7 +1502,7 @@ describe('the import wizard loading one object', () => {
     canImport.mockResolvedValue(true);
     getTemplates.mockResolvedValue([OBJECT_TEMPLATE]);
     getEntityTargets.mockResolvedValue([]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
     getObjectFields.mockResolvedValue([
       { value: 'Record.Id', label: 'Salesforce record ID', isLookup: false, lookupFields: [] },
       { value: 'Record.Session_Key__c', label: 'Session Key', isLookup: false, lookupFields: [] },
@@ -905,6 +1517,10 @@ describe('the import wizard loading one object', () => {
       }
     ]);
     getKeyFields.mockResolvedValue([{ value: 'Session_Key__c', label: 'Session Key' }]);
+    getRowMatchFields.mockResolvedValue([
+      { value: 'Notes__c', label: 'Notes' },
+      { value: 'Session_Key__c', label: 'Session Key' }
+    ]);
     suggestMapping.mockResolvedValue(
       JSON.stringify({
         version: 1,
@@ -920,7 +1536,7 @@ describe('the import wizard loading one object', () => {
     stageRows.mockResolvedValue(2);
     startDryRun.mockResolvedValue(DRY_RUN_BATCH);
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
-    getRows.mockResolvedValue([]);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
   });
 
   afterEach(() => {
@@ -1036,6 +1652,78 @@ describe('the import wizard loading one object', () => {
     ]);
   });
 
+  it('updates by a field the user chooses, which a column must feed', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    const options = loadOptions(element);
+    expect(options.rowMatchFields).toEqual([
+      { value: 'Notes__c', label: 'Notes' },
+      { value: 'Session_Key__c', label: 'Session Key' }
+    ]);
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Update by a matching field',
+          matchField: 'Notes__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    // No column feeds Notes, so nothing can find the records.
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Update by a matching field',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(false);
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).load).toEqual({
+      operation: 'Update by a matching field',
+      matchField: 'Session_Key__c',
+      lookupNotFound: 'Reject the row',
+      severalMatches: 'Reject the row'
+    });
+  });
+
+  it('sends empty cells clear the field for a one-object column that ticks it', async () => {
+    const element = await toColumnsStep();
+    const boxes = element.shadowRoot.querySelectorAll('[data-id="blank-clears"]');
+    expect(boxes).toHaveLength(3);
+    boxes[0].checked = true;
+    boxes[0].dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Upsert by external ID',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const columns = JSON.parse(createBatch.mock.calls[0][0].mappingDocument).columns;
+    expect(columns[0]).toEqual({
+      source: 'Session Key',
+      target: 'Record.Session_Key__c',
+      blankClears: true
+    });
+    expect(columns[1].blankClears).toBeUndefined();
+  });
+
   it('needs a record ID column before an update can dry run', async () => {
     const element = await toColumnsStep();
     click(element, 'next');
@@ -1082,5 +1770,238 @@ describe('the import wizard loading one object', () => {
       '[data-id="file-value-row"] lightning-combobox'
     );
     expect(target.options.map((o) => o.value)).toEqual(['Record.Program__c']);
+  });
+
+  it('confirms a delete by file through the bulk delete panel, not Commit', async () => {
+    const element = await toColumnsStep();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    rows[2]
+      .querySelector('lightning-combobox')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Delete by record Id',
+          matchField: '',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="commit"]')).toBeNull();
+    // A trial commit would bypass the confirmed count, so it is not offered either.
+    expect(element.shadowRoot.querySelector('[data-id="trial"]')).toBeNull();
+    const panel = element.shadowRoot.querySelector('[data-id="delete-by-file"]');
+    expect(panel).not.toBeNull();
+    expect(panel.batchId).toBe('a02');
+    expect(startCommit).not.toHaveBeenCalled();
+  });
+
+  it('writes the results file with one record ID per row', async () => {
+    const RealBlob = global.Blob;
+    let written;
+    global.Blob = function CapturingBlob(parts, options) {
+      written = parts.join('');
+      return new RealBlob(parts, options);
+    };
+    global.URL.createObjectURL = jest.fn(() => 'blob:results');
+    global.URL.revokeObjectURL = jest.fn();
+    jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      startCommit.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Complete', isDryRun: false });
+      getRowPage.mockResolvedValue({
+        cursor: { token: 'c' },
+        rows: [
+          {
+            id: 'r0',
+            rowNumber: 2,
+            status: 'Updated',
+            resultingRecordId: 'a0S000000000001',
+            values: JSON.stringify({ 'Session Key': 'S-1', Program: 'Reading', Notes: 'first' })
+          },
+          {
+            id: 'r1',
+            rowNumber: 3,
+            status: 'Rejected',
+            errorMessage: 'No Program is named Math.',
+            values: JSON.stringify({ 'Session Key': 'S-2', Program: 'Math', Notes: '' })
+          }
+        ],
+        nextIndex: 2,
+        total: 2,
+        hasMore: false
+      });
+      const element = await toColumnsStep();
+      click(element, 'next');
+      await flush();
+      click(element, 'dry-run');
+      await flush();
+      element.shadowRoot.querySelector('[data-id="commit"]').click();
+      await flush();
+      click(element, 'download-results');
+      await flush();
+
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toEqual([
+        '﻿c.Core_Import_ResultsRow,c.Core_Import_ResultsOutcome,' +
+          'c.Core_Import_ResultsRecordId,c.Core_Import_ResultsReason,Session Key,Program,Notes',
+        '2,Updated,a0S000000000001,,S-1,Reading,first',
+        '3,Rejected,,No Program is named Math.,S-2,Math,'
+      ]);
+    } finally {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+    }
+  });
+
+  it('offers the related record fields and sends the related records under a key', async () => {
+    getTemplates.mockResolvedValue([
+      {
+        ...OBJECT_TEMPLATE,
+        loadOperation: 'Upsert by external ID',
+        loadMatchField: 'Session_Key__c',
+        related: 'Attendance__c.Session__c'
+      }
+    ]);
+    getRelatedOptions.mockResolvedValue([
+      { value: 'Attendance__c.Session__c', label: 'Attendance (Session)' }
+    ]);
+    getRelatedFields.mockResolvedValue([
+      { value: 'Related.Status__c', label: 'Attendance: Status', isLookup: false, lookupFields: [] }
+    ]);
+    const element = await toColumnsStep();
+    expect(getRelatedFields).toHaveBeenCalledWith({
+      templateId: 'a05',
+      related: 'Attendance__c.Session__c'
+    });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const picker = rows[2].querySelector('lightning-combobox');
+    expect(picker.options.map((o) => o.value)).toContain('Related.Status__c');
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Related.Status__c' } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    const options = loadOptions(element);
+    expect(options.related).toBe('Attendance__c.Session__c');
+    expect(options.relatedOptions).toEqual([
+      { value: 'Attendance__c.Session__c', label: 'Attendance (Session)' }
+    ]);
+    click(element, 'dry-run');
+    await flush();
+    const call = createBatch.mock.calls[0][0];
+    expect(JSON.parse(call.optionsJson).load.related).toBe('Attendance__c.Session__c');
+    expect(JSON.parse(call.mappingDocument).columns[2].target).toBe('Related.Status__c');
+  });
+
+  it('drops the related records under Insert, which has no parent key', async () => {
+    getRelatedOptions.mockResolvedValue([]);
+    getRelatedFields.mockResolvedValue([]);
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Insert',
+          matchField: '',
+          lookupNotFound: 'Reject the row',
+          related: 'Attendance__c.Session__c'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).load.related).toBeUndefined();
+  });
+
+  /** Commits the default file into an import with one rejected row the user may retry. */
+  async function toRetryableResults() {
+    startCommit.mockResolvedValue({
+      ...DRY_RUN_BATCH,
+      status: 'Complete',
+      isDryRun: false,
+      rejected: 1,
+      canRetry: true,
+      retrying: false
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    click(element, 'commit');
+    await flush();
+    return element;
+  }
+
+  async function chooseRetryFile(element, text) {
+    const input = element.shadowRoot.querySelector('[data-id="retry-file"]');
+    const file = new File([text], 'fixed.csv', { type: 'text/csv' });
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+  }
+
+  it('retries the fixed rejected rows into the same import and previews only them', async () => {
+    const retrying = { ...DRY_RUN_BATCH, retrying: true, canRetry: true };
+    openRetry.mockResolvedValue({ ...retrying, status: 'Retrying', isFinished: false });
+    startDryRun.mockResolvedValue(retrying);
+    const element = await toRetryableResults();
+    stageRows.mockClear();
+    startDryRun.mockClear();
+
+    await chooseRetryFile(element, 'Row,Last Name,Email,Notes,Reason\n3,Okafor,ben@example.org,,x');
+
+    expect(openRetry).toHaveBeenCalledWith({ batchId: 'a02' });
+    expect(stageRows).toHaveBeenCalledTimes(1);
+    expect(stageRows.mock.calls[0][0].batchId).toBe('a02');
+    expect(stageRows.mock.calls[0][0].firstRowNumber).toBe(2);
+    expect(JSON.parse(stageRows.mock.calls[0][0].rowsJson)).toHaveLength(1);
+    expect(startDryRun).toHaveBeenCalledWith({ batchId: 'a02' });
+    expect(element.shadowRoot.querySelector('[data-id="commit"]').disabled).toBe(false);
+    // The retry belongs to a committed import, so there is no earlier step to go back to.
+    expect(element.shadowRoot.querySelector('[data-id="back"]')).toBeNull();
+  });
+
+  it('refuses a fixed rows file missing a column of the original, and opens no retry', async () => {
+    const element = await toRetryableResults();
+    await chooseRetryFile(element, 'Last Name,Notes\nOkafor,');
+    expect(openRetry).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'c.Core_Import_RetryColumnsMissing'
+    );
+  });
+
+  it('offers no retry when the import cannot take one', async () => {
+    startCommit.mockResolvedValue({
+      ...DRY_RUN_BATCH,
+      status: 'Complete',
+      isDryRun: false,
+      canRetry: false
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    click(element, 'commit');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="retry-file"]')).toBeNull();
   });
 });

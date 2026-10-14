@@ -2,8 +2,13 @@
  * The receipting paths the three named tests do not reach: the letters, the console entry points,
  * and the refusals.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptService')
 private class ReceiptServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void issuingWithoutPermissionIsRefusedWithAMessageThatSaysWhatToAskFor() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

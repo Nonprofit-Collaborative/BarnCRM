@@ -2,8 +2,13 @@
  * Membership in both modes: creation, counting, moving, and tidying up.
  * Canonical model R-H1, R-H2, R-H3, R-H11, R-H12.
  */
-@IsTest
+@IsTest(critical=true)
 private class HouseholdServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aNewPersonWithNoHouseholdGetsOne() {
         System.runAs(TestUsers.admin()) {
@@ -183,6 +188,215 @@ private class HouseholdServiceTest {
                     WHERE RecordTypeId = :HouseholdService.householdRecordTypeId()
                 ],
                 'The household he was saved into is the only one there is'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-10. A contact saved in junction mode with its account set to a household joins
+     * that household with exactly one membership row, and is counted there.
+     */
+    @IsTest
+    static void aPersonSavedIntoAHouseholdInJunctionModeJoinsItOnce() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            insert household;
+
+            Test.startTest();
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            john.AccountId = household.Id;
+            insert john;
+            Test.stopTest();
+
+            List<Household_Member__c> memberships = [
+                SELECT Household__c, Is_Primary__c
+                FROM Household_Member__c
+                WHERE Contact__c = :john.Id AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, memberships.size(), 'John has one membership row');
+            Assert.areEqual(
+                household.Id,
+                memberships[0].Household__c,
+                'It is in the household his record names'
+            );
+            Assert.isFalse(
+                memberships[0].Is_Primary__c,
+                'He joins as an ordinary member: who is primary stays a decision (R-H10)'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
+                'The household counts him'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-10. In junction mode a contact's account can be an employer: no membership is
+     * made in an organization, and the person still gets a household of their own.
+     */
+    @IsTest
+    static void aPersonSavedAgainstAnOrganizationInJunctionModeDoesNotJoinIt() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account employer = new Account(Name = 'Riverside Library');
+            insert employer;
+
+            Test.startTest();
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            john.AccountId = employer.Id;
+            insert john;
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :employer.Id],
+                'The employer has no membership rows'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Household_Member__c WHERE Contact__c = :john.Id],
+                'John has the one membership of the household made for him'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-10, bulk: two hundred contacts saved into one household in one save each join
+     * it once.
+     */
+    @IsTest
+    static void twoHundredPeopleSavedIntoAHouseholdInJunctionModeEachJoinItOnce() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account household = HouseholdTestDataFactory.newHousehold('The Bulk Family');
+            insert household;
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
+            for (Contact person : people) {
+                person.AccountId = household.Id;
+            }
+
+            Test.startTest();
+            insert people;
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :household.Id],
+                'One row each'
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Account
+                    WHERE RecordTypeId = :HouseholdService.householdRecordTypeId()
+                ],
+                'Nobody was given a household of their own'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-27. In contact mode the person a household is created for becomes its Primary
+     * Contact, as junction mode marks them the primary member.
+     */
+    @IsTest
+    static void aHouseholdCreatedForAPersonInContactModeNamesThemPrimaryContact() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+
+            Test.startTest();
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            Test.stopTest();
+
+            Contact saved = [
+                SELECT AccountId, Account.Primary_Contact__c
+                FROM Contact
+                WHERE Id = :maria.Id
+            ];
+            Assert.areEqual(
+                maria.Id,
+                saved.Account.Primary_Contact__c,
+                'Maria is the Primary Contact of the household made for her'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-27. In contact mode a household's Primary Contact must be one of its members:
+     * somebody from another household is refused on save, with a message saying why.
+     */
+    @IsTest
+    static void aPrimaryContactFromAnotherHouseholdIsRefusedInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account smiths = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            Account garcias = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert new List<Account>{ smiths, garcias };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = garcias.Id;
+            insert maria;
+
+            Test.startTest();
+            Database.SaveResult result = Database.update(
+                new Account(Id = smiths.Id, Primary_Contact__c = maria.Id),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'The save is refused');
+            Assert.areEqual(
+                Label.Core_Households_PrimaryContactMustBeMember,
+                result.getErrors()[0].getMessage(),
+                'The refusal says the Primary Contact has to be a member'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-27. A new household cannot be created already naming a Primary Contact in
+     * contact mode, because nobody can be its member yet.
+     */
+    @IsTest
+    static void aNewHouseholdNamingAPrimaryContactIsRefusedInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            Account household = HouseholdTestDataFactory.newHousehold('The Other Family');
+            household.Primary_Contact__c = maria.Id;
+
+            Test.startTest();
+            Database.SaveResult result = Database.insert(household, false);
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'The new household is refused');
+        }
+    }
+
+    /**
+     * PEOPLE-27. Clearing the Primary Contact, or saving a household whose primary has since
+     * left, is never blocked.
+     */
+    @IsTest
+    static void clearingThePrimaryContactIsAllowedInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            Id householdId = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+
+            Test.startTest();
+            update new Account(Id = householdId, Primary_Contact__c = null);
+            update new Account(Id = householdId, Name = 'Renamed');
+            Test.stopTest();
+
+            Assert.isNull(
+                [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId].Primary_Contact__c,
+                'The Primary Contact was cleared'
             );
         }
     }
@@ -678,6 +892,86 @@ private class HouseholdServiceTest {
                 households[1].Id,
                 answered.get(maria.Id),
                 'Maria belongs to one household, so that is the answer'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-12, R-M3. A person in two households and primary in neither is answered with
+     * the membership that started first, whatever order the rows were saved in.
+     */
+    @IsTest
+    static void withNoPrimaryTheEarliestCurrentMembershipIsThePersonsHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            List<Account> households = new List<Account>{
+                HouseholdTestDataFactory.newHousehold('The Smith Family'),
+                HouseholdTestDataFactory.newHousehold('The Garcia Family')
+            };
+            insert households;
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            insert john;
+            insert new List<Household_Member__c>{
+                new Household_Member__c(
+                    Household__c = households[0].Id,
+                    Contact__c = john.Id,
+                    Start_Date__c = Date.today()
+                ),
+                new Household_Member__c(
+                    Household__c = households[1].Id,
+                    Contact__c = john.Id,
+                    Start_Date__c = Date.today().addYears(-3)
+                )
+            };
+
+            Test.startTest();
+            Id answered = HouseholdService.getHouseholdIdsFor(new Set<Id>{ john.Id }).get(john.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                households[1].Id,
+                answered,
+                'The household he joined three years ago is his household'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-12, R-M3. Primary wins over an earlier start date.
+     */
+    @IsTest
+    static void thePrimaryMembershipWinsOverAnEarlierOne() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            List<Account> households = new List<Account>{
+                HouseholdTestDataFactory.newHousehold('The Smith Family'),
+                HouseholdTestDataFactory.newHousehold('The Garcia Family')
+            };
+            insert households;
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            insert john;
+            insert new List<Household_Member__c>{
+                new Household_Member__c(
+                    Household__c = households[0].Id,
+                    Contact__c = john.Id,
+                    Start_Date__c = Date.today().addYears(-3)
+                ),
+                new Household_Member__c(
+                    Household__c = households[1].Id,
+                    Contact__c = john.Id,
+                    Is_Primary__c = true,
+                    Start_Date__c = Date.today()
+                )
+            };
+
+            Test.startTest();
+            Id answered = HouseholdService.getHouseholdIdsFor(new Set<Id>{ john.Id }).get(john.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                households[1].Id,
+                answered,
+                'The household he is primary in is his household'
             );
         }
     }
@@ -1780,6 +2074,52 @@ private class HouseholdServiceTest {
     }
 
     /**
+     * PEOPLE-7. The hidden contact behind a person stored as an account, handed to
+     * addMembers, joins as that account: one membership, on the account side, and no row
+     * naming the contact.
+     */
+    @IsTest
+    static void thePersonContactBehindAnAccountJoinsAsTheAccount() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            HouseholdService.personAccountOverride = true;
+            Account person = new Account(Name = 'Maria Garcia');
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Household');
+            insert new List<Account>{ person, household };
+            Contact behind = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert behind;
+            PersonRecordSelector.accountBehindContactOverride = new Map<Id, Id>{
+                behind.Id => person.Id
+            };
+
+            Test.startTest();
+            HouseholdService.addMembers(
+                new Map<Id, Set<Id>>{ household.Id => new Set<Id>{ behind.Id } }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household.Id AND Account__c = :person.Id
+                ],
+                'The person joins by the account side'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household.Id AND Contact__c = :behind.Id
+                ],
+                'No membership names the hidden contact'
+            );
+        }
+    }
+
+    /**
      * The short circuit: an org OrgShapeDetector reports as having no native household
      * groups at all is never asked the per-record question.
      */
@@ -1802,6 +2142,265 @@ private class HouseholdServiceTest {
                 'No accounts are treated as native when the org has none'
             );
             Assert.areEqual(before, after, 'The short circuit runs no query at all');
+        }
+    }
+
+    // ---------------------------------------------------------- moving out of one of several
+
+    /**
+     * A child in two households, moved out of one of them, stays in the other: only the
+     * membership in the household named as the one they leave ends.
+     */
+    @IsTest
+    static void movingAPersonOutOfOneHouseholdLeavesTheirOtherHouseholdAlone() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account second = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            Account target = HouseholdTestDataFactory.newHousehold('The Okonkwo Family');
+            insert new List<Account>{ first, second, target };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert new List<Contact>{ ana, maria };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(Household__c = first.Id, Contact__c = ana.Id),
+                new Household_Member__c(Household__c = first.Id, Contact__c = maria.Id),
+                new Household_Member__c(Household__c = second.Id, Contact__c = ana.Id)
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(ana.Id, target.Id, first.Id);
+            Test.stopTest();
+
+            Map<Id, Integer> current = new Map<Id, Integer>();
+            for (Household_Member__c row : [
+                SELECT Household__c
+                FROM Household_Member__c
+                WHERE Contact__c = :ana.Id AND End_Date__c = NULL
+            ]) {
+                Integer seen = current.get(row.Household__c);
+                current.put(row.Household__c, seen == null ? 1 : seen + 1);
+            }
+            Assert.isFalse(
+                current.containsKey(first.Id),
+                'Ana left the household she was moved out of'
+            );
+            Assert.areEqual(1, current.get(second.Id), 'Ana is still in her other household');
+            Assert.areEqual(1, current.get(target.Id), 'Ana joined the household she was moved to');
+            Map<Id, Account> counts = new Map<Id, Account>(
+                [
+                    SELECT Member_Count__c
+                    FROM Account
+                    WHERE Id IN :new Set<Id>{ first.Id, second.Id, target.Id }
+                ]
+            );
+            Assert.areEqual(1, counts.get(first.Id).Member_Count__c, 'Maria is left in the first');
+            Assert.areEqual(
+                1,
+                counts.get(second.Id).Member_Count__c,
+                'The second still counts Ana'
+            );
+            Assert.areEqual(1, counts.get(target.Id).Member_Count__c, 'The target counts Ana');
+        }
+    }
+
+    /**
+     * A single move stands the person and membership handlers down while it moves, and
+     * settles the households itself once. The handlers are back on straight afterwards, so
+     * the next save in the same transaction is looked after as usual.
+     */
+    @IsTest
+    static void theHandlersAreBackOnAfterAMove() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account target = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ first, target };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert new List<Contact>{ ana, maria };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(Household__c = first.Id, Contact__c = ana.Id),
+                new Household_Member__c(Household__c = first.Id, Contact__c = maria.Id)
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(ana.Id, target.Id, first.Id);
+            Assert.areEqual(
+                'The Garcia Family',
+                [SELECT Name FROM Account WHERE Id = :target.Id].Name,
+                'The move settled the household she joined: it is named from her'
+            );
+            update new Contact(Id = ana.Id, LastName = 'Garcia-Lee');
+            Test.stopTest();
+
+            Assert.areEqual(
+                'The Garcia-Lee Family',
+                [SELECT Name FROM Account WHERE Id = :target.Id].Name,
+                'The next save after the move is looked after by the handlers again'
+            );
+        }
+    }
+
+    /**
+     * The guard against deleting a household that only looks empty: it names the households
+     * any contact points at, and only those.
+     */
+    @IsTest
+    static void anOccupiedHouseholdIsNamedAsOccupied() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account occupied = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account empty = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ occupied, empty };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = occupied.Id;
+            insert maria;
+
+            Test.startTest();
+            Set<Id> result = HouseholdSelector.householdsWithAnyContact(
+                new Set<Id>{ occupied.Id, empty.Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(new Set<Id>{ occupied.Id }, result, 'Only the occupied household');
+        }
+    }
+
+    // ---------------------------------------------------------- one read per upkeep pass
+
+    /** An org shape with no native household groups, so the mutual exclusion asks nothing. */
+    private static OrgShapeDetector.OrgShape shapeWithoutNativeHouseholds() {
+        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+        shape.hasNativeHouseholdGroups = false;
+        shape.hasPersonAccounts = false;
+        return shape;
+    }
+
+    /**
+     * PEOPLE-34: one upkeep pass reads the households once and their members once. In
+     * contact mode that is two queries, the households and the contacts in them, where the
+     * pass used to read both again for the primary, the count, the wording and the tidy-up.
+     */
+    @IsTest
+    static void oneUpkeepPassReadsTheDatabaseTwiceInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            insert household;
+            insert new Contact(
+                Salutation = 'Mr.',
+                FirstName = 'John',
+                LastName = 'Smith',
+                AccountId = household.Id
+            );
+            Set<Id> householdIds = new Set<Id>{ household.Id };
+            // A first pass settles the household and fills every per-transaction cache, so
+            // the pass measured has nothing to save and only its reads are counted.
+            HouseholdService.afterMembershipChange(householdIds, false);
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(2, used, 'One read of the households and one of their contacts');
+        }
+    }
+
+    /**
+     * PEOPLE-34 in junction mode: three queries, the households, their membership rows and
+     * the contacts those rows name.
+     */
+    @IsTest
+    static void oneUpkeepPassReadsTheDatabaseThreeTimesInJunctionMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            insert household;
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            insert john;
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = john.Id,
+                Role__c = 'Head',
+                Is_Primary__c = true,
+                Start_Date__c = Date.today()
+            );
+            Set<Id> householdIds = new Set<Id>{ household.Id };
+            HouseholdService.afterMembershipChange(householdIds, false);
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(
+                3,
+                used,
+                'One read of the households, one of the membership rows, one of the contacts'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-34 in bulk: 200 households joined without upkeep, so each has a stale count,
+     * name and primary, are all put right by one pass.
+     */
+    @IsTest
+    static void oneUpkeepPassSettlesTwoHundredHouseholds() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                households.add(HouseholdTestDataFactory.newHousehold('Household ' + i));
+            }
+            insert households;
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
+            insert people;
+            List<Household_Member__c> rows = new List<Household_Member__c>();
+            for (Integer i = 0; i < 200; i++) {
+                rows.add(
+                    new Household_Member__c(
+                        Household__c = households[i].Id,
+                        Contact__c = people[i].Id,
+                        Role__c = 'Head',
+                        Is_Primary__c = true,
+                        Start_Date__c = Date.today()
+                    )
+                );
+            }
+            AutomationControl.bypass('HouseholdMemberTriggerHandler');
+            insert rows;
+            AutomationControl.clearBypass('HouseholdMemberTriggerHandler');
+            Set<Id> householdIds = new Map<Id, Account>(households).keySet();
+
+            Test.startTest();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Test.stopTest();
+
+            Integer settled = 0;
+            for (Account household : [
+                SELECT Name, Member_Count__c, Primary_Contact__c
+                FROM Account
+                WHERE Id IN :householdIds
+            ]) {
+                Boolean right =
+                    household.Member_Count__c == 1 &&
+                    household.Primary_Contact__c != null &&
+                    household.Name.startsWith('The Bulk');
+                settled += right ? 1 : 0;
+            }
+            Assert.areEqual(
+                200,
+                settled,
+                'Every household was counted, named and given its primary'
+            );
         }
     }
 }

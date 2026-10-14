@@ -44,9 +44,19 @@ access levels (BarnCRM Admin, Program Staff, or Volunteer Coordinator, or Fundra
 with Giving) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them.
 
+Keeping the other side in step does not depend on what the person saving can see or edit.
+Someone who may save a relationship but cannot see or edit the other person's side of it (for
+example under private sharing, where that side belongs to another user) still gets a matching
+other side, and an edit or delete still reaches it: BarnCRM writes the other side itself. The
+relationship they save is still checked against their own access.
+
 Relationships appear in two places once you are set up: a **Relationships** card on every
 person's record, and a **Relationships** tab in the BarnCRM app for reporting and
 list views.
+
+The card reads and removes relationships as the person using it, through Salesforce's own
+record service, so it shows exactly what their object and field access allows, and a
+relationship edited elsewhere on the page shows on the card without a reload.
 
 ### The types you can choose, and what the other side becomes
 
@@ -84,20 +94,23 @@ from the sample data.
    - **Status**: leave it as Current
    - **Start date**: leave it empty
    Choose **Save**.
-4. The card now shows one line: "Luis Garcia, Spouse, Current". Nothing else was asked of
-   you.
-5. Open **Luis Garcia**. His **Relationships** card already shows "Harper Garcia, Spouse,
-   Current". You did not enter it. BarnCRM wrote it when you saved Harper's.
-6. Go back to **Harper Garcia** and choose **Edit** on the Luis line. Set **End date** to
-   last month and choose **Save**. The line now reads **Former**.
-7. Open **Luis Garcia** again. His line reads **Former** too, with the same end date. The
-   two records can never disagree.
+4. The card now shows one line: Luis Garcia, Spouse. A current relationship carries no
+   badge. Nothing else was asked of you.
+5. Open **Luis Garcia**. His **Relationships** card already shows Harper Garcia, Spouse.
+   You did not enter it. BarnCRM wrote it when you saved Harper's.
+6. The card has no Edit action, so change a relationship on its own record: open the App
+   Launcher, search for **Relationships**, open Harper's relationship to Luis, and choose
+   **Edit**. Set **End date** to last month and choose **Save**. Back on Harper's record,
+   the Luis line now carries a **Former** badge.
+7. Open **Luis Garcia** again. His line carries **Former** too, and his record has the same
+   end date. The two records can never disagree.
 8. Now add a second one from Harper: choose **Add relationship**, pick **Diego Garcia**,
    type **Child**, and save. Harper's card reads "Diego Garcia, Child", because the type
    says what the other person is to the person whose record you are on. Open **Diego
    Garcia** and his card reads "Harper Garcia, Parent", the same fact from his side.
-9. Finally, delete the Luis line from Harper's card. Open Luis and the matching line is gone
-   from his card too.
+9. Finally, choose **Remove** on the Luis line of Harper's card. It is deleted at once,
+   with no confirmation, so check the line before you click. Open Luis and the matching
+   line is gone from his card too.
 
 That is the whole feature: enter one side, get both, and never clean up after yourself.
 
@@ -125,6 +138,8 @@ person, use **Move to another household** on their record, which is the Househol
 both sides, because they are one connection. If you meant to keep the other person's
 record, edit the relationship and set an end date instead: it then reads Former on both
 sides and stays on file, which is what you want for anything you may need to explain later.
+If you delete one by mistake, restore either side from the recycle bin: the other side comes
+back with it, paired as before, and no extra copy is made.
 
 **Turning the setting off and wondering why nothing mirrors.** With **Keep both sides of a
 relationship in step** switched off, BarnCRM writes only the side you entered and

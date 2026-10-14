@@ -4,7 +4,7 @@
  * The page counts the queue by matching the rules rather than by reading a field, because that is
  * what a send does (R-AK3). These tests are the proof that the two agree.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AcknowledgmentController')
 private class AcknowledgmentControllerTest {
     @TestSetup
     static void setUp() {

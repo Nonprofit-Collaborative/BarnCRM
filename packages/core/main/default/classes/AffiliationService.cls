@@ -27,6 +27,11 @@
  * carries both lookups with exactly one set (canonical model Section 4), and the field being
  * written exists on both objects, so the only difference between the two shapes is which of
  * two lists the update goes into.
+ *
+ * The upkeep reads and writes run in system mode through `AffiliationUpkeepSelector` and
+ * `AffiliationUpkeepWriter` (ADR-0021, category 2): the affiliation the user saved has already
+ * been authorized in user mode, and the corrections that follow from it must not fail, or miss
+ * rows, because the user cannot edit or see the person and their other affiliations.
  */
 public with sharing class AffiliationService {
     /** The maintenance registry row this feature ships, and the name its bypass is keyed on. */
@@ -39,9 +44,6 @@ public with sharing class AffiliationService {
     private static final String ACCOUNT_HANDLER = 'AccountTriggerHandler';
     private static final String CONTACT_ADDRESS_HANDLER = 'Contact_Address_Capture';
     private static final String ACCOUNT_ADDRESS_HANDLER = 'Account_Address_Capture';
-
-    @TestVisible
-    private static final String STATUS_FORMER = 'Former';
 
     /**
      * Settles the primary affiliation of every person any of these records touches. The old
@@ -60,6 +62,18 @@ public with sharing class AffiliationService {
             return;
         }
         recompute(personIds, justSaved);
+    }
+
+    /**
+     * Settles the primary affiliation of these people from scratch: the newest current one
+     * marked primary keeps the flag. For the survivor of a merge, who can arrive with the
+     * other record's primary affiliation as well as their own (PEOPLE-15).
+     */
+    public static void refreshPrimariesFor(Set<Id> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            return;
+        }
+        recompute(personIds, new Set<Id>());
     }
 
     private static void collectPeople(
@@ -87,7 +101,7 @@ public with sharing class AffiliationService {
      */
     private static void recompute(Set<Id> personIds, Set<Id> justSaved) {
         Map<Id, List<Affiliation__c>> byPerson = new Map<Id, List<Affiliation__c>>();
-        for (Affiliation__c affiliation : AffiliationSelector.selectByPersonIds(personIds)) {
+        for (Affiliation__c affiliation : AffiliationUpkeepSelector.selectForPrimary(personIds)) {
             Id personId = PersonReference.idOf(
                 affiliation.Contact__c,
                 affiliation.Person_Account__c
@@ -143,7 +157,10 @@ public with sharing class AffiliationService {
         Affiliation__c fromThisSave;
         Affiliation__c newest;
         for (Affiliation__c affiliation : affiliations) {
-            if (affiliation.Is_Primary__c != true || affiliation.Status__c == STATUS_FORMER) {
+            if (
+                affiliation.Is_Primary__c != true ||
+                affiliation.Status__c == ConnectionStatus.FORMER
+            ) {
                 continue;
             }
             if (justSaved != null && justSaved.contains(affiliation.Id)) {
@@ -166,7 +183,7 @@ public with sharing class AffiliationService {
         AutomationControl.bypass(AUTOMATION_NAME);
         AutomationControl.bypass(VALIDATION_AUTOMATION_NAME);
         try {
-            Database.update(flagsToClear, AccessLevel.USER_MODE);
+            AffiliationUpkeepWriter.clearPrimaryFlags(flagsToClear);
         } finally {
             AutomationControl.clearBypass(AUTOMATION_NAME);
             AutomationControl.clearBypass(VALIDATION_AUTOMATION_NAME);
@@ -190,14 +207,14 @@ public with sharing class AffiliationService {
         }
 
         List<Contact> contactUpdates = new List<Contact>();
-        for (Contact person : AffiliationSelector.selectContactPrimaries(contactIds)) {
+        for (Contact person : AffiliationUpkeepSelector.selectContactPrimaries(contactIds)) {
             Id wanted = wantedByPerson.get(person.Id);
             if (person.Primary_Affiliation__c != wanted) {
                 contactUpdates.add(new Contact(Id = person.Id, Primary_Affiliation__c = wanted));
             }
         }
         List<Account> accountUpdates = new List<Account>();
-        for (Account person : AffiliationSelector.selectAccountPrimaries(accountIds)) {
+        for (Account person : AffiliationUpkeepSelector.selectAccountPrimaries(accountIds)) {
             Id wanted = wantedByPerson.get(person.Id);
             if (person.Primary_Affiliation__c != wanted) {
                 accountUpdates.add(new Account(Id = person.Id, Primary_Affiliation__c = wanted));
@@ -213,12 +230,8 @@ public with sharing class AffiliationService {
         AutomationControl.bypass(CONTACT_ADDRESS_HANDLER);
         AutomationControl.bypass(ACCOUNT_ADDRESS_HANDLER);
         try {
-            if (!contactUpdates.isEmpty()) {
-                Database.update(contactUpdates, AccessLevel.USER_MODE);
-            }
-            if (!accountUpdates.isEmpty()) {
-                Database.update(accountUpdates, AccessLevel.USER_MODE);
-            }
+            AffiliationUpkeepWriter.savePrimaries(contactUpdates);
+            AffiliationUpkeepWriter.savePrimaries(accountUpdates);
         } finally {
             AutomationControl.clearBypass(CONTACT_HANDLER);
             AutomationControl.clearBypass(ACCOUNT_HANDLER);

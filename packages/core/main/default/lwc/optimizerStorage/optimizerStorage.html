@@ -1,0 +1,34 @@
+<template>
+    <lightning-card title={labels.title} icon-name="standard:storage">
+        <lightning-button slot="actions" label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
+        <div class="slds-var-p-horizontal_medium slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
+            </template>
+            <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.limitsHeading}</h3>
+            <ul class="slds-var-m-bottom_medium" data-id="limits">
+                <template for:each={limits} for:item="use">
+                    <li key={use.name} class="slds-var-p-bottom_small" data-id={use.name}>
+                        <div class="slds-grid slds-grid_align-spread">
+                            <span>{use.label}</span>
+                            <span class="slds-text-body_small">{use.usage}</span>
+                        </div>
+                        <lightning-progress-bar value={use.percent} size="small"></lightning-progress-bar>
+                    </li>
+                </template>
+            </ul>
+            <h3 class="slds-text-heading_small">{labels.ownHeading}</h3>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.ownIntro}</p>
+            <lightning-datatable
+                key-field="apiName"
+                data={ownObjects}
+                columns={columns}
+                hide-checkbox-column
+                data-id="own"
+            ></lightning-datatable>
+        </div>
+    </lightning-card>
+</template>

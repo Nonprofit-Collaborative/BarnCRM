@@ -35,7 +35,13 @@ them leaves you with one empty household rather than with none.
 **What happens to the empty household after a split.** If "Delete a household when the last
 person leaves" is on (BarnCRM Settings, Households), a household that a split empties is
 deleted for you. If it is off, the empty household stays and you delete it yourself. The
-setting is on when Core is installed.
+setting is off when Core is installed.
+
+**People who belong to more than one household.** In the flexible way of belonging a person
+can be in two households at once, such as a child of separated parents. A merge or a split
+moves them out of the household you are working on only; their other household is left
+exactly as it was. A merge keeps the date each person joined, since the two households were
+one family all along.
 
 **Where the button is.** Core ships the placement, not just the action: the **Merge or
 split** action sits in the action bar of the packaged Account record page, on households
@@ -71,11 +77,14 @@ Maria does this from the sample data, after an import left her with the Garcia f
 6. Choose the values you want to keep. Take the name **The Garcia Family**, the anniversary
    from the duplicate (the import brought it in and the original never had one), and the
    left-hand address.
-7. Click **Merge**. A confirmation appears saying which household survives, which one goes
-   away, and that a merge cannot be undone. Read it, then click **Merge households**.
-8. You land on the surviving household. It lists all of the members from both households,
+7. Click **Merge**. A dialog opens saying which household survives, which one goes away, and
+   that a merge cannot be undone. Read it, then click **Merge households** (or **Cancel** or
+   the Escape key to go back without merging).
+8. The window closes and the surviving household refreshes in place. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
-   chose to keep a custom name. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
+   chose to keep a custom name. A name or greeting you took from the other household is kept
+   as you chose it; when it is not what naming would produce, the household is marked as
+   having a custom name, so naming stops rewriting its name and greetings. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
 ### Splitting a member out
@@ -83,8 +92,9 @@ Maria does this from the sample data, after an import left her with the Garcia f
 9. Still on the Garcia household, click **Merge or split households** again and choose the
    **Split** tab.
 10. Tick **Diego Garcia** in the member list.
-11. Leave **A new household** selected and click **Split**. Confirm.
-12. You land on Diego's new household, named **The Garcia Family** because that is what
+11. Leave **A new household** selected and click **Split**. A dialog headed **Split this
+    household?** opens; click **Split**.
+12. The window closes and you land on Diego's new household, named **The Garcia Family** because that is what
     its one member makes it. Go back to the household you split him out of: its member
     count is one lower. Both names were recalculated for you.
 
@@ -108,6 +118,11 @@ raise money from are not households, and merging one into a household would dest
 distinction the whole product relies on. If two organizations are duplicates, merge them
 with the standard Salesforce account merge instead. The message you see is "Both records
 must be households. Choose a household, not an organization."
+
+**"It says one of these households is also a Salesforce Nonprofit Cloud household."**
+In an org that also uses Nonprofit Cloud households, BarnCRM does not merge a household that
+is one of those: the merge deletes one of the two records, and its Nonprofit Cloud household
+group would be deleted or moved with it. Combine them with Nonprofit Cloud's own tools.
 
 **"It says I cannot edit one of these households."**
 Merging edits both records, so you need edit access on both. A split works the same way when

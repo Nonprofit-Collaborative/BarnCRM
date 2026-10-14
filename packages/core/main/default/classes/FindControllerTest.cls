@@ -4,8 +4,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(critical=true)
 private class FindControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ERRORS_ONLY =
         '{"version": 1, "object": "Error_Log__c", "fields": ["Context__c", "Severity__c"], ' +
         '"filter": {"version": 1, "conditions": [{"id": 1, "field": "Severity__c", "operator": "equals", "value": "Error"}]}, ' +
@@ -115,6 +120,7 @@ private class FindControllerTest {
                 'The object is copied from the document'
             );
             String recordId = saved.savedQueries[0].recordId;
+            System.Assert.areEqual(recordId, saved.savedId, 'The page names the query it wrote');
 
             System.runAs(david) {
                 System.Assert.isTrue(
@@ -188,6 +194,31 @@ private class FindControllerTest {
         }
     }
 
+    /** Other people's shared queries never push one of the person's own off the list. */
+    @IsTest
+    static void herOwnQueriesComeFirstEvenPastTheCap() {
+        System.runAs(TestUsers.admin()) {
+            User maria = maria();
+            // Shared by the administrator this test runs as.
+            for (Integer index = 0; index < 3; index++) {
+                FindController.saveQuery(null, 'Alpha ' + index, ERRORS_ONLY, true);
+            }
+            System.runAs(maria) {
+                FindController.saveQuery(null, 'Zulu', ERRORS_ONLY, false);
+            }
+            FindController.maxSavedQueries = 3;
+
+            List<FindController.SavedQueryView> listed;
+            System.runAs(maria) {
+                listed = FindController.getPage().savedQueries;
+            }
+            System.Assert.areEqual(3, listed.size(), 'The cap holds');
+            System.Assert.areEqual('Zulu', listed[0].name, 'Hers first, late in the alphabet');
+            System.Assert.isTrue(listed[0].mine);
+            System.Assert.isFalse(listed[1].mine, 'Then the shared ones');
+        }
+    }
+
     @IsTest
     static void sharingTwoHundredQueriesAtOnceWritesOneShareEach() {
         System.runAs(TestUsers.admin()) {
@@ -246,8 +277,13 @@ private class FindControllerTest {
                         name.endsWith('barncrm_settings__c'),
                         'Settings are not offered'
                     );
-                    System.Assert.isFalse(name.endsWith('__share'), 'Share tables are not offered');
+                    System.Assert.isFalse(name.endsWith('share'), 'Share tables are not offered');
+                    System.Assert.isFalse(name.endsWith('history'), 'History tables neither');
+                    System.Assert.isFalse(name.endsWith('feed'), 'Feeds neither');
                 }
+                // The standard ones too, which an administrator can query.
+                System.Assert.isFalse(names.contains('accountshare'), 'AccountShare');
+                System.Assert.isFalse(names.contains('accounthistory'), 'AccountHistory');
                 System.Assert.areEqual(
                     FindController.DEFAULT_EXPORT_LIMIT,
                     FindController.getPage().exportLimit,

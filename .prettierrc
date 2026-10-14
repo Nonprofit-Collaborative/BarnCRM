@@ -40,7 +40,10 @@
         "*.flow-meta.xml",
         "*.validationRule-meta.xml",
         "*.object-meta.xml",
-        "*.js-meta.xml"
+        "*.js-meta.xml",
+        "*.prompt-meta.xml",
+        "*.genAiPlugin-meta.xml",
+        "*.genAiFunction-meta.xml"
       ],
       "options": {
         "xmlWhitespaceSensitivity": "strict",

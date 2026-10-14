@@ -15,6 +15,13 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
     private static final String DAILY_CRON = '0 0 7 * * ?';
 
     public void execute(SchedulableContext context) {
+        // The daily Error Log run also deletes entries past their retention (R-E6). Its own
+        // try, so neither half stops the other.
+        try {
+            ErrorLogRetention.start();
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, 'Error Log retention');
+        }
         try {
             ErrorDigestService.runScheduled();
         } catch (Exception failed) {
@@ -28,14 +35,14 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
+        return ScheduledJobSelector.schedule(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
     }
 
     /** Stops the daily run. Nothing already sent is affected. */
     public static void stop() {
         Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 

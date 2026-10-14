@@ -1,12 +1,18 @@
 import { createElement } from 'lwc';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import HealthCheckPanel from 'c/healthCheckPanel';
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRecommendedMode';
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
+import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/HealthCheckController.getLastRun', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -144,8 +150,19 @@ function clickFix(element, target) {
     .click();
 }
 
-function confirmBox(element) {
-  return element.shadowRoot.querySelector('[data-id="confirm"]');
+/**
+ * Makes the next confirm dialog wait for the test to answer it.
+ *
+ * @returns {Function} call with true (Confirm) or false (Cancel) to answer
+ */
+function answerLater() {
+  let answer;
+  BarnConfirmModal.open.mockReturnValueOnce(
+    new Promise((resolve) => {
+      answer = resolve;
+    })
+  );
+  return (value) => answer(value);
 }
 
 function flush() {
@@ -153,6 +170,10 @@ function flush() {
 }
 
 describe('c-health-check-panel', () => {
+  beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
@@ -186,12 +207,14 @@ describe('c-health-check-panel', () => {
 
     const button = element.shadowRoot.querySelector('[data-id="use-recommended"]');
     expect(button).not.toBeNull();
+    const answer = answerLater();
     button.click();
     await flush();
 
     expect(applyRecommendedMode).not.toHaveBeenCalled();
-    expect(confirmBox(element)).not.toBeNull();
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    answer(true);
+    await flush();
     await flush();
 
     expect(applyRecommendedMode).toHaveBeenCalled();
@@ -206,10 +229,6 @@ describe('c-health-check-panel', () => {
 
     clickFix(element, 'action:applyJunctionMembership');
     await flush();
-    expect(applyJunctionMembership).not.toHaveBeenCalled();
-
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
-    await flush();
 
     expect(applyJunctionMembership).toHaveBeenCalled();
   });
@@ -222,8 +241,6 @@ describe('c-health-check-panel', () => {
 
     clickFix(element, 'action:enableAutomaticHouseholds');
     await flush();
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
-    await flush();
 
     expect(enableAutomaticHouseholds).toHaveBeenCalled();
   });
@@ -234,25 +251,28 @@ describe('c-health-check-panel', () => {
     const element = createPanel();
     await flush();
 
+    const answer = answerLater();
     clickFix(element, 'action:restoreShippedRollups');
     await flush();
 
     expect(applyFix).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="confirm-title"]').textContent).toContain(
-      '2 shipped rollups are missing'
-    );
-    expect(element.shadowRoot.querySelector('[data-id="confirm-detail"]').textContent).toContain(
-      'Total Gifts, Last Gift Date'
-    );
+    const dialog = BarnConfirmModal.open.mock.calls[0][0];
+    expect(dialog.label).toBe('c.Core_HealthCheck_ConfirmHeading');
+    expect(dialog.message).toBe('c.Core_HealthCheck_ConfirmIntro');
+    expect(dialog.details).toEqual([
+      '2 shipped rollups are missing',
+      'BarnCRM ships totals this org does not have: Total Gifts, Last Gift Date.'
+    ]);
+    expect(dialog.confirmLabel).toBe('c.Core_HealthCheck_ConfirmButton');
 
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
+    answer(true);
+    await flush();
     await flush();
 
     expect(applyFix).toHaveBeenCalledWith({
       fixKey: 'restoreShippedRollups',
       expectedScope: ['Total Gifts', 'Last Gift Date']
     });
-    expect(confirmBox(element)).toBeNull();
   });
 
   it('says what the fix did once it has run', async () => {
@@ -265,47 +285,23 @@ describe('c-health-check-panel', () => {
 
     clickFix(element, 'action:restoreShippedRollups');
     await flush();
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
     await flush();
 
     const outcome = element.shadowRoot.querySelector('[data-id="fix-outcome"]');
     expect(outcome.textContent).toContain('Created: Total Gifts, Last Gift Date');
   });
 
-  it('moves focus into the confirm box and scrolls it into view', async () => {
-    const scrollIntoView = jest.fn();
-    Element.prototype.scrollIntoView = scrollIntoView;
+  it('runs nothing when the dialog is closed with Escape or its close button', async () => {
+    BarnConfirmModal.open.mockResolvedValue(undefined);
     getReport.mockResolvedValue(agentforceReport());
     const element = createPanel();
     await flush();
 
     clickFix(element, 'action:restoreShippedRollups');
     await flush();
-
-    const dialog = confirmBox(element);
-    expect(dialog.getAttribute('role')).toBe('dialog');
-    expect(element.shadowRoot.activeElement).toBe(dialog);
-    expect(scrollIntoView).toHaveBeenCalled();
-    delete Element.prototype.scrollIntoView;
-  });
-
-  it('closes on Escape and returns focus to the button that opened it', async () => {
-    getReport.mockResolvedValue(agentforceReport());
-    const element = createPanel();
     await flush();
 
-    const fixButton = Array.from(element.shadowRoot.querySelectorAll('[data-id="fix"]')).find(
-      (button) => button.dataset.target === 'action:restoreShippedRollups'
-    );
-    const focus = jest.spyOn(fixButton, 'focus');
-    fixButton.click();
-    await flush();
-
-    confirmBox(element).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    await flush();
-
-    expect(confirmBox(element)).toBeNull();
-    expect(focus).toHaveBeenCalled();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
     expect(applyFix).not.toHaveBeenCalled();
   });
 
@@ -332,22 +328,21 @@ describe('c-health-check-panel', () => {
     clickFix(element, 'action:restoreImportTemplates');
     await flush();
 
-    expect(confirmBox(element)).toBeNull();
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
     expect(getReport).toHaveBeenCalledTimes(2);
     expect(applyFix).not.toHaveBeenCalled();
   });
 
   it('runs nothing when the fix is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
     getReport.mockResolvedValue(agentforceReport());
     const element = createPanel();
     await flush();
 
     clickFix(element, 'action:restoreShippedRollups');
     await flush();
-    element.shadowRoot.querySelector('[data-id="confirm-cancel"]').click();
     await flush();
 
-    expect(confirmBox(element)).toBeNull();
     expect(applyFix).not.toHaveBeenCalled();
   });
 
@@ -361,7 +356,6 @@ describe('c-health-check-panel', () => {
 
     clickFix(element, 'action:restoreShippedRollups');
     await flush();
-    element.shadowRoot.querySelector('[data-id="confirm-run"]').click();
     await flush();
     await flush();
 
@@ -398,6 +392,57 @@ describe('c-health-check-panel', () => {
     expect(links[0].textContent).toBe('Ann Lee');
     expect(links[0].getAttribute('href')).toBe('/lightning/r/Contact/003000000000001AAA/view');
     expect(element.shadowRoot.querySelector('[data-id="fix"]')).toBeNull();
+
+    // Outside a console the browser follows the link as it always did.
+    const outside = new MouseEvent('click', { bubbles: true, cancelable: true });
+    links[0].dispatchEvent(outside);
+    await flush();
+    expect(outside.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+
+    // In a console the record opens as a subtab and the report stays where it was.
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    EnclosingTabId.emit('tab0');
+    await flush();
+    const inside = new MouseEvent('click', { bubbles: true, cancelable: true });
+    links[1].dispatchEvent(inside);
+    await flush();
+    expect(inside.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', {
+      url: '/lightning/r/Contact/003000000000002AAA/view',
+      focus: true
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('opens a finding record the usual way when the console refuses a subtab', async () => {
+    openSubtab.mockRejectedValueOnce(new Error('no workspace'));
+    getReport.mockResolvedValue(
+      agentforceReport({
+        findings: [
+          {
+            key: 'people_without_household',
+            title: '1 person is not in a household',
+            severity: 'Warning',
+            category: 'Settings',
+            links: [{ label: 'Ann Lee', url: '/lightning/r/Contact/003000000000001AAA/view' }]
+          }
+        ]
+      })
+    );
+    const element = createPanel();
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    element.shadowRoot
+      .querySelector('[data-id="finding-link"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flush();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__webPage',
+      attributes: { url: '/lightning/r/Contact/003000000000001AAA/view' }
+    });
   });
 
   it('navigates to a relative URL fix', async () => {
@@ -410,7 +455,7 @@ describe('c-health-check-panel', () => {
     errorLog.click();
     await flush();
 
-    expect(confirmBox(element)).toBeNull();
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__webPage',
       attributes: { url: '/lightning/o/Error_Log__c/list' }
@@ -498,5 +543,74 @@ describe('c-health-check-panel', () => {
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
     expect(error.textContent).toBe('Health Check could not read your org.');
+  });
+
+  describe('with the last result first, as on BarnCRM Home (ADMIN-7)', () => {
+    function createHomePanel() {
+      const element = createElement('c-health-check-panel', { is: HealthCheckPanel });
+      element.lastResultFirst = true;
+      document.body.appendChild(element);
+      return element;
+    }
+
+    it('shows the last result without running any check', async () => {
+      getLastRun.mockResolvedValue({
+        ranAt: '2026-10-13T14:05:00.000Z',
+        result: '1 to fix, 2 to be aware of, 3 for your information.',
+        errors: 1,
+        warnings: 2,
+        infos: 3
+      });
+      const element = createHomePanel();
+      await flush();
+
+      expect(getReport).not.toHaveBeenCalled();
+      expect(element.shadowRoot.querySelector('[data-id="last-result"]').textContent).toBe(
+        '1 to fix, 2 to be aware of, 3 for your information.'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="last-run-at"]').value).toBe(
+        '2026-10-13T14:05:00.000Z'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
+        'c.Core_HealthCheck_RunNowButton'
+      );
+    });
+
+    it('says when Health Check has never run', async () => {
+      getLastRun.mockResolvedValue({ ranAt: null, result: null });
+      const element = createHomePanel();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="never-run"]')).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="last-result"]')).toBeNull();
+    });
+
+    it('runs every check on Run now and shows the full report in place', async () => {
+      getLastRun.mockResolvedValue({ ranAt: null, result: null });
+      getReport.mockResolvedValue(agentforceReport());
+      const element = createHomePanel();
+      await flush();
+
+      element.shadowRoot.querySelector('[data-id="rerun"]').click();
+      await flush();
+
+      expect(getReport).toHaveBeenCalledTimes(1);
+      expect(element.shadowRoot.querySelector('[data-id="last-run"]')).toBeNull();
+      expect(element.shadowRoot.querySelectorAll('[data-id="finding"]').length).toBe(6);
+      expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
+        'c.Core_HealthCheck_RerunButton'
+      );
+    });
+
+    it('shows the message when the last result cannot be read', async () => {
+      getLastRun.mockRejectedValue({ body: { message: 'Health Check could not read your org.' } });
+      const element = createHomePanel();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+        'Health Check could not read your org.'
+      );
+      expect(getReport).not.toHaveBeenCalled();
+    });
   });
 });

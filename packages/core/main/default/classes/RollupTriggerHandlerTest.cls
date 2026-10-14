@@ -5,8 +5,16 @@
  * as `RollupEngineTest` does. Account is not registered for real time, so the handler is called
  * directly with the records in front of it, as a registered trigger would.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupTriggerHandler')
 private class RollupTriggerHandlerTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(
             Name = 'Child organization count',
@@ -88,6 +96,84 @@ private class RollupTriggerHandlerTest {
     }
 
     /**
+     * ROLLUPS-1: a handler earlier in the save updates the record being inserted (a gift linked
+     * to its installment), so the rollup handler sees that nested update first. The update must
+     * not use up the insert: the insert is the event that moves the totals.
+     */
+    @IsTest
+    static void aNestedUpdateDoesNotSkipTheInsertItIsPartOf() {
+        System.runAs(TestUsers.admin()) {
+            insert childCount();
+            Account parent = organization('Parent', null);
+            insert parent;
+            Account child = organization('Child', parent.Id);
+            insert child;
+
+            TriggerHandler.clearRunClaims();
+            Account renamed = child.clone(true);
+            renamed.Name = 'Child, renamed';
+            TriggerHandler.testNew = new List<SObject>{ renamed };
+            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => child };
+            RollupTriggerHandler handler = new RollupTriggerHandler();
+
+            Test.startTest();
+            handler.afterUpdate();
+            System.Assert.isNull(
+                countOn(parent.Id),
+                'The nested update changed nothing a rollup reads, so it marked nothing'
+            );
+            TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.testOldMap = null;
+            handler.afterInsert();
+            Test.stopTest();
+
+            System.Assert.areEqual(
+                1,
+                countOn(parent.Id),
+                'The insert still ran after the nested update of the same record'
+            );
+        }
+    }
+
+    /** Every update is its own change: a second update of a record in one transaction runs. */
+    @IsTest
+    static void aSecondUpdateOfTheSameRecordStillRuns() {
+        System.runAs(TestUsers.admin()) {
+            insert childCount();
+            Account first = organization('First parent', null);
+            Account second = organization('Second parent', null);
+            insert new List<Account>{ first, second };
+            Account child = organization('Child', null);
+            insert child;
+
+            TriggerHandler.clearRunClaims();
+            RollupTriggerHandler handler = new RollupTriggerHandler();
+            Account underFirst = child.clone(true);
+            underFirst.ParentId = first.Id;
+            Account underSecond = child.clone(true);
+            underSecond.ParentId = second.Id;
+
+            Test.startTest();
+            update underFirst;
+            TriggerHandler.testNew = new List<SObject>{ underFirst };
+            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => child };
+            handler.afterUpdate();
+            update underSecond;
+            TriggerHandler.testNew = new List<SObject>{ underSecond };
+            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => underFirst };
+            handler.afterUpdate();
+            Test.stopTest();
+
+            Integer leftBehind = countOn(first.Id);
+            System.Assert.isTrue(
+                leftBehind == null || leftBehind == 0,
+                'The child moved away again, so the first parent counts nothing'
+            );
+            System.Assert.areEqual(1, countOn(second.Id), 'And the second move was counted');
+        }
+    }
+
+    /**
      * A definition asking for a SUM with nothing to sum cannot be planned, so the engine refuses
      * it. Two things have to be true afterwards: the save went through, and Maria can find out
      * why the number did not move.
@@ -140,7 +226,7 @@ private class RollupTriggerHandlerTest {
                 'So the entry can be grouped by what it is about'
             );
             System.Assert.areEqual(
-                Label.Core_ErrorLog_UnexpectedFailure,
+                ErrorLogger.friendlyMessage('RollupPlanner.plan'),
                 logged[0].Message__c,
                 'What Maria reads is plain language'
             );

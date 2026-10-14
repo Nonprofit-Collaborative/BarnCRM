@@ -7,8 +7,13 @@
  * assertion here is unverified. They are written to the same standard as if they had run, and
  * the first person with a scratch org should run them before trusting the feature.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AffiliationMaintenanceHandler, ApexClass:AffiliationValidationHandler')
 private class AffiliationHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String MAINTENANCE = 'Affiliation_Primary';
     private static final String VALIDATION = 'Affiliation_Validation';
 

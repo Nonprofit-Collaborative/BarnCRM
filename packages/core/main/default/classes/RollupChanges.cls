@@ -17,9 +17,8 @@
  * too little leaves a total wrong until the nightly run. So the collector marks every alternative
  * of a path, not only the one that resolves.
  *
- * Paths are resolved here, not by `RollupPath.resolveTargets`, which keys its answer by record id
- * and so cannot hold the old and the new version of one record: a soft credit moved to another
- * person used to leave the household it left unmarked.
+ * Paths are resolved here from both the old and the new version of each record, so a soft credit
+ * moved to another person marks the household it left as well as the one it joined.
  *
  * DOCUMENTED EXCEPTION to user mode reads (plan Section 4.13): a path walked beyond its first
  * reference is read in system mode and without sharing, for the reason `RollupAggregator` gives.
@@ -27,15 +26,22 @@
 public without sharing class RollupChanges {
     private static final String LOG_CONTEXT = 'RollupChanges';
 
-    /** Target records marked for recalculation, by target entity. */
+    /**
+     * Target records marked for recalculation, by target entity, and the definitions that marked
+     * them: a save recalculates only those (ADR-0099
+     * `0099-rollups-recalculate-only-what-a-save-changed.md`).
+     */
     public class Marked {
         public Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+        public Map<String, Map<Id, Rollup_Definition__c>> definitionsByTarget = new Map<String, Map<Id, Rollup_Definition__c>>();
 
-        public void add(String targetObject, Set<Id> ids) {
-            if (String.isBlank(targetObject) || ids == null) {
+        /** Marks these records of the definition's target entity, for that definition. */
+        public void add(Rollup_Definition__c definition, Set<Id> ids) {
+            if (definition == null || String.isBlank(definition.Target_Object__c) || ids == null) {
                 return;
             }
-            String key = targetObject.toLowerCase();
+            String key = definition.Target_Object__c.toLowerCase();
+            Boolean added = false;
             for (Id recordId : ids) {
                 if (recordId == null) {
                     continue;
@@ -44,13 +50,43 @@ public without sharing class RollupChanges {
                     this.idsByTarget.put(key, new Set<Id>());
                 }
                 this.idsByTarget.get(key).add(recordId);
+                added = true;
+            }
+            if (added) {
+                if (!this.definitionsByTarget.containsKey(key)) {
+                    this.definitionsByTarget.put(key, new Map<Id, Rollup_Definition__c>());
+                }
+                this.definitionsByTarget.get(key).put(definition.Id, definition);
             }
         }
 
         public void addAll(Marked other) {
             for (String targetObject : other.idsByTarget.keySet()) {
-                this.add(targetObject, other.idsByTarget.get(targetObject));
+                Map<Id, Rollup_Definition__c> definitions = other.definitionsByTarget.get(
+                    targetObject
+                );
+                for (
+                    Rollup_Definition__c definition : definitions == null
+                        ? new List<Rollup_Definition__c>()
+                        : definitions.values()
+                ) {
+                    this.add(definition, other.idsByTarget.get(targetObject));
+                }
             }
+        }
+
+        /**
+         * The definitions that marked records of this target entity, or null when one of them
+         * has no record id and so cannot be named: then every definition on the entity runs.
+         */
+        public List<Rollup_Definition__c> definitionsFor(String targetObject) {
+            Map<Id, Rollup_Definition__c> definitions = String.isBlank(targetObject)
+                ? null
+                : this.definitionsByTarget.get(targetObject.toLowerCase());
+            if (definitions == null || definitions.isEmpty() || definitions.containsKey(null)) {
+                return null;
+            }
+            return definitions.values();
         }
 
         public Integer size() {
@@ -105,8 +141,8 @@ public without sharing class RollupChanges {
                     }
                 }
             }
-            marked.add(definition.Target_Object__c, targetsOf(path, changedType, touched));
-            marked.add(definition.Target_Object__c, targetsOf(path, changedType, before));
+            marked.add(definition, targetsOf(path, changedType, touched));
+            marked.add(definition, targetsOf(path, changedType, before));
         }
         if (oldRecords != null || restored == true) {
             RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
@@ -137,7 +173,7 @@ public without sharing class RollupChanges {
         for (Rollup_Definition__c definition : definitions) {
             RollupPath.Parsed path = pathOf(definition);
             if (path != null && changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
-                marked.add(definition.Target_Object__c, targetsOf(path, changedType, records));
+                marked.add(definition, targetsOf(path, changedType, records));
             }
         }
         HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(
@@ -176,7 +212,7 @@ public without sharing class RollupChanges {
             for (RollupPath.Branch branch : path.branches) {
                 String token = tokenOf(branch);
                 if (token == RollupPath.TOKEN_HOUSEHOLD) {
-                    marked.add(definition.Target_Object__c, change.householdIds);
+                    marked.add(definition, change.householdIds);
                 } else if (token == RollupPath.TOKEN_HOUSEHOLD_MEMBERS) {
                     if (people == null) {
                         people = new Set<Id>(change.personIds);
@@ -189,7 +225,7 @@ public without sharing class RollupChanges {
                             people.addAll(members);
                         }
                     }
-                    marked.add(definition.Target_Object__c, people);
+                    marked.add(definition, people);
                 }
             }
         }

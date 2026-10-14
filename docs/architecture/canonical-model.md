@@ -151,6 +151,8 @@ no Account creates a Household Account named per the naming rules, in the same
 transaction, and attaches the Contact to it. This is controlled by the
 `Auto_Create_Households__c` setting, default on. Bulk safety is required: 200 Contacts
 inserted in one DML operation create their households without exceeding platform limits.
+The person a household is created for is named its Primary Contact (R-H10), as junction
+mode marks them the primary member.
 
 **R-H2 Automatic creation in junction mode.** In junction mode, saving a new person who
 belongs to no household creates a Household Account named per the naming rules and a
@@ -161,6 +163,11 @@ or, in an org shaped that way, as a person record on Account: both take this pat
 person a Household Member record already joins to a household is left alone. Bulk safety
 is required here too: 200 people inserted in one DML operation get their households and
 their membership records without exceeding platform limits.
+
+A Contact inserted in junction mode with its Account set to a household joins that
+household: one Household Member record is created for it, as an ordinary member, and
+automatic creation then leaves it alone. An Account that is an organization (an employer,
+in this mode) or a native Nonprofit Cloud household gets no membership record.
 
 This rule previously said that a person stored as an account got no household unless a
 second setting asked for it. ADR-0037 retires that setting and records why.
@@ -228,7 +235,10 @@ flags are independent.
 must be a current member of the household. When the primary contact leaves the
 household, the reference is cleared and the next member by ordering is proposed, not
 silently assigned. In contact mode that is the Primary Contact field itself; in junction
-mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3).
+mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3). In
+contact mode, setting or changing Primary Contact to a Contact whose Account is not that
+household is refused before save; clearing it, or saving a household whose primary has
+since left, is never refused.
 
 **R-H11 Member count.** Member Count is recomputed on every membership change (insert,
 update, delete, undelete, reparent, merge) and counts current members only. The field
@@ -272,6 +282,10 @@ membership rows reads as empty here while being anything but. The account is the
 that group, so deleting the account would destroy it rather than orphan it. A household
 left in place for that reason is reported to the Error Log at Info severity, naming the
 household: it is a correct outcome, not a failure.
+
+Deleting people never deletes their household; moving them still tidies it as above. Deleting
+a household purges from the Recycle Bin the contacts and membership rows already deleted from
+it, so neither an undelete nor the bulk delete undo (R-BD5) could bring the people back.
 
 **R-H13 Merge and split.** Two households can be merged (members move to the surviving
 household, rollups recalculate, names and greetings recompute unless Custom Name is set)
@@ -374,8 +388,13 @@ contact mirrors the primary member).
   Account accepts a person contact (verified in a person accounts org on 2026-09-23). The
   person contact is read only through dynamic Apex and only where the org has Person
   Accounts, so the model keeps no dependency on them.
-- With no current primary member, Primary Contact is empty (R-H10). With more than one,
-  which only a data load can produce, the first of them in R-H5 order is mirrored and no
+- With no current primary member, Primary Contact is empty (R-H10).
+- A save of one Household Member record, made by a person, that would make it a second
+  current primary member of its household is refused before the save (label
+  `Core_Households_ErrorSecondPrimary`), pointing to Make primary. A save of more than one
+  record, or one arriving through the APIs, the Bulk API or background Apex, is a load and
+  is not refused (ADR-0108, `0108-a-second-primary-is-refused-on-a-single-save.md`): with
+  more than one current primary, the first of them in R-H5 order is mirrored and no
   membership row is changed.
 - `HouseholdService` is the only writer in junction mode. It settles the mirror on every
   membership change (a row added, changed, ended, removed or restored, a person deleted or
@@ -388,6 +407,12 @@ contact mirrors the primary member).
 - A membership whose End Date is in the future stops being current on that date with no
   save to react to; the mirror follows at that household's next membership change, as
   Member Count does (R-H11).
+- **A person's household** in junction mode, wherever one household has to be named for a
+  person (rollups to the person's household, imports, addresses, donation matching),
+  is the household of their current primary membership, and with none, of their earliest
+  current membership: earliest Start Date, a membership with no Start Date counting as
+  earliest, then the row created first. Where a person is primary in more than one, the
+  earliest of those is the answer. A person with any current membership always has one.
 
 **R-M4 Person representation.** Exactly one of Contact or Account identifies the person:
 Contact where the person is a Contact, the person's own Person Account where Person
@@ -404,8 +429,22 @@ person it is history of. Rules R-M2 and R-H11 already ignore a row that identifi
 so a row orphaned before this was so, or by a deletion made with the automation switched
 off, is counted by nothing and named in nothing; it is simply left.
 
+The validation rule `Membership_Names_One_Person` enforces this on every save that creates
+a row or changes who it names, whoever makes it. It does not fire on other edits, so a row
+the platform emptied can still be ended or corrected.
+
 **R-M5 No direct callers.** All reads and writes go through `HouseholdService`. Feature
 code never branches on membership mode.
+
+**R-M6 One current membership per person per household.** A person has at most one
+current membership (R-M2) in a given household; ended ones beside it are history and are
+kept. A save that would make a second one (a new current row, or an edit that changes the
+person or the household on a row, or brings an ended row back) is refused before it is
+written, so a hand-made or loaded row cannot count one person twice. The check runs in the
+Household Member trigger, reads in system mode (ADR-0021), and is stood down with that
+trigger's automation; `HouseholdService` already never writes a second one. An edit that
+does none of those things is let through, so a duplicate left by a platform merge, which
+fires no trigger, can still be ended.
 
 ### Salesforce implementation
 
@@ -648,6 +687,11 @@ found nothing moves the covered window on, and a run that could not send leaves 
 was, so no entry is counted twice or dropped. A run reads at most the newest 2,000 entries
 and says "more than 2,000" beyond that, so a flooded Error Log cannot stop the digest. A
 digest that is scheduled but has not run for two days is a Health Check warning (ADR-0055).
+**R-E6 Entries are kept for a set time.** Each run of the daily Error Log job (the digest's)
+first starts a batch that deletes every entry, whatever its Status, created more than
+`Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
+package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
+setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 
 ### Salesforce implementation
 
@@ -843,7 +887,9 @@ assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 |---|---|---|---|
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
+| `Import_Trial_Rows__c` | integer | 25 | How many of a file's first rows a trial import commits before the rest (R-IB16); the wizard starts from it and the administrator can change it per file. Held between 1 and 2,000. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
 separated set of keys within 255 characters, which the eight step checklist fits with
@@ -898,6 +944,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
+| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the daily Error Log job deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
 
 ### v0.7 keys
 
@@ -909,6 +956,8 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
+| `Import_Row_Retention_Days__c` | integer | 90 | How many days after an import finished its staged rows are kept before the nightly Import row cleanup removes them (R-IR5, D-40). From 1 to 3650; 0 keeps them for ever; empty reads as 90, over 3650 as 3650. |
+| `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
 
@@ -921,15 +970,41 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 ### Field utilization keys
 
-Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-0086
-`0086-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
-scheduling its job from the console (ADR-0038), so it has no on and off key.
+None. ADR-0086 added three (`Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c`,
+`Field_Utilization_Last_Run_Summary__c`); ADR-0101 `0101-field-utilization-on-demand.md`
+removed them when the count moved to Org Optimizer and runs on demand (Section 29F).
+
+### Job notification key
+
+Added by the Core quality pass (Q-04). The notification itself is the platform's custom
+notification, type `BarnCRM_Job_Finished`, sent by `JobNotifier`; nothing about it is stored on
+a BarnCRM record.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Field_Utilization_Objects__c` | text (255) | empty | The API names of the objects the field utilization count covers, separated by commas, each checked against describe when saved and again when counted. Empty counts nothing. Written from the Field Utilization page only, with Manage BarnCRM Settings, and audited. |
-| `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
-| `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
+| `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
+
+### Org Optimizer keys
+
+Added by Org Optimizer (ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`). Shown in
+the console's General section. Each number has a minimum and a maximum (D-40); a value out of
+range reads as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
+| `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
+| `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
+
+### Health Check keys
+
+Added by ADMIN-7 (ADR-0106 `0106-health-check-on-home-shows-the-last-result.md`). BarnCRM Home
+shows the last full Health Check result instead of running every check on each load.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
+| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. |
 
 ### Rules
 
@@ -938,9 +1013,11 @@ subscriber Setup as editable configuration) and hierarchical, so the org-level v
 are what packaged code reads.
 **R-N2 Written from the app.** Values are written synchronously by Apex from the
 settings console, never by asking the admin to open Setup (plan Section 2.3).
-**R-N3 Cache invalidation.** Values are cached in Platform Cache and the cache is
-invalidated on write, so a change takes effect on the next transaction and never appears
-stale beyond ten seconds (C-03 acceptance criterion).
+**R-N3 Cache invalidation.** Values are read with `getOrgDefaults()`, which the platform
+serves from its own custom settings cache and refreshes when a save commits, and are held in
+a per-transaction static that every write clears. So a change takes effect on the next
+transaction and never appears stale beyond ten seconds (C-03 acceptance criterion). Core
+ships no Platform Cache partition (ADR-0094).
 **R-N4 Audited.** Every write produces a Setting Change record (Section 11).
 **R-N5 Extension procedure.** A feature that needs a new key adds a row to the table
 above in the same pull request that adds the field, with its default and its one-line
@@ -1037,6 +1114,8 @@ settings to the console by shipping rows rather than by editing the console.
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
 | `Sort_Order__c` | number | The order of this row inside its section. |
+| `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
+| `Max_Value__c` | number(18, 2) | Number rows only: the highest value accepted, enforced the same way. Every shipped Number row sets it. |
 
 ### Automation Registry
 
@@ -1325,9 +1404,14 @@ Windows are never stored on the definition, so changing the fiscal year start mo
 recalculating is enough to correct every fiscal rollup in the org.
 
 **R-R4 Modes.** Real-time (shown as Instantly) keeps the number current as source records
-change: a normal save updates the totals in the same save, and a bulk change (an import, a
-data loader run, a large update, or any save that is already running in the background) is
-queued (Section 14A) and finishes within minutes. Scheduled (shown as Every night)
+change. By default a save marks the target records (R-R11), writes them to the Rollup Queue
+(Section 14A) and returns, and the queue recalculates them just after the save, usually within
+a minute; a bulk change (an import, a data loader run, a large update) goes the same way and
+finishes within minutes (ADR-0098
+`0098-real-time-rollups-recalculated-just-after-the-save.md`). With
+`Rollup_Processing__c` set to In_Save (Section 12), a normal save recalculates in the same save
+instead, when the queries it is planned to spend fit what the transaction has left; a bulk
+change, a save already running in the background, or one without the room is queued. Scheduled (shown as Every night)
 recalculates in the nightly full run. Both (shown as Both (recommended)) does the first and
 reconciles with the second, so the nightly run is the safety net for anything the first
 missed; it is the mode the packaged giving definitions ship with, because it is the
@@ -1335,7 +1419,7 @@ combination that keeps the numbers visibly right (Principle 2). Real-time needs 
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
 
-One exception to "in the same save": a merge (of people, Section 29A, or of households,
+A merge has its own path, whichever `Rollup_Processing__c` says (of people, Section 29A, or of households,
 R-H13).
 The platform refuses a trigger's write to a record while it is in a merge, so the
 survivors' real-time totals are recalculated just after the merge is saved, by a small
@@ -1412,9 +1496,12 @@ as `Gift__r.Status__c`). A changed path marks both the old and the new target; a
 marks the old target, including when a parent record is deleted and its source records go
 with it, which fires no trigger on them (deleting a gift removes its allocations, so the
 gift's delete marks their funds); an undelete marks the target again. A person who changes
-household marks both households, in both membership modes. All active definitions on one
-target entity are calculated together, one write per target record, and a value that did
-not change is not written.
+household marks both households, in both membership modes. A save recalculates only the
+definitions that marked a target, never every definition on its entity (ADR-0099
+`0099-rollups-recalculate-only-what-a-save-changed.md`); a full run calculates every
+definition it covers. The definitions one calculation runs on one target entity are
+calculated together, one write per target record, and a value that did not change is not
+written.
 
 **R-R12 Where real time comes from.** Each package ships the trigger registration for its
 own source entities (Automation Registry, Section 13). An administrator's own entity has no
@@ -1541,8 +1628,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   system mode (R-RQ4, R-RQ5).
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
-  apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
-  comparison `RollupEngineComparison` makes before they are deleted). That core is
+  the vendored apex-rollup tree, `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` were
+  deleted in slice S9). That core is
   `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
   `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
   `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
@@ -1577,6 +1664,7 @@ failure list and retry.
 | Target Entity | text | yes | The entity whose records are listed, for example Account or Fund. |
 | Record Ids | long text | yes | The identifiers of the target records to recalculate, at most 200, held as text (R-RQ2). |
 | Record Count | integer | yes | How many identifiers Record Ids holds, so "records waiting" is a sum rather than a parse. |
+| Definition Ids | long text | no | The identifiers of the Rollup Definitions whose change queued the entry, held as text. Empty means every active definition on the target entity (R-R11). |
 | Status | picklist(Pending, Failed) | yes (defaults Pending) | Pending: waiting for the processor. Failed: tried five times without success; waits for Retry. |
 | Attempts | integer | yes (defaults 0) | How many times the processor has tried these records. |
 | Next Attempt | datetime | no | The earliest time the processor tries these records again after a failure; empty means now. |
@@ -1584,9 +1672,10 @@ failure list and retry.
 
 ### Relationships
 
-- None. Record Ids and Target Entity are text, never references (R-RQ2), and an entry is not
-  tied to a Rollup Definition: it lists records, and every active definition on their target
-  entity is recalculated for them (R-R11).
+- None. Record Ids, Definition Ids and Target Entity are text, never references (R-RQ2). An
+  entry names the definitions that queued it, and only those active ones are recalculated for
+  its records; an entry with no Definition Ids (a full run's hand-off, an entry written before
+  the attribute existed) recalculates every active definition on its target entity (R-R11).
 
 ### Rules
 
@@ -1600,16 +1689,28 @@ Identifiers held as text lock nothing. The cost is that an entry is not reportab
 the Needs attention list resolves the names.
 
 **R-RQ3 How the processor works.** It reads Pending entries whose Next Attempt has passed,
-merges and sorts their identifiers, recalculates a slice (R-R11), and deletes the entries it
+merges and sorts their identifiers, recalculates a slice for the union of the entries'
+definitions (R-R11), and deletes the entries it
 finished. Target records that failed are written back as a new entry with Attempts increased
 and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
 processor runs again while Pending entries remain. A second processor started by accident is
-harmless, because recalculation recomputes (R-R11).
+harmless, because recalculation recomputes (R-R11). A writer starts a processor only when none
+is queued; when it cannot (its job allowance used, or automation paused), the nightly run, the
+end of a pause, Retry and Start now on the Needs attention list start one for the Pending
+entries. A save inside a Queueable job never starts
+the processor: the platform lets a Queueable queue one job, and that job belongs to the running
+job's own next step (the household soft credit recompute, a subscriber's integration). Instead
+the transaction publishes one `Rollup_Queue_Ready__e` (publish after commit, however many
+entries it wrote), and its subscriber calls `RollupService.startQueuedRecalculation`, which
+starts the processor unless one is already waiting (ADR-0100). A job that rolls back publishes
+nothing. If the event cannot be published, the entries wait for the next processor a later save
+starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
 (which deletes it). Each processor and nightly run writes one summary entry to the Error Log
-(Section 9) when anything failed, so the Hub's error tile sees it.
+(Section 9) when anything failed, so the Hub's error tile sees it. Health Check reports Failed
+entries, and Pending entries older than an hour.
 
 **R-RQ5 Written in system mode.** Entries are the engine's own bookkeeping and are written
 under ADR-0021, so a gift saved by a user who cannot see the queue still queues its totals.
@@ -1626,6 +1727,7 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 | Target Entity | `Target_Object__c` | Text (80) |
 | Record Ids | `Record_Ids__c` | Long Text Area |
 | Record Count | `Record_Count__c` | Number (0 decimals) |
+| Definition Ids | `Definition_Ids__c` | Long Text Area |
 | Status | `Status__c` | Picklist: Pending, Failed |
 | Attempts | `Attempts__c` | Number (0 decimals) |
 | Next Attempt | `Next_Attempt__c` | DateTime |
@@ -1633,6 +1735,9 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 
 - **Service:** `RollupQueue`, which writes entries and is the one processor (a Queueable with a
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
+- **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
+  After Commit, published at most once per transaction by a save inside a Queueable job (R-RQ3).
+  `RollupQueueReadyTrigger` subscribes and starts the processor.
 
 ---
 
@@ -1670,9 +1775,11 @@ Maria load the same payment processor export every month without rebuilding the 
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Target Object | text | no | The API name of the one object this template loads, as describe gives it; empty for a template that loads people and organizations (R-IT12). |
-| Load Operation | picklist(Insert, Update by record Id, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
-| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; required then (R-IT12). |
+| Load Operation | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID, Delete by record Id) | no | What a row of a one-object template does; empty means Insert (R-IT12, R-BD7). |
+| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; under Update by a matching field, the API name of the text, email or phone field they are found by; required under both (R-IT12). |
 | Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
+| Related Object | text | no | The API name of the object a one-object template also creates related records of, as describe gives it; empty for none (R-IT17). |
+| Related Parent Field | text | conditional | The API name of the Related Object's lookup field that points at the Target Object; required with a Related Object (R-IT17). |
 
 ### Relationships
 
@@ -1761,8 +1868,15 @@ bookkeeping fields (the import batch tag, the sample data marks, the household f
 household automation writes), and not a field the fixed column list already offers. For people
 it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
 organizations it lists Account fields that are not person account fields. Values are written
-as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
-value with a blank, and a field the user may not write is skipped and named in the run log.
+as the other attributes are (R-IB12): read as the field's type the one way every import reads
+it (ISO or the user's locale for dates and date times, numbers as spreadsheets export them
+in the user's locale, with currency symbols or codes, grouping marks and a minus sign or
+accounting brackets for a negative, refusing a value whose decimal mark cannot be told, times), never
+clearing a stored value with a blank, and a field the user may not write is skipped and named in
+the run log. A value the field cannot take (unreadable, or text longer than the field) rejects
+the row with the field and value named, as a one-object load does (R-IT12). A matched record
+counts as changed only where a value differs as the field holds it (numbers as numbers, dates as
+dates) and text exactly: a correction of capitals is a change.
 A checkbox reads `true`, `yes`, `y`, `1`, `x`, `checked`, `on` or `t` as ticked and `false`,
 `no`, `n`, `0`, `off` or `f` as cleared, ignoring case and surrounding spaces; one reading
 serves every import, people and one-object alike. Any other value is never read as cleared: a
@@ -1779,11 +1893,18 @@ in every chunk. Load Operation decides what a row does:
 - **Update by record Id** changes the record named by the row's `Record.Id`. An ID that is not
   a valid ID of the target object, or names no record the user can see, rejects the row, and
   nothing is created for it.
+- **Update by a matching field** changes the record whose Load Match Field (any text, email or
+  phone field of the object that the user may read and filter on) holds the row's value,
+  compared ignoring case. A row with no value in the field, or whose value no record holds, is
+  rejected, and nothing is created for it. A value several records hold follows Several Matches
+  (R-IT9). The field is subject to the large object guard (R-IT13).
 - **Upsert by external ID** finds the record whose Load Match Field (a field the object marks
   External ID, holding text or an email, that the user may read) holds the row's value,
   compared ignoring case; it changes that record, or creates one when none holds the value. A
   row with no value in the field is rejected. A value several records hold follows Several
   Matches (R-IT9).
+- **Delete by record Id** deletes the record named by the row's `Record.Id`, through the bulk
+  delete job rather than the loader's save (R-BD7).
 
 The loader reads the existing records itself, in user mode, and never calls the platform's
 upsert, so the dry run decides exactly as the commit will and the journal holds each value
@@ -1791,22 +1912,29 @@ before. An update writes only the values that differ from the record's, and a ro
 nothing is Matched. A value its field cannot take (a date or number that cannot be read, a
 checkbox value that is neither ticked nor cleared under R-IT11, text longer than the field) rejects the row, naming
 the field and the value, because a row is one record. A row naming the same record as an
-earlier row of the file (the same ID or upsert value) is rejected wherever the file's chunks
+earlier row of the file (the same ID or Load Match Field value) is rejected wherever the file's chunks
 fall, through a digest in its Processor Key (Section 17). Under Match only (R-IB15) a row that
 would create a record is rejected. A value for every row of the file (R-IB14) may not be the
 record ID or the Load Match Field. Each row's resulting record is written to its Resulting
 Record. A row a save refuses carries the platform's words. Account and Contact load by Update
-by record Id only (R-IT14).
+by record Id or Update by a matching field only (R-IT14).
 
 **R-IT13 Lookup columns.** A column mapped to a lookup field of the target object names its
 parent by the column's `lookupField` (R-IT1): the record ID when it is empty or `Id`, or else
-the parent's name field or one of the parent's External ID or Unique fields that holds text or
-an email and that the user may read. A lookup that can point at more than one object is read by
-record ID only. Parents are found in user mode, one query per column and chunk, and a parent the
-user cannot see is not found. When none is found, Lookup Not Found decides: Reject the row (the
-default), naming the column and the value, or Leave it empty, loading the rest of the row and
-saying once in the run log that lookups were left empty. A value that finds several parents
-follows Several Matches (R-IT9) and ticks the row's Several Matches.
+the parent's name field or any of the parent's text, email or phone fields that the user may
+read and filter on, compared ignoring case and surrounding spaces. A lookup that can point at
+more than one object is read by record ID only. Parents are found in user mode, one query per
+column and chunk, and a parent the user cannot see is not found. When none is found, Lookup Not
+Found decides: Reject the row (the default), naming the column and the value, or Leave it empty,
+loading the rest of the row and saying once in the run log that lookups were left empty. A value
+that finds several parents follows Several Matches (R-IT9) and ticks the row's Several Matches.
+
+The large object guard: a field the platform indexes (the record ID, the name field, a field
+marked External ID or Unique, and a standard Email field) may always be matched on. Any other
+field a lookup or the template's record key names is matched only when its object holds at most
+100,000 records the user can see, counted in user mode with a capped count, once per object per
+transaction; above that the template is refused (dry run and every chunk alike), naming the
+field and the object, because an unindexed search of a large object is slow and can time out.
 
 **R-IT14 What a load may write.** An object may be loaded only when all of these hold, decided
 from describe at run time, so a new object is judged without a code change:
@@ -1826,10 +1954,11 @@ from describe at run time, so a new object is judged without a code change:
    names through the data protection seam (`DataProtectionExtension`; Giving names receipts,
    receipt runs, receipt number sequences, acknowledgments and acknowledgment runs).
 5. The user can read it and query it, and can create records of it for Insert, edit them for
-   Update, or both for Upsert.
+   either Update, or both for Upsert.
 
-Account and Contact may be loaded only by Update by record Id: people, households and
-organizations are created by a people template, which builds households (R-IR1a).
+Account and Contact may be loaded only by Update by record Id or Update by a matching field: people, households and
+organizations are created by a people template, which builds households (R-IR1a). Delete by
+record Id (R-BD7) is not a load and follows the bulk delete's rules instead.
 
 These fields are never written, whatever the file holds: the fields the platform keeps (Id,
 created and modified stamps, system mod stamp, last activity, viewed and referenced dates),
@@ -1840,6 +1969,40 @@ count, custom name, household role, primary contact, primary affiliation), and a
 Name. A column mapped to one is
 named once in the run log and skipped; so is a field the user may not create or edit, asked of
 describe for each row according to whether it creates or updates.
+
+**R-IT17 Related records in the same file.** A one-object template with a Related Object and a
+Related Parent Field (ADR-0111, `0111-load-related-records.md`) also creates records of the
+Related Object from the same rows. Its columns are mapped to `Related.<field API name>`, with
+the same lookups (R-IT13), value reading, access and never-written rules as `Record` columns
+(R-IT12, R-IT14); a column mapped to the Related Parent Field is skipped, because the load fills
+it. The Related Object must be one a load may create (R-IT14, Account and Contact never), the
+field a lookup or master-detail of it pointing at the Target Object only, which the user may
+create; else the template is refused, as is Insert, since the parent key must be a stored
+field:
+
+- **Parent key.** The row's record key (R-IT12): its record ID under Update by record Id, its
+  Load Match Field value under the other two operations. The first row of the pass with a key is
+  the parent row and loads its `Record` columns; a later row with the same key (by digest,
+  wherever the chunks fall) adds a related record to that parent and its `Record` columns are
+  not loaded, instead of being rejected as a repeat.
+- **Order.** In each chunk the parents are found and saved first, then the related records are
+  created, each with the Related Parent Field set to its parent. A parent row is always the
+  earliest row of its key, so it is in the same chunk as its related rows or an earlier one. A
+  later chunk finds an earlier chunk's parent by its key in user mode, under the template's
+  Several Matches (R-IT9).
+- **Partial failure.** A parent row's Processor Key holds a digest that says whether its
+  parent was saved. A related row whose parent row was rejected is rejected with "parent
+  failed", and nothing is created for it. A related record the platform refuses rejects its
+  row; the parent stays. A row without a key is rejected (R-IT12). Under Match only (R-IB15) a
+  related record, which always creates, rejects its row.
+- **Results.** A row's Status is its parent's outcome (Matched for a later row of the key),
+  unless the row was rejected for its parent or its related record; its Related Status says
+  what its related record did or would do; its Second Resulting Record holds the related
+  record. The run log counts the related records created and rejected.
+- **Undo.** Each chunk journals its related records on Created pages written after its parents'
+  pages, so the undo's Created pass (newest page first) deletes related records before the
+  parents they point at; a related record made by the commit never counts as something its
+  parent gained (R-IB9).
 
 **R-IT15 Changing a column's values (the transform document).** A column of the mapping
 document may carry `"transforms"`, an ordered list of at most 10 steps that change the
@@ -1859,6 +2022,16 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
 | `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
 | `date` | `dateOrder`: `MDY`, `DMY` or `YMD` | Reads the first three numbers, separated by any characters that are not digits, in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+| `map` | `pairs`: 1 to 100 of `{ "text", "value" }` (`text` required, each at most 255), `otherwise` (at most 255), `matchCase` (default false) | The `value` of the first pair whose `text` equals the trimmed value; an unmatched value that is not blank becomes `otherwise` when it is not blank, and is kept otherwise. A blank value stays blank. |
+| `ifThen` | `test`: `equals`, `contains` or `blank`; `text` (required unless `blank`, at most 255), `value` (at most 255, empty clears), `otherwise` (at most 255), `matchCase` | When the trimmed value equals `text`, contains it, or is blank, the value becomes `value`; when not, it becomes `otherwise` if that is not blank, and is kept otherwise. Only the value so far is tested, never another column. |
+| `part` | `separator` (required, 1 to 10), `position` (1 to 50), `fromEnd` (default false) | Splits the value on the literal separator and keeps part `position`, counted from the start or the end, trimmed; blank when there is no such part. |
+| `first`, `last` | `count` (1 to 255) | The first or last `count` characters; a shorter value is kept whole. |
+| `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
+| `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
+
+The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
+whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
+update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
@@ -1890,6 +2063,26 @@ alone and the run log says so; nothing is rejected for it. A matcher failure is 
 Error Log only when a rule was known to be active. Duplicate rules are not asked for a
 one-object template.
 
+**R-IT18 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
+`"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,
+`contains` or `blank` (`text` required unless `blank`, at most 255), and `"uniqueBy"`, at most
+5 column names (ADR-0113, `0113-import-row-rules.md`). Both read a row's cells as uploaded,
+before any column change (R-IT15), trimmed and ignoring capitals. When a page of the file is
+staged, a row any rule matches, and a row whose `uniqueBy` cells (not all empty) equal an
+earlier row's, is staged with Status Skipped and the reason in Error Message; every other row
+with a key keeps the key's digest in Row Key, which later pages look up. No pass reads a
+Skipped row, so the dry run and the commit see the same rows, and the run log counts them. A
+mapping whose rules are incomplete or too many is refused on save; a stored one that fails the
+check skips nothing.
+
+**R-IT19 An empty cell that clears.** A `Record` column (R-IT12) may carry `"blankClears":
+true`. Under Update or Upsert, when that column's cell is empty after values for every row
+(R-IB14) have filled blanks, the record's field is cleared if it holds a value: an ordinary
+change, compared, journaled with the value before (R-IJ3) and put back by undo. A record the
+load creates is not affected. A required field or a checkbox is never cleared, and the run log
+names it once. The run log counts the values cleared, or that a commit would clear in a dry
+run. A people template ignores `blankClears`: a blank never clears a field there.
+
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
 override it per template, and the processor resolves the person references in R-IR1
@@ -1903,8 +2096,11 @@ contact custom field's `__pc` form, and otherwise the account field of the same 
 and never named in the source (Section 4.2 of the plan, ADR-0013).
 
 **R-IT4 Upgrade safety.** Templates with Is Package Default true are materialized from
-`Import_Template_Default__mdt` on install and on "Restore defaults", matched by Template
-Key, and are never overwritten once the admin has edited them (ADR-0006).
+`Import_Template_Default__mdt` on install, on every upgrade (each package's post-install
+script adds the templates it ships, D-41) and on "Restore defaults", matched by Template
+Key, and are never overwritten once the admin has edited them (ADR-0006). A shipped template
+the admin deleted is added again by the next upgrade; switching it off keeps it out of the
+list.
 
 **R-IT6 Recurring sources are shown, not fetched.** A template the administrator marks Is
 Recurring names its feed in Source Name, for example "Monthly processor export", and Source
@@ -1978,9 +2174,11 @@ from Nonprofit Cloud", section 5).
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 | Target Object | `Target_Object__c` | Text (255) |
-| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Upsert by external ID |
+| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Update by a matching field, Upsert by external ID, Delete by record Id |
 | Load Match Field | `Load_Match_Field__c` | Text (255) |
 | Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
+| Related Object | `Related_Object__c` | Text (255) |
+| Related Parent Field | `Related_Parent_Field__c` | Text (255) |
 
 - **Shipped defaults:** `Import_Template_Default__mdt` (Section 13).
 - **Service:** `ImportTemplateService` (materialization and save), `ImportTemplateSelector`,
@@ -2006,15 +2204,21 @@ changes, and what happened). An import is the unit an administrator dry-runs, co
 v0.5 undoes; a bulk update is committed when it starts and is undone the same way
 (plan Section 4.9, ADR-0047).
 
+Labels (ADR-0047): the object reads **Data Job** (plural **Data Jobs**, record name **Job
+Number**) and the lookups to it from Import Row and Import Journal **Data Job**. The tab and
+its app page keep the label **Import** (owner decision 2026-10-13: "Import is more accurate").
+The API names (`Import_Batch__c`, the `Import` tab and flexipage, the lookup fields) are
+unchanged.
+
 ### Attributes
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | computed | The batch's identifier, assigned automatically. |
 | Import Template | reference(Import Template) | yes | The mapping this batch was read with. |
-| File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. |
+| File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. Empty when the file was over 2.5 MB or could not be saved; the import still runs. |
 | File Name | text | yes | The name of the file as the admin uploaded it. |
-| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. |
+| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Retrying, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. Retrying: a committed import is taking in its fixed rejected rows (R-IB17). |
 | Is Dry Run | boolean | yes (defaults true) | Whether this pass only previewed what would happen; a committed batch has run at least one dry run first. |
 | Row Count | integer | computed | How many rows the file contained. |
 | Rows Created | integer | computed | How many rows created at least one new record. |
@@ -2031,6 +2235,7 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Expected Amount | decimal | no | The total the administrator expects the file's gift amounts to add up to, a control total checked by the dry run (R-IB10). |
 | File Amount | decimal | computed | The total of the file's gift amounts as the last pass read them, written only when an entity processor reads amounts (R-IB10). |
 | Processor Settings | long text | computed | The settings the entity processor ran the last dry run under, as a document only that processor reads; the commit runs under them (R-IB11). |
+| Template Snapshot | long text | computed | The template as the last dry run started with it; that dry run and the commit run under it (R-IB1). |
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
@@ -2038,6 +2243,8 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Operation | picklist(Import, Update, Delete) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1) or a bulk delete (R-BD1). Empty on a batch created before v0.7, which reads as Import. |
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
+| Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
+| Retry After Row | integer | computed | While a retry of the import's rejected rows is open, the highest row number before it: the fixed rows are numbered after it, and the retry's dry run and commit read only them (R-IB17). Empty otherwise. |
 
 ### Relationships
 
@@ -2053,7 +2260,14 @@ commit will make. The preview counts and the downloadable exceptions file come f
 Import Row records the dry run wrote. A dry run is refused on a batch that has started a
 commit, or is in any undo status: a dry run over a committed batch would mark it a dry run
 (so it could never be undone), clear its completion time, and a second commit would move its
-undo window.
+undo window. "The same template" means the template as the dry run read it: when a dry run
+starts, the batch records the template (its mapping, values for every row, matching rules and
+person mode) as Template Snapshot, every chunk of that dry run and the commit after it run
+under the snapshot, and an edit to the template since changes the next dry run and not the
+commit. A batch with no snapshot (one previewed before this rule) runs under the template.
+A row is checked in full (its people matched and validated) before any record it names is
+created, so a row rejected for its person creates no organization, in the dry run as in the
+commit; a row whose save fails part way keeps what was saved and points at it.
 
 **R-IB2 Chunked and asynchronous.** Rows are processed in chunks of Chunk Size in Batch
 Apex, with progress visible on the batch record, so a file of hundreds of thousands of
@@ -2130,7 +2344,9 @@ after the deadline is refused, in a sentence naming the date it passed.
     credit, a membership, an address, an activity, anything in any package, found by
     describing the record's child relationships, never by naming an object), and was created
     after the batch completed, or was created while the commit ran by somebody other than the
-    person who committed it;
+    person who committed it; a record carrying this batch's own tag does not count, since the
+    undo deletes it too (an aborted commit's household naming its new person as Primary
+    Contact);
   - the record itself was edited since: by somebody other than the committer after the
     commit started, or by anybody more than ten minutes after it completed (the ten minutes
     are the import's own follow-on work, such as rollups and household naming, which runs as
@@ -2307,6 +2523,19 @@ since every row would then be one person; the batch is refused with that reason.
 an organization. The entity processor receives the row's values with the file's values
 applied, as it receives the template's defaults (R-IR6).
 
+**R-IB16 A trial of the first rows, then the rest, in one batch.** After a dry run completes,
+the administrator may commit only the file's first N rows (N from `Import_Trial_Rows__c`,
+default 25, changeable per file, held between 1 and 2,000) for real, so validation rules,
+required fields and the org's own automation are met before the whole file runs. The trial is
+a commit under the dry run's template (R-IB1) over the first N rows in file order; it records N
+as Trial Rows and ends in Trial complete, counting only the rows it processed. From Trial
+complete the administrator may commit the remaining rows (every row after the trial's last) into
+the same batch, under the same template; that commit ends Complete (or Failed) and counts every
+row of the file. A dry run is refused once the trial has committed (R-IB1). Trial complete is
+undoable like Complete, and one undo covers both commits, because both tag and journal under the
+one batch (R-IB3, R-IB8); the undo deadline is stamped again by the second commit (R-IB7). A
+trial that fails ends Failed, can be undone, and offers no remaining rows.
+
 **R-IB15 Match only.** The wizard can mark a file Match only (ADR-0069,
 `0069-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
 already has. A row whose organization or either person matches no record, by its rule or by a
@@ -2314,6 +2543,24 @@ record ID (R-IT10), is rejected with a message saying the file creates nobody; n
 created for it. The dry run and the commit reject the same rows. Matched records are updated as
 in any import, and an entity processor still loads the rest of a matched row (R-IR6). The
 choice belongs to the file, not the template, and is set again for each upload.
+
+**R-IB17 Retrying the rejected rows.** A committed import's rejected rows can be fixed and
+loaded into the same batch, so one undo still covers everything the import created. A retry
+opens only on an import (not a bulk update or delete) that is Complete with rejected rows, or
+that already has a retry open; only for the user who committed it; only while its undo is
+allowed (R-IB8) and its staged rows are kept (R-IR5); and never while a pass runs. Opening one
+sets Status to Retrying and Retry After Row to the batch's highest row number, discarding the
+rows of an earlier unfinished retry. The fixed file is staged into the batch while it is
+Retrying (staging is otherwise closed once a batch has run), at most 10,000 rows, each numbered
+Retry After Row plus its file row number less one. The retry's dry run reads only rows after
+Retry After Row, counts only them, and keeps the batch a commit: Is Dry Run, Started At,
+Completed At, File Amount and Committed By are left as the commit set them, its log is added
+after the commit's, and the control totals are not checked again. The retry's commit runs
+under the template the commit ran with (R-IB1), keeps Started At so undo covers both runs,
+reads the retry's rows and the earlier Rejected rows, marks each earlier Rejected row Retried
+without processing it, and processes the rest; its finish counts every row (a Retried row
+counts as nothing), clears Retry After Row and re-stamps the undo deadline. Undo is allowed
+while a retry is open, as for the commit (R-IB8).
 
 ### Salesforce implementation
 
@@ -2324,7 +2571,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Import Template | `Import_Template__c` | Lookup to `Import_Template__c` |
 | File Reference | `File_Id__c` | Text (18) |
 | File Name | `File_Name__c` | Text |
-| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed |
+| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Retrying, Failed, Undoing, Undone, Undo failed |
 | Is Dry Run | `Is_Dry_Run__c` | Checkbox |
 | Row Count | `Row_Count__c` | Number |
 | Rows Created | `Rows_Created__c` | Number |
@@ -2341,6 +2588,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Expected Amount | `Expected_Amount__c` | Currency (16, 2) |
 | File Amount | `File_Amount__c` | Currency (16, 2) |
 | Processor Settings | `Processor_Settings_JSON__c` | Long Text Area (32768) |
+| Template Snapshot | `Template_Snapshot_JSON__c` | Long Text Area (131072) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
@@ -2348,6 +2596,8 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Operation | `Operation__c` | Picklist: Import, Update, Delete (default Import) |
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
+| Trial Rows | `Trial_Rows__c` | Number (9, 0) |
+| Retry After Row | `Retry_After_Row__c` | Number (9, 0) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -2363,8 +2613,8 @@ choice belongs to the file, not the template, and is set again for each upload.
 - **Service:** `ImportBatchService`, `ImportBatchSelector`, `ImportProcessorBatch`,
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
-  `importHistory` (recent imports and their undo). The import history lists imports only; bulk
-  updates are listed by their own page (Section 29E).
+  `dataJobHistory` (recent data jobs and their undo; on the Import page it lists imports only,
+  and bulk updates and deletes are listed on the Bulk Update page, Section 29E).
 
 ---
 
@@ -2384,7 +2634,7 @@ processor resolves those in dependency order.
 | Import Batch | reference(Import Batch) | yes | The upload this row came from. |
 | Row Number | integer | yes | The row's position in the file, so a message can name it. |
 | Raw Values | long text | yes | The row's original column values exactly as uploaded, held as a document keyed by column name. |
-| Status | picklist(Pending, Matched, Created, Updated, Rejected, Skipped) | yes | What the processor did with this row, or would do in a dry run. |
+| Status | picklist(Pending, Matched, Created, Updated, Rejected, Skipped, Retried) | yes | What the processor did with this row, or would do in a dry run. Retried: a rejected row a retry's commit replaced with its fixed row (R-IB17). |
 | Error Message | long text | no | Why the row was rejected, in language an administrator can act on. |
 | Household | reference(Household) | computed | The household this row resolved to. |
 | Contact 1 | reference(Contact) | computed | The first person, where people are Contacts. |
@@ -2393,7 +2643,8 @@ processor resolves those in dependency order.
 | Person 2 Account | reference(Organization) | computed | The second person, where people are person Accounts. |
 | Organization | reference(Organization) | computed | The organization this row resolved to. |
 | Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2); for a one-object template, the record the row created, updated or matched (R-IT12). Labelled Resulting Record. |
-| Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2). |
+| Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2); for a one-object template with related records, the related record the row created (R-IT17). Labelled Second Resulting Record. |
+| Related Status | text | computed | For a one-object template with related records, what the row's related record did or would do in a dry run: Created or Rejected; empty when the row has none (R-IT17). |
 | Person 1 Key | text | computed | In a dry run only, a digest of the matching key of the first person this row would create, so later chunks count that person once (R-IB12). Cleared when the row is processed again. |
 | Person 2 Key | text | computed | The same for the second person. |
 | Person 1 Name Key | text | computed | The same digest of the first person's key narrowed to their first name, so a later row finds them by either (R-IB12). |
@@ -2402,7 +2653,8 @@ processor resolves those in dependency order.
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
 | Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
-| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12). |
+| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12), or with related records the parent row's key digest, one form when its parent was saved and another when it failed (R-IT17). |
+| Row Key | text | computed | When the template has One row per key columns, a digest of this row's key cells, written as the row is staged so a later page finds it (R-IT18). Empty for a skipped row or a row with no key. |
 
 ### Relationships
 
@@ -2417,8 +2669,8 @@ processor resolves those in dependency order.
 `SoftCredit` and `Tribute` in the template's mapping document, and they are resolved in
 dependency order: organization, household, people, membership and affiliation, gift,
 allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4). A row of a
-one-object template (R-IT12) is read as the one entity `Record` instead, and none of the
-others.
+one-object template (R-IT12) is read as the one entity `Record` instead, with `Related` when
+it loads related records (R-IT17), and none of the others.
 
 **R-IR1a What a row means for households.** A row is one household. The row's first
 person is saved first and is given a household by the ordinary creation path (R-H1 in
@@ -2457,12 +2709,16 @@ according to the template's Person Mode, never to both (Section 4 "Person refere
 correction is made by fixing the file and re-running, not by editing the staged row, so
 the batch remains an accurate record of what was loaded.
 
-**R-IR5 Retention.** Rows are kept for the undo window and are deletable in bulk from the
-batch record, so a large import does not sit in storage forever. Undo does not read them: it
-reads the tag on the records and the journal (R-IB9, Section 17A).
+**R-IR5 Retention.** Rows are kept for `Import_Row_Retention_Days__c` days (90 unless the
+admin changes it, 0 for ever) after their batch's last pass completed (`Completed_At__c`), then
+deleted by the nightly Import row cleanup job (`ImportRowPurgeScheduler`, listed in Health
+Check's nightly jobs), so a large import does not sit in storage forever (D-40). The batch
+keeps its counts and run log. Undo does not read the rows: it reads the tag on the records and
+the journal (R-IB9, Section 17A). A batch whose rows were removed cannot be run again; a pass is
+refused, saying so.
 
 **R-IR6 Entities Core cannot resolve.** Core resolves `Organization`, `Household`,
-`Contact1` and `Contact2`. `Affiliation`, `Gift`, `Allocation`, `SoftCredit` and `Tribute`
+`Contact1`, `Contact2` and `Affiliation` (R-AF5). `Gift`, `Allocation`, `SoftCredit` and `Tribute`
 belong to features or packages Core may not reference (ADR-0014), so the processor offers
 them to an optional `ImportEntityProcessor` implementation, the class named
 `GiftImportProcessor`, found by namespace and name with `Type.forName` (the mechanism in
@@ -2509,7 +2765,7 @@ when the corrected row is loaded again.
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
 | Row Number | `Row_Number__c` | Number |
 | Raw Values | `Raw_Values_JSON__c` | Long Text Area |
-| Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped |
+| Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped, Retried |
 | Error Message | `Error_Message__c` | Long Text Area |
 | Household | `Household__c` | Lookup to Account |
 | Contact 1 | `Contact_1__c` | Lookup to Contact |
@@ -2525,11 +2781,13 @@ when the corrected row is loaded again.
 | Person 2 Name Key | `Person_2_Name_Key__c` | Text (16), External ID (indexed) |
 | Organization Key | `Organization_Key__c` | Text (16), External ID (indexed) |
 | Processor Key | `Processor_Key__c` | Text (16), External ID (indexed) |
+| Row Key | `Row_Key__c` | Text (16), External ID (indexed) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Several Matches | `Several_Matches__c` | Checkbox |
 | Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
+| Related Status | `Related_Status__c` | Text (20) |
 
-The six keys and the row's Pass Number are bookkeeping written and read in system mode
+The seven keys (Row Key included) and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
 indexed; they are not unique, and nothing outside the import reads them.
 
@@ -2635,7 +2893,7 @@ By, Started At and Completed At.
 
 - **Service:** `ImportJournalService` (writes and reads pages), `ImportRowProcessor` (writes
   the commit phase), `ImportObjectLoader` (writes the commit and created phases of a one-object
-  import), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
+  import), `ImportUndoBatch` (writes the undo phase), LWC `dataJobHistory`.
 
 ---
 
@@ -5253,7 +5511,9 @@ with anything: the two people the other way round, of exactly the reciprocal typ
 Reciprocal Relationship set. Finding one, it pairs the two records instead of creating a
 third. This is what makes an import that already carried both sides, and a restore from
 the recycle bin that brought both sides back, settle into one pair rather than into
-duplicates.
+duplicates. A restore that brings back only one side first looks in the recycle bin for the
+other side deleted with it and restores that record, so restoring one side, then the other,
+or both at once, always ends with the original pair.
 
 **R-RL5 Status follows the dates.** Setting End Date sets Status to Former on both sides.
 Clearing it returns both to Current. Status is never left disagreeing with the dates.
@@ -5273,7 +5533,7 @@ a Spouse relationship, and the two mechanisms do not read each other.
 | Related Contact | `Related_Contact__c` | Lookup to Contact |
 | Related Person Account | `Related_Person_Account__c` | Lookup to Account |
 | Type | `Type__c` | Picklist: Spouse, Partner, Parent, Child, Sibling, Grandparent, Grandchild, Friend, Colleague, Employer contact, Other |
-| Reciprocal Type | `Reciprocal_Type__c` | Picklist, same value set as `Type__c` |
+| Reciprocal Type | `Reciprocal_Type__c` | Picklist, same values as `Type__c`, not restricted: BarnCRM always writes it from the relationship type mapping, whose values the custom metadata page checks against `Type__c`, so a custom type added to `Type__c` alone saves |
 | Status | `Status__c` | Picklist: Current, Former |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
@@ -5349,7 +5609,18 @@ household.
 a former affiliation is never the primary one.
 
 **R-AF5 Created by the importer.** A spreadsheet row that names an employer creates or
-matches an affiliation (R-IR1), which is how most affiliations in a converted org arrive.
+matches an affiliation (R-IR1), which is how most affiliations in a converted org arrive. A
+people import links the row's first person to the row's organization once both are resolved,
+after the people are saved: a current affiliation of that person with that organization is
+matched and nothing is written; otherwise one is created with the row's `Affiliation`
+attributes, through the ordinary rules (R-AF1 to R-AF4, so it is primary only when R-AF2 makes
+it so). Two rows of a chunk naming the same pair make one. The dry run counts the row as
+creating something and writes nothing, unless an earlier row of the file, in its chunk or an
+earlier one, would link the same pair, which the commit then finds (R-IB12): a person or an
+organization the run would create is told apart by the key a later row finds it by. A created affiliation carries no batch tag: it is
+journaled as Created (R-IJ3) and an undo deletes it before the people and organizations. The
+second person is not linked, as NPSP's import links only its first contact with its first
+account.
 
 ### Salesforce implementation
 
@@ -5431,7 +5702,12 @@ owned by an account is the household's or the organization's; an address owned b
 is theirs alone and does not affect their household.
 
 **R-AD2 One default per owner.** At most one address per owner has Is Default true.
-Setting it on a second clears the first.
+Setting it on a second clears the first. Within one save that marks several addresses of
+one owner as default, the last of them keeps the flag. Clearing the flag on an owner's only
+default, with no other put in use in the same save, is refused (label
+`Core_Address_CannotUntickOnlyDefault`). When the default is deleted, the newest remaining
+address that is not Seasonal is promoted, and a Seasonal one only when nothing else is left.
+The first address added from the address card to an owner with none is saved as default.
 
 **R-AD3 Default propagation.** The default address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
@@ -5525,8 +5801,10 @@ be explained.
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
 - **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c` (Section 12).
-- **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector`,
-  `AddressController`; and for the seasonal swap `SeasonalAddressService`,
+- **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
+  Addresses card reads and saves through Lightning Data Service, with no controller,
+  ADR-0093 record reads through Lightning Data Service); and for the seasonal swap
+  `SeasonalAddressService`,
   `SeasonalAddressSelector`, `SeasonalAddressWriter`, `SeasonalAddressBatch`,
   `SeasonalAddressScheduler`, `SeasonalAddressController`.
 
@@ -5572,7 +5850,11 @@ field by field to decide whether they are duplicates.
 **R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
 person stored as an account) is passed over, because the household merge (R-H13) is the only
-account merge BarnCRM performs and a suggestion nobody can act on here is noise.
+account merge BarnCRM performs and a suggestion nobody can act on here is noise. A household
+that also carries a Nonprofit Cloud household group (`PartyRelationshipGroup`) is passed over
+and refused by the merge (ADR-0036), and so is a pair naming a person account's contact half,
+which the platform cannot merge with a contact. The panel applies the same rule to sets a
+duplicate rule wrote on save, and hides a set whose every pair is dismissed (R-DP5).
 
 **R-DP3 The scan finds what the rules would have found.** A duplicate rule runs when a record
 is saved, so records already in the org, and records saved past an alert, are never compared
@@ -6025,7 +6307,21 @@ written in, for display only; no SOQL text is ever accepted (ADR-0047).
 **R-SQ3 Export.** An export reads the same document in pages ordered by Id (the document's
 own order is ignored for paging), at most 2,000 rows a page, and stops at Export Row Limit
 (`Find_Export_Row_Limit__c`). The file is CSV, UTF-8 with a byte-order mark, built in the
-browser.
+browser. The browser's stop is a convenience, not a control: the pages are served to anyone
+with Find, in their own access. Only an export to Files (R-SQ12) enforces the limit on the
+server.
+
+**R-SQ12 Export to Files** (C-36; ADR-0115, `0115-find-export-to-files.md`). A Batch Apex job
+run as the person reads the document's filter in Id order in user mode, at most Export Row
+Limit rows (the query's LIMIT, so the server never reads more), with the document's own
+columns and none of its `related` entries. It writes the rows as R-SQ3's CSV (same cell rules,
+header of the column labels the page sent, values as the page shows them: dates `yyyy-MM-dd`,
+date and times in ISO 8601 UTC) into `ContentVersion` files owned by the person, a new file
+every 50,000 rows or about 4 million characters, each with the header row, titled
+`<Object>-<date>-<job>-part-<n>`. Nothing else is stored: the page finds the files by the
+person's own files whose title carries the job, and polls the job's `AsyncApexJob`. When the
+job ends it tells the person (Q-04 `JobNotifier`), opening the first file. A query that fails
+to compile is refused before the job starts. Permission: `Find_And_Export_Records` (R-SQ5).
 
 **R-SQ4 Sharing.** Saved Query is Private. Sharing is an Apex managed share with the reason
 Shared With Find Users, to the org's All Internal Users group, granting Read. Only the owner
@@ -6044,6 +6340,10 @@ and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved 
 the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
 own saved query of that name if there is one. Nothing else about Saved Query changes
 (ADR-0079, `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+Three person checks read standard Contact fields: no email, phone, mobile, mailing city or
+postal code on a living person; Deceased with an email and Email Opt Out not ticked; and
+Last Modified Date older than `Stale_Record_Years__c` years, the cut-off written into the
+document when it is built.
 
 **R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
 in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
@@ -6106,8 +6406,9 @@ third-party code (the same reasoning as ADR-0049).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
-- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
-  (app page `Data_Hygiene`, component `dataHygieneConsole`).
+- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
+  of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
+  `dataHygieneConsole`).
 
 ---
 
@@ -6152,8 +6453,10 @@ person, in user mode, and shows the first five before and after. The start count
 refused when none match, when more match than the person confirmed, or when more match than
 `Bulk_Update_Run_Limit__c`. One request may read just under 50,000 rows, so the count reads at
 most the run limit plus one, and the limit is held to 48,000. When the count starts, the job
-stamps Committed By, Started At, Row Count (the count) and the Undo Deadline (R-IB7), and runs
-in Batch Apex, at most 200 records a chunk.
+stamps Committed By, Started At, Row Count (the count), Chunk Size (from `Bulk_Chunk_Size__c`)
+and the Undo Deadline (R-IB7), and runs in Batch Apex, at most 200 records a chunk. A person
+lists and undoes their own bulk jobs; a person with Manage BarnCRM Settings may also list and
+undo everyone's.
 
 **R-BU3 Only records that still match, as the person.** The job reads at most the confirmed
 number of records, in Id order, in user mode. Each chunk reads its records again with the
@@ -6259,7 +6562,41 @@ NotRestored with the reason, and the Run Log says how many were restored, purged
 
 **R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
 permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
-only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
+only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access. What reads no query
+needs only `Bulk_Delete_Records`: the list of jobs, a job's progress, the undo, and a delete by
+file (R-BD7), which needs import access instead of Find.
+
+**R-BD7 Delete by file** (ADR-0114, `0114-delete-by-file.md`). A one-object template (R-IT12)
+whose Load Operation is Delete by record Id names, in each row's `Record.Id`, a record to
+delete; every other column is ignored. The operation is offered only to a person holding
+`Bulk_Delete_Records`, for an object R-BD4 allows (people included), and the template is refused
+without them.
+
+- **Dry run.** The file is staged and dry run as any import. A row is Matched, with the record
+  in its Resulting Record, when its ID is a valid ID of the target object naming a record the
+  person can see in user mode; otherwise it is Rejected, as is a row naming the same record as
+  an earlier row (R-IT12's Processor Key digest). Nothing is deleted.
+- **Confirmed start.** The import commit is replaced by a start that takes the confirmed
+  count: refused unless the dry run completed, the count typed equals the Matched rows, and
+  that count is within the run limit (R-BD2). The preview names the cascade kinds as R-BD2.
+  The start turns the same `Import_Batch__c` into a bulk delete: Operation Delete, a definition
+  `{ "version": 1, "source": "file", "object": "...", "confirmedCount": 112 }`, the Undo
+  Deadline of R-BD2, so it leaves the import history and is listed, undone and refused by the
+  import undo as any bulk delete (R-BD5).
+- **The job.** `BulkDeleteBatch` reads at most the confirmed number of the batch's Matched
+  rows in system mode (they are bookkeeping, ADR-0021), and each chunk reads their Resulting
+  Records again in user mode: a record gone or hidden since the dry run is counted as no longer
+  matching. Deleting, journaling, Rows Deleted and the undo are as R-BD3 and R-BD5.
+
+**R-BD8 Download these records first.** Before the count is typed, the panel offers a download
+of every record the delete would delete: the query's matches, or a delete by file's Matched
+rows' records. The browser reads them page by page, 200 records a page in Id order after the
+last Id read, each page read in user mode with every field the person may read (describe's
+`isAccessible`; compound address and location fields and binary fields are left out, an
+address's parts are kept), Id first. It writes them as CSV with Find's export rules (R-SQ3).
+Nothing is written on the server and nothing is deleted; the download is optional and does not
+change the count to type. It needs what the delete's preview needs (R-BD6). Child records the
+platform deletes with a parent are not in it.
 
 ### Salesforce implementation
 
@@ -6269,7 +6606,7 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
   keys).
 - **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
   `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
-  component `bulkDelete`, opened from Find's results, and `bulkDeleteHistory` on the Bulk Update
+  component `bulkDelete`, opened from Find's results, and `dataJobHistory` on the Bulk Update
   tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
 - **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
   `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
@@ -6287,10 +6624,11 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-0086
-`0086-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
-a run is the set of rows sharing it, and a trend is the same object, field and record type
-across runs. Neutral: it names no nonprofit concept and is in Core.
+counted in Org Optimizer's Field utilization section and saved there with "Save these counts"
+(plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-0101
+`0101-field-utilization-on-demand.md`). Every row of one save carries the same Taken At, so a
+saved count is the set of rows sharing it, and a trend is the same object, field and record type
+across saves. Neutral: it names no nonprofit concept and is in Core.
 
 ### Attributes
 
@@ -6305,36 +6643,41 @@ across runs. Neutral: it names no nonprofit concept and is in Core.
 | Record Count | number | yes | Records in this group that were looked at. |
 | Fill Rate | percent | computed | Filled Count divided by Record Count. |
 | Sampled | boolean | yes | True when the count covers a sample of recent records rather than all of them. |
-| Taken At | datetime | yes | When the run started. |
+| Taken At | datetime | yes | When the counts were saved. |
 
 ### Rules
 
-**R-FU1 Describe only.** Objects come from the saved list `Field_Utilization_Objects__c`,
-each kept only when the global describe has it and it is queryable and accessible; fields come
-from that object's describe. No typed text reaches a query.
+**R-FU1 Describe only.** The object picker lists the objects Find offers (accessible, queryable,
+not a custom setting, deprecated, share, history, feed, change event, metadata, event, external
+or big object), minus this object; every call checks the chosen name against the global describe
+again. Fields come from that object's describe. No typed text reaches a query.
 **R-FU2 What is counted.** A field is counted when the runner can read it and either create or
 edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
 location) or non-nillable field.
-**R-FU3 User mode.** Every count, read and write is in user mode, so a run counts the records
-its runner can see. Written into the page and the admin guide.
+**R-FU3 User mode.** Every count, read and write is in user mode, so a count covers the records
+the person on the page can see. Written into the page and the admin guide.
 **R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
 grouped by record type, one query row per group. A field that is not filterable, or whose
 count is refused, is counted on the 200 most recently modified records and its rows are
-Sampled.
-**R-FU5 Size limit.** An object holding more than 1,000,000 records is skipped and named in the
-run summary.
+Sampled. A field whose sample also fails is listed on the page as not counted.
+**R-FU5 Size limit.** An object holding more than 1,000,000 records is not counted; the page
+says so.
 **R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
-**R-FU7 Retention.** Rows are never edited. Each run's finish deletes rows whose Taken At is more
-than 13 months old.
-**R-FU8 Visible last run.** Each run records when it finished and a one sentence summary on
-`BarnCRM_Settings__c`, including a run that counted nothing.
+**R-FU7 On demand, saved by choice.** Counting runs synchronously from the page, 40 fields per
+call (10 when the object holds more than 100,000 records); each call reads the record totals
+again. Nothing is stored until the person chooses "Save these counts"; the save checks each
+row's object, field and record type against describe and caps Filled Count at Record Count.
+Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
+standard delete.
+**R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
+current one, with the change in percentage points.
 
 ### Salesforce implementation
 
 - **Object** `Field_Utilization_Snapshot__c`, auto number Name `FUS-{000000}`, public read only
   sharing, reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it:
-  Read, Create, Delete, View All and Modify All (the last so a user-mode retention delete
-  reaches another administrator's rows).
+  Read, Create, Delete, View All and Modify All (the last so an administrator's user-mode
+  delete reaches another administrator's rows).
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
@@ -6348,10 +6691,10 @@ than 13 months old.
 | Sampled | `Sampled__c` | Checkbox | Default false. |
 | Taken At | `Taken_At__c` | DateTime | |
 
-- **Service:** `FieldUtilizationService` (plan and count), `FieldUtilizationBatch` (25 fields
-  per chunk), `FieldUtilizationScheduler` (weekly, Sundays 04:00), `FieldUtilizationSelector`,
-  `FieldUtilizationController`. The page is the `fieldUtilization` panel on the Field
-  Utilization page of BarnCRM Settings.
+- **Service:** `FieldUtilizationService` (plan, count, save), `FieldUtilizationSelector`
+  (latest saved count), `FieldUtilizationController` (every method requires
+  `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component, embedded in Org
+  Optimizer, its only host (no app page or tab of its own).
 
 ---
 
@@ -6420,6 +6763,97 @@ Task for this feature beyond the action that creates it.
 
 ---
 
+## 29H. Erasure
+
+### Definition
+
+The record that a person was erased at their request (the right to be forgotten): who erased
+them, when, under which request, and what changed. It never holds an erased value
+(ADR-0110, `0110-erase-a-person-anonymizes-in-place.md`).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The erasure's identifier, assigned automatically. |
+| Contact | reference(Contact) | conditional | The anonymized person, where people are Contacts. |
+| Person Account | reference(Organization) | conditional | The anonymized person, where people are person Accounts. |
+| Erased Record Id | text | yes | The same person's record Id as text, kept if the record is deleted later. |
+| Request Reference | text | no | The organization's own reference for the request, for example a ticket number. Never a name or an address. |
+| Details | long text | yes | Each record the erasure changed, by object and Id, with what was done and the labels of the fields emptied. |
+
+### Relationships
+
+- **Erasure to the person**, many to one, to exactly one of Contact or Person Account (Section 4
+  "Person references").
+
+### Rules
+
+**R-ER1 Anonymize in place.** Erasing a person empties every field of their record that can be
+empty, except the fields `DataProtectedFields` protects, owner, record type, currency, the
+Individual link, and the fields an installed module keeps (`PersonErasureExtension`). The name
+becomes "Erased person"; opt-out flags are set and other checkboxes go back to their default. The
+record is never deleted, so gifts and totals keep pointing at it.
+
+**R-ER2 Contact points and connections.** The person's own addresses are deleted. Relationships
+on either side and affiliations are ended (End Date today, or the Start Date if later) and lose
+their description; an affiliation also loses its role and primary flag.
+
+**R-ER3 Households.** The person leaves every household: the contact's account is emptied in
+contact mode, and each current membership is ended in junction mode
+(`HouseholdService.endMembershipsFor`). Upkeep then recounts, renames and tidies away as on any
+move (R-H11, R-H12). A household left empty and kept is anonymized as in R-ER1, named "Erased
+household", with Custom Name on and its addresses deleted. Where the org stores people as
+accounts, the person account fields a household (a business account) cannot carry are left alone.
+
+**R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
+in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is
+deleted after the erasure commits where the user may delete it. Records the erasure deletes are
+emptied from the Recycle Bin.
+
+**R-ER5 As the user, all or nothing.** What to change is read in system mode; every change is
+made in user mode. A record or a field holding a value that the user cannot edit refuses the
+erasure before anything changes, and any refusal during the run takes everything back. The
+Erasure record is written in system mode (ADR-0021) and no packaged permission set may edit or
+delete it.
+
+**R-ER6 Preview.** The preview runs the erasure inside a savepoint and rolls it back, so it lists
+exactly what the erasure would change.
+
+**R-ER7 Who may erase.** Only a user with the custom permission `Erase_People`, who types the
+person's current name to confirm. A person with an Erasure record is not erased again.
+
+**R-ER8 Modules decide about their own records.** Each installed module implementing
+`PersonErasureExtension` changes its own records in the same transaction and reports what it
+changed and kept. A module that is installed but cannot answer refuses the erasure.
+
+**R-ER9 An erased person is not an orphan.** A person an Erasure record names is left out of
+"people with no household" in Health Check and data hygiene, in both membership modes.
+
+**R-ER10 Activities and files are listed, not erased.** Tasks and events naming the person (by
+WhoId, WhatId, TaskRelation or EventRelation) and files linked to the person
+(ContentDocumentLink) are counted and listed as kept, for the admin to delete by hand.
+
+### Salesforce implementation
+
+- **Object:** `Erasure__c`, auto-number Name with format `ER-{000000}`, sharing Read, no tab.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Contact | `Contact__c` | Lookup to Contact (clears on delete) |
+| Person Account | `Person_Account__c` | Lookup to Account (clears on delete) |
+| Erased Record Id | `Erased_Record_Id__c` | Text(18) |
+| Request Reference | `Request_Reference__c` | Text(80) |
+| Details | `Details__c` | Long Text Area(131072) |
+
+- **Permission:** custom permission `Erase_People`, in permission set `BarnCRM_Erase_People`
+  only (in no permission set group). `BarnCRM_Admin` and `BarnCRM_Erase_People` read
+  `Erasure__c`; nothing grants edit or delete.
+- **Service:** `PersonErasure`, `PersonErasureExtension`, `PersonErasureExtensions`,
+  `PersonErasureHistoryCleanup`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -6474,11 +6908,10 @@ is closed deliberately rather than discovered.
 
 | Rule | Gap | Why it is open |
 |---|---|---|
-
-R-M3's Primary Contact mirror was closed on 2026-09-23 by C-22 (ADR-0044, primary contact
-mirrors the primary member).
-| R-M3 (Section 6) | The primary member is not mirrored to the household's Primary Contact. | `Primary_Contact__c` is a lookup to Contact, so it cannot name a person stored as a Person Account, which is the org shape junction membership serves. Closing the gap means changing the field (a Contact and Account pair, per Section 4) or dropping the second half of the rule. Needs an ADR either way. |
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
+
+Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
+mirrors the primary member).
 
 ---
 
@@ -6591,9 +7024,38 @@ mirrors the primary member).
 | post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| post-1.0 | 2026-10-13 | Core quality pass Q-04, job notifications. No object added. `BarnCRM_Settings__c` gains `Job_Notifications__c` (Section 12, job notification key), shipped on and registered in `SettingsService.SHIPPED_DEFAULTS` (ADR-0035). The notification is the platform custom notification type `BarnCRM_Job_Finished`. |
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
+| v0.6 | 2026-10-13 | Rollup Queue and Queueable jobs (rollup comparison run on `oi-test`). No object or field added. R-RQ3: a save inside a Queueable leaves the processor to a later save, to the job's own chain end (`RollupService.startQueuedRecalculation`) or to the nightly run, because taking the job's one chained job stopped the sample data load with "Too many queueable jobs added to the queue: 2". |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.11 | 2026-10-13 | Security checklist follow-up. No object or field added. R-E4 unchanged: the three packaged permission sets keep Read and Create on Error Log Event, because the org refuses Create on a platform event without Read. |
+| v0.6 | 2026-10-13 | Real-time rollups recalculated just after the save (ADR-0098, `0098-real-time-rollups-recalculated-just-after-the-save.md`, Core quality pass Q-01). BarnCRM Settings gains `Rollup_Processing__c` (Section 12, Background or In_Save, default Background). R-R4: by default a save queues its marked targets and the Rollup Queue recalculates them just after the save; In_Save keeps recalculation in the save when the planned queries fit. R-RQ3: the nightly run, the end of a pause, Retry and Start now start a processor for Pending entries no save started one for. R-RQ4: Health Check reports Failed entries and Pending entries older than an hour. No object added. |
+| v0.6 | 2026-10-13 | Rollup Queue ready event (ADR-0100, `0100-rollup-queue-ready-event-from-queueable-jobs.md`). New platform event `Rollup_Queue_Ready__e` (no fields, Publish After Commit), subscribed by `RollupQueueReadyTrigger`; the three packaged permission sets grant Read and Create on it, as on `Error_Log_Event__e`. R-RQ3: a save inside a Queueable publishes one event per transaction and its subscriber starts the processor, so those totals stay near real time without taking the job's one chained job. |
+| post-1.0 | 2026-10-13 | Field utilization on demand (ADR-0101, `0101-field-utilization-on-demand.md`, owner decision). `BarnCRM_Settings__c` loses `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c`. Section 29F: R-FU1 (objects as Find offers them), R-FU5, R-FU7 (on demand, saved by choice, no retention job) and R-FU8 (previous saved count shown) rewritten; `Field_Utilization_Snapshot__c` unchanged. |
+| v0.6 | 2026-10-13 | Health Check on Home shows the last result (ADMIN-7, ADR-0106 `0106-health-check-on-home-shows-the-last-result.md`). No object added. `BarnCRM_Settings__c` gains `Health_Check_Last_Run__c` and `Health_Check_Last_Result__c` (Section 12, Health Check keys). |
+| v0.6 | 2026-10-13 | Error Log retention (owner decision 2026-10-13, ADMIN-26). `BarnCRM_Settings__c` gains `Error_Log_Retention_Days__c` (default 180; Section 12, v0.6 keys). New rule R-E6: the daily Error Log job deletes entries older than that, whatever their status. No object added. |
+| v0.6 | 2026-10-13 | A range on every number setting (owner decision 2026-10-13, ADMIN-27). `Setting_Definition__mdt` gains `Min_Value__c` and `Max_Value__c` (Section 13); every shipped Number row sets both, and the console and `SettingsService` refuse a value outside them. No object added. |
+| v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
+| v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
+| v0.11 | 2026-10-13 | Households and people quality pass (ADR-0107, `0107-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
+| v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-0108, `0108-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
+| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-0110 `0110-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-10, owner decision). No object or field added. R-AF5 states how a people import creates or matches the first person's affiliation with the row's organization, journaled as Created for undo; R-IR6: Core resolves the `Affiliation` entity. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-22, IMPORT-23). No object or field added. The wizard's fixed columns are served by the server with labels, adding Affiliation: role; File Reference is empty for a file over 2.5 MB. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-19, D-41). No object or field added. R-IT4: shipped import templates are added on install and on every upgrade by each package's post-install script. |
+| v0.6 | 2026-10-13 | Core quality pass, import (D-40). No object added. `BarnCRM_Settings__c` gains `Import_Row_Retention_Days__c` (v0.7 keys table, Import section). R-IR5: staged rows are deleted nightly once their batch finished more than that many days ago, and a batch without its rows cannot run again. |
+| v0.6 | 2026-10-13 | Core quality pass, import (number reading). No object or field added. R-IT11: numbers are read as spreadsheets export them in the user's locale (currency symbols and codes, grouping marks, accounting brackets); a value whose decimal mark cannot be told is refused. |
+| v0.6 | 2026-10-13 | Trial import (data tools parity rank 4). `Import_Batch__c` gains `Trial_Rows__c` and the Status value Trial complete; BarnCRM Settings gains `Import_Trial_Rows__c` (default 25). New rule R-IB16: commit the first N rows, then the remaining rows into the same batch, one undo for both. |
+| v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
+| v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
+| v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-0111, `0111-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
+| v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
+| 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-0112, `0112-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
+| 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-0113, `0113-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
 
 ---
 ## 32. Entity ownership by package
@@ -6636,10 +7098,11 @@ included; standard objects the packages extend are named by the entity that gove
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Saved Query | Core | v0.7 | 29D |
-| Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
+| Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Interaction Note (Task, no packaged schema) | Core | v0.9 | 29G |
+| Erasure | Core | not scheduled (owner decision 2026-10-13) | 29H |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |

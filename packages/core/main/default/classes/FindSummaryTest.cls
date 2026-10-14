@@ -4,8 +4,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindSummary')
 private class FindSummaryTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(Map<String, Object> aggregate) {
         return JSON.serialize(
             new Map<String, Object>{
@@ -47,6 +52,57 @@ private class FindSummaryTest {
             System.Assert.fail('Refused: ' + aggregate);
         } catch (QueryCompiler.QueryCompilerException refused) {
             System.Assert.areEqual(expected, refused.getMessage(), 'The refusal says why');
+        }
+    }
+
+    /** A date group reads as the date alone, not "2026-01-05 00:00:00". */
+    @IsTest
+    static void aDateGroupShowsTheDateAlone() {
+        System.runAs(TestUsers.admin()) {
+            List<Import_Template__c> templates = new List<Import_Template__c>();
+            for (Integer index = 0; index < 200; index++) {
+                templates.add(
+                    new Import_Template__c(
+                        Name = 'Template ' + index,
+                        Last_Import_Date__c = index < 150
+                            ? Date.newInstance(2026, 1, 5)
+                            : Date.newInstance(2026, 2, 1)
+                    )
+                );
+            }
+            insert templates;
+
+            Test.startTest();
+            FindSummary.SummaryResult result = FindSummary.summarize(
+                JSON.serialize(
+                    new Map<String, Object>{
+                        'version' => 1,
+                        'object' => 'Import_Template__c',
+                        'fields' => new List<Object>{ 'Name' },
+                        'aggregate' => new Map<String, Object>{
+                            'function' => 'count',
+                            'groupBy' => 'Last_Import_Date__c'
+                        }
+                    }
+                )
+            );
+            Test.stopTest();
+
+            Map<String, Object> byGroup = lineValues(result);
+            System.Assert.areEqual(
+                150,
+                byGroup.get('2026-01-05'),
+                'Grouped by ' + byGroup.keySet()
+            );
+            System.Assert.areEqual(50, byGroup.get('2026-02-01'), 'The second date');
+            System.Assert.areEqual(
+                '2026-01-05',
+                FindSummary.groupText(
+                    Schema.SObjectType.Import_Template__c.fields.Last_Import_Date__c,
+                    Date.newInstance(2026, 1, 5)
+                ),
+                'Typed, not written with a time of day'
+            );
         }
     }
 

@@ -43,7 +43,7 @@ public with sharing class AutomationResumeJob implements Schedulable {
         // next pause and keeps a spent job out of the org's 100 scheduled jobs.
         if (context != null) {
             try {
-                System.abortJob(context.getTriggerId());
+                ScheduledJobSelector.abort(context.getTriggerId());
             } catch (Exception failed) {
                 ErrorLogger.log(failed, LOG_CONTEXT);
             }
@@ -64,14 +64,18 @@ public with sharing class AutomationResumeJob implements Schedulable {
     @TestVisible
     private static Id schedule(Datetime pauseEnds, Datetime runAt) {
         cancel();
-        return System.schedule(JOB_NAME, cronFor(runAt), new AutomationResumeJob(pauseEnds));
+        return ScheduledJobSelector.schedule(
+            JOB_NAME,
+            cronFor(runAt),
+            new AutomationResumeJob(pauseEnds)
+        );
     }
 
     /** Cancels the scheduled resume, if there is one. */
     public static void cancel() {
         Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 

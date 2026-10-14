@@ -2,8 +2,13 @@
  * SeasonalAddressBatch and SeasonalAddressScheduler: the nightly run end to end, the record it
  * leaves behind, and the schedule an administrator starts from the settings console.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SeasonalAddressBatch')
 private class SeasonalAddressBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String HOME_STREET = '812 Willow Lane';
     private static final String HOME_CITY = 'Springfield';
     private static final String WINTER_CITY = 'Phoenix';

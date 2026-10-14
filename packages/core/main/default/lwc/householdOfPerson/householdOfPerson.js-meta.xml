@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
   <masterLabel>Household of Person</masterLabel>
-  <description>The household this person belongs to, with a link to it, the member count and the formal greeting.</description>
+  <description>The household this person belongs to, with a link to it, the member count and the formal greeting. For a contact page, or a person account page.</description>
   <targets>
     <target>lightning__RecordPage</target>
   </targets>
@@ -11,6 +11,7 @@
     <targetConfig targets="lightning__RecordPage">
       <objects>
         <object>Contact</object>
+        <object>Account</object>
       </objects>
     </targetConfig>
   </targetConfigs>

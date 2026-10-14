@@ -88,15 +88,16 @@ public with sharing class HouseholdController {
             }
             return result;
         } catch (Exception e) {
-            throw asUserError(e, Label.Core_Households_ErrorContextNaming, null);
+            throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextNaming, null);
         }
     }
 
     /**
      * The patterns this org has saved, so that the settings page opens on the admin's own
-     * wording rather than on the shipped defaults.
+     * wording rather than on the shipped defaults. Not cacheable: a page reopened after a save
+     * must start from what was saved, or saving again would write the older patterns back.
      */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static NamingSettings getNamingSettings() {
         try {
             BarnCRM_Settings__c settings = SettingsService.getSettings();
@@ -112,7 +113,7 @@ public with sharing class HouseholdController {
             result.canEdit = canManageSettings();
             return result;
         } catch (Exception e) {
-            throw asUserError(e, Label.Core_Households_ErrorContextNaming, null);
+            throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextNaming, null);
         }
     }
 
@@ -130,7 +131,7 @@ public with sharing class HouseholdController {
             }
             return String.valueOf(Database.executeBatch(new HouseholdNamingBatch(), 200));
         } catch (Exception e) {
-            throw asUserError(e, Label.Core_Households_ErrorContextNaming, null);
+            throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextNaming, null);
         }
     }
 
@@ -164,7 +165,7 @@ public with sharing class HouseholdController {
             for (HouseholdService.Person person : members) {
                 MemberView row = new MemberView();
                 row.personId = person.id;
-                row.name = fullName(person);
+                row.name = person.fullName();
                 row.role = person.role;
                 row.source = person.sourceObject;
                 row.isPrimary = person.isPrimary == true;
@@ -173,16 +174,29 @@ public with sharing class HouseholdController {
             }
             return result;
         } catch (Exception e) {
-            throw asUserError(e, Label.Core_Households_ErrorContextMembership, householdId);
+            throw HouseholdException.forScreen(
+                e,
+                Label.Core_Households_ErrorContextMembership,
+                householdId
+            );
         }
     }
 
+    /**
+     * Moves a person from the household whose page the panel sits on (`sourceHouseholdId`)
+     * to another. In junction mode only that one membership ends; left out, every other
+     * household the person is in is left.
+     */
     @AuraEnabled
-    public static void moveContact(Id contactId, Id targetHouseholdId) {
+    public static void moveContact(Id contactId, Id targetHouseholdId, Id sourceHouseholdId) {
         try {
-            HouseholdService.moveContact(contactId, targetHouseholdId);
+            HouseholdService.moveContact(contactId, targetHouseholdId, sourceHouseholdId);
         } catch (Exception e) {
-            throw asUserError(e, Label.Core_Households_ErrorContextMembership, contactId);
+            throw HouseholdException.forScreen(
+                e,
+                Label.Core_Households_ErrorContextMembership,
+                contactId
+            );
         }
     }
 
@@ -190,37 +204,6 @@ public with sharing class HouseholdController {
 
     private static Boolean canManageSettings() {
         return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
-    }
-
-    /**
-     * What the screen is told. A HouseholdException already says in plain words what went
-     * wrong and what to do, so its message goes through as it is. Anything else is a
-     * platform failure whose wording is for an administrator reading the Error Log, not
-     * for the person at the screen: the whole exception is logged and the screen gets the
-     * generic message.
-     */
-    private static AuraHandledException asUserError(Exception e, String context, Id recordId) {
-        String message;
-        if (e instanceof HouseholdException) {
-            message = e.getMessage();
-        } else {
-            ErrorLogger.log(e, context, recordId);
-            message = Label.Core_Households_ErrorUnexpected;
-        }
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
-    }
-
-    private static String fullName(HouseholdService.Person person) {
-        String first = String.isNotBlank(person.preferredName)
-            ? person.preferredName
-            : person.firstName;
-        String full =
-            (first == null ? '' : first) +
-            ' ' +
-            (person.lastName == null ? '' : person.lastName);
-        return full.trim();
     }
 
     /**
@@ -234,7 +217,7 @@ public with sharing class HouseholdController {
     private static String describe(List<HouseholdService.Person> members) {
         List<String> names = new List<String>();
         for (HouseholdService.Person person : members) {
-            names.add(fullName(person));
+            names.add(person.fullName());
         }
         return String.join(names, ', ');
     }

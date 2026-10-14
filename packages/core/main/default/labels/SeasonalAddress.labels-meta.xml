@@ -93,7 +93,7 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>What the last run did: moved in, moved back, failed</shortDescription>
+        <shortDescription>Seasonal run: {0} moved in, {1} moved back, {2} could not be changed</shortDescription>
         <value>{0} moved to a seasonal address, {1} moved back, {2} could not be changed.</value>
     </labels>
     <labels>

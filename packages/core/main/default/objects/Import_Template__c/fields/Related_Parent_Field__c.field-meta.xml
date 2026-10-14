@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Related_Parent_Field__c</fullName>
+  <description>The API name of the Related Object's lookup field that points at the Target Object, which the load fills with each row's parent (canonical model R-IT17).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The field on the related object that points at the parent.</inlineHelpText>
+  <label>Related Parent Field</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

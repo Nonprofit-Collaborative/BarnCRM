@@ -1,5 +1,7 @@
 import { createElement } from 'lwc';
 import { createApexTestWireAdapter as mockCreateApexTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import AccessManager from 'c/accessManager';
 import getAccessOverview from '@salesforce/apex/AccessController.getAccessOverview';
 import searchUsers from '@salesforce/apex/AccessController.searchUsers';
@@ -21,6 +23,9 @@ jest.mock('@salesforce/apex/AccessController.assignRole', () => ({ default: jest
   virtual: true
 });
 jest.mock('@salesforce/apex/AccessController.removeRole', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Access_RemovePerson', () => ({ default: 'Remove {0}' }), {
   virtual: true
 });
 
@@ -78,6 +83,11 @@ function flush() {
 }
 
 describe('c-access-manager', () => {
+  beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
+    jest.spyOn(Toast, 'show');
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
@@ -177,17 +187,30 @@ describe('c-access-manager', () => {
 
     element.shadowRoot.querySelector('[data-id="add-button"]').click();
     await flush();
-
-    const confirmation = element.shadowRoot.querySelector('[data-id="confirmation"]');
-    expect(confirmation).not.toBeNull();
-
-    element.shadowRoot.querySelector('[data-id="confirm-button"]').click();
     await flush();
 
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    const dialog = BarnConfirmModal.open.mock.calls[0][0];
+    expect(dialog.label).toBe('c.Core_Access_ConfirmAddTitle');
+    expect(dialog.confirmLabel).toBe('c.Core_Access_AddButton');
+    expect(dialog.details).toEqual([]);
     expect(assignRole).toHaveBeenCalledWith({
       userId: DAVID_ID,
       roleDeveloperName: 'Fundraising_Staff'
     });
+    await flush();
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({ variant: 'success' }),
+      expect.anything()
+    );
+  });
+
+  it('names each Remove button for its person from one label', async () => {
+    const element = createComponent();
+    getAccessOverview.emit(OVERVIEW);
+    await flush();
+    const remove = element.shadowRoot.querySelector('[data-id="remove-button"]');
+    expect(remove.title).toBe('Remove Maria Alvarez');
   });
 
   it('warns before someone removes their own BarnCRM Admin role', async () => {
@@ -198,44 +221,46 @@ describe('c-access-manager', () => {
 
     element.shadowRoot.querySelector('[data-id="remove-button"]').click();
     await flush();
-
-    expect(element.shadowRoot.querySelector('[data-id="self-removal-warning"]')).not.toBeNull();
-
-    element.shadowRoot.querySelector('[data-id="confirm-button"]').click();
     await flush();
 
+    const dialog = BarnConfirmModal.open.mock.calls[0][0];
+    expect(dialog.label).toBe('c.Core_Access_ConfirmRemoveTitle');
+    expect(dialog.confirmLabel).toBe('c.Core_Access_RemoveButton');
+    expect(dialog.details).toEqual(['c.Core_Access_SelfRemovalWarning']);
     expect(removeRole).toHaveBeenCalledWith({
       userId: MARIA_ID,
       roleDeveloperName: 'BarnCRM_Admin_Group'
     });
   });
 
-  it('shows the confirmation as a labelled region and moves focus to its heading', async () => {
+  it('shows a sticky error toast when a change is refused', async () => {
+    removeRole.mockResolvedValue({ success: false, message: 'Not allowed.' });
     const element = createComponent();
     getAccessOverview.emit(OVERVIEW);
     await flush();
 
     element.shadowRoot.querySelector('[data-id="remove-button"]').click();
     await flush();
+    await flush();
+    await flush();
 
-    const confirmation = element.shadowRoot.querySelector('[data-id="confirmation"]');
-    expect(confirmation.getAttribute('role')).toBe('region');
-    expect(element.shadowRoot.activeElement).toBe(
-      element.shadowRoot.querySelector('[data-id="confirmation-heading"]')
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Not allowed.', variant: 'error', mode: 'sticky' }),
+      expect.anything()
     );
   });
 
-  it('closes the confirmation without changing anything when Cancel is used', async () => {
+  it('changes nothing when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
     const element = createComponent();
     getAccessOverview.emit(OVERVIEW);
     await flush();
 
     element.shadowRoot.querySelector('[data-id="remove-button"]').click();
     await flush();
-    element.shadowRoot.querySelector('[data-id="cancel-button"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="confirmation"]')).toBeNull();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
     expect(removeRole).not.toHaveBeenCalled();
   });
 
@@ -246,5 +271,16 @@ describe('c-access-manager', () => {
 
     const link = element.shadowRoot.querySelector('[data-id="setup-link"]');
     expect(link.href).toContain('/lightning/setup/ManageUsers/home');
+  });
+
+  it('links to the automatic access guide, in a new tab, even in read-only mode', async () => {
+    const element = createComponent();
+    getAccessOverview.emit({ ...OVERVIEW, canManage: false });
+    await flush();
+
+    const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
+    expect(link.href).toContain('docs/admin-guide/automatic-access.md');
+    expect(link.target).toBe('_blank');
+    expect(link.textContent).toBe('c.Core_Access_AutomaticAccessLink');
   });
 });

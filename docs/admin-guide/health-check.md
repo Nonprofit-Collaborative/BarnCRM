@@ -23,12 +23,20 @@ nothing to configure.
 1. Open the **BarnCRM** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-run** whenever you want a fresh look. Health Check reads your org each time;
-   it never shows you a saved result.
+4. Click **Re-run** whenever you want a fresh look. On this page Health Check reads your
+   org each time it opens.
 
-An administrator also finds the same report on the BarnCRM home page, under the setup
-checklist. The settings console is the way in that always works, including for staff who
-do not see the home page copy and for an org where someone removed it from the page.
+An administrator also finds Health Check on the BarnCRM home page, under the setup
+checklist. Home does not run every check each time it opens, because a full run reads a lot
+of your org and Home is the page everyone opens first. Instead it shows the last result: when
+Health Check last ran in full for an administrator, and how many findings it had to fix, to
+be aware of and for your information. Click **Run now** to run it in full there and see the
+whole report. Until Health Check has run once, Home says so and offers **Run now**. A run by
+someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
+because it skips the access checks.
+
+The settings console is the way in that always works, including for staff who do not see
+the home page copy and for an org where someone removed it from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -100,13 +108,16 @@ Nothing is broken today.
 | Settings | Whether the error digest is scheduled but has not run for more than two days, which usually means the person who scheduled it was deactivated. |
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |
+| Settings | Whether any relationship has no person on one side, or any affiliation has no person, because the person was deleted. |
 | Settings | Whether the fiscal year in Setup is the same month as the fiscal year start month in BarnCRM Settings. |
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
 | Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
-| Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, the weekly field utilization count once you have chosen what it counts, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
+| Settings | Whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Connect: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
 
@@ -132,10 +143,9 @@ Most buttons open a page. A button that changes something in your org works like
 1. The finding says exactly what the fix will do, counted from your org: for example, with
    Giving, **3 shipped totals are missing**, followed by their names (Total Gifts, Largest
    Gift, Last Gift Date) and what the fix will create.
-2. Click the button. A box headed **Before this fix runs** opens at the top of the panel, the
-   page scrolls to it, and it shows that sentence again with **Confirm** and **Cancel**.
-   Nothing has changed yet. **Cancel** or the Escape key closes it and takes you back to the
-   button.
+2. Click the button. A dialog headed **Before this fix runs** opens over the page and shows
+   that sentence again with **Confirm** and **Cancel**. Nothing has changed yet. **Cancel**,
+   the close button, or the Escape key closes it and takes you back to the button.
 3. Click **Confirm**. The fix runs, the panel says what it did (for example **Done. Created:
    Total Gifts, Largest Gift, Last Gift Date.**), and Health Check re-runs underneath it. If it
    fails, nothing is changed, the panel says so in a sentence, and the details are in the Error
@@ -150,7 +160,9 @@ Every fix that runs is recorded under **Recent changes** in BarnCRM Settings, as
 
 Every fix only creates something that is missing or switches on something that is off. No
 fix deletes anything or changes a value you chose, and pressing it twice does no more than
-pressing it once. Most can be undone on their own page:
+pressing it once. The one fix that stops something stops only jobs that have already stopped
+running, because their owner was deactivated, and schedules them again as you. Most can be
+undone on their own page:
 
 | Finding | What the fix does | How to undo it |
 |---|---|---|
@@ -158,6 +170,7 @@ pressing it once. Most can be undone on their own page:
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
 | **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollups page, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Connect. |
+| **Scheduled jobs belong to a deactivated person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
@@ -168,7 +181,7 @@ a household with nobody in it.
 ## People with no household, and households with nobody in them
 
 Health Check finds these and links them; it never changes them. To see every one of them, and
-other record checks such as addresses with parts missing, use the **Data Hygiene** tab, which
+other record checks such as addresses with parts missing, use **Data quality** on the **Org Optimizer** tab, which
 opens each list in Find (see [Data hygiene](data-hygiene.md), which also says how the two
 pages differ). Health Check is about whether BarnCRM is set up right; Data hygiene is about
 the records themselves.
@@ -191,6 +204,17 @@ two household checks are shown only to them too, for the reason given above.
 
 If one check cannot run, the rest still run. The check that failed appears as its own finding
 saying so, and the details are written to the Error Log.
+
+## Relationships and affiliations with no person
+
+When a person is deleted (not merged), the relationships that named them are left with nobody on that side, and their affiliations are left with no person. Merging two people moves these records to the kept person, so they are only left blank by a delete. Health Check finds them and links the first five; it never changes or deletes them.
+
+| Finding | Who is counted | What to do |
+|---|---|---|
+| **Relationships have no person on one side** (amber) | Every relationship with no contact and no person account on either side. These cannot be edited until the missing person is chosen again. | Open each linked relationship and choose the missing person, or delete the relationship. |
+| **Affiliations have no person** (amber) | Every affiliation with no contact and no person account. They show as an unnamed person. | Open each linked affiliation and choose the person, or delete the affiliation. |
+
+Each finding counts up to 1,000 and then says **More than 1,000**. Both are shown only to people with the Manage BarnCRM Settings permission.
 
 ## Common mistakes
 
@@ -241,8 +265,8 @@ runs an automation whose switch is left over, so it does no harm.
 
 **Waiting for install to schedule the nightly jobs.** Nothing is scheduled when BarnCRM is
 installed, because a scheduled job runs as the person who scheduled it. Press **Schedule all
-nightly jobs** once, as the administrator the jobs should run as. If that person later leaves,
-stop the jobs on their pages and press the fix again as somebody else.
+nightly jobs** once, as the administrator the jobs should run as. If that person later leaves
+and is deactivated, Health Check says so: press **Schedule them again as me** on that finding.
 
 **Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
 unscheduled rollup run costs you. The button that fixes it is **Schedule all nightly jobs**, on

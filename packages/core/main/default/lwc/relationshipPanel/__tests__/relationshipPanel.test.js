@@ -1,56 +1,44 @@
 import { createElement } from 'lwc';
 import RelationshipPanel from 'c/relationshipPanel';
-import getRelationships from '@salesforce/apex/RelationshipController.getRelationships';
-import removeRelationship from '@salesforce/apex/RelationshipController.removeRelationship';
+import { graphql } from 'lightning/graphql';
+import { deleteRecord } from 'lightning/uiRecordApi';
 
-jest.mock(
-  '@salesforce/apex/RelationshipController.getRelationships',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
+const HARPER = '0031000000000001AA';
 
-jest.mock(
-  '@salesforce/apex/RelationshipController.removeRelationship',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
+/** One relationship as the GraphQL query returns it. */
+function node({ id, relatedName, type, status, description = null, asAccount = false }) {
+  return {
+    Id: id,
+    Related_Contact__r: asAccount ? null : { Name: { value: relatedName } },
+    Related_Person_Account__r: asAccount ? { Name: { value: relatedName } } : null,
+    Type__c: { value: type, displayValue: type },
+    Status__c: { value: status },
+    Description__c: { value: description }
+  };
+}
 
-jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn() }), { virtual: true });
+function response(nodes) {
+  return { uiapi: { query: { Relationship__c: { edges: nodes.map((n) => ({ node: n })) } } } };
+}
 
-const SPOUSE = {
+const SPOUSE = node({
   id: 'a0200000000000AAAA',
-  relationshipNumber: 'RL-000001',
-  relatedPersonId: '0031000000000002AA',
-  relatedPersonName: 'Luis Garcia',
-  relationshipType: 'Spouse',
-  reciprocalType: 'Spouse',
-  status: 'Current',
-  isFormer: false,
-  description: null,
-  isReciprocalManaged: true,
-  hasOtherSide: true
-};
+  relatedName: 'Luis Garcia',
+  type: 'Spouse',
+  status: 'Current'
+});
 
-const FORMER_COLLEAGUE = {
+const FORMER_COLLEAGUE = node({
   id: 'a0200000000000BBBB',
-  relationshipNumber: 'RL-000002',
-  relatedPersonId: '0031000000000003AA',
-  relatedPersonName: 'Jordan Reyes',
-  relationshipType: 'Colleague',
-  reciprocalType: 'Colleague',
+  relatedName: 'Jordan Reyes',
+  type: 'Colleague',
   status: 'Former',
-  isFormer: true,
-  description: 'Worked together at the food bank',
-  isReciprocalManaged: true,
-  hasOtherSide: true
-};
+  description: 'Worked together at the food bank'
+});
 
 function build(objectApiName = 'Contact') {
   const element = createElement('c-relationship-panel', { is: RelationshipPanel });
-  element.recordId = '0031000000000001AA';
+  element.recordId = HARPER;
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
   return element;
@@ -58,6 +46,12 @@ function build(objectApiName = 'Contact') {
 
 function flush() {
   return Promise.resolve().then(() => Promise.resolve());
+}
+
+function names(element) {
+  return Array.from(element.shadowRoot.querySelectorAll('[data-id="related-person"]')).map(
+    (n) => n.textContent
+  );
 }
 
 describe('c-relationship-panel', () => {
@@ -68,34 +62,68 @@ describe('c-relationship-panel', () => {
     jest.clearAllMocks();
   });
 
-  it('shows a card for every relationship this person has', async () => {
+  it('asks for the relationships of the person it sits on', async () => {
+    build();
+    await flush();
+    expect(graphql.getLastConfig().variables).toEqual({ personId: HARPER });
+  });
+
+  it('shows a loading state, not "no relationships", until the relationships arrive', async () => {
     const element = build();
-    getRelationships.emit([SPOUSE, FORMER_COLLEAGUE]);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="loading"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
+
+    graphql.emit(response([SPOUSE]));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="loading"]')).toBeNull();
+  });
+
+  it('shows a card for every relationship this person has, current ones first', async () => {
+    const element = build();
+    graphql.emit(response([FORMER_COLLEAGUE, SPOUSE]));
     await flush();
 
     const cards = element.shadowRoot.querySelectorAll('[data-id="relationship-card"]');
     expect(cards.length).toBe(2);
-    const names = Array.from(element.shadowRoot.querySelectorAll('[data-id="related-person"]')).map(
-      (node) => node.textContent
+    expect(names(element)).toEqual(['Luis Garcia', 'Jordan Reyes']);
+  });
+
+  it('names a related person held as an account, and stands in when there is no name', async () => {
+    const element = build('Account');
+    graphql.emit(
+      response([
+        node({
+          id: 'a0200000000000CCCC',
+          relatedName: 'Luis Garcia',
+          type: 'Spouse',
+          status: 'Current',
+          asAccount: true
+        }),
+        { ...FORMER_COLLEAGUE, Related_Contact__r: null }
+      ])
     );
-    expect(names).toEqual(['Luis Garcia', 'Jordan Reyes']);
+    await flush();
+
+    expect(names(element)).toEqual(['Luis Garcia', 'c.Core_Relationship_UnnamedPerson']);
   });
 
   it('names the type from this side and badges the ones that have ended', async () => {
     const element = build();
-    getRelationships.emit([SPOUSE, FORMER_COLLEAGUE]);
+    graphql.emit(response([SPOUSE, FORMER_COLLEAGUE]));
     await flush();
 
     const types = Array.from(
       element.shadowRoot.querySelectorAll('[data-id="relationship-type"]')
-    ).map((node) => node.textContent);
+    ).map((n) => n.textContent);
     expect(types).toEqual(['Spouse', 'Colleague']);
     expect(element.shadowRoot.querySelectorAll('[data-id="former-badge"]').length).toBe(1);
   });
 
   it('says so when the person has no relationships yet', async () => {
     const element = build();
-    getRelationships.emit([]);
+    graphql.emit(response([]));
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
@@ -104,33 +132,34 @@ describe('c-relationship-panel', () => {
 
   it('shows a message when the relationships cannot be read', async () => {
     const element = build();
-    getRelationships.error();
+    graphql.emitErrors([{ message: 'no access' }]);
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
   });
 
-  it('removes a relationship and redraws what is left', async () => {
-    removeRelationship.mockResolvedValue([FORMER_COLLEAGUE]);
+  it('removes a relationship as the user and reads the card again', async () => {
+    const refresh = jest.fn().mockResolvedValue();
     const element = build();
-    getRelationships.emit([SPOUSE, FORMER_COLLEAGUE]);
+    graphql.emit(response([SPOUSE, FORMER_COLLEAGUE]), undefined, refresh);
     await flush();
 
     element.shadowRoot.querySelector('.remove-relationship').click();
     await flush();
 
-    expect(removeRelationship).toHaveBeenCalledWith({
-      relationshipId: SPOUSE.id,
-      personId: '0031000000000001AA'
-    });
+    expect(deleteRecord).toHaveBeenCalledWith(SPOUSE.Id);
+    expect(refresh).toHaveBeenCalledTimes(1);
+
+    graphql.emit(response([FORMER_COLLEAGUE]), undefined, refresh);
+    await flush();
     expect(element.shadowRoot.querySelectorAll('[data-id="relationship-card"]').length).toBe(1);
   });
 
   it('shows a message when a relationship cannot be removed', async () => {
-    removeRelationship.mockRejectedValue(new Error('no'));
+    deleteRecord.mockRejectedValueOnce(new Error('no'));
     const element = build();
-    getRelationships.emit([SPOUSE]);
+    graphql.emit(response([SPOUSE]));
     await flush();
 
     element.shadowRoot.querySelector('.remove-relationship').click();
@@ -139,27 +168,43 @@ describe('c-relationship-panel', () => {
     expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
   });
 
+  it('reads the card again after a new relationship is saved', async () => {
+    const refresh = jest.fn().mockResolvedValue();
+    const element = build();
+    graphql.emit(response([]), undefined, refresh);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-relationship"]').click();
+    await flush();
+
+    element.shadowRoot
+      .querySelector('lightning-record-edit-form')
+      .dispatchEvent(new CustomEvent('success'));
+    await flush();
+
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
   it('fills in the contact lookups on a contact record and the account lookups on an account', async () => {
     const asContact = build('Contact');
-    getRelationships.emit([]);
+    graphql.emit(response([]));
     await flush();
     asContact.shadowRoot.querySelector('[data-id="add-relationship"]').click();
     await flush();
 
     let fields = Array.from(asContact.shadowRoot.querySelectorAll('lightning-input-field')).map(
-      (node) => node.fieldName
+      (n) => n.fieldName
     );
     expect(fields[0]).toBe('Contact__c');
     expect(fields[1]).toBe('Related_Contact__c');
 
     const asAccount = build('Account');
-    getRelationships.emit([]);
+    graphql.emit(response([]));
     await flush();
     asAccount.shadowRoot.querySelector('[data-id="add-relationship"]').click();
     await flush();
 
     fields = Array.from(asAccount.shadowRoot.querySelectorAll('lightning-input-field')).map(
-      (node) => node.fieldName
+      (n) => n.fieldName
     );
     expect(fields[0]).toBe('Person_Account__c');
     expect(fields[1]).toBe('Related_Person_Account__c');

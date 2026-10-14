@@ -2,8 +2,13 @@
  * Combining and separating households, in both membership modes.
  * Canonical model R-H11, R-H12, R-H13.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeService')
 private class HouseholdMergeServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     // ------------------------------------------------------------------ preview
 
     @IsTest
@@ -205,6 +210,51 @@ private class HouseholdMergeServiceTest {
     }
 
     /**
+     * A greeting is offered as a choice the same way a name is, so a chosen greeting is
+     * kept too rather than recomputed straight over.
+     */
+    @IsTest
+    static void mergeKeepsTheOtherHouseholdsGreetingWhenThePersonChoosesIt() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+            update new Account(
+                Id = victimId,
+                Household_Formal_Greeting__c = 'Dr. Wei Lee and family'
+            );
+
+            Test.startTest();
+            HouseholdMergeService.MergeResult result = HouseholdMergeService.mergeHouseholds(
+                survivorId,
+                victimId,
+                new HouseholdMergeService.MergeChoices(
+                    new Map<String, String>{
+                        'Household_Formal_Greeting__c' => HouseholdMergeService.KEEP_VICTIM
+                    }
+                )
+            );
+            Test.stopTest();
+
+            Account survivor = [
+                SELECT Household_Formal_Greeting__c, Custom_Name__c
+                FROM Account
+                WHERE Id = :survivorId
+            ];
+            Assert.areEqual(
+                'Dr. Wei Lee and family',
+                survivor.Household_Formal_Greeting__c,
+                'The greeting the person chose stands'
+            );
+            Assert.isTrue(survivor.Custom_Name__c, 'It is held as custom wording (R-H8)');
+            Assert.isTrue(result.customNameKept, 'The screen is told');
+        }
+    }
+
+    /**
      * The counterpart: a chosen name that naming produces anyway is not frozen, so the
      * household stays one whose name follows its members.
      */
@@ -212,17 +262,20 @@ private class HouseholdMergeServiceTest {
     static void aChosenNameThatNamingWouldGiveAnywayStaysAnOrdinaryName() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            insert maria;
-            Id victimId = householdOf(maria.Id);
+            // The primary member's surname comes first (R-H5): Sam leads the other household
+            // and Wei the survivor, so both read Lee first and the chosen name is the one
+            // naming gives the merged household.
+            Contact sam = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Lee');
+            insert sam;
+            Id victimId = householdOf(sam.Id);
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert wei;
             Id survivorId = householdOf(wei.Id);
-            Contact sam = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Lee');
-            sam.AccountId = victimId;
-            insert sam;
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = victimId;
+            insert maria;
             Assert.areEqual(
-                'Garcia and Lee Household',
+                'Lee and Garcia Household',
                 [SELECT Name FROM Account WHERE Id = :victimId].Name,
                 'The other household is named from both surnames before the merge'
             );
@@ -238,7 +291,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Account survivor = [SELECT Name, Custom_Name__c FROM Account WHERE Id = :survivorId];
-            Assert.areEqual('Garcia and Lee Household', survivor.Name, 'The chosen name stands');
+            Assert.areEqual('Lee and Garcia Household', survivor.Name, 'The chosen name stands');
             Assert.isFalse(
                 survivor.Custom_Name__c,
                 'Naming gives that name anyway, so the household keeps following its members'
@@ -255,6 +308,44 @@ private class HouseholdMergeServiceTest {
      * (ADR-0021): a deceased flag they cannot read on the record does not reach them
      * through the merge comparison.
      */
+    /**
+     * One field the person cannot read leaves that field out of the comparison; it does
+     * not refuse the whole merge screen.
+     */
+    @IsTest
+    static void previewLeavesOutAFieldThePersonCannotRead() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User staff = HouseholdTestDataFactory.standardUser('mfls2');
+            grantHouseholdFieldRead('C01_Merge_No_Anniversary', staff.Id, 'Anniversary__c');
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            System.runAs(staff) {
+                insert new List<Contact>{ maria, wei };
+            }
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+
+            HouseholdMergeService.MergePreview shown;
+            Boolean canRead;
+            Test.startTest();
+            System.runAs(staff) {
+                canRead = Schema.SObjectType.Account.fields.Anniversary__c.isAccessible();
+                shown = HouseholdMergeService.preview(survivorId, victimId);
+            }
+            Test.stopTest();
+
+            Assert.isFalse(canRead, 'The person really cannot read the anniversary');
+            Map<String, HouseholdMergeService.FieldChoice> fields = byFieldName(shown);
+            Assert.isFalse(
+                fields.containsKey('Anniversary__c'),
+                'The field the person cannot read is left out'
+            );
+            Assert.isTrue(fields.containsKey('Name'), 'The rest of the comparison is shown');
+            Assert.areEqual(2, shown.members.size(), 'Both people are listed');
+        }
+    }
+
     @IsTest
     static void previewShowsOnlyWhatThePersonCanRead() {
         System.runAs(TestUsers.admin()) {
@@ -327,6 +418,15 @@ private class HouseholdMergeServiceTest {
                 saved.Anniversary__c,
                 'The chosen anniversary survives'
             );
+            // Both households had a default address; the merge settlement (PEOPLE-15) keeps
+            // the one matching the chosen billing address.
+            List<Address__c> defaults = [
+                SELECT City__c
+                FROM Address__c
+                WHERE Account__c = :survivor.Id AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(1, defaults.size(), 'The survivor has one default address');
+            Assert.areEqual('Berkeley', defaults[0].City__c, 'The chosen one');
         }
     }
 
@@ -403,6 +503,50 @@ private class HouseholdMergeServiceTest {
     }
 
     // ------------------------------------------------------------------ refusals
+
+    @IsTest
+    static void aNonprofitCloudHouseholdIsNeitherPreviewedNorMerged() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account ours = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            // Theirs carries a native household group, as in a Nonprofit Cloud org.
+            Account theirs = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert new List<Account>{ ours, theirs };
+            HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{ theirs.Id };
+
+            List<String> messages = new List<String>();
+            Test.startTest();
+            try {
+                HouseholdMergeService.preview(ours.Id, theirs.Id);
+            } catch (HouseholdException e) {
+                messages.add(e.getMessage());
+            }
+            try {
+                HouseholdMergeService.mergeHouseholds(
+                    theirs.Id,
+                    ours.Id,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            } catch (HouseholdException e) {
+                messages.add(e.getMessage());
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<String>{
+                    Label.Core_HouseholdMerge_ErrorNativeHousehold,
+                    Label.Core_HouseholdMerge_ErrorNativeHousehold
+                },
+                messages,
+                'Either direction is refused, before anything is moved.'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ ours.Id, theirs.Id }],
+                'Both households are still there.'
+            );
+        }
+    }
 
     @IsTest
     static void anOrganizationCannotBeMergedIntoAHousehold() {
@@ -755,7 +899,114 @@ private class HouseholdMergeServiceTest {
         }
     }
 
+    // ------------------------------------------------------------------ a third household
+
+    /**
+     * Ana belongs to the household being merged away and to her other parent's household.
+     * The merge moves her from the first only, keeps the date she joined, and leaves the
+     * other household exactly as it was.
+     */
+    @IsTest
+    static void mergeInJunctionModeLeavesAThirdHouseholdAlone() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
+            Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ survivor, victim, other };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ ana, wei };
+            Date joined = Date.newInstance(2020, 1, 15);
+            insert new List<Household_Member__c>{
+                new Household_Member__c(
+                    Household__c = victim.Id,
+                    Contact__c = ana.Id,
+                    Start_Date__c = joined
+                ),
+                new Household_Member__c(
+                    Household__c = other.Id,
+                    Contact__c = ana.Id,
+                    Start_Date__c = joined
+                ),
+                new Household_Member__c(
+                    Household__c = other.Id,
+                    Contact__c = wei.Id,
+                    Start_Date__c = joined
+                )
+            };
+
+            Test.startTest();
+            HouseholdMergeService.mergeHouseholds(
+                survivor.Id,
+                victim.Id,
+                new HouseholdMergeService.MergeChoices(null)
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                currentMembers(other.Id),
+                'Ana is still in the other household, with Wei'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT Member_Count__c FROM Account WHERE Id = :other.Id].Member_Count__c,
+                'The other household still counts both of them'
+            );
+            List<Household_Member__c> inSurvivor = [
+                SELECT Start_Date__c
+                FROM Household_Member__c
+                WHERE Household__c = :survivor.Id AND Contact__c = :ana.Id AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, inSurvivor.size(), 'Ana is in the survivor once');
+            Assert.areEqual(
+                joined,
+                inSurvivor[0].Start_Date__c,
+                'A merge keeps the date she joined the family'
+            );
+        }
+    }
+
+    @IsTest
+    static void splitInJunctionModeLeavesAThirdHouseholdAlone() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account source = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ source, other };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            insert new List<Contact>{ maria, ana };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(Household__c = source.Id, Contact__c = maria.Id),
+                new Household_Member__c(Household__c = source.Id, Contact__c = ana.Id),
+                new Household_Member__c(Household__c = other.Id, Contact__c = ana.Id)
+            };
+
+            Test.startTest();
+            Id destination = HouseholdMergeService.split(source.Id, new Set<Id>{ ana.Id }, null);
+            Test.stopTest();
+
+            Assert.areEqual(1, currentMembers(source.Id), 'Maria stays where she was');
+            Assert.areEqual(1, currentMembers(destination), 'Ana is in the new household');
+            Assert.areEqual(
+                1,
+                currentMembers(other.Id),
+                'Ana is still in the household the split did not name'
+            );
+        }
+    }
+
     // ------------------------------------------------------------------ helpers
+
+    private static Integer currentMembers(Id householdId) {
+        return [
+            SELECT COUNT()
+            FROM Household_Member__c
+            WHERE Household__c = :householdId AND (End_Date__c = NULL OR End_Date__c > TODAY)
+        ];
+    }
 
     private static Id householdOf(Id contactId) {
         return [SELECT AccountId FROM Contact WHERE Id = :contactId].AccountId;
@@ -781,6 +1032,10 @@ private class HouseholdMergeServiceTest {
      * that granting access and creating records never mix in one transaction.
      */
     private static void grantHouseholdFieldRead(String name, Id userId) {
+        grantHouseholdFieldRead(name, userId, null);
+    }
+
+    private static void grantHouseholdFieldRead(String name, Id userId, String leftOut) {
         List<String> fields = new List<String>{
             'Anniversary__c',
             'Custom_Name__c',
@@ -789,6 +1044,9 @@ private class HouseholdMergeServiceTest {
             'Member_Count__c',
             'Primary_Contact__c'
         };
+        if (leftOut != null) {
+            fields.remove(fields.indexOf(leftOut));
+        }
         System.runAs(new User(Id = UserInfo.getUserId())) {
             PermissionSet grant = new PermissionSet(Name = name, Label = name);
             insert grant;

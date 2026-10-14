@@ -6,8 +6,13 @@
  * so that a finding is asserted against numbers the test chose rather than against whoever
  * happens to hold a permission set in the org the tests run in.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckService')
 private class HealthCheckServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void npspOrgReportsNpspDetectedAndRecommendsIt() {
         System.runAs(TestUsers.admin()) {
@@ -231,12 +236,16 @@ private class HealthCheckServiceTest {
     @IsTest
     static void peopleLinkedStraightToAHouseholdTheFlexibleWayCannotSeeAreAnError() {
         System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            // Linked straight to the household on the simple way, then the setting moved by a
+            // route the settings write does not guard. Saving her that way under the flexible
+            // way would join her to the household with a membership record.
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             insert household;
             Contact maria = HouseholdTestDataFactory.newContact('Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 
             HealthCheckService.Finding finding = find(
                 HealthCheckService.run(),
@@ -1449,6 +1458,39 @@ private class HealthCheckServiceTest {
                 null,
                 find(findings, 'native_household_collision'),
                 'No warning is raised when nothing collides'
+            );
+        }
+    }
+
+    /** A count past the cap reads "More than" the cap, not a number nobody counted (PEOPLE-3). */
+    @IsTest
+    static void aCountPastTheCapSaysMoreThan() {
+        System.runAs(TestUsers.admin()) {
+            Integer cap = OrgShapeSelector.NATIVE_COUNT_CAP;
+            String moreThan = String.format(
+                System.Label.Core_HealthCheck_OrphansMoreThan,
+                new List<Object>{ cap.format() }
+            );
+            Assert.areEqual(moreThan, HealthCheckOrgShapeChecks.cappedCount(cap + 1), 'Past');
+            Assert.areEqual(String.valueOf(cap), HealthCheckOrgShapeChecks.cappedCount(cap), 'At');
+            Assert.areEqual('3', HealthCheckOrgShapeChecks.cappedCount(3), 'Under');
+
+            OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
+            orgShape.hasNativeHouseholdGroups = true;
+            orgShape.nativeHouseholdGroupCount = cap + 1;
+            OrgShapeDetector.overrideShape = orgShape;
+            HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
+
+            Test.startTest();
+            HealthCheckService.Finding finding = find(
+                HealthCheckService.run(),
+                'native_households'
+            );
+            Test.stopTest();
+
+            Assert.isTrue(
+                finding.detail.contains(moreThan),
+                'The native households finding says more than the cap: ' + finding.detail
             );
         }
     }

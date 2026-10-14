@@ -60,9 +60,16 @@ public with sharing class HouseholdMergeController {
         return HouseholdSelector.getEditableIds(new Set<Id>{ householdId }).contains(householdId);
     }
 
+    /** Set by a test to make the preview fail as an unexpected platform error would. */
+    @TestVisible
+    private static Exception previewFailureForTest;
+
     @AuraEnabled(cacheable=true)
     public static HouseholdMergeService.MergePreview preview(Id survivorId, Id victimId) {
         try {
+            if (previewFailureForTest != null) {
+                throw previewFailureForTest;
+            }
             return HouseholdMergeService.preview(survivorId, victimId);
         } catch (Exception e) {
             throw asUserError(e, survivorId);
@@ -121,23 +128,8 @@ public with sharing class HouseholdMergeController {
         return String.join(parts, ', ');
     }
 
-    /**
-     * What the screen is told. A HouseholdException already says in plain words what went
-     * wrong and what to do, so its message goes through as it is. Anything else is a
-     * platform failure whose wording is for an administrator reading the Error Log, not
-     * for the person at the screen: the whole exception is logged and the screen gets the
-     * generic message.
-     */
+    /** What the screen is told, logged under the merge's own context. */
     private static AuraHandledException asUserError(Exception e, Id recordId) {
-        String message;
-        if (e instanceof HouseholdException) {
-            message = e.getMessage();
-        } else {
-            ErrorLogger.log(e, Label.Core_HouseholdMerge_ErrorContext, recordId);
-            message = Label.Core_Households_ErrorUnexpected;
-        }
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
+        return HouseholdException.forScreen(e, Label.Core_HouseholdMerge_ErrorContext, recordId);
     }
 }

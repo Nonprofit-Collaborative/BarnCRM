@@ -17,6 +17,12 @@
   work but are not tested.
 - **Java 11 or newer**: required for PMD, which `sf code-analyzer` runs as part of the rule
   engine. Java 21 (as installed here) is fine; anything 11+ works.
+- **Salesforce CLI new enough for `RunRelevantTests`**, for the relevant-tests org run
+  (`scripts/org/run-org-tests.sh <alias> --relevant`, see [CI](ci.md), "The org test gate").
+  Check with `sf project deploy start --help`: its `--test-level` options must list
+  `RunRelevantTests` (2.153.5 does). The full gate needs no particular version. The
+  `@IsTest(testFor=...)` and `@IsTest(critical=true)` annotations need API 66.0 or later;
+  `sfdx-project.json` sets 67.0.
 
 ## Install
 
@@ -76,3 +82,24 @@ strings, URLs, page state, or metadata lookups do.
 The product plan's repository layout (Section 4.3) lists this file as `npc.json`. Per Brandon's
 instruction, it is named `person-accounts.json` in this repository instead: the file name says
 what the org shape verifies (Person Accounts enabled) rather than a product-name shorthand.
+
+## Test org shapes and snapshots
+
+Three test org shapes are in use. Every scratch org needs the owner's approval before it is
+created; only recreating an expired approved org is pre-approved.
+
+| Alias       | Shape                          | Definition                                 | Expires    | Recreation   |
+| ----------- | ------------------------------ | ------------------------------------------ | ---------- | ------------ |
+| `oi-test`   | Person Accounts                | `config/scratch-defs/person-accounts.json` | 2026-10-23 | Needs approval; also update `SF_TEST_ORG_AUTH_URL` |
+| `oi-pa`     | Person Accounts                | `config/scratch-defs/person-accounts.json` | 2026-10-24 | Pre-approved |
+| `barn-core` | Platform-only (Developer edition) | `config/scratch-defs/platform-only.json` | 2026-10-15 | Pre-approved |
+
+A scratch org snapshot saves a prepared org (BarnCRM deployed, permission sets assigned) so a
+new org of that shape is created in minutes instead of by a full deploy. Snapshot definitions
+are `config/scratch-defs/person-accounts-snapshot.json` (snapshot `BarnPA`) and
+`platform-only-snapshot.json` (snapshot `BarnPlatform`).
+
+- Create or refresh a snapshot from an existing org: `scripts/org/create-snapshot.sh <source-alias> <snapshot-name>`.
+- Create an org from a snapshot: `scripts/org/create-org-from-snapshot.sh <shape> [alias] --days 7`.
+- **Refresh a snapshot after any change under `packages/`.** A snapshot is frozen at the metadata it was taken from; an org made from a stale one lacks later changes. Refresh from an org deployed at current `main`.
+- The Dev Hub needs Scratch Org Snapshots enabled (Setup, Dev Hub). See `docs/contributor-guide/ci.md`, "Scratch org snapshots".

@@ -1,5 +1,5 @@
 <template>
-    <template if:true={hasError}>
+    <template lwc:if={hasError}>
         <div class="slds-text-color_error slds-var-m-bottom_x-small" role="alert" data-id="related-error">
             {errorMessage}
         </div>
@@ -47,7 +47,7 @@
                     ></lightning-button>
                 </div>
             </div>
-            <template if:true={condition.hasKind}>
+            <template lwc:if={condition.hasKind}>
                 <p class="slds-var-m-top_x-small slds-var-m-bottom_xx-small">{labels.relatedConditions}</p>
                 <c-filter-builder
                     data-key={condition.key}
@@ -104,7 +104,7 @@
                     ></lightning-button>
                 </div>
             </div>
-            <template if:true={column.hasKind}>
+            <template lwc:if={column.hasKind}>
                 <lightning-dual-listbox
                     class="slds-var-m-top_x-small"
                     data-key={column.key}

@@ -3,7 +3,7 @@
  * deliberate refusal to guess at one nobody recognizes.
  */
 // runs-as: deploying user (pure logic: matches column headings in memory, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:ImportColumnLibrary')
 private class ImportColumnLibraryTest {
     @IsTest
     static void recognizesTheUsualHeadings() {

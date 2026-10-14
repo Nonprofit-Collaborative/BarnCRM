@@ -1,8 +1,13 @@
 /**
  * What the merge and split screen calls, including the picker and the read only check.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeController')
 private class HouseholdMergeControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void theSearchOffersHouseholdsAndNotOrganizations() {
         System.runAs(TestUsers.admin()) {
@@ -197,9 +202,10 @@ private class HouseholdMergeControllerTest {
     }
 
     /**
-     * A failure the package did not expect (here, a user whose profile cannot read
-     * households at all, so the platform refuses the comparison's own query) reaches the
-     * screen as the plain message, and the platform's wording goes to the Error Log.
+     * A failure the package did not expect reaches the screen as the plain message, and the
+     * platform's wording goes to the Error Log. The comparison's reads strip what a person
+     * cannot read rather than fail, so no user's access produces one any more:
+     * the test raises it.
      */
     @IsTest
     static void aPlatformFailureReachesTheScreenInPlainWords() {
@@ -208,16 +214,16 @@ private class HouseholdMergeControllerTest {
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
             insert new List<Account>{ survivor, victim };
-            User reader = readOnlyUser();
+            HouseholdMergeController.previewFailureForTest = new QueryException(
+                'Insufficient permissions: secure query included inaccessible field'
+            );
 
             String message;
             Test.startTest();
-            System.runAs(reader) {
-                try {
-                    HouseholdMergeController.preview(survivor.Id, victim.Id);
-                } catch (Exception e) {
-                    message = e.getMessage();
-                }
+            try {
+                HouseholdMergeController.preview(survivor.Id, victim.Id);
+            } catch (Exception e) {
+                message = e.getMessage();
             }
             Test.stopTest();
 
@@ -236,47 +242,5 @@ private class HouseholdMergeControllerTest {
                 'What actually happened is in the Error Log for the administrator'
             );
         }
-    }
-
-    // ------------------------------------------------------------------ helpers
-
-    /**
-     * A user on the most restricted standard profile, the same one the service tests use.
-     */
-    private static User readOnlyUser() {
-        // "Read Only" is absent from some editions and org shapes, so the first of the
-        // known profiles without edit access that this org actually has is used.
-        Map<String, Profile> byName = new Map<String, Profile>();
-        for (Profile candidate : [
-            SELECT Id, Name
-            FROM Profile
-            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
-        ]) {
-            byName.put(candidate.Name, candidate);
-        }
-        Profile readOnly = byName.containsKey('Read Only')
-            ? byName.get('Read Only')
-            : byName.get('Minimum Access - Salesforce');
-        Assert.isNotNull(
-            readOnly,
-            'This org has no standard profile without edit access, so a refused read ' +
-            'cannot be exercised at all'
-        );
-        User reader = new User(
-            ProfileId = readOnly.Id,
-            LastName = 'Reader',
-            Email = 'reader@barncrm.test.invalid',
-            Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
-            Alias = 'reader',
-            TimeZoneSidKey = 'America/Los_Angeles',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
-        // A user is a setup record, so it is saved on its own, after the households.
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert reader;
-        }
-        return reader;
     }
 }

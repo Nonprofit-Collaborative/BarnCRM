@@ -2,7 +2,7 @@
  * Money that goes back is recorded, never erased (R-G3, ADR-0010). These tests follow the
  * refunds walkthrough David is given in the admin guide.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftService')
 private class GiftServiceTest {
     @TestSetup
     static void makeData() {

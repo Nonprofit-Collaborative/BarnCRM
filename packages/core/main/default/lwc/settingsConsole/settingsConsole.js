@@ -9,6 +9,7 @@ import SAVE_BUTTON from '@salesforce/label/c.Core_Settings_SaveButton';
 import DISCARD_BUTTON from '@salesforce/label/c.Core_Settings_DiscardButton';
 import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
 import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
+import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Settings_LoadErrorMessage';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
 import LEARN_MORE from '@salesforce/label/c.Core_Settings_LearnMoreLink';
@@ -22,8 +23,12 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { labelTab } from 'c/workspaceTabs';
 
 const RECENT_LIMIT = 10;
+const TAB_ICON = 'standard:settings';
 
 /** A Record Type List value, stored as developer names separated by commas, as a list. */
 function splitList(text) {
@@ -59,16 +64,12 @@ function importCoreComponent(name) {
       return import('c/rollupDefinitions');
     case 'seasonalAddressJob':
       return import('c/seasonalAddressJob');
-    case 'duplicateReview':
-      return import('c/duplicateReview');
     case 'errorDigestJob':
       return import('c/errorDigestJob');
     case 'moduleManager':
       return import('c/moduleManager');
     case 'customMetadataManager':
       return import('c/customMetadataManager');
-    case 'fieldUtilization':
-      return import('c/fieldUtilization');
     default:
       return null;
   }
@@ -82,6 +83,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     discard: DISCARD_BUTTON,
     saved: SAVED_MESSAGE,
     saveError: SAVE_ERROR,
+    outOfRange: OUT_OF_RANGE,
     loadError: LOAD_ERROR,
     readOnly: READ_ONLY_NOTICE,
     learnMore: LEARN_MORE,
@@ -121,6 +123,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   loading = true;
   componentTypes = {};
   requestedSection;
+  enclosingTabId;
+  focusKey;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -132,8 +136,27 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** In a console the tab is named for the section on screen. */
+  @wire(EnclosingTabId)
+  wiredTabId(tabId) {
+    this.enclosingTabId = tabId;
+    this.nameTab();
+  }
+
   connectedCallback() {
     this.load();
+  }
+
+  renderedCallback() {
+    this.nameTab();
+    this.focusChosenSetting();
+  }
+
+  nameTab() {
+    const label = this.selectedSection
+      ? TAB_LABEL.replace('{0}', TITLE).replace('{1}', this.selectedSection)
+      : TITLE;
+    labelTab(this, label, TAB_ICON);
   }
 
   get navigationItems() {
@@ -299,6 +322,29 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   handleSearchSelect(event) {
     if (event.detail && event.detail.section) {
       this.selectedSection = event.detail.section;
+      this.focusKey = event.detail.key;
+    }
+  }
+
+  // The admin guide says a search result takes you to the setting, not just its section, so
+  // once the section has rendered the chosen row is scrolled to and focused (ADMIN-21).
+  focusChosenSetting() {
+    if (!this.focusKey) {
+      return;
+    }
+    const key = this.focusKey;
+    const row = Array.from(this.template.querySelectorAll('[data-key]')).find(
+      (candidate) => candidate.dataset.key === key
+    );
+    if (!row) {
+      return;
+    }
+    this.focusKey = undefined;
+    if (typeof row.scrollIntoView === 'function') {
+      row.scrollIntoView({ block: 'center' });
+    }
+    if (typeof row.focus === 'function') {
+      row.focus();
     }
   }
 
@@ -328,6 +374,17 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   async handleSave() {
     if (!this.canEdit || !this.isDirty) {
+      return;
+    }
+    // A number outside its range is marked on the box and nothing is sent (ADMIN-27); the
+    // server refuses it too, for anyone who saves another way.
+    const numbers = Array.from(
+      this.template.querySelectorAll('lightning-input[data-kind="Number"]')
+    );
+    const invalid = numbers.filter((input) => input.reportValidity() === false);
+    if (invalid.length > 0) {
+      this.messageIsError = true;
+      this.message = this.labels.outOfRange;
       return;
     }
     const values = { ...this.pending };

@@ -131,17 +131,17 @@ public with sharing class FilterValueBinder {
             return fieldPath + (operator == 'in' ? ' IN ' : ' NOT IN ') + bindList(rawValue);
         }
         if (operator == 'contains') {
-            return fieldPath + ' LIKE ' + bind('%' + escapeLike(text(rawValue)) + '%');
+            return fieldPath + ' LIKE ' + bindPattern('%' + escapeLike(text(rawValue)) + '%');
         }
         if (operator == 'does not contain') {
             return '(NOT ' +
                 fieldPath +
                 ' LIKE ' +
-                bind('%' + escapeLike(text(rawValue)) + '%') +
+                bindPattern('%' + escapeLike(text(rawValue)) + '%') +
                 ')';
         }
         if (operator == 'starts with') {
-            return fieldPath + ' LIKE ' + bind(escapeLike(text(rawValue)) + '%');
+            return fieldPath + ' LIKE ' + bindPattern(escapeLike(text(rawValue)) + '%');
         }
         return fieldPath + ' ' + SOQL_BY_COMPARISON.get(operator) + ' ' + bind(coerce(rawValue));
     }
@@ -242,6 +242,30 @@ public with sharing class FilterValueBinder {
         return ':' + name;
     }
 
+    /**
+     * Stores a LIKE pattern. Its backslashes are LIKE escapes already. In SOQL text `\%` and
+     * `\_` are written as they are, but a string literal reads `\\` as one backslash, so the
+     * LIKE escape for a backslash (`\\` in the pattern) is written `\\\\`.
+     */
+    private String bindPattern(String pattern) {
+        String name = bindPrefix + binds.size();
+        binds.put(name, pattern);
+        List<String> shown = new List<String>();
+        for (Integer i = 0; i < pattern.length(); i++) {
+            String character = pattern.substring(i, i + 1);
+            if (character == '\\' && i + 1 < pattern.length()) {
+                String escaped = pattern.substring(i + 1, i + 2);
+                shown.add(escaped == '\\' ? '\\\\\\\\' : '\\' + escaped);
+                i++;
+            } else {
+                shown.add(character);
+            }
+        }
+        // Only quotes are escaped here: escapeSingleQuotes would double the backslashes again.
+        displayByName.put(name, '\'' + String.join(shown, '').replace('\'', '\\\'') + '\'');
+        return ':' + name;
+    }
+
     /** `%` and `_` in typed text are matched as themselves, not as wildcards. */
     private static String escapeLike(String value) {
         return value.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_');
@@ -265,6 +289,8 @@ public with sharing class FilterValueBinder {
         if (value instanceof Decimal || value instanceof Boolean) {
             return String.valueOf(value);
         }
+        // A backslash is written doubled, as SOQL text reads it: "C:\temp" must not read as a tab.
+        // escapeSingleQuotes doubles it as well as escaping the quotes.
         return '\'' + String.escapeSingleQuotes(String.valueOf(value)) + '\'';
     }
 

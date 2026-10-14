@@ -13,7 +13,7 @@
         <categories>Core, Automation</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Automation handler unavailable</shortDescription>
+        <shortDescription>Error Log: an automation handler could not start; {0} is its name</shortDescription>
         <value>BarnCRM could not start one of its automations ({0}), so it was skipped. Everything else ran as usual. Send this entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Shown when a coexistence mode value is not one of the three.</shortDescription>
+        <shortDescription>A coexistence mode value is not one of the three; {0} is the value</shortDescription>
         <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
     </labels>
     <labels>
@@ -97,6 +97,14 @@
         <value>not confirmed yet</value>
     </labels>
     <labels>
+        <fullName>Core_Console_TabLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Console tab name; {0} the page, {1} what it shows</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
         <fullName>Core_ErrorLog_ActionFailed</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>
@@ -121,6 +129,14 @@
         <value>BarnCRM hit a problem it did not expect. The technical detail on this entry is what a support contact needs to work out why.</value>
     </labels>
     <labels>
+        <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
+        <categories>Core, Error Log</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error log default message naming where it happened ({0})</shortDescription>
+        <value>BarnCRM hit a problem it did not expect in {0}. The technical detail on this entry is what a support contact needs to work out why.</value>
+    </labels>
+    <labels>
         <fullName>Core_ErrorLogTile_Acknowledge</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>
@@ -141,8 +157,8 @@
         <categories>Core, Error Log</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error log tile new count</shortDescription>
-        <value>new</value>
+        <shortDescription>Error log tile: how many entries are new; {0} is the count</shortDescription>
+        <value>{0} new</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_OpenEntry</fullName>

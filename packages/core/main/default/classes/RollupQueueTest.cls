@@ -3,8 +3,13 @@
  * Core holds no giving objects, so the totals here roll organizations up to their parent account
  * (`ParentId`), which runs the same engine the giving totals do.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupQueue')
 private class RollupQueueTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Id organizationType() {
         return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
             .get('Organization')
@@ -183,6 +188,84 @@ private class RollupQueueTest {
         }
     }
 
+    /** Merged entries run the definitions any of them names; one naming none runs them all. */
+    @IsTest
+    static void mergedEntriesCarryTheUnionOfTheirDefinitions() {
+        System.runAs(TestUsers.admin()) {
+            List<Id> ids = new List<Id>(fakeAccountIds(3));
+            Id gifts = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000001'
+            );
+            Id softCredits = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000002'
+            );
+            List<Rollup_Queue__c> named = new List<Rollup_Queue__c>{
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[0],
+                    Definition_Ids__c = String.valueOf(gifts),
+                    Attempts__c = 0
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[1],
+                    Definition_Ids__c = gifts + ',' + softCredits,
+                    Attempts__c = 0
+                )
+            };
+
+            RollupQueue.Slice slice = RollupQueue.take(named, 200);
+            Assert.areEqual(
+                new Set<Id>{ gifts, softCredits },
+                slice.definitionIdsFor('Account'),
+                'The union of what the entries name'
+            );
+
+            named.add(
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[2],
+                    Attempts__c = 0
+                )
+            );
+            Assert.isNull(
+                RollupQueue.take(named, 200).definitionIdsFor('Account'),
+                'An entry naming none runs every definition'
+            );
+        }
+    }
+
+    @IsTest
+    static void anEntryNamesTheDefinitionsThatQueuedIt() {
+        System.runAs(TestUsers.admin()) {
+            Id gifts = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000001'
+            );
+
+            Test.startTest();
+            RollupQueue.add(
+                new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(250) },
+                new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ gifts } }
+            );
+            RollupQueue.retryLater(
+                'Account',
+                new Map<Id, String>{ new List<Id>(fakeAccountIds(1))[0] => 'Record locked.' },
+                0,
+                new Set<Id>{ gifts }
+            );
+            List<Rollup_Queue__c> queued = [SELECT Definition_Ids__c FROM Rollup_Queue__c];
+            Test.stopTest();
+
+            Assert.areEqual(3, queued.size(), 'Two entries for 250 records, one retry');
+            for (Rollup_Queue__c entry : queued) {
+                Assert.areEqual(String.valueOf(gifts), entry.Definition_Ids__c, 'Each split');
+            }
+        }
+    }
+
     @IsTest
     static void aRecordThatCannotBeSavedIsTriedLaterThenFails() {
         System.runAs(TestUsers.admin()) {
@@ -271,6 +354,105 @@ private class RollupQueueTest {
                 new Rollup_Queue__c(Record_Ids__c = '001000000000001, nonsense')
             );
             Assert.areEqual(1, ids.size(), 'Only the identifier is kept');
+        }
+    }
+
+    private static Integer processorsQueued() {
+        return [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RollupQueue'];
+    }
+
+    @IsTest
+    static void insideAQueueableTheEngineLeavesTheChainedJobFree() {
+        System.runAs(TestUsers.admin()) {
+            insertChildCount();
+            Set<Id> parents = parentsWithOneChild(200);
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            // A bulk change saved inside a Queueable queues its 200 parents (R-R4).
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
+
+            Assert.areEqual(
+                0,
+                Limits.getQueueableJobs(),
+                'The one job a Queueable may queue is left for its own next step'
+            );
+            Assert.areEqual(0, processorsQueued(), 'No processor is started from a Queueable');
+            Decimal waiting = 0;
+            for (Rollup_Queue__c entry : entries()) {
+                waiting += entry.Record_Count__c;
+                Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Waiting');
+            }
+            Assert.areEqual(200, waiting, 'Every parent waits in the queue');
+
+            // The chain ends and starts the processor itself.
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(1, processorsQueued(), 'The end of the chain starts one processor');
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(1, processorsQueued(), 'Asking again starts no second one');
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :parents AND NumberOfEmployees = 1],
+                'The processor the chain started calculated every total'
+            );
+            Assert.areEqual(0, entries().size(), 'Every entry is finished');
+        }
+    }
+
+    @IsTest
+    static void startingTheProcessorWithNothingPendingStartsNothing() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(0, processorsQueued(), 'No entries, no processor');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void outsideAQueueableABulkChangeStillStartsTheProcessor() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Assert.areEqual(1, processorsQueued(), 'A save outside a Queueable starts one');
+            Test.stopTest();
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No event outside a Queueable');
+        }
+    }
+
+    @IsTest
+    static void insideAQueueableOneReadyEventCoversEveryChange() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            // 200 changes saved in one Queueable, queued in several writes.
+            Set<Id> ids = fakeAccountIds(200);
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => ids });
+            for (Id oneId : fakeAccountIds(20)) {
+                RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ oneId } });
+            }
+
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'One event per transaction');
+            Assert.areEqual(0, Limits.getQueueableJobs(), 'The chained job is left free');
+            Assert.areEqual(0, processorsQueued(), 'The event, not this job, starts it');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void theReadyEventStartsTheProcessor() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Assert.areEqual(0, processorsQueued(), 'Nothing starts inside the Queueable');
+
+            Test.getEventBus().deliver();
+
+            Assert.areEqual(1, processorsQueued(), 'The subscriber starts one processor');
+            Test.stopTest();
         }
     }
 }

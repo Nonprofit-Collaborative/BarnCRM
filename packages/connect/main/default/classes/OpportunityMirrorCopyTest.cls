@@ -7,7 +7,7 @@
  * Opportunity is read only through dynamic queries, so this class compiles where Opportunity does
  * not exist; there each test stops once it has checked that the mirror did nothing (R-OM1).
  */
-@IsTest
+@IsTest(testFor='ApexClass:OpportunityMirrorService')
 private class OpportunityMirrorCopyTest {
     private static final String LOG_CONTEXT = 'Opportunity mirror';
     // detection-only: read by name so this class compiles where Opportunity does not exist

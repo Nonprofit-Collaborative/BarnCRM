@@ -3,11 +3,17 @@
  * mode over the same document Find runs, with 200-record cases, the records each check must not
  * count, junction mode's count without a Find query, and a refusal shown in place of a number.
  *
- * No org has run these yet; they are written against the behaviour the classes document. Every
- * test states its membership mode and an org shape, so none depends on Person Accounts.
+ * Every test states its membership mode and an org shape, so none depends on Person Accounts;
+ * the person account count is reached through a shape that names a record type as a person
+ * type.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataHygieneService')
 private class DataHygieneServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
@@ -116,6 +122,34 @@ private class DataHygieneServiceTest {
         }
     }
 
+    /**
+     * People kept as accounts are counted too: the shape names a record type as a person type,
+     * so its 200 accounts with no membership stand for 200 person accounts.
+     */
+    @IsTest
+    static void junctionModeCountsPeopleKeptAsAccountsWithNoMembership() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_JUNCTION);
+            List<Account> standIns = new List<Account>();
+            for (Integer index = 0; index < 200; index++) {
+                standIns.add(newOrganization('Stand-in ' + index));
+            }
+            insert standIns;
+            OrgShapeDetector.overrideShape.personAccountRecordTypeIds = new Set<Id>{
+                standIns[0].RecordTypeId
+            };
+            insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(3, 'Loose'));
+
+            DataHygieneService.CheckResult result = runAs(
+                maria(),
+                DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
+            );
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(203, result.count, 'Three contacts and 200 people kept as accounts.');
+        }
+    }
+
     @IsTest
     static void countsTwoHundredHouseholdsWithNobodyButNotOrganizationsOrLivedInHouseholds() {
         System.runAs(TestUsers.admin()) {
@@ -156,14 +190,24 @@ private class DataHygieneServiceTest {
             mode(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
             insert household;
+            // A membership is saved naming a person (R-M4); it comes to name nobody when that
+            // person is deleted with the household automation off, which is how it happens.
+            List<Contact> gone = insertWithoutAutomaticHouseholds(
+                HouseholdTestDataFactory.manyContacts(200, 'Gone')
+            );
             List<Household_Member__c> rows = new List<Household_Member__c>();
-            for (Integer index = 0; index < 200; index++) {
-                rows.add(new Household_Member__c(Household__c = household.Id));
+            for (Contact goner : gone) {
+                rows.add(
+                    new Household_Member__c(Household__c = household.Id, Contact__c = goner.Id)
+                );
             }
             Contact person = HouseholdTestDataFactory.newContact('Eve', 'Named');
             insertWithoutAutomaticHouseholds(new List<Contact>{ person });
             rows.add(new Household_Member__c(Household__c = household.Id, Contact__c = person.Id));
             insert rows;
+            AutomationControl.bypass('ContactTriggerHandler');
+            delete gone;
+            AutomationControl.clearBypass('ContactTriggerHandler');
             User maria = maria();
 
             DataHygieneService.CheckResult result = runAs(
@@ -346,6 +390,41 @@ private class DataHygieneServiceTest {
     }
 
     @IsTest
+    static void emptyHouseholdsWarnNotToDeleteWhenNonprofitCloudHouseholdsExist() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            User maria = maria();
+            DataHygieneService.CheckResult platformOnly = runAs(
+                maria,
+                DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
+            );
+            OrgShapeDetector.OrgShape nativeShape = new OrgShapeDetector.OrgShape();
+            nativeShape.hasNativeHouseholdGroups = true;
+            OrgShapeDetector.overrideShape = nativeShape;
+
+            Test.startTest();
+            DataHygieneService.CheckResult withNative = runAs(
+                maria,
+                DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
+            );
+            DataHygieneService.CheckResult otherCheck = runAs(
+                maria,
+                DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON
+            );
+            Test.stopTest();
+
+            Assert.isNull(platformOnly.note, 'No note where there are no native households.');
+            Assert.areEqual(
+                System.Label.Core_DataHygiene_NativeHouseholdsListed,
+                withNative.note,
+                'The empty households check warns not to delete a Nonprofit Cloud household.'
+            );
+            Assert.isTrue(withNative.canOpenInFind, 'It still opens in Find.');
+            Assert.isNull(otherCheck.note, 'Only that check carries the warning.');
+        }
+    }
+
+    @IsTest
     static void aCheckOnAnObjectThePersonCannotSeeSaysSoInsteadOfANumber() {
         System.runAs(TestUsers.admin()) {
             mode(HouseholdTestDataFactory.MODE_CONTACT);
@@ -404,6 +483,106 @@ private class DataHygieneServiceTest {
                     key + ' has a saved query name Find accepts.'
                 );
             }
+        }
+    }
+
+    @IsTest
+    static void countsTwoHundredPeopleNobodyCanReachButNotTheReachableOrTheDeceased() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Silent');
+            Contact emailed = HouseholdTestDataFactory.newContact('Em', 'Mailed');
+            emailed.Email = 'em.mailed@example.org';
+            Contact phoned = HouseholdTestDataFactory.newContact('Ph', 'Oned');
+            phoned.MobilePhone = '555 0100';
+            Contact posted = HouseholdTestDataFactory.newContact('Po', 'Sted');
+            posted.MailingPostalCode = '02139';
+            Contact deceased = HouseholdTestDataFactory.newContact('De', 'Ceased');
+            deceased.Deceased__c = true;
+            people.addAll(new List<Contact>{ emailed, phoned, posted, deceased });
+            insertWithoutAutomaticHouseholds(people);
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.PEOPLE_UNREACHABLE
+            );
+            Integer listed = findRows(maria, DataHygieneService.PEOPLE_UNREACHABLE);
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(200, result.count, 'Only the 200 with no way to reach them.');
+            Assert.isTrue(result.canOpenInFind, 'It opens in Find.');
+            Assert.areEqual(200, listed, 'Find lists exactly what was counted.');
+        }
+    }
+
+    @IsTest
+    static void countsTwoHundredDeceasedPeopleWhoCanStillBeEmailed() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Late');
+            for (Integer index = 0; index < people.size(); index++) {
+                people[index].Deceased__c = true;
+                people[index].Email = 'late' + index + '@example.org';
+            }
+            Contact optedOut = HouseholdTestDataFactory.newContact('Op', 'Out');
+            optedOut.Deceased__c = true;
+            optedOut.Email = 'op.out@example.org';
+            optedOut.HasOptedOutOfEmail = true;
+            Contact living = HouseholdTestDataFactory.newContact('Li', 'Ving');
+            living.Email = 'li.ving@example.org';
+            people.addAll(new List<Contact>{ optedOut, living });
+            insertWithoutAutomaticHouseholds(people);
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.DECEASED_STILL_EMAILED
+            );
+            Integer listed = findRows(maria, DataHygieneService.DECEASED_STILL_EMAILED);
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(200, result.count, 'Not the opted out, not the living.');
+            Assert.areEqual(200, listed, 'Find lists exactly what was counted.');
+        }
+    }
+
+    @IsTest
+    static void peopleNotChangedReadTheirYearsFromSettingsWithinBounds() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            Assert.areEqual(
+                DataHygieneService.DEFAULT_STALE_YEARS,
+                DataHygieneService.staleYears(),
+                'Empty reads as the default.'
+            );
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Stale_Record_Years__c = 50;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(20, DataHygieneService.staleYears(), 'Above the maximum reads as 20.');
+            settings.Stale_Record_Years__c = 0;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(1, DataHygieneService.staleYears(), 'Below the minimum reads as 1.');
+            settings.Stale_Record_Years__c = 3;
+            HouseholdTestDataFactory.save(settings);
+            insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(200, 'Fresh'));
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.PEOPLE_NOT_UPDATED
+            );
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(0, result.count, 'People changed today are not listed.');
+            Assert.isTrue(result.title.contains('3'), 'The title names the years: ' + result.title);
+            Assert.isTrue(result.canOpenInFind, 'It opens in Find.');
         }
     }
 

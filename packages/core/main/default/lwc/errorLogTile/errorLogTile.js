@@ -1,5 +1,8 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { openInWorkspace } from 'c/workspaceTabs';
+import ERROR_LOG_OBJECT from '@salesforce/schema/Error_Log__c';
 import { refreshApex } from '@salesforce/apex';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
@@ -31,6 +34,8 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   busy = false;
   wiredTileResult;
 
+  @wire(EnclosingTabId) enclosingTabId;
+
   @wire(getTile, { rowCount: ROW_COUNT })
   wiredTile(result) {
     this.wiredTileResult = result;
@@ -47,7 +52,8 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   }
 
   get newCountLabel() {
-    return `${this.newCount} ${this.labels.newCount}`;
+    const more = this.tile && this.tile.newCountCapped ? '+' : '';
+    return this.labels.newCount.replace('{0}', `${this.newCount}${more}`);
   }
 
   get entries() {
@@ -97,22 +103,26 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
       });
   }
 
-  handleOpenEntry(event) {
-    this[NavigationMixin.Navigate]({
+  /** In a console the entry opens as a subtab beside this tile; elsewhere it opens as a page. */
+  async handleOpenEntry(event) {
+    const pageReference = {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.target.dataset.entry,
-        objectApiName: 'Error_Log__c',
+        objectApiName: ERROR_LOG_OBJECT.objectApiName,
         actionName: 'view'
       }
-    });
+    };
+    if (!(await openInWorkspace(this, { pageReference }))) {
+      this[NavigationMixin.Navigate](pageReference);
+    }
   }
 
   handleViewAll() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
       attributes: {
-        objectApiName: 'Error_Log__c',
+        objectApiName: ERROR_LOG_OBJECT.objectApiName,
         actionName: 'list'
       },
       state: {

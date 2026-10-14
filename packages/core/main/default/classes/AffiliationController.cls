@@ -1,137 +1,50 @@
 /**
- * The affiliation card's server side. Every method validates what it is given and returns a
- * typed result or a message the card can show a person (plan Section 7.2).
- *
- * One card serves both ends of the connection. On a person's record it lists the organizations
- * they are connected to; on an organization's record it lists the people. The card does not
- * have to be told which: an account can be an organization in one org and a person in another,
- * so the controller reads both sides for the record it is given and each row says which end of
- * itself the reader is looking at.
+ * The affiliation card's one server call. The card reads affiliations through GraphQL and
+ * saves through Lightning Data Service (ADR-0093); only which lookups a new affiliation fills
+ * in needs the server, because it depends on the record's type and the org's shape.
  */
 public with sharing class AffiliationController {
-    /** One affiliation as the card draws it. */
-    public class AffiliationView {
+    /**
+     * Which lookups a new affiliation added from this record's card fills in: the record's
+     * own (`ownerField`) and the other end's (`otherEndField`).
+     */
+    public class CardContext {
         @AuraEnabled
-        public Id id;
+        public String ownerField;
         @AuraEnabled
-        public String affiliationNumber;
-        @AuraEnabled
-        public Id personId;
-        @AuraEnabled
-        public String personName;
-        @AuraEnabled
-        public Id organizationId;
-        @AuraEnabled
-        public String organizationName;
-        @AuraEnabled
-        public String role;
-        @AuraEnabled
-        public String status;
-        @AuraEnabled
-        public Boolean isFormer;
-        @AuraEnabled
-        public Boolean isPrimary;
-        @AuraEnabled
-        public Date startDate;
-        @AuraEnabled
-        public Date endDate;
-        @AuraEnabled
-        public String description;
-        /** True when the record the card sits on is the organization, so the row names a person. */
-        @AuraEnabled
-        public Boolean readFromOrganization;
+        public String otherEndField;
     }
 
     /**
-     * Every affiliation on file for one record, whether that record is the person or the
-     * organization. Current ones first, and the primary one first among those.
+     * Decided from the record itself, never from the affiliations already on file, so an
+     * organization with no affiliations yet is still read as an organization. A contact and
+     * a person account are people; any other account is the organization end, and the
+     * person at the other end is a contact, or a person account in an org that stores
+     * people as accounts.
      */
     @AuraEnabled(cacheable=true)
-    public static List<AffiliationView> getAffiliations(Id ownerId) {
-        if (ownerId == null) {
-            throw messageFor(Label.Core_Affiliation_PersonRequired);
+    public static CardContext getCardContext(Id recordId) {
+        CardContext context = new CardContext();
+        context.ownerField = 'Contact__c';
+        context.otherEndField = 'Organization__c';
+        if (recordId == null || recordId.getSObjectType() != Account.SObjectType) {
+            return context;
         }
-        try {
-            List<AffiliationView> views = toViews(
-                AffiliationSelector.selectByPersonIds(new Set<Id>{ ownerId }),
-                false
-            );
-            views.addAll(
-                toViews(AffiliationSelector.selectByOrganizationIds(new Set<Id>{ ownerId }), true)
-            );
-            return views;
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'AffiliationController.getAffiliations');
-            throw messageFor(Label.Core_Affiliation_LoadFailed);
+        Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        if (personTypes != null && !personTypes.isEmpty()) {
+            for (
+                Account record : HouseholdSelector.getAccountRecordTypes(new Set<Id>{ recordId })
+            ) {
+                if (personTypes.contains(record.RecordTypeId)) {
+                    context.ownerField = 'Person_Account__c';
+                    return context;
+                }
+            }
         }
-    }
-
-    /**
-     * Makes one affiliation the primary one for its person and returns that record's
-     * affiliations as they now stand. Clearing the flag from the person's other affiliations
-     * and copying the organization to their Primary Affiliation field is the trigger's work,
-     * not this method's.
-     */
-    @AuraEnabled
-    public static List<AffiliationView> makePrimary(Id affiliationId, Id ownerId) {
-        if (affiliationId == null || ownerId == null) {
-            throw messageFor(Label.Core_Affiliation_NotFound);
-        }
-        try {
-            Database.update(
-                new List<Affiliation__c>{
-                    new Affiliation__c(Id = affiliationId, Is_Primary__c = true)
-                },
-                AccessLevel.USER_MODE
-            );
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'AffiliationController.makePrimary');
-            throw messageFor(Label.Core_Affiliation_MakePrimaryFailed);
-        }
-        return getAffiliations(ownerId);
-    }
-
-    private static List<AffiliationView> toViews(
-        List<Affiliation__c> records,
-        Boolean readFromOrganization
-    ) {
-        List<AffiliationView> views = new List<AffiliationView>();
-        for (Affiliation__c record : records) {
-            AffiliationView view = new AffiliationView();
-            view.id = record.Id;
-            view.affiliationNumber = record.Name;
-            view.personId = PersonReference.idOf(record.Contact__c, record.Person_Account__c);
-            view.personName = personName(record);
-            view.organizationId = record.Organization__c;
-            view.organizationName = record.Organization__r == null
-                ? null
-                : record.Organization__r.Name;
-            view.role = record.Role__c;
-            view.status = record.Status__c;
-            view.isFormer = record.Status__c != 'Current';
-            view.isPrimary = record.Is_Primary__c == true;
-            view.startDate = record.Start_Date__c;
-            view.endDate = record.End_Date__c;
-            view.description = record.Description__c;
-            view.readFromOrganization = readFromOrganization;
-            views.add(view);
-        }
-        return views;
-    }
-
-    private static String personName(Affiliation__c record) {
-        if (record.Contact__r != null && String.isNotBlank(record.Contact__r.Name)) {
-            return record.Contact__r.Name;
-        }
-        if (record.Person_Account__r != null && String.isNotBlank(record.Person_Account__r.Name)) {
-            return record.Person_Account__r.Name;
-        }
-        return Label.Core_Affiliation_UnnamedPerson;
-    }
-
-    private static AuraHandledException messageFor(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
+        context.ownerField = 'Organization__c';
+        context.otherEndField = HouseholdService.isPersonAccountOrg()
+            ? 'Person_Account__c'
+            : 'Contact__c';
+        return context;
     }
 }

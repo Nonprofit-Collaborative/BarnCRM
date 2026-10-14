@@ -2,7 +2,7 @@
  * ADR-0032's third test: the merge file is a file, and a letter run is finished by a person
  * (R-AK11).
  */
-@IsTest
+@IsTest(testFor='ApexClass:AcknowledgmentLetterMerge')
 private class AcknowledgmentLetterMergeTest {
     @TestSetup
     static void setUp() {

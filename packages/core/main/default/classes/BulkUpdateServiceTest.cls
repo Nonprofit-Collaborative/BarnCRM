@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkUpdateService')
 private class BulkUpdateServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String title) {
         return JSON.serialize(
             new Map<String, Object>{
@@ -76,7 +81,7 @@ private class BulkUpdateServiceTest {
             System.Assert.areEqual(200, preview.count, 'Only matching records are counted');
             System.Assert.areEqual(
                 BulkUpdateService.MAX_RUN_LIMIT,
-                preview.runLimit,
+                BulkUpdateService.runLimit(),
                 'The default'
             );
             System.Assert.areEqual(
@@ -242,11 +247,7 @@ private class BulkUpdateServiceTest {
                 );
                 String definition = checked.definition(200);
                 BulkUpdateService.Plan again = BulkUpdateService.planFromDefinition(definition);
-                System.Assert.areEqual(
-                    200,
-                    BulkUpdateService.confirmedCountOf(definition),
-                    'Count'
-                );
+                System.Assert.areEqual(200, DataJobs.confirmedCountOf(definition), 'Count');
                 System.Assert.areEqual('Contact', again.objectName, 'The object');
                 System.Assert.areEqual(2, again.changes.size(), 'Both changes');
                 System.Assert.areEqual('Coordinator', again.changes[0].value, 'The value to set');

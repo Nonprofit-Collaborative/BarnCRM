@@ -50,12 +50,7 @@ Salesforce org is needed for this job. Steps:
    metadata only, because a component's JavaScript cannot reference an SObject and several of
    our own component names are the same words. This half was added after an audit found the
    gate matched `GiftTransaction` alone, so Core could have named the two objects Nonprofit
-   Cloud households are made of and the build would have passed. The vendored rollup engine is
-   excluded from that half, because it names `ContactPointAddress` and `Individual` in its
-   own test classes and is not source this project rewrites line by line. It is not
-   unguarded: check 7 below covers the vendored tree with an allowlist, and the objects it
-   names are recorded, with the evidence that they are present on the Platform-only shape,
-   in `packages/core/vendor/apex-rollup/VENDOR.md`.
+   Cloud households are made of and the build would have passed.
    It also checks Connect's object and field declarations (everything under
    `packages/connect/**/objects/`): Connect's Apex may name Campaign or Opportunity as strings,
    but a lookup, formula or field declared on one of those objects is resolved at deploy time
@@ -65,7 +60,7 @@ Salesforce org is needed for this job. Steps:
    The next workflow step, `scripts/ci/check-person-account-fields.py`, closes the gap both
    gates leave: a static reference to a Person Account field (`IsPersonAccount`,
    `PersonEmail`, `PersonMailingPostalCode`, any `__pc` or `__pr` field) anywhere under
-   `packages/`, outside the vendored tree. Apex comments and string literals are ignored,
+   `packages/`. Apex comments and string literals are ignored,
    because holding the name as text and resolving it through describe is the allowed seam
    (`dynamic-apex.md`); a token such as `Account.PersonEmail`, a static SOQL query naming one,
    an `@salesforce/schema` import, a `field-name` attribute, or a metadata reference such as a
@@ -79,12 +74,7 @@ Salesforce org is needed for this job. Steps:
    subscriber org does not have is a compile error, and one compile error in one class
    refuses the whole package, so the promise that Core installs on a Platform-only org
    (ADR-0009, ADR-0013) needs a gate where everything is forbidden unless it is listed.
-   Each allowed name carries its reason on its own line in the script. The vendored rollup
-   engine is inside this gate rather than excluded from it, with its own `VENDOR_ONLY`
-   section: the tree is third party source, but it ships inside Core's package, so a
-   standard object it names is Core's deployment risk. The practical effect is that an
-   upstream upgrade introducing a new standard object fails here instead of in a
-   subscriber org. Names are read only from positions where a bare identifier can be an
+   Each allowed name carries its reason on its own line in the script. Names are read only from positions where a bare identifier can be an
    SObject (`new X(`, `List<X>`, `X.SObjectType`, `FROM X`); the docstring says why that is
    narrower than every possible reference, and an unrecognized name always fails, so
    widening the patterns is safe.
@@ -172,9 +162,7 @@ Salesforce org is needed for this job. Steps:
    `packages/*/main/default/objects/` is named in the model, and every custom field shipped
    in it is named in backticks in a top-level section that also names that object. Until
    2026-10 only the first direction ran, so this line claimed more than the script did, and
-   four custom metadata fields had shipped with no API name in the model. The vendored
-   rollup engine (`packages/core/vendor/`) is not BarnCRM's data model and is outside the
-   path it reads.
+   four custom metadata fields had shipped with no API name in the model.
    `scripts/ci/check-openapi.js` (`npm run check:openapi`) fails the build if
    `docs/architecture/reference/inbound-gift-api.openapi.yaml` does not parse as YAML, is
    not OpenAPI 3.1, has a `$ref` that resolves to nothing, an operation without a unique
@@ -201,8 +189,8 @@ Salesforce org is needed for this job. Steps:
    keeps the value it first stored. The rename of the default to `BarnCRM_Settings__c` left
    such orgs pointed at the old object and every save refused with "That setting does not
    exist in this org".
-   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests and
-   `vendor/` excepted) leaves its sharing or access mode to the platform default: a class
+   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests
+   excepted) leaves its sharing or access mode to the platform default: a class
    with no `with`, `without` or `inherited sharing` keyword (an inner class only when it
    touches the database), an inline query with no `WITH USER_MODE` or `WITH SYSTEM_MODE`, a
    DML statement with no `as user` or `as system`, or a `Database` or `Search` method with no
@@ -214,8 +202,18 @@ Salesforce org is needed for this job. Steps:
    run as that user shows it.
    `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
    in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
-   carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
-   create" below for why.
+   carries no `// runs-as: deploying user (reason)` comment (a `@TestSetup` that only calls
+   `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
+   is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
+   below for why.
+   `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
+   excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
+   `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
+   that is not in `packages/`. See "Relevant tests" below.
+   `scripts/ci/check-lwc-apex-params.py` fails the build if a component calls an Apex method
+   with an object literal whose keys are not that method's parameter names. The platform
+   drops an unknown key without an error and the parameter arrives as null, and a Jest mock
+   accepts any shape, so nothing else sees it (ADMIN-1, ADMIN-13).
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
@@ -223,6 +221,10 @@ Salesforce org is needed for this job. Steps:
    has neither a Flow template (`Template_<registry name>`) nor a row on
    `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
    or not marked as a template (ADR-0040, ADR-0090).
+   `scripts/ci/check-whats-new.py` warns (a build annotation, not a failure) when the newest
+   version named in `docs/release-notes` has no `Release_Note` custom metadata record, so the
+   What's New card would still show an older release. Run with `--release` it fails instead;
+   the release checklist in `docs/release-notes/README.md` runs it that way.
 19. A grep check that fails the build if any tracked file contains an em dash character.
 20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
@@ -275,6 +277,7 @@ npm run check:openapi
 npm run check:setting-defaults
 npm run check:flow-templates
 npm run check:tests-run-as
+npm run check:test-relevance
 npm run check:apex
 npm run check:analyzer
 ```
@@ -379,6 +382,12 @@ gate script works against either: `scripts/org/run-org-tests.sh oi-pa` posts the
 `Org tests (local)` status. No other org is used for testing without the maintainer's
 approval.
 
+Both orgs need the System Administrator profile to hold a person account record type, or the
+tests that create real person accounts fail with `PersonAccountTestShape.NO_PERSON_TYPE_FOR_USER`
+(PEOPLE-29). `create-scratch-org.sh` does this for the `person-accounts` and `nonprofit-cloud`
+shapes; for an org created before that, run `scripts/org/grant-person-record-type.sh <alias>`
+once.
+
 When several people or agents share these orgs, take turns: one deploy or test run per org at
 a time. A deploy from one branch while another branch's tests run leaves the org holding a
 mix of the two.
@@ -395,13 +404,55 @@ That last one is posted from your machine, not by a GitHub runner:
 scripts/org/run-org-tests.sh <org alias>
 ```
 
-It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, assigns
-`BarnCRM_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
+It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, runs every
+Apex test class in that commit's source (assigning no permission set to you first: see "Tests
+run as a user they create" below), and
 posts `Org tests (local)` on that commit: success only when every test passed, failure
-otherwise. It names the test classes rather than running every test in the org, because the
-test org is shared: another branch's deploy can leave its own test classes behind, and those
-would fail on code this commit does not contain.
+otherwise. Its description starts "Full run:". It names the test classes rather than running
+every test in the org, because the test org is shared: another branch's deploy can leave its
+own test classes behind, and those would fail on code this commit does not contain. The
+vendored rollup engine's own tests (531 methods, about 70 seconds) are left out: no BarnCRM
+runtime path calls the engine, ADR-0082 deletes it in slice S9, and they test the upstream
+project. Its classes are still deployed.
 The results are written to `test-results/org-tests.json`, which git ignores.
+
+**Every full run checks code coverage.** The tests are enqueued with coverage on, so the org
+records it, and the run is followed by polling its `AsyncApexJob` every `TEST_POLL_SECONDS`
+(30) for up to `TEST_WAIT_MINUTES` (90). The results are then fetched without coverage, and
+coverage is read separately from the org's per-class totals (`ApexCodeCoverageAggregate`
+through the Tooling API, a few hundred rows). Only Apex in the commit's source counts: not test
+classes, not the vendored engine, not whatever another branch left in the shared org. The run
+fails, with every test passed, when:
+
+- BarnCRM's total coverage is under `COVERAGE_TOTAL_FLOOR` (75%), or
+- a class is under `COVERAGE_CLASS_FLOOR` (75%), unless it is listed in
+  `scripts/org/coverage-floor-exceptions.txt`, in which case it may not fall below the figure
+  recorded there. That list holds the 23 classes that were under 75% when the floor came in
+  (four had no coverage at all). Raise a figure when tests improve it, and remove the line
+  once the class reaches 75%; the run says which ones have.
+
+Per-class figures (covered lines, total lines, percent, floor, result) are written to
+`test-results/coverage.tsv`, and the status description carries the total and the count of
+classes under their floor, for example "Full run: 2700/2700 passed on oi-test, coverage 90%, 0
+class(es) under floor". The org-wide figure (`ApexOrgWideCoverage`) is recorded in that file
+for information only: it counts the vendored engine, whose tests the gate no longer runs, and
+anything other branches left in the org, so it cannot judge one commit.
+
+**The relevant-tests run, for iteration.** `scripts/org/run-org-tests.sh <alias> --relevant`
+(or `ORG_TESTS_MODE=relevant`) does the same staged deploy, then deploys again only the Apex
+the branch changed since its merge base with `origin/main` (`RELEVANT_BASE` to change it), plus
+the `critical=true` test classes, with `sf project deploy start --test-level RunRelevantTests`.
+Salesforce runs the tests in that payload, the tests that depend directly on it, and the
+classes whose `testFor` names something in it (see "Relevant tests" below). `RunRelevantTests`
+exists only for deployments, not for `sf apex run test`, which is why this mode deploys. It
+posts a different status, `Org tests (relevant, local)`, whose description starts "Relevant
+tests only, not the merge gate", and the `main` ruleset does not require it: a relevant run can
+never stand in for the full gate. Results go to `test-results/org-tests-relevant.json`.
+
+The full run stays the merge gate. `RunRelevantTests` is beta, follows direct Apex references
+only, and selects nothing for a change to an object, a flow, a permission set or a label, all
+of which a Core test can fail on. Use the relevant run while a branch is moving and the full
+run on the head you intend to merge.
 
 Three rules make the status worth trusting:
 
@@ -428,7 +479,10 @@ user (one row per person and set, so a second insert is refused), and a saved fi
 into the user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY,
 invalid cross reference id: []` while another transaction on that library rolls back). The
 few tests marked `// runs-as: deploying user` still share the running user, so they must do
-neither. A test that saves a receipt, letter or logo file runs as
+neither. The gate gives that user no BarnCRM permission set, so they must need none either: a
+describe or field access check counts (three classes that check field access while parsing a
+filter or an import row failed this way and now run as a `TestUsers` user). A test that saves
+a receipt, letter or logo file runs as
 `ReceiptTestDataFactory.issuer()`.
 
 **A test run that returns no results is retried once.** When `sf apex run test` comes back
@@ -437,14 +491,16 @@ with no test results and its output names `UNKNOWN_EXCEPTION` or a platform or n
 once more. A run with any result, including real failures, is never retried. Deploy stages
 that stall are resubmitted too: see "Stalled deploys" under `org-tests`.
 
-**At about 2,200 tests the sf CLI can run out of memory reading the results.** The Node
-process aborts with `JavaScript heap out of memory` after every stage has deployed. The script
-exports `NODE_OPTIONS=--max-old-space-size=8192` itself (a larger heap you set is kept; other
-`NODE_OPTIONS` flags are preserved). If the CLI still crashes, or returns empty or unreadable
-output, the script prints "sf CLI crashed, rerun", exits 3, does not retry, and posts no
-`Org tests (local)` status (it used to post a failure reading `0 of 0 failed`). Rerun the gate.
-The CLI has no option to omit passing-test detail from the JSON, so the payload is not reduced.
-`deploy-packages.sh` has not shown the crash and is unchanged.
+**At about 2,200 tests the sf CLI used to run out of memory reading the results.** The Node
+process aborted with `JavaScript heap out of memory` after every stage had deployed. The cause
+was the per-test code coverage that `--code-coverage` pulls into the result, not the
+passing-test detail: in a 2,805-test run, coverage was 102 MB of the 313 MB result against
+1.1 MB for the tests themselves. Fetching the results without coverage and reading the
+per-class totals separately (above) removes that payload, so the script no longer raises the
+Node heap to 8 GB. If the CLI still crashes, or returns empty or unreadable output, or the run
+is still going after `TEST_WAIT_MINUTES`, the script prints "sf CLI crashed, rerun", exits 3,
+does not retry, and posts no status (it used to post a failure reading `0 of 0 failed`).
+Rerun the gate.
 
 **One test depends on Salesforce's own duplicate matching.**
 `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce` asks the platform's
@@ -458,15 +514,16 @@ in `sf org list limits`). Several gate runs in a day can use it up, and then eve
 including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test starts.
 `--synchronous` runs of one class still work, one at a time for the whole org.
 
-While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` against
-your own org for speed; the script is the final full run before merge, not the inner loop.
+While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` for one
+class, or the relevant-tests run above for a branch; the full run is the final run before
+merge, not the inner loop.
 
 ### Tests run as a user they create
 
 From API version 67.0 a query or DML statement with no access mode runs in user mode, and
 that includes the plain `insert` and `[SELECT ...]` in a test class. A test that runs as
 whoever deploys or runs it passes only where that person already holds the BarnCRM
-permission sets. The gate above assigns them, so the gate alone never showed the problem; a
+permission sets. The gate above used to assign them, so the gate alone never showed the problem; a
 check-only deploy to a real sandbox, as an administrator without them, failed 565 of 1008
 Core tests ("fields being inaccessible", "No such column", "Record Type ID: this ID value
 isn't valid for the user", "You need the Manage BarnCRM Settings permission"). A subscriber
@@ -481,6 +538,12 @@ So every test is self-contained:
   name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
   other list. It keeps one user per list of sets per transaction, and finds the user a
   `@TestSetup` made again in every test method, so setup data and the test share an owner.
+- Each test method is a transaction of its own, so a user made only inside test methods is
+  inserted again, with its permission set assignments, in every one (about 330 ms each,
+  roughly 7.5 minutes of a gate run before this was fixed). A class whose test methods use
+  a `TestUsers` user in more than one method creates it once in a `@TestSetup`; when there
+  is no other setup, that is a method whose body is just the call, such as
+  `TestUsers.admin();`, and it needs no `runAs`.
 - A Core test whose code calls into whichever modules are installed (the sample data loader
   counts and removes each module's records) runs as `TestUsers.adminWithInstalledModules()`:
   BarnCRM Admin plus the admin permission set of each module the org has, and `admin()` in
@@ -499,8 +562,38 @@ So every test is self-contained:
   `scripts/ci/check-tests-run-as.py` fails the build on any other test method without
   `System.runAs`.
 
-To prove a branch is self-contained, run its tests in an org as a user who holds none of the
-BarnCRM permission sets.
+The gate is the proof that a branch is self-contained: it assigns no permission set, so it
+runs the tests as whoever starts it, and that user should hold none of the BarnCRM, Giving or
+Connect permission sets. On `barn-core` the running user holds none. If you hold them in your
+own org, remove them (or run as a user who lacks them), so the run shows what a subscriber's
+administrator would see.
+
+### Relevant tests
+
+Spring '26 (API 66.0) added the `RunRelevantTests` test level (beta) to deployments: Salesforce
+runs the tests in the deployment, the tests that depend directly on the Apex being deployed, and
+any test class that asks to be included. It follows direct references only, so a test that
+reaches a class through a trigger, the automation registry or `Type.forName` is missed. Two
+class-level `@IsTest` parameters close that gap, and every test class carries one:
+
+- `@IsTest(testFor='ApexClass:HouseholdService, ApexClass:HouseholdMergeService')` runs the
+  class whenever one of the named classes (or `ApexTrigger:Name`) is in the deployment. It adds
+  to what the platform selects; it never narrows it. Name the classes the test exercises, not
+  every class it touches on the way.
+- `@IsTest(critical=true)` runs the class on every relevant-tests deployment, whatever changed.
+  Five classes carry it, one smoke test for each core path: `SettingsControllerTest` (settings
+  console save), `HouseholdServiceTest` (a new person gets a household), `GiftRealTimeRollupTest`
+  (a saved gift moves its totals), `ImportProcessorBatchTest` (an import commit) and
+  `FindControllerTest` (Find and export). Together they take about 110 seconds of the full run's
+  35 minutes. Add another only for a path that has to be proven on every change, since each one
+  runs every time.
+
+A test class with neither, because no Apex change should select it (a test of validation rules
+or of a test utility), is listed in `scripts/ci/test-relevance-cross-cutting.txt` with its reason.
+`scripts/ci/check-test-relevance.py` (static check 16) holds every new test class to this, and
+fails when a `testFor` names a class or trigger that is not in `packages/`, so a rename cannot
+leave a test pointing at nothing. Test utilities with no test method (`TestDataFactory`,
+`TestUsers`) are skipped. The vendored rollup engine is outside the check.
 
 ### `org-tests`
 
@@ -529,23 +622,23 @@ between the package and that mistake, and it is a grep. Testing the Platform-onl
 means a second org and a second secret; until then, treat every green org test as evidence
 about one shape and no other.
 
-The deploy goes in stages through `scripts/org/deploy-packages.sh`: the vendored rollup
-engine, then Core (one stage per object under `packages/core/main/default/objects`, then
+The deploy goes in stages through `scripts/org/deploy-packages.sh`: Core (one stage per object under `packages/core/main/default/objects`, then
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
-everything that wires the two together: permission sets and groups, layouts, flexipages,
+flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
 applications, tabs, quick actions, Lightning components), then Giving. A failed stage asks the
 org for the component level report, by job id, in human form and then as JSON. After the last
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no
 post-install script and would otherwise leave the org without the rollup definitions a real
-install creates (ADR-0029).
+install creates (ADR-0029). Before the first stage the script fails if a folder under
+`packages/core/main/default` is named by no stage: Core's flows were never deployed until
+2026-10-13 because no stage named `flows`.
 
 That is not tidiness. The first deploy this project ever attempted sent all 982 components in
 one request and came back with `UNKNOWN_EXCEPTION`, zero components deployed, zero component
 errors, and a Salesforce ErrorId. A failure with nothing attached to it tells you nothing
 about which of 982 things caused it. In stages, the same failure names a stage. The order also
-matches how the packages depend on each other: the vendored engine is self contained, Core
-does not call it yet, and Giving depends on Core.
+matches how the packages depend on each other: Giving depends on Core.
 
 An `UNKNOWN_EXCEPTION` with zero component errors is a Salesforce side failure rather than
 something wrong with a component. Quote the ErrorId to Salesforce support.
@@ -656,6 +749,24 @@ same-content split of a stage that has already failed that way more than once), 
 both this section and that header with the new count before pushing. Guessing a threshold and
 pre-splitting everything to be safe is not the goal: each split should answer a question the
 previous failure actually raised.
+
+**Faster deploys: two switches, off until timed.** The stages cost about 36 requests, each
+followed by the pause: about 9 minutes of sleep per run before any submit or poll time. Both
+faults that drove the splitting were later traced to real defects (the Account to
+`Import_Batch__c` order, now computed, and the unparseable custom metadata resolved on
+2026-09-22), so neither the pause nor the per-object split has evidence behind it any more.
+Two environment variables let a run drop them:
+
+- `STAGE_PAUSE_SECONDS=0` skips the pause between stages.
+- `DATA_MODEL_STAGES=combined` deploys every Core object in one request. If that request fails
+  with component errors, the run stops as usual. If it fails with none (the opaque
+  `UNKNOWN_EXCEPTION`), the script falls back to one object per stage in the same run.
+
+To decide whether either becomes the default, time a deploy on the test org (holding its lock,
+as for any deploy) with each: `time STAGE_PAUSE_SECONDS=0 DATA_MODEL_STAGES=combined scripts/org/deploy-packages.sh <alias>`,
+then the same with the defaults, and note in this section and the script header whether the
+combined request succeeded or fell back, and the minutes saved. Change the defaults only after
+two clean runs.
 
 Two things constrain when it runs, both because there is one org rather than one per run.
 
@@ -969,3 +1080,38 @@ each with the default that shipped and a recommendation.
   for a clean tree only when it starts.
 - **Staging:** stage by explicit path. A synced checkout can create untracked copies named
   like `file 2.md`.
+
+## Scratch org snapshots
+
+Snapshots shorten recreating a test org from a full deploy (many minutes, and the stalled deploys
+described above) to creating an org from saved state. They are a local convenience: nothing in
+continuous integration creates or uses one.
+
+**Dev Hub requirements.** The Dev Hub must have Scratch Org Snapshots turned on (Setup, Dev Hub,
+enable scratch org snapshots; the orchestrator confirms the exact label). Snapshot count and the
+snapshot's own lifetime are limited and set by Salesforce; check the current values with
+`sf org list snapshot` and Salesforce's scratch org snapshot documentation before relying on a
+snapshot older than a few weeks. The source org must be an active scratch org of that Dev Hub.
+A snapshot cannot be created from an org that is not a scratch org.
+
+**Commands.**
+
+```bash
+scripts/org/create-snapshot.sh oi-pa BarnPA              # snapshot an existing org (refreshes if BarnPA exists)
+scripts/org/create-org-from-snapshot.sh person-accounts oi-pa --days 7 --replace
+scripts/org/create-org-from-snapshot.sh platform-only barn-core --days 7
+sf org list snapshot                                      # status and names
+```
+
+**Owner approval.** Creating a snapshot and creating any scratch org need the owner's approval.
+Pre-approved without asking: recreating `oi-pa` or `barn-core` (expires 2026-10-15) when it
+expires. Replacing `oi-test` also means updating the `SF_TEST_ORG_AUTH_URL` secret, because the
+new org has a new auth URL.
+
+**When to refresh.** After any change under `packages/` that the next test run needs (a snapshot
+does not track the repository), after the Dev Hub or the Salesforce release changes the shape,
+and before the snapshot's own expiry. The script warns when `packages/` changed after the
+snapshot date. Sample data is seeded into the source org before the snapshot, so it carries over.
+
+**After creating an org from a snapshot,** run `scripts/org/run-org-tests.sh <alias>` once and
+check the shape line it prints, as for any new org.

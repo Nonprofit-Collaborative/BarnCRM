@@ -6,8 +6,13 @@
  * assertion here is unverified. They are written to the same standard as if they had run, and
  * the first person with a scratch org should run them before trusting the feature.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RelationshipService')
 private class RelationshipServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void createsTheOtherSideWhenARelationshipIsSaved() {
         System.runAs(TestUsers.admin()) {
@@ -215,7 +220,7 @@ private class RelationshipServiceTest {
                 SetupOwnerId = UserInfo.getOrganizationId(),
                 Relationship_Auto_Reciprocal__c = false
             );
-            SettingsService.clearCache();
+            SettingsService.clearCaches();
             List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
 
             Test.startTest();
@@ -411,6 +416,122 @@ private class RelationshipServiceTest {
             Assert.isTrue(
                 upkeepIsOn,
                 'The upkeep ships on, so both sides are written before anyone saves a setting'
+            );
+        }
+    }
+
+    /**
+     * The shipped one-way pair: Employer contact maps to Colleague, and Colleague maps to
+     * itself. Editing the Colleague side must not retype the original to Colleague.
+     */
+    @IsTest
+    static void editingTheOtherSideOfAOneWayPairKeepsTheOriginalType() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+            Relationship__c saved = RelationshipTestDataFactory.between(
+                people[0],
+                people[1],
+                'Employer contact'
+            );
+            insert saved;
+            Relationship__c other = otherSideOf(people[1].Id);
+            Assert.areEqual('Colleague', other.Type__c, 'The other side is a colleague');
+
+            Test.startTest();
+            update new Relationship__c(Id = other.Id, Description__c = 'Met at the food bank');
+            Test.stopTest();
+
+            Relationship__c original = otherSideOf(people[0].Id);
+            Assert.areEqual(
+                'Employer contact',
+                original.Type__c,
+                'The original keeps the type it was given'
+            );
+            Assert.areEqual(
+                'Met at the food bank',
+                original.Description__c,
+                'And still follows the edit'
+            );
+            Assert.areEqual(
+                'Employer contact',
+                otherSideOf(people[1].Id).Reciprocal_Type__c,
+                'The other side still reads back to Employer contact'
+            );
+        }
+    }
+
+    /**
+     * Two relationships whose other sides would be the same record: the second does not get a
+     * duplicate other side (R-RL4).
+     */
+    @IsTest
+    static void twoRelationshipsWithTheSameOtherSideDoNotDuplicateIt() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+            insert RelationshipTestDataFactory.between(people[0], people[1], 'Colleague');
+
+            Test.startTest();
+            insert RelationshipTestDataFactory.between(people[0], people[1], 'Employer contact');
+            Test.stopTest();
+
+            Integer colleagueSides = 0;
+            for (Relationship__c record : RelationshipTestDataFactory.allRelationships()) {
+                if (record.Contact__c == people[1].Id && record.Type__c == 'Colleague') {
+                    colleagueSides++;
+                }
+            }
+            Assert.areEqual(1, colleagueSides, 'One Colleague record from the other person');
+        }
+    }
+
+    /**
+     * A pair that drifted apart while the upkeep was off is brought back into step by the
+     * next save of either side, even one that changes nothing the other side copies.
+     */
+    @IsTest
+    static void theNextSaveBringsADriftedPairBackIntoStep() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+            Relationship__c saved = RelationshipTestDataFactory.between(
+                people[0],
+                people[1],
+                'Spouse'
+            );
+            saved.Description__c = 'Married in 2010';
+            insert saved;
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Relationship_Auto_Reciprocal__c = false;
+            upsert settings;
+            SettingsService.clearCaches();
+            update new Relationship__c(
+                Id = otherSideOf(people[1].Id).Id,
+                Description__c = 'Typed while the upkeep was off'
+            );
+            settings.Relationship_Auto_Reciprocal__c = true;
+            upsert settings;
+            SettingsService.clearCaches();
+
+            Test.startTest();
+            update new Relationship__c(Id = saved.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                'Married in 2010',
+                otherSideOf(people[1].Id).Description__c,
+                'The other side is back in step with the side that was saved'
+            );
+        }
+    }
+
+    @IsTest
+    static void aCustomTypeNeedsAddingToTypeOnly() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isFalse(
+                Relationship__c.Reciprocal_Type__c.getDescribe().isRestrictedPicklist(),
+                'Reciprocal Type takes any type the mapping gives, so a custom type is added once'
             );
         }
     }

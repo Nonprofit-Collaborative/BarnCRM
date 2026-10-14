@@ -3,8 +3,13 @@
  * not in the org is the ordinary case and says nothing; a class of the wrong shape is left out
  * and written to the Error Log, because it means a package shipped a broken processor.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportEntityProcessors')
 private class ImportEntityProcessorsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Integer logged() {
         Test.getEventBus().deliver();
         return [

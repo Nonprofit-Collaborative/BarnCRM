@@ -4,7 +4,7 @@
  * user may write that a cell can fill, and not formulas, lookups, system fields or the
  * package's own; a column mapped to one is written by the import.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportFieldCatalog')
 private class ImportFieldCatalogTest {
     @TestSetup
     static void setUp() {

@@ -4,8 +4,13 @@
  * the primary contact being moved from one membership record to another, and a new or
  * existing person joining a household in the flexible way of belonging.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdOfPersonController')
 private class HouseholdOfPersonControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aContactPointsAtItsHouseholdInTheSimpleWay() {
         System.runAs(TestUsers.admin()) {
@@ -237,6 +242,36 @@ private class HouseholdOfPersonControllerTest {
         }
     }
 
+    /**
+     * PEOPLE-7. A person stored as an account is offered once, as the account, and never a
+     * second time as the contact the platform keeps behind it. Needs real person accounts.
+     */
+    @IsTest
+    static void searchOffersAPersonStoredAsAnAccountOnce() {
+        System.runAs(TestUsers.admin()) {
+            if (PersonAccountTestShape.skipReason() != null) {
+                // The reason is checked and logged.
+                return;
+            }
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account person = new Account(
+                RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+            );
+            person.put('FirstName', 'Quillon');
+            person.put('LastName', 'Vantrees');
+            insert person;
+
+            Test.startTest();
+            List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+                'Vantrees'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, hits.size(), 'One person, offered once: ' + hits);
+            Assert.areEqual(person.Id, hits[0].id, 'Offered as the account');
+        }
+    }
+
     @IsTest
     static void searchWithFewerThanTwoCharactersFindsNothing() {
         System.runAs(TestUsers.admin()) {
@@ -324,14 +359,173 @@ private class HouseholdOfPersonControllerTest {
                 LIMIT 1
             ];
             Assert.areEqual('Wei', created.FirstName, 'The new contact carries the name entered');
+            Id personId = personIdOf(created.Id);
             Assert.areEqual(
                 1,
                 [
                     SELECT COUNT()
                     FROM Household_Member__c
-                    WHERE Household__c = :household.Id AND Contact__c = :created.Id
+                    WHERE
+                        Household__c = :household.Id
+                        AND (Contact__c = :personId
+                        OR Account__c = :personId)
                 ],
                 'The new contact is now a member of the household'
+            );
+        }
+    }
+
+    /**
+     * Automatic creation is on (the shipped default). The new person joins the household
+     * the panel is on and is not given an empty household of their own first.
+     */
+    @IsTest
+    static void addingANewPersonInContactModeLeavesNoStrayHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+            Id recordTypeId = HouseholdService.householdRecordTypeId();
+            Integer householdsBefore = [
+                SELECT COUNT()
+                FROM Account
+                WHERE RecordTypeId = :recordTypeId
+            ];
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            Contact created = [SELECT AccountId FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+            Assert.areEqual(
+                household.Id,
+                created.AccountId,
+                'Wei is in the household he was added to'
+            );
+            Assert.areEqual(
+                householdsBefore,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId],
+                'No household of his own was made and left empty'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
+                'The household counts him'
+            );
+        }
+    }
+
+    @IsTest
+    static void addingANewPersonInJunctionModeJoinsOnlyThatHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            Contact created = [SELECT Id FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+            Id personId = personIdOf(created.Id);
+            List<Household_Member__c> memberships = [
+                SELECT Household__c
+                FROM Household_Member__c
+                WHERE (Contact__c = :personId OR Account__c = :personId) AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
+            Assert.areEqual(
+                household.Id,
+                memberships[0].Household__c,
+                'It is the one he was added to'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-4. Where the org gives this user a person record type, a new person in the
+     * flexible way of belonging is a person account; otherwise a contact.
+     */
+    @IsTest
+    static void aNewPersonIsAPersonAccountOnlyWhenOneCanBeCreated() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            HouseholdService.personAccountOverride = true;
+            Id creatable = OrgShapeDetector.creatablePersonRecordTypeId();
+
+            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+            if (creatable == null) {
+                Assert.areEqual(
+                    Contact.SObjectType,
+                    person.getSObjectType(),
+                    'With no person record type to create with, the new person is a contact'
+                );
+            } else {
+                Assert.areEqual(
+                    Account.SObjectType,
+                    person.getSObjectType(),
+                    'With a person record type to create with, the new person is an account'
+                );
+                Assert.areEqual(creatable, person.get('RecordTypeId'), 'It uses that type');
+            }
+            Assert.areEqual('Lee', person.get('LastName'), 'It carries the name entered');
+        }
+    }
+
+    /**
+     * PEOPLE-4. In contact mode a person account cannot belong to a household by reference,
+     * so a new person is a contact there whatever the org shape.
+     */
+    @IsTest
+    static void aNewPersonIsAContactInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            HouseholdService.personAccountOverride = true;
+
+            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+            Assert.areEqual(
+                Contact.SObjectType,
+                person.getSObjectType(),
+                'Contact mode always creates a contact'
+            );
+            Assert.areEqual('Wei', person.get('FirstName'), 'It carries the name entered');
+        }
+    }
+
+    /**
+     * PEOPLE-4, meaningful on a Person Account org only (oi-pa): the new person is a person
+     * account and joins the household through a membership on its account. Ends early where
+     * the org has no person record type this user can create with.
+     */
+    @IsTest
+    static void addingANewPersonInAPersonAccountOrgCreatesAPersonAccount() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Id creatable = HouseholdService.isPersonAccountOrg()
+                ? OrgShapeDetector.creatablePersonRecordTypeId()
+                : null;
+            if (creatable == null) {
+                return;
+            }
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            List<Household_Member__c> memberships = [
+                SELECT Account__c, Account__r.RecordTypeId
+                FROM Household_Member__c
+                WHERE Household__c = :household.Id AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, memberships.size(), 'The new person joined the household once');
+            Assert.areEqual(
+                creatable,
+                memberships[0].Account__r.RecordTypeId,
+                'The member is a person account of the type the user can create'
             );
         }
     }
@@ -438,6 +632,17 @@ private class HouseholdOfPersonControllerTest {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * The id a membership names this new person by. Where the org stores people as accounts
+     * the panel creates a person account (PEOPLE-4), whose membership names the account, not
+     * the contact behind it.
+     */
+    private static Id personIdOf(Id contactId) {
+        Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId })
+            .get(contactId);
+        return account != null ? account : contactId;
+    }
 
     /**
      * A user on the most restricted standard profile, so that creating a contact without

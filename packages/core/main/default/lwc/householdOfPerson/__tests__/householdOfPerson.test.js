@@ -1,12 +1,35 @@
 import { createElement } from 'lwc';
 import HouseholdOfPerson from 'c/householdOfPerson';
 import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock(
   '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson',
   () => {
     const { createApexTestWireAdapter } = jest.requireActual('@salesforce/sfdx-lwc-jest');
     return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const GenerateUrl = Symbol('GenerateUrl');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+        [GenerateUrl](pageReference) {
+          return Promise.resolve(`/lightning/r/${pageReference.attributes.recordId}/view`);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    NavigationMixin.GenerateUrl = GenerateUrl;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
   },
   { virtual: true }
 );
@@ -47,7 +70,7 @@ describe('c-household-of-person', () => {
 
     const link = element.shadowRoot.querySelector('.household-link');
     expect(link.textContent).toBe('The Garcia Family');
-    expect(link.getAttribute('href')).toBe(`/${HOUSEHOLD_ID}`);
+    expect(link.getAttribute('href')).toBe(`/lightning/r/${HOUSEHOLD_ID}/view`);
     // Labels resolve to their names under Jest, so the plural label is what is checked for.
     expect(element.shadowRoot.querySelector('.member-count').textContent).toBe(
       'c.Core_HouseholdPanel_MemberCountMany'
@@ -57,6 +80,17 @@ describe('c-household-of-person', () => {
     );
     expect(element.shadowRoot.querySelector('.empty-message')).toBeNull();
     expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+  });
+
+  it('works on a person account page as on a contact page', async () => {
+    const element = createElement('c-household-of-person', { is: HouseholdOfPerson });
+    element.recordId = '001000000000009AAA';
+    document.body.appendChild(element);
+    getHouseholdsForPerson.emit([GARCIA]);
+    await flush();
+
+    expect(getHouseholdsForPerson.getLastConfig()).toEqual({ personId: '001000000000009AAA' });
+    expect(element.shadowRoot.querySelectorAll('.household-row').length).toBe(1);
   });
 
   it('says one member without a plural', async () => {
@@ -109,5 +143,60 @@ describe('c-household-of-person', () => {
     const alert = element.shadowRoot.querySelector('[role="alert"]');
     expect(alert.textContent).toBe('c.Core_HouseholdPanel_OfPersonLoadFailed');
     expect(element.shadowRoot.querySelector('.empty-message')).toBeNull();
+  });
+});
+
+describe('c-household-of-person in a console', () => {
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  function click(link, init = {}) {
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...init });
+    link.dispatchEvent(event);
+    return event;
+  }
+
+  it('lets the browser follow the link outside a console', async () => {
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'));
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+  });
+
+  it('opens the household as a subtab beside the person', async () => {
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'));
+    await flush();
+    await flush();
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', { recordId: HOUSEHOLD_ID, focus: true });
+  });
+
+  it('leaves a click for a new browser tab to the browser', async () => {
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'), { metaKey: true });
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
   });
 });

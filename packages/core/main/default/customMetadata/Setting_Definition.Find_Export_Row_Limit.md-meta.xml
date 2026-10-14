@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The most rows one Find export writes to a CSV file. Leave it at 50,000. Larger exports belong in Data Loader; anything over 500,000 is read as 500,000.</value>
+    <value xsi:type="xsd:string">The most rows one Find export writes to a CSV file. Leave it at 50,000. Larger exports belong in Data Loader; anything over 500,000 is read as 500,000. A convenience stop, not a security control: a person can still read every record they have access to.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -37,5 +37,13 @@
   <values>
     <field>Settings_Object__c</field>
     <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Min_Value__c</field>
+    <value xsi:type="xsd:double">1</value>
+  </values>
+  <values>
+    <field>Max_Value__c</field>
+    <value xsi:type="xsd:double">500000</value>
   </values>
 </CustomMetadata>

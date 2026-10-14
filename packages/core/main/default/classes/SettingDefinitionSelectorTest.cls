@@ -1,6 +1,11 @@
 /** The console reads what to show from the shipped Setting Definition rows. */
-@IsTest
+@IsTest(testFor='ApexClass:SettingDefinitionSelector')
 private class SettingDefinitionSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void readsTheShippedRows() {
         System.runAs(TestUsers.admin()) {

@@ -2,7 +2,7 @@ import { LightningElement, api, wire, track } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
 import getMembershipMode from '@salesforce/apex/HouseholdController.getMembershipMode';
 import moveContact from '@salesforce/apex/HouseholdController.moveContact';
@@ -387,7 +387,11 @@ export default class HouseholdMembersPanel extends LightningElement {
     const personId = this.movingPersonId;
     const targetId = this.targetHouseholdId;
     this.busy = true;
-    return moveContact({ contactId: personId, targetHouseholdId: targetId })
+    return moveContact({
+      contactId: personId,
+      targetHouseholdId: targetId,
+      sourceHouseholdId: this.recordId
+    })
       .then(() => {
         this.movingPersonId = undefined;
         this.targetHouseholdId = undefined;
@@ -435,7 +439,7 @@ export default class HouseholdMembersPanel extends LightningElement {
   }
 
   toast(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 
   readError(error) {

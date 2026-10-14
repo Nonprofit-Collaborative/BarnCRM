@@ -1,7 +1,8 @@
 /**
- * All SOQL against Affiliation__c, and the two small reads of the person records that carry
- * the primary affiliation. Feature code never queries any of them directly (plan Section 7.2:
- * every query lives in a Selector).
+ * The user mode reads of Affiliation__c: what the cards show and what the save checks compare
+ * against. Feature code never queries the object directly (plan Section 7.2: every query lives
+ * in a Selector). The reads behind primary affiliation upkeep, which must see rows the saving
+ * user cannot, are in `AffiliationUpkeepSelector` (ADR-0021).
  */
 public with sharing class AffiliationSelector {
     /**
@@ -64,37 +65,6 @@ public with sharing class AffiliationSelector {
             WHERE Organization__c IN :organizationIds
             WITH USER_MODE
             ORDER BY Status__c, CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
-
-    /**
-     * The primary affiliation each of these contacts currently carries, so that the package
-     * writes a person record only when the value it holds is actually wrong.
-     */
-    public static List<Contact> selectContactPrimaries(Set<Id> contactIds) {
-        if (contactIds == null || contactIds.isEmpty()) {
-            return new List<Contact>();
-        }
-        return [
-            SELECT Id, Primary_Affiliation__c
-            FROM Contact
-            WHERE Id IN :contactIds
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-    }
-
-    /** The same for people an org holds as accounts. */
-    public static List<Account> selectAccountPrimaries(Set<Id> accountIds) {
-        if (accountIds == null || accountIds.isEmpty()) {
-            return new List<Account>();
-        }
-        return [
-            SELECT Id, Primary_Affiliation__c
-            FROM Account
-            WHERE Id IN :accountIds
-            WITH USER_MODE
             LIMIT 10000
         ];
     }

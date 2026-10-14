@@ -1,8 +1,13 @@
 /**
  * The rules a soft credit is saved by (feature G-08).
  */
-@IsTest
+@IsTest(testFor='ApexClass:SoftCreditTriggerHandler')
 private class SoftCreditTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void refusesACreditWithNobodyCredited() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

@@ -8,7 +8,7 @@
  * passing test proves it is enough to record a gift. InboundGiftAccessTest proves the same
  * through both entry points.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InboundGiftService')
 private class InboundGiftServiceTest {
     private static final String LUIS_EMAIL = 'luis.garcia.inbound@example.org';
     private static final String BUILDING_CODE = '4100';

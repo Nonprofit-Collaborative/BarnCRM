@@ -85,6 +85,24 @@ Sending the digest does not use up your organization's daily email allowance: it
 users of your own Salesforce, which the platform does not count. At most 50 people receive
 it.
 
+## How long entries are kept
+
+Each entry can hold a long technical detail, so an Error Log that is never emptied slowly
+fills your organization's data storage. BarnCRM deletes entries older than **180 days**, whatever
+their status, every morning when the daily Error Log run starts (the same 7:00 AM run that
+sends the digest).
+
+1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
+2. In **Days to keep Error Log entries**, type how many days to keep them, from 1 to
+   3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
+   anything older; nothing is deleted when you save.
+3. Make sure the daily run is scheduled: the **Error digest** panel says so, and Health
+   Check lists it under **Nightly jobs are not scheduled** when it is not. Old entries are
+   deleted only while it runs, whether or not anyone receives the digest.
+
+Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need
+an entry for longer, export the Error Log list or build a report on it before it ages out.
+
 ## A five-minute walkthrough
 
 Maria has heard from a colleague that "something did not save this morning."
@@ -97,7 +115,9 @@ Maria has heard from a colleague that "something did not save this morning."
 4. Read the **Message**. It is written for you, not for a developer: it says what went
    wrong and what to do about it, for example "This household could not be renamed because
    every member is marked deceased. Add a living member, or set a custom name on the
-   household."
+   household." When BarnCRM hit something it did not expect, the message names where it
+   happened, for example "BarnCRM hit a problem it did not expect in Household naming.",
+   so two such entries from different places read differently in the list.
 5. Do what it says on the record it names. The **Record reference** on the entry is the
    record involved, so you can open it and fix the data.
 6. Come back to the Error Log entry and set **Status** to **Resolved**, then save. It

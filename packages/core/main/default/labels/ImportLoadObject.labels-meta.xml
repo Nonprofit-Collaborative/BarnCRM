@@ -21,7 +21,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the user lacks the object access the load needs</shortDescription>
+        <shortDescription>Load one object: user lacks the object access; {0} is the object</shortDescription>
         <value>You cannot read, create or edit {0} as this mapping needs. Ask your Salesforce administrator for access, or choose another action for each row.</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: accounts and contacts load by update only</shortDescription>
+        <shortDescription>Load one object: people load by update only; {0} is the object plural</shortDescription>
         <value>{0} can only be updated by record ID here. Add new people and organizations with a people mapping, which also builds their households.</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the chosen upsert field cannot be used</shortDescription>
+        <shortDescription>Load one object: the upsert field cannot be used; {0} is the field</shortDescription>
         <value>Rows cannot be matched on {0}: it is not an external ID text field of this object that you can read. Choose another field.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: no column is mapped to the upsert field</shortDescription>
+        <shortDescription>Load one object: no column for the upsert field; {0} is the field</shortDescription>
         <value>Upsert by external ID needs a column mapped to {0}, the field rows are matched on.</value>
     </labels>
     <labels>
@@ -77,7 +77,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: a value for every row names the record</shortDescription>
+        <shortDescription>Load one object: a value for every row names the record; {0} field</shortDescription>
         <value>A value for every row cannot be {0}: every row would then name the same record. Map {0} to a column of the file instead.</value>
     </labels>
     <labels>
@@ -85,7 +85,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: a value is longer than its field holds</shortDescription>
+        <shortDescription>Load one object: value too long; {0} field, {1} the length it holds</shortDescription>
         <value>The value for {0} is longer than the {1} characters it holds. Shorten it and load the row again.</value>
     </labels>
     <labels>
@@ -93,7 +93,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: a value cannot be read as its field type</shortDescription>
+        <shortDescription>Load one object: unreadable value; {0} field, {1} the value</shortDescription>
         <value>"{1}" is not a value {0} accepts. Fix the cell and load the row again.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the record ID is of another object</shortDescription>
+        <shortDescription>Load one object: record ID of another object; {0} the ID, {1} object</shortDescription>
         <value>"{0}" is the ID of another kind of record, not of {1}. Check the Salesforce record ID column.</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the row has no value in the upsert field</shortDescription>
+        <shortDescription>Load one object: the row has no upsert value; {0} is the field</shortDescription>
         <value>This row has no {0}, which the upsert matches rows on.</value>
     </labels>
     <labels>
@@ -149,7 +149,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: a lookup value finds no record</shortDescription>
+        <shortDescription>Load one object: lookup finds no record; {0} field, {1} the value</shortDescription>
         <value>No record you can see matches "{1}" for {0}. Check the value or the field it is found by, or choose Leave it empty to load the rest of the row.</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: a lookup value finds several records</shortDescription>
+        <shortDescription>Load one object: lookup finds several records; {0} field, {1} value</shortDescription>
         <value>More than one record matches "{1}" for {0}, and the mapping says to reject such a row. Find it by a unique field, or choose Use the most recently changed.</value>
     </labels>
     <labels>
@@ -173,7 +173,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object run log: a mapped field is never written</shortDescription>
+        <shortDescription>Load one object log: a mapped field is never written; {0} the field</shortDescription>
         <value>Not loaded: {0} is kept by BarnCRM or by Salesforce and is never imported over.</value>
     </labels>
     <labels>
@@ -181,7 +181,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object run log: some lookups were left empty</shortDescription>
+        <shortDescription>Load one object log: some lookups left empty; {0} is the field</shortDescription>
         <value>Some rows name no record you can see for {0}. They were loaded with it left empty, as the mapping says.</value>
     </labels>
     <labels>
@@ -189,7 +189,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object run log: a lookup to several objects is read by ID</shortDescription>
+        <shortDescription>Load one object log: a lookup to several objects; {0} is the field</shortDescription>
         <value>{0} can point at more than one kind of record, so it is read by Salesforce record ID only.</value>
     </labels>
     <labels>
@@ -197,7 +197,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object run log: a lookup's chosen field cannot be searched</shortDescription>
+        <shortDescription>Load one object log: lookup field unsearchable; {0} lookup, {1} field</shortDescription>
         <value>{0} is found by {1}, which you cannot search by, so no record was found for it. Choose another field in the columns step.</value>
     </labels>
     <labels>

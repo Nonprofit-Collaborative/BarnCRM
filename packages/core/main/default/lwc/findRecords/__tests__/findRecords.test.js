@@ -5,11 +5,17 @@ import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
 import runQuery from '@salesforce/apex/FindController.runQuery';
 import exportPage from '@salesforce/apex/FindController.exportPage';
+import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import * as navigation from 'lightning/navigation';
 import { TextEncoder as NodeTextEncoder } from 'util';
@@ -18,11 +24,23 @@ import { TextEncoder as NodeTextEncoder } from 'util';
 global.TextEncoder = global.TextEncoder || NodeTextEncoder;
 
 jest.mock(
+  '@salesforce/label/c.Core_Find_HiddenColumns',
+  () => ({ default: 'Left out columns you do not have access to: {0}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'America/New_York' }), {
+  virtual: true
+});
+
+jest.mock(
   '@salesforce/apex/FindController.listChildRelationships',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
 jest.mock('@salesforce/apex/FindController.saveEdits', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/FindController.summarize', () => ({ default: jest.fn() }), {
@@ -191,6 +209,22 @@ describe('c-find-records', () => {
     });
     expect(one(element, 'soql').value).toBe('SELECT Id, Name FROM Gift__c LIMIT 200');
     expect(element.shadowRoot.querySelector('c-filter-builder').objectApiName).toBe('Gift__c');
+    // Outside a console the tab is left as it is.
+    expect(setTabLabel).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the object being searched', async () => {
+    const element = await render();
+    EnclosingTabId.emit('tab0');
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Find_Title');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'utility:search', {
+      iconAlt: 'c.Core_Find_Title'
+    });
+
+    await choose(one(element, 'object'), 'Gift__c');
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Find_Title: Gift');
   });
 
   it('adds a related record so its fields can be columns, and shows them in the results', async () => {
@@ -282,6 +316,36 @@ describe('c-find-records', () => {
       expect.objectContaining({ recordId: null, name: 'Mine', shared: true })
     );
     expect(one(element, 'notice-message').textContent).toBe('c.Core_Find_SavedNotice');
+  });
+
+  it('keeps open the query a Save as wrote, even when another has the same name', async () => {
+    const twoOfTheSameName = {
+      ...PAGE,
+      savedQueries: [
+        { recordId: 'a0X000000000AAAAAA', name: 'Mine', mine: true, queryJson: '{}' },
+        { recordId: 'a0X000000000BBBBBB', name: 'Mine', mine: true, queryJson: '{}' }
+      ]
+    };
+    saveQuery
+      .mockResolvedValueOnce({ ...twoOfTheSameName, savedId: 'a0X000000000BBBBBB' })
+      .mockResolvedValueOnce({ ...twoOfTheSameName, savedId: 'a0X000000000BBBBBB' });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    const name = one(element, 'query-name');
+    name.value = 'Mine';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+
+    one(element, 'save-as').click();
+    await flush();
+    await flush();
+    one(element, 'save').click();
+    await flush();
+    await flush();
+
+    expect(saveQuery).toHaveBeenCalledTimes(2);
+    expect(saveQuery.mock.calls[0][0].recordId).toBeNull();
+    expect(saveQuery.mock.calls[1][0].recordId).toBe('a0X000000000BBBBBB');
   });
 
   it('opens a query someone shared, read only, with its related columns and conditions', async () => {
@@ -395,6 +459,72 @@ describe('c-find-records', () => {
     );
   });
 
+  it('leaves out a shared column the person cannot see, and says so', async () => {
+    const hidden = { ...PAGE.savedQueries[0] };
+    hidden.queryJson = JSON.stringify({
+      version: 1,
+      object: 'Gift__c',
+      fields: ['Name', 'Secret__c', 'Amount__c'],
+      limit: 50
+    });
+    getPage.mockResolvedValue({ ...PAGE, savedQueries: [hidden] });
+    const element = await render();
+    await flush();
+    await choose(one(element, 'saved'), hidden.recordId);
+    await flush();
+
+    expect(one(element, 'columns').value).toEqual(['Name', 'Amount__c']);
+    expect(one(element, 'notice-message').textContent).toBe(
+      'Left out columns you do not have access to: Secret__c.'
+    );
+  });
+
+  it('shows and exports a date-time with its time, in the person time zone', async () => {
+    const withTime = {
+      ...GIFT,
+      fields: [
+        ...GIFT.fields,
+        { apiName: 'Received__c', label: 'Received', dataType: 'datetime', filterable: true }
+      ]
+    };
+    getObjectInfo.mockImplementation(({ objectApiName }) =>
+      Promise.resolve(objectApiName === 'Contact' ? CONTACT : withTime)
+    );
+    runQuery.mockResolvedValue({
+      soql: 'SELECT ...',
+      rows: [{ Id: 'a01', Name: 'G-1', Received__c: '2026-01-05T03:00:00.000Z' }]
+    });
+    exportPage.mockResolvedValue({
+      rows: [{ Id: 'a01', Name: 'G-1', Received__c: '2026-01-05T03:00:00.000Z' }],
+      lastId: 'a01',
+      done: true
+    });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Received__c']);
+    one(element, 'run').click();
+    await flush();
+    await flush();
+
+    const shown = one(element, 'results').columns[1];
+    expect(shown.type).toBe('date');
+    expect(shown.typeAttributes).toEqual(
+      expect.objectContaining({ hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' })
+    );
+
+    one(element, 'export').click();
+    await flush();
+    await flush();
+    const blob = global.URL.createObjectURL.mock.calls[0][0];
+    const text = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsText(blob);
+    });
+    // Ten at night on the 4th in New York, not three in the morning UTC.
+    expect(text).toContain('G-1,2026-01-04 22:00:00');
+  });
+
   it('loads a typed query into the builder', async () => {
     const element = await render();
     await choose(one(element, 'object'), 'Contact');
@@ -443,6 +573,22 @@ describe('c-find-records', () => {
     expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     expect(blob.size).toBeGreaterThan(0);
     expect(one(element, 'notice-message').textContent).toBe('Exported 1 rows.');
+  });
+
+  it('hands the query and the column labels to the export to Files', async () => {
+    startServerExport.mockResolvedValue({ jobId: '707', tag: 'abc123', done: false, files: [] });
+    jest.spyOn(window, 'setInterval').mockImplementation(() => 1);
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+    one(element, 'export-files').click();
+    await flush();
+
+    expect(startServerExport).toHaveBeenCalledTimes(1);
+    const sent = startServerExport.mock.calls[0][0];
+    expect(JSON.parse(sent.queryJson).fields).toEqual(['Name', 'Amount__c']);
+    expect(Object.keys(JSON.parse(sent.labelsJson))).toEqual(['Name', 'Amount__c']);
+    expect(exportPage).not.toHaveBeenCalled();
   });
 
   it('saves grid edits as the person and marks the rows that failed', async () => {

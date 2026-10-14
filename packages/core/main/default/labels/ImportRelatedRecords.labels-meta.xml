@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_RelatedOptionLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Related records choice; {0} is the object, {1} its parent field</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRelatedNeedsKey</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: related records chosen under Insert, which has no parent key</shortDescription>
+        <value>Related records need a parent key. Choose Upsert by external ID, Update by a field you choose or Update by record ID, or turn off related records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRelatedObjectUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: related records cannot be created; {0} is the object</shortDescription>
+        <value>Related records cannot be created in {0}. Choose another related object, or ask your Salesforce administrator for access to create them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRelatedFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: no parent field; {0} is the related object, {1} the loaded one</shortDescription>
+        <value>No field of {0} that you may fill in points at {1}. Choose the related records again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRelatedParentFailed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a row's related record is not created because its parent was not saved</shortDescription>
+        <value>The parent record of this row was not saved, so its related record was not created. Fix the first row with this key, then load these rows again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRelatedRecord</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a row's related record was refused; {0} is the reason</shortDescription>
+        <value>The related record was not saved: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRelatedParentFieldSkipped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: column on the related parent field skipped; {0} is the field</shortDescription>
+        <value>{0} is filled in with each row's parent, so the column mapped to it is not loaded.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRelatedCommit</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: related records; {0} is the count created, {1} not created</shortDescription>
+        <value>Related records: {0} created, {1} not created.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRelatedDryRun</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: related records; {0} is the count a commit would create, {1} not</shortDescription>
+        <value>Related records: {0} would be created, {1} would not.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column picker: a related field; {0} is the object, {1} the field</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the related records picker</shortDescription>
+        <value>Related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedNone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: no related records</shortDescription>
+        <value>None</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what related records do</shortDescription>
+        <value>Each row can also create a record that points at its parent, such as a session of a program. Rows with the same value in the field rows are matched by share one parent. Then map the related columns on the columns step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedInsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: why Insert offers no related records</shortDescription>
+        <value>To load related records, choose Upsert by external ID or one of the updates, so rows can name their parent by a key.</value>
+    </labels>
+</CustomLabels>

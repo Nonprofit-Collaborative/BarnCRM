@@ -81,6 +81,7 @@ public with sharing class HealthCheckService {
     public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
     public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
     public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
+    public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
 
     /**
      * What one of those fixes would change if it ran now: the names of the rows it would create,
@@ -104,6 +105,9 @@ public with sharing class HealthCheckService {
         }
         if (FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
             return NightlyJobs.unscheduledLabels();
+        }
+        if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
+            return ScheduledJobSelector.namesOwnedByInactiveUsers();
         }
         return null;
     }
@@ -151,11 +155,8 @@ public with sharing class HealthCheckService {
     @NamespaceAccessible
     public static final String FIX_CUSTOM_PERMISSIONS_URL = '/lightning/setup/CustomPermissions/home';
 
-    /**
-     * The custom permission that gates changing settings and reading who else is in the org.
-     * Declared once, next to the setting it protects.
-     */
-    public static final String MANAGE_SETTINGS = CoexistenceService.MANAGE_SETTINGS;
+    /** The custom permission that gates changing settings and reading who else is in the org. */
+    public static final String MANAGE_SETTINGS = BarnCRMPermissions.MANAGE_SETTINGS;
 
     /**
      * Test injection points, null in every real transaction: a check that always throws, and
@@ -484,6 +485,18 @@ public with sharing class HealthCheckService {
             );
             steps.add(
                 new CheckStep(
+                    'relationships_without_person',
+                    new HealthCheckHouseholdChecks.RelationshipsWithoutPersonCheck()
+                )
+            );
+            steps.add(
+                new CheckStep(
+                    'affiliations_without_person',
+                    new HealthCheckHouseholdChecks.AffiliationsWithoutPersonCheck()
+                )
+            );
+            steps.add(
+                new CheckStep(
                     'shipped_rollups',
                     new HealthCheckSettingsChecks.ShippedRollupsCheck()
                 )
@@ -505,9 +518,18 @@ public with sharing class HealthCheckService {
             );
             steps.add(
                 new CheckStep(
+                    'jobs_inactive_owner',
+                    new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
+                )
+            );
+            steps.add(
+                new CheckStep(
                     'nightly_rollups',
                     new HealthCheckSettingsChecks.NightlyRollupsCheck()
                 )
+            );
+            steps.add(
+                new CheckStep('rollup_queue', new HealthCheckSettingsChecks.RollupQueueCheck())
             );
         }
 
@@ -520,7 +542,7 @@ public with sharing class HealthCheckService {
      */
     @NamespaceAccessible
     public static Boolean canManageSettings() {
-        return FeatureManagement.checkPermission(MANAGE_SETTINGS);
+        return BarnCRMPermissions.canManageSettings();
     }
 
     /**
@@ -547,6 +569,12 @@ public with sharing class HealthCheckService {
                 String.isBlank(report.currentMode) ||
                 (report.recommendedMode != null &&
                 !report.recommendedMode.equals(report.currentMode));
+        } catch (Exception e) {
+            logQuietly(e);
+        }
+
+        try {
+            HealthCheckLastRun.record(report);
         } catch (Exception e) {
             logQuietly(e);
         }

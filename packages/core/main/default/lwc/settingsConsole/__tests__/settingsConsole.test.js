@@ -4,6 +4,11 @@ import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
 import * as navigation from 'lightning/navigation';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/SettingsController.getConsoleModel', () => ({ default: jest.fn() }), {
   virtual: true
@@ -17,6 +22,11 @@ jest.mock('@salesforce/apex/SettingsController.getRecentChanges', () => ({ defau
 jest.mock('@salesforce/apex/SettingsController.search', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/SettingsController.getSetupChecks',
+  () => ({ default: jest.fn().mockResolvedValue({}) }),
+  { virtual: true }
+);
 
 // Reached through the module namespace rather than by name: a wire adapter may only be named
 // in a @wire decorator, and a test drives it through the stub's emit.
@@ -54,6 +64,20 @@ function model(canEdit) {
             value: 'true',
             checked: true,
             options: []
+          },
+          {
+            key: 'Import_Chunk_Size__c',
+            label: 'Rows per import chunk',
+            description: 'How many rows an import processes at a time.',
+            dataType: 'Number',
+            section: 'Households',
+            component: null,
+            helpUrl: null,
+            value: '200',
+            checked: false,
+            options: [],
+            minValue: 1,
+            maxValue: 2000
           }
         ]
       },
@@ -186,7 +210,7 @@ describe('c-settings-console', () => {
     expect(navItems).toHaveLength(5);
 
     const inputs = element.shadowRoot.querySelectorAll('lightning-input');
-    expect(inputs).toHaveLength(2);
+    expect(inputs).toHaveLength(3);
     expect(inputs[0].value).toBe('The {LastName} Family');
     expect(inputs[1].checked).toBe(true);
 
@@ -261,6 +285,59 @@ describe('c-settings-console', () => {
     expect(combobox.value).toBe('Standalone');
   });
 
+  it('leaves the tab alone outside a console', async () => {
+    build();
+    await settle();
+
+    expect(setTabLabel).not.toHaveBeenCalled();
+    expect(setTabIcon).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the section on screen', async () => {
+    const element = build();
+    EnclosingTabId.emit('tab0');
+    await settle();
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Settings_Title: Households');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'standard:settings', {
+      iconAlt: 'c.Core_Settings_Title: Households'
+    });
+
+    element.shadowRoot
+      .querySelector('c-settings-search')
+      .dispatchEvent(new CustomEvent('settingselect', { detail: { section: 'General' } }));
+    await settle();
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Settings_Title: General');
+  });
+
+  it('scrolls to and focuses the setting a search result names', async () => {
+    const element = build();
+    await settle();
+    const focus = jest.fn();
+    const scrollIntoView = jest.fn();
+    const originalFocus = HTMLElement.prototype.focus;
+    const originalScroll = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.focus = focus;
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    try {
+      const search = element.shadowRoot.querySelector('c-settings-search');
+      search.dispatchEvent(
+        new CustomEvent('settingselect', {
+          detail: { section: 'General', key: 'Coexistence_Mode__c' }
+        })
+      );
+      await settle();
+    } finally {
+      HTMLElement.prototype.focus = originalFocus;
+      HTMLElement.prototype.scrollIntoView = originalScroll;
+    }
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(focus.mock.instances[0].dataset.key).toBe('Coexistence_Mode__c');
+  });
+
   it('opens the section a setup step asked for', async () => {
     const element = build();
     openSection('General');
@@ -269,6 +346,18 @@ describe('c-settings-console', () => {
     const combobox = element.shadowRoot.querySelector('lightning-combobox');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
+  });
+
+  it('puts the Setup note of the open section at the top of it', async () => {
+    const element = build();
+    await settle();
+
+    const notes = element.shadowRoot.querySelector('c-settings-setup-notes');
+    expect(notes.section).toBe('Households');
+
+    openSection('General');
+    await settle();
+    expect(notes.section).toBe('General');
   });
 
   it('offers a module its own page instead of trying to render it', async () => {
@@ -295,7 +384,7 @@ describe('c-settings-console', () => {
     await settle();
 
     const groups = element.shadowRoot.querySelectorAll('div[role="group"]');
-    expect(groups).toHaveLength(2);
+    expect(groups).toHaveLength(3);
     const describedBy = groups[0].getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
     const description = element.shadowRoot.querySelector(`[id="${describedBy}"]`);
@@ -361,5 +450,34 @@ describe('c-settings-console', () => {
 
     const message = element.shadowRoot.querySelector('p[role="status"]');
     expect(message.textContent).toContain('Core_Settings_LoadErrorMessage');
+  });
+
+  it('gives a number its range, and sends nothing while a number is outside it (ADMIN-27)', async () => {
+    const element = build();
+    await settle();
+
+    const input = element.shadowRoot.querySelector('lightning-input[data-kind="Number"]');
+    expect(input.min).toBe(1);
+    expect(input.max).toBe(2000);
+
+    input.value = '5000';
+    input.dispatchEvent(new CustomEvent('change'));
+    input.reportValidity = jest.fn(() => false);
+    await settle();
+
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(input.reportValidity).toHaveBeenCalled();
+    expect(saveSettings).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('p[role="status"]').textContent).toContain(
+      'Core_Settings_NumberOutOfRangeOnPage'
+    );
+
+    input.reportValidity = jest.fn(() => true);
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({ values: { Import_Chunk_Size__c: '5000' } });
   });
 });

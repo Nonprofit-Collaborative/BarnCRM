@@ -100,6 +100,8 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
         public Set<Id> refused = new Set<Id>();
         public Set<Id> failedIds = new Set<Id>();
         public Boolean failedIdsComplete = true;
+        /** Who started the run from a page, told when it ends; null for the nightly run (Q-04). */
+        public Id notifyUserId = JobNotifier.starter();
     }
 
     @TestVisible
@@ -489,6 +491,20 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
                 ErrorLogger.SEVERITY_WARNING
             );
         }
+        JobNotifier.aboutSettings(
+            this.run.notifyUserId,
+            System.Label.Core_JobNotice_Rollups,
+            this.run.stoppedChunks > 0,
+            String.format(
+                System.Label.Core_JobNotice_RollupsBody,
+                new List<Object>{
+                    this.run.written.format(),
+                    this.run.failed.format(),
+                    this.run.stoppedChunks.format()
+                }
+            ),
+            JobNotifier.SECTION_ROLLUPS
+        );
     }
 
     // -------------------------------------------------------------------------------- progress

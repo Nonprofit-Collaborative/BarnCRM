@@ -2,8 +2,13 @@
  * Tests for the nightly top up batch: every active recurring commitment is reached, not
  * only the oldest handful, and the run is recorded when the batch finishes.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InstallmentTopUpBatch')
 private class InstallmentTopUpBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void extendsEveryActiveRecurringCommitmentNotJustTheOldest() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

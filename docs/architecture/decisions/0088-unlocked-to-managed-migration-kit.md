@@ -1,6 +1,6 @@
 # ADR-0088: Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API
 
-**Status:** Proposed
+**Status:** Accepted (owner decision D-64, 2026-10-13)
 **Date:** 2026-10-12
 **Source:** plan Section 3 "Suites and packaging", feature C-31 (Section 5.1, roadmap v0.11),
 ADR-0046 (unlocked now, managed at listing)

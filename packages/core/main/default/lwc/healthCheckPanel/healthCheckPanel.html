@@ -2,7 +2,7 @@
     <lightning-card title={labels.title} icon-name="utility:health_check">
         <div slot="actions">
             <lightning-button
-                label={labels.rerun}
+                label={rerunLabel}
                 onclick={handleRerun}
                 class="slds-m-right_x-small"
                 data-id="rerun"
@@ -28,45 +28,33 @@
                 <p class="slds-text-color_error" data-id="error" role="alert">{errorMessage}</p>
             </template>
 
+            <template if:true={showLastRun}>
+                <div class="slds-m-bottom_small" data-id="last-run">
+                    <template if:true={hasLastRun}>
+                        <p>
+                            <span class="slds-text-title">{labels.lastRun}</span>&nbsp;
+                            <lightning-formatted-date-time
+                                value={lastRunAt}
+                                year="numeric"
+                                month="short"
+                                day="numeric"
+                                hour="numeric"
+                                minute="2-digit"
+                                data-id="last-run-at"
+                            ></lightning-formatted-date-time>
+                        </p>
+                        <p data-id="last-result">{lastRunResult}</p>
+                    </template>
+                    <template if:false={hasLastRun}>
+                        <p data-id="never-run">{labels.neverRun}</p>
+                    </template>
+                </div>
+            </template>
+
             <template if:true={fixOutcome}>
                 <p class="slds-text-color_success slds-m-bottom_small" data-id="fix-outcome" role="status">
                     {fixOutcome}
                 </p>
-            </template>
-
-            <template if:true={pendingFix}>
-                <section
-                    class="slds-box slds-theme_shade slds-m-bottom_medium"
-                    data-id="confirm"
-                    role="dialog"
-                    aria-labelledby="confirm-heading"
-                    aria-describedby="confirm-detail"
-                    tabindex="-1"
-                    onkeydown={handleConfirmKeydown}
-                >
-                    <h2 class="slds-text-heading_small" id="confirm-heading">{labels.confirmHeading}</h2>
-                    <p class="slds-text-body_small slds-m-top_xx-small">{labels.confirmIntro}</p>
-                    <p class="slds-m-top_x-small slds-text-title_bold" data-id="confirm-title">
-                        {pendingFix.title}
-                    </p>
-                    <p class="slds-text-body_small" data-id="confirm-detail" id="confirm-detail">
-                        {pendingFix.detail}
-                    </p>
-                    <div class="slds-m-top_small">
-                        <lightning-button
-                            class="slds-m-right_x-small"
-                            label={labels.cancel}
-                            onclick={handleCancelFix}
-                            data-id="confirm-cancel"
-                        ></lightning-button>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.confirm}
-                            onclick={handleConfirmFix}
-                            data-id="confirm-run"
-                        ></lightning-button>
-                    </div>
-                </section>
             </template>
 
             <template if:true={isReadOnly}>
@@ -122,7 +110,7 @@
                                             <ul class="slds-list_dotted slds-text-body_small" data-id="finding-links">
                                                 <template for:each={finding.links} for:item="link">
                                                     <li key={link.url}>
-                                                        <a href={link.url} data-id="finding-link">{link.label}</a>
+                                                        <a href={link.url} data-id="finding-link" onclick={handleFindingLink}>{link.label}</a>
                                                     </li>
                                                 </template>
                                             </ul>

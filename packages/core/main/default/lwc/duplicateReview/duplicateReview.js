@@ -1,5 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 // Bare, and correctly so: a custom permission in the same package resolves without a prefix.
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import DISMISSAL_OBJECT from '@salesforce/schema/Duplicate_Dismissal__c';
@@ -102,9 +104,12 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   merging;
   mergePreview;
   keepId;
+  previewRequest = 0;
 
   /** The data-id of the box heading already given focus, so it is focused once per opening. */
   focusedHeading;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   connectedCallback() {
     this.load();
@@ -246,6 +251,11 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.busy || !this.canManage || !this.canReviewSuggestions;
   }
 
+  /** A second scan beside a running one would record the same pairs twice; the server refuses it too. */
+  get scanDisabled() {
+    return this.controlsDisabled || this.scanRunning;
+  }
+
   // ------------------------------------------------------------------ scan and refresh
 
   handleScan() {
@@ -255,6 +265,17 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   handleRefresh() {
     this.noticeMessage = undefined;
     this.load();
+  }
+
+  /** In a console a suggested record opens as a subtab, so the review stays where it was. */
+  handleRecordClick(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    followLinkInWorkspace(this, event, { recordId }, () =>
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId, actionName: 'view' }
+      })
+    );
   }
 
   handleViewDismissed() {
@@ -304,16 +325,29 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.loadPreview();
   }
 
+  /**
+   * Only the answer to the latest request is shown: after a quick change of the kept household
+   * an earlier, slower answer would otherwise describe the other direction.
+   */
   async loadPreview() {
+    this.previewRequest += 1;
+    const request = this.previewRequest;
     this.busy = true;
     this.errorMessage = undefined;
     try {
-      this.mergePreview = await previewMerge({ survivorId: this.keepId, victimId: this.otherId });
+      const preview = await previewMerge({ survivorId: this.keepId, victimId: this.otherId });
+      if (request === this.previewRequest) {
+        this.mergePreview = preview;
+      }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
-      this.merging = undefined;
+      if (request === this.previewRequest) {
+        this.errorMessage = this.messageFrom(error);
+        this.merging = undefined;
+      }
     } finally {
-      this.busy = false;
+      if (request === this.previewRequest) {
+        this.busy = false;
+      }
     }
   }
 

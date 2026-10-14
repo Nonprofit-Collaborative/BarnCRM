@@ -9,6 +9,8 @@
  * way for the same reason.
  */
 public with sharing class HouseholdOfPersonController {
+    private static final String CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS = 'SELECT Id, Name FROM Contact WHERE Name LIKE :likeTerm AND IsPersonAccount = false ORDER BY Name LIMIT 10'; // detection-only: used only after isPersonAccountOrg found person accounts, so each such person is offered once, as the account
+
     /**
      * One household as the panel on a person's record shows it.
      */
@@ -112,9 +114,11 @@ public with sharing class HouseholdOfPersonController {
         }
         try {
             String likeTerm = '%' + trimmed + '%';
-            result.addAll(searchContacts(likeTerm));
             if (HouseholdService.isPersonAccountOrg()) {
+                result.addAll(searchContactsWithoutPersonAccounts(likeTerm));
                 result.addAll(searchPersonAccounts(likeTerm));
+            } else {
+                result.addAll(searchContacts(likeTerm));
             }
             return result;
         } catch (Exception e) {
@@ -146,8 +150,8 @@ public with sharing class HouseholdOfPersonController {
     }
 
     /**
-     * Creates a new contact and joins them to this household, in the flexible way of
-     * belonging. The contact is created with this user's own access (ADR-0021 does not cover
+     * Creates a new person and joins them to this household: a contact, or a person account
+     * where the org stores people that way (see newPerson). The person is created with this user's own access (ADR-0021 does not cover
      * an ordinary Contact save, only package-owned data), so the save succeeds exactly when
      * the user could have created the contact by hand. The join that follows is the same one
      * addExistingPerson uses.
@@ -163,12 +167,21 @@ public with sharing class HouseholdOfPersonController {
             if (householdId == null || String.isBlank(lastName)) {
                 throw new HouseholdException(Label.Core_HouseholdPanel_AddMemberMissingName);
             }
-            Contact person = new Contact(
-                Salutation = salutation,
-                FirstName = firstName,
-                LastName = lastName
-            );
-            Database.insert(person, AccessLevel.USER_MODE);
+            SObject person = newPerson(salutation, firstName, lastName);
+            if (!HouseholdService.isJunctionMode()) {
+                // In contact mode the household is the contact's own account, so the person
+                // is created straight into it.
+                person.put('AccountId', householdId);
+            }
+            // The person is joining this household, so automatic creation must not give
+            // them one of their own first: that would leave an empty household behind in
+            // contact mode, and two households in junction mode.
+            HouseholdService.suspendAutomaticCreation();
+            try {
+                Database.insert(person, AccessLevel.USER_MODE);
+            } finally {
+                HouseholdService.resumeAutomaticCreation();
+            }
             HouseholdService.addMembers(
                 new Map<Id, Set<Id>>{ householdId => new Set<Id>{ person.Id } }
             );
@@ -181,6 +194,27 @@ public with sharing class HouseholdOfPersonController {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * The new person, stored the way this org stores people (PEOPLE-4): a person account
+     * where the org has them, belongs to households by the flexible way, and gives the user
+     * a person record type to create with; a contact otherwise. The person fields of an
+     * account exist only in such an org, so they are set by name.
+     */
+    @TestVisible
+    private static SObject newPerson(String salutation, String firstName, String lastName) {
+        Id personType = HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode()
+            ? OrgShapeDetector.creatablePersonRecordTypeId()
+            : null;
+        if (personType == null) {
+            return new Contact(Salutation = salutation, FirstName = firstName, LastName = lastName);
+        }
+        Account person = new Account(RecordTypeId = personType);
+        person.put('Salutation', salutation); // detection-only: person field, set by name
+        person.put('FirstName', firstName); // detection-only: person field, set by name
+        person.put('LastName', lastName); // detection-only: person field, set by name
+        return person;
+    }
 
     /**
      * The household a contact points at, when it is one. A person stored as an account has
@@ -247,22 +281,46 @@ public with sharing class HouseholdOfPersonController {
     }
 
     /**
-     * People this org stores as accounts, matched by name. The field that tells such an
-     * account apart from an organization exists on the account object only in an org shaped
-     * that way, exactly as PersonRecordSelector reads it, so the query is built as text and
-     * never names that field at compile time.
+     * Contacts that are people in their own right, in an org that also stores people as
+     * accounts. The contact the platform keeps behind each such account is left out, because
+     * that person is offered as the account (PEOPLE-7) and joins by the account side.
+     */
+    private static List<PersonResult> searchContactsWithoutPersonAccounts(String likeTerm) {
+        List<PersonResult> result = new List<PersonResult>();
+        Map<String, Object> binds = new Map<String, Object>{ 'likeTerm' => likeTerm };
+        for (
+            SObject record : Database.queryWithBinds(
+                CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS,
+                binds,
+                AccessLevel.USER_MODE
+            )
+        ) {
+            result.add(toPersonResult(record.Id, (String) record.get('Name')));
+        }
+        return result;
+    }
+
+    /**
+     * People this org stores as accounts, matched by name. Such an account is told apart
+     * from an organization by its person record type, exactly as PersonRecordSelector reads
+     * it. A surname filter cannot: the platform matches LastName != NULL on business
+     * accounts too.
      */
     private static List<PersonResult> searchPersonAccounts(String likeTerm) {
         List<PersonResult> result = new List<PersonResult>();
-        if (!Schema.SObjectType.Account.isAccessible()) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (!Schema.SObjectType.Account.isAccessible() || personTypes.isEmpty()) {
             return result;
         }
-        String query =
-            'SELECT Id, Name FROM Account WHERE Name LIKE :likeTerm AND LastName != NULL ' +
-            'ORDER BY Name LIMIT 10';
-        Map<String, Object> binds = new Map<String, Object>{ 'likeTerm' => likeTerm };
-        for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)) {
-            result.add(toPersonResult(record.Id, (String) record.get('Name')));
+        for (Account record : [
+            SELECT Id, Name
+            FROM Account
+            WHERE Name LIKE :likeTerm AND RecordTypeId IN :personTypes
+            WITH USER_MODE
+            ORDER BY Name
+            LIMIT 10
+        ]) {
+            result.add(toPersonResult(record.Id, record.Name));
         }
         return result;
     }

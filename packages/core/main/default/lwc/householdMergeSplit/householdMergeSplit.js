@@ -1,7 +1,12 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import { getRecord } from 'lightning/uiRecordApi';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { CloseActionScreenEvent } from 'lightning/actions';
+import { RefreshEvent } from 'lightning/refresh';
+import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { openInWorkspace, refreshEnclosingTab } from 'c/workspaceTabs';
 import searchHouseholds from '@salesforce/apex/HouseholdMergeController.searchHouseholds';
 import canEdit from '@salesforce/apex/HouseholdMergeController.canEdit';
 import getPreview from '@salesforce/apex/HouseholdMergeController.preview';
@@ -38,6 +43,7 @@ import SPLIT_NEW from '@salesforce/label/c.Core_HouseholdMerge_SplitNewHousehold
 import SPLIT_EXISTING from '@salesforce/label/c.Core_HouseholdMerge_SplitExistingHousehold';
 import SPLIT_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
 import SPLIT_CONFIRM_BODY from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmBody';
+import SPLIT_CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmHeading';
 import SPLIT_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_SplitSuccess';
 import RESULT_ACCESSIBLE_NAME from '@salesforce/label/c.Core_HouseholdScreens_ResultAccessibleName';
 import LOADING_COMPARISON from '@salesforce/label/c.Core_HouseholdScreens_LoadingComparison';
@@ -65,16 +71,12 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     columnOther: COLUMN_OTHER,
     membersHeading: MEMBERS_HEADING,
     mergeButton: MERGE_BUTTON,
-    confirmHeading: CONFIRM_HEADING,
-    confirmButton: CONFIRM_BUTTON,
-    cancel: CANCEL,
     readOnly: READ_ONLY,
     notAHousehold: NOT_A_HOUSEHOLD,
     splitHeading: SPLIT_HEADING,
     splitNew: SPLIT_NEW,
     splitExisting: SPLIT_EXISTING,
     splitButton: SPLIT_BUTTON,
-    splitConfirmBody: SPLIT_CONFIRM_BODY,
     loadingComparison: LOADING_COMPARISON
   };
 
@@ -92,7 +94,6 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   @track comparison = [];
   @track mergeMembers = [];
   choices = {};
-  confirmingMerge = false;
 
   @track splitMembers = [];
   splitDestination = NEW_HOUSEHOLD;
@@ -101,7 +102,8 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   @track splitSearchResults = [];
   splitSearchTerm = '';
   splitSearchedOnce = false;
-  confirmingSplit = false;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   @wire(getRecord, { recordId: '$recordId', fields: [RECORD_TYPE_FIELD] })
   wiredAccount({ data, error }) {
@@ -267,15 +269,19 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     });
   }
 
-  handleMergeClick() {
-    this.confirmingMerge = true;
+  async handleMergeClick() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: CONFIRM_HEADING,
+      message: this.confirmBody,
+      confirmLabel: CONFIRM_BUTTON,
+      cancelLabel: CANCEL,
+      confirmVariant: 'destructive'
+    });
+    return confirmed ? this.merge() : undefined;
   }
 
-  handleMergeCancel() {
-    this.confirmingMerge = false;
-  }
-
-  handleMergeConfirm() {
+  merge() {
     this.busy = true;
     return mergeHouseholds({
       survivorId: this.recordId,
@@ -283,7 +289,6 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
       fieldChoices: this.choices
     })
       .then((result) => {
-        this.confirmingMerge = false;
         this.errorMessage = undefined;
         // The person is not told anywhere else that choosing a name during a merge locks
         // it against the naming automation, so the success message is where that is said.
@@ -291,10 +296,9 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
           ? `${MERGE_SUCCESS} ${CUSTOM_NAME_KEPT}`
           : MERGE_SUCCESS;
         this.toast(message, 'success');
-        this.goTo(result.survivorId);
+        return this.finish(result.survivorId);
       })
       .catch((error) => {
-        this.confirmingMerge = false;
         this.errorMessage = this.readError(error);
       })
       .finally(() => {
@@ -349,15 +353,18 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     this.splitTargetName = chosen ? chosen.name : '';
   }
 
-  handleSplitClick() {
-    this.confirmingSplit = true;
+  async handleSplitClick() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: SPLIT_CONFIRM_HEADING,
+      message: SPLIT_CONFIRM_BODY,
+      confirmLabel: SPLIT_BUTTON,
+      cancelLabel: CANCEL
+    });
+    return confirmed ? this.split() : undefined;
   }
 
-  handleSplitCancel() {
-    this.confirmingSplit = false;
-  }
-
-  handleSplitConfirm() {
+  split() {
     this.busy = true;
     return splitHousehold({
       householdId: this.recordId,
@@ -365,13 +372,11 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
       targetHouseholdId: this.splitDestination === NEW_HOUSEHOLD ? null : this.splitTargetId
     })
       .then((destinationId) => {
-        this.confirmingSplit = false;
         this.errorMessage = undefined;
         this.toast(SPLIT_SUCCESS, 'success');
-        this.goTo(destinationId);
+        return this.finish(destinationId);
       })
       .catch((error) => {
-        this.confirmingSplit = false;
         this.errorMessage = this.readError(error);
       })
       .finally(() => {
@@ -394,6 +399,29 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     }));
   }
 
+  /**
+   * After a merge or split: close the quick action if this runs in one (a no-op on a record
+   * page) and show that this household changed. In a console its tab is refreshed in place;
+   * everywhere else LDS and the page are told (its header and the members panel otherwise
+   * stay stale until a reload). The page moves only when the action ended on another
+   * household, since a merge ends on the page it started from: in a console a split's other
+   * household opens beside it as a subtab, elsewhere the page goes to it.
+   */
+  async finish(recordId) {
+    const refreshedTab = await refreshEnclosingTab(this);
+    this.dispatchEvent(new CloseActionScreenEvent());
+    if (!refreshedTab) {
+      notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
+      this.dispatchEvent(new RefreshEvent());
+    }
+    if (!recordId || recordId === this.recordId) {
+      return;
+    }
+    if (!refreshedTab || !(await openInWorkspace(this, { recordId }))) {
+      this.goTo(recordId);
+    }
+  }
+
   goTo(recordId) {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
@@ -402,7 +430,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   }
 
   toast(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 
   readError(error) {

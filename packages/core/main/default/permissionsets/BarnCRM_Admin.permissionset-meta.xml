@@ -20,10 +20,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AddressController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AddressSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -60,11 +56,19 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>CreatePersonAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>CustomPermissionSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
     <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>DataManagerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -96,7 +100,19 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FindPeopleAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FiscalYearSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetDataJobStatusAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetHouseholdSummaryAction</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -145,10 +161,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>HubController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HubErrorCountSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -216,6 +228,14 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>OrgOptimizerSetupController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>OrgOptimizerStorageController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>OrgShapeDetector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -241,10 +261,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>QueryFieldCatalog</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -750,6 +766,31 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Erasure__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Erasure__c.Details__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Erasure__c.Erased_Record_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Erasure__c.Person_Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Erasure__c.Request_Reference__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Error_Log__c.Context__c</field>
     <readable>true</readable>
@@ -955,6 +996,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Retry_After_Row__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Batch__c.Row_Count__c</field>
     <readable>true</readable>
@@ -997,6 +1043,16 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Batch__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Template_Snapshot_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Trial_Rows__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1087,6 +1143,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Related_Status__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1192,6 +1253,16 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Template__c.Lookup_Not_Found__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Related_Object__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Related_Parent_Field__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1356,6 +1427,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Rollup_Queue__c.Definition_Ids__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Rollup_Queue__c.Last_Error__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1479,8 +1555,17 @@
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
+    <modifyAllRecords>true</modifyAllRecords>
     <object>Duplicate_Dismissal__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Erasure__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
@@ -1490,6 +1575,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Error_Log_Event__e</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Rollup_Queue_Ready__e</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
@@ -1634,6 +1728,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Data_Manager</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

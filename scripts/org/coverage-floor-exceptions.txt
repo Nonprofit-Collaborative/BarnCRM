@@ -1,0 +1,27 @@
+# Apex classes below the per-class coverage floor (COVERAGE_CLASS_FLOOR, 75%) when the floor
+# was introduced, read from the last full gate run (2,805 tests, 2026-10-13). Each may not fall
+# below the figure here; a class not listed has to meet the floor. Raise a figure when tests
+# improve, and take the line out once the class reaches 75%: the gate prints which ones have.
+# Read by scripts/org/run-org-tests.sh. Format: Name  percent  # note.
+AccountAddressHandler 60  # 6 of 10 lines
+AcknowledgmentController 67  # 96 of 143 lines
+AcknowledgmentRunService 67  # 94 of 140 lines
+AcknowledgmentScheduler 33  # 11 of 33 lines
+AffiliationMaintenanceHandler 58  # 21 of 36 lines
+AffiliationValidationHandler 47  # 9 of 19 lines
+BlobToPdfReceiptRenderer 0  # 0 of 6 lines
+GiftDonorDeleteGuardHandler 66  # 4 of 6 lines
+GivingSampleData 47  # 11 of 23 lines
+HouseholdSoftCreditRecompute 73  # 36 of 49 lines
+HubController 67  # 46 of 68 lines
+InstallmentSchedulable 68  # 11 of 16 lines
+InstallmentTopUpSchedulable 60  # 3 of 5 lines
+ReceiptController 45  # 56 of 124 lines
+RelationshipMaintenanceHandler 47  # 16 of 34 lines
+RelationshipValidationHandler 52  # 9 of 17 lines
+RollupChanges 72  # 151 of 209 lines
+StewardshipTriggerHandler 70  # 7 of 10 lines
+StewardshipWriter 62  # 37 of 59 lines
+# No coverage row at all in that run: no test executed them.
+AcknowledgmentBatch 0  # no test ran it
+MessagingAcknowledgmentSender 0  # no test ran it

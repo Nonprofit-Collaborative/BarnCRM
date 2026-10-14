@@ -14,6 +14,12 @@ its year round one, an old address stays on file so a mailing sent last year can
 explained, and one person can have an address of their own without moving the rest of
 their household.
 
+In an org that stores people as person accounts, a person saved with a mailing address, or
+whose mailing address is changed afterwards, also gets an address of their own (type Home,
+marked default), and an address that is already on file for them, with the same words, is not
+added a second time. This is the same as it is for a person held as a contact, except that a
+person account never moves a household: the address is theirs alone.
+
 A winter address does not have to be moved by hand. A **seasonal** address carries the dates
 it is used, and a nightly job makes it the address in use on the day its season starts and
 puts the previous address back on the day the season ends. The job records when it last ran
@@ -53,8 +59,7 @@ the schedule.
 
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
 does not ask you to do that: the button on this page is the supported way to schedule the
-swap, now and after the Module Manager arrives in a later release. The Module Manager will
-switch whole modules on and off; the seasonal swap belongs to Core, which is always on, so it
+swap. The Module Manager switches whole modules on and off; the seasonal swap belongs to Core, which is always on, so it
 is scheduled here.
 
 Two things to know about the schedule.
@@ -75,6 +80,11 @@ BarnCRM Settings. Read Only users can see addresses and cannot change them.
 Addresses appear in two places once you are set up: an **Addresses** card on every
 household, organization, and person record, and an **Addresses** tab in the BarnCRM
 app for reporting and list views.
+
+The card reads and saves addresses as the person using it, through Salesforce's own record
+service, so it shows exactly what their object and field access allows and nothing more. An
+address edited elsewhere on the page shows on the card without a reload, and after **Set as
+default** the record's own address boxes refresh too.
 
 ## A five-minute walkthrough
 
@@ -109,7 +119,10 @@ year at home, and letters have been going to the wrong place. Start from the sam
 7. Go back to **The Garcia Family**. Because your setting says **Update household**, the
    household's default address now shows Harper's new street, and every other member of the
    household has the same new mailing address. One edit moved the whole household, which is
-   what a household moving actually means.
+   what a household moving actually means. The new street is a new Home address card marked
+   default; the address it replaced stays on the card as history and is not overwritten. If
+   the household is away for the season when you make the edit, the seasonal address card is
+   left as it is, and the new street is the one the household comes back to.
 
 If you had set **Create personal address** instead, step 7 would look different: Harper
 would have her own address card on her own record, marked default for her, and the rest of
@@ -158,13 +171,32 @@ on the address card instead, or mark a new address as the default. This is also 
 verification apps should be pointed at the address records.
 
 **Marking two addresses as default.** You cannot end up with two. Marking a second address
-as the default clears the first one automatically. If you expected both to stay marked, you
-wanted two addresses with different types (for example Home and Work), not two defaults.
+as the default clears the first one automatically, and when one save (an import, say) marks
+two addresses of the same household or person as default, the last of them is kept and the
+others are saved unmarked. If you expected both to stay marked, you wanted two addresses
+with different types (for example Home and Work), not two defaults.
+
+**Unticking Default on the address in use.** Refused, with "This is the address in use. To
+change that, make another address the default, or delete this one." A household or person
+is never left with no address in use while their standard address boxes still show the old
+one. Choose **Set as default** on the address you want instead.
+
+**The first address on a record.** The first address you add from the address card to a
+household, organization or person with none is saved as the default, so it is in use straight
+away. After that, a new address is added unmarked until you choose **Set as default**.
+
+**Two defaults just after a merge.** When Salesforce's own merge combines two records that
+each had a default address, the kept record briefly has both. Within a minute or so BarnCRM
+keeps one: the one that matches the kept record's address boxes (billing for a household or
+organization, mailing for a contact), or else the most recently created. The other stays on
+the card as an ordinary address. This runs in the background because Salesforce does not let
+anything change records while it is merging them.
 
 **Filling in a seasonal address with no dates.** A Seasonal address needs all four date
 boxes: start month, start day, end month, end day. Saving without them gives you
 "A seasonal address needs a start month, a start day, an end month, and an end day so we
-know when to use it." Fill in the four boxes, or change the type to Other if the address is
+know when to use it." The day must be one its month has (April 31 is refused; February 29
+is accepted). Fill in the four boxes, or change the type to Other if the address is
 not really seasonal. A range that crosses New Year, such as November 1 to March 31, is one
 range: enter it exactly that way, do not split it into two addresses.
 
@@ -183,8 +215,10 @@ address inside a household, put the person on it and leave the household blank.
 
 **Deleting the default address.** You can delete it, and BarnCRM promotes the most
 recently created remaining address to default so the household is never left with no
-address in its standard boxes. If the household has only one address, deleting it leaves
-the standard address boxes as they were and nothing is promoted. Prefer adding a new
+address in its standard boxes. An address that is not seasonal is preferred: a seasonal one
+is promoted only when nothing else is left, so mail does not go to a winter home in July. If
+the household has only one address, deleting it leaves the standard address boxes as they
+were and nothing is promoted. Prefer adding a new
 address and marking it default over deleting the old one: the old address is the record of
 where a mailing actually went.
 

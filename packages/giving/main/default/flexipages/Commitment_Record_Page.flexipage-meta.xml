@@ -244,6 +244,39 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentInstanceProperties>
+          <name>actionNames</name>
+          <valueList>
+            <valueListItems>
+              <value>Edit</value>
+            </valueListItems>
+            <valueListItems>
+              <value>ChangeOwnerOne</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Share</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Delete</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsConfiguration</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>
         <identifier>commitmentHighlightsPanel</identifier>
       </componentInstance>
@@ -312,8 +345,60 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
-        <componentName>force:relatedListContainer</componentName>
-        <identifier>commitmentRelatedLists</identifier>
+        <componentInstanceProperties>
+          <name>adminFilters</name>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>maxRecordsToDisplay</name>
+          <value>10</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>parentFieldApiName</name>
+          <value>Commitment__c.Id</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListApiName</name>
+          <value>Gifts__r</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListDisplayType</name>
+          <value>ADVGRID</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListFieldAliases</name>
+          <valueList>
+            <valueListItems>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift_Date__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListLabel</name>
+          <value>Gifts</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showActionBar</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldAlias</name>
+          <value>Gift_Date__c</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldOrder</name>
+          <value>Descending</value>
+        </componentInstanceProperties>
+        <componentName>lst:dynamicRelatedList</componentName>
+        <identifier>commitmentGiftsList</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

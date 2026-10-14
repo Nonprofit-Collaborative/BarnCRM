@@ -5,7 +5,7 @@
  * show each value before and after. The 200-row case runs as a minimal-profile user holding
  * only BarnCRM Admin, since every read and save of an import is in that user's own mode.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataTransform, ApexClass:ImportMapping')
 private class ImportTransformTest {
     private static final Integer MANY = 200;
     private static final Integer ALREADY_THERE = 10;

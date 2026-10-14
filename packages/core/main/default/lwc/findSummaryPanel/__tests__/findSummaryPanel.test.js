@@ -16,15 +16,32 @@ jest.mock('@salesforce/label/c.Core_Find_Blank', () => ({ default: '(blank)' }),
 const GIFT = {
   apiName: 'Gift__c',
   fields: [
-    { apiName: 'Amount__c', label: 'Amount', dataType: 'currency', filterable: true },
-    { apiName: 'Gift_Date__c', label: 'Gift Date', dataType: 'date', filterable: true },
+    {
+      apiName: 'Amount__c',
+      label: 'Amount',
+      dataType: 'currency',
+      filterable: true,
+      groupable: false,
+      aggregatable: true
+    },
+    {
+      apiName: 'Gift_Date__c',
+      label: 'Gift Date',
+      dataType: 'date',
+      filterable: true,
+      groupable: true,
+      aggregatable: true
+    },
     {
       apiName: 'Status__c',
       label: 'Status',
       dataType: 'picklist',
       filterable: true,
+      groupable: true,
+      aggregatable: false,
       picklistValues: []
     },
+    { apiName: 'Formula_Total__c', label: 'Formula', dataType: 'double', aggregatable: false },
     { apiName: 'Notes__c', label: 'Notes', dataType: 'textarea', filterable: false }
   ]
 };
@@ -78,7 +95,27 @@ describe('c-find-summary-panel', () => {
     const groups = element.shadowRoot
       .querySelector('[data-id="group-by"]')
       .options.map((option) => option.value);
-    expect(groups).toEqual(['', 'Amount__c', 'Gift_Date__c', 'Status__c']);
+    // A currency field cannot be grouped by, and a field the describe says cannot be totalled
+    // is not offered to measure.
+    expect(groups).toEqual(['', 'Gift_Date__c', 'Status__c']);
+  });
+
+  it('shows the lowest or highest date as a date', async () => {
+    const element = await mount();
+    choose(element, 'function', 'max');
+    await flush();
+    choose(element, 'field', 'Gift_Date__c');
+    await flush();
+    summarize.mockResolvedValue({
+      soql: 'SELECT ...',
+      capped: false,
+      lines: [{ groupValue: null, groupLabel: null, value: '2026-01-31' }]
+    });
+    element.shadowRoot.querySelector('[data-id="summarize"]').click();
+    await flush();
+
+    const table = element.shadowRoot.querySelector('[data-id="summary"]');
+    expect(table.columns[1].type).toBe('date-local');
   });
 
   it('sends the query with the summary and shows one line per group', async () => {

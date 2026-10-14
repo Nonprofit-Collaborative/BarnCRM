@@ -30,6 +30,19 @@ public with sharing class RollupDateWindow {
     }
 
     /**
+     * Whether a definition's total changes as the date moves on, with no record saved: a fiscal
+     * year window, or a condition such as is this year. Only a run over every record (the
+     * nightly run, Recalculate) keeps such a total right, so it may not be Instantly only
+     * (ROLLUPS-8).
+     */
+    public static Boolean movesWithTheDate(Rollup_Definition__c definition) {
+        return definition != null &&
+            (definition.Fiscal_Year_Aware__c == true ||
+            RollupFilterParser.usesRelativeDate(definition.Filter_JSON__c) ||
+            RollupFilterParser.usesRelativeDate(definition.Target_Filter_JSON__c));
+    }
+
+    /**
      * The month the fiscal year starts, 1 through 12, defaulting to January when the setting has
      * never been touched or holds something the platform cannot mean.
      */

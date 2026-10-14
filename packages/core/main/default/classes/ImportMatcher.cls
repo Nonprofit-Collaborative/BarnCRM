@@ -49,9 +49,7 @@ public with sharing class ImportMatcher {
      * without it has nothing to say about it (ADR-0013).
      */
     private static Boolean readable(Schema.SObjectType type, String fieldName) {
-        Schema.SObjectField field = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .get(fieldName.toLowerCase());
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(type).get(fieldName.toLowerCase());
         if (field == null) {
             return false;
         }
@@ -60,9 +58,7 @@ public with sharing class ImportMatcher {
 
     /** Remembers a field a lookup was skipped for, by its label. */
     private static void skippedFor(Schema.SObjectType type, String fieldName) {
-        Schema.SObjectField field = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .get(fieldName.toLowerCase());
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(type).get(fieldName.toLowerCase());
         if (field != null) {
             unreadable.add(field.getDescribe().getLabel());
         }
@@ -292,7 +288,7 @@ public with sharing class ImportMatcher {
             skippedFor(Contact.SObjectType, 'Email');
             return result;
         }
-        for (List<String> slice : slices(emails)) {
+        for (List<String> slice : ImportValues.slices(emails, MAX_KEYS_PER_QUERY)) {
             List<Contact> found = contactsByEmailSlice(slice);
             for (Contact record : found) {
                 // Records arrive oldest first, so a duplicate resolves the same way twice.
@@ -317,7 +313,7 @@ public with sharing class ImportMatcher {
             return result;
         }
         Map<String, Set<String>> byName = postalCodesByLastName(keys);
-        for (List<String> slice : slices(byName.keySet())) {
+        for (List<String> slice : ImportValues.slices(byName.keySet(), MAX_KEYS_PER_QUERY)) {
             List<Contact> found = contactsByNameSlice(slice, postalCodesOf(slice, byName));
             noteCutOff(found.size(), slice, keys);
             for (Contact record : found) {
@@ -363,7 +359,7 @@ public with sharing class ImportMatcher {
     @NamespaceAccessible
     public static Map<String, Id> accountsByName(Set<String> names, Id recordTypeId) {
         Map<String, Id> result = new Map<String, Id>();
-        for (List<String> slice : slices(names)) {
+        for (List<String> slice : ImportValues.slices(names, MAX_KEYS_PER_QUERY)) {
             List<Account> found = accountsByNameSlice(slice, recordTypeId);
             for (Account record : found) {
                 String key = nameKey(record.Name);
@@ -397,7 +393,7 @@ public with sharing class ImportMatcher {
             skippedFor(Account.SObjectType, ACCOUNT_EMAIL_FIELD);
             return result;
         }
-        for (List<String> slice : slices(emails)) {
+        for (List<String> slice : ImportValues.slices(emails, MAX_KEYS_PER_QUERY)) {
             List<SObject> found = personAccountsByEmailSlice(slice, recordTypeIds);
             for (SObject record : found) {
                 put(
@@ -470,7 +466,7 @@ public with sharing class ImportMatcher {
             return result;
         }
         Map<String, Set<String>> byName = postalCodesByLastName(keys);
-        for (List<String> slice : slices(byName.keySet())) {
+        for (List<String> slice : ImportValues.slices(byName.keySet(), MAX_KEYS_PER_QUERY)) {
             List<SObject> found = personAccountsByNameSlice(
                 slice,
                 postalCodesOf(slice, byName),
@@ -574,7 +570,7 @@ public with sharing class ImportMatcher {
             return result;
         }
         String objectName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-        for (List<String> slice : slices(values)) {
+        for (List<String> slice : ImportValues.slices(values, MAX_KEYS_PER_QUERY)) {
             List<SObject> found = byMatchFieldSlice(objectName, field, slice, recordTypeIds);
             for (SObject record : found) {
                 String key = nameKey((String) record.get(field));
@@ -686,45 +682,13 @@ public with sharing class ImportMatcher {
         return matchable.get(type);
     }
 
-    /** The account field map, described once per transaction (dynamic-apex.md section 5). */
-    private static Map<String, Schema.SObjectField> accountFields;
-
     /**
      * True when the account object in this org has the named field. Called once per matched
-     * row by `firstNameOf`, so the describe is taken once and kept.
+     * row by `firstNameOf`, so the describe is the one `ImportObjectSchema` keeps.
      */
     @NamespaceAccessible
     public static Boolean accountHasField(String fieldName) {
-        if (accountFields == null) {
-            accountFields = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .fields.getMap();
-        }
-        return accountFields.containsKey(fieldName.toLowerCase());
-    }
-
-    /**
-     * The key set cut into query-sized lists, with blanks dropped. One chunk of an import can
-     * be larger than a single IN clause should carry.
-     */
-    private static List<List<String>> slices(Set<String> keys) {
-        List<List<String>> result = new List<List<String>>();
-        if (keys == null || keys.isEmpty()) {
-            return result;
-        }
-        List<String> current = new List<String>();
-        for (String key : keys) {
-            if (String.isBlank(key)) {
-                continue;
-            }
-            current.add(key);
-            if (current.size() == MAX_KEYS_PER_QUERY) {
-                result.add(current);
-                current = new List<String>();
-            }
-        }
-        if (!current.isEmpty()) {
-            result.add(current);
-        }
-        return result;
+        return ImportObjectSchema.fieldsOf(Account.SObjectType)
+            .containsKey(fieldName.toLowerCase());
     }
 }

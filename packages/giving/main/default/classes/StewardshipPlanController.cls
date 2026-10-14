@@ -15,7 +15,6 @@
  * read, and `runningPlans` on each template is the number that edit will not reach.
  */
 public with sharing class StewardshipPlanController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Stewardship plans page';
     private static final String PLAN_KEY_FALLBACK = 'plan';
 
@@ -91,7 +90,7 @@ public with sharing class StewardshipPlanController {
     public static PageModel getPage() {
         try {
             PageModel model = new PageModel();
-            model.canEdit = FeatureManagement.checkPermission(EDIT_PERMISSION);
+            model.canEdit = BarnCRMPermissions.canManageSettings();
             model.triggerEvents = optionsFor(
                 Stewardship_Plan_Template__c.Trigger_Event__c.getDescribe()
             );
@@ -347,7 +346,7 @@ public with sharing class StewardshipPlanController {
     }
 
     private static void requireEdit() {
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw refuse(Label.Giving_Stewardship_ErrorNotPermitted);
         }
     }

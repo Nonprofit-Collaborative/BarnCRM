@@ -37,7 +37,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that packaged automation is paused.</shortDescription>
+        <shortDescription>Health Check: packaged automation is paused; {0} is the end time</shortDescription>
         <value>Automation is paused until {0}. While it is paused, households are not created and names are not recomputed. That is right during a bulk load and wrong the rest of the time.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that one check could not run.</shortDescription>
+        <shortDescription>Health Check: one check could not run; {0} is the check name</shortDescription>
         <value>Health Check could not finish the check named {0}. The rest of this report is still accurate. The details are in the Error Log.</value>
     </labels>
     <labels>
@@ -213,7 +213,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that there are unread Error Log entries.</shortDescription>
+        <shortDescription>Health Check: unread Error Log entries; {0} is the count</shortDescription>
         <value>The Error Log has {0} new entries. Each one says what went wrong and what to do about it. Work through them, then mark them resolved.</value>
     </labels>
     <labels>
@@ -229,7 +229,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the unread errors finding.</shortDescription>
+        <shortDescription>Health Check title: unread errors; {0} is the count</shortDescription>
         <value>{0} errors nobody has looked at</value>
     </labels>
     <labels>
@@ -245,7 +245,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: Setup and BarnCRM fiscal year start months differ</shortDescription>
+        <shortDescription>Health Check: fiscal year starts differ; {0} BarnCRM month, {1} Setup month</shortDescription>
         <value>BarnCRM starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total BarnCRM calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
     </labels>
     <labels>
@@ -279,6 +279,38 @@
         <protected>false</protected>
         <shortDescription>After the nightly jobs fix: what it did. {0} the job names.</shortDescription>
         <value>Done. Scheduled: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_FixStoppedOnly</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>After the deactivated owner fix: jobs stopped, not rescheduled. {0} names.</shortDescription>
+        <value>Stopped, and not scheduled again because Health Check never schedules them for you: {0}. Schedule each again on its own page if you still want it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding title: scheduled jobs owned by a deactivated user</shortDescription>
+        <value>Scheduled jobs belong to a deactivated person</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding detail: deactivated owner jobs. {0} the job names.</shortDescription>
+        <value>These jobs run as a person who has been deactivated, so they stopped running although their pages still show them as scheduled: {0}. The fix stops each one and schedules it again to run as you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button: reschedule deactivated owner jobs as me</shortDescription>
+        <value>Schedule them again as me</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixStale</fullName>
@@ -319,6 +351,14 @@
         <protected>false</protected>
         <shortDescription>Name of the nightly job that emails the error digest.</shortDescription>
         <value>Error digest email</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobImportRows</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that removes the rows of old imports.</shortDescription>
+        <value>Import row cleanup</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobRollups</fullName>
@@ -381,7 +421,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that the coexistence mode matches the org.</shortDescription>
+        <shortDescription>Health Check: coexistence mode matches the org; {0} is the mode</shortDescription>
         <value>This org is set to {0}, which is what BarnCRM recommends for what is installed here.</value>
     </labels>
     <labels>
@@ -397,7 +437,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that the coexistence mode does not match the org.</shortDescription>
+        <shortDescription>Health Check: mode does not match; {0} mode set, {1} mode recommended</shortDescription>
         <value>This org is set to {0}, but what is installed points to {1}. If that is deliberate, leave it. If it is not, switch: households and imports behave differently in each mode.</value>
     </labels>
     <labels>
@@ -413,7 +453,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that nobody has confirmed a coexistence mode.</shortDescription>
+        <shortDescription>Health Check: no mode confirmed; {0} mode in use, {1} mode recommended</shortDescription>
         <value>BarnCRM is running as {0} because nobody has confirmed a mode yet. This org looks like {1}. Confirm it before you create households or load data.</value>
     </labels>
     <labels>
@@ -557,7 +597,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The org shape sentence, with what was detected and the recommended mode.</shortDescription>
+        <shortDescription>Health Check org shape: {0} what was detected, {1} the recommended mode</shortDescription>
         <value>{0} BarnCRM supports this org shape directly. The coexistence mode it recommends is {1}. Shield Platform Encryption cannot be detected from inside the app: if your org uses it, say so before you load data.</value>
     </labels>
     <labels>
@@ -797,7 +837,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that active users hold no BarnCRM role.</shortDescription>
+        <shortDescription>Health Check: active users hold no BarnCRM role; {0} is the count</shortDescription>
         <value>{0} active users have a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
     </labels>
     <labels>
@@ -805,7 +845,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the users without access finding.</shortDescription>
+        <shortDescription>Health Check title: users without access; {0} is the count</shortDescription>
         <value>{0} users cannot see the app</value>
     </labels>
     <labels>
@@ -821,7 +861,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Detail of the finding for a pause nothing will end.</shortDescription>
+        <shortDescription>Health Check: a pause nothing will end; {0} is the end time</shortDescription>
         <value>Automation is paused until {0}, and nothing is set to switch it back on by then and record that it did. The pause was started before automatic resume existed, or somewhere other than the Automation page. Open the Automation page and click Resume automation, then pause again for a set time if you still need to.</value>
     </labels>
     <labels>
@@ -847,5 +887,109 @@
         <protected>false</protected>
         <shortDescription>Fix button for the stopped digest finding.</shortDescription>
         <value>Open Error Log settings</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFailedTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: queued totals failed five times.</shortDescription>
+        <value>Some totals could not be saved</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFailedDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: queued totals failed. {0} is the count.</shortDescription>
+        <value>{0} queued total updates failed five times and wait for you. The Error Log says why, often a validation rule or a record someone was editing. Fix the cause, then click Retry in Needs attention.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueStuckTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: queued totals have waited too long.</shortDescription>
+        <value>Totals are waiting longer than they should</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueStuckDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: queued totals waited. {0} count, {1} minutes.</shortDescription>
+        <value>{0} queued total updates have waited more than {1} minutes. They usually finish within a minute of the save. Click Start now in Needs attention to recalculate them now; the nightly run also picks them up.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button for the rollup queue findings.</shortDescription>
+        <value>Open Needs attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_LastResult</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Last Health Check result. {0} to fix, {1} to be aware of, {2} information.</shortDescription>
+        <value>{0} to fix, {1} to be aware of, {2} for your information.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_LastRunLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label before the time Health Check last ran in full.</shortDescription>
+        <value>Last run</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NeverRun</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown where the last result goes when Health Check has never run.</shortDescription>
+        <value>Health Check has not run yet. Click Run now to check this org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RunNowButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that runs every check where the panel showed the last result.</shortDescription>
+        <value>Run now</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: relationships with no person on a side. {0} count or more than.</shortDescription>
+        <value>{0} relationships have no person on one side</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: relationships left with no person after a delete.</shortDescription>
+        <value>The person on one side of these relationships was deleted, so the relationship no longer connects two people, and it cannot be edited until a person is chosen again. Open each one and choose the missing person, or delete the relationship. Health Check finds these and does not change them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: affiliations with no person. {0} count or more than.</shortDescription>
+        <value>{0} affiliations have no person</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: affiliations left with no person after a delete.</shortDescription>
+        <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check finds these and does not change them.</value>
     </labels>
 </CustomLabels>

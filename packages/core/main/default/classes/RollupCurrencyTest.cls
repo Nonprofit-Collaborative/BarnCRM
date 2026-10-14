@@ -5,8 +5,13 @@
  * show: amounts as entered in a single-currency org, and conversion into the target record's
  * currency in a multi-currency one.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupCurrency')
 private class RollupCurrencyTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void amountsGoThroughTheCorporateCurrency() {
         System.runAs(TestUsers.admin()) {

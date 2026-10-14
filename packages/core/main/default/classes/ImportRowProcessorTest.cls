@@ -5,8 +5,13 @@
  * The assertion that matters most here is the one in `dryRunWritesNothing`: the preview an
  * administrator decides on has to be free.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor')
 private class ImportRowProcessorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 
@@ -96,8 +101,13 @@ private class ImportRowProcessorTest {
             );
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Import_Journal__c],
-                'Nothing is journaled for records the import created: the tag is their record.'
+                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
+                'Nothing is journaled for records the import tagged: the tag is their record.'
+            );
+            Assert.areEqual(
+                1,
+                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_CREATED),
+                'Only the affiliation with Rose City, which carries no tag, is journaled (R-AF5).'
             );
         }
     }
@@ -323,6 +333,176 @@ private class ImportRowProcessorTest {
                 queriesUsed < 25,
                 'Fifty rows cost a handful of queries, not one per row: got ' + queriesUsed
             );
+        }
+    }
+
+    /** The donor mapping with a birthdate and a title, for the value tests below. */
+    private static void givenWithBirthdateAndTitle(List<Map<String, String>> values) {
+        TestDataFactory.defaultSettings();
+        ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
+        mapping.columns.add(new ImportMapping.Column('Born', 'Contact1.Birthdate'));
+        mapping.columns.add(new ImportMapping.Column('Title', 'Contact1.Title'));
+        template = ImportTestDataFactory.template(
+            mapping.serialize(),
+            ImportTemplateService.RULE_EMAIL
+        );
+        batch = ImportTestDataFactory.batch(template);
+        ImportTestDataFactory.rows(batch, values);
+    }
+
+    private static Map<String, String> bornRow(Integer i, String born, String title) {
+        Map<String, String> row = ImportTestDataFactory.donorRow(
+            'Person' + i,
+            'Surname' + i,
+            'person' + i + '@example.org',
+            null
+        );
+        row.put('Born', born);
+        row.put('Title', title);
+        return row;
+    }
+
+    /**
+     * People read dates as Load one object does (IMPORT-4): a date written in the user's
+     * locale loads, where it was dropped before with the row still counted a success, and a
+     * value that cannot be read rejects its row with the field and value named. Two hundred
+     * rows, a full default chunk.
+     */
+    @IsTest
+    static void aLocaleDateLoadsAndAnUnreadableValueRejectsItsRow() {
+        System.runAs(TestUsers.admin()) {
+            Date expected = Date.newInstance(1980, 4, 2);
+            String localeDate = expected.format();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 199; i++) {
+                values.add(bornRow(i, localeDate, 'Treasurer'));
+            }
+            values.add(bornRow(199, 'not a date', 'Treasurer'));
+            givenWithBirthdateAndTitle(values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(199, outcome.created, 'Every readable row loaded: ' + outcome.notes);
+            Assert.areEqual(
+                199,
+                [SELECT COUNT() FROM Contact WHERE Birthdate = :expected],
+                'With the birthdate as written in the user\'s locale.'
+            );
+            Assert.areEqual(1, outcome.rejected, 'The unreadable row is rejected.');
+            Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c);
+            Assert.isTrue(
+                rejected.Error_Message__c.contains('not a date'),
+                'The reason names the value: ' + rejected.Error_Message__c
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Email = 'person199@example.org'],
+                'Nobody was created for it.'
+            );
+        }
+    }
+
+    /**
+     * Amounts load as spreadsheets export them: currency symbols and codes, grouping in the
+     * user's locale and accounting brackets for a negative. A value that cannot be read
+     * without guessing still rejects its row. Two hundred rows, a full default chunk.
+     */
+    @IsTest
+    static void spreadsheetAmountsLoadAndAnUnreadableOneRejectsItsRow() {
+        System.runAs(TestUsers.admin()) {
+            // Written as the user's locale writes them, so the test holds in any locale.
+            List<String> written = new List<String>{
+                '$' + Decimal.valueOf('1250.5').format(),
+                '€' + Decimal.valueOf('100').format(),
+                '(' +
+                Decimal.valueOf('45.5').format() +
+                ')',
+                'USD ' + Decimal.valueOf('1250000').format()
+            };
+            List<Decimal> expected = new List<Decimal>{ 1250.5, 100, -45.5, 1250000 };
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                Map<String, String> row = ImportTestDataFactory.donorRow(
+                    'Person' + i,
+                    'Surname' + i,
+                    'person' + i + '@example.org',
+                    'Employer ' + i
+                );
+                row.put('Revenue', i == 199 ? '12abc' : written[Math.mod(i, 4)]);
+                values.add(row);
+            }
+            TestDataFactory.defaultSettings();
+            ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
+            mapping.columns.add(new ImportMapping.Column('Revenue', 'Organization.AnnualRevenue'));
+            template = ImportTestDataFactory.template(
+                mapping.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            batch = ImportTestDataFactory.batch(template);
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(199, outcome.created, 'Every readable row loaded: ' + outcome.notes);
+            Assert.areEqual(1, outcome.rejected, 'The unreadable amount rejects its row.');
+            Map<String, Decimal> revenueByName = new Map<String, Decimal>();
+            for (Account organization : [
+                SELECT Name, AnnualRevenue
+                FROM Account
+                WHERE Name LIKE 'Employer %'
+            ]) {
+                revenueByName.put(organization.Name, organization.AnnualRevenue);
+            }
+            for (Integer i = 0; i < 199; i++) {
+                Assert.isTrue(
+                    revenueByName.get('Employer ' + i) == expected[Math.mod(i, 4)],
+                    'Read as written: ' + written[Math.mod(i, 4)]
+                );
+            }
+            Assert.isFalse(revenueByName.containsKey('Employer 199'), 'Nothing made for it.');
+        }
+    }
+
+    /**
+     * A re-import compares as the save would write (IMPORT-8): a date written differently is
+     * no change, while a correction of capitals is one, as in Load one object.
+     */
+    @IsTest
+    static void aReimportComparesTypedValuesAndAppliesCapitals() {
+        System.runAs(TestUsers.admin()) {
+            List<Contact> existing = new List<Contact>();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                existing.add(
+                    new Contact(
+                        FirstName = 'Person' + i,
+                        LastName = 'Surname' + i,
+                        Email = 'person' + i + '@example.org',
+                        MailingCity = 'Portland',
+                        Birthdate = Date.newInstance(1980, 1, 5),
+                        Title = Math.mod(i, 2) == 0 ? 'treasurer' : 'Treasurer'
+                    )
+                );
+                values.add(bornRow(i, '1980-1-5', 'Treasurer'));
+            }
+            insert existing;
+            givenWithBirthdateAndTitle(values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(100, outcome.updated, 'Only the capitals corrections update.');
+            Assert.areEqual(100, outcome.matched, 'The same date, written another way, is none.');
+            for (Contact person : [SELECT Title FROM Contact]) {
+                // Compared in Apex: SOQL compares text without regard to capitals.
+                Assert.isTrue('Treasurer'.equals(person.Title), 'Corrected: ' + person.Title);
+            }
         }
     }
 
@@ -636,9 +816,10 @@ private class ImportRowProcessorTest {
                 shape.hasPersonAccounts = true;
                 shape.personAccountRecordTypeIds = new Set<Id>{ organizationRecordTypeId() };
                 OrgShapeDetector.overrideShape = shape;
-            } else if (OrgShapeDetector.creatablePersonRecordTypeId() == null) {
+            } else if (PersonAccountTestShape.skipReason() != null) {
                 // Person accounts, but none of their record types is given to the running
-                // user, so the import creates nobody (ImportPersonAccountTest proves that).
+                // user: skipReason fails the test there, naming the script that fixes the
+                // org (PEOPLE-29), so this return is never reached in a person account org.
                 return;
             }
             givenACoupleOnOneRow(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);
@@ -841,6 +1022,124 @@ private class ImportRowProcessorTest {
             .getRecordTypeId();
     }
 
+    /** Two hundred rows, each naming its own organization; the last has no last name. */
+    private static List<Map<String, String>> organizationRows() {
+        List<Map<String, String>> values = new List<Map<String, String>>();
+        for (Integer i = 0; i < 199; i++) {
+            values.add(
+                ImportTestDataFactory.donorRow(
+                    'Person' + i,
+                    'Surname' + i,
+                    'person' + i + '@example.org',
+                    'Employer ' + i
+                )
+            );
+        }
+        values.add(
+            ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer')
+        );
+        return values;
+    }
+
+    /**
+     * A row rejected for its person creates no organization (IMPORT-3, R-IB1), so the preview
+     * and the commit agree, and re-importing the fixed row creates it once.
+     */
+    @IsTest
+    static void aRowRejectedForItsPersonCreatesNoOrganization() {
+        System.runAs(TestUsers.admin()) {
+            given(organizationRows());
+
+            Test.startTest();
+            ImportRowProcessor.Outcome preview = run(true);
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(1, preview.rejected, 'The preview rejects the row.');
+            Assert.areEqual(preview.created, committed.created, 'The commit does what it showed.');
+            Assert.areEqual(preview.rejected, committed.rejected);
+            Id organizationType = organizationRecordTypeId();
+            Assert.areEqual(
+                199,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :organizationType],
+                'One organization per clean row.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Lonely Employer'],
+                'None for the rejected row.'
+            );
+            Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
+            Assert.areEqual(Label.Core_Import_ErrorLastNameMissing, rejected.Error_Message__c);
+            Assert.isNull(rejected.Organization__c, 'Pointing at nothing it did not create.');
+        }
+    }
+
+    /**
+     * The heaviest chunk (IMPORT-9): two hundred rows, two people each, an organization and a
+     * household name, committed in one transaction within stated budgets. The budgets leave
+     * room for an org's own automation; an org run reports the real figures.
+     */
+    @IsTest
+    static void aFullChunkOfCouplesWithOrganizationsStaysWithinBudget() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            ImportMapping mapping = new ImportMapping();
+            mapping.columns.add(new ImportMapping.Column('Household', 'Household.Name'));
+            mapping.columns.add(new ImportMapping.Column('First 1', 'Contact1.FirstName'));
+            mapping.columns.add(new ImportMapping.Column('Last 1', 'Contact1.LastName'));
+            mapping.columns.add(new ImportMapping.Column('Email 1', 'Contact1.Email'));
+            mapping.columns.add(new ImportMapping.Column('First 2', 'Contact2.FirstName'));
+            mapping.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
+            mapping.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
+            mapping.columns.add(new ImportMapping.Column('Employer', 'Organization.Name'));
+            template = ImportTestDataFactory.template(
+                mapping.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            batch = ImportTestDataFactory.batch(template);
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                values.add(
+                    new Map<String, String>{
+                        'Household' => 'The Family ' + i,
+                        'First 1' => 'Ana' + i,
+                        'Last 1' => 'Family' + i,
+                        'Email 1' => 'ana' +
+                        i +
+                        '@example.org',
+                        'First 2' => 'Ben' + i,
+                        'Last 2' => 'Family' + i,
+                        'Email 2' => 'ben' +
+                        i +
+                        '@example.org',
+                        'Employer' => 'Employer ' + Math.mod(i, 20)
+                    }
+                );
+            }
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Integer queries = Limits.getQueries();
+            Integer statements = Limits.getDmlStatements();
+            Integer cpu = Limits.getCpuTime();
+            Test.stopTest();
+
+            Assert.areEqual(200, outcome.created, 'Every row loaded: ' + outcome.notes);
+            Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Two people a row.');
+            Id organizationType = organizationRecordTypeId();
+            Assert.areEqual(
+                20,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :organizationType],
+                'Each employer once.'
+            );
+            Assert.isTrue(queries <= 60, 'Queries within budget: ' + queries);
+            Assert.isTrue(statements <= 60, 'DML statements within budget: ' + statements);
+            Assert.isTrue(cpu <= 8000, 'CPU within budget (ms): ' + cpu);
+        }
+    }
+
     // -------------------------------------------------------------------------------------
     // The entity processor seam (R-IR6, R-IR7)
     // -------------------------------------------------------------------------------------
@@ -868,6 +1167,8 @@ private class ImportRowProcessorTest {
             Boolean dryRun
         ) {
             if (throwOnResolve) {
+                // Something saved before the failure, as a gift would be, must not survive it.
+                insert as user new Account(Name = 'Saved before the failure');
                 throw new IllegalArgumentException('stub failed');
             }
             sawDryRun = dryRun;
@@ -1054,12 +1355,20 @@ private class ImportRowProcessorTest {
         }
     }
 
+    /**
+     * A processor that throws part way leaves nothing of its own behind, and every row that
+     * carried its columns is rejected with the reason, not reported loaded. The people stay,
+     * on the row, and a row without its columns keeps Core's outcome.
+     */
     @IsTest
-    static void aProcessorThatThrowsDoesNotFailTheImport() {
+    static void aProcessorThatThrowsIsRolledBackAndItsRowsRejected() {
         System.runAs(TestUsers.admin()) {
-            givenGiftRows(
-                new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') }
-            );
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 199; i++) {
+                values.add(giftRow('donor' + i + '@example.org', 'Surname' + i, '50'));
+            }
+            values.add(giftRow('nogift@example.org', 'Nogift', ''));
+            givenGiftRows(values);
             StubProcessor stub = new StubProcessor();
             stub.throwOnResolve = true;
             ImportEntityProcessors.processorOverride = stub;
@@ -1068,8 +1377,65 @@ private class ImportRowProcessorTest {
             ImportRowProcessor.Outcome outcome = run(false);
             Test.stopTest();
 
-            Assert.areEqual(1, outcome.created, 'The person still loaded.');
-            Assert.isTrue(outcome.notes.contains('stub failed'), 'And the run log says why.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Saved before the failure'],
+                'What the processor saved before it failed was rolled back.'
+            );
+            Assert.areEqual(200, [SELECT COUNT() FROM Contact], 'The people stay saved.');
+            Assert.areEqual(199, outcome.rejected, 'Every row with a gift is rejected.');
+            Assert.areEqual(1, outcome.created, 'The row without one keeps its outcome.');
+            Assert.isTrue(outcome.notes.contains('stub failed'), 'The run log says why.');
+            Map<String, Import_Row__c> rows = rowsByEmail();
+            Import_Row__c rejected = rows.get('donor0@example.org');
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c);
+            Assert.areEqual(
+                String.format(
+                    Label.Core_Import_ErrorEntitiesNotLoaded,
+                    new List<String>{ 'Gift', 'stub failed' }
+                ),
+                rejected.Error_Message__c,
+                'The row says its gift was not loaded, and why.'
+            );
+            Assert.isNotNull(rejected.Contact_1__c, 'And still points at its person.');
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_CREATED,
+                rows.get('nogift@example.org').Status__c,
+                'Nothing was lost for a row with no gift.'
+            );
+        }
+    }
+
+    /** A staged row that cannot be saved is said, in the run log, not left silently stale. */
+    @IsTest
+    static void aRowThatCannotBeSavedIsReported() {
+        System.runAs(TestUsers.admin()) {
+            givenGiftRows(
+                new List<Map<String, String>>{
+                    giftRow('ana@example.org', 'Ramirez', '50'),
+                    giftRow('ben@example.org', 'Okafor', '50')
+                }
+            );
+            List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
+            delete rows[1];
+            for (Import_Row__c row : rows) {
+                row.Status__c = ImportRowProcessor.STATUS_MATCHED;
+            }
+            ImportRowProcessor.Outcome outcome = new ImportRowProcessor.Outcome();
+
+            Test.startTest();
+            ImportRowProcessor.saveRows(rows, outcome, 'ImportRowProcessorTest');
+            Test.stopTest();
+
+            Assert.areEqual(1, outcome.notes.size(), 'One line for the chunk: ' + outcome.notes);
+            String line = new List<String>(outcome.notes)[0];
+            Assert.isTrue(line.startsWith('1 '), 'It counts the row that failed: ' + line);
+            Assert.isTrue(line.contains(' 3: '), 'And names it by its file row: ' + line);
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_MATCHED,
+                ImportTestDataFactory.reload(batch.Id)[0].Status__c,
+                'The other row saved.'
+            );
         }
     }
 

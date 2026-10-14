@@ -4,8 +4,13 @@
  * the check of a choice at save. Run as Maria, who holds the admin permission sets, because
  * the payments are read in her own mode.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftEntryPayments')
 private class GiftEntryPaymentsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',

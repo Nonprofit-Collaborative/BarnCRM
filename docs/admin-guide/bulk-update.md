@@ -15,7 +15,8 @@ one go. For each field you choose one of:
 
 Before anything changes, BarnCRM counts the records that match and shows the first five, each
 with the value before and the value after. You type that number to confirm. The update then
-runs in the background, in chunks of up to 200 records, and the page shows its progress.
+runs in the background, in chunks of up to 200 records (the **Bulk chunk size** setting), and
+the page shows its progress.
 
 Every change is recorded in the import journal, so for as long as an import can be undone (30
 days unless your administrator changed it) you can undo a bulk update: each value goes back to
@@ -27,7 +28,7 @@ record, as they do on any save. A record that is refused is listed with the reas
 still save.
 
 Values you change by editing Find's results table ([Find](find.md), section 7.6) are saved
-the same way, and each save is listed with the bulk updates on the **Bulk Update** tab, its
+the same way, and each save is listed with the bulk updates under **Data jobs** on the **Data Manager** tab, its
 run log starting "Edited in Find", with the same undo.
 
 ## 2. How to turn it on
@@ -37,7 +38,8 @@ run log starting "Edited in Find", with the same undo.
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (Setup, Users, choose the person,
    Permission Set Assignments). Neither grants access to any record or field.
-   A person without both sees nothing of bulk update on the **Bulk Update** tab: no list, no error.
+   A person without both sees no bulk updates under **Data jobs** on the **Data Manager** tab,
+   and no error.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk update run limit**
    (default 48,000). A bulk update that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
@@ -61,10 +63,12 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
 6. The progress bar shows the chunks done. When it finishes, the panel says how many records
    were updated, how many already held the new value and how many failed, with the reason for
-   each failure. The job's run log, on the Import record, also says how many no longer matched
+   each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.
-7. To undo it, open the **Bulk Update** tab. Find the job under **Recent bulk updates**, press
-   **Undo**, check the number, and confirm.
+7. To undo it, open the **Data Manager** tab. Find the job under **Data jobs** (choose **Bulk
+   updates** in **Show** to list only those), press **Undo**, type the number, and confirm.
+   The list shows your own bulk updates. Someone who manages BarnCRM Settings can tick **Show
+   everyone's jobs** to see and undo anyone's.
 
 ## 4. What can and cannot be changed
 
@@ -88,8 +92,11 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 - **Copy from another field** offers only fields whose values fit: a field of the same type;
   any text, email, phone, URL or picklist into a text field; any number into a number field;
   and a lookup into a lookup that can point at the same kind of record.
-- **Household names.** A household's name is kept by household naming. To give a household a
-  name of its own, bulk update **Custom Name** rather than **Account Name**.
+- **Household names.** A household's name is kept by household naming, so a bulk update of
+  **Account Name** leaves every household as it is and lists each one with the reason; the
+  organizations in the same query are changed. To give one household a name of its own, open
+  the household, check **Custom name** and type the name (see
+  [Household naming](household-naming.md)).
 
 ## 5. Common mistakes
 
@@ -108,6 +115,17 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 - **The undo did not put everything back.** A value somebody changed after the bulk update is
   kept, on purpose, because putting back the old value would silently overwrite their
   correction.
+- **The job was stopped part way.** A job stopped in Setup, or by Salesforce, saved the records
+  of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** asks you to
+  confirm the number of values those chunks saved, then puts them back. A job also stops when
+  your access to the object or a field is taken away while it runs; the run log says why, and
+  the records it had not reached are left as they were. When Salesforce stopped part of the
+  job, the run log also says how many of the confirmed records were not reached; run a new
+  bulk update over them, in smaller parts if automation on them is heavy, or lower **Bulk
+  chunk size** in BarnCRM Settings (Import) so each chunk saves fewer records.
+- **"The old and new values of this record are too long to keep for an undo."** A very long
+  text value (tens of thousands of characters) cannot be kept for an undo, so that record is
+  left as it was rather than changed without one. Change it on the record itself.
 
 ## 6. Changing values with steps
 
@@ -125,10 +143,20 @@ in the order listed:
 | **Value when empty** | Gives an empty field a value. | empty becomes `Unknown` |
 | **Add other fields** | Adds the values of other fields of the same record after this one, with a separator you choose (a space unless you type another). An empty one is left out. | First Name with Last Name becomes `Ana Ramirez` |
 | **Read as a date** | Reads a date written month first, day first or year first and writes it the way Salesforce reads it. | day first: `31/12/2025` becomes `2025-12-31` |
+| **Map values** | Changes each value listed in a table (up to 100 rows) to the value beside it. A value not in the table is kept, or becomes the value in **Anything else** if you give one. | `M` becomes `Monthly` |
+| **If, then** | When the value equals some text, contains it, or is empty, writes the value you give (empty clears the field); **Otherwise** is written when the test fails, or the value is kept. | contains `test`: becomes `Do not mail` |
+| **Keep part** | Splits the value at a separator and keeps one part, from the start or the end. | separator `@`, part 2: `ana@example.org` becomes `example.org` |
+| **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
+| **Shift a date** | Adds or takes away days or months. Use it on date fields: a date and time field refuses the result, record by record. | minus 30 days: `2025-12-31` becomes `2025-12-01` |
+| **Today's date** | Writes today's date, or only into empty fields if you tick **Only when empty**. | empty becomes today |
 
 The steps work on the value as text, and the result is then saved as the field's type: a
-number field takes `1,250.00` as 1250, a checkbox takes `true`, `yes` or `1` as ticked, and a
-date field takes `2025-12-31`. A step never runs code and never reads another record.
+number field takes `1,250.00` as 1250 (a whole-number field refuses `12.5` rather than drop the
+point), a checkbox takes `true`, `yes` or `1` as ticked and `false`, `no`, `0` or nothing as
+unticked (any other word is refused for that record), and a date field takes `2025-12-31`. A
+step reads a date as `2025-12-31` and a date and time as `2025-12-31 09:30:00` in your own time
+zone, so a step that changes nothing leaves the value as it was. A step never runs code and
+never reads another record.
 
 - **The preview shows each record's own result.** The five records in the preview show the
   value before and after the steps, so you can see the change before you confirm.
@@ -150,10 +178,11 @@ Deleting the records a query returns is a separate tool with its own permission:
 
 | Where | Field | What it holds |
 |---|---|---|
-| Import (data job) | Operation | Import for a file import, Update for a bulk update, Delete for a bulk delete. |
-| Import (data job) | Bulk Update Definition | The query, the changes (with any steps) and the confirmed count a bulk update ran with; for a bulk delete, the query and the confirmed count. Written only by bulk update and bulk delete. |
-| Import (data job) | Row Count | How many records matched when the bulk update started. |
-| Import (data job) | Rows Updated | How many records the bulk update saved. |
-| Import (data job) | Rows Matched | How many records already held the new values and were not saved. |
-| Import (data job) | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
+| Data Job | Operation | Import for a file import, Update for a bulk update, Delete for a bulk delete. |
+| Data Job | Bulk Update Definition | The query, the changes (with any steps) and the confirmed count a bulk update ran with; for a bulk delete, the query and the confirmed count. Written only by bulk update and bulk delete. |
+| Data Job | Row Count | How many records matched when the bulk update started. |
+| Data Job | Rows Updated | How many records the bulk update saved. |
+| Data Job | Rows Matched | How many records already held the new values and were not saved. |
+| Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk update run limit | The most records one bulk update may change. Default 48,000, at most 48,000. |
+| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a bulk update or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |

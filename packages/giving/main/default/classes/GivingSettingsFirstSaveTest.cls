@@ -7,7 +7,9 @@
  * gifts to installments, household soft credits, and the receipt logo. Every test here starts
  * with no record, makes one save, and asserts those three are still on (ADR-0035).
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:CommitmentService, ApexClass:AccountingPeriodWriter, ApexClass:AcknowledgmentService, ApexClass:DonorLevelWriter'
+)
 private class GivingSettingsFirstSaveTest {
     private static final String PERMISSION_SET = 'GivingFirstSaveTestAccess';
 
@@ -182,6 +184,34 @@ private class GivingSettingsFirstSaveTest {
             Giving_Settings__c saved = stored();
             Assert.areEqual('R-', saved.Receipt_Number_Prefix__c, 'The setting is saved');
             assertShippedOnKept(saved, 'The settings console');
+        }
+    }
+
+    /**
+     * Before the first save the console reads the shipped values, so a feature that is in
+     * effect never shows as off (ADMIN-4).
+     */
+    @IsTest
+    static void theConsoleReadsTheShippedDefaultsBeforeTheFirstSave() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+
+            Test.startTest();
+            Object autoApply = SettingsService.getValue(
+                'Giving_Settings__c',
+                'Auto_Apply_Gifts_To_Installments__c'
+            );
+            Object softCredits = SettingsService.getValue(
+                'Giving_Settings__c',
+                'Automatic_Household_Soft_Credits__c'
+            );
+            Object logo = SettingsService.getValue('Giving_Settings__c', 'Receipt_Print_Logo__c');
+            Test.stopTest();
+
+            Assert.areEqual(true, autoApply, 'Applying gifts to installments reads as on');
+            Assert.areEqual(true, softCredits, 'Household soft credits read as on');
+            Assert.areEqual(true, logo, 'The receipt logo reads as on');
+            assertNoRecordYet();
         }
     }
 

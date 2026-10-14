@@ -4,8 +4,13 @@
  * Every test supplies the jobs in memory, so none depends on what the org it runs in has
  * scheduled, and none schedules a real job.
  */
-@IsTest
+@IsTest(testFor='ApexClass:NightlyJobs')
 private class NightlyJobsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A job that only remembers whether it was scheduled. */
     private class FakeJob implements NightlyJob {
         private final String name;
@@ -67,6 +72,7 @@ private class NightlyJobsTest {
             Assert.isTrue(jobs[0] instanceof NightlyJobs.RollupJob, 'Rollups first.');
             Assert.isTrue(jobs[1] instanceof NightlyJobs.SeasonalAddressJob, 'Then addresses.');
             Assert.isTrue(jobs[2] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
+            Assert.isTrue(jobs[3] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
             Assert.areEqual(moduleJob, jobs[jobs.size() - 1], 'A registered job is counted last.');
             Assert.areEqual(
                 System.Label.Core_HealthCheck_JobSeasonalAddresses,
@@ -92,57 +98,7 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(4, jobs.size(), 'Core three, plus the module that answered.');
-        }
-    }
-
-    @IsTest
-    static void theWeeklyCountIsListedOnceObjectsAreChosen() {
-        System.runAs(TestUsers.admin()) {
-            NightlyJobs.providerOverrides.put(
-                NightlyJobs.PROVIDER_CLASSES[0],
-                new FakeProvider(null)
-            );
-            NightlyJobs.providerOverrides.put(
-                NightlyJobs.PROVIDER_CLASSES[1],
-                new FakeProvider(null)
-            );
-            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-            settings.Field_Utilization_Objects__c = null;
-            settings = HouseholdTestDataFactory.save(settings);
-
-            Test.startTest();
-            Integer withoutObjects = NightlyJobs.all().size();
-            settings.Field_Utilization_Objects__c = 'Contact';
-            HouseholdTestDataFactory.save(settings);
-            List<NightlyJob> withObjects = NightlyJobs.all();
-            Test.stopTest();
-
-            Assert.areEqual(3, withoutObjects, 'With nothing chosen, Core lists its three jobs.');
-            Assert.areEqual(4, withObjects.size(), 'Choosing an object adds the weekly count.');
-            Assert.isTrue(
-                withObjects[3] instanceof NightlyJobs.FieldUtilizationJob,
-                'The weekly count comes after Core\'s nightly jobs.'
-            );
-        }
-    }
-
-    @IsTest
-    static void theFieldUtilizationCountIsScheduledLikeTheNightlyJobs() {
-        System.runAs(TestUsers.admin()) {
-            NightlyJobs.FieldUtilizationJob job = new NightlyJobs.FieldUtilizationJob();
-
-            Test.startTest();
-            job.schedule();
-            Boolean after = job.isScheduled();
-            Test.stopTest();
-
-            Assert.isTrue(after, 'The fix schedules the weekly count, or leaves a scheduled one.');
-            Assert.areEqual(
-                System.Label.Core_FieldUtilization_JobLabel,
-                job.label(),
-                'It is named from its label.'
-            );
+            Assert.areEqual(5, jobs.size(), 'Core four, plus the module that answered.');
         }
     }
 

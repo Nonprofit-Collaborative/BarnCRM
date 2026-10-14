@@ -1,11 +1,14 @@
 import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { labelTab } from 'c/workspaceTabs';
 import listObjects from '@salesforce/apex/FindController.listObjects';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
-import { CELL_TYPES, writeXlsx, xlsxFileName } from 'c/xlsxWriter';
-import { valueAt } from 'c/findCsv';
+import { CELL_TYPES, writeXlsx } from 'c/xlsxWriter';
+import { fileName, format, messageFrom, toCsv, valueAt, zonedDateTime } from 'c/findCsv';
+import TIME_ZONE from '@salesforce/i18n/timeZone';
 import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
 import runQuery from '@salesforce/apex/FindController.runQuery';
@@ -13,9 +16,9 @@ import exportPage from '@salesforce/apex/FindController.exportPage';
 import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import deleteQuery from '@salesforce/apex/FindController.deleteQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
-import { toCsv, fileName } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
+import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import INTRO from '@salesforce/label/c.Core_Find_Intro';
 import OBJECT from '@salesforce/label/c.Core_Find_Object';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
@@ -58,9 +61,11 @@ import LOADING from '@salesforce/label/c.Core_Find_Loading';
 import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
+import EXPORT_FILES from '@salesforce/label/c.Core_Find_ExportFiles';
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
 import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
+import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
 
 const XLSX_TYPES = {
   currency: CELL_TYPES.NUMBER,
@@ -101,10 +106,18 @@ const TABLE_TYPES = {
   datetime: 'date',
   boolean: 'boolean'
 };
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
+/**
+ * A date-time column shows its time too, in the person's Salesforce time zone: the same clock
+ * the CSV and the workbook write.
+ */
+const DATETIME_ATTRIBUTES = {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: TIME_ZONE
+};
 
 /**
  * The Find tab (C-34, admin guide find.md): a visual query over one object, run, saved, shared
@@ -135,6 +148,7 @@ export default class FindRecords extends LightningElement {
     run: RUN,
     export: EXPORT,
     exportExcel: EXPORT_EXCEL,
+    exportFiles: EXPORT_FILES,
     summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
     bulkDelete: BULK_DELETE,
@@ -186,6 +200,24 @@ export default class FindRecords extends LightningElement {
   draftValues = [];
   tableErrors;
   requestedSavedQueryId;
+  enclosingTabId;
+
+  /** In a console the tab is named for the object being searched. */
+  @wire(EnclosingTabId)
+  wiredTabId(tabId) {
+    this.enclosingTabId = tabId;
+    this.nameTab();
+  }
+
+  renderedCallback() {
+    this.nameTab();
+  }
+
+  nameTab() {
+    const object = this.objectOptions.find((option) => option.value === this.objectApiName);
+    const label = object ? TAB_LABEL.replace('{0}', TITLE).replace('{1}', object.label) : TITLE;
+    labelTab(this, label, 'utility:search');
+  }
 
   /** Another page (Data Hygiene, C-28) can link to Find with a saved query to open and run. */
   @wire(CurrentPageReference)
@@ -203,7 +235,7 @@ export default class FindRecords extends LightningElement {
     if (data) {
       this.objectOptions = data.map((option) => ({ label: option.label, value: option.value }));
     } else if (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error);
     }
   }
 
@@ -215,7 +247,7 @@ export default class FindRecords extends LightningElement {
     try {
       this.page = await getPage();
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error);
     }
     this.openRequested();
   }
@@ -359,6 +391,9 @@ export default class FindRecords extends LightningElement {
         fieldName: column.key,
         type: TABLE_EDIT_TYPES[dataType] || TABLE_TYPES[dataType] || 'text'
       };
+      if (dataType === 'datetime') {
+        shown.typeAttributes = DATETIME_ATTRIBUTES;
+      }
       if (this.editableFields.has(column.key)) {
         shown.editable = true;
       }
@@ -510,7 +545,7 @@ export default class FindRecords extends LightningElement {
     } catch (error) {
       if (sequence === this.previewSequence) {
         this.soql = '';
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = messageFrom(error);
       }
     }
   }
@@ -684,6 +719,22 @@ export default class FindRecords extends LightningElement {
     return this.exportAs('xlsx');
   }
 
+  /**
+   * Hands the query and each field column's label to the export to Files (R-SQ12), which runs
+   * on the server; related record columns are not part of it.
+   */
+  handleExportFiles() {
+    this.noticeMessage = undefined;
+    if (!this.checkReady()) {
+      return;
+    }
+    const labelsByPath = {};
+    for (const path of this.columns) {
+      labelsByPath[path] = this.columnLabel(path);
+    }
+    this.template.querySelector('c-find-export-files').start(this.queryDocument(), labelsByPath);
+  }
+
   /** Reads every page (R-SQ3) and writes CSV, or an Excel workbook (R-SQ11). */
   async exportAs(kind) {
     this.noticeMessage = undefined;
@@ -693,45 +744,59 @@ export default class FindRecords extends LightningElement {
     await this.work(async () => {
       const limit = this.page ? this.page.exportLimit : 50000;
       const queryJson = this.queryDocument();
-      let rows = [];
+      const columns = this.outputColumns();
+      // A CSV writes a date-time as the clock reads in the person's Salesforce time zone; the
+      // workbook converts it itself, as a date it can sort.
+      const readers = columns.map((column) => {
+        if (kind !== 'xlsx' && column.field?.dataType === 'datetime') {
+          return (row) => zonedDateTime(column.valueOf(row), TIME_ZONE);
+        }
+        return column.valueOf;
+      });
+      // Each record becomes its row of cells as its page arrives, so only one copy is held.
+      const rows = [];
       let afterId = null;
       let done = false;
+      let leftOver = false;
       while (!done && rows.length < limit) {
         // Each page starts after the last Id of the one before, so pages are read in turn.
         // eslint-disable-next-line no-await-in-loop
         const result = await exportPage({ queryJson, afterId });
-        rows = rows.concat(result.rows);
+        for (const row of result.rows) {
+          if (rows.length < limit) {
+            rows.push(readers.map((read) => read(row)));
+          } else {
+            leftOver = true;
+          }
+        }
         afterId = result.lastId;
         done = result.done;
         this.noticeMessage = format(EXPORTING, String(rows.length));
       }
-      const stopped = rows.length >= limit && !done;
-      rows = rows.slice(0, limit);
-      const columns = this.outputColumns();
+      const stopped = leftOver || (rows.length >= limit && !done);
       if (kind === 'xlsx') {
         const bytes = await writeXlsx(
           columns.map((column) => ({
             label: column.label,
             type: XLSX_TYPES[column.field?.dataType] || CELL_TYPES.TEXT
           })),
-          rows.map((row) => columns.map((column) => column.valueOf(row))),
-          { sheetName: this.objectApiName }
+          rows,
+          { sheetName: this.objectApiName, timeZone: TIME_ZONE }
         );
         this.download(
           new Blob([bytes], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           }),
-          xlsxFileName(this.objectApiName)
+          fileName(this.objectApiName, new Date(), 'xlsx')
         );
       } else {
-        // Each row as an array, so a column's path is its position.
-        const flat = rows.map((row) => columns.map((column) => column.valueOf(row)));
         this.download(
           new Blob(
             [
+              // Each row is an array, so a column's path is its position.
               toCsv(
                 columns.map((column, index) => ({ label: column.label, path: String(index) })),
-                flat
+                rows
               )
             ],
             { type: 'text/csv;charset=utf-8' }
@@ -768,7 +833,12 @@ export default class FindRecords extends LightningElement {
       const saved = this.page.savedQueries.find(
         (query) => query.mine && query.name === this.queryName.trim()
       );
-      this.openQueryId = saved ? saved.recordId : this.openQueryId;
+      // Names are not unique: the Id the save wrote decides which query stays open.
+      if (this.page.savedId) {
+        this.openQueryId = this.page.savedId;
+      } else if (saved) {
+        this.openQueryId = saved.recordId;
+      }
       this.noticeMessage = format(SAVED_NOTICE, this.queryName.trim());
     });
   }
@@ -853,7 +923,14 @@ export default class FindRecords extends LightningElement {
         await this.addRelated(segments.slice(0, depth).join('.'));
       }
     }
-    this.columns = [...(document.fields || [])];
+    // A shared query can name a column the person cannot see: it is left out, and they are told,
+    // rather than kept where they can neither see nor remove it and every run refuses it.
+    const fields = document.fields || [];
+    const hidden = fields.filter((path) => !this.fieldOf(path));
+    this.columns = fields.filter((path) => this.fieldOf(path));
+    if (hidden.length > 0) {
+      this.noticeMessage = format(HIDDEN_COLUMNS, hidden.join(', '));
+    }
     this.filterJson = document.filter ? JSON.stringify(document.filter) : '';
     const order = (document.orderBy || [])[0];
     this.sortField = order ? order.field : '';
@@ -898,7 +975,7 @@ export default class FindRecords extends LightningElement {
     try {
       await action();
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error);
     } finally {
       this.busy = false;
     }
@@ -994,12 +1071,5 @@ export default class FindRecords extends LightningElement {
     link.download = name;
     link.click();
     URL.revokeObjectURL(link.href);
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return error && error.message ? error.message : String(error);
   }
 }

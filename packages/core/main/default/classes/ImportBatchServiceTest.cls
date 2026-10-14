@@ -2,7 +2,7 @@
  * The life of a batch: created, staged in pages, dry run before commit, and finished with
  * counts read back from the rows rather than carried in memory.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportBatchService')
 private class ImportBatchServiceTest {
     @TestSetup
     static void setUp() {
@@ -27,7 +27,15 @@ private class ImportBatchServiceTest {
             Import_Template__c template = newTemplate();
 
             Test.startTest();
-            Import_Batch__c batch = ImportBatchService.create(template.Id, null, 'donors.csv');
+            Import_Batch__c batch = ImportBatchService.create(
+                template.Id,
+                null,
+                'donors.csv',
+                null,
+                null,
+                null,
+                false
+            );
             Test.stopTest();
 
             Assert.areEqual(50, batch.Chunk_Size__c, 'The batch takes the chunk size the org set.');
@@ -87,6 +95,68 @@ private class ImportBatchServiceTest {
             List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
             Assert.areEqual(2, rows[0].Row_Number__c, 'The first data row is file row two.');
             Assert.areEqual(3, rows[1].Row_Number__c, 'And the second is file row three.');
+        }
+    }
+
+    /** Rows cannot join a batch that has run: it would flip back to Parsing. */
+    @IsTest
+    static void refusesToStageIntoABatchThatHasRun() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
+            batch.Status__c = ImportBatchService.STATUS_COMPLETE;
+            update batch;
+
+            Test.startTest();
+            String refused;
+            try {
+                ImportBatchService.stageRows(
+                    batch.Id,
+                    new List<Map<String, Object>>{
+                        new Map<String, Object>{ 'Email' => 'a@b.org' }
+                    },
+                    2
+                );
+            } catch (ImportException e) {
+                refused = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Import_ErrorStagingClosed, refused, 'Refused, and why.');
+            Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
+            Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'Unchanged.');
+            Assert.areEqual(0, ImportTestDataFactory.reload(batch.Id).size(), 'Nothing staged.');
+        }
+    }
+
+    /** A row too long to hold is refused by its number, not cut into unreadable text. */
+    @IsTest
+    static void refusesARowTooLongToHold() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
+            List<Map<String, Object>> page = new List<Map<String, Object>>{
+                new Map<String, Object>{ 'Email' => 'a@b.org' },
+                new Map<String, Object>{ 'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH) }
+            };
+
+            Test.startTest();
+            String refused;
+            try {
+                ImportBatchService.stageRows(batch.Id, page, 2);
+            } catch (ImportException e) {
+                refused = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                String.format(Label.Core_Import_ErrorRowTooLong, new List<String>{ '3' }),
+                refused,
+                'The second row of the page is file row three.'
+            );
+            Assert.areEqual(
+                0,
+                ImportTestDataFactory.reload(batch.Id).size(),
+                'No row of the page was staged.'
+            );
         }
     }
 
@@ -195,6 +265,86 @@ private class ImportBatchServiceTest {
                 );
             }
             Test.stopTest();
+        }
+    }
+
+    /**
+     * The commit runs under the template its dry run started with (R-IB1): a column set to
+     * Do not load and a rule changed after the preview change nothing in the commit, until the
+     * next preview. Two hundred rows, a full default chunk.
+     */
+    @IsTest
+    static void aCommitRunsUnderTheTemplateItsDryRunRecorded() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = newTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                values.add(
+                    ImportTestDataFactory.donorRow(
+                        'Ana' + i,
+                        'Ramirez',
+                        'ana' + i + '@example.org',
+                        null
+                    )
+                );
+            }
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportBatchService.startDryRun(batch.Id);
+            Test.stopTest();
+
+            String snapshot = ImportBatchSelector.selectTemplateSnapshot(batch.Id);
+            Assert.isTrue(
+                snapshot.contains('Contact1.MailingCity'),
+                'The dry run recorded the template it ran with.'
+            );
+            // Edited after the preview: City no longer loaded, and a different rule.
+            ImportMapping edited = new ImportMapping();
+            edited.columns.add(new ImportMapping.Column('First Name', 'Contact1.FirstName'));
+            edited.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
+            edited.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
+            template.Column_Mapping_JSON__c = edited.serialize();
+            template.Matching_Rule__c = ImportTemplateService.normalizedRule(
+                ImportTemplateService.RULE_NAME_POSTAL
+            );
+            update template;
+
+            Import_Template__c ran = ImportBatchService.templateFor(
+                ImportBatchSelector.selectById(batch.Id)
+            );
+            Assert.isTrue(
+                ran.Column_Mapping_JSON__c.contains('Contact1.MailingCity'),
+                'The commit reads the recorded mapping, not the edited one.'
+            );
+            Assert.areEqual(
+                ImportTemplateService.normalizedRule(ImportTemplateService.RULE_EMAIL),
+                ran.Matching_Rule__c,
+                'And the recorded rule.'
+            );
+            ImportProcessorBatch committing = new ImportProcessorBatch(batch.Id, false);
+            committing.execute(null, ImportTestDataFactory.reload(batch.Id));
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE MailingCity = 'Portland'],
+                'Every person got the city the preview showed.'
+            );
+        }
+    }
+
+    /** A batch previewed before the copy was kept runs under the template as it stands. */
+    @IsTest
+    static void aBatchWithNoRecordedTemplateRunsUnderTheTemplate() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = newTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            Test.startTest();
+            Import_Template__c ran = ImportBatchService.templateFor(batch);
+            Test.stopTest();
+            Assert.areEqual(template.Id, ran.Id, 'The template itself.');
+            Assert.areEqual(template.Column_Mapping_JSON__c, ran.Column_Mapping_JSON__c);
         }
     }
 
@@ -406,10 +556,12 @@ private class ImportBatchServiceTest {
                 null,
                 'gifts.csv',
                 3,
-                250.5
+                250.5,
+                null,
+                false
             );
             try {
-                ImportBatchService.create(template.Id, null, 'gifts.csv', -1, null);
+                ImportBatchService.create(template.Id, null, 'gifts.csv', -1, null, null, false);
                 Assert.fail('A negative number of rows makes no sense.');
             } catch (ImportException e) {
                 Assert.areEqual(
@@ -442,7 +594,14 @@ private class ImportBatchServiceTest {
             update batch;
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 75.00);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                75.00,
+                null
+            );
             Test.stopTest();
 
             Assert.isTrue(after.File_Amount__c == 75, 'The amount the run read is kept.');
@@ -469,7 +628,14 @@ private class ImportBatchServiceTest {
             batch.Expected_Count__c = 2;
             batch.Expected_Amount__c = 100;
             update batch;
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 80);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                80,
+                null
+            );
 
             Test.startTest();
             try {
@@ -507,7 +673,14 @@ private class ImportBatchServiceTest {
             update batch;
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.isFalse(
@@ -541,7 +714,9 @@ private class ImportBatchServiceTest {
                 batch.Id,
                 true,
                 false,
-                new List<String>{ 'A line of the run log' }
+                new List<String>{ 'A line of the run log' },
+                null,
+                null
             );
             Test.stopTest();
 
@@ -570,7 +745,14 @@ private class ImportBatchServiceTest {
             );
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                false,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'It completed.');
@@ -603,7 +785,14 @@ private class ImportBatchServiceTest {
             Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                false,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.isTrue(
@@ -650,7 +839,9 @@ private class ImportBatchServiceTest {
                 batch.Id,
                 false,
                 true,
-                new List<String>{ 'Chunk 1 failed' }
+                new List<String>{ 'Chunk 1 failed' },
+                null,
+                null
             );
             Test.stopTest();
             Assert.areEqual(ImportBatchService.STATUS_FAILED, after.Status__c, 'Marked as failed.');

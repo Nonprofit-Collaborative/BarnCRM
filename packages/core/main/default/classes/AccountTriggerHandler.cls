@@ -21,8 +21,6 @@
  * written, so that it holds whichever of their three addresses they chose (R-C6).
  */
 public with sharing class AccountTriggerHandler extends TriggerHandler {
-    private static Boolean running = false;
-
     /**
      * The households the people currently being deleted are leaving. Filled in
      * `beforeDelete` and consumed in `afterDelete`, which is also where it is emptied
@@ -40,7 +38,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
 
     /**
      * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted, renamed and tidied once, after the delete,
+     * itself, so that a household is recounted and renamed once, after the delete,
      * rather than in the middle of it.
      */
     private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
@@ -50,7 +48,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
     public override void beforeInsert() {
         HouseholdService.refuseHandSetPrimaryContacts((List<Account>) newRecords(), null);
         nameNewHouseholds((List<Account>) newRecords());
-        PreferredEmailService.applyToPersonRecords((List<Account>) newRecords());
     }
 
     public override void beforeUpdate() {
@@ -59,7 +56,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
             (Map<Id, Account>) oldRecordsById()
         );
         nameNewHouseholds((List<Account>) newRecords());
-        PreferredEmailService.applyToPersonRecords((List<Account>) newRecords());
     }
 
     public override void afterInsert() {
@@ -81,13 +77,9 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 renamedPeople.add(record);
             }
         }
-        if (!released.isEmpty()) {
-            // Mutual exclusion (product-plan Section 11.2 item 9): clearing Custom Name on a
-            // household that Nonprofit Cloud manages natively must not hand its name to
-            // BarnCRM's naming, the same guard the other two naming callers apply.
-            released.removeAll(HouseholdSelector.nativeHouseholdAccountsAmong(released));
-            HouseholdNamingService.applyNaming(released);
-        }
+        // A household that Nonprofit Cloud manages natively keeps its name: applyNaming
+        // leaves it alone (mutual exclusion, product-plan Section 11.2 item 9).
+        HouseholdNamingService.applyNaming(released);
         // R-H4 and R-H11. A person renamed, marked deceased, given a preferred name, moved
         // to another household role or excluded from the wording changes what every
         // household they belong to is called.
@@ -117,15 +109,14 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A delete recounts and renames the households the people left, and tidies away one left
-     * empty where the org asks for that (R-H12).
+     * A delete recounts and renames the households the people left, and never tidies one away,
+     * even left empty (R-H12): deleting the household would purge the people's membership rows
+     * from the Recycle Bin, so an undelete could not put them back in it.
      *
      * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled as
      * it is for a person stored as a contact (C-20). The merged-away person's memberships go
-     * to the survivor, a household keeps its primary member, and a household the
-     * merged-away person was in is never tidied away by the merge: gifts, notes and history
-     * credited to it would lose their household. The survivors' real-time totals are then
-     * recalculated, for the survivors only.
+     * to the survivor and a household keeps its primary member. The survivors' real-time
+     * totals are then recalculated, for the survivors only.
      */
     public override void afterDelete() {
         List<Account> gone = (List<Account>) oldRecords();
@@ -135,9 +126,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         departingMemberships = new List<Household_Member__c>();
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        Set<Id> keptByMerge = new Set<Id>();
         if (!survivorByMerged.isEmpty()) {
-            keptByMerge = householdsOfMerged(removed, survivorByMerged.keySet());
             AutomationControl.bypass(MEMBER_HANDLER);
             try {
                 affected.addAll(
@@ -147,11 +136,41 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
-        Set<Id> mayTidy = new Set<Id>(affected);
-        mayTidy.removeAll(keptByMerge);
-        HouseholdService.afterMembershipChange(mayTidy, true);
-        HouseholdService.afterMembershipChange(keptByMerge, false);
+        HouseholdService.afterMembershipChange(affected, false);
         recalculateSurvivors(gone, survivorByMerged);
+        settleSurvivors(gone, survivorByMerged);
+    }
+
+    /**
+     * What the merge moved onto the survivors without running their children's triggers,
+     * settled once the merge is saved (PEOPLE-15, MergeSettlement): a household that took in
+     * another household's members is recounted and renamed, every survivor keeps one default
+     * address, and a surviving person's relationships and primary affiliation are settled.
+     */
+    private static void settleSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
+        if (survivorByMerged.isEmpty()) {
+            return;
+        }
+        // People in either membership mode: relationships and affiliations do not depend on it.
+        Set<Id> mergedPeople = new Set<Id>();
+        if (HouseholdService.isPersonAccountOrg()) {
+            mergedPeople = new Map<Id, SObject>(PersonRecordSelector.filterPeople(gone)).keySet();
+        }
+        Id householdType = HouseholdService.householdRecordTypeId();
+        Set<Id> households = new Set<Id>();
+        Set<Id> people = new Set<Id>();
+        for (Account record : gone) {
+            Id survivorId = survivorByMerged.get(record.Id);
+            if (survivorId == null) {
+                continue;
+            }
+            if (mergedPeople.contains(record.Id)) {
+                people.add(survivorId);
+            } else if (householdType != null && record.RecordTypeId == householdType) {
+                households.add(survivorId);
+            }
+        }
+        MergeSettlement.afterMerge(households, new Set<Id>(survivorByMerged.values()), people);
     }
 
     /**
@@ -172,20 +191,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         for (Account record : records) {
             if (record.MasterRecordId != null) {
                 result.put(record.Id, record.MasterRecordId);
-            }
-        }
-        return result;
-    }
-
-    /** Every household the merged-away people were members of. */
-    private static Set<Id> householdsOfMerged(
-        List<Household_Member__c> removed,
-        Set<Id> mergedIds
-    ) {
-        Set<Id> result = new Set<Id>();
-        for (Household_Member__c row : removed) {
-            if (mergedIds.contains(row.Account__c) && row.Household__c != null) {
-                result.add(row.Household__c);
             }
         }
         return result;
@@ -270,7 +275,10 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         for (Account record : records) {
             Boolean isHousehold = record.RecordTypeId == recordTypeId;
             if (isHousehold && record.Custom_Name__c != true && String.isBlank(record.Name)) {
-                record.Name = Label.Core_Households_NamePlaceholder;
+                record.Name = HouseholdNamingService.storedLabel(
+                    'Core_Households_NamePlaceholder',
+                    Label.Core_Households_NamePlaceholder
+                );
             }
         }
     }
@@ -285,7 +293,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
      * was told nothing about it.
      */
     private static void createHouseholdsForNewPeople(List<Account> records) {
-        if (running || records == null || records.isEmpty()) {
+        if (records == null || records.isEmpty()) {
             return;
         }
         if (!handlesPeople()) {
@@ -299,11 +307,8 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         if (people.isEmpty()) {
             return;
         }
-        running = true;
-        try {
-            HouseholdService.createHouseholdsForPersonAccounts(people);
-        } finally {
-            running = false;
-        }
+        // HouseholdService guards its own creation pass against the saves it makes coming
+        // back round through this trigger (ADR-0037).
+        HouseholdService.createHouseholdsForPersonAccounts(people);
     }
 }

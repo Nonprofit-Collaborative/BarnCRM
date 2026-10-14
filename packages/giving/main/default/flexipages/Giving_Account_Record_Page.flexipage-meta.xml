@@ -304,6 +304,9 @@
               <value>Edit</value>
             </valueListItems>
             <valueListItems>
+              <value>Account.Log_Interaction</value>
+            </valueListItems>
+            <valueListItems>
               <value>Account.Merge_Household</value>
               <visibilityRule>
                 <criteria>
@@ -315,6 +318,27 @@
             </valueListItems>
             <valueListItems>
               <value>Account.New_Gift</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Account.Erase_Person</value>
+              <visibilityRule>
+                <booleanFilter>1 AND 2 AND 3</booleanFilter>
+                <criteria>
+                  <leftValue>{!$Permission.CustomPermission.Erase_People}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>true</rightValue>
+                </criteria>
+                <criteria>
+                  <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                  <operator>NE</operator>
+                  <rightValue>Household</rightValue>
+                </criteria>
+                <criteria>
+                  <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                  <operator>NE</operator>
+                  <rightValue>Organization</rightValue>
+                </criteria>
+              </visibilityRule>
             </valueListItems>
             <valueListItems>
               <value>Delete</value>
@@ -331,6 +355,10 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
           <value>true</value>
         </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>

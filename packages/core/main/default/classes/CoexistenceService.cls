@@ -18,9 +18,6 @@ public with sharing class CoexistenceService {
     public static final String KEY_COEXISTENCE_MODE = 'Coexistence_Mode__c';
     public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
-    /** The custom permission that gates changing the mode. */
-    public static final String MANAGE_SETTINGS = 'Manage_BarnCRM_Settings';
-
     private static final Set<String> VALID_MODES = new Set<String>{
         MODE_STANDALONE,
         MODE_NPSP,
@@ -255,15 +252,27 @@ public with sharing class CoexistenceService {
      * type. Zero in any org without Person Accounts, because there is no such record type.
      */
     public static Integer countPeopleStoredAsAccounts() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        if (
-            shape == null ||
-            shape.personAccountRecordTypeIds == null ||
-            shape.personAccountRecordTypeIds.isEmpty()
-        ) {
+        return countPeopleStoredAsAccounts(null);
+    }
+
+    /**
+     * The same, stopping at `cap` when one is given, so that Health Check on an org with a
+     * great many person accounts does not count every one of them against the query row limit.
+     */
+    public static Integer countPeopleStoredAsAccounts(Integer cap) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (personTypes.isEmpty()) {
             return 0;
         }
-        Set<Id> personTypes = shape.personAccountRecordTypeIds;
+        if (cap != null) {
+            return [
+                SELECT COUNT()
+                FROM Account
+                WHERE RecordTypeId IN :personTypes
+                WITH SYSTEM_MODE
+                LIMIT :cap
+            ];
+        }
         return [SELECT COUNT() FROM Account WHERE RecordTypeId IN :personTypes WITH SYSTEM_MODE];
     }
 
@@ -279,7 +288,7 @@ public with sharing class CoexistenceService {
      */
     @NamespaceAccessible
     public static void applyMode(String mode) {
-        if (!FeatureManagement.checkPermission(MANAGE_SETTINGS)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw new CoexistenceException(System.Label.Core_HealthCheck_PermissionRequired);
         }
         setMode(mode);

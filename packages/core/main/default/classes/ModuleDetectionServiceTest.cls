@@ -2,8 +2,13 @@
  * Core has to run on an org where no other BarnCRM package is installed, so detection
  * answers honestly and nothing static ever names another package's schema.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ModuleDetectionService')
 private class ModuleDetectionServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void listsTheSixPackagesAndSaysWhichAreHere() {
         System.runAs(TestUsers.admin()) {
@@ -237,6 +242,58 @@ private class ModuleDetectionServiceTest {
                 givingListed,
                 'The module list and the Giving check give the same answer'
             );
+        }
+    }
+
+    @IsTest
+    static void anotherPackagesFundAndAppealDoNotLookLikeGiving() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            NamespaceUtil.cachedPrefix = '';
+            String otherPrefix = 'other__';
+            NamespaceUtil.describeOverride = new Map<String, Schema.SObjectType>{
+                otherPrefix + 'fund__c' => Account.SObjectType,
+                otherPrefix + 'appeal__c' => Contact.SObjectType
+            };
+
+            Test.startTest();
+            Boolean foreignLooksLikeGiving = ModuleDetectionService.isGivingPresent();
+            String foreignFund = ModuleDetectionService.resolveObject('Fund__c');
+            NamespaceUtil.describeOverride.put('fund__c', Account.SObjectType);
+            NamespaceUtil.describeOverride.put('appeal__c', Contact.SObjectType);
+            Boolean ownLooksLikeGiving = ModuleDetectionService.isGivingPresent();
+            Test.stopTest();
+
+            Assert.isFalse(
+                foreignLooksLikeGiving,
+                'Objects of the same name in another namespace are not Giving'
+            );
+            Assert.isNull(foreignFund, 'Another package\'s Fund__c does not resolve');
+            Assert.isTrue(ownLooksLikeGiving, 'The package\'s own objects are found');
+            Assert.areEqual(
+                'Account',
+                ModuleDetectionService.resolveObject('Fund__c'),
+                'The real API name of the matching object comes back'
+            );
+        }
+    }
+
+    @IsTest
+    static void anObjectIsFoundByItsUnprefixedNameInAnyCase() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            String found = ModuleDetectionService.resolveObject('error_log__c');
+            String again = ModuleDetectionService.resolveObject('Error_Log__c');
+            String missing = ModuleDetectionService.resolveObject('No_Such_Object__c');
+            Test.stopTest();
+
+            Assert.areEqual(
+                Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
+                found,
+                'The real API name comes back, prefix and all once a namespace exists'
+            );
+            Assert.areEqual(found, again, 'The second ask, from the cache, gives the same answer');
+            Assert.isNull(missing, 'An object this org lacks resolves to nothing');
         }
     }
 }

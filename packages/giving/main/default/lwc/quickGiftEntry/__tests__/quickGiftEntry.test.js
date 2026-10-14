@@ -1,4 +1,5 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
 import QuickGiftEntry from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
@@ -222,8 +223,7 @@ describe('c-quick-gift-entry', () => {
   it('saves the gift the person entered and confirms it with a link', async () => {
     const element = build();
     await settle();
-    const toast = jest.fn();
-    element.addEventListener('lightning__showtoast', toast);
+    const toast = jest.spyOn(Toast, 'show');
 
     await enterAGift(element);
     pick(element, 'save').click();
@@ -247,8 +247,8 @@ describe('c-quick-gift-entry', () => {
     expect(pick(element, 'saved')).not.toBeNull();
     expect(pick(element, 'saved-link').href).toContain('/lightning/r/Gift__c/');
     expect(toast).toHaveBeenCalled();
-    expect(toast.mock.calls[0][0].detail.messageData[0].label).toBe('G-000123');
-    expect(toast.mock.calls[0][0].detail.messageData[0].url).toContain('004000000000000AAA');
+    expect(toast.mock.calls[0][0].messageLinks[0].label).toBe('G-000123');
+    expect(toast.mock.calls[0][0].messageLinks[0].url).toContain('004000000000000AAA');
   });
 
   it('clears the donor and the amount after save and new, and keeps the date and fund', async () => {

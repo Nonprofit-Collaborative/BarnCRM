@@ -64,8 +64,18 @@ public with sharing class HouseholdWriter {
      * member count.
      */
     public static void updateHouseholds(List<Account> households) {
+        updateHouseholdsReportingRefusals(households);
+    }
+
+    /**
+     * The same, answering the ids of the households the save refused, so a caller can save
+     * part of a refused change again (each refusal is logged). A refused save carries no id,
+     * so the refused records are found by their position in the list.
+     */
+    public static Set<Id> updateHouseholdsReportingRefusals(List<Account> households) {
+        Set<Id> refused = new Set<Id>();
         if (households == null || households.isEmpty()) {
-            return;
+            return refused;
         }
         List<Database.SaveResult> saves = Database.update(
             households,
@@ -73,6 +83,12 @@ public with sharing class HouseholdWriter {
             AccessLevel.SYSTEM_MODE
         );
         logFailures(saves, Label.Core_Households_ErrorContextNaming);
+        for (Integer i = 0; i < saves.size(); i++) {
+            if (!saves[i].isSuccess()) {
+                refused.add(households[i].Id);
+            }
+        }
+        return refused;
     }
 
     /**
@@ -106,6 +122,39 @@ public with sharing class HouseholdWriter {
         }
         if (promoted != null && !promoted.isEmpty()) {
             Database.update(promoted, true, AccessLevel.SYSTEM_MODE);
+        }
+    }
+
+    /**
+     * Settles a household merge's duplicate memberships: the kept rows that take Is Primary,
+     * then the duplicate rows removed. System mode (upkeep, ADR-0021), and a refusal is
+     * logged rather than thrown so one row cannot stop the rest of the settlement.
+     */
+    public static void collapseMemberships(
+        List<Household_Member__c> promoted,
+        List<Household_Member__c> redundant
+    ) {
+        if (promoted != null && !promoted.isEmpty()) {
+            logFailures(
+                Database.update(promoted, false, AccessLevel.SYSTEM_MODE),
+                Label.Core_Households_ErrorContextMergeSettle
+            );
+        }
+        if (redundant != null && !redundant.isEmpty()) {
+            for (
+                Database.DeleteResult result : Database.delete(
+                    redundant,
+                    false,
+                    AccessLevel.SYSTEM_MODE
+                )
+            ) {
+                if (!result.isSuccess()) {
+                    log(
+                        firstMessage(result.getErrors()),
+                        Label.Core_Households_ErrorContextMergeSettle
+                    );
+                }
+            }
         }
     }
 

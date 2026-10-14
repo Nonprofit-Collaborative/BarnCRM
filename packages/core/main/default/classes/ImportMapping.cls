@@ -31,10 +31,20 @@ public with sharing class ImportMapping {
     @NamespaceAccessible
     public static final String ENTITY_RECORD = 'Record';
 
+    /** The person-to-organization link Core makes from a row (R-AF5). */
+    @NamespaceAccessible
+    public static final String ENTITY_AFFILIATION = 'Affiliation';
+
+    /**
+     * The related record a one-object template with a Related Object also creates from each
+     * row (R-IT17): its attributes are the related object's field API names.
+     */
+    @NamespaceAccessible
+    public static final String ENTITY_RELATED = 'Related';
+
     /** The row entities Core stages but does not write (R-IR6). */
     @NamespaceAccessible
     public static final Set<String> DEFERRED_ENTITIES = new Set<String>{
-        'Affiliation',
         'Gift',
         'Allocation',
         'SoftCredit',
@@ -68,6 +78,12 @@ public with sharing class ImportMapping {
         /** The steps that change this column's values before they are used (R-IT15). */
         @AuraEnabled
         public List<DataTransform.Step> transforms;
+        /**
+         * For a `Record` column of an update or upsert, an empty cell clears the field rather
+         * than leaving it as it is (R-IT19). False when absent.
+         */
+        @AuraEnabled
+        public Boolean blankClears;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -129,16 +145,43 @@ public with sharing class ImportMapping {
         }
     }
 
+    /**
+     * A rule that skips a row of the file (R-IT18): the row's cell in `column` equals `text`,
+     * contains it, or is blank (a test of `DataTransform.TESTS`), compared as uploaded,
+     * trimmed and ignoring capitals.
+     */
+    @NamespaceAccessible
+    public class SkipRule {
+        @AuraEnabled
+        public String column;
+        @AuraEnabled
+        public String test;
+        @AuraEnabled
+        public String text;
+
+        @NamespaceAccessible
+        public SkipRule() {
+            this.column = null;
+        }
+    }
+
     @AuraEnabled
     public Integer version;
     @AuraEnabled
     public List<Column> columns;
     @AuraEnabled
     public List<Assignment> defaults;
+    /** Rows any of these rules matches are skipped when the file is staged (R-IT18). */
+    @AuraEnabled
+    public List<SkipRule> skipRows;
+    /** Only the first row of each combination of these columns' values loads (R-IT18). */
+    @AuraEnabled
+    public List<String> uniqueBy;
 
     @NamespaceAccessible
     public ImportMapping() {
-        this.version = 1;
+        // A new document may hold any step the engine knows (ADR-0112, more transform steps).
+        this.version = DataTransform.DOCUMENT_VERSION;
         this.columns = new List<Column>();
         this.defaults = new List<Assignment>();
     }
@@ -161,6 +204,8 @@ public with sharing class ImportMapping {
             result.version = parsed.version == null ? 1 : parsed.version;
             result.columns = parsed.columns == null ? new List<Column>() : parsed.columns;
             result.defaults = parsed.defaults == null ? new List<Assignment>() : parsed.defaults;
+            result.skipRows = parsed.skipRows;
+            result.uniqueBy = parsed.uniqueBy;
         } catch (Exception ignored) {
             // An unreadable document is an empty mapping. The caller reports the emptiness.
             return new ImportMapping();
@@ -429,6 +474,12 @@ public with sharing class ImportMapping {
      */
     @NamespaceAccessible
     public Map<String, String> lookupFieldsByAttribute() {
+        return lookupFieldsByAttribute(ENTITY_RECORD);
+    }
+
+    /** The same for the lookup columns of one entity, `Record` or `Related` (R-IT17). */
+    @NamespaceAccessible
+    public Map<String, String> lookupFieldsByAttribute(String entity) {
         Map<String, String> result = new Map<String, String>();
         for (Column column : columns) {
             if (
@@ -436,7 +487,7 @@ public with sharing class ImportMapping {
                 isIgnored(column.target) ||
                 String.isBlank(column.lookupField) ||
                 'Id'.equalsIgnoreCase(column.lookupField.trim()) ||
-                !ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+                !entity.equalsIgnoreCase(entityOf(column.target))
             ) {
                 continue;
             }
@@ -451,6 +502,12 @@ public with sharing class ImportMapping {
      */
     @NamespaceAccessible
     public Set<String> recordAttributes() {
+        return attributesOf(ENTITY_RECORD);
+    }
+
+    /** The same for one entity, `Record` or `Related` (R-IT17). */
+    @NamespaceAccessible
+    public Set<String> attributesOf(String entity) {
         Set<String> result = new Set<String>();
         List<String> targets = new List<String>(targetsBySourceKey().values());
         for (Assignment assignment : defaults) {
@@ -459,8 +516,28 @@ public with sharing class ImportMapping {
             }
         }
         for (String target : targets) {
-            if (ENTITY_RECORD.equalsIgnoreCase(entityOf(target))) {
+            if (entity.equalsIgnoreCase(entityOf(target))) {
                 result.add(attributeOf(target).toLowerCase());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The `Record` attributes whose column says an empty cell clears the field (R-IT19),
+     * folded to lower case. A column set to Do not load is left out.
+     */
+    @NamespaceAccessible
+    public Set<String> clearingAttributes() {
+        Set<String> result = new Set<String>();
+        for (Column column : columns) {
+            if (
+                column != null &&
+                column.blankClears == true &&
+                !isIgnored(column.target) &&
+                ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+            ) {
+                result.add(attributeOf(column.target).toLowerCase());
             }
         }
         return result;

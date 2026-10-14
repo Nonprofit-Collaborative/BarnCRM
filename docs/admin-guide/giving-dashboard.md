@@ -23,10 +23,11 @@ else sees.
    dashboard as** choose a person who can see all gifts, usually the person who installed
    the package.
 3. Give people access. In BarnCRM Settings, open **Access** and assign the
-   **Fundraising Staff** role, and then, in Salesforce Setup, the Giving module's
-   **Giving Staff** or **Giving Read Only** permission set. The role does not carry the
-   Giving permission sets yet, and without one of them a person cannot read gifts, so the
-   dashboard has nothing to show them. The report and dashboard folders themselves ship as
+   **Fundraising Staff** role, which includes the Giving module's **Giving Staff**
+   permission set. Someone who should only look gets the **Read Only** role and, in
+   Salesforce Setup, the **Giving Read Only** permission set. Without one of the Giving
+   permission sets a person cannot read gifts, so the dashboard has nothing to show them.
+   The report and dashboard folders themselves ship as
    public read only, so nothing has to be shared by hand.
 4. Optional, and worth the ten seconds: with the dashboard open, choose **Subscribe** and
    have it emailed to yourself on the first of the month.

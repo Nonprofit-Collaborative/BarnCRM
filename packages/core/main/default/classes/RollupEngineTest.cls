@@ -4,8 +4,13 @@
  * (`ParentId`) and people up to households, which exercises the same code the giving totals run.
  * The giving totals themselves are judged by the regression suite in Giving.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine')
 private class RollupEngineTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Id organizationType() {
         return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
             .get('Organization')
@@ -271,6 +276,114 @@ private class RollupEngineTest {
             RollupEngine.recalculate(both, new List<Rollup_Definition__c>{ count, sum });
             Assert.areEqual(100, reread(north.Id).Member_Count__c, 'Order does not matter');
             Assert.areEqual(1, reread(south.Id).Member_Count__c, 'Order does not matter');
+        }
+    }
+
+    /** ROLLUPS-12: an equals test on text is answered from the records already read. */
+    @IsTest
+    static void twoHundredParentsFilteredOnTextInApex() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> parents = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                Account parent = organization('Parent ' + i, null);
+                parent.Preferred_Name__c = Math.mod(i, 2) == 0 ? 'North' : 'South';
+                parents.add(parent);
+            }
+            insert parents;
+            List<Account> children = new List<Account>();
+            for (Account parent : parents) {
+                children.add(
+                    new Account(
+                        Name = 'Child',
+                        RecordTypeId = organizationType(),
+                        ParentId = parent.Id,
+                        NumberOfEmployees = 3
+                    )
+                );
+            }
+            insert children;
+            Rollup_Definition__c sum = fromChildren('SUM', 'NumberOfEmployees', 'Member_Count__c');
+            sum.Target_Filter_JSON__c = filter('Preferred_Name__c', 'equals', 'north');
+            Rollup_Definition__c count = fromChildren('COUNT', null, 'NumberOfEmployees');
+            count.Target_Filter_JSON__c = filter('Preferred_Name__c', 'not equals', 'NORTH');
+
+            Test.startTest();
+            RollupEngine.Result result = RollupEngine.recalculate(
+                new Map<Id, Account>(parents).keySet(),
+                new List<Rollup_Definition__c>{ sum, count }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(200, result.written.size(), 'Every parent written once');
+            for (Account parent : [
+                SELECT Preferred_Name__c, Member_Count__c, NumberOfEmployees
+                FROM Account
+                WHERE Id IN :parents
+            ]) {
+                if (parent.Preferred_Name__c == 'North') {
+                    Assert.areEqual(3, parent.Member_Count__c, 'Equals ignores case');
+                    Assert.isNull(parent.NumberOfEmployees, 'Not equals leaves North alone');
+                } else {
+                    Assert.isNull(parent.Member_Count__c, 'Equals leaves South alone');
+                    Assert.areEqual(1, parent.NumberOfEmployees, 'Not equals admits South');
+                }
+            }
+        }
+    }
+
+    /** ROLLUPS-12: the filter costs no query of its own unless a record holds a blank. */
+    @IsTest
+    static void aTextFilterIsQueriedOnlyWhenARecordHoldsABlank() {
+        System.runAs(TestUsers.admin()) {
+            Account named = organization('Named', null);
+            named.Preferred_Name__c = 'North';
+            Account blank = organization('Blank', null);
+            insert new List<Account>{ named, blank };
+            insert new List<Account>{
+                new Account(
+                    Name = 'C1',
+                    RecordTypeId = organizationType(),
+                    ParentId = named.Id,
+                    NumberOfEmployees = 2
+                ),
+                new Account(
+                    Name = 'C2',
+                    RecordTypeId = organizationType(),
+                    ParentId = blank.Id,
+                    NumberOfEmployees = 5
+                )
+            };
+            Rollup_Definition__c plain = fromChildren(
+                'SUM',
+                'NumberOfEmployees',
+                'Member_Count__c'
+            );
+            Rollup_Definition__c equalsNorth = plain.clone();
+            equalsNorth.Target_Filter_JSON__c = filter('Preferred_Name__c', 'equals', 'North');
+            Rollup_Definition__c notNorth = plain.clone();
+            notNorth.Target_Filter_JSON__c = filter('Preferred_Name__c', 'not equals', 'North');
+
+            Test.startTest();
+            RollupEngine.preview(plain, named.Id);
+            Integer before = Limits.getQueries();
+            RollupEngine.preview(plain, named.Id);
+            Integer unfiltered = Limits.getQueries() - before;
+
+            before = Limits.getQueries();
+            RollupEngine.Preview inApex = RollupEngine.preview(equalsNorth, named.Id);
+            Integer filtered = Limits.getQueries() - before;
+
+            before = Limits.getQueries();
+            RollupEngine.Preview fallback = RollupEngine.preview(notNorth, blank.Id);
+            Integer queried = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(unfiltered, filtered, 'Tested on the record already read');
+            Assert.isTrue(inApex.admitted, 'North passes equals North');
+            Assert.areEqual(2, inApex.calculated, 'Its total');
+            Assert.areEqual(unfiltered + 1, queried, 'A blank name is left to the query');
+            Assert.isTrue(fallback.admitted, 'A blank name is not North, as SOQL answers it');
+            Assert.areEqual(5, fallback.calculated, 'Its total');
         }
     }
 

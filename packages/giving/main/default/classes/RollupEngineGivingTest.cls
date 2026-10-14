@@ -5,7 +5,7 @@
  * The fund totals are sourced from Gift Allocation and filtered and windowed on the parent gift
  * (`Gift__r.Status__c`, `Gift__r.Gift_Date__c`), which the vendored engine could not aggregate.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine')
 private class RollupEngineGivingTest {
     @TestSetup
     static void makeData() {

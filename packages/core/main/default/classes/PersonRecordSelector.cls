@@ -6,16 +6,11 @@
  * read with SObject.get. It is the only class in Core that does this, and it runs only
  * when HouseholdService.isPersonAccountOrg() is true.
  *
- * How a person is told apart from an organization, and what that costs: the sound test is
- * the platform's own person flag, which the CI check on standard object references
- * forbids Core to name at all, with no exemption. So this class infers it: an account
- * holds a person when the surname field both exists on the object and carries a value on
- * the record. That is right for every ordinary case, because an organization never
- * carries a surname. It is wrong in two ways worth knowing: a record read with a query
- * that did not select the surname reads as an organization, and an org that puts a value
- * in that field on a business account would be misread. Both are visible only inside this
- * class. If the check ever grows an exemption for a describe-only read of the person flag,
- * that is the one line to change.
+ * How a person is told apart from an organization: the record's record type is one the org
+ * describes as a person type (OrgShapeDetector.personRecordTypeIds). The platform's own
+ * person flag is not used, because the CI check on standard object references forbids Core
+ * to name it. A record read with a query that did not select RecordTypeId reads as an
+ * organization, which is visible only inside this class.
  *
  * There are two kinds of read here, and they are not interchangeable, exactly as in
  * HouseholdSelector. The upkeep read (getPersons) feeds the member count, the household
@@ -43,7 +38,7 @@ public with sharing class PersonRecordSelector {
 
     // detection-only: an account holds a person rather than an organization when this
     // field both exists on the object and carries a value on the record.
-    private static final String PERSON_MARKER_FIELD = 'LastName';
+    private static final String RECORD_TYPE_FIELD = 'RecordTypeId';
 
     // detection-only: the contact the platform keeps behind an account that holds a person
     // exists as a field only where the org stores people as accounts.
@@ -56,6 +51,15 @@ public with sharing class PersonRecordSelector {
      */
     @TestVisible
     private static Map<Id, Id> personContactIdOverride;
+
+    private static final String ACCOUNTS_BEHIND_CONTACTS_QUERY = 'SELECT Id, AccountId FROM Contact WHERE Id IN :contactIds AND IsPersonAccount = true LIMIT 10000'; // detection-only: run only after isPersonAccountOrg found person accounts, to map a person contact to its account
+
+    /**
+     * Set only by tests, keyed by contact id: the account a person contact stands behind,
+     * which an org without person accounts cannot hold. Production code never sets it.
+     */
+    @TestVisible
+    private static Map<Id, Id> accountBehindContactOverride;
 
     /**
      * Set only by tests. When it is true every account record is treated as a person, so
@@ -74,9 +78,8 @@ public with sharing class PersonRecordSelector {
     private static Map<String, HouseholdService.Person> personOverridesByName;
 
     /**
-     * True when this account record holds a person. Nothing that exists only in some orgs
-     * is named at compile time: the field is looked up by name and read from the values
-     * the record actually carries.
+     * True when this account record holds a person: its record type is a person type. The
+     * record type is read from the values the record actually carries.
      */
     public static Boolean isPersonRecord(SObject record) {
         if (record == null) {
@@ -85,11 +88,9 @@ public with sharing class PersonRecordSelector {
         if (personRecordOverride != null) {
             return personRecordOverride;
         }
-        if (!Schema.SObjectType.Account.fields.getMap().containsKey(PERSON_MARKER_FIELD)) {
-            return false;
-        }
-        Object value = record.getPopulatedFieldsAsMap().get(PERSON_MARKER_FIELD);
-        return value != null && String.isNotBlank(String.valueOf(value));
+        Object recordTypeId = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
+        return recordTypeId != null &&
+            OrgShapeDetector.personRecordTypeIds().contains((Id) recordTypeId);
     }
 
     /**
@@ -109,11 +110,22 @@ public with sharing class PersonRecordSelector {
         Map<String, Object> current = record.getPopulatedFieldsAsMap();
         Map<String, Object> before = previous.getPopulatedFieldsAsMap();
         for (String fieldName : namingFields()) {
-            if (current.get(fieldName) != before.get(fieldName)) {
+            if (valueChanged(current.get(fieldName), before.get(fieldName))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Text is compared case-sensitively, so that correcting "Mcdonald" to "McDonald"
+     * counts as a change: Apex `==` and `!=` ignore case for Strings.
+     */
+    private static Boolean valueChanged(Object now, Object before) {
+        if (now instanceof String && before instanceof String) {
+            return !((String) now).equals((String) before);
+        }
+        return now != before;
     }
 
     /**
@@ -237,6 +249,49 @@ public with sharing class PersonRecordSelector {
         Map<String, Object> binds = new Map<String, Object>{ 'personRecordIds' => personRecordIds };
         for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.SYSTEM_MODE)) {
             Object value = record.get(PERSON_CONTACT_FIELD);
+            if (value instanceof Id) {
+                result.put(record.Id, (Id) value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The reverse of getPersonContactIds: for each contact among `contactIds` that is the
+     * hidden contact behind a person stored as an account, that account. Such a person
+     * belongs to a household by the account side of a membership (canonical model, Household
+     * Member), so a caller handed the contact half joins the account instead. Contacts that
+     * are people in their own right are absent from the answer, and so is everything in an
+     * org that does not store people as accounts.
+     *
+     * Read in system mode: the answer is only a mapping between two ids of the same person,
+     * never shown, and a mapping the caller could not see would put the person in twice.
+     */
+    public static Map<Id, Id> getAccountsBehindPersonContacts(Set<Id> contactIds) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        if (contactIds == null || contactIds.isEmpty()) {
+            return result;
+        }
+        if (accountBehindContactOverride != null) {
+            for (Id contactId : contactIds) {
+                if (accountBehindContactOverride.containsKey(contactId)) {
+                    result.put(contactId, accountBehindContactOverride.get(contactId));
+                }
+            }
+            return result;
+        }
+        if (!HouseholdService.isPersonAccountOrg()) {
+            return result;
+        }
+        Map<String, Object> binds = new Map<String, Object>{ 'contactIds' => contactIds };
+        for (
+            SObject record : Database.queryWithBinds(
+                ACCOUNTS_BEHIND_CONTACTS_QUERY,
+                binds,
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
+            Object value = record.get('AccountId');
             if (value instanceof Id) {
                 result.put(record.Id, (Id) value);
             }

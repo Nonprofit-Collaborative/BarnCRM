@@ -119,9 +119,101 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
+    /**
+     * Totals the Rollup Queue could not finish (ADR-0098 async rollups): records whose
+     * recalculation failed five times, or entries waiting longer than an hour, which means no
+     * processor is running for them. The errors themselves are in the Error Log.
+     */
+    public class RollupQueueCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            return rollupQueueFinding();
+        }
+    }
+
+    /** How long a Pending entry may wait before Health Check calls the queue stuck. */
+    @TestVisible
+    private static Integer queueStuckAfterMinutes = 60;
+
+    private static HealthCheckService.Finding rollupQueueFinding() {
+        Integer failed = [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :RollupQueue.STATUS_FAILED
+            WITH USER_MODE
+            LIMIT 10000
+        ];
+        Datetime stuckBefore = Datetime.now().addMinutes(-queueStuckAfterMinutes);
+        Integer stuck = [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :RollupQueue.STATUS_PENDING AND CreatedDate < :stuckBefore
+            WITH USER_MODE
+            LIMIT 10000
+        ];
+        if (failed == 0 && stuck == 0) {
+            return null;
+        }
+        String fixTarget = '/lightning/n/' + NamespaceUtil.qualify('Rollup_Builder');
+        if (failed > 0) {
+            return new HealthCheckService.Finding(
+                    'rollup_queue_failed',
+                    System.Label.Core_HealthCheck_RollupQueueFailedTitle,
+                    String.format(
+                        System.Label.Core_HealthCheck_RollupQueueFailedDetail,
+                        new List<Object>{ failed.format() }
+                    ),
+                    HealthCheckService.SEVERITY_WARNING,
+                    HealthCheckService.CATEGORY_SETTINGS
+                )
+                .withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
+        }
+        return new HealthCheckService.Finding(
+                'rollup_queue_stuck',
+                System.Label.Core_HealthCheck_RollupQueueStuckTitle,
+                String.format(
+                    System.Label.Core_HealthCheck_RollupQueueStuckDetail,
+                    new List<Object>{ stuck.format(), queueStuckAfterMinutes.format() }
+                ),
+                HealthCheckService.SEVERITY_WARNING,
+                HealthCheckService.CATEGORY_SETTINGS
+            )
+            .withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
+    }
+
     public class NightlyJobsCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return nightlyJobsFinding();
+        }
+    }
+
+    /**
+     * Scheduled BarnCRM jobs whose owner has been deactivated (ADMIN-12). Such a job stops
+     * running but keeps its trigger, so every other check and page reads it as scheduled.
+     */
+    public class InactiveOwnerJobsCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            List<String> stopped = HealthCheckService.fixScope(
+                HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+            );
+            if (stopped.isEmpty()) {
+                return null;
+            }
+            return new HealthCheckService.Finding(
+                    'jobs_inactive_owner',
+                    System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
+                    String.format(
+                        System.Label.Core_HealthCheck_InactiveOwnerJobsDetail,
+                        new List<Object>{ String.join(stopped, ', ') }
+                    ),
+                    HealthCheckService.SEVERITY_WARNING,
+                    HealthCheckService.CATEGORY_SETTINGS
+                )
+                .withFix(
+                    System.Label.Core_HealthCheck_InactiveOwnerJobsFix,
+                    HealthCheckService.FIX_ACTION_PREFIX +
+                    HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+                )
+                .withScope(stopped);
         }
     }
 

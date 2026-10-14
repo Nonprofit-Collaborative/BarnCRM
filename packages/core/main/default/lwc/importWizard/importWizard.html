@@ -92,7 +92,7 @@
                         type="file"
                         data-id="file"
                         label={labels.uploadLabel}
-                        accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         onchange={handleFileChange}
                     ></lightning-input>
                     <p class="slds-text-body_small slds-var-m-top_x-small">{labels.uploadHint}</p>
@@ -107,8 +107,36 @@
                     <h2 class="slds-text-heading_small slds-var-m-bottom_small">
                         {labels.stepColumns}
                     </h2>
+                    <template lwc:if={isDelimitedFile}>
+                        <lightning-combobox
+                            data-id="delimiter"
+                            class="slds-var-m-bottom_small"
+                            label={labels.delimiterLabel}
+                            field-level-help={labels.delimiterHelp}
+                            options={delimiterOptions}
+                            value={delimiter}
+                            disabled={parsing}
+                            onchange={handleDelimiterChange}
+                        ></lightning-combobox>
+                    </template>
+                    <template lwc:if={hasSeveralSheets}>
+                        <lightning-combobox
+                            data-id="sheet"
+                            class="slds-var-m-bottom_small"
+                            label={labels.sheetLabel}
+                            field-level-help={labels.sheetHelp}
+                            options={sheetOptions}
+                            value={sheetName}
+                            disabled={parsing}
+                            onchange={handleSheetChange}
+                        ></lightning-combobox>
+                    </template>
                     <div class="slds-scrollable_x">
-                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <table
+                            class="slds-table slds-table_bordered slds-table_cell-buffer"
+                            aria-label={labels.stepColumns}
+                            data-id="columns-table"
+                        >
                             <thead>
                                 <tr class="slds-line-height_reset">
                                     <th scope="col">{labels.columnHeader}</th>
@@ -147,6 +175,16 @@
                                                 data-source={column.source}
                                                 onclick={handleEditChanges}
                                             ></lightning-button>
+                                            <template lwc:if={loadsOneObject}>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    label={labels.blankClearsLabel}
+                                                    data-id="blank-clears"
+                                                    data-source={column.source}
+                                                    checked={column.blankClears}
+                                                    onchange={handleBlankClearsChange}
+                                                ></lightning-input>
+                                            </template>
                                         </td>
                                         <td class="slds-text-body_small">{column.samples}</td>
                                     </tr>
@@ -165,6 +203,13 @@
                             ondone={handleChangesDone}
                         ></c-import-column-transforms>
                     </template>
+                    <c-import-row-rules
+                        data-id="row-rules"
+                        column-names={headers}
+                        skip-rows={skipRows}
+                        unique-by={uniqueBy}
+                        onchange={handleRowRulesChange}
+                    ></c-import-row-rules>
                 </template>
 
                 <template lwc:if={isStepMatching}>
@@ -179,6 +224,9 @@
                             match-field={loadMatchField}
                             lookup-not-found={lookupNotFound}
                             key-fields={keyFields}
+                            row-match-fields={rowMatchFields}
+                            related={loadRelated}
+                            related-options={relatedOptions}
                             onchange={handleLoadOptionsChange}
                         ></c-import-load-options>
                     </template>
@@ -389,12 +437,69 @@
                         <template lwc:if={isStepPreview}>{labels.stepPreview}</template>
                         <template lwc:else>{labels.stepResults}</template>
                     </h2>
+                    <template lwc:if={storeFileError}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="original-not-kept">
+                            {storeFileError}
+                        </p>
+                    </template>
                     <c-import-results
                         batch={batch}
                         rejected-rows={rejectedRows}
                         changed-values={changedValues}
                         data-id="results"
                     ></c-import-results>
+                    <template lwc:if={showTrialChoice}>
+                        <div class="slds-box slds-var-m-top_small" data-id="trial">
+                            <h3 class="slds-text-heading_small">{labels.trialHeading}</h3>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small">
+                                {labels.trialHelp}
+                            </p>
+                            <lightning-input
+                                type="number"
+                                data-id="trial-rows"
+                                label={labels.trialRowsLabel}
+                                value={trialRowCount}
+                                min="1"
+                                max="2000"
+                                step="1"
+                                onchange={handleTrialRowsChange}
+                            ></lightning-input>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.trialButton}
+                                data-id="trial-button"
+                                disabled={cannotTrial}
+                                onclick={handleTrial}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                    <template lwc:if={isTrialComplete}>
+                        <div class="slds-box slds-var-m-top_small" data-id="remaining">
+                            <p class="slds-var-m-bottom_x-small" data-id="trial-done">
+                                {trialDoneText}
+                            </p>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.remainingButton}
+                                data-id="remaining-button"
+                                onclick={handleCommitRemaining}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:if={showRetry}>
+                    <div class="slds-var-m-top_medium" data-id="retry">
+                        <h3 class="slds-text-heading_small">{labels.retryHeading}</h3>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.retryHelp}</p>
+                        <lightning-input
+                            type="file"
+                            data-id="retry-file"
+                            label={labels.retryFileLabel}
+                            accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onchange={handleRetryFile}
+                        ></lightning-input>
+                    </div>
                 </template>
 
                 <div class="slds-var-m-top_medium">
@@ -421,6 +526,7 @@
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
+                            disabled={hasNoColumns}
                             onclick={handleNext}
                         ></lightning-button>
                     </template>
@@ -435,13 +541,23 @@
                         ></lightning-button>
                     </template>
                     <template lwc:if={isStepPreview}>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.commitButton}
-                            data-id="commit"
-                            disabled={cannotCommit}
-                            onclick={handleCommit}
-                        ></lightning-button>
+                        <template lwc:if={showDeleteConfirm}>
+                            <c-bulk-delete
+                                class="slds-show slds-var-m-bottom_small"
+                                batch-id={batch.id}
+                                data-id="delete-by-file"
+                                onclose={handleStartOver}
+                            ></c-bulk-delete>
+                        </template>
+                        <template lwc:if={showCommit}>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.commitButton}
+                                data-id="commit"
+                                disabled={cannotCommit}
+                                onclick={handleCommit}
+                            ></lightning-button>
+                        </template>
                         <lightning-button
                             class="slds-var-m-left_x-small"
                             label={labels.downloadExceptionsButton}
@@ -460,6 +576,12 @@
                             label={labels.downloadExceptionsButton}
                             data-id="download"
                             onclick={handleDownloadExceptions}
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.downloadResultsButton}
+                            data-id="download-results"
+                            onclick={handleDownloadResults}
                         ></lightning-button>
                     </template>
                 </div>

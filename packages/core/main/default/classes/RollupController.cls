@@ -133,6 +133,14 @@ public with sharing class RollupController {
             if (!isKnownMode(mode)) {
                 throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorInvalidMode);
             }
+            if (
+                RollupService.MODE_REAL_TIME.equals(mode) &&
+                RollupDateWindow.movesWithTheDate(definition)
+            ) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+                );
+            }
             RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Mode__c = mode));
             return currentPage();
         } catch (Exception caught) {
@@ -154,13 +162,13 @@ public with sharing class RollupController {
         }
     }
 
-    /** Runs the nightly work now, over every scheduled rollup. */
+    /** Recalculates every active rollup now, whatever its mode, Instantly ones included. */
     @AuraEnabled
     public static RollupPageView recalculateAll() {
         try {
             requirePermission();
             refuseWhileAFullRunIsGoing();
-            RollupScheduler.runNow();
+            RollupService.startFullRunOfEveryDefinition();
             return currentPage();
         } catch (Exception caught) {
             throw asUserError(caught, 'Recalculate all rollups');
@@ -200,8 +208,8 @@ public with sharing class RollupController {
     }
 
     /**
-     * Counts the records the nightly run goes through: every record of each entity an active
-     * Scheduled or Both rollup writes. The time is a rough figure, and during working hours
+     * Counts the records Recalculate all goes through: every record of each entity an active
+     * rollup writes, whatever its mode. The time is a rough figure, and during working hours
      * (8 AM to 6 PM, Monday to Friday, in the user's time zone) the Builder suggests tonight.
      */
     @AuraEnabled
@@ -211,7 +219,7 @@ public with sharing class RollupController {
             Set<Schema.SObjectType> targets = new Set<Schema.SObjectType>();
             for (
                 Rollup_Definition__c definition : RollupSelector.selectActiveForModes(
-                    RollupService.scheduledModes()
+                    RollupService.everyMode()
                 )
             ) {
                 Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
@@ -248,7 +256,9 @@ public with sharing class RollupController {
 
     /**
      * Recalculate all, tonight: nothing extra when the nightly run is scheduled, since it
-     * recalculates every total at 2:00 AM; otherwise one run at 2:00 AM tonight.
+     * recalculates every Every night and Both total at 2:00 AM and each save keeps the Instantly
+     * ones (a second run at the same moment would only be refused as one already running);
+     * otherwise one run of every definition at 2:00 AM tonight.
      *
      * @return what to tell the administrator
      */
@@ -372,7 +382,7 @@ public with sharing class RollupController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

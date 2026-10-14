@@ -1,0 +1,80 @@
+<template>
+  <lightning-quick-action-panel header={label.title}>
+    <template lwc:if={allowed}>
+      <p class="slds-m-bottom_small">{label.warning}</p>
+      <template lwc:if={error}>
+        <div class="slds-m-bottom_small" role="alert">
+          <lightning-formatted-text value={error} data-id="error"></lightning-formatted-text>
+        </div>
+      </template>
+      <template lwc:if={working}>
+        <lightning-spinner alternative-text={label.working} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={hasRows}>
+        <lightning-datatable
+          key-field="key"
+          data={rows}
+          columns={columns}
+          hide-checkbox-column
+          data-id="changes"
+        ></lightning-datatable>
+      </template>
+      <template lwc:if={erased}>
+        <p class="slds-m-top_small" data-id="done">{label.done}</p>
+      </template>
+      <template lwc:elseif={hasRows}>
+        <lightning-input
+          class="slds-m-top_small"
+          label={label.reference}
+          field-level-help={label.referenceHelp}
+          max-length="80"
+          value={reference}
+          onchange={handleReference}
+          data-id="reference"
+        ></lightning-input>
+        <lightning-input
+          label={confirmLabel}
+          value={typedName}
+          onchange={handleTypedName}
+          data-id="confirm"
+        ></lightning-input>
+      </template>
+    </template>
+    <template lwc:else>
+      <p data-id="no-permission">{label.noPermission}</p>
+    </template>
+    <div slot="footer">
+      <lightning-button label={label.close} onclick={handleClose} data-id="close"></lightning-button>
+      <template lwc:if={allowed}>
+        <template lwc:if={erased}>
+          <lightning-button
+            class="slds-m-left_x-small"
+            variant="brand"
+            label={label.openAudit}
+            onclick={handleOpenAudit}
+            data-id="open-audit"
+          ></lightning-button>
+        </template>
+        <template lwc:else>
+          <lightning-button
+            class="slds-m-left_x-small"
+            label={label.preview}
+            onclick={handlePreview}
+            disabled={working}
+            data-id="preview"
+          ></lightning-button>
+          <template lwc:if={hasRows}>
+            <lightning-button
+              class="slds-m-left_x-small"
+              variant="destructive"
+              label={label.erase}
+              onclick={handleErase}
+              disabled={eraseDisabled}
+              data-id="erase"
+            ></lightning-button>
+          </template>
+        </template>
+      </template>
+    </div>
+  </lightning-quick-action-panel>
+</template>

@@ -26,6 +26,8 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
     private Integer donorsProcessed = 0;
     private Integer receiptsIssued = 0;
     private Integer chunkErrors = 0;
+    /** Who started the run from the Receipts page, told when it ends (Q-04). */
+    private Id notifyUserId = JobNotifier.starter();
 
     public ReceiptStatementBatch(Integer statementYear, Id runId) {
         this.statementYear = statementYear;
@@ -80,6 +82,20 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
         } catch (Exception finishFailure) {
             ErrorLogger.log(finishFailure, 'ReceiptStatementBatch.finish', runId);
         }
+        JobNotifier.aboutRecord(
+            notifyUserId,
+            Label.Giving_JobNotice_Statements,
+            false,
+            String.format(
+                Label.Giving_JobNotice_StatementsBody,
+                new List<Object>{
+                    donorsProcessed.format(),
+                    receiptsIssued.format(),
+                    chunkErrors.format()
+                }
+            ),
+            runId
+        );
     }
 
     // ----------------------------------------------------------------------- internals

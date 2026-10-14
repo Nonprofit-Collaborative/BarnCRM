@@ -1,4 +1,6 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import HouseholdNamingSettings from 'c/householdNamingSettings';
 import preview from '@salesforce/apex/HouseholdController.preview';
 import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSettings';
@@ -80,6 +82,8 @@ describe('c-household-naming-settings', () => {
     getNamingSettings.mockResolvedValue(SAVED);
     recomputeAll.mockResolvedValue('707000000000000AAA');
     saveSettings.mockResolvedValue();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    jest.spyOn(Toast, 'show');
   });
 
   afterEach(() => {
@@ -98,6 +102,9 @@ describe('c-household-naming-settings', () => {
     expect(preview).toHaveBeenCalled();
     expect(rows.length).toBe(2);
     expect(rows[0].textContent).toContain('The Smith Family');
+    expect(element.shadowRoot.querySelector('table').getAttribute('aria-label')).toBe(
+      'c.Core_HouseholdNamingSettings_PreviewHeading'
+    );
   });
 
   it('waits 300 milliseconds after typing before asking for a new preview', async () => {
@@ -125,12 +132,31 @@ describe('c-household-naming-settings', () => {
     await flush();
 
     expect(saveSettings).toHaveBeenCalledWith({
-      settings: {
+      values: {
         Household_Name_Pattern__c: '{LastName} Household',
         Formal_Greeting_Pattern__c: '{Salutation} {LastName}',
         Informal_Greeting_Pattern__c: '{FirstName}'
       }
     });
+  });
+
+  it('reports Saved only when Apex receives the values parameter', async () => {
+    // Mirrors SettingsController.saveSettings(Map<String, Object> values): any other key
+    // reaches Apex as null and nothing is saved, so this mock refuses it.
+    saveSettings.mockImplementation((params) => {
+      const ok = params && params.values && Object.keys(params).length === 1;
+      return ok ? Promise.resolve() : Promise.reject({ body: { message: 'values was null' } });
+    });
+    const element = build();
+    await flush();
+
+    const handler = jest.fn();
+    element.addEventListener('save', handler);
+    element.shadowRoot.querySelector('.save-button').dispatchEvent(new CustomEvent('click'));
+    await flush();
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('disables Save while a save is in progress, so a double click cannot write twice', async () => {
@@ -178,12 +204,25 @@ describe('c-household-naming-settings', () => {
 
     element.shadowRoot.querySelector('.recompute-button').dispatchEvent(new CustomEvent('click'));
     await flush();
-    expect(recomputeAll).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('.confirm-box')).not.toBeNull();
-
-    element.shadowRoot.querySelector('.confirm-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'c.Core_HouseholdNamingSettings_RecomputeConfirm' })
+    );
     expect(recomputeAll).toHaveBeenCalled();
+    expect(Toast.show).toHaveBeenCalledWith(
+      { label: 'c.Core_HouseholdNamingSettings_RecomputeStarted', variant: 'success' },
+      expect.anything()
+    );
+  });
+
+  it('does not recompute when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = build();
+    await flush();
+
+    element.shadowRoot.querySelector('.recompute-button').dispatchEvent(new CustomEvent('click'));
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    expect(recomputeAll).not.toHaveBeenCalled();
   });
 
   it('leaves the fields editable for a user who may change settings', async () => {

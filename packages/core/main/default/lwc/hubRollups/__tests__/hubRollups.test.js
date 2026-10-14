@@ -74,6 +74,14 @@ describe('c-hub-rollups', () => {
     );
   });
 
+  it('claims nothing about the rollups while the model is still loading', async () => {
+    const element = build();
+    await settle();
+
+    expect(byId(element, 'rollups-never')).toBeNull();
+    expect(byId(element, 'rollups-last-calculated')).toBeNull();
+  });
+
   it('says the tile could not load rather than claiming rollups never ran', async () => {
     const element = build();
     getHomeModel.error();

@@ -4,7 +4,7 @@
  * These tests have not been executed against an org: none was reachable from the environment they
  * were written in. They are written to the rules in canonical model Sections 25I to 25K.
  */
-@IsTest
+@IsTest(testFor='ApexClass:StewardshipService')
 private class StewardshipServiceTest {
     private static final String WELCOME = 'First gift welcome';
     private static final String MAJOR = 'Major gift thanks';

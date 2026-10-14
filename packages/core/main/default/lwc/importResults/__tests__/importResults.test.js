@@ -58,6 +58,18 @@ describe('the import results view', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="rejected-row"]');
     expect(rows).toHaveLength(2);
     expect(rows[0].textContent).toContain('Required value missing: last name.');
+    // Every rejected row is in the table, so there is no "first N of M" note.
+    expect(element.shadowRoot.querySelector('[data-id="rejected-shown"]')).toBeNull();
+  });
+
+  it('says when the table shows only the first of the rejected rows', () => {
+    const element = render({
+      batch: { ...DRY_RUN, rejected: 3500 },
+      rejectedRows: [{ id: 'r1', rowNumber: 4, errorMessage: 'Required value missing.' }]
+    });
+    expect(element.shadowRoot.querySelector('[data-id="rejected-shown"]').textContent).toContain(
+      'c.Core_Import_RejectedShownOf'
+    );
   });
 
   it('says plainly when nothing was rejected', () => {
@@ -90,6 +102,25 @@ describe('the import results view', () => {
     expect(rows[0].textContent).toContain('ana@example.org');
     const none = render({ batch: DRY_RUN, rejectedRows: [] });
     expect(none.shadowRoot.querySelectorAll('[data-id="changed-value"]')).toHaveLength(0);
+  });
+
+  it('names each table for a screen reader and announces the counts as they change', () => {
+    const element = render({
+      batch: DRY_RUN,
+      rejectedRows: [{ id: 'r1', rowNumber: 4, errorMessage: 'Required value missing.' }],
+      changedValues: [{ rowNumber: 2, column: 'Email', before: 'a', after: 'b' }]
+    });
+    const root = element.shadowRoot;
+    expect(root.querySelector('[data-id="rejected-table"]').getAttribute('aria-label')).toBe(
+      'c.Core_Import_RejectedHeading'
+    );
+    expect(root.querySelector('[data-id="changed-values-table"]').getAttribute('aria-label')).toBe(
+      'c.Core_Import_ChangedValuesHeading'
+    );
+    expect(root.querySelector('[data-id="counts"]').getAttribute('aria-live')).toBe('polite');
+    root.querySelectorAll('th').forEach((header) => {
+      expect(header.getAttribute('scope')).toBe('col');
+    });
   });
 
   it('renders with no batch at all', () => {

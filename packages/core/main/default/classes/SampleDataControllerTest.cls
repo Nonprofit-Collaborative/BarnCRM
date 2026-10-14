@@ -8,8 +8,13 @@
  * permission and the permission set that grants it are owned by another feature, so the
  * running user cannot be assumed to hold it in every org shape.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataController')
 private class SampleDataControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     private static String buildJson(Integer householdCount, Integer membersPerHousehold) {
         List<Object> households = new List<Object>();
         Integer memberNumber = 1;
@@ -45,30 +50,18 @@ private class SampleDataControllerTest {
         return JSON.serialize(root);
     }
 
-    /** Inserts stage one and every contact chunk without relying on queueable chaining. */
+    /** Inserts stage one and every contact chunk without relying on the stage batch. */
     private static void loadEverything(String jsonBody) {
         SampleDataSet data = SampleDataSet.parse(jsonBody);
-        SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
+        SampleDataLoadStages.loadHouseholdsAndOrganizations(data);
         for (Integer chunk = 0; chunk < data.chunkCount(); chunk++) {
-            SampleDataLoadQueueable.loadContactChunk(data, chunk);
+            SampleDataLoadStages.loadContactChunk(data, chunk);
         }
     }
 
     /** A Standard User, used for the permission-denied path. */
     private static User buildStandardUser() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        String suffix = String.valueOf(Datetime.now().getTime());
-        return new User(
-            ProfileId = standard.Id,
-            LastName = 'Sample',
-            Email = 'sample.tester@example.org',
-            Username = 'sample.tester.' + suffix + '@example.org.invalid',
-            Alias = 'smpl',
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        return TestUsers.newStandardUser('Sample');
     }
 
     @IsTest

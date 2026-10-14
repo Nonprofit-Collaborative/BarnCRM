@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteController')
 private class BulkDeleteControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,
@@ -54,7 +59,7 @@ private class BulkDeleteControllerTest {
         System.runAs(TestUsers.admin()) {
             makeVolunteers(5);
             System.Assert.isFalse(BulkDeleteController.hasPermission(), 'In no role');
-            BulkDeleteController.BulkDeletePage page = BulkDeleteController.getPage();
+            BulkDeleteController.BulkDeletePage page = BulkDeleteController.getPage(false);
             System.Assert.isFalse(page.allowed, 'The list says so');
             System.Assert.areEqual(0, page.jobs.size(), 'And lists nothing');
             try {
@@ -102,7 +107,7 @@ private class BulkDeleteControllerTest {
                 System.Assert.isTrue(done.canUndo, 'Within the window');
                 System.Assert.areEqual(200, done.recordsToUndo, 'The number to confirm');
 
-                BulkDeleteController.BulkDeletePage page = BulkDeleteController.getPage();
+                BulkDeleteController.BulkDeletePage page = BulkDeleteController.getPage(false);
                 System.Assert.isTrue(page.allowed, 'Allowed');
                 System.Assert.areEqual(1, page.jobs.size(), 'Listed');
 
@@ -118,6 +123,91 @@ private class BulkDeleteControllerTest {
                 );
                 System.Assert.areEqual(ImportBatchService.STATUS_UNDOING, undoing.status);
                 System.Assert.isFalse(undoing.canUndo, 'Once only');
+            }
+        }
+    }
+
+    /** Aborted after its chunk ran: the finish never counted what it deleted. */
+    @IsTest
+    static void anAbortedJobOffersUndoForWhatItDeleted() {
+        System.runAs(TestUsers.admin()) {
+            makeVolunteers(200);
+            System.runAs(deleter()) {
+                Import_Batch__c created = BulkDeleteService.createJob(
+                    BulkDeleteService.plan(VOLUNTEERS),
+                    200,
+                    200
+                );
+                BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+
+                BulkDeleteController.JobView aborted = BulkDeleteController.getJob(created.Id);
+                System.Assert.areEqual(ImportBatchService.STATUS_FAILED, aborted.status);
+                System.Assert.areEqual(0, aborted.deleted, 'Never counted');
+                System.Assert.isTrue(aborted.canUndo, 'Undo is still offered');
+                System.Assert.areEqual(200, aborted.recordsToUndo, 'Counted from the journal');
+
+                Test.startTest();
+                BulkDeleteController.JobView undoing = BulkDeleteController.undo(created.Id, 200);
+                Test.stopTest();
+                System.Assert.areEqual(ImportBatchService.STATUS_UNDOING, undoing.status);
+            }
+            System.Assert.areEqual(200, [SELECT COUNT() FROM Contact], 'Brought back');
+        }
+    }
+
+    /**
+     * A person lists and opens their own bulk deletes only; someone who manages BarnCRM
+     * Settings may also ask for everyone's.
+     */
+    @IsTest
+    static void aPersonSeesTheirOwnJobsAndAnAdministratorEveryones() {
+        System.runAs(TestUsers.admin()) {
+            makeVolunteers(1);
+            User bea = TestDataFactory.createUser(
+                'Bea',
+                new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Delete' }
+            );
+            User admin = deleter();
+            Id beasJob;
+            Id adminsJob;
+            System.runAs(bea) {
+                beasJob = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 1, 1).Id;
+            }
+            System.runAs(admin) {
+                adminsJob = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 1, 1)
+                    .Id;
+            }
+
+            System.runAs(bea) {
+                BulkDeleteController.BulkDeletePage page = BulkDeleteController.getPage(true);
+                System.Assert.isFalse(page.canSeeEveryone, 'Not hers to ask');
+                System.Assert.areEqual(1, page.jobs.size(), 'Her own only, even when asked');
+                System.Assert.areEqual(String.valueOf(beasJob), page.jobs[0].recordId);
+                try {
+                    BulkDeleteController.getJob(adminsJob);
+                    System.Assert.fail('Another person job is not hers to open');
+                } catch (AuraHandledException refused) {
+                    System.Assert.areEqual(
+                        System.Label.Core_BulkDelete_ErrorNotBulkDelete,
+                        refused.getMessage()
+                    );
+                }
+            }
+            System.runAs(admin) {
+                System.Assert.isTrue(BulkDeleteController.getPage(false).canSeeEveryone);
+                System.Assert.areEqual(1, BulkDeleteController.getPage(false).jobs.size(), 'Own');
+                System.Assert.areEqual(2, BulkDeleteController.getPage(true).jobs.size(), 'All');
+                System.Assert.areEqual(
+                    String.valueOf(beasJob),
+                    BulkDeleteController.getJob(beasJob).recordId,
+                    'And opens hers'
+                );
             }
         }
     }

@@ -3,6 +3,9 @@ import BulkDelete from 'c/bulkDelete';
 import previewDelete from '@salesforce/apex/BulkDeleteController.preview';
 import startDelete from '@salesforce/apex/BulkDeleteController.start';
 import getJob from '@salesforce/apex/BulkDeleteController.getJob';
+import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
+import startFile from '@salesforce/apex/BulkDeleteController.startFile';
+import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 
 jest.mock('@salesforce/apex/BulkDeleteController.preview', () => ({ default: jest.fn() }), {
   virtual: true
@@ -13,6 +16,20 @@ jest.mock('@salesforce/apex/BulkDeleteController.start', () => ({ default: jest.
 jest.mock('@salesforce/apex/BulkDeleteController.getJob', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/BulkDeleteController.previewFile', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkDeleteController.startFile', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkDeleteController.backupPage', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_BulkDelete_BackupDone',
+  () => ({ default: 'Downloaded {0} records.' }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/label/c.Core_BulkDelete_PreviewCount',
   () => ({ default: '{0} {1} match. The first ones:' }),
@@ -150,6 +167,86 @@ describe('c-bulk-delete', () => {
     expect(element.shadowRoot.querySelector('[data-id="job"] li').textContent).toBe(
       '003000000000009: Has gifts'
     );
+  });
+
+  it('deletes what a delete by file dry run found, sending the batch and the count', async () => {
+    previewFile.mockResolvedValue(PREVIEW);
+    startFile.mockResolvedValue(RUNNING);
+    jest.spyOn(window, 'setInterval').mockImplementation(() => 1);
+    const element = createElement('c-bulk-delete', { is: BulkDelete });
+    element.batchId = 'a0B000000000009';
+    document.body.appendChild(element);
+    await flush();
+    expect(one(element, 'intro').textContent).toBe('c.Core_BulkDelete_FileIntro');
+
+    one(element, 'preview').click();
+    await flush();
+    expect(previewFile).toHaveBeenCalledWith({ batchId: 'a0B000000000009' });
+    expect(previewDelete).not.toHaveBeenCalled();
+    expect(one(element, 'cascades').textContent).toContain('Program Enrollments');
+
+    await change(one(element, 'confirm'), '200');
+    one(element, 'start').click();
+    await flush();
+    expect(startFile).toHaveBeenCalledWith({ batchId: 'a0B000000000009', confirmedCount: 200 });
+    expect(startDelete).not.toHaveBeenCalled();
+    expect(one(element, 'notice-message')).not.toBeNull();
+  });
+
+  it('downloads every record page by page as CSV before anything is deleted', async () => {
+    previewDelete.mockResolvedValue(PREVIEW);
+    const columns = [
+      { fieldName: 'Id', label: 'Contact ID' },
+      { fieldName: 'LastName', label: 'Last Name' }
+    ];
+    backupPage
+      .mockResolvedValueOnce({
+        objectName: 'Contact',
+        columns,
+        rows: [{ Id: '003000000000001', LastName: 'Person 0' }],
+        lastId: '003000000000001',
+        done: false
+      })
+      .mockResolvedValueOnce({
+        objectName: 'Contact',
+        columns,
+        rows: [{ Id: '003000000000002', LastName: '=Person 1' }],
+        lastId: '003000000000002',
+        done: true
+      });
+    let saved;
+    URL.createObjectURL = jest.fn((blob) => {
+      saved = blob;
+      return 'blob:backup';
+    });
+    URL.revokeObjectURL = jest.fn();
+    const clicked = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+
+    one(element, 'backup').click();
+    await flush();
+    expect(backupPage).toHaveBeenNthCalledWith(1, {
+      queryJson: QUERY,
+      batchId: null,
+      afterId: null
+    });
+    expect(backupPage).toHaveBeenNthCalledWith(2, {
+      queryJson: QUERY,
+      batchId: null,
+      afterId: '003000000000001'
+    });
+    expect(clicked).toHaveBeenCalledTimes(1);
+    const text = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsText(saved);
+    });
+    expect(text).toContain('Contact ID,Last Name\r\n003000000000001,Person 0\r\n');
+    expect(text).toContain("003000000000002,'=Person 1");
+    expect(one(element, 'notice-message').textContent).toBe('Downloaded 2 records.');
+    expect(startDelete).not.toHaveBeenCalled();
   });
 
   it('shows a refusal and offers no delete', async () => {

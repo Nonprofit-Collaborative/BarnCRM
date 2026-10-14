@@ -34,7 +34,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     /**
      * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted, renamed and tidied once, after the delete,
+     * itself, so that a household is recounted and renamed once, after the delete,
      * rather than in the middle of it. Rollups on membership rows are a different handler and
      * still run.
      */
@@ -42,18 +42,17 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     public override void beforeInsert() {
         HouseholdService.ensureHouseholds((List<Contact>) Trigger.new);
-        PreferredEmailService.apply((List<Contact>) Trigger.new);
-    }
-
-    public override void beforeUpdate() {
-        PreferredEmailService.apply((List<Contact>) Trigger.new);
     }
 
     public override void afterInsert() {
         // Junction mode first: a person saved into it with no household gets one here,
         // because the membership row that joins them to it needs an id the contact did not
-        // have before insert (R-H2, ADR-0037). Contact mode did its half before insert.
+        // have before insert (R-H2, ADR-0037). Contact mode did its half before insert, and
+        // names the person the new household's Primary Contact here. A person saved against
+        // a household in junction mode joins it first, so creation then leaves them alone.
+        HouseholdService.joinHouseholdsNamedOnNewContacts((List<Contact>) Trigger.new);
         HouseholdService.createHouseholdsForNewContacts((List<Contact>) Trigger.new);
+        HouseholdService.seedPrimaryContactsOfNewHouseholds((List<Contact>) Trigger.new);
         refresh(householdIds((List<Contact>) Trigger.new), false);
     }
 
@@ -61,19 +60,25 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         Map<Id, Contact> previousById = (Map<Id, Contact>) Trigger.oldMap;
         Set<Id> affected = new Set<Id>();
         Set<Id> renamed = new Set<Id>();
+        // In junction mode the account a contact points at is an employer, not a household,
+        // so a change of account is not a change of household and is not settled here.
+        Boolean accountIsHousehold = !HouseholdService.isJunctionMode();
         for (Contact record : (List<Contact>) Trigger.new) {
             Contact previous = previousById.get(record.Id);
-            Boolean moved = record.AccountId != previous.AccountId;
-            if (moved) {
+            if (accountIsHousehold && record.AccountId != previous.AccountId) {
                 add(affected, previous.AccountId);
                 add(affected, record.AccountId);
-            } else if (namingChanged(record, previous)) {
-                add(affected, record.AccountId);
+            }
+            // Checked on its own, so that a save that moves a person and corrects their
+            // name in one go still renames the household they are in.
+            if (namingChanged(record, previous)) {
+                if (accountIsHousehold) {
+                    add(affected, record.AccountId);
+                }
                 renamed.add(record.Id);
             }
         }
-        // In junction mode the account a contact points at is an employer, not their
-        // household, so the households to rewrite have to be read from the membership
+        // In junction mode the households to rewrite have to be read from the membership
         // rows. Answers empty in contact mode, where the loop above already has them.
         affected.addAll(HouseholdService.householdIdsForPeople(renamed));
         refresh(affected, true);
@@ -96,14 +101,15 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A delete recounts and renames the households the people left, and tidies away one left
-     * empty where the org asks for that.
+     * A delete recounts and renames the households the people left, and never tidies one away,
+     * even left empty (R-H12): deleting the household would purge the people, or their
+     * membership rows, from the Recycle Bin, and neither an undelete nor a bulk delete undo
+     * could bring them back.
      *
      * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled so
      * that nothing is lost (C-20). The merged-away person's memberships go to the survivor
-     * (junction mode), and a household the merged-away person was in is never tidied away by
-     * the merge: gifts, notes and history credited to it would lose their household. A
-     * household a merge leaves empty is kept for a person to merge into the survivor's.
+     * (junction mode). A household a merge leaves empty is kept for a person to merge into
+     * the survivor's.
      */
     public override void afterDelete() {
         List<Contact> gone = (List<Contact>) Trigger.old;
@@ -114,9 +120,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         affected.addAll(householdIds(gone));
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        Set<Id> keptByMerge = new Set<Id>();
         if (!survivorByMerged.isEmpty()) {
-            keptByMerge = householdsOfMerged(gone, removed, survivorByMerged.keySet());
             AutomationControl.bypass(MEMBER_HANDLER);
             try {
                 affected.addAll(
@@ -126,10 +130,13 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
-        Set<Id> mayTidy = new Set<Id>(affected);
-        mayTidy.removeAll(keptByMerge);
-        refresh(mayTidy, true);
-        refresh(keptByMerge, false);
+        refresh(affected, false);
+        if (!survivorByMerged.isEmpty()) {
+            // The survivors' addresses, relationships and affiliations, once the merge is
+            // saved (PEOPLE-15). Their households were settled above: none is in the merge.
+            Set<Id> survivors = new Set<Id>(survivorByMerged.values());
+            MergeSettlement.afterMerge(new Set<Id>(), survivors, survivors);
+        }
     }
 
     /**
@@ -156,36 +163,23 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         return result;
     }
 
-    /** Every household the merged-away people were in, by reference or by membership. */
-    private static Set<Id> householdsOfMerged(
-        List<Contact> records,
-        List<Household_Member__c> removed,
-        Set<Id> mergedIds
-    ) {
-        Set<Id> result = new Set<Id>();
-        for (Contact record : records) {
-            if (mergedIds.contains(record.Id)) {
-                add(result, record.AccountId);
-            }
-        }
-        for (Household_Member__c row : removed) {
-            Id personId = row.Contact__c != null ? row.Contact__c : row.Account__c;
-            if (mergedIds.contains(personId)) {
-                add(result, row.Household__c);
-            }
-        }
-        return result;
-    }
-
+    /**
+     * Text is compared case-sensitively (`!=` on Strings ignores case in Apex), so that
+     * correcting "Mcdonald" to "McDonald" renames the household and greetings too.
+     */
     private static Boolean namingChanged(Contact record, Contact previous) {
-        return record.FirstName != previous.FirstName ||
-            record.LastName != previous.LastName ||
-            record.Salutation != previous.Salutation ||
-            record.Preferred_Name__c != previous.Preferred_Name__c ||
+        return textChanged(record.FirstName, previous.FirstName) ||
+            textChanged(record.LastName, previous.LastName) ||
+            textChanged(record.Salutation, previous.Salutation) ||
+            textChanged(record.Preferred_Name__c, previous.Preferred_Name__c) ||
             record.Deceased__c != previous.Deceased__c ||
             record.Household_Role__c != previous.Household_Role__c ||
             record.Exclude_From_Household_Name__c != previous.Exclude_From_Household_Name__c ||
             record.Exclude_From_Greetings__c != previous.Exclude_From_Greetings__c;
+    }
+
+    private static Boolean textChanged(String now, String before) {
+        return now == null ? before != null : !now.equals(before);
     }
 
     private static Set<Id> householdIds(List<Contact> records) {

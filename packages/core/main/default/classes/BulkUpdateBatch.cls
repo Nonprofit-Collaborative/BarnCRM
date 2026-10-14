@@ -39,28 +39,10 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
-        Id owner = jobId;
-        definition = [
-            SELECT Operation_JSON__c
-            FROM Import_Batch__c
-            WHERE Id = :owner
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ]
-        .Operation_JSON__c;
+        definition = DataJobs.definitionOf(jobId);
         try {
             BulkUpdateService.Plan checked = BulkUpdateService.planFromDefinition(definition);
-            QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
-                checked.queryJson,
-                new Set<String>{ 'Id' },
-                null
-            );
-            selection.binds.put('confirmed', BulkUpdateService.confirmedCountOf(definition));
-            return Database.getQueryLocatorWithBinds(
-                selection.soql + ' ORDER BY Id LIMIT :confirmed',
-                selection.binds,
-                AccessLevel.USER_MODE
-            );
+            return DataJobs.locatorFor(checked.queryJson, DataJobs.confirmedCountOf(definition));
         } catch (Exception e) {
             failed = true;
             stoppedBecause = e.getMessage();
@@ -70,12 +52,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             ) {
                 ErrorLogger.log(e, 'BulkUpdateBatch.start', jobId);
             }
-            // A locator that reads no record, so finish still closes the job.
-            return Database.getQueryLocatorWithBinds(
-                'SELECT Id FROM Import_Batch__c WHERE Id = :owner AND Id = NULL',
-                new Map<String, Object>{ 'owner' => owner },
-                AccessLevel.SYSTEM_MODE
-            );
+            return DataJobs.noRecords(jobId);
         }
     }
 
@@ -92,6 +69,10 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             );
             noLongerMatching += ids.size() - current.size();
             apply(checked, current, journal);
+        } catch (BulkUpdateFields.BulkUpdateException refused) {
+            stop(refused);
+        } catch (QueryCompiler.QueryCompilerException refused) {
+            stop(refused);
         } catch (Exception e) {
             failed = true;
             ErrorLogger.log(e, 'BulkUpdateBatch.execute', jobId);
@@ -99,6 +80,16 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
         if (!ImportJournalService.write(jobId, ImportJournalService.PHASE_COMMIT, journal)) {
             journalIncomplete = true;
         }
+    }
+
+    /**
+     * Stops the job for something the person can fix, found when a chunk checks the definition
+     * again (access taken away, a field deleted): the remaining chunks return at once, and the
+     * reason goes in the run log rather than one Error Log row per chunk.
+     */
+    private void stop(Exception refused) {
+        failed = true;
+        stoppedBecause = refused.getMessage();
     }
 
     /**
@@ -144,6 +135,23 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                 unchanged++;
                 continue;
             }
+            // Every saved record can be undone: one whose before and after values are too long
+            // for a journal page (long text) is refused rather than saved without an undo.
+            if (
+                !ImportJournalService.fitsOnAPage(
+                    ImportJournalService.updated(checked.objectName, record.Id, null, before, after)
+                )
+            ) {
+                failedRecords++;
+                journal.add(
+                    ImportJournalService.failed(
+                        checked.objectName,
+                        record.Id,
+                        System.Label.Core_BulkUpdate_ErrorTooLargeToUndo
+                    )
+                );
+                continue;
+            }
             toSave.add(change);
             beforeOf.add(before);
             afterOf.add(after);
@@ -179,30 +187,20 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
     }
 
     public void finish(Database.BatchableContext context) {
-        if (chunkStopped(context)) {
+        Boolean platformStopped = DataJobs.chunkStopped(context, jobErrorsForTest);
+        if (platformStopped) {
             failed = true;
         }
         try {
-            Import_Batch__c job = [
-                SELECT Id, Run_Log__c
-                FROM Import_Batch__c
-                WHERE Id = :jobId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            List<String> lines = new List<String>();
-            if (String.isNotBlank(job.Run_Log__c)) {
-                lines.add(job.Run_Log__c);
-            }
-            if (String.isNotBlank(stoppedBecause)) {
-                lines.add(
-                    String.format(
-                        System.Label.Core_BulkUpdate_LogStopped,
-                        new List<Object>{ stoppedBecause }
-                    )
-                );
-            }
-            lines.add(
+            Import_Batch__c job = DataJobs.forFinish(jobId);
+            job.Run_Log__c = DataJobs.finalLog(
+                job,
+                String.isBlank(stoppedBecause)
+                    ? null
+                    : String.format(
+                          System.Label.Core_BulkUpdate_LogStopped,
+                          new List<Object>{ stoppedBecause }
+                      ),
                 String.format(
                     System.Label.Core_BulkUpdate_LogFinished,
                     new List<Object>{
@@ -211,12 +209,11 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                         noLongerMatching.format(),
                         failedRecords.format()
                     }
-                )
+                ),
+                platformStopped,
+                updated + unchanged + noLongerMatching + failedRecords,
+                journalIncomplete
             );
-            if (journalIncomplete) {
-                lines.add(System.Label.Core_BulkUpdate_LogJournalIncomplete);
-            }
-            job.Run_Log__c = String.join(lines, '\n').right(32768);
             job.Status__c = failed
                 ? ImportBatchService.STATUS_FAILED
                 : ImportBatchService.STATUS_COMPLETE;
@@ -225,31 +222,24 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             job.Rows_Matched__c = unchanged;
             job.Rows_Rejected__c = failedRecords;
             Database.update(job, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                System.Label.Core_JobNotice_BulkUpdate,
+                failed,
+                String.format(
+                    System.Label.Core_JobNotice_BulkUpdateBody,
+                    new List<Object>{
+                        updated.format(),
+                        unchanged.format(),
+                        noLongerMatching.format(),
+                        failedRecords.format()
+                    }
+                ),
+                jobId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkUpdateBatch.finish', jobId);
         }
-    }
-
-    /**
-     * Whether the platform stopped any chunk. A governor limit cannot be caught, so the job's
-     * own error count is the one record of it, as in the import undo (R-IB8).
-     */
-    private Boolean chunkStopped(Database.BatchableContext context) {
-        if (jobErrorsForTest != null) {
-            return jobErrorsForTest > 0;
-        }
-        if (context == null || context.getJobId() == null) {
-            return false;
-        }
-        Id asyncJobId = context.getJobId();
-        List<AsyncApexJob> jobs = [
-            SELECT NumberOfErrors
-            FROM AsyncApexJob
-            WHERE Id = :asyncJobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
     }
 
     /**

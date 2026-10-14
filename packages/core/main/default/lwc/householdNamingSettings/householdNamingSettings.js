@@ -1,5 +1,6 @@
 import { LightningElement, track } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import hasManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import preview from '@salesforce/apex/HouseholdController.preview';
 import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSettings';
@@ -50,10 +51,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     columnInformal: COLUMN_INFORMAL,
     save: SAVE,
     recompute: RECOMPUTE,
-    recomputeConfirm: RECOMPUTE_CONFIRM,
     readOnly: READ_ONLY,
-    cancel: CANCEL,
-    confirm: CONFIRM,
     saving: SAVING
   };
 
@@ -64,7 +62,6 @@ export default class HouseholdNamingSettings extends LightningElement {
   @track samples = [];
   errorMessage;
   isSaving = false;
-  isConfirmingRecompute = false;
 
   debounceTimer;
 
@@ -152,7 +149,8 @@ export default class HouseholdNamingSettings extends LightningElement {
     values[NAME_KEY] = this.namePattern;
     values[FORMAL_KEY] = this.formalPattern;
     values[INFORMAL_KEY] = this.informalPattern;
-    return saveSettings({ settings: values })
+    // The key must match the Apex parameter name (SettingsController.saveSettings(values)).
+    return saveSettings({ values })
       .then(() => {
         this.errorMessage = undefined;
         this.toast(SAVED, 'success');
@@ -168,16 +166,17 @@ export default class HouseholdNamingSettings extends LightningElement {
       });
   }
 
-  handleRecomputeClick() {
-    this.isConfirmingRecompute = true;
-  }
-
-  handleRecomputeCancel() {
-    this.isConfirmingRecompute = false;
-  }
-
-  handleRecomputeConfirm() {
-    this.isConfirmingRecompute = false;
+  async handleRecomputeClick() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: RECOMPUTE,
+      message: RECOMPUTE_CONFIRM,
+      confirmLabel: CONFIRM,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return undefined;
+    }
     return recomputeAll()
       .then(() => {
         this.errorMessage = undefined;
@@ -189,7 +188,7 @@ export default class HouseholdNamingSettings extends LightningElement {
   }
 
   toast(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 
   readError(error) {

@@ -14,13 +14,19 @@
 public with sharing class ImportProcessorBatch implements Database.Batchable<SObject>, Database.Stateful {
     /** How many lines of the run log are kept. A chunk failure is worth more than a note. */
     private static final Integer MAX_LOG_LINES = 200;
+    /** How many distinct notes are kept, so a file of odd values cannot swell the state. */
+    @TestVisible
+    private static final Integer MAX_NOTES = 200;
 
     private final Id batchId;
     private final Boolean dryRun;
     private Boolean failed = false;
     private List<String> log = new List<String>();
     private Set<String> notes = new Set<String>();
+    private Boolean notesCut = false;
     private Integer chunksRun = 0;
+    /** Values empty cells cleared, or would clear, over the chunks (R-IT19). */
+    private Integer cleared = 0;
     /** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
     private Decimal fileAmount;
     /** The entity processor's own state, handed from chunk to chunk (R-IR6). */
@@ -30,13 +36,39 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     /** The pass this run is (R-IB13), stamped on a chunk's rows even when the chunk dies. */
     private Decimal pass;
 
+    /** A trial's size, or null: only the file's first rows are committed (R-IB16). */
+    private final Integer trialRows;
+    /** The rest of a trial: only rows after this row number, or null for every row. */
+    private final Decimal afterRow;
+
     public ImportProcessorBatch(Id batchId, Boolean dryRun) {
+        this(batchId, dryRun, null, null);
+    }
+
+    public ImportProcessorBatch(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
         this.batchId = batchId;
         this.dryRun = dryRun == true;
+        this.trialRows = trialRows;
+        this.afterRow = afterRow;
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        Decimal after = afterRow == null ? -1 : afterRow;
+        Integer most = trialRows == null ? 50000000 : trialRows;
+        List<Import_Batch__c> batches = [
+            SELECT Retry_After_Row__c
+            FROM Import_Batch__c
+            WHERE Id = :owner
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        retryAfter = batches.isEmpty() ? null : batches[0].Retry_After_Row__c;
+        if (retryAfter != null) {
+            return retryRows();
+        }
+        // A row skipped when it was staged (R-IT18) is never processed.
+        String skipped = ImportRowProcessor.STATUS_SKIPPED;
         // System mode, stated because API 67.0 would otherwise read in user mode: the staged
         // rows are the package's own bookkeeping, written in system mode for the reason
         // ADR-0021 gives, and this read only feeds that processing. The records a row makes
@@ -59,11 +91,89 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Gift_Id__c,
                     Soft_Credit_Id__c
                 FROM Import_Row__c
-                WHERE Import_Batch__c = :owner
+                WHERE
+                    Import_Batch__c = :owner
+                    AND Status__c != :skipped
+                    AND (Row_Number__c > :after
+                    OR Row_Number__c = NULL)
+                WITH SYSTEM_MODE
+                ORDER BY Row_Number__c ASC
+                LIMIT :most
+            ]
+        );
+    }
+
+    /** A retry's open boundary, read at the start: rows after it are the fixed rows (R-IB17). */
+    private Decimal retryAfter;
+
+    /**
+     * A retry's rows (R-IB17): its preview reads only the fixed rows; its commit reads them and
+     * the earlier rejected rows, which `execute` marks Retried rather than processing. System
+     * mode for the reason `start` gives.
+     */
+    private Database.QueryLocator retryRows() {
+        Id owner = batchId;
+        Decimal after = retryAfter;
+        Set<String> replaced = dryRun
+            ? new Set<String>()
+            : new Set<String>{ ImportRowProcessor.STATUS_REJECTED };
+        // A fixed row skipped when it was staged (R-IT18) is never processed either.
+        String skipped = ImportRowProcessor.STATUS_SKIPPED;
+        return Database.getQueryLocator(
+            [
+                SELECT
+                    Id,
+                    Import_Batch__c,
+                    Row_Number__c,
+                    Raw_Values_JSON__c,
+                    Status__c,
+                    Error_Message__c,
+                    Household__c,
+                    Contact_1__c,
+                    Person_1_Account__c,
+                    Contact_2__c,
+                    Person_2_Account__c,
+                    Organization__c,
+                    Gift_Id__c,
+                    Soft_Credit_Id__c
+                FROM Import_Row__c
+                WHERE
+                    Import_Batch__c = :owner
+                    AND Status__c != :skipped
+                    AND (Row_Number__c > :after
+                    OR Status__c IN :replaced)
                 WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
             ]
         );
+    }
+
+    /**
+     * Marks the earlier rejected rows a retry's commit met as Retried, and hands back the rest
+     * to process (R-IB17). Written in system mode for the reason `rejectChunk` gives.
+     */
+    private List<Import_Row__c> retireReplaced(List<Import_Row__c> scope) {
+        if (retryAfter == null || dryRun) {
+            return scope;
+        }
+        List<Import_Row__c> rest = new List<Import_Row__c>();
+        List<Import_Row__c> replaced = new List<Import_Row__c>();
+        for (Import_Row__c row : scope) {
+            if (row.Row_Number__c != null && row.Row_Number__c <= retryAfter) {
+                replaced.add(
+                    new Import_Row__c(
+                        Id = row.Id,
+                        Status__c = ImportBatchService.ROW_STATUS_RETRIED
+                    )
+                );
+            } else {
+                rest.add(row);
+            }
+        }
+        if (!replaced.isEmpty()) {
+            Database.update(replaced, AccessLevel.SYSTEM_MODE);
+        }
+        return rest;
     }
 
     /** Makes a chunk die after its rows were processed, so a test can see the rollback. */
@@ -78,9 +188,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         Savepoint beforeChunk = Database.setSavepoint();
         try {
             Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-            Import_Template__c template = ImportTemplateSelector.selectById(
-                batch == null ? null : batch.Import_Template__c
-            );
+            // The template as the dry run started with it, not as edited since (R-IB1).
+            Import_Template__c template = ImportBatchService.templateFor(batch);
             pass = batch == null ? null : batch.Pass_Number__c;
             if (batch == null || template == null) {
                 throw new ImportException(Label.Core_Import_ErrorTemplateGone);
@@ -92,19 +201,17 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 )
                 .withFileValues(batch.File_Values_JSON__c);
             ImportEntityProcessors.carriedState = processorState;
-            ImportRowProcessor.Outcome outcome = ImportRowProcessor.process(
-                batch,
-                template,
-                mapping,
-                scope,
-                dryRun
-            );
+            List<Import_Row__c> rows = retireReplaced(scope);
+            ImportRowProcessor.Outcome outcome = rows.isEmpty()
+                ? new ImportRowProcessor.Outcome()
+                : ImportRowProcessor.process(batch, template, mapping, rows, dryRun);
             if (failAfterProcessForTest) {
                 throw new ImportException('Failed for the test.');
             }
             // Kept only from a chunk that finished: a chunk that died saved nothing.
             processorState = ImportEntityProcessors.carriedState;
-            notes.addAll(outcome.notes);
+            addNotes(outcome);
+            cleared += outcome.cleared;
             if (outcome.fileAmount != null) {
                 fileAmount = (fileAmount == null ? 0 : fileAmount) + outcome.fileAmount;
             }
@@ -133,15 +240,28 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             lines.add(
                 dryRun ? Label.Core_Import_LogDryRunHeader : Label.Core_Import_LogCommitHeader
             );
-            lines.addAll(new List<String>(notes));
+            // Chunk failures first: the run log is cut at its field's length, and they matter most.
             lines.addAll(log);
+            if (cleared > 0) {
+                lines.add(
+                    String.format(
+                        dryRun ? Label.Core_Import_LogWouldClear : Label.Core_Import_LogCleared,
+                        new List<String>{ String.valueOf(cleared) }
+                    )
+                );
+            }
+            lines.addAll(new List<String>(notes));
+            if (notesCut) {
+                lines.add(Label.Core_Import_LogNotesCut);
+            }
             ImportBatchService.finish(
                 batchId,
                 dryRun,
                 failed,
                 lines,
                 fileAmount,
-                processorSettings
+                processorSettings,
+                trialRows != null
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'ImportProcessorBatch.finish');
@@ -164,11 +284,25 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 : reason.abbreviate(4000);
             rows.add(rejected);
         }
-        if (!rows.isEmpty()) {
-            Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+        ImportRowProcessor.Outcome saved = new ImportRowProcessor.Outcome();
+        ImportRowProcessor.saveRows(rows, saved, 'ImportProcessorBatch.rejectChunk');
+        for (String line : saved.notes) {
+            addLog(line);
         }
     }
 
+    @TestVisible
+    private void addNotes(ImportRowProcessor.Outcome outcome) {
+        for (String note : outcome.notes) {
+            if (notes.size() < MAX_NOTES) {
+                notes.add(note);
+            } else if (!notes.contains(note)) {
+                notesCut = true;
+            }
+        }
+    }
+
+    @TestVisible
     private void addLog(String line) {
         if (log.size() < MAX_LOG_LINES) {
             log.add(line);

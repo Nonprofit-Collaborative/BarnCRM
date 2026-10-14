@@ -3,7 +3,7 @@
  * pass is tested end to end by `RollupEngineTest`.
  */
 // runs-as: deploying user (pure logic: tallies values in memory, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:RollupAggregator')
 private class RollupAggregatorTest {
     @IsTest
     static void laterAlternativesCountOnlyWhereEarlierOnesAreBlank() {
@@ -22,16 +22,16 @@ private class RollupAggregatorTest {
     @IsTest
     static void aSumOfNothingIsZeroAndAnAverageIsExact() {
         RollupAggregator.Tally empty = new RollupAggregator.Tally();
-        Assert.isTrue((Decimal) empty.result('SUM') == 0, 'A sum of nothing is zero');
-        Assert.isTrue((Decimal) empty.result('COUNT') == 0, 'A count of nothing is zero');
-        Assert.isNull(empty.result('AVG'), 'An average of nothing is blank');
-        Assert.isNull(empty.result('MAX'), 'A maximum of nothing is blank');
+        Assert.isTrue((Decimal) empty.result('SUM', null) == 0, 'A sum of nothing is zero');
+        Assert.isTrue((Decimal) empty.result('COUNT', null) == 0, 'A count of nothing is zero');
+        Assert.isNull(empty.result('AVG', null), 'An average of nothing is blank');
+        Assert.isNull(empty.result('MAX', null), 'A maximum of nothing is blank');
 
         RollupAggregator.Tally three = new RollupAggregator.Tally();
         three.total = 100;
         three.counted = 3;
         Assert.isTrue(
-            ((Decimal) three.result('AVG')).setScale(2) == 33.33,
+            ((Decimal) three.result('AVG', null)).setScale(2) == 33.33,
             'Divided, not truncated'
         );
     }

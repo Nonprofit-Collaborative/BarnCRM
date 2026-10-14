@@ -33,15 +33,29 @@ both switched on as they ship:
 They are two rows on purpose. Switching the upkeep off before a large import, which is the
 usual reason to touch it, leaves every check running.
 
+A people import links each row's first person to the organization on the row with an
+affiliation, or finds the one they already have (see [Importing](importing.md), section 8).
+
 To let your team see and manage affiliations, make sure they have one of the packaged access
 levels (BarnCRM Admin, Program Staff, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them.
+
+The upkeep does not depend on what the person saving can see or edit. Someone who may add an
+affiliation but cannot edit the person it belongs to, or cannot see that person's other
+affiliations (for example under private sharing), still ends up with one primary and the
+right **Primary Affiliation** on the person: BarnCRM makes those two corrections itself. The
+affiliation they save is still checked against their own access.
 
 Affiliations appear in three places once you are set up: an **Affiliations** card on every
 person's record, an **Affiliations** card on every organization's record showing the people
 connected to it, and an **Affiliations** tab in the BarnCRM app for reporting and list
 views. Every person also carries a **Primary Affiliation** field holding the one organization
 they are chiefly associated with, which you can put on a list view or a mail merge.
+
+The card reads and saves affiliations as the person using it, through Salesforce's own record
+service, so it shows exactly what their object and field access allows. An affiliation
+edited elsewhere on the page shows on the card without a reload, and after **Make primary**
+the person's **Primary Affiliation** field refreshes too.
 
 ## A five-minute walkthrough
 
@@ -59,8 +73,8 @@ among your contacts works where. Start from the sample data.
    - **Primary**: select it
    - **Start date**: January 1 of last year
    Choose **Save**.
-4. The card shows one line: "Bayview Hardware, Store Manager, Current", with a
-   **Primary** badge on it. Look at the top of Harper's record: **Primary Affiliation** now
+4. The card shows one line: Bayview Hardware, Store Manager, with a **Primary** badge on
+   it. A current affiliation carries no status badge. Look at the top of Harper's record: **Primary Affiliation** now
    reads Bayview Hardware. You did not fill that in.
 5. Open **Bayview Hardware** from the **Organizations** tab. Its **Affiliations** card
    shows Harper Garcia, Store Manager. The same record, read from the organization's side.
@@ -73,8 +87,10 @@ among your contacts works where. Start from the sample data.
    longer primary. **Primary Affiliation** at the top of the record now reads Heritage
    Rotary Club. Only one organization can be primary at a time, and you never have to clear
    the old one.
-7. Edit the Heritage Rotary Club line and set **End date** to last month. Save. The line reads
-   **Former**, the **Primary** badge disappears, and **Primary Affiliation** at the top of
+7. The card has no Edit action, so change an affiliation on its own record: open the App
+   Launcher, search for **Affiliations**, open Harper's Heritage Rotary Club affiliation,
+   and choose **Edit**. Set **End date** to last month and save. Back on Harper's record,
+   the line carries a **Former** badge, the **Primary** badge disappears, and **Primary Affiliation** at the top of
    Harper's record is empty, because a connection that has ended is not the one Harper is
    chiefly associated with. Mark the Bayview Hardware line primary to fill it again.
 8. Check the Households tab. Harper is still in The Garcia Family, exactly where she was.
@@ -107,7 +123,10 @@ member from 2019 to 2022 and is a board member again now, that is two affiliatio
 date ranges, and both should have their dates filled in. Two affiliations for the same person,
 the same organization, and the same role with overlapping dates is refused with "Harper Garcia
 already has an affiliation with Bayview Hardware as Store Manager covering those dates.
-Open AF-000123 to change it." End the first one before you start the second.
+Open AF-000123 to change it." End the first one before you start the second. Two that
+already overlap (loaded before the rule, or with automation off) are checked only when you
+change the person, organization, role or dates on one of them: marking one primary or
+editing its description still saves, and changing its dates is how you fix the overlap.
 
 **Looking for a setting to turn on.** There is not one. Affiliations behaves the same way in
 every organization, so nothing is exposed in BarnCRM Settings, and there is nothing you can

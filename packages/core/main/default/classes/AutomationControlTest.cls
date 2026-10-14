@@ -6,8 +6,13 @@
  * BarnCRM Admin permission set, because a test that runs as the system administrator proves
  * nothing about what the package grants.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AutomationControl')
 private class AutomationControlTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String NAMING = 'Household_Naming';
     private static final String HOUSEHOLDS = 'Household_Creation';
     private static final String LOCK = 'Gift_Receipt_Lock';

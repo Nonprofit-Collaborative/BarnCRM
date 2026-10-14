@@ -5,7 +5,7 @@
  * The permission is the point of most of these. The run itself reads and writes in system mode
  * (ADR-0027), so the check here is where the authorization for that actually happens.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SeasonalAddressController')
 private class SeasonalAddressControllerTest {
     /**
      * The permission has to be committed before the test methods run, which is what @TestSetup
@@ -83,6 +83,24 @@ private class SeasonalAddressControllerTest {
                 'A scheduled job shows the administrator when it will next run.'
             );
             Assert.isFalse(stopped.scheduled, 'And choosing Stop must actually stop it.');
+        }
+    }
+
+    /** PEOPLE-37: the view asks about the job twice, not seven times. */
+    @IsTest
+    static void theViewOfAScheduledSwapCostsTwoQueries() {
+        System.runAs(TestUsers.admin()) {
+            SeasonalAddressScheduler.start();
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            SeasonalAddressController.SwapView view = SeasonalAddressController.getSwap();
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.isTrue(view.scheduled, 'Scheduled');
+            Assert.isNotNull(view.nextRunAt, 'With its next run');
+            Assert.isTrue(used <= 2, 'Whether it is scheduled, and when it runs next: ' + used);
         }
     }
 
@@ -167,21 +185,6 @@ private class SeasonalAddressControllerTest {
 
     /** A user holding no packaged permission set, so the custom permission is genuinely absent. */
     private static User readOnlyUser() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        User reader = new User(
-            Alias = 'oiread',
-            Email = 'seasonal.reader@barncrm.invalid',
-            EmailEncodingKey = 'UTF-8',
-            LastName = 'Reader',
-            LanguageLocaleKey = 'en_US',
-            LocaleSidKey = 'en_US',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/Chicago',
-            UserName = 'seasonal.reader.' + DateTime.now().getTime() + '@barncrm.invalid'
-        );
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert reader;
-        }
-        return reader;
+        return TestUsers.standardUser('Reader');
     }
 }

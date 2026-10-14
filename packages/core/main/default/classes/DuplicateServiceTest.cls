@@ -3,8 +3,13 @@
  * platform calls duplicates is the org's own rules' business, so only one test touches the
  * matcher, and it says what it expects under whichever rules the org has switched on.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DuplicateService')
 private class DuplicateServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Id fakeContactId(Integer n) {
         return Id.valueOf('003' + String.valueOf(n).leftPad(12, '0'));
     }
@@ -340,6 +345,105 @@ private class DuplicateServiceTest {
     }
 
     @IsTest
+    static void aHouseholdThatIsAlsoANonprofitCloudHouseholdIsNotProposed() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = (List<Account>) insertAllowingDuplicates(
+                new List<Account>{
+                    HouseholdTestDataFactory.newHousehold('The Npccheck Family'),
+                    HouseholdTestDataFactory.newHousehold('The Npccheck Family'),
+                    HouseholdTestDataFactory.newHousehold('The Npccheck Family')
+                }
+            );
+            // The middle one carries a native household group, as in a Nonprofit Cloud org.
+            HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{
+                households[1].Id
+            };
+            List<DuplicateService.Pair> pairs = new List<DuplicateService.Pair>{
+                new DuplicateService.Pair(households[0].Id, households[1].Id, null),
+                new DuplicateService.Pair(households[1].Id, households[2].Id, null),
+                new DuplicateService.Pair(households[0].Id, households[2].Id, null)
+            };
+
+            Test.startTest();
+            List<DuplicateService.Pair> kept = DuplicateService.actionablePairs(pairs);
+            Test.stopTest();
+
+            Assert.areEqual(1, kept.size(), 'Only the pair with no native household is kept.');
+            Assert.areEqual(pairs[2].key, kept[0].key, 'The two BarnCRM-only households.');
+        }
+    }
+
+    /**
+     * Needs real person accounts: the contact half of one is what the people pass must not
+     * propose. Proven only where person accounts exist and the running user can create one.
+     */
+    @IsTest
+    static void aPersonAccountIsNotProposedAsADuplicateOfAContact() {
+        System.runAs(TestUsers.admin()) {
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (personType == null) {
+                Assert.isTrue(
+                    DuplicateSelector.personContactIds(new Set<Id>{ fakeContactId(1) }).isEmpty(),
+                    'Without person accounts no contact is a person account.'
+                );
+                return;
+            }
+            SObject person = Account.SObjectType.newSObject();
+            person.put('RecordTypeId', personType);
+            person.put('FirstName', 'Paz');
+            person.put('LastName', 'Dupcheck');
+            insertAllowingDuplicates(new List<SObject>{ person });
+            Id personContact = PersonRecordSelector.getPersonContactIds(new Set<Id>{ person.Id })
+                .get(person.Id);
+            List<Contact> people = twoPeople();
+            List<DuplicateService.Pair> pairs = new List<DuplicateService.Pair>{
+                new DuplicateService.Pair(people[0].Id, personContact, null),
+                new DuplicateService.Pair(people[0].Id, people[1].Id, null)
+            };
+
+            Test.startTest();
+            List<DuplicateService.Pair> kept = DuplicateService.actionablePairs(pairs);
+            Test.stopTest();
+
+            Assert.areEqual(1, kept.size(), 'The pair with a person account is dropped.');
+            Assert.areEqual(pairs[1].key, kept[0].key, 'Two contacts are kept.');
+        }
+    }
+
+    /**
+     * The canary for the tests that stop early when no duplicate rule is active: in a scratch
+     * org, where Salesforce switches the standard rules on, a run with them off fails here
+     * instead of passing with the duplicate feature untested. In any other org (a sandbox or
+     * production, where switching the rules off is the administrator's choice) it only says so.
+     */
+    @IsTest
+    static void aScratchOrgKeepsTheStandardRulesOnSoNoDuplicateTestIsSkipped() {
+        System.runAs(TestUsers.admin()) {
+            // A scratch org is the one kind of org that is a sandbox and expires.
+            Organization org = [
+                SELECT IsSandbox, TrialExpirationDate
+                FROM Organization
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ];
+            Boolean scratchOrg = org.IsSandbox && org.TrialExpirationDate != null;
+            Set<String> active = DuplicateSelector.objectsWithActiveRules(
+                new Set<String>(DuplicateSelector.REVIEWED_OBJECTS)
+            );
+            if (!scratchOrg) {
+                Assert.isNotNull(active, 'Outside a scratch org the rules are the org\'s choice.');
+                return;
+            }
+            Assert.isTrue(
+                active.contains('Contact') && active.contains('Account'),
+                'A scratch org must keep an active duplicate rule for Contact and for Account, ' +
+                    'or the duplicate tests return early and test nothing. Active for: ' +
+                    active
+            );
+        }
+    }
+
+    @IsTest
     static void theMatcherIsAskedOnlyWhenThereIsSomethingToAsk() {
         System.runAs(TestUsers.admin()) {
             Assert.isTrue(
@@ -470,11 +574,10 @@ private class DuplicateServiceTest {
                 },
                 null
             );
-            // Somebody else's dismissal lands between this one's check and its write.
+            // Somebody else's dismissal is already there when this one writes.
             insert new Duplicate_Dismissal__c(
                 Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id)
             );
-            DuplicateService.skipDismissedCheck = true;
 
             Test.startTest();
             Integer dismissed = DuplicateService.dismiss(

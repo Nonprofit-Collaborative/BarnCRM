@@ -44,6 +44,7 @@ belongs to C-28. Four questions needed an answer:
   query). It then navigates to the Find tab with `c__savedQueryId` in the page state. Find
   today ignores that state and the person picks the query from **Saved queries**; reading it
   so Find opens the query directly is a small follow-up to `findRecords` once C-35 has merged.
+  (Follow-up done since: `findRecords` reads the state key, opens the saved query and runs it.)
 - **Gated by the Find permission.** Every console action requires `Find_And_Export_Records`.
   The console is a way into Find and adds no access of its own, so no new permission.
 - **Empty households read Member Count.** A household is counted when its `Member_Count__c`
@@ -85,4 +86,5 @@ belongs to C-28. Four questions needed an answer:
   resets that copy to the check's query; the admin guide says to use Save as to keep changes.
 - The count and the Find list agree for the same person. Two people may see different counts.
 - Adding a check is one method in `DataHygieneService`, its labels and its admin guide row.
-- `findRecords` reading `c__savedQueryId` is a recorded follow-up (after C-35 merges).
+- `findRecords` reading `c__savedQueryId` was a recorded follow-up (after C-35 merges). It is
+  done: Find opens and runs the saved query the link names.

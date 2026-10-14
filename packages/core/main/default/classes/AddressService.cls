@@ -9,6 +9,8 @@
  *    reports, and other apps keep reading the address they have always read (R-AD3).
  * 2. captureFromStandardFields: an address typed into the standard fields, or changed
  *    there, becomes or updates an address record, so the records stay the truth (R-AD5).
+ *    A person account's mailing address is captured the same way, on insert and on update
+ *    (capturePersonMailingChanges).
  *
  * No Person Account field is referenced statically anywhere in this class. Where people
  * are person accounts their mailing fields are written dynamically, by name, only in an
@@ -28,7 +30,7 @@ public with sharing class AddressService {
 
     private static final String TYPE_HOME = 'Home';
     private static final String TYPE_WORK = 'Work';
-    private static final String TYPE_SEASONAL = 'Seasonal';
+    public static final String TYPE_SEASONAL = 'Seasonal';
 
     private static final String RECORD_TYPE_HOUSEHOLD = 'Household';
     private static final String RECORD_TYPE_ORGANIZATION = 'Organization';
@@ -83,8 +85,10 @@ public with sharing class AddressService {
 
     /**
      * After a default address is deleted, promotes the most recently created remaining
-     * address for that owner. Deleting a default is allowed: refusing it would leave a
-     * household stuck with an address it no longer uses.
+     * address for that owner, preferring one that is not seasonal: a seasonal address put in
+     * use outside its season would send the mail to the wrong home (PEOPLE-49). A seasonal one
+     * is promoted only when nothing else is left. Deleting a default is allowed: refusing it
+     * would leave a household stuck with an address it no longer uses.
      */
     public static void promoteDefaultAfterDelete(List<Address__c> deletedAddresses) {
         if (deletedAddresses == null || deletedAddresses.isEmpty() || isPropagating) {
@@ -107,8 +111,7 @@ public with sharing class AddressService {
             if (deletedIds.contains(address.Id) || ownerId == null) {
                 continue;
             }
-            Address__c held = newestByOwner.get(ownerId);
-            if (held == null || address.CreatedDate > held.CreatedDate) {
+            if (betterReplacement(address, newestByOwner.get(ownerId))) {
                 newestByOwner.put(ownerId, address);
             }
         }
@@ -132,6 +135,187 @@ public with sharing class AddressService {
         }
     }
 
+    /** Whether `candidate` is a better address to put in use than `held`, the best so far. */
+    private static Boolean betterReplacement(Address__c candidate, Address__c held) {
+        if (held == null) {
+            return true;
+        }
+        Boolean candidateSeasonal = candidate.Type__c == TYPE_SEASONAL;
+        Boolean heldSeasonal = held.Type__c == TYPE_SEASONAL;
+        if (candidateSeasonal != heldSeasonal) {
+            return !candidateSeasonal;
+        }
+        return candidate.CreatedDate > held.CreatedDate;
+    }
+
+    // ---------------------------------------------------------------- before the save
+
+    /**
+     * One default per owner within a single save (R-AD2, PEOPLE-22). When one insert or
+     * update marks two or more addresses of the same owner as default (an import can), the
+     * last of them in the save keeps the flag and the others are saved without it; the
+     * defaults already on file are cleared after the save, as for any new default.
+     */
+    public static void keepOneDefaultPerOwnerInSave(List<Address__c> records) {
+        if (records == null || records.isEmpty()) {
+            return;
+        }
+        Map<Id, Address__c> lastDefaultByOwner = new Map<Id, Address__c>();
+        for (Address__c address : records) {
+            Id ownerId = ownerIdOf(address);
+            if (address.Is_Default__c != true || ownerId == null) {
+                continue;
+            }
+            Address__c earlier = lastDefaultByOwner.put(ownerId, address);
+            if (earlier != null) {
+                earlier.Is_Default__c = false;
+            }
+        }
+    }
+
+    /**
+     * Refuses unticking the address an owner has in use when nothing else in the same save
+     * puts another in use and the owner has no other default on file (PEOPLE-49). Without
+     * it the owner would have no address in use and standard fields still showing this one.
+     * Choosing another address as the default, or deleting this one, is how it is changed.
+     * The package's own writes (a new default clearing the old one, the seasonal swap, a
+     * promotion after a delete) always put another in use in the same save, or run while
+     * propagation is under way, so they are never refused.
+     */
+    public static void refuseLeavingAnOwnerWithoutADefault(
+        List<Address__c> records,
+        Map<Id, SObject> previousById
+    ) {
+        if (records == null || previousById == null || isPropagating) {
+            return;
+        }
+        Map<Id, List<Address__c>> untickedByOwner = new Map<Id, List<Address__c>>();
+        Set<Id> ownersWithADefaultInSave = new Set<Id>();
+        for (Address__c address : records) {
+            Id ownerId = ownerIdOf(address);
+            if (ownerId == null) {
+                continue;
+            }
+            if (address.Is_Default__c == true) {
+                ownersWithADefaultInSave.add(ownerId);
+                continue;
+            }
+            Address__c previous = (Address__c) previousById.get(address.Id);
+            if (previous != null && previous.Is_Default__c == true) {
+                if (!untickedByOwner.containsKey(ownerId)) {
+                    untickedByOwner.put(ownerId, new List<Address__c>());
+                }
+                untickedByOwner.get(ownerId).add(address);
+            }
+        }
+        untickedByOwner.keySet().removeAll(ownersWithADefaultInSave);
+        if (untickedByOwner.isEmpty()) {
+            return;
+        }
+        Set<Id> ownersWithAnotherDefault = new Set<Id>();
+        for (
+            Address__c other : AddressSelector.selectDefaultsByOwnerIds(
+                untickedByOwner.keySet(),
+                previousById.keySet()
+            )
+        ) {
+            ownersWithAnotherDefault.add(ownerIdOf(other));
+        }
+        for (Id ownerId : untickedByOwner.keySet()) {
+            if (ownersWithAnotherDefault.contains(ownerId)) {
+                continue;
+            }
+            for (Address__c address : untickedByOwner.get(ownerId)) {
+                address.addError(Label.Core_Address_CannotUntickOnlyDefault);
+            }
+        }
+    }
+
+    /**
+     * Leaves each of these owners with one default address (R-AD2), for the survivor of a
+     * merge, which arrives with the other record's default as well as its own (PEOPLE-15).
+     *
+     * The default kept is the one that matches the owner's standard address fields (billing
+     * for an account, mailing for a contact), because those hold the address the merge chose;
+     * otherwise, and for a person account, the most recently created, as when a default is
+     * deleted. The others stay as ordinary addresses. Nothing is copied into the standard
+     * fields: the kept default is the one they already hold, or the merge left them as chosen.
+     */
+    public static void keepOneDefault(Set<Id> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return;
+        }
+        Map<Id, List<Address__c>> defaultsByOwner = new Map<Id, List<Address__c>>();
+        // Newest first, so the first address held for an owner is the fallback to keep.
+        for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(ownerIds, null)) {
+            Id ownerId = ownerIdOf(address);
+            if (!defaultsByOwner.containsKey(ownerId)) {
+                defaultsByOwner.put(ownerId, new List<Address__c>());
+            }
+            defaultsByOwner.get(ownerId).add(address);
+        }
+        Set<Id> crowded = new Set<Id>();
+        Set<Id> crowdedAccounts = new Set<Id>();
+        Set<Id> crowdedContacts = new Set<Id>();
+        for (Id ownerId : defaultsByOwner.keySet()) {
+            if (defaultsByOwner.get(ownerId).size() > 1) {
+                crowded.add(ownerId);
+                if (ownerId.getSObjectType() == Contact.SObjectType) {
+                    crowdedContacts.add(ownerId);
+                } else {
+                    crowdedAccounts.add(ownerId);
+                }
+            }
+        }
+        if (crowded.isEmpty()) {
+            return;
+        }
+        Map<Id, String> standardKeyByOwner = new Map<Id, String>();
+        for (Account owner : AddressSelector.selectAccountBillingAddresses(crowdedAccounts)) {
+            standardKeyByOwner.put(
+                owner.Id,
+                addressKey(owner.BillingStreet, owner.BillingCity, owner.BillingPostalCode)
+            );
+        }
+        for (Contact owner : AddressSelector.selectContactMailingAddresses(crowdedContacts)) {
+            standardKeyByOwner.put(
+                owner.Id,
+                addressKey(owner.MailingStreet, owner.MailingCity, owner.MailingPostalCode)
+            );
+        }
+        List<Address__c> stale = new List<Address__c>();
+        for (Id ownerId : crowded) {
+            List<Address__c> defaults = defaultsByOwner.get(ownerId);
+            Address__c kept = defaults[0];
+            for (Address__c address : defaults) {
+                String key = addressKey(address.Street__c, address.City__c, address.Postal_Code__c);
+                if (key == standardKeyByOwner.get(ownerId)) {
+                    kept = address;
+                    break;
+                }
+            }
+            for (Address__c address : defaults) {
+                if (address.Id != kept.Id) {
+                    stale.add(new Address__c(Id = address.Id, Is_Default__c = false));
+                }
+            }
+        }
+        isPropagating = true;
+        try {
+            Database.update(stale, AccessLevel.USER_MODE);
+        } finally {
+            isPropagating = false;
+        }
+    }
+
+    private static String addressKey(String street, String city, String postalCode) {
+        return (String.isBlank(street) ? '' : street.trim().toLowerCase()) +
+            '|' +
+            (String.isBlank(city) ? '' : city.trim().toLowerCase()) +
+            '|' +
+            (String.isBlank(postalCode) ? '' : postalCode.trim().toLowerCase());
+    }
+
     // ---------------------------------------------------------------- direction two
 
     /**
@@ -151,27 +335,66 @@ public with sharing class AddressService {
         }
         isPropagating = true;
         try {
+            // A changed address is always a new record (R-AD7): the old one is kept as
+            // history and loses the default flag below, rather than being overwritten.
             List<Address__c> toInsert = new List<Address__c>();
-            List<Address__c> toUpdate = new List<Address__c>();
             captureAccounts(accounts, toInsert);
-            captureContacts(contacts, toInsert, toUpdate);
-            if (!toUpdate.isEmpty()) {
-                Database.update(toUpdate, AccessLevel.USER_MODE);
-            }
-            if (!toInsert.isEmpty()) {
-                Database.insert(toInsert, AccessLevel.USER_MODE);
-            }
-            List<Address__c> touched = new List<Address__c>();
-            touched.addAll(toUpdate);
-            touched.addAll(toInsert);
-            if (touched.isEmpty()) {
-                return;
-            }
-            clearOtherDefaults(touched);
-            applyToStandardFields(touched);
+            captureContacts(contacts, toInsert);
+            insertCaptured(toInsert);
         } finally {
             isPropagating = false;
         }
+    }
+
+    /**
+     * A person account saved with a mailing address, or whose mailing address was changed,
+     * gets an address record of their own, so the records stay the truth for people held as
+     * accounts too (R-AD5, PEOPLE-17). Contact triggers do not fire for person account saves,
+     * so the Account handler calls this after update. Only a person whose mailing address
+     * differs from the one before the save is looked at. Does nothing, and runs no query, in an
+     * org with no person accounts.
+     */
+    public static void capturePersonMailingChanges(
+        List<Account> accounts,
+        Map<Id, SObject> previousById
+    ) {
+        if (accounts == null || accounts.isEmpty() || isPropagating) {
+            return;
+        }
+        Set<Id> personTypes = personRecordTypeIds();
+        if (personTypes.isEmpty()) {
+            return;
+        }
+        List<Account> moved = new List<Account>();
+        for (Account account : accounts) {
+            SObject before = previousById == null ? null : previousById.get(account.Id);
+            if (
+                personTypes.contains(account.RecordTypeId) &&
+                (before == null || personMailingChanged(account, before))
+            ) {
+                moved.add(account);
+            }
+        }
+        if (moved.isEmpty()) {
+            return;
+        }
+        isPropagating = true;
+        try {
+            List<Address__c> toInsert = new List<Address__c>();
+            capturePersonAccounts(moved, toInsert);
+            insertCaptured(toInsert);
+        } finally {
+            isPropagating = false;
+        }
+    }
+
+    private static void insertCaptured(List<Address__c> toInsert) {
+        if (toInsert.isEmpty()) {
+            return;
+        }
+        Database.insert(toInsert, AccessLevel.USER_MODE);
+        clearOtherDefaults(toInsert);
+        applyToStandardFields(toInsert);
     }
 
     // ---------------------------------------------------------------- seasonal helper
@@ -223,7 +446,11 @@ public with sharing class AddressService {
         return defaults;
     }
 
-    private static Id ownerIdOf(Address__c address) {
+    /** The owner of an address: its household or organization, or the person it belongs to. */
+    public static Id ownerIdOf(Address__c address) {
+        if (address == null) {
+            return null;
+        }
         if (address.Account__c != null) {
             return address.Account__c;
         }
@@ -403,12 +630,36 @@ public with sharing class AddressService {
      * and be skipped, so the address would silently reach some of a household and not the
      * rest. The answer decides which fields a write may name and never reaches a screen.
      */
+    /**
+     * Moves an address that names a person account through `Account__c` over to
+     * `Person_Account__c`, before insert. Does nothing, and runs no query, in an org with
+     * no person accounts.
+     */
+    public static void ownPersonAccountsAsPeople(List<Address__c> addresses) {
+        Set<Id> accountIds = new Set<Id>();
+        for (Address__c address : addresses) {
+            if (address.Account__c != null && address.Person_Account__c == null) {
+                accountIds.add(address.Account__c);
+            }
+        }
+        Set<Id> people = personAccountIdsAmong(accountIds);
+        if (people.isEmpty()) {
+            return;
+        }
+        for (Address__c address : addresses) {
+            if (address.Person_Account__c == null && people.contains(address.Account__c)) {
+                address.Person_Account__c = address.Account__c;
+                address.Account__c = null;
+            }
+        }
+    }
+
     private static Set<Id> personAccountIdsAmong(Set<Id> accountIds) {
         Set<Id> found = new Set<Id>();
         if (accountIds == null || accountIds.isEmpty() || !personAccountFieldsAvailable()) {
             return found;
         }
-        Set<Id> personRecordTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        Set<Id> personRecordTypeIds = OrgShapeDetector.personAccountRecordTypeIds();
         if (personRecordTypeIds == null || personRecordTypeIds.isEmpty()) {
             return found;
         }
@@ -498,7 +749,7 @@ public with sharing class AddressService {
     }
 
     private static Boolean personAccountFieldsAvailable() {
-        if (!OrgShapeDetector.detect().hasPersonAccounts) {
+        if (!OrgShapeDetector.hasPersonAccounts()) {
             return false;
         }
         if (accountFields == null) {
@@ -517,12 +768,11 @@ public with sharing class AddressService {
                 SObjectDescribeOptions.DEFERRED
             )
             .getRecordTypeInfosById();
-        Set<Id> personAccountRecordTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        Set<Id> personRecordTypeIds = OrgShapeDetector.personRecordTypeIds();
+        List<Account> people = new List<Account>();
         for (Account account : accounts) {
-            if (
-                personAccountRecordTypeIds != null &&
-                personAccountRecordTypeIds.contains(account.RecordTypeId)
-            ) {
+            if (personRecordTypeIds.contains(account.RecordTypeId)) {
+                people.add(account);
                 continue;
             }
             String developerName = account.RecordTypeId == null ||
@@ -559,13 +809,90 @@ public with sharing class AddressService {
                 )
             );
         }
+        capturePersonAccounts(people, toInsert);
     }
 
-    private static void captureContacts(
-        List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
-    ) {
+    /**
+     * People held as accounts keep their mailing address as an address record of their own
+     * (type Home, default). The person fields are read by name with get, never referenced, so
+     * this compiles in an org with no person accounts, where it returns at once.
+     */
+    private static void capturePersonAccounts(List<Account> people, List<Address__c> toInsert) {
+        if (people == null || people.isEmpty() || !personAccountFieldsAvailable()) {
+            return;
+        }
+        List<Account> withAddress = new List<Account>();
+        for (Account person : people) {
+            if (
+                hasAnyValue(
+                    (String) person.get(PERSON_MAILING_STREET),
+                    (String) person.get(PERSON_MAILING_CITY),
+                    (String) person.get(PERSON_MAILING_STATE),
+                    (String) person.get(PERSON_MAILING_POSTAL_CODE),
+                    (String) person.get(PERSON_MAILING_COUNTRY)
+                )
+            ) {
+                withAddress.add(person);
+            }
+        }
+        if (withAddress.isEmpty()) {
+            return;
+        }
+        Map<Id, Address__c> defaultByPerson = new Map<Id, Address__c>();
+        for (
+            Address__c address : AddressSelector.selectDefaultsByOwnerIds(
+                new Map<Id, Account>(withAddress).keySet(),
+                null
+            )
+        ) {
+            if (address.Person_Account__c != null) {
+                defaultByPerson.put(address.Person_Account__c, address);
+            }
+        }
+        for (Account person : withAddress) {
+            Address__c existing = defaultByPerson.get(person.Id);
+            Address__c typed = new Address__c(
+                Person_Account__c = person.Id,
+                Type__c = TYPE_HOME,
+                Is_Default__c = true,
+                Street__c = (String) person.get(PERSON_MAILING_STREET),
+                City__c = (String) person.get(PERSON_MAILING_CITY),
+                State__c = (String) person.get(PERSON_MAILING_STATE),
+                Postal_Code__c = (String) person.get(PERSON_MAILING_POSTAL_CODE),
+                Country__c = (String) person.get(PERSON_MAILING_COUNTRY)
+            );
+            if (!sameAddress(existing, typed)) {
+                toInsert.add(typed);
+            }
+        }
+    }
+
+    private static Set<Id> personRecordTypeIds() {
+        if (!personAccountFieldsAvailable()) {
+            return new Set<Id>();
+        }
+        Set<Id> found = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        return found == null ? new Set<Id>() : found;
+    }
+
+    private static Boolean personMailingChanged(Account person, SObject before) {
+        for (
+            String field : new List<String>{
+                PERSON_MAILING_STREET,
+                PERSON_MAILING_CITY,
+                PERSON_MAILING_STATE,
+                PERSON_MAILING_POSTAL_CODE,
+                PERSON_MAILING_COUNTRY
+            }
+        ) {
+            if (!sameText((String) person.get(field), (String) before.get(field))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void captureContacts(List<Contact> contacts, List<Address__c> toInsert) {
         if (contacts == null || contacts.isEmpty()) {
             return;
         }
@@ -587,29 +914,35 @@ public with sharing class AddressService {
             return;
         }
         if (behavior() == BEHAVIOR_PERSONAL_ADDRESS) {
-            capturePersonalAddresses(withAddress, toInsert, toUpdate);
+            capturePersonalAddresses(withAddress, toInsert);
         } else {
-            captureHouseholdAddresses(withAddress, toInsert, toUpdate);
+            captureHouseholdAddresses(withAddress, toInsert);
         }
     }
 
     private static void captureHouseholdAddresses(
         List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
+        List<Address__c> toInsert
     ) {
         Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
         Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(contactIds);
-        if (householdByPerson == null || householdByPerson.isEmpty()) {
-            return;
+        if (householdByPerson == null) {
+            householdByPerson = new Map<Id, Id>();
         }
         Map<Id, Contact> sourceByHousehold = new Map<Id, Contact>();
+        List<Contact> withoutAHousehold = new List<Contact>();
         for (Contact contact : contacts) {
             Id householdId = householdByPerson.get(contact.Id);
             if (householdId == null) {
+                withoutAHousehold.add(contact);
                 continue;
             }
             sourceByHousehold.put(householdId, contact);
+        }
+        // A person with no household to move still keeps the address they were given, as
+        // their own (PEOPLE-24, R-AD5).
+        if (!withoutAHousehold.isEmpty()) {
+            capturePersonalAddresses(withoutAHousehold, toInsert);
         }
         if (sourceByHousehold.isEmpty()) {
             return;
@@ -627,19 +960,15 @@ public with sharing class AddressService {
         }
         for (Id householdId : sourceByHousehold.keySet()) {
             Contact source = sourceByHousehold.get(householdId);
-            Address__c existing = defaultByHousehold.get(householdId);
-            if (existing == null) {
+            if (!sameAddress(defaultByHousehold.get(householdId), source)) {
                 toInsert.add(newAddressFromContact(source, TYPE_HOME, householdId, null));
-            } else {
-                toUpdate.add(copyContactAddressOnto(new Address__c(Id = existing.Id), source));
             }
         }
     }
 
     private static void capturePersonalAddresses(
         List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
+        List<Address__c> toInsert
     ) {
         Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
         Map<Id, Address__c> defaultByContact = new Map<Id, Address__c>();
@@ -649,13 +978,40 @@ public with sharing class AddressService {
             }
         }
         for (Contact contact : contacts) {
-            Address__c existing = defaultByContact.get(contact.Id);
-            if (existing == null) {
+            if (!sameAddress(defaultByContact.get(contact.Id), contact)) {
                 toInsert.add(newAddressFromContact(contact, TYPE_HOME, null, contact.Id));
-            } else {
-                toUpdate.add(copyContactAddressOnto(new Address__c(Id = existing.Id), contact));
             }
         }
+    }
+
+    /**
+     * Whether the owner's default already holds exactly what the person typed, so that a
+     * second household member saved with the shared address, or a save that rewrites the
+     * same address, does not add a duplicate record.
+     */
+    private static Boolean sameAddress(Address__c existing, Contact source) {
+        return existing != null &&
+            sameText(existing.Street__c, source.MailingStreet) &&
+            sameText(existing.City__c, source.MailingCity) &&
+            sameText(existing.State__c, source.MailingState) &&
+            sameText(existing.Postal_Code__c, source.MailingPostalCode) &&
+            sameText(existing.Country__c, source.MailingCountry);
+    }
+
+    /** The same test against an address record built from a person account's mailing fields. */
+    private static Boolean sameAddress(Address__c existing, Address__c typed) {
+        return existing != null &&
+            sameText(existing.Street__c, typed.Street__c) &&
+            sameText(existing.City__c, typed.City__c) &&
+            sameText(existing.State__c, typed.State__c) &&
+            sameText(existing.Postal_Code__c, typed.Postal_Code__c) &&
+            sameText(existing.Country__c, typed.Country__c);
+    }
+
+    private static Boolean sameText(String left, String right) {
+        String a = left == null ? '' : left;
+        String b = right == null ? '' : right;
+        return a.equals(b);
     }
 
     private static Address__c newAddressFromContact(

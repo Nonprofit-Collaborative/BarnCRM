@@ -28,8 +28,9 @@ as they type, but nobody can review or merge suggestions: not on this panel, and
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
-2. In the left navigation choose **Households**, and scroll to **Duplicates**.
+1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
+2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
+   **Open** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -49,7 +50,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **BarnCRM Settings**, choose **Households**, and scroll to **Duplicates**.
+1. Open **Org Optimizer** and choose **Duplicates**.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -61,13 +62,21 @@ choose to save anyway.
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because
    records can still point at it: merge it into the kept person's household with **Merge households** (step 6).
+   Within a minute or so BarnCRM also tidies the kept person in the background: one default
+   address stays (see [Addresses](addresses.md)), a relationship the two records had with each
+   other is removed, so is a second copy of a relationship both had with the same person, and
+   their primary affiliation is chosen again.
 5. Back on the Duplicates panel, refresh. The pair is gone.
 6. If the scan found two households, choose **Merge households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
    keep and choose **Merge these two**. You see "The two households are now one."
 7. For a pair that is not the same person, for example twin sisters at one address, choose
    **Not a duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
-   suggested again." Scan again and check that the pair does not come back.
+   suggested again." Scan again and check that the pair does not come back. It stays off the
+   panel even when a duplicate rule reports the pair again as someone saves one of the two.
+   A suggestion that names three or more records (one a duplicate rule wrote as someone saved)
+   is dismissed as a whole: every pair in it is noted. If two of them are in fact the same
+   person, merge those first, then dismiss the rest.
 
 ## Common mistakes
 
@@ -84,7 +93,9 @@ address match on nothing. Fill those in, or ask whoever manages your Salesforce 
 matching rule in Setup, and scan again.
 
 **An organization pair never appears.** The panel shows people and households only. Merge
-organizations with Salesforce's own tools.
+organizations with Salesforce's own tools. A scan checks households only when an account rule
+that compares organizations and households is switched on; a person account rule alone does
+not start that part of the scan.
 
 **A pair of person accounts never appears either.** If your org stores people as person
 accounts, merge two of them with Salesforce's own account merge. BarnCRM handles it as it
@@ -92,15 +103,32 @@ does a merge of two contacts: the kept person joins every household the other on
 to, each household keeps its primary member, an emptied household is kept, and the kept
 person's totals are recalculated straight away.
 
+**A Nonprofit Cloud household never appears.** In an org that also uses Salesforce Nonprofit
+Cloud households, a household that is one of those is not suggested and cannot be merged here
+or with **Merge or split**: merging deletes one of the two records, and its Nonprofit Cloud
+household group would be deleted or moved with it. Combine those with Nonprofit Cloud's own
+tools.
+
+**A person account is never paired with a contact.** Salesforce cannot merge the two, so such
+a pair is not suggested.
+
+**Scan for duplicates is greyed out.** A scan is already running, perhaps one a colleague
+started. Wait for it to finish and choose **Refresh**. Two scans at once would suggest the
+same pairs twice, so a second one is refused.
+
 **A household pair should not be merged with the Salesforce merge.** Always merge households
 from this panel or with **Merge or split** on the household's record page. That merge moves
-the members, recalculates the totals and renames the household; Salesforce's own account merge
-does none of that, which is why the household record page does not offer it.
+the members, recalculates the totals and renames the household, and lets you choose what to
+keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
+and renames the kept household, settles its primary member and keeps one default address within
+a minute or so, in the background, because Salesforce does not let anything change the records
+while it is merging them. If a person was in both households, they are left with one membership in the kept household (the primary one, or else the earlier start), so they are counted once. It cannot ask which name or members to keep, which is why the
+household record page does not offer that merge.
 
-**A colleague sees the panel but the buttons are missing.** Scanning, dismissing and merging
-from this panel need the Manage BarnCRM Settings permission, which the BarnCRM Admin
-permission set grants, and access to duplicate record sets, which the BarnCRM Duplicate Review
-permission set grants.
+**A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
+Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings
+permission, which the BarnCRM Admin permission set grants, and access to duplicate record sets,
+which the BarnCRM Duplicate Review permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
@@ -119,4 +147,5 @@ from this panel or with **Merge or split** on the household's page.
 
 **You dismissed a pair and now want it back.** Dismissals are records. On the panel, choose
 **View** next to **Dismissed pairs**, pick the **All Duplicate Dismissals** list, find the pair
-by its reason, and delete it. The next scan suggests that pair again.
+by its reason, and delete it. The next scan suggests that pair again. Anyone with BarnCRM
+Admin can delete a dismissal, whoever made it: a dismissal is the organization's decision.

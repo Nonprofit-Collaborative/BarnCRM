@@ -43,8 +43,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /** Children never counted as something a record gained: the import's own bookkeeping. */
     private static final Set<String> NOT_GAINED = new Set<String>{
         'import_row__c',
-        'import_journal__c',
-        'rollupcalcitem__c'
+        'import_journal__c'
     };
 
     /**
@@ -79,6 +78,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 
     /** The relationships each object is checked through, described once per transaction. */
     private static final Map<Schema.SObjectType, List<Schema.ChildRelationship>> CHECKED = new Map<Schema.SObjectType, List<Schema.ChildRelationship>>();
+
+    /** Child objects among those checked that carry the import tag. */
+    private static final Set<Schema.SObjectType> TAGGED_CHILDREN = new Set<Schema.SObjectType>();
 
     private final Id batchId;
     private final Integer countedAtStart;
@@ -302,7 +304,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     }
 
     public void finish(Database.BatchableContext context) {
-        if (chunkStopped(context)) {
+        // A governor limit cannot be caught, so `execute` never gets to say it failed: the
+        // pass's own error count is the one record of it (R-IB8).
+        if (DataJobs.chunkStopped(context, jobErrorsForTest)) {
             failed = true;
         }
         try {
@@ -330,29 +334,6 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             failed = true;
         }
         ImportUndoService.finish(batchId, countedAtStart, restored, failed, createdGone);
-    }
-
-    /**
-     * Whether the platform stopped any chunk of this pass. A governor limit cannot be caught,
-     * so `execute` never gets to say it failed and the state it would have set is lost; the
-     * job's own error count is the one record of it (R-IB8).
-     */
-    private Boolean chunkStopped(Database.BatchableContext context) {
-        if (jobErrorsForTest != null) {
-            return jobErrorsForTest > 0;
-        }
-        if (context == null || context.getJobId() == null) {
-            return false;
-        }
-        Id jobId = context.getJobId();
-        List<AsyncApexJob> jobs = [
-            SELECT NumberOfErrors
-            FROM AsyncApexJob
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
     }
 
     // -------------------------------------------------------------------------------------
@@ -971,7 +952,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             'committedBy' => committedBy,
             'undoer' => UserInfo.getUserId(),
             'undoStartedAt' => undoStartedAt,
-            'checkedAt' => Datetime.now()
+            'checkedAt' => Datetime.now(),
+            'importBatch' => batchId
         };
         if (relationships.size() == 1) {
             List<SObject> rows = guardQuery(keep, ids, gainedQuery(type, relationships), binds);
@@ -1047,11 +1029,18 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             ') AND (CreatedById != :undoer OR CreatedDate < :undoStartedAt OR CreatedDate > :checkedAt)';
         List<String> subqueries = new List<String>();
         for (Schema.ChildRelationship relationship : relationships) {
+            // A related record this import created is undone with it, so it keeps nothing: an
+            // aborted commit's household names its new person as Primary Contact (R-IB13).
+            String own = TAGGED_CHILDREN.contains(relationship.getChildSObject())
+                ? ' AND ' + ImportEntityProcessors.TAG_FIELD + ' != :importBatch'
+                : '';
             subqueries.add(
                 '(SELECT Id FROM ' +
                     relationship.getRelationshipName() +
-                    ' WHERE ' +
+                    ' WHERE (' +
                     filter +
+                    ')' +
+                    own +
                     ' LIMIT 1)'
             );
         }
@@ -1098,6 +1087,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 (!child.isCustom() && !child.isCreateable())
             ) {
                 continue;
+            }
+            if (childFields.containsKey(NamespaceUtil.qualify(ImportEntityProcessors.TAG_FIELD))) {
+                TAGGED_CHILDREN.add(relationship.getChildSObject());
             }
             result.add(relationship);
         }

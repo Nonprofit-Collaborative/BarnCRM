@@ -3,8 +3,13 @@
  * completed for more than two days is reported to Maria, in Core's one report, and only when the
  * mirror is scheduled, on, and she may manage settings.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ConnectHealthCheckExtension')
 private class ConnectHealthCheckExtensionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static void choose(String direction) {
         Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();
         settings.Opportunity_Mirror_Direction__c = direction;

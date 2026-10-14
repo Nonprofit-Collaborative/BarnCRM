@@ -1,0 +1,35 @@
+{
+  "required": ["lastName"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "firstName": {
+      "title": "First Name",
+      "description": "Optional. The person's first name.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isUserInput": true
+    },
+    "lastName": {
+      "title": "Last Name",
+      "description": "Required. The person's last name.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isUserInput": true
+    },
+    "email": {
+      "title": "Email",
+      "description": "Optional. The person's email address.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isUserInput": true
+    },
+    "householdId": {
+      "title": "Household Id",
+      "description": "Optional. The record id of an existing household to add the person to, for example a Household Id from Find People. Leave empty to give the person a household of their own, when the org creates households automatically.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

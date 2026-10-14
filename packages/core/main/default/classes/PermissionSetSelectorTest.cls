@@ -2,8 +2,13 @@
  * Tests for PermissionSetSelector: the packaged permission set the post-install script
  * hands to the person who installed BarnCRM.
  */
-@IsTest
+@IsTest(testFor='ApexClass:PermissionSetSelector')
 private class PermissionSetSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void selectByNameFindsThePackagedAdminPermissionSet() {
         System.runAs(TestUsers.admin()) {

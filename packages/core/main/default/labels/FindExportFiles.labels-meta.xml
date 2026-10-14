@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Find_ExportFilesNotFound</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files: no such export of yours</shortDescription>
+        <value>This export to Files was not found. Only the person who started an export can follow it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_FindExport</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a Find export to Files</shortDescription>
+        <value>Export to Files</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_FindExportBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: export outcome. {0} rows, {1} files.</shortDescription>
+        <value>{0} rows written to {1} CSV files in your Files. Open to see the first file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFiles</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Find button: export on the server to Files</shortDescription>
+        <value>Export to Files</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFilesStarted</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files: started</shortDescription>
+        <value>Export to Files started. You can leave this page: BarnCRM tells you when the files are ready.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFilesProgress</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files progress. {0} chunks done, {1} chunks in all.</shortDescription>
+        <value>Exporting: {0} of {1} chunks done.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFilesDone</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files finished. {0} is the number of files.</shortDescription>
+        <value>Ready: {0} CSV files in your Files (Owned by Me). Delete them there once downloaded.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFilesFailed</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files stopped before it finished</shortDescription>
+        <value>The export stopped before it finished. The files below hold only what was written.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportFilesList</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files: heading over the file links</shortDescription>
+        <value>Files:</value>
+    </labels>
+</CustomLabels>

@@ -5,8 +5,16 @@
  * The engine's own arithmetic is `RollupEngineTest`'s; here it is which definitions run, for
  * which records, and what is stamped afterwards.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService')
 private class RollupServiceTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static Rollup_Definition__c memberCount(String mode, Boolean active) {
         return new Rollup_Definition__c(
             Name = 'Household member count',
@@ -194,8 +202,7 @@ private class RollupServiceTest {
                 )
             };
 
-            List<Rollup_Definition__c> forRealTime = RollupSelector.selectActiveForSource(
-                'Household_Member__c',
+            List<Rollup_Definition__c> forRealTime = RollupSelector.selectActiveForModes(
                 new Set<String>{ RollupService.MODE_REAL_TIME, RollupService.MODE_BOTH }
             );
 

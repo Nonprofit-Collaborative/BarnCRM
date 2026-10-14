@@ -1,8 +1,13 @@
 /**
  * What the two record page panels call (features G-08 and G-09).
  */
-@IsTest
+@IsTest(testFor='ApexClass:TributeController, ApexClass:SoftCreditController')
 private class RecognitionControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void listsTheCreditsOnAGift() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

@@ -18,12 +18,12 @@ object references: those live only in the Connect module, behind dynamic Apex.
   `Setting_Definition__mdt`, so a feature adds its settings to the console by shipping rows
   rather than by editing the console.
 
-  **Platform Cache is optional.** `SettingsService` uses an org cache partition named
-  `BarnCRMSettings` when one exists and a per-transaction static cache when it does not,
-  so Core runs unchanged on an org with no cache allocation. The package ships no partition
-  file: an org that wants the cross-transaction cache creates the partition in Setup and
-  allocates it a few megabytes. Either way a change takes effect on the next transaction,
-  because every write clears both caches.
+  **No Platform Cache.** Settings and the shipped custom metadata are read through the
+  platform's own caches (`getOrgDefaults()` and custom metadata `getAll()`), which cost no
+  query and are refreshed when a save commits, plus a per-transaction static cache that every
+  write clears. Core ships no cache partition and needs no cache allocation (ADR-0094). A
+  `BarnCRMSettings` partition created for an earlier version is no longer used and can be
+  deleted.
 - **Trigger framework**: one trigger per object, bypassable handlers, a pause-all switch.
 - **Error Log** (`Error_Log__c`): every caught exception with context, user, record, and a
   plain-language message, published as a platform event so the entry survives the rollback it
@@ -189,26 +189,12 @@ version adds it then. Until then the same effect is achieved by the org scripts,
 assign the permission sets and create the shipped rollup definitions after deploying:
 a source deployment runs no post-install script.
 
-## Vendored code
+## Third party code
 
-Core carries one third party dependency, as source rather than as a package: the
-[apex-rollup](https://github.com/jamessimone/apex-rollup) aggregation engine (MIT, James Simone),
-under `packages/core/vendor/apex-rollup/`. It is driven through an adapter BarnCRM owns, and
-`Rollup_Definition__c` stays the only rollup configuration an administrator ever sees.
-
-- **What was taken, what was changed, and how to take a newer version:**
-  [`packages/core/vendor/apex-rollup/VENDOR.md`](vendor/apex-rollup/VENDOR.md). Read it before
-  touching anything under `vendor/`, and update it in the same pull request that changes the
-  vendored tree.
-- **Why it was vendored rather than written or depended on:**
-  [ADR-0015](../../docs/architecture/decisions/0015-vendor-apex-rollup-behind-adapter.md), with the
-  source level comparison of the three candidates in
-  [rollup-library-evaluation.md](../../docs/architecture/reference/rollup-library-evaluation.md).
-- The upstream MIT licence text travels with the code, in
-  [`packages/core/vendor/apex-rollup/LICENSE`](vendor/apex-rollup/LICENSE), and must stay there in
-  every build that ships it.
-- `packages/core/vendor/` is excluded from Prettier so that upstream diffs stay readable. Everything
-  else under `packages/core` is formatted normally.
+Core carries none. The vendored [apex-rollup](https://github.com/jamessimone/apex-rollup) engine
+(MIT, James Simone) was replaced by BarnCRM's own rollup engine and deleted in rollup slice S9
+([decision](../../docs/architecture/decisions/0082-barncrm-owns-its-rollup-engine.md)).
+`Rollup_Definition__c` is the only rollup configuration an administrator ever sees.
 
 ## Iteration
 

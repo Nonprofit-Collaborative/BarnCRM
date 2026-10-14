@@ -8,4 +8,9 @@
     <target>lightning__AppPage</target>
     <target>lightning__HomePage</target>
   </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage,lightning__HomePage">
+      <property name="lastResultFirst" type="Boolean" default="false" label="Show the last result first" description="Show when Health Check last ran and what it found, with Run now, instead of running every check each time the page opens." />
+    </targetConfig>
+  </targetConfigs>
 </LightningComponentBundle>

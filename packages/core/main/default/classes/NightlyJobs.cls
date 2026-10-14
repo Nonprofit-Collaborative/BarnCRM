@@ -36,12 +36,9 @@ public with sharing class NightlyJobs {
         List<NightlyJob> jobs = new List<NightlyJob>{
             new RollupJob(),
             new SeasonalAddressJob(),
-            new ErrorDigestJob()
+            new ErrorDigestJob(),
+            new ImportRowPurgeJob()
         };
-        // The weekly count is expected only once an administrator has chosen what it counts.
-        if (!FieldUtilizationService.trackedObjects().isEmpty()) {
-            jobs.add(new FieldUtilizationJob());
-        }
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
         }
@@ -78,6 +75,34 @@ public with sharing class NightlyJobs {
         return scheduled;
     }
 
+    /**
+     * Stops each named job and schedules it again to run as the running user, for jobs whose
+     * owner was deactivated (ADMIN-12): such a job stops running but keeps its trigger, so it
+     * reads as scheduled. Every job this class knows is scheduled again by `scheduleAll`, and the
+     * end of a running automation pause by AutomationResumeJob. Returns the names that are not
+     * scheduled afterwards, such as a module job Health Check never schedules for anyone.
+     */
+    public static List<String> rescheduleAsRunningUser(List<String> jobNames) {
+        Datetime pauseEnds = AutomationControl.pausedUntil();
+        for (String name : jobNames) {
+            Id triggerId = ScheduledJobSelector.triggerIdByName(name);
+            if (triggerId != null) {
+                ScheduledJobSelector.abort(triggerId);
+            }
+        }
+        scheduleAll();
+        if (jobNames.contains(AutomationResumeJob.JOB_NAME) && pauseEnds != null) {
+            AutomationResumeJob.scheduleAt(pauseEnds);
+        }
+        List<String> stoppedOnly = new List<String>();
+        for (String name : jobNames) {
+            if (ScheduledJobSelector.triggerIdByName(name) == null) {
+                stoppedOnly.add(name);
+            }
+        }
+        return stoppedOnly;
+    }
+
     private static List<NightlyJob> providedBy(String className) {
         try {
             NightlyJobProvider provider = providerOverrides.containsKey(className)
@@ -92,14 +117,7 @@ public with sharing class NightlyJobs {
     }
 
     private static NightlyJobProvider resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type providerType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (providerType == null) {
-            providerType = Type.forName(className);
-        }
+        Type providerType = NamespaceUtil.resolveType(className);
         if (providerType == null) {
             return null;
         }
@@ -161,20 +179,20 @@ public with sharing class NightlyJobs {
     }
 
     /**
-     * The weekly field utilization count, started and stopped on the Health page; listed only
-     * once at least one object is chosen for it.
+     * The nightly Import row cleanup (R-IR5, D-40). How long rows are kept is an Import
+     * setting, and 0 keeps them, so the job always belongs on the list.
      */
-    public class FieldUtilizationJob implements NightlyJob {
+    public class ImportRowPurgeJob implements NightlyJob {
         public String label() {
-            return System.Label.Core_FieldUtilization_JobLabel;
+            return System.Label.Core_HealthCheck_JobImportRows;
         }
 
         public Boolean isScheduled() {
-            return FieldUtilizationScheduler.isScheduled();
+            return ImportRowPurgeScheduler.isScheduled();
         }
 
         public void schedule() {
-            FieldUtilizationScheduler.start();
+            ImportRowPurgeScheduler.start();
         }
     }
 }

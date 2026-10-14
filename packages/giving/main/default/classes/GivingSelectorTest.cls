@@ -2,7 +2,9 @@
  * The queries the rest of the package is built on. Every one of them runs in user mode, so a
  * test that passes here is a query a user is allowed to run.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:GiftSelector, ApexClass:AppealSelector, ApexClass:GiftAllocationSelector, ApexClass:GivingAccountSelector, ApexClass:FundSelector'
+)
 private class GivingSelectorTest {
     @TestSetup
     static void makeData() {

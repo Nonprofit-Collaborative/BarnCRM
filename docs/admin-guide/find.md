@@ -39,7 +39,10 @@ builder and checks it exactly as if it had been built by hand.
    grants access to a record or field the person could not already see.
 2. Open the **Find** tab in the BarnCRM app.
 3. Optional: open **BarnCRM Settings**, choose **Import**, and set **Export row limit**
-   (default 50,000). An export stops at this many rows and says so.
+   (default 50,000). An export stops at this many rows and says so. The limit is a
+   convenience stop that keeps a file a size a spreadsheet opens, not a security control: a
+   person can still read every record their access allows, in several exports or other tools.
+   To keep data from someone, take away their access to it.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -59,6 +62,11 @@ to send them a letter.
    rows are shown.
 6. Press **Export to CSV**. Find reads every matching household, in pages, and downloads one
    file. If there are more than the export row limit, the file stops there and Find says so.
+   A date and time is written as `2026-01-05 09:30:00` in your own Salesforce time zone, the
+   time the table shows, and the workbook from **Export to Excel** uses the same clock. A text
+   value that starts with = + - or @ (such as `+44 20 7946 0000`) is written with a single
+   quote in front, so a spreadsheet never runs it as a formula; BarnCRM's import takes that
+   one quote off again.
 7. Press **Save**, name it "Springfield, no email", and tick **Show to everyone who uses
    Find** so the volunteer coordinator can run it too.
 
@@ -71,6 +79,7 @@ a value; the operators offered depend on the field:
 |---|---|
 | Text, email, phone, URL | equals, does not equal, contains, does not contain, starts with, is one of, is not one of, is blank, is not blank |
 | Picklist | equals, does not equal, is one of, is not one of, is blank, is not blank |
+| Multi-select picklist | is exactly, is not exactly (the whole set of chosen values), is blank, is not blank |
 | Number, currency, percent | equals, does not equal, is less than, is at most, is greater than, is at least, is blank, is not blank |
 | Date, date and time | the number operators, plus is this year, is last year, is in the last N days |
 | Checkbox | equals True or False |
@@ -96,9 +105,11 @@ a value; the operators offered depend on the field:
   who can use Find. Untick it to stop sharing. Only the person who saved a query can change,
   share or delete it; anyone it is shared with can open it, run it, and save their own copy.
 - The **Saved queries** list shows your own queries first, then the ones shared with you,
-  with the name of the person who shared each.
-- A shared query that names a field someone cannot see opens with that condition or column
-  marked, and does not run for them until it is removed from their copy.
+  with the name of the person who shared each. The list holds up to 500 queries; your own
+  are always counted first, so shared queries never push one of yours off it.
+- A shared query that names a field someone cannot see opens for them with that column left
+  out, and a notice names it; a condition on such a field opens marked, and the query does not
+  run for them until it is removed from their copy.
 - Another page, such as the Data Hygiene console, can open Find on a saved query. Find opens
   that query and runs it straight away, as if you had chosen it from the list and pressed
   **Run**. A query you cannot open (deleted, or not shared with you) is simply not opened.
@@ -110,8 +121,9 @@ a value; the operators offered depend on the field:
 - **Fewer rows than a colleague sees.** Find uses each person's own access and sharing. This
   is deliberate; it is not a fault.
 - **The export stopped early.** It reached the export row limit. Narrow the conditions, or ask
-  an admin to raise **Export row limit**. Exports above a few hundred thousand rows belong in
-  Data Loader.
+  an admin to raise **Export row limit** (at most 500,000). For a large export, use **Export to
+  Files** (section 7.5a), which does not depend on your browser. Exports above 500,000 rows
+  belong in Data Loader.
 - **Contains on a number.** Numbers offer comparisons, not contains. Use "is at least" and
   "is at most" together for a range.
 - **A date field shows the right day in the table but a condition seems a day off.** Date and
@@ -147,8 +159,9 @@ Press **Summarize** to count or total the matching records instead of listing th
 
 1. Choose **Count of records**, **Total of**, **Lowest** or **Highest**, and for the last three
    the number or date field to measure.
-2. Optional: choose **Group by**, a field such as **Status** or **Gift Date** (or a related
-   record's field, such as **Household > Billing City**). Leave it empty for one line.
+2. Optional: choose **Group by**, a field of the query's object such as **Status** or
+   **Gift Date**. Only fields Salesforce can group by are offered, so currency, number and
+   long text fields are not. Leave it empty for one line.
 3. Press **Summarize**. A table shows one line per group, with the blank group shown as
    "(blank)".
 
@@ -188,8 +201,37 @@ a message pointing at the words it could not read. Use **Summarize** for totals.
 
 **Export to Excel** reads the same rows as **Export to CSV**, up to the same export row limit,
 and downloads an Excel workbook with one sheet, a header row of column labels, numbers as
-numbers and dates as dates. A very large export can take a while to build in the browser; for
-more than a few tens of thousands of rows, CSV is faster.
+numbers and dates as dates (a date and time as the clock reads in your Salesforce time zone).
+A very large export can take a while to build in the browser; for more than a few tens of
+thousands of rows, CSV is faster. One Excel cell holds at most 32,767
+characters, so a longer text value is cut to that length in the workbook; export to CSV to
+keep it whole.
+
+### 7.5a Export to Files
+
+**Export to Files** runs the export on the Salesforce server instead of in your browser, for
+exports too large for a browser tab to hold (a mailing list of a few hundred thousand donors,
+for example). You can close the page while it runs.
+
+1. Run the query and press **Export to Files**. The export starts in the background and the
+   page shows its progress.
+2. It reads every row the query matches, up to the **Export row limit**, in record ID order,
+   with your own access, and writes them as CSV in the same format as **Export to CSV**. Columns
+   of related records listed under a row (section 7.1's related lists) are not included.
+3. A large export is split into several files of up to 50,000 rows each, every one with the
+   header row, named for the object, the date and the part, for example
+   `Contact-2026-10-13-a1b2c3-part-2.csv`. They are saved to your Salesforce Files (**Files**,
+   **Owned by Me**); nobody else can see them unless you share them.
+4. When it finishes, the page lists the files with a link to each, and BarnCRM sends you a
+   notification (the bell) that opens the first file, if job notifications are on.
+
+The files count against your org's file storage. Delete them from Files once you have
+downloaded them.
+
+**The export row limit is enforced on the server** for an export to Files: it never writes
+more rows than the limit, whoever asks. For **Export to CSV** and **Export to Excel** the limit
+is where your browser stops reading; treat it as a convenience, not a control on what people
+with Find can read, which is always only what their own access allows.
 
 ### 7.6 Editing in the table
 
@@ -203,14 +245,14 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 - Each save runs with your access, and your organization's validation rules and automation
   run, as on any save. A record that is refused is marked in the table with the reason; the
   rest still save.
-- Each save is recorded like a bulk update. It appears on the **Bulk Update** tab under
-  **Recent bulk updates**, and can be undone there within the same window as an import. The
+- Each save is recorded like a bulk update. It appears on the **Data Manager** tab under
+  **Data jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 
 ## 8. What Find does not do (yet)
 
-Exports run on the server, for more rows than a browser can hold, are planned for a later
-release (C-36). Totals are a summary table, not a chart. To change many records to the same
+An export to Files runs once, when you press it: scheduled or recurring exports and sending a
+file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
 value at once, run a query and press **Bulk update**, shown to people who also hold the Bulk
 Update Records permission. See [Bulk update](bulk-update.md). To delete every record a query
 returns, press **Bulk delete**, shown only to people who hold the Bulk Delete Records

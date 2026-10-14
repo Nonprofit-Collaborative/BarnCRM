@@ -2,7 +2,7 @@
  * Tests for HealthCheckGivingSelector (G-20 follow-up, ADR-0053, ADR-0021 as amended by
  * ADR-0057): the org-wide, without-sharing read behind the unposted-in-closed-period finding.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckGivingSelector')
 private class HealthCheckGivingSelectorTest {
     private static User jen() {
         return TestDataFactory.createUser(

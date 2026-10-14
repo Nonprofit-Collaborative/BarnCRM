@@ -9,6 +9,14 @@
         <value>and</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorAlreadyCurrentMember</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A second current membership of one person in one household</shortDescription>
+        <value>This person is already a current member of this household. Edit their existing membership instead of adding another.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorContextMembership</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -105,6 +113,14 @@
         <value>A household could not be saved, so its name or its member count may be out of date.</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorSecondPrimary</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refuses a membership that would give a household a second current primary</shortDescription>
+        <value>This household already has a primary member. To change who it is, click Make primary on the right person in the household's Household Members panel.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorUnexpected</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -117,16 +133,8 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Empty household kept because records outside BarnCRM point at it</shortDescription>
+        <shortDescription>Empty household kept, outside records use it; {0} name, {1} record Id</shortDescription>
         <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_LatePrefix</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Prefix for a person who has died in a formal greeting</shortDescription>
-        <value>the late</value>
     </labels>
     <labels>
         <fullName>Core_Households_ListSeparator</fullName>
@@ -159,5 +167,29 @@
         <protected>true</protected>
         <shortDescription>Refuses a hand edit of a household Primary Contact in junction mode</shortDescription>
         <value>In this org a household's Primary Contact follows the member marked primary. To change it, click Make primary on the right person in the household's Household Members panel.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Households_PrimaryContactMustBeMember</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refuses a Primary Contact who is not a member of the household</shortDescription>
+        <value>The Primary Contact has to be somebody in this household. Choose one of its members, or move the person into the household first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Households_ErrorContextMergeSettle</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error log context for the tidy-up after a Salesforce merge</shortDescription>
+        <value>Tidy-up after a merge</value>
+    </labels>
+    <labels>
+        <fullName>Core_Households_MergeSettleNotQueued</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The tidy-up after a merge could not start; {0} is the kept records</shortDescription>
+        <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because the merge ran inside another background job. These kept records may have a stale member count or name, two default addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
     </labels>
 </CustomLabels>

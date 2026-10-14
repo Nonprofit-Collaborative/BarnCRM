@@ -3,8 +3,13 @@
  * ID loaded by an earlier chunk is Matched, in the dry run as in the commit, and under Never
  * match too.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftImportRunState')
 private class GiftImportRunStateTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',

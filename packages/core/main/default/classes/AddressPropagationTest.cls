@@ -8,8 +8,15 @@
  * service reads membership only through that one call, so this is the whole of the
  * difference between the two modes as far as addresses are concerned.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:AddressService, ApexClass:AccountAddressHandler, ApexClass:ContactAddressHandler, ApexClass:AddressTriggerHandler'
+)
 private class AddressPropagationTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String WINTER_STREET = '4120 East Camelback Road';
     private static final String WINTER_CITY = 'Phoenix';
     private static final String MEMBER_OWN_STREET = '1912 North Third Street';

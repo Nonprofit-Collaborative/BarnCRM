@@ -93,8 +93,22 @@ async function change(target, value) {
 
 describe('c-bulk-update', () => {
   beforeEach(() => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [] });
     getTargets.mockResolvedValue(TARGETS);
+  });
+
+  it('opens on one server read and allows five changes', async () => {
+    const element = await render(QUERY);
+    expect(getPage).not.toHaveBeenCalled();
+    expect(getTargets).toHaveBeenCalledTimes(1);
+
+    const add = element.shadowRoot.querySelector('[data-id="add-change"]');
+    for (let i = 0; i < 4; i++) {
+      expect(add.disabled).toBe(false);
+      add.click();
+      // eslint-disable-next-line no-await-in-loop
+      await flush();
+    }
+    expect(add.disabled).toBe(true);
   });
 
   afterEach(() => {
@@ -136,6 +150,9 @@ describe('c-bulk-update', () => {
       '200 records match.'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="sample-row"]')).toHaveLength(1);
+    expect(
+      element.shadowRoot.querySelector('[data-id="preview-table"]').getAttribute('aria-label')
+    ).toBeTruthy();
     const start = element.shadowRoot.querySelector('[data-id="start"]');
     expect(start.disabled).toBe(true);
 

@@ -5,8 +5,13 @@
  * NOT EXECUTED. No Salesforce org exists in the environment these were written in, so every
  * assertion here is unverified.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AffiliationService')
 private class AffiliationServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void copiesThePrimaryOrganizationToThePerson() {
         System.runAs(TestUsers.admin()) {
@@ -251,6 +256,39 @@ private class AffiliationServiceTest {
                 }
             }
             Assert.areEqual(1, primaries, 'Two flagged in one save still leaves one primary');
+        }
+    }
+
+    /** PEOPLE-39: editing the role settles nothing, so it costs less than moving the flag. */
+    @IsTest
+    static void aRoleEditDoesNotSettleThePrimaryAgain() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            Affiliation__c work = RelationshipTestDataFactory.affiliation(
+                people[0],
+                orgs[0],
+                'Program Officer'
+            );
+            work.Is_Primary__c = true;
+            insert work;
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            update new Affiliation__c(Id = work.Id, Role__c = 'Director');
+            Integer forRole = Limits.getQueries() - before;
+            before = Limits.getQueries();
+            update new Affiliation__c(Id = work.Id, Is_Primary__c = false);
+            Integer forFlag = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.isTrue(forRole < forFlag, 'Role ' + forRole + ', flag ' + forFlag);
+            Assert.isNull(
+                [SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
+                .Primary_Affiliation__c,
+                'Moving the flag still settles the person'
+            );
         }
     }
 }

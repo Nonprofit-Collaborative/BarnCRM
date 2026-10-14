@@ -13,7 +13,7 @@
  * up too. The stricter promise, totals right before the save returns, is
  * `theTotalsAreRightInTheSameTransaction` below, on the instant path.
  */
-@IsTest
+@IsTest(critical=true)
 private class GiftRealTimeRollupTest {
     private static final Set<String> GIVING_SOURCES = new Set<String>{
         'Gift__c',
@@ -236,6 +236,59 @@ private class GiftRealTimeRollupTest {
 
             Assert.areEqual(250, person.Total_Giving__c, 'Right before the save returned');
             Assert.areEqual(250, household.Total_Giving__c, 'And on the household too');
+        }
+    }
+
+    /**
+     * ROLLUPS-1: a gift paying a pledge. The save links the gift to the pledge's earliest open
+     * installment with a nested update of the same gift, which reached the rollup handler before
+     * the insert did. The rollup recursion guard was shared by every event, so the update used
+     * it up and the insert, the event that moves the donor, household and pledge totals, was
+     * skipped. No later save would have queued them either, so the totals stayed wrong until the
+     * nightly run. Read after `Test.stopTest`, so this holds on the instant and the queued path.
+     */
+    @IsTest
+    static void aGiftPayingAPledgeUpdatesTheDonorAndThePledge() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+            Commitment__c pledge = new Commitment__c(
+                Type__c = 'Pledge',
+                Status__c = 'Active',
+                Donor_Contact__c = ana.Id,
+                Amount__c = 100,
+                Frequency__c = 'Monthly',
+                Start_Date__c = Date.today(),
+                Expected_Total__c = 300,
+                Installments_Planned__c = 3
+            );
+            insert pledge;
+            CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
+            GivingRollupTestData.nextSave();
+
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
+            gift.Commitment__c = pledge.Id;
+
+            Test.startTest();
+            insert gift;
+            Test.stopTest();
+
+            Assert.isNotNull(
+                [SELECT Installment__c FROM Gift__c WHERE Id = :gift.Id].Installment__c,
+                'The save linked the gift to an installment, the nested update under test'
+            );
+            Contact person = GivingRollupTestData.person(ana.Id);
+            GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
+            Assert.areEqual(100, person.Total_Giving__c, 'Ana\'s total giving');
+            Assert.areEqual(
+                100,
+                GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
+                'The Nolan household\'s total giving'
+            );
+            Assert.areEqual(
+                100,
+                [SELECT Paid_To_Date__c FROM Commitment__c WHERE Id = :pledge.Id].Paid_To_Date__c,
+                'The pledge\'s paid to date'
+            );
         }
     }
 }

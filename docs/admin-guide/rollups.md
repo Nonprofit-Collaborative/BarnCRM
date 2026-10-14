@@ -123,13 +123,18 @@ button. Clearing the **Active** box is the durable way to say no to a total: an 
 rollup stays inactive across every upgrade, and the values it has already calculated stay
 on the records.
 
-Two settings on the same page change how every rollup behaves:
+Three settings on the same page change how every rollup behaves:
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
-  begin. Choose the month your fiscal year starts from the list. Changing it and recalculating is
-  all that is needed to correct every year based total in the org.
+  begin. Choose the month your fiscal year starts from the list. Changing it and clicking
+  **Recalculate all** corrects every year based total in **Every night** or **Both** mode,
+  which is every year based total the Builder saves (see
+  [What the Builder will not save](#what-the-builder-will-not-save)).
 - **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
   **Every night**, or **Both (recommended)**. The next section says what each one means.
+- **When instant totals are calculated** decides when a save updates the totals in
+  **Instantly** and **Both** mode. See [Just after the save, or during
+  it](#just-after-the-save-or-during-it) below.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollups page still opens and still shows every total and its last calculated time; the
@@ -141,7 +146,7 @@ Every rollup has a mode.
 
 | Mode | What happens |
 |---|---|
-| **Instantly** | A gift saved by a person updates the totals in the same save: when the page refreshes, the household's total giving already includes it. A bulk change (an import, a data loader run, a big update, or anything already running in the background) is put in a queue instead, and the totals catch up within minutes. |
+| **Instantly** | A gift saved by a person updates the totals a few seconds after the save: refresh the household a moment later and its total giving already includes it. A bulk change (an import, a data loader run, a big update) goes through the same queue and catches up within minutes. A change made by a background job is also queued, and the queue run starts as soon as that job's step is saved, so those totals catch up within minutes too. If that start fails, the next queue run or the nightly run picks them up. |
 | **Every night** | Recalculated in the nightly run at 2:00 AM, and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
 | **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
 
@@ -149,6 +154,29 @@ Every rollup has a mode.
 other BarnCRM records. For a total that counts records from one of your own objects, see
 [Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
 without that, such a total is calculated every night and on demand only.
+
+A save recalculates only the totals its change can move. Saving a soft credit recalculates the
+soft credit totals on that person and household, not their gift or pledge totals, and an
+**Every night** total waits for the nightly run even when a record it counts is saved.
+
+### Just after the save, or during it
+
+**When instant totals are calculated** has two choices:
+
+- **Just after the save (recommended)**, the default. The save notes which households,
+  people, organizations, appeals, funds and pledges it changed, and returns. BarnCRM
+  recalculates them in the background a few seconds later, usually within a minute. Every
+  save stays fast, and a save can never fail because the rollups ran out of room: with the
+  shipped totals, recalculating a gift's totals takes more than half of what one save is
+  allowed to do.
+- **During the save**. A normal save recalculates its totals before it returns, so the totals
+  are already right when the page refreshes. Each gift save is slower. When a save has too
+  little room left (because your own Flows or triggers on gifts already used most of it), or
+  is a bulk change, its totals are queued instead, just as with the first choice.
+
+Either way the numbers end up the same: every total is recalculated from all of its records,
+never added to. Choose **During the save** only if your team relies on seeing a total change
+the moment a gift is saved and your org has little automation of its own on gifts.
 
 ### How the nightly run works
 
@@ -258,13 +286,17 @@ to change, before it lets you go on.
    [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
    hold, the field it reads, for First and Last the field that decides which record comes
    first, and the time window: all time, this fiscal year, last fiscal year, or two fiscal
-   years ago, with the date that decides which year a record falls in.
+   years ago, with the date that decides which year a record falls in (a date field, not a
+   date and time field).
 4. **Which records count?** Conditions you pick from lists (a field, a comparison and a
    value), read back as a sentence: "Gifts whose Status is Received, Refunded or Written off".
    Add a condition for each thing that must be true; to mix "and" and "or", type the
    condition numbers in **Combine conditions**, for example `1 AND (2 OR 3)`. **Only for
    some records** holds the same kind of conditions on the record that shows the total, for
-   two rollups that fill one field for different records.
+   two rollups that fill one field for different records. The comparisons **is this year** and
+   **is last year** in a condition mean the calendar year (January to December); for your fiscal
+   year, use the time window in step 3. **Contains** and **starts with** match what you type
+   exactly, so `%` and `_` are ordinary characters.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
@@ -281,7 +313,12 @@ It says what to change instead of saving:
 - A sum or average of something that is not a number or an amount, and a minimum or maximum
   of something that is not a number, an amount or a date.
 - First or Last without the field that decides which record comes first.
-- A fiscal year window without a date to measure it on.
+- A fiscal year window without a date to measure it on, or measured on a date and time field.
+  Choose a date field, such as the gift date.
+- An **Instantly** total with a fiscal year window, or with an **is this year**, **is last year** or
+  **is in the last N days** condition. Such a total changes when the date moves on, with no record
+  saved, so only the nightly run can keep it right. Choose **Both (recommended)** or **Every
+  night**. Changing the mode on the Rollups list refuses it too.
 - Conditions that name a field the records do not have.
 - A field another active rollup already fills for some of the same records. Two rollups may
   fill one field only when their **Only for some records** conditions never pick the same
@@ -304,8 +341,9 @@ After changing exchange rates, recalculate your money totals to bring them up to
 Under the list, **Needs attention** shows what the engine has not finished:
 
 - **Records waiting**, for example "1,204 records waiting, oldest 3 minutes ago". These are
-  totals from bulk changes, queued and calculated within minutes. Nothing to do unless the
-  oldest is more than an hour old.
+  totals from recent saves and bulk changes, queued and calculated within a minute or a few.
+  Nothing to do unless the oldest is more than an hour old, which Health Check also reports.
+  Then click **Start now** to recalculate them now; the nightly run also picks them up.
 - **Could not be saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or
@@ -315,12 +353,21 @@ Under the list, **Needs attention** shows what the engine has not finished:
 
 ### Recalculate all, now or tonight
 
+**Recalculate all** rebuilds every active rollup, whatever its mode: **Instantly** totals as
+well as **Every night** and **Both** ones. The nightly run covers only **Every night** and
+**Both**, because each save already keeps an **Instantly** total right; **Recalculate all** is
+for when you want every total rebuilt from scratch, for example after loading data with
+automation paused.
+
 Before **Recalculate all** starts, the Builder says how many records it will go through and
-roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." During
-working hours (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it
-tonight instead, because a long run competes with people saving records. **Run tonight**
-does nothing extra when the nightly run is scheduled, since it already recalculates every
-total at 2:00 AM; otherwise it sets up a single run for 2:00 AM tonight.
+roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." The count
+includes the records of every active rollup, **Instantly** ones too. During working hours
+(8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it tonight instead,
+because a long run competes with people saving records. When the nightly run is not
+scheduled, **Run tonight** sets up a single run of every active rollup for 2:00 AM tonight.
+When it is scheduled, **Run tonight** adds nothing: the nightly run already recalculates the
+**Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
+only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
 ## Instant totals on your own objects
 
@@ -418,7 +465,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    visibly right.
 4. Click **Recalculate** on that row. The page says "Recalculation started" and the row's
    last calculated time moves to a moment ago when the run finishes. **Recalculate all**
-   at the top does the same for every scheduled rollup at once.
+   at the top does the same for every active rollup at once, **Instantly** ones included.
 5. Open any household record. Its giving totals now match what you just recalculated. If
    any of them changed, the **Rollups last calculated** field on the record shows the time
    of that run; if none did, it keeps its earlier time, because the run found nothing to
@@ -446,6 +493,12 @@ recalculated once a night, so a record entered this afternoon does not move it u
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
 needs to be right the moment a record is saved, set it to **Instantly** or **Both
 (recommended)**.
+
+**Expecting the total on the page the instant you click Save.** By default, Instantly and
+Both totals are recalculated a few seconds after the save, so the donor's page you are looking
+at may still show the old total. Refresh it a moment later. If your team needs the total in
+the save itself, change **When instant totals are calculated** to **During the save** (see
+[Just after the save, or during it](#just-after-the-save-or-during-it)).
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before

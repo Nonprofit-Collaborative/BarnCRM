@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
+import { messageFrom } from 'c/findCsv';
 
 import RELATED_RECORDS from '@salesforce/label/c.Core_Find_RelatedRecords';
 import RELATED_HELP from '@salesforce/label/c.Core_Find_RelatedHelp';
@@ -308,11 +309,4 @@ export default class FindRelatedPanel extends LightningElement {
     this.columns = this.columns.filter((column) => column.key !== event.target.dataset.key);
     this.announce();
   }
-}
-
-function messageFrom(error) {
-  if (error && error.body && error.body.message) {
-    return error.body.message;
-  }
-  return error && error.message ? error.message : String(error);
 }

@@ -1,5 +1,5 @@
 /** Recent changes are what Maria checks when she is not sure a change went in. */
-@IsTest
+@IsTest(testFor='ApexClass:SettingChangeSelector')
 private class SettingChangeSelectorTest {
     @TestSetup
     static void makeData() {

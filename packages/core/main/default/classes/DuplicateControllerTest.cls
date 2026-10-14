@@ -5,7 +5,7 @@
  * to name an active rule, so a test that needs one stops, with an assertion, in an org that
  * has no active rule for its object.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DuplicateController')
 private class DuplicateControllerTest {
     @TestSetup
     static void grantPermission() {
@@ -154,6 +154,124 @@ private class DuplicateControllerTest {
                 'The dismissed pair is gone from the list.'
             );
             Assert.areEqual(1, view.dismissedCount, 'And counted as dismissed.');
+        }
+    }
+
+    /**
+     * A rule that reports on save writes the pair again when one of the two is saved past its
+     * alert; the dismissal still holds for that new suggestion (R-DP5).
+     */
+    @IsTest
+    static void aDismissedPairWrittenAgainStaysOffThePanel() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = twoHouseholds();
+            if (!suggest(households[0].Id, households[1].Id)) {
+                return;
+            }
+            DuplicateController.dismiss(DuplicateController.getView().suggestions[0].setId, null);
+            suggest(households[0].Id, households[1].Id);
+
+            Test.startTest();
+            DuplicateController.DuplicateView view = DuplicateController.getView();
+            Test.stopTest();
+
+            Assert.areEqual(1, [SELECT COUNT() FROM DuplicateRecordSet], 'The set was written.');
+            Assert.areEqual(0, view.suggestions.size(), 'But the dismissed pair is not offered.');
+            Assert.areEqual(0, view.totalSuggestions, 'Nor counted.');
+        }
+    }
+
+    @IsTest
+    static void aNonprofitCloudHouseholdIsNotOfferedForMerge() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = twoHouseholds();
+            if (!suggest(households[0].Id, households[1].Id)) {
+                return;
+            }
+            HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{
+                households[1].Id
+            };
+
+            Test.startTest();
+            DuplicateController.DuplicateView view = DuplicateController.getView();
+            String refusal;
+            try {
+                DuplicateController.previewMerge(households[0].Id, households[1].Id);
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(0, view.suggestions.size(), 'The pair is not shown (ADR-0036).');
+            Assert.areEqual(
+                Label.Core_HouseholdMerge_ErrorNativeHousehold,
+                refusal,
+                'And a merge of it is refused in words.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSecondScanIsRefusedWhileOneIsRunning() {
+        System.runAs(TestUsers.admin()) {
+            DuplicateService.stubMatches = new List<DuplicateService.Pair>();
+
+            Test.startTest();
+            Database.executeBatch(
+                new DuplicateScanBatch('Contact', new List<String>()),
+                DuplicateService.MAX_RECORDS_PER_CALL
+            );
+            DuplicateController.DuplicateView view = DuplicateController.getView();
+            String refusal;
+            try {
+                DuplicateController.startScan();
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.isTrue(view.scanRunning, 'The panel says a scan is running.');
+            Assert.areEqual(
+                Label.Core_Duplicates_ErrorScanRunning,
+                refusal,
+                'A second scan is refused in words.'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'DuplicateScanBatch'],
+                'Only the first scan was started.'
+            );
+        }
+    }
+
+    /**
+     * Organization pairs the standard Account rule writes on save do not hide the households
+     * behind them: the panel reads on past a window it can use none of.
+     */
+    @IsTest
+    static void organizationPairsDoNotHideAHouseholdPairBehindThem() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = twoHouseholds();
+            if (!suggest(households[0].Id, households[1].Id)) {
+                return;
+            }
+            for (Integer index = 0; index < 3; index++) {
+                List<Account> bakeries = (List<Account>) insertAllowingDuplicates(
+                    new List<Account>{
+                        new Account(Name = 'Dupview Bakery ' + index),
+                        new Account(Name = 'Dupview Bakery ' + index)
+                    }
+                );
+                suggest(bakeries[0].Id, bakeries[1].Id);
+            }
+            DuplicateController.maxRead = 2;
+
+            Test.startTest();
+            DuplicateController.DuplicateView view = DuplicateController.getView();
+            Test.stopTest();
+
+            Assert.areEqual(1, view.suggestions.size(), 'The households, found past the bakeries.');
+            Assert.isTrue(view.suggestions[0].canMerge, 'And offered for merge.');
         }
     }
 

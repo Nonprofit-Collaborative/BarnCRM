@@ -3,8 +3,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QueryFieldCatalog')
 private class QueryFieldCatalogTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void describesAnObjectWithItsFieldsSortedByLabel() {
         System.runAs(TestUsers.admin()) {
@@ -115,6 +120,61 @@ private class QueryFieldCatalogTest {
                     );
                 }
             }
+        }
+    }
+
+    /** Describes are read once per object in a transaction, and give the same answers after. */
+    @IsTest
+    static void anObjectIsDescribedOnceAndAnswersTheSameAfter() {
+        System.runAs(TestUsers.admin()) {
+            Schema.DescribeSObjectResult first = QueryFieldCatalog.describeObject('Affiliation__c');
+            System.Assert.areEqual(
+                first,
+                QueryFieldCatalog.describeObject('AFFILIATION__C'),
+                'The second read, in any case, is the first describe'
+            );
+            for (Integer index = 0; index < 200; index++) {
+                System.Assert.areEqual(
+                    'Name',
+                    QueryFieldCatalog.resolvePath('Affiliation__c', 'contact__r.ACCOUNT.Name')
+                        .getName(),
+                    'Every path crossing the same lookups resolves the same way'
+                );
+            }
+            for (Integer attempt = 0; attempt < 2; attempt++) {
+                try {
+                    QueryFieldCatalog.describeObject('No_Such_Object__c');
+                    System.Assert.fail('An unknown object is refused every time');
+                } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+                    System.Assert.isTrue(
+                        refused.getMessage().contains('No_Such_Object__c'),
+                        'A refusal is never cached as an answer'
+                    );
+                }
+            }
+        }
+    }
+
+    /** One rule for the platform's own tables, standard and custom, and for settings. */
+    @IsTest
+    static void tellsThePlatformsOwnTablesFromRecords() {
+        System.runAs(TestUsers.admin()) {
+            System.Assert.isFalse(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.Account),
+                'Account holds records'
+            );
+            System.Assert.isFalse(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.Affiliation__c),
+                'A package object holds records'
+            );
+            System.Assert.isTrue(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.AccountShare),
+                'A standard share table'
+            );
+            System.Assert.isTrue(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.BarnCRM_Settings__c),
+                'A custom setting'
+            );
         }
     }
 

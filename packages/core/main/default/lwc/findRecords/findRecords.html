@@ -1,17 +1,17 @@
 <template>
     <lightning-card title={labels.title} icon-name="utility:search">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
-            <template if:true={busy}>
+            <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
                     <span data-id="error-message">{errorMessage}</span>
                 </div>
             </template>
-            <template if:true={hasNotice}>
+            <template lwc:if={hasNotice}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
                     role="status"
@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <template if:true={hasObject}>
+            <template lwc:if={hasObject}>
                 <div class="slds-var-m-top_medium">
                     <lightning-dual-listbox
                         data-id="columns"
@@ -167,7 +167,15 @@
                         disabled={actionDisabled}
                         onclick={handleExportExcel}
                     ></lightning-button>
-                    <template if:true={canBulkUpdate}>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="export-files"
+                        label={labels.exportFiles}
+                        icon-name="utility:upload"
+                        disabled={actionDisabled}
+                        onclick={handleExportFiles}
+                    ></lightning-button>
+                    <template lwc:if={canBulkUpdate}>
                         <lightning-button
                             class="slds-var-m-left_x-small"
                             data-id="bulk-update"
@@ -177,7 +185,7 @@
                             onclick={handleBulkUpdate}
                         ></lightning-button>
                     </template>
-                    <template if:true={canBulkDelete}>
+                    <template lwc:if={canBulkDelete}>
                         <lightning-button
                             class="slds-var-m-left_x-small"
                             data-id="bulk-delete"
@@ -188,6 +196,7 @@
                         ></lightning-button>
                     </template>
                 </div>
+                <c-find-export-files data-id="export-files-panel"></c-find-export-files>
 
                 <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-top_medium">
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
@@ -233,12 +242,12 @@
                     </div>
                 </div>
 
-                <template if:true={rows}>
+                <template lwc:if={rows}>
                     <p class="slds-var-m-top_medium slds-var-m-bottom_x-small" data-id="result-line" role="status">
                         {resultLine}
                     </p>
                 </template>
-                <template if:true={hasRows}>
+                <template lwc:if={hasRows}>
                     <div class="slds-scrollable_x">
                         <lightning-datatable
                             data-id="results"
@@ -254,7 +263,7 @@
                         ></lightning-datatable>
                     </div>
                 </template>
-                <template if:true={showNoResults}>
+                <template lwc:if={showNoResults}>
                     <p data-id="no-results">{labels.noResults}</p>
                 </template>
                 <h2 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">
@@ -266,12 +275,12 @@
                     aggregate={aggregate}
                     onchange={handleSummaryChange}
                 ></c-find-summary-panel>
-                <template if:true={showBulkUpdate}>
+                <template lwc:if={showBulkUpdate}>
                     <div class="slds-var-m-top_medium">
                         <c-bulk-update query-json={bulkQueryJson} onclose={handleBulkClose}></c-bulk-update>
                     </div>
                 </template>
-                <template if:true={showBulkDelete}>
+                <template lwc:if={showBulkDelete}>
                     <div class="slds-var-m-top_medium">
                         <c-bulk-delete query-json={deleteQueryJson} onclose={handleDeleteClose}></c-bulk-delete>
                     </div>

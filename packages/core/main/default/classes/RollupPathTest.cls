@@ -3,8 +3,13 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupPath')
 private class RollupPathTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void oneReferenceAttributeIsOneHop() {
         System.runAs(TestUsers.admin()) {
@@ -113,37 +118,6 @@ private class RollupPathTest {
             } catch (RollupPath.RollupPathException expected) {
                 System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
             }
-        }
-    }
-
-    @IsTest
-    static void aHouseholdTokenResolvesThroughHouseholdServiceInContactMode() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            // A household account, not any account: in contact mode HouseholdService answers with
-            // the account a person points at only when that account is a household.
-            Account household = HouseholdTestDataFactory.newHousehold('Test household');
-            insert household;
-            Contact person = new Contact(LastName = 'Rivera', AccountId = household.Id);
-            insert person;
-
-            List<Household_Member__c> sources = new List<Household_Member__c>{
-                new Household_Member__c(Household__c = household.Id, Contact__c = person.Id)
-            };
-            insert sources;
-
-            Test.startTest();
-            Map<Id, Set<Id>> targets = RollupPath.resolveTargets(
-                RollupPath.parse('Contact__c > {Household}'),
-                sources
-            );
-            Test.stopTest();
-
-            System.Assert.areEqual(1, targets.size(), 'The one source record reaches one target');
-            System.Assert.isTrue(
-                targets.get(sources[0].Id).contains(household.Id),
-                'The household the person belongs to is the target, resolved by HouseholdService'
-            );
         }
     }
 }

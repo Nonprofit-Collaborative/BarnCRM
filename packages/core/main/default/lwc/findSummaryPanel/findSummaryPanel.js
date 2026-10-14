@@ -1,6 +1,8 @@
 import { LightningElement, api } from 'lwc';
 import summarize from '@salesforce/apex/FindController.summarize';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
+import { messageFrom } from 'c/findCsv';
+import TIME_ZONE from '@salesforce/i18n/timeZone';
 
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import SUMMARY_FUNCTION from '@salesforce/label/c.Core_Find_SummaryFunction';
@@ -103,7 +105,9 @@ export default class FindSummaryPanel extends LightningElement {
     return this.fields
       .filter(
         (field) =>
-          NUMBER_TYPES.has(field.dataType) || (this.fn !== 'sum' && DATE_TYPES.has(field.dataType))
+          field.aggregatable !== false &&
+          (NUMBER_TYPES.has(field.dataType) ||
+            (this.fn !== 'sum' && DATE_TYPES.has(field.dataType)))
       )
       .map((field) => ({ label: field.label, value: field.apiName }));
   }
@@ -112,7 +116,12 @@ export default class FindSummaryPanel extends LightningElement {
     return [
       { label: NO_GROUP, value: '' },
       ...this.fields
-        .filter((field) => field.filterable && !NOT_GROUPABLE.has(field.dataType))
+        // The describe says which fields SOQL groups by (not currency, number or long text);
+        // the type list stays for a field described without that answer.
+        .filter(
+          (field) =>
+            field.groupable !== false && field.filterable && !NOT_GROUPABLE.has(field.dataType)
+        )
         .map((field) => ({ label: field.label, value: field.apiName }))
     ];
   }
@@ -136,14 +145,24 @@ export default class FindSummaryPanel extends LightningElement {
   get columns() {
     const measured = this.fields.find((field) => field.apiName === this.field);
     const type = this.fn === 'count' || !measured ? 'number' : measured.dataType;
-    return [
-      { label: GROUP, fieldName: 'group', type: 'text' },
-      {
-        label: RESULT,
-        fieldName: 'value',
-        type: NUMBER_TYPES.has(type) || this.fn === 'count' ? 'number' : 'text'
-      }
-    ];
+    const result = { label: RESULT, fieldName: 'value', type: 'text' };
+    if (NUMBER_TYPES.has(type) || this.fn === 'count') {
+      result.type = 'number';
+    } else if (type === 'date') {
+      // The lowest or highest date, shown as a date like the grid shows it.
+      result.type = 'date-local';
+    } else if (type === 'datetime') {
+      result.type = 'date';
+      result.typeAttributes = {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: TIME_ZONE
+      };
+    }
+    return [{ label: GROUP, fieldName: 'group', type: 'text' }, result];
   }
 
   get rows() {
@@ -206,11 +225,4 @@ export default class FindSummaryPanel extends LightningElement {
       this.busy = false;
     }
   }
-}
-
-function messageFrom(error) {
-  if (error && error.body && error.body.message) {
-    return error.body.message;
-  }
-  return error && error.message ? error.message : String(error);
 }

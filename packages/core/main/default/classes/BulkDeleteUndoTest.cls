@@ -8,8 +8,13 @@
  *
  * No org has run these yet; they are written against the behaviour the classes document.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteService, ApexClass:BulkDeleteBatch')
 private class BulkDeleteUndoTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,
@@ -137,6 +142,74 @@ private class BulkDeleteUndoTest {
         }
     }
 
+    /**
+     * With Delete Empty Households on, deleting each household's only member still keeps the
+     * household (R-H12): deleting it would purge the person from the Recycle Bin. The undo
+     * brings the people back into their households.
+     */
+    @IsTest
+    static void householdsEmptiedByTheDeleteAreKeptAndGetTheirPeopleBack() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            List<Account> households = new List<Account>();
+            for (Integer index = 0; index < 200; index++) {
+                households.add(HouseholdTestDataFactory.newHousehold('Tidied ' + index));
+            }
+            insert households;
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < 200; index++) {
+                people.add(
+                    new Contact(
+                        AccountId = households[index].Id,
+                        LastName = 'Tidied ' + index,
+                        Title = 'Volunteer'
+                    )
+                );
+            }
+            insert people;
+            Id jobId;
+            System.runAs(deleter()) {
+                Import_Batch__c created = BulkDeleteService.createJob(
+                    BulkDeleteService.plan(VOLUNTEERS),
+                    200,
+                    200
+                );
+                jobId = created.Id;
+                BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+                job.finish(null);
+            }
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :households AND Member_Count__c = 0],
+                'The emptied households are kept, with nobody in them'
+            );
+
+            Test.startTest();
+            System.runAs(deleter()) {
+                BulkDeleteService.undo(jobId, 200);
+            }
+            Test.stopTest();
+
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE AccountId IN :households],
+                reread(jobId).Run_Log__c
+            );
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :households AND Member_Count__c = 1],
+                'Each household has its person back'
+            );
+        }
+    }
+
     @IsTest
     static void refusesAWrongCountASecondUndoAndAClosedWindow() {
         System.runAs(TestUsers.admin()) {
@@ -178,6 +251,35 @@ private class BulkDeleteUndoTest {
             BulkDeleteService.UndoPreview preview = BulkDeleteService.undoPreview(updateJob.Id);
             System.Assert.isFalse(preview.allowed, 'Refused');
             System.Assert.areEqual(System.Label.Core_BulkDelete_ErrorNotBulkDelete, preview.reason);
+        }
+    }
+
+    /** The import undo would mark a bulk delete Undone and bring nothing back, so it refuses. */
+    @IsTest
+    static void theImportUndoRefusesABulkDelete() {
+        System.runAs(TestUsers.admin()) {
+            Id jobId;
+            System.runAs(deleter()) {
+                jobId = deleteVolunteers(5);
+            }
+            ImportUndoService.Preview preview = ImportUndoService.preview(jobId);
+            System.Assert.isFalse(preview.allowed, 'Refused');
+            System.Assert.areEqual(System.Label.Core_Import_UndoErrorBulkDelete, preview.reason);
+            try {
+                ImportUndoService.start(jobId, 0);
+                System.Assert.fail('Refused');
+            } catch (ImportException expected) {
+                System.Assert.areEqual(
+                    System.Label.Core_Import_UndoErrorBulkDelete,
+                    expected.getMessage()
+                );
+            }
+            System.Assert.areEqual(
+                ImportBatchService.STATUS_COMPLETE,
+                reread(jobId).Status__c,
+                'Not marked Undone'
+            );
+            System.Assert.isTrue(BulkDeleteService.undoPreview(jobId).allowed, 'Still undoable');
         }
     }
 }

@@ -31,6 +31,9 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
      */
     private Date runDate;
 
+    /** Who pressed Run now, told when the swap ends; null for the nightly run (Q-04). */
+    private Id notifyUserId = JobNotifier.starter();
+
     public SeasonalAddressBatch() {
         this(Date.today());
     }
@@ -48,7 +51,7 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
         try {
             Set<Id> ownerIds = new Set<Id>();
             for (Address__c address : scope) {
-                Id ownerId = SeasonalAddressService.ownerIdOf(address);
+                Id ownerId = AddressService.ownerIdOf(address);
                 if (ownerId != null) {
                     ownerIds.add(ownerId);
                 }
@@ -69,6 +72,13 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
      */
     public void finish(Database.BatchableContext context) {
         SeasonalAddressService.recordRun(this.summary, System.now());
+        JobNotifier.aboutSettings(
+            this.notifyUserId,
+            System.Label.Core_JobNotice_SeasonalAddress,
+            false,
+            this.summary.text(),
+            JobNotifier.SECTION_ADDRESSES
+        );
     }
 
     /** What this run came to, for a caller or a test that wants the counts rather than the text. */

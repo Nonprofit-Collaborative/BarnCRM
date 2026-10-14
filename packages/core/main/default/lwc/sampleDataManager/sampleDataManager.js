@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getStatus from '@salesforce/apex/SampleDataController.getStatus';
 import loadSampleData from '@salesforce/apex/SampleDataController.loadSampleData';
 import removeSampleData from '@salesforce/apex/SampleDataController.removeSampleData';
@@ -85,7 +86,6 @@ export default class SampleDataManager extends LightningElement {
   canManage = false;
   isLoadingStatus = true;
   isBusy = false;
-  pendingAction; // 'load', 'remove', or undefined
 
   pollTimer;
 
@@ -201,22 +201,6 @@ export default class SampleDataManager extends LightningElement {
     return this.loaded ? 'slds-theme_success' : '';
   }
 
-  get showConfirm() {
-    return this.pendingAction != null;
-  }
-
-  get confirmTitle() {
-    return this.pendingAction === 'load'
-      ? this.labels.loadConfirmTitle
-      : this.labels.removeConfirmTitle;
-  }
-
-  get confirmBody() {
-    return this.pendingAction === 'load'
-      ? this.labels.loadConfirmBody
-      : this.labels.removeConfirmBody;
-  }
-
   get loadDisabled() {
     return !this.canManage || this.loaded || this.loading || this.isBusy;
   }
@@ -228,20 +212,31 @@ export default class SampleDataManager extends LightningElement {
   }
 
   handleLoadClick() {
-    this.pendingAction = 'load';
+    return this.confirmAndRun('load');
   }
 
   handleRemoveClick() {
-    this.pendingAction = 'remove';
+    return this.confirmAndRun('remove');
   }
 
-  handleCancel() {
-    this.pendingAction = undefined;
-  }
-
-  async handleConfirm() {
-    const action = this.pendingAction;
-    this.pendingAction = undefined;
+  /**
+   * Asks the person to confirm in a modal, then loads or removes the sample data.
+   * Cancel, Escape and the close button change nothing.
+   *
+   * @param {string} action 'load' or 'remove'
+   */
+  async confirmAndRun(action) {
+    const isLoad = action === 'load';
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: isLoad ? this.labels.loadConfirmTitle : this.labels.removeConfirmTitle,
+      message: isLoad ? this.labels.loadConfirmBody : this.labels.removeConfirmBody,
+      confirmLabel: this.labels.confirmButtonLabel,
+      cancelLabel: this.labels.cancelButtonLabel
+    });
+    if (!confirmed) {
+      return;
+    }
     this.isBusy = true;
     try {
       if (action === 'load') {
@@ -260,7 +255,7 @@ export default class SampleDataManager extends LightningElement {
   }
 
   showToast(title, message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    Toast.show({ label: title, message, variant }, this);
   }
 
   reduceError(error) {

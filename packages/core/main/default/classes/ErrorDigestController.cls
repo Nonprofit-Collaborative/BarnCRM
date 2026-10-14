@@ -8,8 +8,6 @@
  * console can read the panel.
  */
 public with sharing class ErrorDigestController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
-
     /** Raised with a message the panel shows as it is. */
     public class ErrorDigestException extends Exception {
     }
@@ -88,7 +86,7 @@ public with sharing class ErrorDigestController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission(EDIT_PERMISSION);
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

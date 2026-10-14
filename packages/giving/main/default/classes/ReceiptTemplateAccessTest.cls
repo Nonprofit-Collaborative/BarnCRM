@@ -9,8 +9,13 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptTemplateService, ApexClass:ReceiptController')
 private class ReceiptTemplateAccessTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void theReceiptsPageReadsTheLettersAndWritesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

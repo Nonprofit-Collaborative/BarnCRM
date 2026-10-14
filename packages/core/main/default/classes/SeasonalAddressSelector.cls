@@ -13,8 +13,6 @@
  * hands it identifiers that came from its own query locator.
  */
 public without sharing class SeasonalAddressSelector {
-    private static final String TYPE_SEASONAL = 'Seasonal';
-
     /**
      * Every seasonal address in the org, grouped by owner.
      *
@@ -27,7 +25,7 @@ public without sharing class SeasonalAddressSelector {
      * anyway: the swap is idempotent and the second pass finds nothing to do.
      */
     public Database.QueryLocator seasonalLocator() {
-        String seasonal = TYPE_SEASONAL;
+        String seasonal = AddressService.TYPE_SEASONAL;
         return Database.getQueryLocator(
             [
                 SELECT Id, Account__c, Contact__c, Person_Account__c

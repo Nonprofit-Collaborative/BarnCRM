@@ -29,7 +29,8 @@ Nothing to install and no Setup step. Gift batches arrive with the Giving packag
    fund**. A line with no fund of its own, in a batch with no fund, goes to that fund, and
    without one the batch cannot post.
 3. The people who type batches need the **Giving Staff** permission set, the same one Quick
-   Gift Entry needs. Deleting a batch is kept to **Giving Admin**.
+   Gift Entry needs. The **Fundraising Staff** role includes it. Deleting a batch is kept to
+   **Giving Admin**.
 
 There are no settings for batches themselves.
 

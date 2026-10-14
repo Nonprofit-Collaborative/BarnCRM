@@ -2,8 +2,13 @@
  * Automatic household soft credits, in both membership modes, at bulk, and through every path a
  * gift can take (feature G-08).
  */
-@IsTest
+@IsTest(testFor='ApexClass:SoftCreditService')
 private class SoftCreditServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void creditsTheOtherHouseholdMemberInContactMode() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -122,6 +127,53 @@ private class SoftCreditServiceTest {
                 'The setting off means no household member is wanted, so the credit goes (R-SC3)'
             );
             System.assertNotEquals(null, luis.Id, 'Luis is still a person');
+        }
+    }
+
+    @IsTest
+    static void peopleJoiningHouseholdsWithNoGiftsQueueNoRecompute() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.setAutomaticHouseholdCredits(true);
+            Id householdType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+                .get(RecognitionTestData.HOUSEHOLD_RECORD_TYPE)
+                .getRecordTypeId();
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
+            }
+            insert households;
+            Account givers = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', givers.Id);
+            RecognitionTestData.gift(ana.Id, null, 500);
+            List<Contact> people = new List<Contact>();
+            for (Account household : households) {
+                people.add(new Contact(LastName = household.Name, AccountId = household.Id));
+            }
+            people.add(new Contact(FirstName = 'Luis', LastName = 'Garcia', AccountId = givers.Id));
+
+            Test.startTest();
+            insert people;
+            Integer queued = [
+                SELECT COUNT()
+                FROM AsyncApexJob
+                WHERE ApexClass.Name = 'HouseholdSoftCreditRecompute'
+            ];
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                queued,
+                'Only the household with a gift is recomputed; the 200 without gifts queue nothing'
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Soft_Credit__c
+                    WHERE Contact__c IN (SELECT Id FROM Contact WHERE FirstName = 'Luis')
+                ],
+                'Luis joins the household that gave and is recognized on its gift (R-SC3)'
+            );
         }
     }
 

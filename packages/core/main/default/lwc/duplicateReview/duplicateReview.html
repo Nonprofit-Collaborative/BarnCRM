@@ -33,7 +33,7 @@
         <lightning-button
           data-id="scan-button"
           label={labels.scanButton}
-          disabled={controlsDisabled}
+          disabled={scanDisabled}
           onclick={handleScan}
         ></lightning-button>
         <lightning-button
@@ -108,7 +108,13 @@
             <ul>
               <template for:each={suggestion.records} for:item="record">
                 <li key={record.recordId} class="slds-text-body_regular">
-                  <a href={record.url} data-id="record-link">{record.name}</a>
+                  <a
+                    href={record.url}
+                    data-id="record-link"
+                    data-record-id={record.recordId}
+                    onclick={handleRecordClick}
+                    >{record.name}</a
+                  >
                   <span class="slds-text-body_small slds-var-m-left_x-small"
                     >{record.kind}: {record.detail}</span
                   >

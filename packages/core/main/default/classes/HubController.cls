@@ -11,8 +11,14 @@
  * page.
  */
 public with sharing class HubController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'BarnCRM home';
+
+    /**
+     * The tile counts this many new errors and then says "more", so a flooded Error Log costs
+     * the home page at most this many query rows plus one. A test lowers it.
+     */
+    @TestVisible
+    private static Integer errorCountCap = 999;
 
     public class HomeModel {
         @AuraEnabled
@@ -24,6 +30,12 @@ public with sharing class HubController {
         /** True when there are more new errors than `newErrorCount`, the most the tile counts. */
         @AuraEnabled
         public Boolean newErrorCountCapped;
+        /**
+         * Problems the install and its upgrades logged that nobody has looked at, capped like
+         * the error count; null for someone who cannot read the Error Log.
+         */
+        @AuraEnabled
+        public Integer installProblemCount;
         @AuraEnabled
         public Integer stepsCompleted;
         @AuraEnabled
@@ -68,17 +80,27 @@ public with sharing class HubController {
 
     private static HomeModel buildModel() {
         HomeModel model = new HomeModel();
-        model.canEdit = FeatureManagement.checkPermission(EDIT_PERMISSION);
-        List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
-        model.stepsTotal = steps.size();
-        model.stepsCompleted = SetupAssistantService.countCompleted(steps);
+        model.canEdit = BarnCRMPermissions.canManageSettings();
         model.automationPaused = readAutomationPaused();
-        Integer newErrors = readNewErrorCount();
-        model.newErrorCountCapped = newErrors > HubErrorCountSelector.cap();
-        model.newErrorCount = model.newErrorCountCapped ? HubErrorCountSelector.cap() : newErrors;
-        readRollupFreshness(model);
-        readSeasonalAddressRun(model);
         model.recurringSources = readRecurringSources();
+        if (model.canEdit) {
+            List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
+            model.stepsTotal = steps.size();
+            model.stepsCompleted = SetupAssistantService.countCompleted(steps);
+            readErrorCounts(model);
+            readRollupFreshness(model);
+            readSeasonalAddressRun(model);
+        } else {
+            // The checklist and the administrator tiles are hidden from staff (the page's
+            // visibility rules, barncrm-app.md), so their numbers are not worked out (ADMIN-10).
+            model.stepsTotal = 0;
+            model.stepsCompleted = 0;
+            model.newErrorCount = 0;
+            model.newErrorCountCapped = false;
+            model.rollupsStale = false;
+            model.seasonalAddressScheduled = false;
+            model.seasonalAddressStale = false;
+        }
         return model;
     }
 
@@ -98,6 +120,7 @@ public with sharing class HubController {
      */
     private static void readRollupFreshness(HomeModel model) {
         try {
+            failIfTestSaysSo(PART_ROLLUPS);
             model.rollupsLastCalculated = RollupService.lastCalculated();
             model.rollupsStale = RollupService.isStale();
         } catch (Exception e) {
@@ -116,10 +139,13 @@ public with sharing class HubController {
      */
     private static void readSeasonalAddressRun(HomeModel model) {
         try {
+            failIfTestSaysSo(PART_SEASONAL);
             model.seasonalAddressLastRun = SeasonalAddressService.lastRun();
             model.seasonalAddressLastRunSummary = SeasonalAddressService.lastRunSummary();
             model.seasonalAddressScheduled = SeasonalAddressScheduler.isScheduled();
-            model.seasonalAddressStale = SeasonalAddressService.isStale();
+            model.seasonalAddressStale = SeasonalAddressService.isStale(
+                model.seasonalAddressScheduled
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             model.seasonalAddressScheduled = false;
@@ -152,13 +178,42 @@ public with sharing class HubController {
         return result;
     }
 
-    private static Integer readNewErrorCount() {
+    /**
+     * The new error count and the install problem count, both capped (ADMIN-8). The Error Log
+     * ships in Core, so the static, user mode count in ErrorLogCountSelector is enough: it
+     * answers zero for someone who cannot read the log.
+     */
+    private static void readErrorCounts(HomeModel model) {
         try {
-            return HubErrorCountSelector.countNewErrors();
+            Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorCountCap);
+            model.newErrorCountCapped = newErrors > errorCountCap;
+            model.newErrorCount = Math.min(newErrors, errorCountCap);
+            Integer installProblems = CorePostInstall.countInstallProblemsUpTo(errorCountCap);
+            model.installProblemCount = installProblems == null
+                ? null
+                : Math.min(installProblems, errorCountCap);
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            return 0;
+            model.newErrorCount = 0;
+            model.newErrorCountCapped = false;
         }
+    }
+
+    /** Parts of the page a test can make fail, to see the page degrade instead (ADMIN-13). */
+    @TestVisible
+    private static final String PART_ROLLUPS = 'rollups';
+    @TestVisible
+    private static final String PART_SEASONAL = 'seasonal';
+    @TestVisible
+    private static Set<String> failingPartsForTest = new Set<String>();
+
+    private static void failIfTestSaysSo(String part) {
+        if (Test.isRunningTest() && failingPartsForTest.contains(part)) {
+            throw new HubPartException('A test made this part fail: ' + part);
+        }
+    }
+
+    private class HubPartException extends Exception {
     }
 
     private static AuraHandledException asAuraException(String message) {

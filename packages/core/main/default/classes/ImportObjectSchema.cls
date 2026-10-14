@@ -14,8 +14,35 @@ public with sharing class ImportObjectSchema {
     public static final String OPERATION_INSERT = 'Insert';
     @NamespaceAccessible
     public static final String OPERATION_UPDATE = 'Update by record Id';
+    /** Each row updates the record a field the user chose finds (R-IT12). */
+    @NamespaceAccessible
+    public static final String OPERATION_UPDATE_BY_FIELD = 'Update by a matching field';
     @NamespaceAccessible
     public static final String OPERATION_UPSERT = 'Upsert by external ID';
+    /** Deletes the records a file names, through the bulk delete job (R-BD7). */
+    @NamespaceAccessible
+    public static final String OPERATION_DELETE = 'Delete by record Id';
+
+    /**
+     * The most records an object may hold, counted in the user's access, for a field it does not
+     * index to be matched on (R-IT13, the large object guard).
+     */
+    @NamespaceAccessible
+    public static final Integer LARGE_OBJECT_ROWS = 100000;
+
+    /** The guard's ceiling, lowered by a test so it need not make 100,000 records. */
+    @TestVisible
+    private static Integer largeObjectRows = LARGE_OBJECT_ROWS;
+
+    /** Whether each object is over the guard's ceiling, counted once per transaction. */
+    private static Map<Schema.SObjectType, Boolean> large = new Map<Schema.SObjectType, Boolean>();
+
+    /** The field types a row or a lookup may be matched on beyond the record ID (R-IT13). */
+    private static final Set<Schema.DisplayType> MATCH_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE
+    };
 
     @NamespaceAccessible
     public static final String LOOKUP_REJECT = 'Reject the row';
@@ -33,7 +60,8 @@ public with sharing class ImportObjectSchema {
     };
 
     /** The field types a file's text is read into; any other is not offered. */
-    private static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+    @NamespaceAccessible
+    public static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.STRING,
         Schema.DisplayType.TEXTAREA,
         Schema.DisplayType.EMAIL,
@@ -87,12 +115,33 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static String operationOf(Import_Template__c template) {
         String chosen = template == null ? null : template.Load_Operation__c;
-        for (String known : new List<String>{ OPERATION_UPDATE, OPERATION_UPSERT }) {
+        for (
+            String known : new List<String>{
+                OPERATION_UPDATE,
+                OPERATION_UPDATE_BY_FIELD,
+                OPERATION_UPSERT,
+                OPERATION_DELETE
+            }
+        ) {
             if (known.equalsIgnoreCase(chosen)) {
                 return known;
             }
         }
         return OPERATION_INSERT;
+    }
+
+    /**
+     * The template's operation as this object allows it: people and organizations keep the two
+     * updates (R-IT14) and a delete by record Id (R-BD7); anything else becomes Update by record Id.
+     */
+    @NamespaceAccessible
+    public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
+        String chosen = operationOf(template);
+        return updatesOnly(type) &&
+            !neverCreates(chosen) &&
+            chosen != OPERATION_DELETE
+            ? OPERATION_UPDATE
+            : chosen;
     }
 
     /** Whether a lookup that finds no record leaves the lookup empty rather than rejecting. */
@@ -102,10 +151,25 @@ public with sharing class ImportObjectSchema {
             LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
     }
 
-    /** The field an upsert matches rows on, as describe names it, or null when it cannot. */
+    /**
+     * The field an upsert or an update by a matching field finds rows' records by, as describe
+     * names it, or null when it cannot.
+     */
     @NamespaceAccessible
     public static String keyFieldOf(Import_Template__c template) {
-        return template == null ? null : keyField(typeOf(template), template.Load_Match_Field__c);
+        if (template == null) {
+            return null;
+        }
+        Schema.SObjectType type = typeOf(template);
+        return operationOf(template) == OPERATION_UPDATE_BY_FIELD
+            ? matchField(type, template.Load_Match_Field__c)
+            : keyField(type, template.Load_Match_Field__c);
+    }
+
+    /** True for the operations that change records and never create them. */
+    @NamespaceAccessible
+    public static Boolean neverCreates(String operation) {
+        return operation == OPERATION_UPDATE || operation == OPERATION_UPDATE_BY_FIELD;
     }
 
     /** True when a one-object load may only update records of this object (R-IT14). */
@@ -152,12 +216,43 @@ public with sharing class ImportObjectSchema {
         return sortedValues(byLabel);
     }
 
-    /** The operations a load of this object may use: Update only for people (R-IT14). */
+    /**
+     * The operations a load of this object may use: the two updates only for people (R-IT14),
+     * and Delete by record Id for a person who may bulk delete records of it (R-BD7).
+     */
     @NamespaceAccessible
     public static List<String> operationsFor(Schema.SObjectType type) {
-        return updatesOnly(type)
-            ? new List<String>{ OPERATION_UPDATE }
-            : new List<String>{ OPERATION_INSERT, OPERATION_UPDATE, OPERATION_UPSERT };
+        List<String> result = updatesOnly(type)
+            ? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
+            : new List<String>{
+                  OPERATION_INSERT,
+                  OPERATION_UPDATE,
+                  OPERATION_UPDATE_BY_FIELD,
+                  OPERATION_UPSERT
+              };
+        if (deleteRefusal(type) == null) {
+            result.add(OPERATION_DELETE);
+        }
+        return result;
+    }
+
+    /**
+     * Why the running user may not delete records of this object by file, or null (R-BD7): the
+     * bulk delete permission and the bulk delete's object rules (R-BD4).
+     */
+    @NamespaceAccessible
+    public static String deleteRefusal(Schema.SObjectType type) {
+        if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
+            return Label.Core_Import_ErrorDeleteNeedsPermission;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        String reason = BulkDeleteService.objectReason(described);
+        return reason == null
+            ? null
+            : String.format(
+                  Label.Core_BulkDelete_ErrorObject,
+                  new List<String>{ described.getLabelPlural(), reason }
+              );
     }
 
     /**
@@ -218,10 +313,110 @@ public with sharing class ImportObjectSchema {
     }
 
     /**
+     * The fields rows or lookups may be matched on beyond the record ID (R-IT12, R-IT13): every
+     * text, email or phone field of the object that the user may read and filter on, sorted by
+     * label. The large object guard (`unselective`) decides later whether one may be searched.
+     */
+    @NamespaceAccessible
+    public static List<ImportMapping.Target> matchFields(Schema.SObjectType type) {
+        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        if (type == null) {
+            return new List<ImportMapping.Target>();
+        }
+        for (Schema.SObjectField token : fieldsOf(type).values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if (
+                MATCH_TYPES.contains(field.getType()) &&
+                field.isAccessible() &&
+                field.isFilterable()
+            ) {
+                byLabel.put(
+                    field.getLabel() + '|' + field.getName(),
+                    new ImportMapping.Target(field.getName(), field.getLabel())
+                );
+            }
+        }
+        return sortedValues(byLabel);
+    }
+
+    /** The field's API name when rows may be matched on it (`matchFields`), or null. */
+    @NamespaceAccessible
+    public static String matchField(Schema.SObjectType type, String fieldName) {
+        if (type == null || String.isBlank(fieldName)) {
+            return null;
+        }
+        for (ImportMapping.Target candidate : matchFields(type)) {
+            if (sameField(candidate.value, fieldName)) {
+                return candidate.value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether the platform indexes this field, so a search by it stays quick on any number of
+     * records (R-IT13): the record ID, the name field, a field marked External ID or Unique, and
+     * a standard Email field. Custom indexes cannot be seen from Apex, so they are not counted.
+     */
+    @NamespaceAccessible
+    public static Boolean isIndexed(Schema.SObjectType type, String fieldName) {
+        if (ID_ATTRIBUTE.equalsIgnoreCase(fieldName)) {
+            return true;
+        }
+        Schema.SObjectField token = fieldNamed(type, fieldName);
+        if (token == null) {
+            return false;
+        }
+        Schema.DescribeFieldResult field = token.getDescribe();
+        return field.isNameField() ||
+            field.isExternalId() ||
+            field.isUnique() ||
+            (!field.isCustom() &&
+            field.getType() == Schema.DisplayType.EMAIL &&
+            field.getName() == 'Email');
+    }
+
+    /**
+     * Why rows cannot be matched on this field of this object, or null (R-IT13, the large object
+     * guard): a field the platform does not index, on an object holding more than
+     * LARGE_OBJECT_ROWS records the user can see, would be searched by reading the whole object,
+     * which is slow and can time out. Counted once per object per transaction, the count capped
+     * one past the ceiling.
+     */
+    @NamespaceAccessible
+    public static String unselective(Schema.SObjectType type, String fieldName) {
+        if (type == null || String.isBlank(fieldName) || isIndexed(type, fieldName)) {
+            return null;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        if (!large.containsKey(type)) {
+            Integer counted = Database.countQueryWithBinds(
+                'SELECT COUNT() FROM ' +
+                    String.escapeSingleQuotes(described.getName()) +
+                    ' LIMIT :cap',
+                new Map<String, Object>{ 'cap' => largeObjectRows + 1 },
+                AccessLevel.USER_MODE
+            );
+            large.put(type, counted > largeObjectRows);
+        }
+        if (!large.get(type)) {
+            return null;
+        }
+        return String.format(
+            Label.Core_Import_ErrorFieldNotSelective,
+            new List<String>{
+                labelOf(type, fieldName),
+                described.getLabelPlural(),
+                largeObjectRows.format()
+            }
+        );
+    }
+
+    /**
      * The fields a lookup column may name its parent by (R-IT13): the record ID, the parent's
-     * name field, and its External ID or Unique fields holding text or an email that the user
-     * may read. A lookup that can point at more than one object is named by record ID only, as
-     * is a field that is not a lookup of this object.
+     * name field, and any text, email or phone field of the parent the user may read and filter
+     * on (`matchFields`). A lookup that can point at more than one object is named by record ID
+     * only, as is a field that is not a lookup of this object.
      */
     @NamespaceAccessible
     public static List<ImportMapping.Target> parentFields(
@@ -242,9 +437,9 @@ public with sharing class ImportObjectSchema {
             result.add(new ImportMapping.Target(name.getName(), name.getLabel()));
             offered.add(name.getName().toLowerCase());
         }
-        for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(parent)) {
-            if (!offered.contains(field.getName().toLowerCase())) {
-                result.add(new ImportMapping.Target(field.getName(), field.getLabel()));
+        for (ImportMapping.Target field : matchFields(parent)) {
+            if (!offered.contains(field.value.toLowerCase())) {
+                result.add(field);
             }
         }
         return result;
@@ -277,12 +472,7 @@ public with sharing class ImportObjectSchema {
         if (nameField != null && sameField(nameField, fieldName)) {
             return nameField;
         }
-        for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(parent)) {
-            if (sameField(field.getName(), fieldName)) {
-                return field.getName();
-            }
-        }
-        return null;
+        return matchField(parent, fieldName);
     }
 
     /** The object's name field when the user may read and filter on it, or null. */
@@ -360,9 +550,9 @@ public with sharing class ImportObjectSchema {
     /**
      * Why this template cannot load its rows, or null (R-IT12, R-IT14): an object that is gone
      * or protected, an operation people do not allow, access the operation needs and the user
-     * lacks, no column mapped to the object, the key column an update or an upsert needs, and a
-     * value for every row that names the record. Asked when a template is saved and in every
-     * chunk.
+     * lacks, no column mapped to the object, the key column an update or an upsert needs, a
+     * value for every row that names the record, and a field searched by that the large object
+     * guard refuses (R-IT13). Asked when a run starts and in every chunk.
      */
     @NamespaceAccessible
     public static String refusal(Import_Template__c template, ImportMapping mapping) {
@@ -374,7 +564,13 @@ public with sharing class ImportObjectSchema {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         List<String> plural = new List<String>{ described.getLabelPlural() };
         String operation = operationOf(template);
-        if (updatesOnly(type) && operation != OPERATION_UPDATE) {
+        Boolean byId = operation == OPERATION_UPDATE || operation == OPERATION_DELETE;
+        if (operation == OPERATION_DELETE) {
+            String cannotDelete = deleteRefusal(type);
+            if (cannotDelete != null) {
+                return cannotDelete;
+            }
+        } else if (updatesOnly(type) && !neverCreates(operation)) {
             return String.format(Label.Core_Import_ErrorPeopleUpdateOnly, plural);
         }
         if (!canRun(described, operation)) {
@@ -385,25 +581,32 @@ public with sharing class ImportObjectSchema {
         if (attributes.isEmpty()) {
             return Label.Core_Import_ErrorNothingMapped;
         }
-        String key = operation == OPERATION_UPDATE ? ID_ATTRIBUTE : null;
-        if (operation == OPERATION_UPDATE && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
+        String key = byId ? ID_ATTRIBUTE : null;
+        if (byId && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
             return Label.Core_Import_ErrorIdColumnMissing;
         }
-        if (operation == OPERATION_UPSERT) {
+        if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
+            Boolean byKey = operation == OPERATION_UPSERT;
             String chosen = template.Load_Match_Field__c;
             if (String.isBlank(chosen)) {
-                return Label.Core_Import_ErrorKeyFieldRequired;
+                return byKey
+                    ? Label.Core_Import_ErrorKeyFieldRequired
+                    : Label.Core_Import_ErrorMatchFieldRequired;
             }
-            key = keyField(type, chosen);
+            key = byKey ? keyField(type, chosen) : matchField(type, chosen);
             if (key == null) {
                 return String.format(
-                    Label.Core_Import_ErrorKeyFieldUnusable,
+                    byKey
+                        ? Label.Core_Import_ErrorKeyFieldUnusable
+                        : Label.Core_Import_ErrorMatchFieldUnusable,
                     new List<String>{ chosen.trim().abbreviate(80) }
                 );
             }
             if (!mapsField(attributes, key)) {
                 return String.format(
-                    Label.Core_Import_ErrorKeyColumnMissing,
+                    byKey
+                        ? Label.Core_Import_ErrorKeyColumnMissing
+                        : Label.Core_Import_ErrorMatchColumnMissing,
                     new List<String>{ labelOf(type, key) }
                 );
             }
@@ -416,7 +619,153 @@ public with sharing class ImportObjectSchema {
                 }
             );
         }
+        String slow = slowSearch(type, key, given);
+        return slow != null ? slow : relatedRefusal(template, type, operation, given);
+    }
+
+    /**
+     * The large object guard over every field this template searches by (R-IT13): the field
+     * rows find their record by, and each lookup column's parent field.
+     */
+    private static String slowSearch(Schema.SObjectType type, String key, ImportMapping mapping) {
+        String refused = key == null ? null : unselective(type, key);
+        return refused != null ? refused : slowLookups(type, mapping.lookupFieldsByAttribute());
+    }
+
+    /** The same guard over the lookup columns of one object, keyed by lookup field. */
+    private static String slowLookups(Schema.SObjectType type, Map<String, String> lookups) {
+        String refused;
+        for (String attribute : lookups.keySet()) {
+            Schema.SObjectType parent = parentOf(type, attribute);
+            String field = parentField(parent, lookups.get(attribute));
+            refused = field == null ? null : unselective(parent, field);
+            if (refused != null) {
+                return refused;
+            }
+        }
         return null;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Related records (R-IT17)
+    // -------------------------------------------------------------------------------------
+
+    /** True when this one-object template also creates related records from its rows. */
+    @NamespaceAccessible
+    public static Boolean loadsRelated(Import_Template__c template) {
+        return loadsOneObject(template) && String.isNotBlank(template.Related_Object__c);
+    }
+
+    /** The template's related object, or null for none or one the org does not have. */
+    @NamespaceAccessible
+    public static Schema.SObjectType relatedTypeOf(Import_Template__c template) {
+        return loadsRelated(template) ? typeNamed(template.Related_Object__c) : null;
+    }
+
+    /**
+     * The related object's field that points at the parent, as describe names it, when it is a
+     * lookup or master-detail to the parent object alone that the user may fill in on a new
+     * record; else null.
+     */
+    @NamespaceAccessible
+    public static String relatedParentField(
+        Schema.SObjectType parent,
+        Schema.SObjectType related,
+        String fieldName
+    ) {
+        Schema.SObjectField token = related == null ? null : fieldNamed(related, fieldName);
+        return parent != null && token != null ? pointsAt(token.getDescribe(), parent) : null;
+    }
+
+    /** The field's name when it points at this object alone and may be filled in, or null. */
+    private static String pointsAt(Schema.DescribeFieldResult field, Schema.SObjectType parent) {
+        List<Schema.SObjectType> parents = field.getReferenceTo();
+        return parents.size() == 1 &&
+            parents[0] == parent &&
+            field.isCreateable()
+            ? field.getName()
+            : null;
+    }
+
+    /**
+     * The related records a load of this object may create (R-IT17): each object a load may
+     * insert (R-IT14) with a field pointing at this object alone that the user may fill in.
+     * Values are `Object.Field`; labels name the object and the field.
+     */
+    @NamespaceAccessible
+    public static List<ImportMapping.Target> relatedOptions(Schema.SObjectType type) {
+        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        if (type == null) {
+            return new List<ImportMapping.Target>();
+        }
+        for (Schema.ChildRelationship relationship : type.getDescribe().getChildRelationships()) {
+            String field = pointsAt(relationship.getField().getDescribe(), type);
+            Schema.SObjectType child = relationship.getChildSObject();
+            if (field == null || insertRefusal(child) != null) {
+                continue;
+            }
+            Schema.DescribeSObjectResult described = child.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            );
+            String label = String.format(
+                Label.Core_Import_RelatedOptionLabel,
+                new List<String>{ described.getLabel(), labelOf(child, field) }
+            );
+            String value = described.getName() + '.' + field;
+            byLabel.put(label + '|' + value, new ImportMapping.Target(value, label));
+        }
+        return sortedValues(byLabel);
+    }
+
+    /** Why a load may not create records of this object (R-IT14), or null. */
+    @NamespaceAccessible
+    public static String insertRefusal(Schema.SObjectType type) {
+        String refused = DataProtectedFields.objectRefusal(type);
+        if (refused != null) {
+            return refused;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        return updatesOnly(type) || !canRun(described, OPERATION_INSERT)
+            ? String.format(
+                  Label.Core_Import_ErrorRelatedObjectUnusable,
+                  new List<String>{ described.getLabelPlural() }
+              )
+            : null;
+    }
+
+    /**
+     * Why this template's related records cannot load (R-IT17), or null: Insert, which has no
+     * parent key; a related object a load may not create; a parent field that does not point at
+     * the target object alone or that the user may not fill in; and the large object guard over
+     * the related lookup columns.
+     */
+    private static String relatedRefusal(
+        Import_Template__c template,
+        Schema.SObjectType type,
+        String operation,
+        ImportMapping mapping
+    ) {
+        if (!loadsRelated(template)) {
+            return null;
+        }
+        if (operation == OPERATION_INSERT) {
+            return Label.Core_Import_ErrorRelatedNeedsKey;
+        }
+        Schema.SObjectType related = relatedTypeOf(template);
+        String refused = insertRefusal(related);
+        if (refused != null) {
+            return refused;
+        }
+        if (relatedParentField(type, related, template.Related_Parent_Field__c) == null) {
+            return String.format(
+                Label.Core_Import_ErrorRelatedFieldUnusable,
+                new List<String>{
+                    related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
+                    type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+                }
+            );
+        }
+        return slowLookups(related, mapping.lookupFieldsByAttribute(ImportMapping.ENTITY_RELATED));
     }
 
     /** Whether the user's object access allows the operation. */
@@ -427,8 +776,11 @@ public with sharing class ImportObjectSchema {
         if (operation == OPERATION_INSERT) {
             return described.isCreateable();
         }
-        if (operation == OPERATION_UPDATE) {
+        if (neverCreates(operation)) {
             return described.isUpdateable();
+        }
+        if (operation == OPERATION_DELETE) {
+            return described.isDeletable();
         }
         return described.isCreateable() && described.isUpdateable();
     }
@@ -500,8 +852,9 @@ public with sharing class ImportObjectSchema {
 
     /**
      * A value as its field's type. A date is read as ISO 8601 (2026-10-12) or in the running
-     * user's locale; a date and time as ISO 8601 or in the locale; numbers without spaces,
-     * thousands separators or a currency or percent sign; a checkbox as `checkbox` reads it.
+     * user's locale; a date and time as ISO 8601 or in the locale; a number as
+     * `ImportValues.number` reads it, so "$1,250.00", "1 250,50" in a locale that writes it so
+     * and "(45.00)" load; a checkbox as `checkbox` reads it.
      * Returns null, or throws, when the value cannot be read. Lookups are not read here.
      */
     @NamespaceAccessible
@@ -519,13 +872,18 @@ public with sharing class ImportObjectSchema {
             kind == Schema.DisplayType.DOUBLE ||
             kind == Schema.DisplayType.PERCENT
         ) {
-            return Decimal.valueOf(trimmed.replaceAll('[\\s,$%]', ''));
+            return ImportValues.number(trimmed);
         }
-        if (kind == Schema.DisplayType.INTEGER) {
-            return Integer.valueOf(trimmed.replaceAll('[\\s,]', ''));
-        }
-        if (kind == Schema.DisplayType.LONG) {
-            return Long.valueOf(trimmed.replaceAll('[\\s,]', ''));
+        if (kind == Schema.DisplayType.INTEGER || kind == Schema.DisplayType.LONG) {
+            // A whole number, however it is written; "12.5" is not one.
+            Decimal whole = ImportValues.number(trimmed);
+            if (whole == null || whole != whole.round(System.RoundingMode.DOWN)) {
+                return null;
+            }
+            if (kind == Schema.DisplayType.LONG) {
+                return whole.longValue();
+            }
+            return Math.abs(whole) > 2147483647 ? null : whole.intValue();
         }
         if (kind == Schema.DisplayType.DATE) {
             return dateOf(trimmed);

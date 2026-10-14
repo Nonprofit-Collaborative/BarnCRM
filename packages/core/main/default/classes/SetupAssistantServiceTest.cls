@@ -1,7 +1,7 @@
 /**
  * Maria works down the setup checklist, and the Hub remembers where she got to.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SetupAssistantService')
 private class SetupAssistantServiceTest {
     @TestSetup
     static void grantPermission() {
@@ -63,6 +63,24 @@ private class SetupAssistantServiceTest {
                 stepByKey(afterMarking, 'modules').completed,
                 'The step Maria marked is the one that is done'
             );
+        }
+    }
+
+    @IsTest
+    static void checklistClicksAreNotSettingsChanges() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SetupAssistantService.markComplete('modules');
+            SetupAssistantService.markSkipped('data');
+            SetupAssistantService.reset();
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Setting_Change__c],
+                'Ticking, skipping and starting again leave Recent changes to real changes'
+            );
+            Assert.isNull(SetupAssistantService.getStartedAt(), 'Starting again clears the start');
         }
     }
 

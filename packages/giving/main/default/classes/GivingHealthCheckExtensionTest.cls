@@ -5,7 +5,7 @@
  * Health Check shows. `HealthCheckGivingChecksTest` covers what the finding says; this class
  * covers only that Core actually reaches it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingHealthCheckExtension')
 private class GivingHealthCheckExtensionTest {
     private static User jen() {
         return TestDataFactory.createUser(

@@ -3,7 +3,7 @@
  * matching rule is always one the picklist accepts, and a mapping that identifies nobody is
  * refused before it can be saved.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportTemplateService')
 private class ImportTemplateServiceTest {
     @TestSetup
     static void setUp() {

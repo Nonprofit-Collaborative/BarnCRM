@@ -6,7 +6,7 @@
  * the class documents.
  */
 // runs-as: deploying user (pure logic: parses a filter document, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:RollupFilterParser')
 private class RollupFilterParserTest {
     @IsTest
     static void emptyDocumentMeansEveryRecord() {
@@ -107,6 +107,121 @@ private class RollupFilterParserTest {
         System.Assert.areEqual('Gift_Date__c >= 2026-01-01', clause, 'A date is not a string');
     }
 
+    /** ROLLUPS-15: with the entity known, a date shaped value is a date only on a date field. */
+    @IsTest
+    static void aDateShapedValueOnATextFieldIsText() {
+        String onText = '{"version": 1, "conditions": [{"id": 1, "field": "Name", "operator": "equals", "value": "2026-01-01"}]}';
+        String onDate = onText.replace('"Name"', '"Anniversary__c"');
+        String throughParent = onText.replace('"Name"', '"Parent.Name"');
+
+        System.Assert.areEqual(
+            'Name = \'2026-01-01\'',
+            RollupFilterParser.toWhereClause(onText, Account.SObjectType),
+            'Quoted on a text field'
+        );
+        System.Assert.areEqual(
+            'Anniversary__c = 2026-01-01',
+            RollupFilterParser.toWhereClause(onDate, Account.SObjectType),
+            'A date on a date field'
+        );
+        System.Assert.areEqual(
+            'Parent.Name = \'2026-01-01\'',
+            RollupFilterParser.toWhereClause(throughParent, Account.SObjectType),
+            'Through a relationship too'
+        );
+    }
+
+    /** ROLLUPS-15: contains and starts with match % and _ as typed, not as wildcards. */
+    @IsTest
+    static void likeWildcardsInAValueMatchThemselves() {
+        System.Assert.areEqual(
+            'Name like \'%50\\% off\\_now%\'',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Name", "operator": "contains", "value": "50% off_now"}]}'
+            ),
+            'Escaped for LIKE'
+        );
+        System.Assert.areEqual(
+            'Name like \'a\\_b%\'',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Name", "operator": "starts with", "value": "a_b"}]}'
+            ),
+            'Starts with as well'
+        );
+    }
+
+    /** ROLLUPS-8: the conditions that move with today's date. */
+    @IsTest
+    static void relativeDatesAreRecognised() {
+        String lastDays = '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "last n days", "value": 30}]}';
+        System.Assert.isTrue(RollupFilterParser.usesRelativeDate(lastDays), 'Last n days');
+        System.Assert.isTrue(
+            RollupFilterParser.usesRelativeDate(lastDays.replace('last n days', 'this year')),
+            'This year'
+        );
+        System.Assert.isFalse(
+            RollupFilterParser.usesRelativeDate(lastDays.replace('last n days', 'equals')),
+            'A fixed comparison'
+        );
+        System.Assert.isFalse(RollupFilterParser.usesRelativeDate(null), 'No filter');
+        System.Assert.isFalse(RollupFilterParser.usesRelativeDate('{not json'), 'Unreadable');
+    }
+
+    /** ROLLUPS-12: the filters simple enough for the engine to test in Apex. */
+    @IsTest
+    static void textEqualitiesAreReadOnlyFromSimpleTextFilters() {
+        String both =
+            '{"version": 1, "conditions": [' +
+            '{"id": 1, "field": "Site", "operator": "equals", "value": "North"},' +
+            '{"id": 2, "field": "RecordType.DeveloperName", "operator": "Not Equals", "value": "Household"}]}';
+        List<RollupFilterParser.TextEquality> equalities = RollupFilterParser.textEqualities(
+            both,
+            Account.SObjectType
+        );
+        System.Assert.areEqual(2, equalities.size(), 'Both conditions');
+        System.Assert.areEqual('Site', equalities[0].field, 'The first field');
+        System.Assert.isFalse(equalities[0].negated, 'Equals');
+        System.Assert.areEqual('North', equalities[0].value, 'The first value');
+        System.Assert.areEqual(
+            'RecordType.DeveloperName',
+            equalities[1].field,
+            'A text field through a relationship'
+        );
+        System.Assert.isTrue(equalities[1].negated, 'Not equals, whatever its case');
+
+        String one = '{"version": 1, "conditions": [{"id": 1, "field": "Site", "operator": "equals", "value": "North"}]}';
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"equals"', '"contains"'),
+                Account.SObjectType
+            ),
+            'Another operator is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"Site"', '"NumberOfEmployees"').replace('"North"', '"5"'),
+                Account.SObjectType
+            ),
+            'A number field is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(one.replace('"North"', '""'), Account.SObjectType),
+            'A blank value is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"conditions"', '"logic": "1", "conditions"'),
+                Account.SObjectType
+            ),
+            'A logic string is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities('{not json', Account.SObjectType),
+            'Unreadable'
+        );
+        System.Assert.isNull(RollupFilterParser.textEqualities(one, null), 'No entity');
+    }
+
     @IsTest
     static void relativeDatesRenderAsDateLiterals() {
         System.Assert.areEqual(
@@ -204,6 +319,30 @@ private class RollupFilterParserTest {
             );
         } catch (RollupFilterParser.RollupFilterException expected) {
             System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
+        }
+    }
+
+    /** A part of the right name but the wrong shape is refused with the filter message. */
+    @IsTest
+    static void aDocumentOfTheWrongShapeIsRefused() {
+        for (
+            String document : new List<String>{
+                'null',
+                '{"conditions": ["Status__c"]}',
+                '{"conditions": {"id": 1}}',
+                '{"logic": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "equals", "value": "Open"}]}'
+            }
+        ) {
+            try {
+                RollupFilterParser.toWhereClause(document);
+                System.Assert.fail('Must be refused: ' + document);
+            } catch (RollupFilterParser.RollupFilterException expected) {
+                System.Assert.areEqual(
+                    System.Label.Core_Rollups_ErrorInvalidFilter,
+                    expected.getMessage(),
+                    document
+                );
+            }
         }
     }
 

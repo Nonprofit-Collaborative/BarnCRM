@@ -19,6 +19,10 @@ that way, was refused; duplicateReview's, 251, deployed):
 - record page visibility rules: none tests a lookup field itself (the platform refuses EQUAL
   and NE on a reference field; test a field across it, such as Donor_Account__r.Name)
 - dynamic related list columns: one field per valueListItems, never several in one value
+- in-app guidance prompts (ADR-0096, in-app guidance): title and header 36, dismiss button 15,
+  action button 25, description 255, label 80; single step only (a walkthrough needs a licence);
+  no deprecated app namespace fields; the app and the app page tab each names exist in the repo
+  (a released prompt cannot be removed from the package, so a wrong target ships for good)
 """
 
 import glob
@@ -40,6 +44,15 @@ OBJECTS = "packages/*/main/default/objects/*/*.object-meta.xml"
 LABELS = "packages/*/main/default/labels/*.labels-meta.xml"
 LAYOUTS = "packages/*/main/default/layouts/*.layout-meta.xml"
 APEX = "packages/**/*.cls"
+PROMPTS = "packages/*/main/default/prompts/*.prompt-meta.xml"
+PROMPT_VERSION_LIMITS = {
+    "title": 36,
+    "header": 36,
+    "dismissButtonLabel": 15,
+    "actionButtonLabel": 25,
+    "description": 255,
+    "masterLabel": 80,
+}
 
 RESERVED_TYPE_NAMES = {
     name.lower()
@@ -152,6 +165,32 @@ def check_related_list_columns(problems, path):
                 problems.append(f"{path}: related list column '{value}' names several fields")
 
 
+def check_prompt(problems, path):
+    """A packaged prompt: within its text limits, single step, and aimed at a page that exists."""
+    text = read(path)
+    check_length(problems, path, text, "masterLabel", 80)
+    for block in re.findall(r"<promptVersions>(.*?)</promptVersions>", text, re.DOTALL):
+        values = {
+            tag: html.unescape(value).strip()
+            for tag, value in re.findall(r"<(\w+)\s*>(.*?)</\1>", block, re.DOTALL)
+        }
+        for tag, limit in PROMPT_VERSION_LIMITS.items():
+            if tag in values and len(values[tag]) > limit:
+                problems.append(f"{path}: {tag} is {len(values[tag])} characters, over {limit}")
+        if "stepNumber" in values:
+            problems.append(f"{path}: has stepNumber; walkthroughs need a licence, ship single prompts")
+        for tag in ("targetAppNamespacePrefix", "targetAppDeveloperName"):
+            if tag in values:
+                problems.append(f"{path}: {tag} is deprecated; name the app in customApplication")
+        app = values.get("customApplication")
+        if not app or not glob.glob(f"packages/*/main/default/applications/{app}.app-meta.xml"):
+            problems.append(f"{path}: customApplication '{app}' is not an app in this repo")
+        if values.get("targetPageType") == "standard__navItemPage":
+            tab = values.get("targetPageKey1")
+            if not tab or not glob.glob(f"packages/*/main/default/tabs/{tab}.tab-meta.xml"):
+                problems.append(f"{path}: targetPageKey1 '{tab}' is not a tab in this repo")
+
+
 def main():
     problems = []
     checked = 0
@@ -192,6 +231,10 @@ def main():
     for path in sorted(glob.glob(APEX, recursive=True)):
         checked += 1
         check_apex(problems, path)
+
+    for path in sorted(glob.glob(PROMPTS)):
+        checked += 1
+        check_prompt(problems, path)
 
     for problem in problems:
         print(problem, file=sys.stderr)

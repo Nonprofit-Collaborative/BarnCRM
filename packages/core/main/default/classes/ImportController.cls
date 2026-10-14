@@ -72,6 +72,9 @@ public with sharing class ImportController {
         public String loadMatchField;
         @AuraEnabled
         public String lookupNotFound;
+        /** The related records each row also creates, `Object.Field`, or null (R-IT17). */
+        @AuraEnabled
+        public String related;
     }
 
     /** One field a column of a one-object template can be mapped to (R-IT12). */
@@ -113,6 +116,9 @@ public with sharing class ImportController {
         public Integer rejected;
         @AuraEnabled
         public String runLog;
+        /** When the run started, so the job history can list imports among other data jobs. */
+        @AuraEnabled
+        public Datetime startedAt;
         /** The end of the window in which this import can be undone (R-IB7). */
         @AuraEnabled
         public Datetime undoDeadline;
@@ -122,6 +128,18 @@ public with sharing class ImportController {
         /** False when the file does not match the control totals it was given (R-IB10). */
         @AuraEnabled
         public Boolean controlTotalsAgree;
+        /** How many first rows a trial committed, or null (R-IB16). */
+        @AuraEnabled
+        public Integer trialRows;
+        /** How many rows a trial of this file would commit unless the wizard is told otherwise. */
+        @AuraEnabled
+        public Integer defaultTrialRows;
+        /** True when the import's fixed rejected rows may be retried into it (R-IB17). */
+        @AuraEnabled
+        public Boolean canRetry;
+        /** True while a retry of the rejected rows is open (R-IB17). */
+        @AuraEnabled
+        public Boolean retrying;
     }
 
     /**
@@ -162,6 +180,9 @@ public with sharing class ImportController {
         /** Account fields, for organizations and for people stored as person accounts. */
         @AuraEnabled
         public List<MatchFieldView> account = new List<MatchFieldView>();
+        /** The fixed columns of a people file, with their labels (ImportFieldCatalog). */
+        @AuraEnabled
+        public List<ImportMapping.Target> fixedTargets = new List<ImportMapping.Target>();
         /** The fields a person's column can be mapped to besides the fixed list (R-IT11). */
         @AuraEnabled
         public List<ImportMapping.Target> personFields = new List<ImportMapping.Target>();
@@ -174,11 +195,18 @@ public with sharing class ImportController {
          */
         @AuraEnabled
         public Boolean contactRules;
+        /** For organizations and households: an Account rule that is not a person account's. */
         @AuraEnabled
         public Boolean accountRules;
+        /** For people kept as person accounts: a person account rule (the person account subtype). */
+        @AuraEnabled
+        public Boolean personAccountRules;
     }
 
-    /** One staged row as the exceptions table shows it. */
+    /**
+     * One staged row as the exceptions table and the results file show it: its outcome, the
+     * records it resulted in, and its own values.
+     */
     public class RowView {
         @AuraEnabled
         public String id;
@@ -190,7 +218,41 @@ public with sharing class ImportController {
         public String errorMessage;
         @AuraEnabled
         public String values;
+        /** The first person, as a contact or a person account, whichever the row resolved to. */
+        @AuraEnabled
+        public String person1Id;
+        @AuraEnabled
+        public String person2Id;
+        @AuraEnabled
+        public String householdId;
+        @AuraEnabled
+        public String organizationId;
+        /** The record a module's import, or Load one object, created, updated or matched. */
+        @AuraEnabled
+        public String resultingRecordId;
     }
+
+    /**
+     * One page of rows read through a pagination cursor. The screen hands the cursor and
+     * nextIndex back to read the next page, until hasMore is false.
+     */
+    public class RowPage {
+        @AuraEnabled
+        public Database.PaginationCursor cursor;
+        @AuraEnabled
+        public List<RowView> rows = new List<RowView>();
+        @AuraEnabled
+        public Integer nextIndex = 0;
+        /** How many rows the cursor holds, at most ImportRowSelector.MAX_CURSOR_ROWS. */
+        @AuraEnabled
+        public Integer total = 0;
+        @AuraEnabled
+        public Boolean hasMore = false;
+    }
+
+    /** The most rows one page may hold (the platform's limit for a pagination cursor page). */
+    @TestVisible
+    private static final Integer MAX_PAGE_ROWS = 2000;
 
     /** How many rows the changed values are shown for, in the wizard and after a dry run. */
     @TestVisible
@@ -227,7 +289,7 @@ public with sharing class ImportController {
      * where none is installed, and the wizard then offers the gift columns as kept with the
      * row and not loaded.
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getEntityTargets() {
         try {
             enforcePermission();
@@ -288,17 +350,22 @@ public with sharing class ImportController {
      * may read. With them, the fields of people and organizations a column can be mapped to
      * besides the fixed list (R-IT11).
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static MatchFieldsView getMatchFields() {
         try {
             enforcePermission();
             MatchFieldsView view = new MatchFieldsView();
             view.contact = fieldViews(Contact.SObjectType);
             view.account = fieldViews(Account.SObjectType);
+            view.fixedTargets = ImportFieldCatalog.fixedTargets();
             view.personFields = ImportFieldCatalog.personFields();
             view.organizationFields = ImportFieldCatalog.organizationFields();
             view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
             view.accountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType);
+            view.personAccountRules = ImportDuplicateRuleMatcher.hasActiveRule(
+                Account.SObjectType,
+                true
+            );
             return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getMatchFields');
@@ -317,7 +384,7 @@ public with sharing class ImportController {
     }
 
     /** The objects a template may load (R-IT14), by label. */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getLoadableObjects() {
         try {
             enforcePermission();
@@ -358,39 +425,105 @@ public with sharing class ImportController {
      * first, then the fields the user may write, and for each lookup the fields it can name its
      * parent by (R-IT13).
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<FieldChoice> getObjectFields(String templateId) {
         try {
             enforcePermission();
             Schema.SObjectType type = ImportObjectSchema.typeOf(
                 ImportTemplateSelector.selectById(templateId)
             );
-            List<FieldChoice> result = new List<FieldChoice>();
-            if (type == null) {
-                return result;
-            }
-            for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
-                FieldChoice choice = new FieldChoice();
-                choice.value = ImportMapping.ENTITY_RECORD + '.' + target.value;
-                choice.label = target.label;
-                Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
-                if (
-                    token != null &&
-                    token.getDescribe().getType() == Schema.DisplayType.REFERENCE
-                ) {
-                    choice.isLookup = true;
-                    choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
-                }
-                result.add(choice);
-            }
-            return result;
+            return fieldChoices(type, ImportMapping.ENTITY_RECORD, null, null);
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getObjectFields');
         }
     }
 
-    /** The external ID fields an upsert of this template's object can match on (R-IT12). */
+    /** The related records this one-object template's object offers, `Object.Field` (R-IT17). */
     @AuraEnabled
+    public static List<ImportMapping.Target> getRelatedOptions(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.relatedOptions(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRelatedOptions');
+        }
+    }
+
+    /**
+     * The fields a column can fill on the related record chosen as `Object.Field` (R-IT17):
+     * `Related.<field>`, labelled with the object's name, without the record ID and the field
+     * the load fills with the parent. Nothing when the choice does not point at the object.
+     */
+    @AuraEnabled
+    public static List<FieldChoice> getRelatedFields(String templateId, String related) {
+        try {
+            enforcePermission();
+            Schema.SObjectType type = ImportObjectSchema.typeOf(
+                ImportTemplateSelector.selectById(templateId)
+            );
+            String chosen = related == null ? '' : related;
+            Schema.SObjectType relatedType = ImportObjectSchema.typeNamed(
+                chosen.substringBefore('.')
+            );
+            String parentField = ImportObjectSchema.relatedParentField(
+                type,
+                relatedType,
+                chosen.substringAfter('.')
+            );
+            return parentField == null
+                ? new List<FieldChoice>()
+                : fieldChoices(relatedType, ImportMapping.ENTITY_RELATED, parentField, related);
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRelatedFields');
+        }
+    }
+
+    /**
+     * Each field of this object a column may fill, as `<entity>.<field>`, with its lookup's
+     * parent fields. For the related entity, the record ID and the parent field are left out
+     * and each label starts with the object's.
+     */
+    private static List<FieldChoice> fieldChoices(
+        Schema.SObjectType type,
+        String entity,
+        String parentField,
+        String related
+    ) {
+        List<FieldChoice> result = new List<FieldChoice>();
+        if (type == null) {
+            return result;
+        }
+        String objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+        for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
+            if (
+                related != null &&
+                (target.value == ImportObjectSchema.ID_ATTRIBUTE ||
+                target.value == parentField)
+            ) {
+                continue;
+            }
+            FieldChoice choice = new FieldChoice();
+            choice.value = entity + '.' + target.value;
+            choice.label = related == null
+                ? target.label
+                : String.format(
+                      Label.Core_Import_RelatedFieldLabel,
+                      new List<String>{ objectLabel, target.label }
+                  );
+            Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
+            if (token != null && token.getDescribe().getType() == Schema.DisplayType.REFERENCE) {
+                choice.isLookup = true;
+                choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
+            }
+            result.add(choice);
+        }
+        return result;
+    }
+
+    /** The external ID fields an upsert of this template's object can match on (R-IT12). */
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getKeyFields(String templateId) {
         try {
             enforcePermission();
@@ -399,6 +532,19 @@ public with sharing class ImportController {
             );
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getKeyFields');
+        }
+    }
+
+    /** The text, email and phone fields an update by a matching field can find records by. */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getRowMatchFields(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.matchFields(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRowMatchFields');
         }
     }
 
@@ -411,21 +557,27 @@ public with sharing class ImportController {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         view.targetObject = described.getName();
         view.targetObjectLabel = described.getLabel();
-        view.loadOperation = ImportObjectSchema.updatesOnly(type)
-            ? ImportObjectSchema.OPERATION_UPDATE
-            : ImportObjectSchema.operationOf(template);
+        view.loadOperation = ImportObjectSchema.operationFor(type, template);
         view.loadOperations = ImportObjectSchema.operationsFor(type);
         view.loadMatchField = template.Load_Match_Field__c;
         view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)
             ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
             : ImportObjectSchema.LOOKUP_REJECT;
+        view.related = ImportObjectSchema.loadsRelated(template)
+            ? template.Related_Object__c + '.' + template.Related_Parent_Field__c
+            : null;
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */
     private static String lookupFieldOf(ImportMapping saved, String sourceKey) {
+        ImportMapping.Column column = savedColumn(saved, sourceKey);
+        return column == null ? null : column.lookupField;
+    }
+
+    private static ImportMapping.Column savedColumn(ImportMapping saved, String sourceKey) {
         for (ImportMapping.Column column : saved.columns) {
             if (column != null && ImportMapping.key(column.source) == sourceKey) {
-                return column.lookupField;
+                return column;
             }
         }
         return null;
@@ -466,10 +618,15 @@ public with sharing class ImportController {
                     if (String.isNotBlank(fromTemplate)) {
                         column.target = fromTemplate;
                         column.lookupField = lookupFieldOf(saved, source);
+                        column.blankClears = savedColumn(saved, source).blankClears;
+                        column.transforms = savedColumn(saved, source).transforms;
                     } else if (ignored.contains(source)) {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
                 }
+                // The rows to load are the mapping's, whatever the file's headings (R-IT18).
+                suggested.skipRows = saved.skipRows;
+                suggested.uniqueBy = saved.uniqueBy;
             }
             return suggested.serialize();
         } catch (Exception e) {
@@ -494,23 +651,17 @@ public with sharing class ImportController {
         try {
             enforcePermission();
             BatchOptions options = parseOptions(optionsJson);
-            ImportTemplateService.saveMapping(templateId, mappingDocument, matchingRule);
-            if (options.savePaymentMatching == true) {
-                ImportTemplateService.savePaymentMatching(
-                    templateId,
-                    options.paymentMatching,
-                    options.matchDateWindowDays,
-                    options.matchAmountTolerance
-                );
-            }
-            if (options.load != null) {
-                ImportTemplateService.saveLoad(templateId, options.load);
-            }
-            if (options.matching != null) {
-                // The wizard's rule for people is the one passed above; the rest is saved here.
-                options.matching.personRule = matchingRule;
-                ImportTemplateService.saveMatching(templateId, options.matching);
-            }
+            // One read and one write of the template for everything the wizard settled on.
+            ImportTemplateService.UploadChoices choices = new ImportTemplateService.UploadChoices();
+            choices.mappingDocument = mappingDocument;
+            choices.matchingRule = matchingRule;
+            choices.savePaymentMatching = options.savePaymentMatching;
+            choices.paymentMatching = options.paymentMatching;
+            choices.matchDateWindowDays = options.matchDateWindowDays;
+            choices.matchAmountTolerance = options.matchAmountTolerance;
+            choices.load = options.load;
+            choices.matching = options.matching;
+            ImportTemplateService.saveUpload(templateId, choices);
             return toView(
                 ImportBatchService.create(
                     templateId,
@@ -532,9 +683,9 @@ public with sharing class ImportController {
      * (canonical model Section 16, File Reference), and returns its document identifier.
      *
      * The component sends the file only when it is small enough to pass through a request
-     * without risking the heap. A larger file still imports: the batch keeps its name and the
-     * run log says the original was not kept, which is the honest answer rather than a
-     * failure the administrator cannot act on.
+     * without risking the heap (2.5 MB, sent as base64 and decoded here). A larger file still
+     * imports: the batch keeps its name and the wizard says the original was not kept, which
+     * is the honest answer rather than a failure the administrator cannot act on.
      */
     @AuraEnabled
     public static String saveFile(String fileName, String base64Content) {
@@ -603,6 +754,35 @@ public with sharing class ImportController {
     }
 
     /**
+     * Commits only the file's first rows after its dry run (R-IB16); startCommit then commits
+     * the rest into the same import. Refused unless the dry run of this batch has completed.
+     */
+    @AuraEnabled
+    public static BatchView startTrial(String batchId, Integer rowCount) {
+        try {
+            enforcePermission();
+            ImportBatchService.startTrial(batchId, rowCount);
+            return getBatch(batchId);
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.startTrial');
+        }
+    }
+
+    /**
+     * Opens a retry of a committed import's rejected rows, so its fixed rows can be staged,
+     * previewed and committed into the same import (R-IB17).
+     */
+    @AuraEnabled
+    public static BatchView openRetry(String batchId) {
+        try {
+            enforcePermission();
+            return toView(ImportBatchService.openRetry(batchId));
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.openRetry');
+        }
+    }
+
+    /**
      * What undoing an import would remove and put back, and why it cannot be undone when it
      * cannot. Nothing is deleted by it (R-IB8).
      */
@@ -656,29 +836,75 @@ public with sharing class ImportController {
     }
 
     /**
-     * One page of a batch's rows, optionally only those in one status. The exceptions file is
-     * built from this with status Rejected.
+     * One page of a batch's rows in file order, optionally only those in one status. The
+     * rejected-rows table reads the first page; the exceptions file reads every page with
+     * status Rejected. Pass no cursor to open one; then pass back the cursor and nextIndex
+     * this returned, until hasMore is false.
+     *
+     * @param pageSize rows per page, held between 1 and MAX_PAGE_ROWS
      */
     @AuraEnabled
-    public static List<RowView> getRows(String batchId, String status, Integer offsetRows) {
+    public static RowPage getRowPage(
+        String batchId,
+        String status,
+        Database.PaginationCursor cursor,
+        Integer startIndex,
+        Integer pageSize
+    ) {
         try {
-            List<Import_Row__c> rows = String.isBlank(status)
-                ? ImportRowSelector.selectByBatch(batchId, offsetRows)
-                : ImportRowSelector.selectByBatchAndStatus(batchId, status, offsetRows);
-            List<RowView> result = new List<RowView>();
-            for (Import_Row__c row : rows) {
-                RowView view = new RowView();
-                view.id = row.Id;
-                view.rowNumber = row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
-                view.status = row.Status__c;
-                view.errorMessage = row.Error_Message__c;
-                view.values = row.Raw_Values_JSON__c;
-                result.add(view);
+            RowPage page = new RowPage();
+            if (String.isBlank(batchId)) {
+                return page;
             }
-            return result;
+            page.cursor = cursor == null
+                ? ImportRowSelector.openCursor(Id.valueOf(batchId), status)
+                : cursor;
+            page.total = page.cursor.getNumRecords();
+            Integer start = startIndex == null || startIndex < 0 ? 0 : startIndex;
+            Integer size = pageSize == null ||
+                pageSize < 1
+                ? ImportRowSelector.PAGE_SIZE
+                : Math.min(pageSize, MAX_PAGE_ROWS);
+            size = Math.min(size, page.total - start);
+            page.nextIndex = Math.min(start, page.total);
+            if (size > 0) {
+                Database.CursorFetchResult fetched = page.cursor.fetchPage(start, size);
+                for (SObject record : fetched.getRecords()) {
+                    page.rows.add(toRowView((Import_Row__c) record));
+                }
+                // A page covers positions start to start + size - 1 (rows deleted since the
+                // cursor opened are skipped, not replaced), so the next page starts after it.
+                // The result's getNextIndex is not used: on the last page it comes back as a
+                // sentinel, not a position, and reading it as one restarted the read at row 0.
+                page.nextIndex = start + size;
+            }
+            // The cursor's own isDone is per page, so the whole read is judged by position.
+            page.hasMore = page.nextIndex < page.total;
+            return page;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRows');
+            throw auraError(e, 'ImportController.getRowPage');
         }
+    }
+
+    private static RowView toRowView(Import_Row__c row) {
+        RowView view = new RowView();
+        view.id = row.Id;
+        view.rowNumber = row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
+        view.status = row.Status__c;
+        view.errorMessage = row.Error_Message__c;
+        view.values = row.Raw_Values_JSON__c;
+        view.person1Id = idText(row.Contact_1__c, row.Person_1_Account__c);
+        view.person2Id = idText(row.Contact_2__c, row.Person_2_Account__c);
+        view.householdId = idText(row.Household__c, null);
+        view.organizationId = idText(row.Organization__c, null);
+        view.resultingRecordId = row.Gift_Id__c;
+        return view;
+    }
+
+    /** The first ID that is set, as text, or null. */
+    private static String idText(Id first, Id second) {
+        Id chosen = first != null ? first : second;
+        return chosen == null ? null : String.valueOf(chosen);
     }
 
     /**
@@ -735,9 +961,8 @@ public with sharing class ImportController {
         try {
             List<ChangedValue> result = new List<ChangedValue>();
             Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-            Import_Template__c template = batch == null
-                ? null
-                : ImportTemplateSelector.selectById(batch.Import_Template__c);
+            // The template the dry run ran under, so the changes shown are the ones it made.
+            Import_Template__c template = ImportBatchService.templateFor(batch);
             if (template == null) {
                 return result;
             }
@@ -748,7 +973,7 @@ public with sharing class ImportController {
             if (mapping.transformsBySourceKey().isEmpty()) {
                 return result;
             }
-            List<Import_Row__c> rows = ImportRowSelector.selectByBatch(batchId, 0);
+            List<Import_Row__c> rows = ImportRowSelector.selectFirstPage(batchId);
             for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
                 for (List<String> cell : ImportRowProcessor.changedValues(rows[i], mapping)) {
                     ChangedValue changed = new ChangedValue();
@@ -777,10 +1002,17 @@ public with sharing class ImportController {
         view.fileName = batch.File_Name__c;
         // An undo whose job was aborted shows as Undo failed, which it is (R-IB8).
         view.status = ImportUndoService.effectiveStatus(batch);
-        view.isDryRun = batch.Is_Dry_Run__c;
+        view.retrying = ImportBatchService.isRetrying(batch);
+        // A retry's preview runs over a committed import, so it is a dry run of its own rows.
+        view.isDryRun =
+            batch.Is_Dry_Run__c ||
+            (view.retrying &&
+            (ImportBatchService.STATUS_DRY_RUN.equals(view.status) ||
+            ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(view.status)));
         view.isFinished =
             ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(view.status) ||
             ImportBatchService.STATUS_COMPLETE.equals(view.status) ||
+            ImportBatchService.STATUS_TRIAL_COMPLETE.equals(view.status) ||
             ImportBatchService.STATUS_FAILED.equals(view.status) ||
             ImportBatchService.STATUS_UNDONE.equals(view.status) ||
             ImportBatchService.STATUS_UNDO_FAILED.equals(view.status);
@@ -790,9 +1022,14 @@ public with sharing class ImportController {
         view.matched = intOf(batch.Rows_Matched__c);
         view.rejected = intOf(batch.Rows_Rejected__c);
         view.runLog = batch.Run_Log__c;
+        view.startedAt = batch.Started_At__c;
         view.undoDeadline = batch.Undo_Deadline__c;
-        view.canUndo = String.isBlank(ImportUndoService.refusal(batch));
-        view.controlTotalsAgree = ImportBatchService.controlTotalsAgree(batch);
+        view.canUndo = String.isBlank(ImportUndoService.refusal(batch, view.status));
+        // A retry's file is the fixed rows, which the totals do not describe (R-IB17).
+        view.controlTotalsAgree = view.retrying || ImportBatchService.controlTotalsAgree(batch);
+        view.trialRows = intOf(batch.Trial_Rows__c);
+        view.defaultTrialRows = ImportBatchService.trialRows();
+        view.canRetry = ImportBatchService.retryRefusal(batch) == null;
         return view;
     }
 

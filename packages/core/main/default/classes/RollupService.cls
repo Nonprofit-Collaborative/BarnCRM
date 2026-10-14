@@ -6,8 +6,10 @@
  * happen:
  *
  * - **Real time.** A trigger on a source entity calls `runRealTime`. `RollupChanges` works out
- *   which target records the save marks (R-R11), and they are recalculated in the same save or,
- *   for a bulk or background save, written to the Rollup Queue (R-R4, Section 14A).
+ *   which target records the save marks (R-R11). By default they are written to the Rollup Queue
+ *   and recalculated just after the save, so the save itself only marks and queues; an org that
+ *   sets Rollup Processing to In the save recalculates a normal save's totals in it, and a bulk
+ *   or background save still queues (R-R4, Section 14A, ADR-0098 async rollups).
  * - **Scheduled.** `RollupScheduler` calls `startNightlyRun` for the definitions in Scheduled or
  *   Both mode, which is the nightly reconciliation R-R4 describes: `RollupFullRecalcBatch`.
  * - **On demand.** `recalculate` runs one definition over every record now, which is what the
@@ -16,9 +18,6 @@
  * Freshness is the engine's own: `RollupWriter` stamps `Rollups_Last_Calculated__c` on a record
  * in the same write as its totals, and the full recalculation marks a definition calculated when
  * its run has finished (R-R13).
- *
- * The vendored apex-rollup tree and `RollupAdapter` are no longer reached from here. They stay in
- * the repository only for `RollupEngineComparison`, until the comparison run the ADR requires.
  */
 @NamespaceAccessible
 public with sharing class RollupService {
@@ -50,6 +49,11 @@ public with sharing class RollupService {
 
     private static final Set<String> REAL_TIME_MODES = new Set<String>{ MODE_REAL_TIME, MODE_BOTH };
     private static final Set<String> SCHEDULED_MODES = new Set<String>{ MODE_SCHEDULED, MODE_BOTH };
+    private static final Set<String> EVERY_MODE = new Set<String>{
+        MODE_REAL_TIME,
+        MODE_SCHEDULED,
+        MODE_BOTH
+    };
 
     /** The records the last merge recalculated, so a test can see only survivors were. */
     @TestVisible
@@ -61,6 +65,32 @@ public with sharing class RollupService {
      */
     @TestVisible
     private static Integer instantLimit = 50;
+
+    /** The setting that says when real-time totals are recalculated (R-R4, ADR-0098). */
+    @NamespaceAccessible
+    public static final String PROCESSING_SETTING = 'Rollup_Processing__c';
+    /** Queued and recalculated just after the save: the default. */
+    @NamespaceAccessible
+    public static final String PROCESSING_BACKGROUND = 'Background';
+    /** Recalculated in the save itself when it is small enough, as before ADR-0098. */
+    @NamespaceAccessible
+    public static final String PROCESSING_IN_SAVE = 'In_Save';
+
+    /**
+     * Queries a recalculation in the save spends on top of its planned aggregate queries for one
+     * target entity: the stored values, the target filter and the write's own automation.
+     */
+    private static final Integer QUERIES_PER_TARGET = 4;
+
+    /**
+     * Whether a normal save recalculates its real-time totals itself. Anything but In the save,
+     * including a setting never saved, means just after the save.
+     */
+    @NamespaceAccessible
+    public static Boolean recalculatesInTheSave() {
+        Object stored = SettingsService.getValue(PROCESSING_SETTING);
+        return stored != null && PROCESSING_IN_SAVE.equals(String.valueOf(stored));
+    }
 
     /** The modes a nightly run covers. */
     @NamespaceAccessible
@@ -204,14 +234,31 @@ public with sharing class RollupService {
         }
         lastParentIds = survivorIds;
         String target = String.valueOf(targetType);
+        // Inside a Queueable the one job it may queue belongs to its own next step, never to
+        // the engine (`RollupQueue.requestProcessor`), so survivors go to the queue there too.
         if (
             survivorIds.size() > instantLimit ||
+            System.isQueueable() ||
             Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
         ) {
-            RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+            queue(
+                new Map<String, Set<Id>>{ target => survivorIds },
+                new Map<String, List<Rollup_Definition__c>>{ target => definitions }
+            );
             return;
         }
         System.enqueueJob(new SurvivorRecalculation(target, survivorIds, definitions));
+    }
+
+    /**
+     * Starts the Rollup Queue's processor when entries are pending. A background job that saved
+     * records calls this when it has no next step of its own: inside a Queueable the engine
+     * never takes the job's one chained job, so the totals it queued would otherwise wait for a
+     * later save or the nightly run.
+     */
+    @NamespaceAccessible
+    public static void startQueuedRecalculation() {
+        RollupQueue.startProcessor();
     }
 
     /**
@@ -240,11 +287,15 @@ public with sharing class RollupService {
                 RollupQueue.retryLater(
                     target,
                     RollupEngine.recalculate(survivorIds, definitions).failed,
-                    0
+                    0,
+                    idsOf(definitions)
                 );
             } catch (Exception stopped) {
                 ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
-                RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+                queue(
+                    new Map<String, Set<Id>>{ target => survivorIds },
+                    new Map<String, List<Rollup_Definition__c>>{ target => definitions }
+                );
             }
         }
     }
@@ -285,9 +336,13 @@ public with sharing class RollupService {
             return;
         }
         if (deleting == true) {
-            RollupQueue.add(
-                idsByTargetOf(RollupChanges.afterDelete(sourceObject, records, definitions))
+            RollupChanges.Marked marked = RollupChanges.afterDelete(
+                sourceObject,
+                records,
+                definitions
             );
+            Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
+            queue(idsByTarget, definitionsByTargetOf(marked, idsByTarget.keySet()));
             return;
         }
         recalculateNowOrQueue(
@@ -308,31 +363,87 @@ public with sharing class RollupService {
     }
 
     /**
-     * R-R4: a normal save that marks a few records recalculates them in the same save; a bulk
-     * change, or a save already running in the background, queues them. A record the platform
-     * refuses to save is queued to be tried again, and anything that stops the recalculation
-     * queues the lot, so nothing marked is lost.
+     * The definitions that marked each target entity's records, which are the ones recalculated
+     * (ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`): a gift save does not
+     * run the soft credit totals on the donor. When one of them has no record id to name it,
+     * every active definition on the entity runs, as before.
+     */
+    private static Map<String, List<Rollup_Definition__c>> definitionsByTargetOf(
+        RollupChanges.Marked marked,
+        Set<String> targets
+    ) {
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget = new Map<String, List<Rollup_Definition__c>>();
+        for (String target : targets) {
+            List<Rollup_Definition__c> definitions = marked.definitionsFor(target);
+            definitionsByTarget.put(
+                target,
+                definitions == null
+                    ? RollupSelector.selectActiveForTarget(target, EVERY_MODE)
+                    : definitions
+            );
+        }
+        return definitionsByTarget;
+    }
+
+    /** Queues the records with the definitions to recalculate for them. */
+    private static void queue(
+        Map<String, Set<Id>> idsByTarget,
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
+        Map<String, Set<Id>> definitionIdsByTarget = new Map<String, Set<Id>>();
+        for (String target : definitionsByTarget.keySet()) {
+            definitionIdsByTarget.put(target, idsOf(definitionsByTarget.get(target)));
+        }
+        RollupQueue.add(idsByTarget, definitionIdsByTarget);
+    }
+
+    /** The definitions' ids; a definition with none leaves a null in, which queues every one. */
+    private static Set<Id> idsOf(List<Rollup_Definition__c> definitions) {
+        if (definitions == null) {
+            return null;
+        }
+        Set<Id> ids = new Set<Id>();
+        for (Rollup_Definition__c definition : definitions) {
+            ids.add(definition.Id);
+        }
+        return ids;
+    }
+
+    /**
+     * R-R4: by default every save queues the records it marked, and the Rollup Queue
+     * recalculates them just after the save (ADR-0098 async rollups), so a save pays for marking
+     * and one insert, never for the aggregate queries. With Rollup Processing set to In the
+     * save, a normal save that marks a few records recalculates them in the same save when the
+     * transaction has room for it; a bulk change, a save already running in the background, or
+     * one without the room queues them. A record the platform refuses to save is queued to be
+     * tried again, and anything that stops the recalculation queues the lot, so nothing marked
+     * is lost.
      */
     private static void recalculateNowOrQueue(RollupChanges.Marked marked) {
         if (marked.isEmpty()) {
             return;
         }
         Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
-        if (!canRecalculateNow(marked.size())) {
-            RollupQueue.add(idsByTarget);
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget = definitionsByTargetOf(
+            marked,
+            idsByTarget.keySet()
+        );
+        if (!recalculatesInTheSave() || !canRecalculateNow(marked.size(), definitionsByTarget)) {
+            queue(idsByTarget, definitionsByTarget);
             return;
         }
         try {
             for (String target : idsByTarget.keySet()) {
+                List<Rollup_Definition__c> definitions = definitionsByTarget.get(target);
                 RollupEngine.Result result = RollupEngine.recalculate(
                     idsByTarget.get(target),
-                    SettingsService.typeByName(target)
+                    definitions
                 );
-                RollupQueue.retryLater(target, result.failed, 0);
+                RollupQueue.retryLater(target, result.failed, 0, idsOf(definitions));
             }
         } catch (Exception stopped) {
             ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
-            RollupQueue.add(idsByTarget);
+            queue(idsByTarget, definitionsByTarget);
         }
     }
 
@@ -346,7 +457,50 @@ public with sharing class RollupService {
             !System.isScheduled() &&
             Limits.getQueries() * 2 < Limits.getLimitQueries() &&
             Limits.getDmlStatements() * 2 < Limits.getLimitDmlStatements() &&
-            Limits.getCpuTime() * 2 < Limits.getLimitCpuTime();
+            Limits.getCpuTime() * 2 < Limits.getLimitCpuTime() &&
+            Limits.getQueryRows() * 2 < Limits.getLimitQueryRows();
+    }
+
+    /**
+     * As above, and the queries the recalculation is planned to spend fit in what the
+     * transaction has left (ROLLUPS-2): a save that reaches the rollups with 45 queries used
+     * must queue, since a limit error there would fail the person's save and no catch can stop
+     * it. The estimate costs no query: definitions come from the transaction's cache.
+     */
+    @TestVisible
+    private static Boolean canRecalculateNow(
+        Integer targetCount,
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
+        if (!canRecalculateNow(targetCount)) {
+            return false;
+        }
+        return plannedQueries(definitionsByTarget) <=
+            Limits.getLimitQueries() - Limits.getQueries();
+    }
+
+    /**
+     * The queries a recalculation of these definitions spends at most: one per definition (the
+     * planner folds some together, never splits one), one more for a path through a household
+     * token, and the fixed cost of each target entity. Counted, not planned, so a definition
+     * that cannot be planned is not logged twice.
+     */
+    @TestVisible
+    private static Integer plannedQueries(
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
+        Integer planned = 0;
+        for (List<Rollup_Definition__c> definitions : definitionsByTarget.values()) {
+            if (definitions == null || definitions.isEmpty()) {
+                continue;
+            }
+            planned += QUERIES_PER_TARGET;
+            for (Rollup_Definition__c definition : definitions) {
+                String path = definition.Relationship_Path__c;
+                planned += String.isNotBlank(path) && path.contains('{') ? 2 : 1;
+            }
+        }
+        return planned;
     }
 
     // ---------------------------------------------------------------------------- full runs
@@ -374,13 +528,31 @@ public with sharing class RollupService {
 
     /**
      * Starts the nightly run now: every active Scheduled and Both definition, over every record
-     * (R-R4). The scheduled job and the Recalculate all button both call this.
+     * (R-R4). The nightly job calls this.
      *
      * @return the batch job started, the full run still going when there is one (R-R14), or
      *         null when nothing started
      */
     public static Id startNightlyRun() {
         return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(SCHEDULED_MODES));
+    }
+
+    /**
+     * Recalculate all: every active definition whatever its mode, Instantly ones too, over every
+     * record. An administrator who clicks it expects every total rebuilt (owner decision on
+     * ROLLUPS-8), which the nightly run's Scheduled and Both scope does not do.
+     *
+     * @return the batch job started, the full run still going when there is one (R-R14), or
+     *         null when nothing started
+     */
+    public static Id startFullRunOfEveryDefinition() {
+        return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(EVERY_MODE));
+    }
+
+    /** The modes Recalculate all covers: every one. */
+    @NamespaceAccessible
+    public static Set<String> everyMode() {
+        return new Set<String>(EVERY_MODE);
     }
 
     /**

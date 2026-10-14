@@ -1,7 +1,8 @@
 # ADR-0043: Record pages use Dynamic Forms, with one fallback layout per object and no layout assignments
 
 **Status:** Accepted; the related-lists rule is amended for Giving's lists on the donor record
-pages by ADR-0064 (Giving ships the donor record pages)
+pages by ADR-0064 (Giving ships the donor record pages), and for record pages of objects the
+shipping package owns by ADR-0097 (every packaged record page places its own actions)
 **Date:** 2026-09-23
 **Source:** product owner decision (Brandon), plan Section 4 and feature C-08
 

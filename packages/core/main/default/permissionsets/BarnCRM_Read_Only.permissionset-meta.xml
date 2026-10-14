@@ -16,10 +16,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AddressController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AddressSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -60,7 +56,15 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FindPeopleAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FiscalYearSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetHouseholdSummaryAction</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -85,10 +89,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>HubController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HubErrorCountSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -121,10 +121,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>QueryFieldCatalog</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -805,6 +801,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Error_Log_Event__e</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Rollup_Queue_Ready__e</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

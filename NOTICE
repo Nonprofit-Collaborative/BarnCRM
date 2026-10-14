@@ -2,10 +2,3 @@ BarnCRM
 Copyright 2026 The BarnCRM contributors
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
-
-This product includes third party software licensed separately by its authors:
-
-  apex-rollup, in packages/core/vendor/apex-rollup/
-  Copyright (c) 2019 James Simone
-  Licensed under the MIT License; the full text is in
-  packages/core/vendor/apex-rollup/LICENSE.

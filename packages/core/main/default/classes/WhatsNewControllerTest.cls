@@ -6,8 +6,13 @@
  * also proves the least privileged BarnCRM role can use the card, and keeps the per-user record
  * apart from other test classes running as the running user.
  */
-@IsTest
+@IsTest(testFor='ApexClass:WhatsNewController')
 private class WhatsNewControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User readOnlyUser() {
         return TestDataFactory.createUser('Reader', new List<String>{ 'BarnCRM_Read_Only' });
     }

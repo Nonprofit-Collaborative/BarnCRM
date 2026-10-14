@@ -5,8 +5,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataHygieneController')
 private class DataHygieneControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
@@ -120,6 +125,28 @@ private class DataHygieneControllerTest {
                 [SELECT COUNT() FROM Saved_Query__c WHERE OwnerId = :maria.Id],
                 'One saved query, not one per press.'
             );
+        }
+    }
+
+    /** With two of her own queries of the check's name, Find opens the one just put back. */
+    @IsTest
+    static void openInFindOpensTheQueryItSavedWhenTwoShareTheName() {
+        System.runAs(TestUsers.admin()) {
+            contactMode();
+            User maria = maria();
+            String key = DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS;
+            DataHygieneController.OpenInFind first;
+            DataHygieneController.OpenInFind again;
+            System.runAs(maria) {
+                first = DataHygieneController.openInFind(key);
+                insert new Saved_Query__c(
+                    Name = first.savedQueryName,
+                    Object_Name__c = 'Account',
+                    Query_JSON__c = DataHygieneService.queryDocument(key)
+                );
+                again = DataHygieneController.openInFind(key);
+            }
+            Assert.areEqual(first.savedQueryId, again.savedQueryId, 'The query it updated.');
         }
     }
 

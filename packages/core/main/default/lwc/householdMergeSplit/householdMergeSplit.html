@@ -128,39 +128,6 @@
                                 ></lightning-button>
                             </div>
                         </template>
-
-                        <template if:true={confirmingMerge}>
-                            <!-- Not a real dialog: focus never moves here and Escape does nothing, so role="region"
-                                 with aria-labelledby describes what this actually is rather than promising modal behavior. -->
-                            <div
-                                class="slds-box slds-theme_warning slds-var-m-top_medium merge-confirm"
-                                role="region"
-                                aria-labelledby="merge-confirm-heading"
-                            >
-                                <h3 id="merge-confirm-heading" class="slds-text-heading_small">
-                                    {label.confirmHeading}
-                                </h3>
-                                <p class="slds-var-m-top_x-small confirm-body">{confirmBody}</p>
-                                <p class="slds-var-m-top_x-small confirm-names">
-                                    <span class="confirm-victim">{otherHouseholdName}</span>
-                                    <span class="confirm-survivor">{survivorName}</span>
-                                </p>
-                                <div class="slds-var-m-top_small">
-                                    <lightning-button
-                                        variant="destructive"
-                                        label={label.confirmButton}
-                                        disabled={busy}
-                                        onclick={handleMergeConfirm}
-                                        class="slds-var-m-right_x-small merge-confirm-button"
-                                    ></lightning-button>
-                                    <lightning-button
-                                        label={label.cancel}
-                                        onclick={handleMergeCancel}
-                                        class="merge-cancel-button"
-                                    ></lightning-button>
-                                </div>
-                            </div>
-                        </template>
                     </lightning-tab>
 
                     <lightning-tab label={label.tabSplit} value="split" class="split-tab">
@@ -252,34 +219,6 @@
                                 class="split-button"
                             ></lightning-button>
                         </div>
-
-                        <template if:true={confirmingSplit}>
-                            <!-- Not a real dialog: focus never moves here and Escape does nothing, so role="region"
-                                 with aria-labelledby describes what this actually is rather than promising modal behavior. -->
-                            <div
-                                class="slds-box slds-var-m-top_medium split-confirm"
-                                role="region"
-                                aria-labelledby="split-confirm-heading"
-                            >
-                                <p id="split-confirm-heading" class="split-confirm-body">
-                                    {label.splitConfirmBody}
-                                </p>
-                                <div class="slds-var-m-top_small">
-                                    <lightning-button
-                                        variant="brand"
-                                        label={label.splitButton}
-                                        disabled={busy}
-                                        onclick={handleSplitConfirm}
-                                        class="slds-var-m-right_x-small split-confirm-button"
-                                    ></lightning-button>
-                                    <lightning-button
-                                        label={label.cancel}
-                                        onclick={handleSplitCancel}
-                                        class="split-cancel-button"
-                                    ></lightning-button>
-                                </div>
-                            </div>
-                        </template>
                     </lightning-tab>
                 </lightning-tabset>
             </template>

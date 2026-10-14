@@ -1,5 +1,6 @@
 <template>
   <div class="slds-p-around_medium">
+    <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
     <template lwc:if={loadError}>
       <p role="alert" data-id="load-error" class="slds-text-color_error slds-m-bottom_small">{loadError}</p>
     </template>

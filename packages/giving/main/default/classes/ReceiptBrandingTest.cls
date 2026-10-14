@@ -12,7 +12,7 @@
  * ADR-0016's second spike that an Apex test cannot settle: they assert the markup this package
  * composes, not that the PDF rendering service fetches the image. Only a real org can say that.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptLogoSource')
 private class ReceiptBrandingTest {
     private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
 

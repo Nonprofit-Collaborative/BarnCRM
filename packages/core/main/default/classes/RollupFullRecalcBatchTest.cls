@@ -5,8 +5,13 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupFullRecalcBatch')
 private class RollupFullRecalcBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c peopleCount() {
         Rollup_Definition__c definition = new Rollup_Definition__c(
             Name = 'People per organization',

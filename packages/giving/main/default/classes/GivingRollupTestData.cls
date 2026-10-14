@@ -39,10 +39,13 @@ public class GivingRollupTestData {
 
     /**
      * Creates the shipped rollups, as the Giving install does. From here on every save of a gift
-     * or a commitment runs the real-time rollups.
+     * or a commitment runs the real-time rollups, recalculated in the save, so a test can read a
+     * total right after each of several saves (`RollupTestSupport`). The default, queued just
+     * after the save, is pinned by `GiftSaveRollupCostTest`.
      */
     public static void installShippedRollups() {
         RollupService.ensureDefaults();
+        RollupTestSupport.recalculateInTheSave();
     }
 
     /**

@@ -6,7 +6,7 @@
  * refund, thank and receipt. The one afternoon Maria holds Override Posting Lock, she can make an
  * auditor's correction, and BarnCRM writes down what she did.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftPostingLock')
 private class GiftPostingLockTest {
     private static final String OVERRIDE_PERMISSION = 'Override_Posting_Lock';
 

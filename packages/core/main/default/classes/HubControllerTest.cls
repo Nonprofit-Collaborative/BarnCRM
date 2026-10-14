@@ -3,7 +3,7 @@
  * Manage BarnCRM Settings permission, sees the same page and cannot change anything.
  * Finishing a step belongs to the Setup Assistant's own controller.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HubController')
 private class HubControllerTest {
     @TestSetup
     static void grantPermission() {
@@ -13,19 +13,7 @@ private class HubControllerTest {
     }
 
     private static User buildDavid() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        return new User(
-            FirstName = 'David',
-            LastName = 'Okonkwo',
-            Alias = 'davidh',
-            Email = 'david.hub@example.com',
-            Username = 'david.hub.' + DateTime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davidh');
     }
 
     @IsTest
@@ -62,13 +50,18 @@ private class HubControllerTest {
                 );
             }
             insert errors;
-            HubErrorCountSelector.countCap = 2;
+            HubController.errorCountCap = 2;
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
             System.runAs(maria) {
                 HubController.HomeModel model = HubController.getHomeModel();
                 Assert.areEqual(2, model.newErrorCount, 'The tile shows the cap');
                 Assert.isTrue(model.newErrorCountCapped, 'and says there are more than that');
+                Assert.areEqual(
+                    0,
+                    model.installProblemCount,
+                    'Errors from elsewhere are not install problems, and the count arrives in the same model'
+                );
             }
 
         }
@@ -86,8 +79,17 @@ private class HubControllerTest {
             Test.startTest();
             System.runAs(david) {
                 HubController.HomeModel model = HubController.getHomeModel();
-                Assert.areEqual(8, model.stepsTotal, 'David sees the same eight steps counted');
                 Assert.isFalse(model.canEdit, 'David may not change anything');
+                Assert.areEqual(
+                    0,
+                    model.stepsTotal,
+                    'The checklist is hidden from David, so its steps are not worked out for him'
+                );
+                Assert.areEqual(0, model.newErrorCount, 'Nor is the administrator error count');
+                Assert.isNull(model.installProblemCount, 'Nor the install problem count');
+                Assert.isFalse(model.rollupsStale, 'The admin tiles read as quiet, not broken');
+                Assert.isFalse(model.seasonalAddressStale, 'Both of them');
+                Assert.isNotNull(model.recurringSources, 'What staff do see still arrives');
             }
             Test.stopTest();
         }
@@ -114,6 +116,67 @@ private class HubControllerTest {
                 'By the name Maria gave it.'
             );
             Assert.isNull(model.recurringSources[0].lastImportDate, 'Never imported yet.');
+        }
+    }
+
+    @IsTest
+    static void showsTheLastSeasonalSwapAndTheRollupFreshness() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime finished = Datetime.now().addHours(-2);
+            SeasonalAddressWriter.recordRun(finished, '3 moved in, 1 moved back, 0 failed.');
+
+            Test.startTest();
+            HubController.HomeModel model = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.areEqual(finished, model.seasonalAddressLastRun, 'When the swap last ran');
+            Assert.areEqual(
+                '3 moved in, 1 moved back, 0 failed.',
+                model.seasonalAddressLastRunSummary,
+                'and what it did'
+            );
+            Assert.areEqual(
+                SeasonalAddressScheduler.isScheduled(),
+                model.seasonalAddressScheduled,
+                'Whether the nightly swap is scheduled'
+            );
+            Assert.isFalse(model.seasonalAddressStale, 'A run two hours ago is not stale');
+            Assert.areEqual(
+                RollupService.lastCalculated(),
+                model.rollupsLastCalculated,
+                'When the rollups last completed'
+            );
+            Assert.areEqual(
+                RollupService.isStale(),
+                model.rollupsStale,
+                'and whether that is too long ago'
+            );
+        }
+    }
+
+    @IsTest
+    static void aTileThatCannotAnswerIsLostNotThePage() {
+        System.runAs(TestUsers.admin()) {
+            SetupAssistantTestExtension.useNone();
+            TestDataFactory.defaultSettings();
+            SeasonalAddressWriter.recordRun(Datetime.now(), 'Nothing to swap.');
+            HubController.failingPartsForTest = new Set<String>{
+                HubController.PART_ROLLUPS,
+                HubController.PART_SEASONAL
+            };
+
+            Test.startTest();
+            HubController.HomeModel model = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.isNotNull(model, 'The page still loads');
+            Assert.areEqual(8, model.stepsTotal, 'with its checklist');
+            Assert.isNull(model.rollupsLastCalculated, 'The rollup tile has nothing to show');
+            Assert.isFalse(model.rollupsStale, 'and raises no false alarm');
+            Assert.isNull(model.seasonalAddressLastRun, 'Nor does the seasonal tile');
+            Assert.isFalse(model.seasonalAddressScheduled, 'It does not claim a schedule');
+            Assert.isFalse(model.seasonalAddressStale, 'or a missed run');
         }
     }
 }

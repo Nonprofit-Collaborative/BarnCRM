@@ -3,8 +3,13 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupController')
 private class RollupControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c definition() {
         return new Rollup_Definition__c(
             Name = 'Household member count',
@@ -124,6 +129,32 @@ private class RollupControllerTest {
         }
     }
 
+    /** ROLLUPS-8: a year based total cannot be Instantly only, from the list either. */
+    @IsTest
+    static void aYearBasedTotalCannotBeSwitchedToInstantlyOnly() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Fiscal_Year_Aware__c = true;
+            rollup.Fiscal_Year_Offset__c = 0;
+            rollup.Fiscal_Date_Field__c = 'Start_Date__c';
+            insert rollup;
+
+            String message;
+            try {
+                RollupController.setMode(rollup.Id, RollupService.MODE_REAL_TIME);
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+
+            System.Assert.areEqual(Label.Core_RollupBuilder_ErrorInstantMovesWithDate, message);
+            System.Assert.areEqual(
+                RollupService.MODE_BOTH,
+                [SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
+                'The mode is unchanged'
+            );
+        }
+    }
+
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
         System.runAs(TestUsers.admin()) {
@@ -218,6 +249,44 @@ private class RollupControllerTest {
                 'Every account a scheduled rollup writes, at the rough rate'
             );
             System.Assert.isTrue(estimate.workingHours, 'Ten on a Monday morning is working hours');
+        }
+    }
+
+    /** Recalculate all rebuilds Instantly totals too, so the estimate counts their records. */
+    @IsTest
+    static void theEstimateCountsTheRecordsOfAnInstantlyRollup() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c instantly = definition();
+            instantly.Mode__c = RollupService.MODE_REAL_TIME;
+            insert instantly;
+            List<Account> accounts = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                accounts.add(new Account(Name = 'Household ' + i));
+            }
+            insert accounts;
+            User admin = maria();
+            Integer records;
+            System.runAs(admin) {
+                records = [SELECT COUNT() FROM Account WITH USER_MODE];
+            }
+
+            Test.startTest();
+            RollupController.FullRunEstimate estimate = estimateAt(
+                admin,
+                Date.newInstance(2026, 10, 12),
+                Time.newInstance(20, 0, 0, 0)
+            );
+            Test.stopTest();
+
+            System.Assert.isTrue(records >= 200, 'The accounts are visible to Maria');
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_Estimate,
+                    new List<String>{ records.format(), (1).format() }
+                ),
+                estimate.summary,
+                'Every account the Instantly rollup writes is counted'
+            );
         }
     }
 
