@@ -498,6 +498,8 @@ private class SampleDataLoaderTest {
     static void testRemoveDeletesEverythingFlagged() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(2, 2, false));
+            // An org with Giving installed would hand the removal to Giving first.
+            SampleDataModules.moduleOverride = new List<SampleDataModule>();
 
             Test.startTest();
             SampleDataLoader.Counts removed = SampleDataLoader.remove();
