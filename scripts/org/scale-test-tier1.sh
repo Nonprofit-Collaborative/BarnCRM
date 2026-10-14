@@ -109,7 +109,7 @@ EOF
 
 # job_error_hint <text>: a hint when the error text points at the hard delete permission.
 job_error_hint() {
-  if printf '%s' "$1" | grep -qiE 'hard.?delete|INSUFFICIENT_ACCESS|not authorized|insufficient access|permission'; then
+  if grep -qiE 'hard.?delete|INSUFFICIENT_ACCESS|not authorized|insufficient access|permission' <<< "$1"; then
     log "  HINT: this looks like a permission problem. Hard delete needs the Bulk API Hard Delete"
     log "  permission on the running user (a profile or permission set system permission that is"
     log "  off by default, even for System Administrators). Grant it, or rerun cleanup with"
@@ -370,8 +370,7 @@ delete_where() {
     # No hard delete permission: the first delete says so. Fall back to soft delete for this
     # and the remaining steps unless the user forced hard delete.
     if [[ -n "$flag" && "$FORCE_HARD" != "1" && "$JOB_SUCCESS" -le 0 ]] \
-      && cat "$outfile" "$DIR/work/last-delete.err" "$DIR/work/failed-$slug.csv" 2>/dev/null \
-        | grep -qi 'HardDeletePermissionError'; then
+      && grep -qis 'HardDeletePermissionError' "$outfile" "$DIR/work/last-delete.err" "$DIR/work/failed-$slug.csv"; then
       DELETE_SOFT=1
       log "  HardDeletePermissionError: the user lacks Bulk API Hard Delete. Falling back to soft"
       log "  delete (Recycle Bin) for this and the remaining steps."
