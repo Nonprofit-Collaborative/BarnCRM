@@ -574,9 +574,14 @@ public with sharing class ImportController {
 
     /** The parent field a saved column names its parent by, for the column with this source. */
     private static String lookupFieldOf(ImportMapping saved, String sourceKey) {
+        ImportMapping.Column column = savedColumn(saved, sourceKey);
+        return column == null ? null : column.lookupField;
+    }
+
+    private static ImportMapping.Column savedColumn(ImportMapping saved, String sourceKey) {
         for (ImportMapping.Column column : saved.columns) {
             if (column != null && ImportMapping.key(column.source) == sourceKey) {
-                return column.lookupField;
+                return column;
             }
         }
         return null;
@@ -617,10 +622,14 @@ public with sharing class ImportController {
                     if (String.isNotBlank(fromTemplate)) {
                         column.target = fromTemplate;
                         column.lookupField = lookupFieldOf(saved, source);
+                        column.blankClears = savedColumn(saved, source).blankClears;
                     } else if (ignored.contains(source)) {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
                 }
+                // The rows to load are the mapping's, whatever the file's headings (R-IT17).
+                suggested.skipRows = saved.skipRows;
+                suggested.uniqueBy = saved.uniqueBy;
             }
             return suggested.serialize();
         } catch (Exception e) {

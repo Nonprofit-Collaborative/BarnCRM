@@ -175,6 +175,16 @@
                                                 data-source={column.source}
                                                 onclick={handleEditChanges}
                                             ></lightning-button>
+                                            <template lwc:if={loadsOneObject}>
+                                                <lightning-input
+                                                    type="checkbox"
+                                                    label={labels.blankClearsLabel}
+                                                    data-id="blank-clears"
+                                                    data-source={column.source}
+                                                    checked={column.blankClears}
+                                                    onchange={handleBlankClearsChange}
+                                                ></lightning-input>
+                                            </template>
                                         </td>
                                         <td class="slds-text-body_small">{column.samples}</td>
                                     </tr>
@@ -193,6 +203,13 @@
                             ondone={handleChangesDone}
                         ></c-import-column-transforms>
                     </template>
+                    <c-import-row-rules
+                        data-id="row-rules"
+                        column-names={headers}
+                        skip-rows={skipRows}
+                        unique-by={uniqueBy}
+                        onchange={handleRowRulesChange}
+                    ></c-import-row-rules>
                 </template>
 
                 <template lwc:if={isStepMatching}>

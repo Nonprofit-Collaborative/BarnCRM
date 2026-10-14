@@ -143,6 +143,28 @@ private class ImportRowRulesTest {
         }
     }
 
+    @IsTest
+    static void theNextFileStartsFromTheSavedRowRulesAndClearingColumns() {
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                Import_Template__c template = clearingTemplate(true);
+                ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
+                saved.skipRows = new List<ImportMapping.SkipRule>{ rule('Reason', 'blank', null) };
+                saved.uniqueBy = new List<String>{ 'Id' };
+                template.Column_Mapping_JSON__c = saved.serialize();
+                update template;
+
+                ImportMapping suggested = ImportMapping.parse(
+                    ImportController.suggestMapping(template.Id, new List<String>{ 'Id', 'Reason' })
+                );
+
+                Assert.areEqual('blank', suggested.skipRows[0].test);
+                Assert.areEqual(new List<String>{ 'Id' }, suggested.uniqueBy);
+                Assert.isTrue(suggested.clearingAttributes().contains('reason__c'));
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------------------
     // Empty cells that clear (R-IT18)
     // -------------------------------------------------------------------------------------
