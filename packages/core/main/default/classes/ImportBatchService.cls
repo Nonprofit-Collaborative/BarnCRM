@@ -230,7 +230,27 @@ public with sharing class ImportBatchService {
                 )
             );
         }
+        // Skip rows and One row per key (R-IT17) decide as the rows arrive, so every pass and
+        // the dry run's counts see the same rows.
+        Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
+        List<String> keys = ImportRowFilter.apply(
+            batch.Id,
+            ImportMapping.parse(template == null ? null : template.Column_Mapping_JSON__c),
+            staged,
+            rows
+        );
         Database.insert(staged, AccessLevel.USER_MODE);
+        // The row keys are bookkeeping in no permission set (ADR-0021): written in system mode
+        // after the user-mode insert of the rows themselves.
+        List<Import_Row__c> keyed = new List<Import_Row__c>();
+        for (Integer i = 0; i < staged.size(); i++) {
+            if (keys[i] != null) {
+                keyed.add(new Import_Row__c(Id = staged[i].Id, Row_Key__c = keys[i]));
+            }
+        }
+        if (!keyed.isEmpty()) {
+            Database.update(keyed, AccessLevel.SYSTEM_MODE);
+        }
         Integer total =
             (batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()) + staged.size();
         batch.Row_Count__c = total;
@@ -855,6 +875,16 @@ public with sharing class ImportBatchService {
             lines.add(batch.Run_Log__c);
         }
         lines.addAll(logLines == null ? new List<String>() : logLines);
+        Integer skipped = count(counts, ImportRowProcessor.STATUS_SKIPPED);
+        if (skipped > 0) {
+            // Skipped as staged (R-IT18): not rejected, and listed with the rows.
+            lines.add(
+                String.format(
+                    Label.Core_Import_LogRowsSkipped,
+                    new List<String>{ String.valueOf(skipped) }
+                )
+            );
+        }
         if (!retrying) {
             lines.addAll(controlTotalLines(batch));
         }

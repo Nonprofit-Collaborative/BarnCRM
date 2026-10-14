@@ -116,14 +116,20 @@ public with sharing class ImportObjectLoader {
         Boolean related = ImportObjectSchema.loadsRelated(template);
         // With related records only a key's first row loads the parent (R-IT17).
         List<Item> parents = related ? groupByKey(batch, template, type, operation, items) : items;
+        // An empty cell clears its field only where the column says so, and never on insert
+        // (R-IT19).
+        Set<String> clearing = operation == ImportObjectSchema.OPERATION_INSERT
+            ? new Set<String>()
+            : mapping.clearingAttributes();
         Map<String, Plan> plans = plan(
             type,
             mapping,
             parents,
+            clearing,
             outcome,
             ImportMapping.ENTITY_RECORD
         );
-        readValues(parents, plans);
+        readValues(parents, plans, clearing);
         resolveLookups(
             parents,
             plans,
@@ -220,12 +226,14 @@ public with sharing class ImportObjectLoader {
         Schema.SObjectType type,
         ImportMapping mapping,
         List<Item> items,
+        Set<String> clearing,
         ImportRowProcessor.Outcome outcome,
         String entity
     ) {
         Map<String, Plan> plans = new Map<String, Plan>();
         Map<String, String> lookupFields = mapping.lookupFieldsByAttribute(entity);
-        Set<String> attributes = new Set<String>();
+        // A clearing column is planned even when every cell of the chunk is empty.
+        Set<String> attributes = new Set<String>(clearing);
         for (Item item : items) {
             attributes.addAll(item.held.keySet());
         }
@@ -298,10 +306,22 @@ public with sharing class ImportObjectLoader {
     }
 
     /** Converts each row's values to their fields' types; one that cannot be read rejects it. */
-    private static void readValues(List<Item> items, Map<String, Plan> plans) {
+    private static void readValues(
+        List<Item> items,
+        Map<String, Plan> plans,
+        Set<String> clearing
+    ) {
         for (Item item : items) {
             if (item.error != null) {
                 continue;
+            }
+            for (String attribute : clearing) {
+                // An empty cell of a clearing column, with no value for every row to fill it,
+                // clears the field; `decide` keeps it only for a record that holds a value.
+                Plan planned = plans.get(attribute);
+                if (planned != null && String.isBlank(item.held.get(attribute))) {
+                    item.values.put(planned.field.getName(), null);
+                }
             }
             for (String attribute : item.held.keySet()) {
                 Plan planned = plans.get(attribute);
@@ -751,6 +771,22 @@ public with sharing class ImportObjectLoader {
                 : (Id) item.stored.get('RecordTypeId');
             for (String name : item.values.keySet()) {
                 Schema.DescribeFieldResult field = byName.get(name);
+                Boolean clears = item.values.get(name) == null;
+                if (clears && item.creates) {
+                    // A new record has nothing to clear (R-IT18).
+                    continue;
+                }
+                if (
+                    clears && (!field.isNillable() || field.getType() == Schema.DisplayType.BOOLEAN)
+                ) {
+                    outcome.notes.add(
+                        String.format(
+                            Label.Core_Import_LogCannotClear,
+                            new List<String>{ field.getLabel() }
+                        )
+                    );
+                    continue;
+                }
                 if (!mayWrite(field, item.creates)) {
                     outcome.notes.add(noAccess(field));
                 } else if (
@@ -766,6 +802,7 @@ public with sharing class ImportObjectLoader {
                     item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))
                 ) {
                     kept.put(name, item.values.get(name));
+                    outcome.cleared += clears ? 1 : 0;
                 }
             }
             item.values = kept;
@@ -987,6 +1024,7 @@ public with sharing class ImportObjectLoader {
             relatedType,
             mapping,
             children,
+            new Set<String>(),
             outcome,
             ImportMapping.ENTITY_RELATED
         );
@@ -1002,7 +1040,8 @@ public with sharing class ImportObjectLoader {
                 );
             }
         }
-        readValues(children, plans);
+        // A related record is always created, so it has nothing to clear (R-IT19).
+        readValues(children, plans, new Set<String>());
         resolveLookups(
             children,
             plans,

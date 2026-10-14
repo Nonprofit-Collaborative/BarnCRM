@@ -2057,6 +2057,26 @@ alone and the run log says so; nothing is rejected for it. A matcher failure is 
 Error Log only when a rule was known to be active. Duplicate rules are not asked for a
 one-object template.
 
+**R-IT17 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
+`"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,
+`contains` or `blank` (`text` required unless `blank`, at most 255), and `"uniqueBy"`, at most
+5 column names (ADR-NEXT, `NEXT-import-row-rules.md`). Both read a row's cells as uploaded,
+before any column change (R-IT15), trimmed and ignoring capitals. When a page of the file is
+staged, a row any rule matches, and a row whose `uniqueBy` cells (not all empty) equal an
+earlier row's, is staged with Status Skipped and the reason in Error Message; every other row
+with a key keeps the key's digest in Row Key, which later pages look up. No pass reads a
+Skipped row, so the dry run and the commit see the same rows, and the run log counts them. A
+mapping whose rules are incomplete or too many is refused on save; a stored one that fails the
+check skips nothing.
+
+**R-IT18 An empty cell that clears.** A `Record` column (R-IT12) may carry `"blankClears":
+true`. Under Update or Upsert, when that column's cell is empty after values for every row
+(R-IB14) have filled blanks, the record's field is cleared if it holds a value: an ordinary
+change, compared, journaled with the value before (R-IJ3) and put back by undo. A record the
+load creates is not affected. A required field or a checkbox is never cleared, and the run log
+names it once. The run log counts the values cleared, or that a commit would clear in a dry
+run. A people template ignores `blankClears`: a blank never clears a field there.
+
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
 override it per template, and the processor resolves the person references in R-IR1
@@ -2626,6 +2646,7 @@ processor resolves those in dependency order.
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
 | Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
 | Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12), or with related records the parent row's key digest, one form when its parent was saved and another when it failed (R-IT17). |
+| Row Key | text | computed | When the template has One row per key columns, a digest of this row's key cells, written as the row is staged so a later page finds it (R-IT18). Empty for a skipped row or a row with no key. |
 
 ### Relationships
 
@@ -2752,12 +2773,13 @@ when the corrected row is loaded again.
 | Person 2 Name Key | `Person_2_Name_Key__c` | Text (16), External ID (indexed) |
 | Organization Key | `Organization_Key__c` | Text (16), External ID (indexed) |
 | Processor Key | `Processor_Key__c` | Text (16), External ID (indexed) |
+| Row Key | `Row_Key__c` | Text (16), External ID (indexed) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Several Matches | `Several_Matches__c` | Checkbox |
 | Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
 | Related Status | `Related_Status__c` | Text (20) |
 
-The six keys and the row's Pass Number are bookkeeping written and read in system mode
+The seven keys (Row Key included) and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
 indexed; they are not unique, and nothing outside the import reads them.
 
@@ -6974,6 +6996,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-NEXT, `NEXT-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
 | v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
 | 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-NEXT, `NEXT-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
+| 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-NEXT, `NEXT-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
 
 ---
 ## 32. Entity ownership by package

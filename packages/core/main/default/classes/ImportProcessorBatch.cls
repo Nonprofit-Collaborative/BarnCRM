@@ -25,6 +25,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     private Set<String> notes = new Set<String>();
     private Boolean notesCut = false;
     private Integer chunksRun = 0;
+    /** Values empty cells cleared, or would clear, over the chunks (R-IT18). */
+    private Integer cleared = 0;
     /** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
     private Decimal fileAmount;
     /** The entity processor's own state, handed from chunk to chunk (R-IR6). */
@@ -65,6 +67,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         if (retryAfter != null) {
             return retryRows();
         }
+        // A row skipped when it was staged (R-IT18) is never processed.
+        String skipped = ImportRowProcessor.STATUS_SKIPPED;
         // System mode, stated because API 67.0 would otherwise read in user mode: the staged
         // rows are the package's own bookkeeping, written in system mode for the reason
         // ADR-0021 gives, and this read only feeds that processing. The records a row makes
@@ -87,7 +91,11 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Gift_Id__c,
                     Soft_Credit_Id__c
                 FROM Import_Row__c
-                WHERE Import_Batch__c = :owner AND (Row_Number__c > :after OR Row_Number__c = NULL)
+                WHERE
+                    Import_Batch__c = :owner
+                    AND Status__c != :skipped
+                    AND (Row_Number__c > :after
+                    OR Row_Number__c = NULL)
                 WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
                 LIMIT :most
@@ -109,6 +117,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         Set<String> replaced = dryRun
             ? new Set<String>()
             : new Set<String>{ ImportRowProcessor.STATUS_REJECTED };
+        // A fixed row skipped when it was staged (R-IT18) is never processed either.
+        String skipped = ImportRowProcessor.STATUS_SKIPPED;
         return Database.getQueryLocator(
             [
                 SELECT
@@ -129,6 +139,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 FROM Import_Row__c
                 WHERE
                     Import_Batch__c = :owner
+                    AND Status__c != :skipped
                     AND (Row_Number__c > :after
                     OR Status__c IN :replaced)
                 WITH SYSTEM_MODE
@@ -200,6 +211,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             // Kept only from a chunk that finished: a chunk that died saved nothing.
             processorState = ImportEntityProcessors.carriedState;
             addNotes(outcome);
+            cleared += outcome.cleared;
             if (outcome.fileAmount != null) {
                 fileAmount = (fileAmount == null ? 0 : fileAmount) + outcome.fileAmount;
             }
@@ -230,6 +242,14 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             );
             // Chunk failures first: the run log is cut at its field's length, and they matter most.
             lines.addAll(log);
+            if (cleared > 0) {
+                lines.add(
+                    String.format(
+                        dryRun ? Label.Core_Import_LogWouldClear : Label.Core_Import_LogCleared,
+                        new List<String>{ String.valueOf(cleared) }
+                    )
+                );
+            }
             lines.addAll(new List<String>(notes));
             if (notesCut) {
                 lines.add(Label.Core_Import_LogNotesCut);

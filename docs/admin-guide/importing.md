@@ -645,8 +645,10 @@ skipped and named the same way.
 in a number, text longer than the field) rejects the whole row with the field and the value,
 rather than loading the rest of it. A row naming the same record as an earlier row of the file
 (the same ID, or the same value in the field rows are matched by) is rejected too: fix the
-duplicate and load it again. Under **Match only**, a row that would create a record is
-rejected. A value for every row cannot be the record ID or the field rows are matched by.
+duplicate and load it again, or set **One row per** on that column (section 11). An empty
+cell leaves its field as it is unless the column says **Empty cells clear the field**
+(section 11). Under **Match only**, a row that would create a record is rejected. A value
+for every row cannot be the record ID or the field rows are matched by.
 
 **Undo** works as in section 5. It deletes the records the import created (keeping any that
 someone has edited or added a record to since) and puts back the values it changed.
@@ -735,6 +737,41 @@ file's value for every row, if you gave one. A change never runs code and never 
 it only rearranges the text of the row. A date that cannot be read the way you chose is left as
 it was, and the field then refuses it as it would any value it cannot take (a one-object load
 and a people load both reject the row).
+
+## 11. Skipping rows, one row per key, and empty cells that clear
+
+Partner and event exports carry test rows, cancelled lines and repeats. Set these on the
+columns step, under **Rows to load**; they are saved with the mapping like the columns.
+
+- **Skip rows where.** Up to five rules, each a column and a test: **equals** some text,
+  **contains** it, or **is empty**. A row any rule matches is skipped. Cells are compared as they
+  are in the file (before **Change values**), ignoring spaces at the ends and capitals. Example:
+  skip rows where Status equals `Cancelled`, or where Email contains `@test.`.
+- **One row per.** Up to five columns, for example Email, or Event and Email. Only the first row
+  of the file with each combination of their values loads; a later row with the same values is
+  skipped and says which earlier row it repeats. Spaces at the ends and capitals are ignored,
+  and a row whose key columns are all empty is never skipped for this.
+
+A skipped row is not rejected: it is decided when the file is uploaded, before the dry run, and
+the dry run, the commit and the run log all count it as skipped ("12 rows were skipped by Skip
+rows or One row per"). **View rows** lists each one with its reason; it is not in the rejected
+rows file. To load a skipped row after all, change the rule and upload the file again.
+
+**Empty cells clear the field** (one-object loads that update or upsert, section 9). By default
+an empty cell leaves the field as it is. Tick **Empty cells clear the field** beside a column
+to clear the field instead when the cell is empty, for example to load back an export where you
+deleted values in Excel. It is off for every column until you tick it.
+
+- A **value for every row** still fills an empty cell first, so only a cell that stays empty
+  clears.
+- Records the load creates are not affected: there is nothing to clear.
+- A required field or a checkbox cannot be cleared; the run log says so and leaves it.
+- The dry run says how many values the commit would clear ("Empty cells would clear 37
+  values"), and the commit's run log how many it cleared. Each cleared value is
+  journaled, so **Undo** (section 5) puts it back, unless someone has given the field a value
+  since.
+
+People imports never clear a field from an empty cell.
 
 ## Fields the BarnCRM Admin role can import
 

@@ -116,7 +116,8 @@ public with sharing class ImportBatchSelector {
 
     /**
      * The row number of the batch's nth row in file order (n from 1), or null when it has
-     * fewer; the last row of a trial of n rows (R-IB16). OFFSET reaches 2,000, the trial's
+     * fewer; the last row of a trial of n rows (R-IB16). Rows skipped at staging (R-IT18) are
+     * not counted, as the trial does not process them. OFFSET reaches 2,000, the trial's
      * ceiling. System mode, as the processor reads the rows (ADR-0021).
      */
     @NamespaceAccessible
@@ -126,8 +127,12 @@ public with sharing class ImportBatchSelector {
         }
         List<Import_Row__c> rows = Database.queryWithBinds(
             'SELECT Row_Number__c FROM Import_Row__c WHERE Import_Batch__c = :batchId' +
-            ' ORDER BY Row_Number__c ASC LIMIT 1 OFFSET :skip',
-            new Map<String, Object>{ 'batchId' => batchId, 'skip' => n - 1 },
+            ' AND Status__c != :skipped ORDER BY Row_Number__c ASC LIMIT 1 OFFSET :skip',
+            new Map<String, Object>{
+                'batchId' => batchId,
+                'skipped' => ImportRowProcessor.STATUS_SKIPPED,
+                'skip' => n - 1
+            },
             AccessLevel.SYSTEM_MODE
         );
         return rows.isEmpty() ? null : rows[0].Row_Number__c;
