@@ -624,73 +624,81 @@ private class PersonErasureTest {
 
     @IsTest
     static void installedModulesAreFoundByNameAfterTheInjectedOnes() {
-        PersonErasureExtensions.noneForTest = false;
-        PersonErasureExtensions.overrides.add(new KeepsDepartment());
-        Boolean givingThere = Type.forName('GivingPersonErasureExtension') != null;
+        System.runAs(eraser()) {
+            PersonErasureExtensions.noneForTest = false;
+            PersonErasureExtensions.overrides.add(new KeepsDepartment());
+            Boolean givingThere = Type.forName('GivingPersonErasureExtension') != null;
 
-        List<PersonErasureExtension> found = PersonErasureExtensions.installed();
+            List<PersonErasureExtension> found = PersonErasureExtensions.installed();
 
-        Assert.areEqual(
-            givingThere ? 2 : 1,
-            found.size(),
-            'The Giving module is asked for by name'
-        );
-        Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
+            Assert.areEqual(
+                givingThere ? 2 : 1,
+                found.size(),
+                'The Giving module is asked for by name'
+            );
+            Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
+        }
     }
 
     @IsTest
     static void aModuleThatDoesNotImplementTheInterfaceRefusesTheErasure() {
-        PersonErasureExtensions.noneForTest = false;
-        PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.NotAnExtension');
+        System.runAs(eraser()) {
+            PersonErasureExtensions.noneForTest = false;
+            PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.NotAnExtension');
 
-        Test.startTest();
-        try {
-            PersonErasureExtensions.installed();
-            Assert.fail('An installed module that cannot be used refuses the erasure');
-        } catch (PersonErasure.ErasureException refused) {
+            Test.startTest();
+            try {
+                PersonErasureExtensions.installed();
+                Assert.fail('An installed module that cannot be used refuses the erasure');
+            } catch (PersonErasure.ErasureException refused) {
+                Assert.isTrue(
+                    refused.getMessage().contains('PersonErasureTest.NotAnExtension'),
+                    'Names the module: ' + refused.getMessage()
+                );
+            }
+            Test.stopTest();
+            List<Error_Log__c> entries = [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Context__c = 'PersonErasureExtensions.resolve'
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(1, entries.size(), 'The reason is logged');
             Assert.isTrue(
-                refused.getMessage().contains('PersonErasureTest.NotAnExtension'),
-                'Names the module: ' + refused.getMessage()
+                entries[0].Message__c.contains('does not implement PersonErasureExtension'),
+                'It says why: ' + entries[0].Message__c
             );
         }
-        Test.stopTest();
-        List<Error_Log__c> entries = [
-            SELECT Message__c
-            FROM Error_Log__c
-            WHERE Context__c = 'PersonErasureExtensions.resolve'
-        ];
-        Assert.areEqual(1, entries.size(), 'The reason is logged');
-        Assert.isTrue(
-            entries[0].Message__c.contains('does not implement PersonErasureExtension'),
-            'It says why: ' + entries[0].Message__c
-        );
     }
 
     @IsTest
     static void aModuleThatCannotBeBuiltRefusesTheErasure() {
-        PersonErasureExtensions.noneForTest = false;
-        PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.CannotBuild');
+        System.runAs(eraser()) {
+            PersonErasureExtensions.noneForTest = false;
+            PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.CannotBuild');
 
-        Test.startTest();
-        try {
-            PersonErasureExtensions.installed();
-            Assert.fail('An installed module that cannot be built refuses the erasure');
-        } catch (PersonErasure.ErasureException refused) {
-            Assert.isTrue(
-                refused.getMessage().contains('PersonErasureTest.CannotBuild'),
-                'Names the module: ' + refused.getMessage()
+            Test.startTest();
+            try {
+                PersonErasureExtensions.installed();
+                Assert.fail('An installed module that cannot be built refuses the erasure');
+            } catch (PersonErasure.ErasureException refused) {
+                Assert.isTrue(
+                    refused.getMessage().contains('PersonErasureTest.CannotBuild'),
+                    'Names the module: ' + refused.getMessage()
+                );
+            }
+            Test.stopTest();
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'PersonErasureExtensions.resolve'
+                    WITH SYSTEM_MODE
+                ],
+                'The reason is logged'
             );
         }
-        Test.stopTest();
-        Assert.areEqual(
-            1,
-            [
-                SELECT COUNT()
-                FROM Error_Log__c
-                WHERE Context__c = 'PersonErasureExtensions.resolve'
-            ],
-            'The reason is logged'
-        );
     }
 
     public class NotAnExtension {
