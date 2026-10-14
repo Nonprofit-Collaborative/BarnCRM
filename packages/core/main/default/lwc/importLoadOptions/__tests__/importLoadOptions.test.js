@@ -50,6 +50,22 @@ describe('what each row of a one-object mapping does', () => {
     expect(operation.options.map((option) => option.value)).toEqual(['Update by record Id']);
   });
 
+  it('offers a delete only when the server does, and then asks nothing about lookups', async () => {
+    const element = render({
+      operations: ['Insert', 'Update by record Id', 'Upsert by external ID', 'Delete by record Id']
+    });
+    await flush();
+    const operation = element.shadowRoot.querySelector('[data-id="operation"]');
+    expect(operation.options.map((option) => option.value)).toContain('Delete by record Id');
+    expect(element.shadowRoot.querySelector('[data-id="not-found"]')).not.toBeNull();
+    element.operation = 'Delete by record Id';
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="operation-help"]').textContent).toContain(
+      'c.Core_Import_LoadDeleteHelp'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="not-found"]')).toBeNull();
+  });
+
   it('asks for the external ID field only under an upsert', async () => {
     const element = render({
       keyFields: [{ value: 'Pair_Key__c', label: 'Pair Key' }]

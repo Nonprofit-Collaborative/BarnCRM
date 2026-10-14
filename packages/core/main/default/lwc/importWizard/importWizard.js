@@ -149,7 +149,14 @@ import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
 import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
 import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
 import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
-import { INSERT, UPDATE, UPDATE_BY_FIELD, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
+import {
+  INSERT,
+  UPDATE,
+  UPDATE_BY_FIELD,
+  UPSERT,
+  DELETE,
+  LOOKUP_REJECT
+} from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
 const CHANGE_SAMPLE_ROWS = 5;
@@ -516,6 +523,20 @@ export default class ImportWizard extends LightningElement {
   /** Whether the chosen mapping loads one object rather than people (R-IT12). */
   get loadsOneObject() {
     return Boolean(this.selectedTemplate && this.selectedTemplate.targetObject);
+  }
+
+  /** Whether the mapping deletes the records the file names, as a bulk delete (R-BD7). */
+  get deletesByFile() {
+    return this.loadsOneObject && this.loadOperation === DELETE;
+  }
+
+  /** After a delete by file's dry run, the bulk delete confirm replaces Commit. */
+  get showDeleteConfirm() {
+    return this.isStepPreview && this.deletesByFile && !this.cannotCommit;
+  }
+
+  get showCommit() {
+    return !this.deletesByFile;
   }
 
   get loadsPeople() {
@@ -1112,7 +1133,7 @@ export default class ImportWizard extends LightningElement {
     if (!targets.some((target) => target.startsWith(RECORD_PREFIX))) {
       return false;
     }
-    if (this.loadOperation === UPDATE) {
+    if (this.loadOperation === UPDATE || this.loadOperation === DELETE) {
       return targets.includes(RECORD_ID);
     }
     if (this.loadFindsByField) {
@@ -1464,6 +1485,7 @@ export default class ImportWizard extends LightningElement {
       this.isStepPreview &&
       !this.cannotCommit &&
       !this.batch.retrying &&
+      !this.deletesByFile &&
       (this.batch.rowCount || 0) > 1
     );
   }

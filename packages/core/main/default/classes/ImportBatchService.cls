@@ -372,15 +372,19 @@ public with sharing class ImportBatchService {
         if (!isRetrying(batch) && !controlTotalsAgree(batch)) {
             throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
         }
+        refuseDeleteByFile(batch);
+        return start(batchId, false);
+    }
+
+    /** A delete by file starts as a bulk delete, with the count confirmed (R-BD7), never here. */
+    private static void refuseDeleteByFile(Import_Batch__c batch) {
         if (
             ImportObjectSchema.operationOf(
                 ImportTemplateSelector.selectById(batch.Import_Template__c)
             ) == ImportObjectSchema.OPERATION_DELETE
         ) {
-            // A delete by file starts as a bulk delete, with the count confirmed (R-BD7).
             throw new ImportException(Label.Core_Import_ErrorDeleteNeedsConfirm);
         }
-        return start(batchId, false);
     }
 
     /**
@@ -398,6 +402,7 @@ public with sharing class ImportBatchService {
         if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
             throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
         }
+        refuseDeleteByFile(batch);
         if (isRetrying(batch)) {
             // A retry's fixed rows are committed whole: they are already the few rows that
             // needed fixing (R-IB17).

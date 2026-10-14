@@ -1772,6 +1772,37 @@ describe('the import wizard loading one object', () => {
     expect(target.options.map((o) => o.value)).toEqual(['Record.Program__c']);
   });
 
+  it('confirms a delete by file through the bulk delete panel, not Commit', async () => {
+    const element = await toColumnsStep();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    rows[2]
+      .querySelector('lightning-combobox')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Delete by record Id',
+          matchField: '',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="commit"]')).toBeNull();
+    // A trial commit would bypass the confirmed count, so it is not offered either.
+    expect(element.shadowRoot.querySelector('[data-id="trial"]')).toBeNull();
+    const panel = element.shadowRoot.querySelector('[data-id="delete-by-file"]');
+    expect(panel).not.toBeNull();
+    expect(panel.batchId).toBe('a02');
+    expect(startCommit).not.toHaveBeenCalled();
+  });
+
   it('writes the results file with one record ID per row', async () => {
     const RealBlob = global.Blob;
     let written;

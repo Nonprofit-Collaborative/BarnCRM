@@ -10,6 +10,8 @@ import upsertHelp from '@salesforce/label/c.Core_Import_LoadUpsertHelp';
 import updateByFieldOption from '@salesforce/label/c.Core_Import_OperationUpdateByField';
 import updateByFieldHelp from '@salesforce/label/c.Core_Import_LoadUpdateByFieldHelp';
 import noMatchFields from '@salesforce/label/c.Core_Import_LoadNoMatchFields';
+import deleteOption from '@salesforce/label/c.Core_Import_OperationDelete';
+import deleteHelp from '@salesforce/label/c.Core_Import_LoadDeleteHelp';
 import matchFieldLabel from '@salesforce/label/c.Core_Import_LoadMatchFieldLabel';
 import noKeyFields from '@salesforce/label/c.Core_Import_LoadNoKeyFields';
 import notFoundLabel from '@salesforce/label/c.Core_Import_LookupNotFoundLabel';
@@ -27,6 +29,7 @@ export const INSERT = 'Insert';
 export const UPDATE = 'Update by record Id';
 export const UPDATE_BY_FIELD = 'Update by a matching field';
 export const UPSERT = 'Upsert by external ID';
+export const DELETE = 'Delete by record Id';
 export const LOOKUP_REJECT = 'Reject the row';
 export const LOOKUP_LEAVE_EMPTY = 'Leave it empty';
 
@@ -34,15 +37,17 @@ const OPERATIONS = [
   { value: INSERT, label: insertOption, help: insertHelp },
   { value: UPDATE, label: updateOption, help: updateHelp },
   { value: UPDATE_BY_FIELD, label: updateByFieldOption, help: updateByFieldHelp },
-  { value: UPSERT, label: upsertOption, help: upsertHelp }
+  { value: UPSERT, label: upsertOption, help: upsertHelp },
+  { value: DELETE, label: deleteOption, help: deleteHelp }
 ];
 
 /**
  * What a mapping that loads one object does with each row (canonical model R-IT12, R-IT13):
- * insert, update by record ID, update by a field the user chooses, or upsert by an external ID
- * field, with what each choice risks, the field an update or upsert matches on, and what a row
- * does when a lookup finds no record, and the related records each row also creates (R-IT17),
- * offered under every operation but Insert, which has no parent key.
+ * insert, update by record ID, update by a field the user chooses, upsert by an external ID
+ * field, or delete by record ID (R-BD7), with what each choice risks, the field an update or
+ * upsert matches on, and what a row does when a lookup finds no record, and the related records
+ * each row also creates (R-IT17), offered under every operation but Insert, which has no parent
+ * key, and Delete, which reads only the record ID.
  * Presentational: the wizard owns the values and hears every change through a `change` event
  * whose detail is `{ operation, matchField, lookupNotFound, related }`.
  * See docs/admin-guide/importing.md, section 9.
@@ -51,7 +56,10 @@ export default class ImportLoadOptions extends LightningElement {
   @api operation = INSERT;
   @api matchField = '';
   @api lookupNotFound = LOOKUP_REJECT;
-  /** The operations the object allows (R-IT14); all four when not given. */
+  /**
+   * The operations the object allows (R-IT14, R-BD7); when not given, the four that load, never
+   * Delete, which the server offers only to a person who may bulk delete.
+   */
   @api operations;
   /** The object's external ID fields an upsert can match on: `{ label, value }`. */
   @api keyFields = [];
@@ -71,9 +79,9 @@ export default class ImportLoadOptions extends LightningElement {
     relatedInsertHelp
   };
 
-  /** Related records need a parent key, which Insert does not have. */
+  /** Related records need a parent key, which Insert does not have; a delete loads none. */
   get offersRelated() {
-    return this.operation !== INSERT;
+    return this.operation !== INSERT && this.operation !== DELETE;
   }
 
   get relatedChoices() {
@@ -87,11 +95,17 @@ export default class ImportLoadOptions extends LightningElement {
   }
 
   get operationOptions() {
-    const allowed = this.operations && this.operations.length > 0 ? this.operations : null;
-    return OPERATIONS.filter((each) => !allowed || allowed.includes(each.value)).map((each) => ({
+    const given = this.operations && this.operations.length > 0;
+    const allowed = given ? this.operations : [INSERT, UPDATE, UPDATE_BY_FIELD, UPSERT];
+    return OPERATIONS.filter((each) => allowed.includes(each.value)).map((each) => ({
       label: each.label,
       value: each.value
     }));
+  }
+
+  /** A delete reads only the record ID, so what a lookup does is not asked. */
+  get readsLookups() {
+    return this.operation !== DELETE;
   }
 
   get operationHelp() {
