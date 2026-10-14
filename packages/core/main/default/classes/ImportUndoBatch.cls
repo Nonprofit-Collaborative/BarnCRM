@@ -3,7 +3,7 @@
  *
  * 0. **Judge.** One pass per delete pass below, in the same order, notes which tagged records
  *    were edited before the undo began, so a rollup set off by a later restore or delete
- *    cannot hide the edit (ADR-NEXT). Nothing is changed. A bulk update's undo has none.
+ *    cannot hide the edit (ADR-0119). Nothing is changed. A bulk update's undo has none.
  * 1. **Restore.** Each commit journal page, newest first, puts back the values the import
  *    wrote where the record still holds the value written.
  * 1a. **Created.** Each Created journal page of a one-object import (R-IT12) deletes the
@@ -44,7 +44,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static final String PASS_TAGGED_PREFIX = 'Tagged:';
     /**
      * A judging pass is this prefix and the delete pass it judges for. It deletes nothing: it
-     * notes which records were already edited before the undo began (ADR-NEXT).
+     * notes which records were already edited before the undo began (ADR-0119).
      */
     @TestVisible
     private static final String PASS_JUDGE_PREFIX = 'Judge:';
@@ -90,7 +90,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /**
      * How long after a commit completes a rollup it set off may still be saved by the Rollup
      * Queue: the queue drains in minutes (about seven for 25,000 rows) but waits behind the
-     * rest of the org's work. A rollup stamped later may hide a real edit (ADR-NEXT).
+     * rest of the org's work. A rollup stamped later may hide a real edit (ADR-0119).
      */
     private static final Integer ROLLUP_SETTLE_MINUTES = 60;
 
@@ -123,7 +123,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /**
      * The records the judging passes found edited before the undo began, carried from pass to
      * pass. Only these are kept when a record's last change was made during the undo by the
-     * undo itself or by a rollup (ADR-NEXT).
+     * undo itself or by a rollup (ADR-0119).
      */
     private Set<Id> editedBeforeUndo = new Set<Id>();
 
@@ -700,7 +700,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 
     /**
      * Notes which of this chunk's tagged records were edited before the undo began, before any
-     * pass puts back or deletes anything (ADR-NEXT). The other passes come later; by then a
+     * pass puts back or deletes anything (ADR-0119). The other passes come later; by then a
      * gift the undo deleted may have set off a rollup that saved its donor, which would hide
      * an edit made before it.
      */
@@ -990,7 +990,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      * counts when it was made by somebody other than the committer after the commit started,
      * or by anybody once the commit's own follow-on work has settled.
      *
-     * Two kinds of save are not edits (ADR-NEXT): a rollup the import set off, told by the
+     * Two kinds of save are not edits (ADR-0119): a rollup the import set off, told by the
      * freshness stamp it writes in the same save, dated before the import's follow-on work
      * settled, whoever ran it (the committer or the Automated Process user that starts the
      * Rollup Queue); and, once the judging is done, the undo's own saves and the rollups its

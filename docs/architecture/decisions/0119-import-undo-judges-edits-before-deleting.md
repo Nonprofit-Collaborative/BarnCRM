@@ -1,4 +1,4 @@
-# ADR-NEXT: Import undo judges edits before it deletes, and a rollup's save is not an edit
+# ADR-0119: Import undo judges edits before it deletes, and a rollup's save is not an edit
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-14

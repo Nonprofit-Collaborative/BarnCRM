@@ -1,6 +1,6 @@
 /**
  * Undoing a gift import that created person accounts: the same undo as `GiftImportUndoTest`
- * where people are stored as accounts (canonical model R-IB9, ADR-NEXT). A Platform only org
+ * where people are stored as accounts (canonical model R-IB9, ADR-0119). A Platform only org
  * has none (ADR-0013), so there the setup imports nothing and the test returns at once: the
  * contact shape is covered by `GiftImportUndoTest`.
  */

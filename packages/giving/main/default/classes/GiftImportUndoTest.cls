@@ -1,5 +1,5 @@
 /**
- * Undoing a gift import that created people (canonical model R-IB9, R-GI9, ADR-NEXT).
+ * Undoing a gift import that created people (canonical model R-IB9, R-GI9, ADR-0119).
  *
  * Deleting the imported gifts sets off the donors' rollups. In an org the Rollup Queue saves
  * them, started by its platform event as the Automated Process user: somebody other than the
@@ -167,7 +167,7 @@ public class GiftImportUndoTest {
     /**
      * The Rollup Queue started by its Ready event, the path the platform runs as the Automated
      * Process user, writes the freshness stamp with the totals, so the undo can tell its save
-     * from an edit (ADR-NEXT). A test's subscriber runs as the user who published, so the
+     * from an edit (ADR-0119). A test's subscriber runs as the user who published, so the
      * event is published by one who may not edit the stamp.
      */
     @IsTest

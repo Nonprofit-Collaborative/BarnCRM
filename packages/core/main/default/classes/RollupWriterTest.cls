@@ -12,7 +12,7 @@ private class RollupWriterTest {
     /**
      * The freshness stamp is written wherever the entity has one that is not calculated,
      * whatever the running user may edit: the Rollup Queue runs as the Automated Process user,
-     * and import undo reads the stamp to tell a rollup's save from an edit (ADR-NEXT).
+     * and import undo reads the stamp to tell a rollup's save from an edit (ADR-0119).
      */
     @IsTest
     static void theStampIsFoundByTheFieldNotTheUsersAccess() {

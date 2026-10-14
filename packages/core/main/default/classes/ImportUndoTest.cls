@@ -358,7 +358,7 @@ private class ImportUndoTest {
     /**
      * The undo's own save of a record (a household renamed, a total recalculated) is not an
      * edit, but it must not hide one made before the undo began: the judging passes noted it
-     * before anything was deleted (ADR-NEXT).
+     * before anything was deleted (ADR-0119).
      */
     @IsTest
     static void anEditBeforeTheUndoIsNotHiddenByASaveTheUndoMakes() {
@@ -425,7 +425,7 @@ private class ImportUndoTest {
     /**
      * A rollup saved long after the import settled (a nightly run, a total that depends on
      * the date) may hide a real edit made before it, so the person is kept: not knowing is not
-     * the same as knowing nobody edited them (ADR-NEXT).
+     * the same as knowing nobody edited them (ADR-0119).
      */
     @IsTest
     static void aRollupSavedLongAfterTheImportKeepsThePerson() {

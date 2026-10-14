@@ -347,7 +347,7 @@ deploy_stage() {
 CORE_DIR="packages/core/main/default"
 CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
   classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
-  tabs quickActions lwc prompts flows)
+  tabs quickActions lwc prompts flows PlatformEventSubscriberConfigs)
 unstaged=()
 for dir in "$CORE_DIR"/*/; do
   dir="$(basename "$dir")"
@@ -445,7 +445,8 @@ deploy_stage "Core (data model, static resources and custom permissions)" \
   "packages/core/main/default/notificationtypes" || exit $?
 deploy_stage "Core (Apex)" \
   "packages/core/main/default/classes" \
-  "packages/core/main/default/triggers" || exit $?
+  "packages/core/main/default/triggers" \
+  "packages/core/main/default/PlatformEventSubscriberConfigs" || exit $?
 # After Apex, which a flow can call, and before the UI, which can launch a flow.
 deploy_stage "Core (flows)" "packages/core/main/default/flows" || exit $?
 deploy_stage "Core (UI and permissions)" \
