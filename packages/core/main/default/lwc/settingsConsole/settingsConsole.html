@@ -146,7 +146,10 @@
                                     {row.label}
                                 </h3>
                                 <template lwc:if={row.ctor}>
-                                    <lwc:component lwc:is={row.ctor}></lwc:component>
+                                    <lwc:component
+                                        lwc:is={row.ctor}
+                                        onfeatureturnedon={handleFeatureTurnedOn}
+                                    ></lwc:component>
                                 </template>
                                 <template lwc:elseif={row.navigatesAway}>
                                     <lightning-button

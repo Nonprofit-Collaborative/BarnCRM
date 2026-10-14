@@ -1,4 +1,9 @@
 <template>
+    <template lwc:if={loadError}>
+        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert" data-id="load-error">
+            <p>{loadError}</p>
+        </div>
+    </template>
     <template lwc:if={show}>
         <section
             role="dialog"
@@ -7,6 +12,7 @@
             aria-labelledby="first-run-heading"
             class="slds-modal slds-fade-in-open"
             data-id="first-run"
+            onkeydown={handleKeyDown}
         >
             <div class="slds-modal__container">
                 <div class="slds-modal__header">

@@ -351,6 +351,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     this.load();
   }
 
+  /** A feature turned on in General (ADR-NEXT): its settings rows now show, without a reload. */
+  handleFeatureTurnedOn() {
+    this.load();
+  }
+
   handleSearchSelect(event) {
     if (event.detail && event.detail.section) {
       const sameSection = this.selectedSection === event.detail.section;

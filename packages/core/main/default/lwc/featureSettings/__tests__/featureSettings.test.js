@@ -82,6 +82,8 @@ describe('c-feature-settings', () => {
       features: MODEL.features.map((feature) => ({ ...feature, isOn: true }))
     });
     const element = await build();
+    const turnedOn = jest.fn();
+    element.addEventListener('featureturnedon', turnedOn);
 
     all(element, 'turn-on')[0].click();
     await flushPromises();
@@ -89,6 +91,8 @@ describe('c-feature-settings', () => {
     expect(turnOn).toHaveBeenCalledWith({ key: 'Relationships' });
     expect(all(element, 'turn-on')).toHaveLength(0);
     expect(all(element, 'saved')).toHaveLength(1);
+    expect(turnedOn).toHaveBeenCalledTimes(1);
+    expect(turnedOn.mock.calls[0][0].detail).toEqual({ key: 'Relationships' });
   });
 
   it('shows the message when turning on fails', async () => {
@@ -101,5 +105,18 @@ describe('c-feature-settings', () => {
     await flushPromises();
 
     expect(all(element, 'error')[0].textContent).toBe('Could not turn it on.');
+  });
+
+  it('tells the console nothing when the confirmation is cancelled', async () => {
+    getFeatures.mockResolvedValue(MODEL);
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await build();
+    const turnedOn = jest.fn();
+    element.addEventListener('featureturnedon', turnedOn);
+
+    all(element, 'turn-on')[0].click();
+    await flushPromises();
+
+    expect(turnedOn).not.toHaveBeenCalled();
   });
 });

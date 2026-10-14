@@ -31,6 +31,9 @@ jest.mock(
 jest.mock('c/householdNamingSettings', () =>
   require('../../../../../test/jest-mocks/settingsConsole/householdNamingSettings')
 );
+jest.mock('c/featureSettings', () =>
+  require('../../../../../test/jest-mocks/settingsConsole/featureSettings')
+);
 
 const NAMING_KEYS = [
   'Household_Name_Pattern__c',
@@ -614,6 +617,46 @@ describe('c-settings-console', () => {
       }
 
       expect(focus.mock.instances[0].dataset.key).toBe('Include_Deceased_In_Name__c');
+    });
+
+    it('reloads when a feature is turned on, so its settings rows appear', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      const element = build();
+      await settle();
+      await settle();
+      expect(getConsoleModel).toHaveBeenCalledTimes(1);
+
+      const panel = element.shadowRoot.querySelector(
+        'h3[data-key="Feature_List"]'
+      ).nextElementSibling;
+      panel.dispatchEvent(new CustomEvent('featureturnedon', { detail: { key: 'Addresses' } }));
+      await settle();
+
+      expect(getConsoleModel).toHaveBeenCalledTimes(2);
     });
 
     it('keeps the plain pattern rows when the section has no naming panel', async () => {

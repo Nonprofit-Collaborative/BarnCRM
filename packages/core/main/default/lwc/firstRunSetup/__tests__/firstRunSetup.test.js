@@ -82,11 +82,77 @@ describe('c-first-run-setup', () => {
     expect(byId(element, 'first-run')).toBeNull();
   });
 
-  it('blocks nothing when the state cannot be read', async () => {
+  it('blocks nothing when the state cannot be read, and says so', async () => {
     getState.mockRejectedValue({ body: { message: 'nope' } });
     const element = await build();
 
     expect(byId(element, 'first-run')).toBeNull();
+    expect(byId(element, 'load-error').textContent).toBe('nope');
+  });
+
+  describe('keyboard', () => {
+    let focus;
+    let originalFocus;
+
+    beforeEach(() => {
+      originalFocus = HTMLElement.prototype.focus;
+      focus = jest.fn();
+      HTMLElement.prototype.focus = focus;
+    });
+
+    afterEach(() => {
+      HTMLElement.prototype.focus = originalFocus;
+    });
+
+    function tab(target, shiftKey = false) {
+      const event = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        shiftKey,
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      });
+      target.dispatchEvent(event);
+      return event;
+    }
+
+    it('starts on the first control', async () => {
+      getState.mockResolvedValue(ADMIN_STATE);
+      const element = await build();
+
+      expect(focus.mock.instances[0]).toBe(byId(element, 'edition'));
+    });
+
+    it('wraps Tab from the last control to the first, and Shift+Tab back', async () => {
+      getState.mockResolvedValue(ADMIN_STATE);
+      const element = await build();
+      focus.mockClear();
+
+      const forward = tab(byId(element, 'finish'));
+      expect(forward.defaultPrevented).toBe(true);
+      expect(focus.mock.instances[0]).toBe(byId(element, 'edition'));
+
+      const back = tab(byId(element, 'edition'), true);
+      expect(back.defaultPrevented).toBe(true);
+      expect(focus.mock.instances[1]).toBe(byId(element, 'finish'));
+    });
+
+    it('leaves Tab alone between controls', async () => {
+      getState.mockResolvedValue(ADMIN_STATE);
+      const element = await build();
+
+      expect(tab(byId(element, 'edition')).defaultPrevented).toBe(false);
+    });
+
+    it('keeps focus on the window when it has no control', async () => {
+      getState.mockResolvedValue({ needsSetup: true, canFinish: false, features: [] });
+      const element = await build();
+      focus.mockClear();
+
+      const event = tab(byId(element, 'admin-needed'));
+      expect(event.defaultPrevented).toBe(true);
+      expect(focus.mock.instances[0]).toBe(byId(element, 'first-run'));
+    });
   });
 
   it('tells someone who cannot finish that an administrator needs to', async () => {

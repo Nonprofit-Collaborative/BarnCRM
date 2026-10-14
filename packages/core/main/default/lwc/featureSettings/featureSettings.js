@@ -76,6 +76,8 @@ export default class FeatureSettings extends LightningElement {
     try {
       this.apply(await turnOn({ key }));
       this.savedMessage = format(TURNED_ON, feature.name);
+      // The settings rows the feature brings are shown by the console around this panel.
+      this.dispatchEvent(new CustomEvent('featureturnedon', { detail: { key } }));
     } catch (error) {
       this.errorMessage = messageOf(error);
     } finally {
