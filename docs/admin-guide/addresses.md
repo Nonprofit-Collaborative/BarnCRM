@@ -188,7 +188,7 @@ away. After that, a new address is added unmarked until you choose **Set as defa
 **Two defaults just after a merge.** When Salesforce's own merge combines two records that
 each had a default address, the kept record briefly has both. Within a minute or so BarnCRM
 keeps one: the one that matches the kept record's address boxes (billing for a household or
-organization, mailing for a contact), or else the most recently created. The other stays on
+organization, mailing for a contact or a person account), or else the most recently created. The other stays on
 the card as an ordinary address. This runs in the background because Salesforce does not let
 anything change records while it is merging them.
 
