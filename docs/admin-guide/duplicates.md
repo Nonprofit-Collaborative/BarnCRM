@@ -125,6 +125,17 @@ a minute or so, in the background, because Salesforce does not let anything chan
 while it is merging them. If a person was in both households, they are left with one membership in the kept household (the primary one, or else the earlier start), so they are counted once. It cannot ask which name or members to keep, which is why the
 household record page does not offer that merge.
 
+**A merge run by another app or a background job.** The tidy-up after a Salesforce merge (one
+membership per person, the count and name, one default address, no relationship with oneself,
+the primary affiliation) also runs when the merge was made by a background job, an
+integration or a deduplication app. When the merge itself runs in the background, BarnCRM
+asks for the tidy-up once the merge is saved, so it can take a minute or two longer. That
+tidy-up runs as Salesforce's Automated Process user, so it shows as **Last Modified By** on the
+addresses, relationships and memberships it changed. Only if
+Salesforce refuses that request (for example, the org has used its daily allowance of
+events) does the **Error Log** get a Warning, under the context "Tidy-up after a merge",
+naming the kept records and the reason. Open each record named and correct it by hand.
+
 **A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
 Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings
 permission, which the BarnCRM Admin permission set grants, and access to duplicate record sets,

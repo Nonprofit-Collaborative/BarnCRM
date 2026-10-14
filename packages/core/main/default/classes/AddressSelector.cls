@@ -91,16 +91,41 @@ public with sharing class AddressSelector {
 
     /** The billing address in the standard fields of these accounts. */
     public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
+        return selectAccountBillingAddresses(accountIds, null);
+    }
+
+    /**
+     * The billing address in the standard fields of these accounts, and the named extra fields.
+     * The extra fields are a person account's mailing fields, named as strings by the caller and
+     * read with get, so this class compiles and runs in an org without person accounts; the
+     * caller names them only where the org has them.
+     *
+     * @param accountIds the accounts
+     * @param extraFields further Account fields to read; null or empty for none
+     */
+    public static List<Account> selectAccountBillingAddresses(
+        Set<Id> accountIds,
+        List<String> extraFields
+    ) {
         if (accountIds == null || accountIds.isEmpty()) {
             return new List<Account>();
         }
-        return [
-            SELECT Id, BillingStreet, BillingCity, BillingPostalCode
-            FROM Account
-            WHERE Id IN :accountIds
-            WITH USER_MODE
-            LIMIT 10000
-        ];
+        List<String> fields = new List<String>{
+            'Id',
+            'BillingStreet',
+            'BillingCity',
+            'BillingPostalCode'
+        };
+        if (extraFields != null) {
+            fields.addAll(extraFields);
+        }
+        return Database.queryWithBinds(
+            'SELECT ' +
+                String.join(fields, ', ') +
+                ' FROM Account WHERE Id IN :accountIds LIMIT 10000',
+            new Map<String, Object>{ 'accountIds' => accountIds },
+            AccessLevel.USER_MODE
+        );
     }
 
     /** The mailing address in the standard fields of these contacts. */
