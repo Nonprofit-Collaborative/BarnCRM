@@ -68,5 +68,39 @@ class NameField(unittest.TestCase):
         self.assertIn("nameField", problems[0])
 
 
+PERM = """<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <objectPermissions>
+        <allowCreate>%s</allowCreate>
+        <allowRead>%s</allowRead>
+        <object>%s</object>
+    </objectPermissions>
+</PermissionSet>
+"""
+
+
+def perm_repo(create, read, obj):
+    root = tempfile.mkdtemp()
+    write(root, "packages/core/main/default/permissionsets/P.permissionset-meta.xml", PERM % (create, read, obj))
+    return root
+
+
+class EventPermissions(unittest.TestCase):
+    def test_passes_with_create_and_read(self):
+        self.assertEqual(cdr.check_event_permissions(perm_repo("true", "true", "E__e")), [])
+
+    def test_fails_create_without_read(self):
+        problems = cdr.check_event_permissions(perm_repo("true", "false", "E__e"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("E__e", problems[0])
+        self.assertIn("P.permissionset-meta.xml", problems[0])
+
+    def test_ignores_non_event_object(self):
+        self.assertEqual(cdr.check_event_permissions(perm_repo("true", "false", "A__c")), [])
+
+    def test_passes_without_create(self):
+        self.assertEqual(cdr.check_event_permissions(perm_repo("false", "false", "E__e")), [])
+
+
 if __name__ == "__main__":
     unittest.main()

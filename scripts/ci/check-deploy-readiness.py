@@ -12,6 +12,8 @@ Rules (each is a certain platform or script requirement, not a style preference)
    false (Erasure__c had streaming false beside sharing and bulk true).
 3. A custom object (a __c object that is not a custom setting) must carry a nameField,
    label and pluralLabel. The Metadata API rejects a custom object without them.
+4. In a permission set, an objectPermissions block for a platform event (object ends in __e)
+   that sets allowCreate true must also set allowRead true. The org refuses the deploy otherwise.
 
 Usage: check-deploy-readiness.py [repo_root]   (default: the current directory)
 """
@@ -77,9 +79,31 @@ def check_objects(root):
     return problems
 
 
+def check_event_permissions(root):
+    # Found 2026-10-13: the org refuses the deploy with
+    # "Permission Create X__e depends on permission(s): Read X__e".
+    problems = []
+    pattern = os.path.join(root, "packages", "**", "*.permissionset-meta.xml")
+    for path in sorted(glob.glob(pattern, recursive=True)):
+        rel = os.path.relpath(path, root)
+        for block in ET.parse(path).getroot().findall(NS + "objectPermissions"):
+
+            def text(tag):
+                node = block.find(NS + tag)
+                return "" if node is None else (node.text or "").strip()
+
+            obj = text("object")
+            if obj.endswith("__e") and text("allowCreate") == "true" and text("allowRead") != "true":
+                problems.append(
+                    f"{rel}: {obj} has allowCreate true without allowRead true. "
+                    "The org refuses the deploy: Create on a platform event depends on Read."
+                )
+    return problems
+
+
 def main(argv):
     root = argv[1] if len(argv) > 1 else "."
-    problems = check_staged(root) + check_objects(root)
+    problems = check_staged(root) + check_objects(root) + check_event_permissions(root)
     for problem in problems:
         print(f"::error::{problem}" if os.environ.get("GITHUB_ACTIONS") else problem, file=sys.stderr)
     if problems:

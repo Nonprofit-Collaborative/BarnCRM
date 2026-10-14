@@ -229,7 +229,8 @@ Salesforce org is needed for this job. Steps:
    on deploy errors the org gate would otherwise only find after starting: a Core folder not
    named in `CORE_STAGED` in `scripts/org/deploy-packages.sh`, a custom object whose
    `enableSharing`, `enableBulkApi` and `enableStreamingApi` are not all equal, or a custom
-   object without `nameField`, `label` or `pluralLabel`. The rules are listed in its header.
+   object without `nameField`, `label` or `pluralLabel`, or a permission set that grants
+   Create on a platform event (`__e`) without Read. The rules are listed in its header.
 19. A grep check that fails the build if any tracked file contains an em dash character.
 20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
