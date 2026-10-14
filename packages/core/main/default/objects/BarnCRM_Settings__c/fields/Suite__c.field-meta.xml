@@ -4,7 +4,7 @@
   <description>Which edition the administrator chose in the Setup Assistant's first step: Community (the Standard Edition, Core alone) or Impact (the Nonprofit Edition, Core with Giving). Empty until chosen. Held as text because a custom setting field cannot be a picklist (ADR-0019). Installs and hides nothing (C-30).</description>
   <externalId>false</externalId>
   <inlineHelpText>The edition you chose in the Setup Assistant.</inlineHelpText>
-  <label>Suite</label>
+  <label>Edition</label>
   <length>20</length>
   <required>false</required>
   <type>Text</type>
