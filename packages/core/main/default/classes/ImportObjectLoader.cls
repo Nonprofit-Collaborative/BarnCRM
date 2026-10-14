@@ -1,7 +1,7 @@
 /**
  * Loads one chunk of a one-object template (canonical model R-IT12 to R-IT14; ADR-0080
- * `0080-import-load-one-object.md`): Insert, Update by record Id, or Upsert by external ID, for
- * any object `ImportObjectSchema` admits, custom ones included.
+ * `0080-import-load-one-object.md`): Insert, Update by record Id, Update by a matching field, or
+ * Upsert by external ID, for any object `ImportObjectSchema` admits, custom ones included.
  *
  * Every read and save of the target object and of lookup parents is in the running user's own
  * mode; the only system-mode writes are the staged rows and the journal, the package's own
@@ -474,8 +474,9 @@ public with sharing class ImportObjectLoader {
     }
 
     /**
-     * Finds the record each row names under Update by record Id and Upsert by external ID,
-     * reads what it holds now, and rejects a row whose key an earlier row of the file used.
+     * Finds the record each row names under Update by record Id, Update by a matching field and
+     * Upsert by external ID, reads what it holds now, and rejects a row whose key an earlier row
+     * of the file used.
      */
     private static void findRecords(
         Import_Batch__c batch,
@@ -498,8 +499,20 @@ public with sharing class ImportObjectLoader {
             }
         }
         rejectRepeats(batch, items);
-        if (operation == ImportObjectSchema.OPERATION_UPSERT) {
+        if (operation != ImportObjectSchema.OPERATION_UPDATE) {
             matchKeys(items, type, keyField, ImportTemplateService.usesMostRecent(template));
+        }
+        if (operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD) {
+            // An update creates nothing: a value no record holds rejects its row (R-IT12).
+            for (Item item : items) {
+                if (item.error == null && item.creates) {
+                    item.creates = false;
+                    item.error = String.format(
+                        Label.Core_Import_ErrorNoRecordMatched,
+                        new List<String>{ ImportObjectSchema.labelOf(type, keyField) }
+                    );
+                }
+            }
         }
         Map<Id, SObject> stored = readStored(type, items, plans);
         for (Item item : items) {
@@ -548,7 +561,9 @@ public with sharing class ImportObjectLoader {
         }
         if (String.isBlank(value)) {
             item.error = String.format(
-                Label.Core_Import_ErrorKeyMissing,
+                operation == ImportObjectSchema.OPERATION_UPSERT
+                    ? Label.Core_Import_ErrorKeyMissing
+                    : Label.Core_Import_ErrorMatchValueMissing,
                 new List<String>{ ImportObjectSchema.labelOf(type, keyField) }
             );
             return;

@@ -115,14 +115,17 @@ private class ImportObjectSchemaTest {
             Assert.isTrue(ImportObjectSchema.leavesLookupEmpty(load), 'Leave it empty.');
             Assert.isFalse(ImportObjectSchema.leavesLookupEmpty(people), 'Reject is the default.');
             Assert.areEqual(
-                new List<String>{ ImportObjectSchema.OPERATION_UPDATE },
+                new List<String>{
+                    ImportObjectSchema.OPERATION_UPDATE,
+                    ImportObjectSchema.OPERATION_UPDATE_BY_FIELD
+                },
                 ImportObjectSchema.operationsFor(Contact.SObjectType),
-                'People load by Update only.'
+                'People load by the two updates only.'
             );
             Assert.areEqual(
-                3,
+                4,
                 ImportObjectSchema.operationsFor(Affiliation__c.SObjectType).size(),
-                'Any other object has all three.'
+                'Any other object has all four.'
             );
         }
     }

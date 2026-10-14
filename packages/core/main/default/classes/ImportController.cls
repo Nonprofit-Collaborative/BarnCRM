@@ -460,6 +460,19 @@ public with sharing class ImportController {
         }
     }
 
+    /** The text, email and phone fields an update by a matching field can find records by. */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getRowMatchFields(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.matchFields(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRowMatchFields');
+        }
+    }
+
     /** Fills in what a one-object template loads, and how. */
     private static void describeLoad(Import_Template__c template, TemplateView view) {
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
@@ -469,9 +482,11 @@ public with sharing class ImportController {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         view.targetObject = described.getName();
         view.targetObjectLabel = described.getLabel();
-        view.loadOperation = ImportObjectSchema.updatesOnly(type)
+        String operation = ImportObjectSchema.operationOf(template);
+        view.loadOperation = ImportObjectSchema.updatesOnly(type) &&
+            !ImportObjectSchema.neverCreates(operation)
             ? ImportObjectSchema.OPERATION_UPDATE
-            : ImportObjectSchema.operationOf(template);
+            : operation;
         view.loadOperations = ImportObjectSchema.operationsFor(type);
         view.loadMatchField = template.Load_Match_Field__c;
         view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)

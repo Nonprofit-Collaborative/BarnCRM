@@ -7,7 +7,7 @@
         onchange={handleOperationChange}
     ></lightning-combobox>
     <p class="slds-text-body_small slds-var-m-top_x-small" data-id="operation-help">{operationHelp}</p>
-    <template lwc:if={isUpsert}>
+    <template lwc:if={usesMatchField}>
         <template lwc:if={hasKeyFields}>
             <lightning-combobox
                 data-id="match-field"
@@ -20,7 +20,7 @@
         </template>
         <template lwc:else>
             <p class="slds-text-color_error slds-text-body_small" data-id="no-key-fields">
-                {labels.noKeyFields}
+                {noFieldsText}
             </p>
         </template>
     </template>

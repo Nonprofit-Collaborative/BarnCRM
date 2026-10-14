@@ -37,6 +37,7 @@ import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObj
 import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
+import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFields';
 
 import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
 import tabLabel from '@salesforce/label/c.Core_Import_TabLabel';
@@ -140,7 +141,7 @@ import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCo
 import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
 import ruleNameExact from '@salesforce/label/c.Core_Import_RuleNameExact';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
-import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
+import { INSERT, UPDATE, UPDATE_BY_FIELD, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
 const CHANGE_SAMPLE_ROWS = 5;
@@ -324,6 +325,7 @@ export default class ImportWizard extends LightningElement {
   /** A mapping that loads one object (R-IT12, R-IT13): its fields, and how each row loads. */
   objectFields = [];
   keyFields = [];
+  rowMatchFields = [];
   loadOperation = INSERT;
   loadMatchField = '';
   lookupNotFound = LOOKUP_REJECT;
@@ -482,6 +484,7 @@ export default class ImportWizard extends LightningElement {
     this.lookupNotFound = (template && template.lookupNotFound) || LOOKUP_REJECT;
     this.objectFields = [];
     this.keyFields = [];
+    this.rowMatchFields = [];
     // A mapping saved before a field could be chosen starts with the first one offered.
     if (this.isPersonExternalId && !this.personMatchField && this.personFields.length > 0) {
       this.personMatchField = this.personFields[0].value;
@@ -729,12 +732,14 @@ export default class ImportWizard extends LightningElement {
   async buildColumns(file) {
     if (this.loadsOneObject && this.objectFields.length === 0) {
       // The object's fields and keys, from the running user's describe (R-IT12).
-      const [fields, keys] = await Promise.all([
+      const [fields, keys, matchable] = await Promise.all([
         getObjectFields({ templateId: this.templateId }),
-        getKeyFields({ templateId: this.templateId })
+        getKeyFields({ templateId: this.templateId }),
+        getRowMatchFields({ templateId: this.templateId })
       ]);
       this.objectFields = fields || [];
       this.keyFields = keys || [];
+      this.rowMatchFields = matchable || [];
     }
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
@@ -915,7 +920,7 @@ export default class ImportWizard extends LightningElement {
       // A one-object mapping's load choices, saved on the template (R-IT12, R-IT13).
       options.load = {
         operation: this.loadOperation,
-        matchField: this.loadOperation === UPSERT ? this.loadMatchField : null,
+        matchField: this.loadFindsByField ? this.loadMatchField : null,
         lookupNotFound: this.lookupNotFound,
         severalMatches: this.severalMatches
       };
@@ -1034,7 +1039,8 @@ export default class ImportWizard extends LightningElement {
 
   /**
    * Whether a one-object mapping can load (R-IT12): a column on the object, the record ID
-   * under an update, and under an upsert a chosen key field that a column feeds.
+   * under an update by record ID, and under an upsert or an update by a matching field a chosen
+   * field that a column feeds.
    */
   get mapsTheObject() {
     const targets = this.columns.map((column) => column.target || '');
@@ -1044,11 +1050,16 @@ export default class ImportWizard extends LightningElement {
     if (this.loadOperation === UPDATE) {
       return targets.includes(RECORD_ID);
     }
-    if (this.loadOperation === UPSERT) {
+    if (this.loadFindsByField) {
       const key = (RECORD_PREFIX + this.loadMatchField).toLowerCase();
       return Boolean(this.loadMatchField) && targets.some((target) => target.toLowerCase() === key);
     }
     return true;
+  }
+
+  /** Whether a one-object load finds records by a chosen field: an upsert, or an update. */
+  get loadFindsByField() {
+    return this.loadOperation === UPSERT || this.loadOperation === UPDATE_BY_FIELD;
   }
 
   handleLoadOptionsChange(event) {
@@ -1192,7 +1203,7 @@ export default class ImportWizard extends LightningElement {
   get fileValueTargetOptions() {
     if (this.loadsOneObject) {
       // Every row would name the same record (R-IT12).
-      const key = this.loadOperation === UPSERT ? RECORD_PREFIX + this.loadMatchField : null;
+      const key = this.loadFindsByField ? RECORD_PREFIX + this.loadMatchField : null;
       return this.targetOptions.filter(
         (option) =>
           option.value !== IGNORE &&

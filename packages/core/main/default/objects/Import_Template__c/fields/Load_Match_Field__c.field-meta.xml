@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Load_Match_Field__c</fullName>
-  <description>Under Upsert by external ID, the API name of the target object's External ID field rows are found by (canonical model R-IT12).</description>
+  <description>Under Upsert by external ID, the API name of the target object's External ID field rows are found by; under Update by a matching field, the text, email or phone field they are found by (canonical model R-IT12).</description>
   <externalId>false</externalId>
-  <inlineHelpText>The ID field an upsert finds records by.</inlineHelpText>
+  <inlineHelpText>The field an upsert or an update by a matching field finds records by.</inlineHelpText>
   <label>Load Match Field</label>
   <length>255</length>
   <required>false</required>

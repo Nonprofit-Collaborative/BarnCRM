@@ -591,11 +591,13 @@ the same dry run, results, journal and undo as any import.
 |---|---|---|
 | **Insert** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
 | **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
+| **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 4. |
 | **Upsert by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
 
    Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
-   **Leave it empty** and load the rest of the row. When a lookup or an upsert finds more than
-   one record, the **When more than one record matches** choice applies, as in section 8.
+   **Leave it empty** and load the rest of the row. When a lookup, an update by a field you
+   choose, or an upsert finds more than one record, the **When more than one record matches**
+   choice applies, as in section 8.
 6. Select **Dry run**, read the results, and commit. After the import, **Download results**
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
@@ -613,7 +615,8 @@ may create or edit records. Never listed, whatever your access:
   series and acknowledgments are never listed either.
 
 **People and organizations load by Update only.** Contacts and accounts can be updated by record
-ID, for example to load back an export you corrected in Excel, but not inserted or upserted
+ID, for example to load back an export you corrected in Excel, or by a field you choose, such
+as a contact's email, but not inserted or upserted
 here: new people, households and organizations come in through a people mapping, which builds
 their households.
 
@@ -626,9 +629,9 @@ skipped and named the same way.
 **A row is one record.** A value its field cannot take (a date Salesforce cannot read, letters
 in a number, text longer than the field) rejects the whole row with the field and the value,
 rather than loading the rest of it. A row naming the same record as an earlier row of the file
-(the same ID, or the same external ID) is rejected too: fix the duplicate and load it again.
-Under **Match only**, a row that would create a record is rejected. A value for every row
-cannot be the record ID or the upsert ID field.
+(the same ID, or the same value in the field rows are matched by) is rejected too: fix the
+duplicate and load it again. Under **Match only**, a row that would create a record is
+rejected. A value for every row cannot be the record ID or the field rows are matched by.
 
 **Undo** works as in section 5. It deletes the records the import created (keeping any that
 someone has edited or added a record to since) and puts back the values it changed.
