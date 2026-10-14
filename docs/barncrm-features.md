@@ -190,6 +190,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Shipped rollups created at install | Minor | Each package creates its own default totals at install; upgrades add new ones without touching edited ones. | Shipped | C-13, ADR-0029 |
 | Restore shipped rollups | Minor | Recreates any shipped total that is missing, skipping one whose field your own rollup already writes. | Shipped | C-13, C-21 |
 | Recalculate on demand | Minor | Recalculate any single total, or all of them, from the Rollups page. | Shipped | C-13 |
+| Rollups settings open the Rollup Builder | Minor | The Rollups section of BarnCRM Settings opens the Rollup Builder, which lists every total with its controls, instead of repeating the list. The rollup Health Check findings, the Restore shipped rollups fix and the nightly rollup job reach Health Check through the module seams, so they leave with the engine. | In review (rollup module stack, PR 2) | ADR-NEXT (Rollup Builder module) |
 | Default rollup mode setting | Minor | Decides how a newly created rollup starts out (Real time, Scheduled or Both). | Shipped | C-13 |
 | Fiscal-year aware totals | Minor | This year, last year and two years ago follow the fiscal year start month set in the app. | Shipped | C-13 |
 | Schedule nightly recalculation | Minor | One button on the Rollups page schedules the nightly run. | Shipped | C-13 |

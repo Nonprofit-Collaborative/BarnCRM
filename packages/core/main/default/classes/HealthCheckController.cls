@@ -139,9 +139,6 @@ public with sharing class HealthCheckController {
 
     /** The button label of a fix, which also names it in the change history; null if unknown. */
     private static String fixLabel(String fixKey) {
-        if (HealthCheckService.FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)) {
-            return System.Label.Core_HealthCheck_RollupsMissingFix;
-        }
         if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
             return System.Label.Core_HealthCheck_SwitchesMissingFix;
         }
@@ -154,11 +151,16 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             return System.Label.Core_HealthCheck_InactiveOwnerJobsFix;
         }
-        return null;
+        HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
+        return owner == null ? null : owner.fixLabel(fixKey);
     }
 
     /** Runs the fix and returns the sentence that says what it did. */
     private static String runFix(String fixKey, List<String> scope) {
+        HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
+        if (owner != null) {
+            return owner.runFix(fixKey, scope);
+        }
         if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             List<String> stoppedOnly = NightlyJobs.rescheduleAsRunningUser(scope);
             List<String> again = new List<String>();
@@ -193,18 +195,7 @@ public with sharing class HealthCheckController {
             System.Label.Core_HealthCheck_FixCreated,
             new List<Object>{ String.join(scope, ', ') }
         );
-        if (HealthCheckService.FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)) {
-            List<String> skipped = RollupService.skippedDefaultNames();
-            RollupService.ensureDefaults();
-            if (!skipped.isEmpty()) {
-                outcome +=
-                    ' ' +
-                    String.format(
-                        System.Label.Core_HealthCheck_RollupsSkippedDetail,
-                        new List<Object>{ String.join(skipped, ', ') }
-                    );
-            }
-        } else if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
+        if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
             AutomationControl.ensureDefaults();
         } else {
             ImportTemplateService.materializeDefaults();

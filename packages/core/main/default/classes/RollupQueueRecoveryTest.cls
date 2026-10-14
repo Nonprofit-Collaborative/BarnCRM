@@ -8,7 +8,7 @@
  * (`AccountId`).
  */
 @IsTest(
-    testFor='ApexClass:RollupQueue, ApexClass:RollupService, ApexClass:RollupAttentionController, ApexClass:HealthCheckSettingsChecks'
+    testFor='ApexClass:RollupQueue, ApexClass:RollupService, ApexClass:RollupAttentionController, ApexClass:RollupsHealthCheckExtension'
 )
 private class RollupQueueRecoveryTest {
     @TestSetup
@@ -103,7 +103,7 @@ private class RollupQueueRecoveryTest {
             insert stuck;
             Test.setCreatedDate(stuck.Id, Datetime.now().addHours(-2));
 
-            HealthCheckService.Finding finding = new HealthCheckSettingsChecks.RollupQueueCheck()
+            HealthCheckService.Finding finding = new RollupsHealthCheckExtension.RollupQueueCheck()
                 .run();
             Assert.areEqual('rollup_queue_stuck', finding.key, 'Waiting two hours is stuck');
             Assert.isTrue(finding.fixTarget.contains('Rollup_Builder'), 'Fixed in Needs attention');
@@ -115,7 +115,7 @@ private class RollupQueueRecoveryTest {
                 Attempts__c = RollupQueue.MAX_ATTEMPTS,
                 Status__c = RollupQueue.STATUS_FAILED
             );
-            finding = new HealthCheckSettingsChecks.RollupQueueCheck().run();
+            finding = new RollupsHealthCheckExtension.RollupQueueCheck().run();
             Assert.areEqual(
                 'rollup_queue_failed',
                 finding.key,
@@ -129,7 +129,7 @@ private class RollupQueueRecoveryTest {
 
             delete [SELECT Id FROM Rollup_Queue__c];
             Assert.isNull(
-                new HealthCheckSettingsChecks.RollupQueueCheck().run(),
+                new RollupsHealthCheckExtension.RollupQueueCheck().run(),
                 'An empty queue is no finding'
             );
         }

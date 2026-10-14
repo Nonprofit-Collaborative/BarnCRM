@@ -81,8 +81,6 @@ function importCoreComponent(name) {
       return import('c/healthCheckPanel');
     case 'sampleDataManager':
       return import('c/sampleDataManager');
-    case 'rollupDefinitions':
-      return import('c/rollupDefinitions');
     case 'seasonalAddressJob':
       return import('c/seasonalAddressJob');
     case 'errorDigestJob':

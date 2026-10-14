@@ -3,8 +3,9 @@
  * whether automation is paused (and whether anything will end the pause), whether the two
  * fiscal years agree, and whether anything is waiting in the Error Log
  * (plan Section 4.8, feature C-11). Since C-21 it also asks whether the package defaults
- * materialized from shipped metadata are all here, and whether the nightly rollup run is
- * scheduled when a rollup needs it; those four findings carry a fix button (ADR-0048).
+ * materialized from shipped metadata are all here; those findings carry a fix button
+ * (ADR-0048). The rollup checks belong to the Rollup Builder module
+ * (`RollupsHealthCheckExtension`, ADR-NEXT).
  *
  * The fiscal year check reads Setup's fiscal year dynamically through FiscalYearSelector, so a
  * Platform-only org is told nothing rather than told zero (ADR-0009, ADR-0013). Whether
@@ -43,39 +44,6 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
-    /**
-     * Shipped rollups this org does not have (ADR-0006, ADR-0048). A shipped total that one of
-     * the administrator's own active totals already writes is not restored, and the finding
-     * says so rather than hiding it.
-     */
-    public class ShippedRollupsCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            HealthCheckService.Finding finding = missingDefaultsFinding(
-                'shipped_rollups_missing',
-                HealthCheckService.FIX_KEY_RESTORE_ROLLUPS,
-                System.Label.Core_HealthCheck_RollupsMissingTitle,
-                System.Label.Core_HealthCheck_RollupsMissingDetail,
-                HealthCheckService.SEVERITY_WARNING
-            );
-            if (finding == null) {
-                return null;
-            }
-            List<String> skipped = RollupService.skippedDefaultNames();
-            if (!skipped.isEmpty()) {
-                finding.detail +=
-                    ' ' +
-                    String.format(
-                        System.Label.Core_HealthCheck_RollupsSkippedDetail,
-                        new List<Object>{ String.join(skipped, ', ') }
-                    );
-            }
-            return finding.withFix(
-                System.Label.Core_HealthCheck_RollupsMissingFix,
-                HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_RESTORE_ROLLUPS
-            );
-        }
-    }
-
     /** Shipped automations with no switch on the Automation page. */
     public class AutomationSwitchesCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
@@ -110,74 +78,6 @@ public with sharing class HealthCheckSettingsChecks {
                     HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES
                 );
         }
-    }
-
-    /** Active rollups waiting on a nightly run nobody has scheduled. */
-    public class NightlyRollupsCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return nightlyRollupsFinding();
-        }
-    }
-
-    /**
-     * Totals the Rollup Queue could not finish (ADR-0098 async rollups): records whose
-     * recalculation failed five times, or entries waiting longer than an hour, which means no
-     * processor is running for them. The errors themselves are in the Error Log.
-     */
-    public class RollupQueueCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return rollupQueueFinding();
-        }
-    }
-
-    /** How long a Pending entry may wait before Health Check calls the queue stuck. */
-    @TestVisible
-    private static Integer queueStuckAfterMinutes = 60;
-
-    private static HealthCheckService.Finding rollupQueueFinding() {
-        Integer failed = [
-            SELECT COUNT()
-            FROM Rollup_Queue__c
-            WHERE Status__c = :RollupQueue.STATUS_FAILED
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-        Datetime stuckBefore = Datetime.now().addMinutes(-queueStuckAfterMinutes);
-        Integer stuck = [
-            SELECT COUNT()
-            FROM Rollup_Queue__c
-            WHERE Status__c = :RollupQueue.STATUS_PENDING AND CreatedDate < :stuckBefore
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-        if (failed == 0 && stuck == 0) {
-            return null;
-        }
-        String fixTarget = '/lightning/n/' + NamespaceUtil.qualify('Rollup_Builder');
-        if (failed > 0) {
-            return new HealthCheckService.Finding(
-                    'rollup_queue_failed',
-                    System.Label.Core_HealthCheck_RollupQueueFailedTitle,
-                    String.format(
-                        System.Label.Core_HealthCheck_RollupQueueFailedDetail,
-                        new List<Object>{ failed.format() }
-                    ),
-                    HealthCheckService.SEVERITY_WARNING,
-                    HealthCheckService.CATEGORY_SETTINGS
-                )
-                .withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
-        }
-        return new HealthCheckService.Finding(
-                'rollup_queue_stuck',
-                System.Label.Core_HealthCheck_RollupQueueStuckTitle,
-                String.format(
-                    System.Label.Core_HealthCheck_RollupQueueStuckDetail,
-                    new List<Object>{ stuck.format(), queueStuckAfterMinutes.format() }
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
     }
 
     public class NightlyJobsCheck implements HealthCheckService.Check {
@@ -277,44 +177,6 @@ public with sharing class HealthCheckSettingsChecks {
                 HealthCheckService.CATEGORY_SETTINGS
             )
             .withScope(missingNames);
-    }
-
-    /**
-     * Rollups set to recalculate in the nightly run while the run is not scheduled. A rollup
-     * set to Scheduled alone is then never recalculated, which is a warning; one set to Both
-     * still updates as records change and only misses the nightly correction, which is
-     * information. Its fix is the nightly jobs finding's, which schedules this run with the
-     * rest, so one cause has one button.
-     */
-    private static HealthCheckService.Finding nightlyRollupsFinding() {
-        if (RollupScheduler.isScheduled()) {
-            return null;
-        }
-        List<Rollup_Definition__c> waiting = RollupSelector.selectActiveForModes(
-            RollupService.scheduledModes()
-        );
-        if (waiting.isEmpty()) {
-            return null;
-        }
-        Integer nightlyOnly = 0;
-        for (Rollup_Definition__c definition : waiting) {
-            if (RollupService.MODE_SCHEDULED.equals(definition.Mode__c)) {
-                nightlyOnly++;
-            }
-        }
-        List<Object> values = new List<Object>{
-            String.valueOf(waiting.size()),
-            String.valueOf(nightlyOnly)
-        };
-        return new HealthCheckService.Finding(
-            'nightly_rollups_not_scheduled',
-            System.Label.Core_HealthCheck_NightlyOffTitle,
-            String.format(System.Label.Core_HealthCheck_NightlyOffDetail, values),
-            nightlyOnly > 0
-                ? HealthCheckService.SEVERITY_WARNING
-                : HealthCheckService.SEVERITY_INFO,
-            HealthCheckService.CATEGORY_SETTINGS
-        );
     }
 
     private static HealthCheckService.Finding automationFinding() {

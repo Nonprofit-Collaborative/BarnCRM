@@ -7,8 +7,9 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Component</value></values>
-    <values><field>Component__c</field><value xsi:type="xsd:string">rollupDefinitions</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">Every total BarnCRM maintains, what it counts, when it was last calculated, and the nightly schedule.</value></values>
+    <values><field>Component__c</field><value xsi:nil="true" /></values>
+    <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Rollup_Builder</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Every total BarnCRM maintains, what it counts, when it was last calculated, and the nightly schedule, in the Rollup Builder.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
 </CustomMetadata>

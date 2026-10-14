@@ -60,6 +60,14 @@ private class NightlyJobsTest {
     static void coreListsItsOwnJobsThenThoseAModuleRegisters() {
         System.runAs(TestUsers.admin()) {
             FakeJob moduleJob = new FakeJob('Module nightly job', false);
+            // Every registered provider is stood in for, so the modules deployed in the test
+            // org do not change the count.
+            for (String className : NightlyJobs.PROVIDER_CLASSES) {
+                NightlyJobs.providerOverrides.put(
+                    className,
+                    new FakeProvider(new List<NightlyJob>())
+                );
+            }
             NightlyJobs.providerOverrides.put(
                 NightlyJobs.PROVIDER_CLASSES[0],
                 new FakeProvider(new List<NightlyJob>{ moduleJob })
@@ -69,19 +77,19 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.isTrue(jobs[0] instanceof NightlyJobs.RollupJob, 'Rollups first.');
-            Assert.isTrue(jobs[1] instanceof NightlyJobs.SeasonalAddressJob, 'Then addresses.');
-            Assert.isTrue(jobs[2] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
-            Assert.isTrue(jobs[3] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
+            Assert.isTrue(jobs[0] instanceof NightlyJobs.SeasonalAddressJob, 'Addresses first.');
+            Assert.isTrue(jobs[1] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
+            Assert.isTrue(jobs[2] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
             Assert.isTrue(
-                jobs[4] instanceof NightlyJobs.EmptyHouseholdTidyJob,
+                jobs[3] instanceof NightlyJobs.EmptyHouseholdTidyJob,
                 'Then the empty households.'
             );
-            Assert.isTrue(jobs[5] instanceof NightlyJobs.TabAccessJob, 'Then the tabs.');
-            Assert.areEqual(moduleJob, jobs[jobs.size() - 1], 'A registered job is counted last.');
+            Assert.isTrue(jobs[4] instanceof NightlyJobs.TabAccessJob, 'Then the tabs.');
+            Assert.areEqual(6, jobs.size(), 'Core has five of its own.');
+            Assert.areEqual(moduleJob, jobs[5], 'A registered job is counted after them.');
             Assert.areEqual(
                 System.Label.Core_HealthCheck_JobSeasonalAddresses,
-                jobs[1].label(),
+                jobs[0].label(),
                 'Each job is named from a label.'
             );
         }
@@ -90,6 +98,12 @@ private class NightlyJobsTest {
     @IsTest
     static void aModuleWhoseProviderFailsCostsOnlyItsOwnJobs() {
         System.runAs(TestUsers.admin()) {
+            for (String className : NightlyJobs.PROVIDER_CLASSES) {
+                NightlyJobs.providerOverrides.put(
+                    className,
+                    new FakeProvider(new List<NightlyJob>())
+                );
+            }
             NightlyJobs.providerOverrides.put(
                 NightlyJobs.PROVIDER_CLASSES[0],
                 new BrokenProvider()
@@ -103,7 +117,7 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(7, jobs.size(), 'Core six, plus the module that answered.');
+            Assert.areEqual(6, jobs.size(), 'Core five, plus the module that answered.');
         }
     }
 
