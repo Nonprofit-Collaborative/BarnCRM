@@ -78,9 +78,11 @@ In an org that uses membership records, **Open in Find** for **People with no ho
 the contacts that have no current membership (Find's **Has no related records**, see
 [Find](find.md), section 7.1), leaving out a contact whose account is a household or a person
 account. The date "today" is written into the query when you press **Open in Find**, so press
-it again for an up-to-date list. People kept as person accounts are in the count but not in the
-Find list, because Find lists one kind of record at a time, and the check says so; Health Check
-links the first five of them.
+it again for an up-to-date list. The count and the list can differ, and the check says so:
+people kept as person accounts are in the count but not in the Find list, because Find lists one
+kind of record at a time; and the count leaves out people who have been erased, which Find
+cannot do because people who run Find cannot read the erasure records, so it may list an erased
+contact. Health Check links the first five of the people counted.
 
 Each count stops at 2,000 and then says **More than 2,000**, the same as the most rows Find
 shows at once. Find's export reads every matching record.
@@ -145,8 +147,8 @@ section 6).
 Checking whether a household's name still matches the naming rule needs every name worked out
 again, which is not a question a query can ask; it is not offered. Checks on related records
 ("households with no gifts") are built in Find with **Has no related records** (section 7.1 of
-[Find](find.md)); only the one above is a ready-made check. Changing many records at once is **Bulk update** (C-35), which starts
-from a Find query.
+[Find](find.md)); only the one above is a ready-made check. Changing many records at once is
+**Bulk update** (C-35), which starts from a Find query.
 
 ## Field reference
 

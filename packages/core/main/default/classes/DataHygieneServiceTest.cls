@@ -121,7 +121,11 @@ private class DataHygieneServiceTest {
             Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
             Assert.areEqual(4, result.count, 'Three loose and one whose membership has ended.');
             Assert.isTrue(result.canOpenInFind, 'Find can ask about a missing membership.');
-            Assert.isNull(result.note, 'No person accounts, nothing to add.');
+            Assert.areEqual(
+                System.Label.Core_DataHygiene_PeopleAccountsNotListed,
+                result.note,
+                'The check says where the count and the Find list can differ.'
+            );
             Assert.areEqual(4, listed, 'Find lists exactly what was counted.');
         }
     }

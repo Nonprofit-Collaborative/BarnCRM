@@ -92,9 +92,7 @@ public with sharing class DataHygieneService {
             String document = queryDocument(key);
             if (key == PEOPLE_WITHOUT_HOUSEHOLD && HouseholdService.isJunctionMode()) {
                 result.count = countJunctionPeopleWithoutHousehold();
-                if (!OrgShapeDetector.personRecordTypeIds().isEmpty()) {
-                    result.note = System.Label.Core_DataHygiene_PeopleAccountsNotListed;
-                }
+                result.note = System.Label.Core_DataHygiene_PeopleAccountsNotListed;
             } else {
                 result.count = count(document);
             }
