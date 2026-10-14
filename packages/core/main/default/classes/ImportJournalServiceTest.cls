@@ -205,7 +205,9 @@ private class ImportJournalServiceTest {
             for (Integer row = 0; row < 250; row++) {
                 entries.add(anUpdate(row));
             }
-            Id someone = Contact.SObjectType.getDescribe().getKeyPrefix() + '000000000001AAA';
+            Id someone =
+                Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+                '000000000001AAA';
             for (Integer index = 0; index < 30; index++) {
                 entries.add(ImportJournalService.failed('Contact', someone, 'Refused ' + index));
             }

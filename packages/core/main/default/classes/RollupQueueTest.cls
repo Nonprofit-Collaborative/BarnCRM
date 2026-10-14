@@ -194,10 +194,12 @@ private class RollupQueueTest {
         System.runAs(TestUsers.admin()) {
             List<Id> ids = new List<Id>(fakeAccountIds(3));
             Id gifts = Id.valueOf(
-                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000001'
             );
             Id softCredits = Id.valueOf(
-                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000002'
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000002'
             );
             List<Rollup_Queue__c> named = new List<Rollup_Queue__c>{
                 new Rollup_Queue__c(
@@ -239,7 +241,8 @@ private class RollupQueueTest {
     static void anEntryNamesTheDefinitionsThatQueuedIt() {
         System.runAs(TestUsers.admin()) {
             Id gifts = Id.valueOf(
-                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000001'
             );
 
             Test.startTest();

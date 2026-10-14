@@ -19,7 +19,9 @@ private class OrgOptimizerObjectChecksTest {
             Assert.isTrue(near.count >= 1, 'Account has more than one custom field.');
             Assert.isTrue(
                 String.join(near.examples, '|')
-                    .contains(Account.SObjectType.getDescribe().getLabel()),
+                    .contains(
+                        Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+                    ),
                 'Account is named: ' + near.examples
             );
 
