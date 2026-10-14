@@ -38,7 +38,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
 
     /**
      * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted, renamed and tidied once, after the delete,
+     * itself, so that a household is recounted and renamed once, after the delete,
      * rather than in the middle of it.
      */
     private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
@@ -109,15 +109,14 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A delete recounts and renames the households the people left, and tidies away one left
-     * empty where the org asks for that (R-H12).
+     * A delete recounts and renames the households the people left, and never tidies one away,
+     * even left empty (R-H12): deleting the household would purge the people's membership rows
+     * from the Recycle Bin, so an undelete could not put them back in it.
      *
      * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled as
      * it is for a person stored as a contact (C-20). The merged-away person's memberships go
-     * to the survivor, a household keeps its primary member, and a household the
-     * merged-away person was in is never tidied away by the merge: gifts, notes and history
-     * credited to it would lose their household. The survivors' real-time totals are then
-     * recalculated, for the survivors only.
+     * to the survivor and a household keeps its primary member. The survivors' real-time
+     * totals are then recalculated, for the survivors only.
      */
     public override void afterDelete() {
         List<Account> gone = (List<Account>) oldRecords();
@@ -127,9 +126,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         departingMemberships = new List<Household_Member__c>();
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        Set<Id> keptByMerge = new Set<Id>();
         if (!survivorByMerged.isEmpty()) {
-            keptByMerge = householdsOfMerged(removed, survivorByMerged.keySet());
             AutomationControl.bypass(MEMBER_HANDLER);
             try {
                 affected.addAll(
@@ -139,10 +136,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
-        Set<Id> mayTidy = new Set<Id>(affected);
-        mayTidy.removeAll(keptByMerge);
-        HouseholdService.afterMembershipChange(mayTidy, true);
-        HouseholdService.afterMembershipChange(keptByMerge, false);
+        HouseholdService.afterMembershipChange(affected, false);
         recalculateSurvivors(gone, survivorByMerged);
         settleSurvivors(gone, survivorByMerged);
     }
@@ -197,20 +191,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         for (Account record : records) {
             if (record.MasterRecordId != null) {
                 result.put(record.Id, record.MasterRecordId);
-            }
-        }
-        return result;
-    }
-
-    /** Every household the merged-away people were members of. */
-    private static Set<Id> householdsOfMerged(
-        List<Household_Member__c> removed,
-        Set<Id> mergedIds
-    ) {
-        Set<Id> result = new Set<Id>();
-        for (Household_Member__c row : removed) {
-            if (mergedIds.contains(row.Account__c) && row.Household__c != null) {
-                result.add(row.Household__c);
             }
         }
         return result;

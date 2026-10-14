@@ -283,11 +283,9 @@ that group, so deleting the account would destroy it rather than orphan it. A ho
 left in place for that reason is reported to the Error Log at Info severity, naming the
 household: it is a correct outcome, not a failure.
 
-A household emptied because its people were deleted, rather than moved, is kept whenever
-it is a deleted contact's own account (its `AccountId`), in a single delete or a bulk delete
-(R-BD5) alike: deleting it would purge those contacts from the Recycle Bin, so neither an
-undelete nor the bulk delete undo could bring them back. It is recounted and renamed, and an
-undelete puts the people back into it. A merge keeps its households as R-H13 says.
+Deleting people never deletes their household; moving them still tidies it as above. Deleting
+a household purges from the Recycle Bin the contacts and membership rows already deleted from
+it, so neither an undelete nor the bulk delete undo (R-BD5) could bring the people back.
 
 **R-H13 Merge and split.** Two households can be merged (members move to the surviving
 household, rollups recalculate, names and greetings recompute unless Custom Name is set)

@@ -100,12 +100,12 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
     }
 
     /**
-     * Brings back, before the people, the households that automation deleted because this job
-     * left them empty (Delete Empty Households, R-H12). Those deletes are not the job's own, so
+     * Brings back, before the people, the households other automation deleted because this job
+     * left them empty. BarnCRM's own upkeep never deletes a household its people were deleted
+     * from (R-H12), but a flow or another package may. Those deletes are not the job's own, so
      * they are not in the journal, but a person cannot come back into a household that is still
-     * in the Recycle Bin: in junction mode the person's memberships name it. A household that is
-     * a deleted contact's own account is never tidied away by the delete (R-H12), since that
-     * would purge the contact.
+     * in the Recycle Bin: in contact mode the person's account is that household, and in
+     * junction mode the person's memberships name it.
      *
      * Only a household (record type Household) deleted since the job started is restored, so a
      * household somebody deleted before it on purpose stays deleted. Restored as the person; a

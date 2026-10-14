@@ -184,7 +184,7 @@ private class ContactTriggerHandlerTest {
     }
 
     @IsTest
-    static void deletingTheLastMemberInJunctionModeTidiesTheHouseholdAway() {
+    static void deletingTheLastMemberInJunctionModeKeepsTheHouseholdForTheUndelete() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -195,11 +195,7 @@ private class ContactTriggerHandlerTest {
                 WHERE Contact__c = :maria.Id
             ]
             .Household__c;
-
-            Test.startTest();
             delete maria;
-            Test.stopTest();
-
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :household],
@@ -207,8 +203,27 @@ private class ContactTriggerHandlerTest {
             );
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Account WHERE Id = :household],
-                'The household nobody is left in is tidied away'
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'The household is kept, recounted to nobody, because Maria was deleted, not moved'
+            );
+
+            Test.startTest();
+            undelete maria;
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household AND Contact__c = :maria.Id
+                ],
+                'Her membership came back into the kept household'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'She is counted again'
             );
         }
     }

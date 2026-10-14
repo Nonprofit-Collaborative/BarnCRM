@@ -282,23 +282,80 @@ private class AccountTriggerHandlerTest {
     }
 
     @IsTest
-    static void deletingTheLastPersonStoredAsAnAccountTidiesTheHouseholdAway() {
+    static void deletingTheLastPersonStoredAsAnAccountKeepsTheHouseholdForTheUndelete() {
         System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_JUNCTION
+            );
+            Assert.isTrue(settings.Delete_Empty_Households__c, 'The tidy-up is on');
             Account person = personInAHousehold();
+            Id household = [SELECT Household__c FROM Household_Member__c].Household__c;
+            delete person;
+            Assert.areEqual(
+                0,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'The household is kept, recounted to nobody, because Maria was deleted, not moved'
+            );
 
             Test.startTest();
+            undelete person;
+            Test.stopTest();
+
+            List<Household_Member__c> back = [SELECT Household__c FROM Household_Member__c];
+            Assert.areEqual(1, back.size(), 'Her membership came back with her');
+            Assert.areEqual(household, back[0].Household__c, 'Into the household that was kept');
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'She is counted again'
+            );
+        }
+    }
+
+    /** The same with a real person account, on an org that has them. */
+    @IsTest
+    static void deletingTheLastRealPersonAccountKeepsTheHouseholdForTheUndelete() {
+        System.runAs(TestUsers.admin()) {
+            if (PersonAccountTestShape.skipReason() != null) {
+                // Proven on every shape by the test above; the reason is checked and logged.
+                return;
+            }
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_JUNCTION
+            );
+            settings.Auto_Create_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            SObject person = Account.SObjectType.newSObject();
+            person.put('RecordTypeId', OrgShapeDetector.creatablePersonRecordTypeId());
+            person.put('FirstName', 'Maria');
+            person.put('LastName', 'Garcia');
+            insert person;
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert household;
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Account__c = person.Id,
+                Is_Primary__c = true
+            );
             delete person;
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :household.Id],
+                'The household is kept although nobody is left in it'
+            );
+
+            Test.startTest();
+            undelete person;
             Test.stopTest();
 
             Assert.areEqual(
-                0,
+                1,
                 [
                     SELECT COUNT()
-                    FROM Account
-                    WHERE RecordTypeId = :HouseholdService.householdRecordTypeId()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household.Id AND Account__c = :person.Id
                 ],
-                'The household nobody is left in is tidied away, as it is when a contact leaves'
+                'Her membership came back into the kept household'
             );
         }
     }
