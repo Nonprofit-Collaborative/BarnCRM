@@ -569,7 +569,8 @@ public with sharing class ImportObjectSchema {
                 }
             );
         }
-        return slowSearch(type, key, given);
+        String slow = slowSearch(type, key, given);
+        return slow != null ? slow : relatedRefusal(template, type, operation, given);
     }
 
     /**
@@ -578,10 +579,12 @@ public with sharing class ImportObjectSchema {
      */
     private static String slowSearch(Schema.SObjectType type, String key, ImportMapping mapping) {
         String refused = key == null ? null : unselective(type, key);
-        if (refused != null) {
-            return refused;
-        }
-        Map<String, String> lookups = mapping.lookupFieldsByAttribute();
+        return refused != null ? refused : slowLookups(type, mapping.lookupFieldsByAttribute());
+    }
+
+    /** The same guard over the lookup columns of one object, keyed by lookup field. */
+    private static String slowLookups(Schema.SObjectType type, Map<String, String> lookups) {
+        String refused;
         for (String attribute : lookups.keySet()) {
             Schema.SObjectType parent = parentOf(type, attribute);
             String field = parentField(parent, lookups.get(attribute));
@@ -591,6 +594,128 @@ public with sharing class ImportObjectSchema {
             }
         }
         return null;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Related records (R-IT17)
+    // -------------------------------------------------------------------------------------
+
+    /** True when this one-object template also creates related records from its rows. */
+    @NamespaceAccessible
+    public static Boolean loadsRelated(Import_Template__c template) {
+        return loadsOneObject(template) && String.isNotBlank(template.Related_Object__c);
+    }
+
+    /** The template's related object, or null for none or one the org does not have. */
+    @NamespaceAccessible
+    public static Schema.SObjectType relatedTypeOf(Import_Template__c template) {
+        return loadsRelated(template) ? typeNamed(template.Related_Object__c) : null;
+    }
+
+    /**
+     * The related object's field that points at the parent, as describe names it, when it is a
+     * lookup or master-detail to the parent object alone that the user may fill in on a new
+     * record; else null.
+     */
+    @NamespaceAccessible
+    public static String relatedParentField(
+        Schema.SObjectType parent,
+        Schema.SObjectType related,
+        String fieldName
+    ) {
+        Schema.SObjectField token = related == null ? null : fieldNamed(related, fieldName);
+        return parent != null && token != null ? pointsAt(token.getDescribe(), parent) : null;
+    }
+
+    /** The field's name when it points at this object alone and may be filled in, or null. */
+    private static String pointsAt(Schema.DescribeFieldResult field, Schema.SObjectType parent) {
+        List<Schema.SObjectType> parents = field.getReferenceTo();
+        return parents.size() == 1 &&
+            parents[0] == parent &&
+            field.isCreateable()
+            ? field.getName()
+            : null;
+    }
+
+    /**
+     * The related records a load of this object may create (R-IT17): each object a load may
+     * insert (R-IT14) with a field pointing at this object alone that the user may fill in.
+     * Values are `Object.Field`; labels name the object and the field.
+     */
+    @NamespaceAccessible
+    public static List<ImportMapping.Target> relatedOptions(Schema.SObjectType type) {
+        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        if (type == null) {
+            return new List<ImportMapping.Target>();
+        }
+        for (Schema.ChildRelationship relationship : type.getDescribe().getChildRelationships()) {
+            String field = pointsAt(relationship.getField().getDescribe(), type);
+            Schema.SObjectType child = relationship.getChildSObject();
+            if (field == null || insertRefusal(child) != null) {
+                continue;
+            }
+            Schema.DescribeSObjectResult described = child.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            );
+            String label = String.format(
+                Label.Core_Import_RelatedOptionLabel,
+                new List<String>{ described.getLabel(), labelOf(child, field) }
+            );
+            String value = described.getName() + '.' + field;
+            byLabel.put(label + '|' + value, new ImportMapping.Target(value, label));
+        }
+        return sortedValues(byLabel);
+    }
+
+    /** Why a load may not create records of this object (R-IT14), or null. */
+    @NamespaceAccessible
+    public static String insertRefusal(Schema.SObjectType type) {
+        String refused = DataProtectedFields.objectRefusal(type);
+        if (refused != null) {
+            return refused;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        return updatesOnly(type) || !canRun(described, OPERATION_INSERT)
+            ? String.format(
+                  Label.Core_Import_ErrorRelatedObjectUnusable,
+                  new List<String>{ described.getLabelPlural() }
+              )
+            : null;
+    }
+
+    /**
+     * Why this template's related records cannot load (R-IT17), or null: Insert, which has no
+     * parent key; a related object a load may not create; a parent field that does not point at
+     * the target object alone or that the user may not fill in; and the large object guard over
+     * the related lookup columns.
+     */
+    private static String relatedRefusal(
+        Import_Template__c template,
+        Schema.SObjectType type,
+        String operation,
+        ImportMapping mapping
+    ) {
+        if (!loadsRelated(template)) {
+            return null;
+        }
+        if (operation == OPERATION_INSERT) {
+            return Label.Core_Import_ErrorRelatedNeedsKey;
+        }
+        Schema.SObjectType related = relatedTypeOf(template);
+        String refused = insertRefusal(related);
+        if (refused != null) {
+            return refused;
+        }
+        if (relatedParentField(type, related, template.Related_Parent_Field__c) == null) {
+            return String.format(
+                Label.Core_Import_ErrorRelatedFieldUnusable,
+                new List<String>{
+                    related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
+                    type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+                }
+            );
+        }
+        return slowLookups(related, mapping.lookupFieldsByAttribute(ImportMapping.ENTITY_RELATED));
     }
 
     /** Whether the user's object access allows the operation. */

@@ -35,6 +35,13 @@ public with sharing class ImportMapping {
     @NamespaceAccessible
     public static final String ENTITY_AFFILIATION = 'Affiliation';
 
+    /**
+     * The related record a one-object template with a Related Object also creates from each
+     * row (R-IT17): its attributes are the related object's field API names.
+     */
+    @NamespaceAccessible
+    public static final String ENTITY_RELATED = 'Related';
+
     /** The row entities Core stages but does not write (R-IR6). */
     @NamespaceAccessible
     public static final Set<String> DEFERRED_ENTITIES = new Set<String>{
@@ -432,6 +439,12 @@ public with sharing class ImportMapping {
      */
     @NamespaceAccessible
     public Map<String, String> lookupFieldsByAttribute() {
+        return lookupFieldsByAttribute(ENTITY_RECORD);
+    }
+
+    /** The same for the lookup columns of one entity, `Record` or `Related` (R-IT17). */
+    @NamespaceAccessible
+    public Map<String, String> lookupFieldsByAttribute(String entity) {
         Map<String, String> result = new Map<String, String>();
         for (Column column : columns) {
             if (
@@ -439,7 +452,7 @@ public with sharing class ImportMapping {
                 isIgnored(column.target) ||
                 String.isBlank(column.lookupField) ||
                 'Id'.equalsIgnoreCase(column.lookupField.trim()) ||
-                !ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+                !entity.equalsIgnoreCase(entityOf(column.target))
             ) {
                 continue;
             }
@@ -454,6 +467,12 @@ public with sharing class ImportMapping {
      */
     @NamespaceAccessible
     public Set<String> recordAttributes() {
+        return attributesOf(ENTITY_RECORD);
+    }
+
+    /** The same for one entity, `Record` or `Related` (R-IT17). */
+    @NamespaceAccessible
+    public Set<String> attributesOf(String entity) {
         Set<String> result = new Set<String>();
         List<String> targets = new List<String>(targetsBySourceKey().values());
         for (Assignment assignment : defaults) {
@@ -462,7 +481,7 @@ public with sharing class ImportMapping {
             }
         }
         for (String target : targets) {
-            if (ENTITY_RECORD.equalsIgnoreCase(entityOf(target))) {
+            if (entity.equalsIgnoreCase(entityOf(target))) {
                 result.add(attributeOf(target).toLowerCase());
             }
         }

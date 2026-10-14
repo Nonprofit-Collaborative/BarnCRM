@@ -636,6 +636,50 @@ rejected. A value for every row cannot be the record ID or the field rows are ma
 **Undo** works as in section 5. It deletes the records the import created (keeping any that
 someone has edited or added a record to since) and puts back the values it changed.
 
+### Related records in the same file
+
+One file often holds two kinds of record: programs and their sessions, events and their
+attendees, or a legacy system's accounts and their notes. Each row names its parent by a key,
+and the rows that share a key belong to one parent. **Related records** loads both in one
+import, with one dry run and one undo.
+
+1. On the step where you choose what each row does, choose **Upsert by external ID**, **Update
+   by a field you choose** or **Update by record ID**. The field rows are matched by is the
+   **parent key**: rows with the same value in it share one parent. **Insert** cannot load
+   related records, because a key that no field holds cannot find its parent again in a later
+   part of the file or on a second run. To create new parents, give the object an External ID
+   field (a program code, a legacy ID) and upsert by it.
+2. Under **Related records**, choose the related object and the field on it that points at
+   your object (for example **Session (Program)**). Only objects you may create records of
+   are listed.
+3. Back on the columns step, the picker lists the related object's fields after your object's,
+   each starting with the related object's name. Map the related columns to them. The field
+   that points at the parent is filled in by the load, so a column mapped to it is skipped.
+
+How it loads:
+
+- **Parents first.** The first row with a key is that parent's row: its parent columns create
+  or update the parent. Later rows with the same key add related records to it, and their
+  parent columns are not loaded, so put the parent's values on its first row.
+- **A row with only a key and related columns** adds a related record to the parent that key
+  finds, in the file or already in Salesforce. Under Upsert, a key no record holds creates a
+  parent with only that value.
+- **A parent that fails takes its related records with it.** When a parent row is rejected,
+  each later row with the same key is rejected with "The parent record of this row was not
+  saved", and nothing is created for it. Fix the parent row and load the rejected rows again:
+  the key finds the parents that were saved, so none is made twice.
+- **A related record that fails** rejects its own row with the reason. Its parent is still
+  saved, and loading the row again finds it by its key.
+- **Related records are always created.** A second run of the same file adds them again, so
+  load only the rows you fixed, not the whole file.
+
+The dry run decides both, and writes neither. The counts are of your object's rows (a row that
+adds a related record to a parent an earlier row named counts as matched), and the run log says
+how many related records would be created and how many rows were rejected for theirs. Each row
+keeps its related record as its second resulting record. **Undo** deletes the related records
+first, then the parents the import created, and puts back the values it changed on parents
+that already existed.
+
 ## 10. Changing values as they load
 
 A file from another system rarely says things the way your database does: names in capitals,

@@ -1775,6 +1775,8 @@ Maria load the same payment processor export every month without rebuilding the 
 | Load Operation | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
 | Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; under Update by a matching field, the API name of the text, email or phone field they are found by; required under both (R-IT12). |
 | Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
+| Related Object | text | no | The API name of the object a one-object template also creates related records of, as describe gives it; empty for none (R-IT17). |
+| Related Parent Field | text | conditional | The API name of the Related Object's lookup field that points at the Target Object; required with a Related Object (R-IT17). |
 
 ### Relationships
 
@@ -1962,6 +1964,40 @@ Name. A column mapped to one is
 named once in the run log and skipped; so is a field the user may not create or edit, asked of
 describe for each row according to whether it creates or updates.
 
+**R-IT17 Related records in the same file.** A one-object template with a Related Object and a
+Related Parent Field (ADR-NEXT, `NEXT-load-related-records.md`) also creates records of the
+Related Object from the same rows. Its columns are mapped to `Related.<field API name>`, with
+the same lookups (R-IT13), value reading, access and never-written rules as `Record` columns
+(R-IT12, R-IT14); a column mapped to the Related Parent Field is skipped, because the load fills
+it. The Related Object must be one a load may create (R-IT14, Account and Contact never), the
+field a lookup or master-detail of it pointing at the Target Object only, which the user may
+create; else the template is refused, as is Insert, since the parent key must be a stored
+field:
+
+- **Parent key.** The row's record key (R-IT12): its record ID under Update by record Id, its
+  Load Match Field value under the other two operations. The first row of the pass with a key is
+  the parent row and loads its `Record` columns; a later row with the same key (by digest,
+  wherever the chunks fall) adds a related record to that parent and its `Record` columns are
+  not loaded, instead of being rejected as a repeat.
+- **Order.** In each chunk the parents are found and saved first, then the related records are
+  created, each with the Related Parent Field set to its parent. A parent row is always the
+  earliest row of its key, so it is in the same chunk as its related rows or an earlier one. A
+  later chunk finds an earlier chunk's parent by its key in user mode, under the template's
+  Several Matches (R-IT9).
+- **Partial failure.** A parent row's Processor Key holds a digest that says whether its
+  parent was saved. A related row whose parent row was rejected is rejected with "parent
+  failed", and nothing is created for it. A related record the platform refuses rejects its
+  row; the parent stays. A row without a key is rejected (R-IT12). Under Match only (R-IB15) a
+  related record, which always creates, rejects its row.
+- **Results.** A row's Status is its parent's outcome (Matched for a later row of the key),
+  unless the row was rejected for its parent or its related record; its Related Status says
+  what its related record did or would do; its Second Resulting Record holds the related
+  record. The run log counts the related records created and rejected.
+- **Undo.** Each chunk journals its related records on Created pages written after its parents'
+  pages, so the undo's Created pass (newest page first) deletes related records before the
+  parents they point at; a related record made by the commit never counts as something its
+  parent gained (R-IB9).
+
 **R-IT15 Changing a column's values (the transform document).** A column of the mapping
 document may carry `"transforms"`, an ordered list of at most 10 steps that change the
 column's value before it is matched or written (ADR-0081, `0081-data-transform-document.md`):
@@ -2105,6 +2141,8 @@ from Nonprofit Cloud", section 5).
 | Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Update by a matching field, Upsert by external ID |
 | Load Match Field | `Load_Match_Field__c` | Text (255) |
 | Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
+| Related Object | `Related_Object__c` | Text (255) |
+| Related Parent Field | `Related_Parent_Field__c` | Text (255) |
 
 - **Shipped defaults:** `Import_Template_Default__mdt` (Section 13).
 - **Service:** `ImportTemplateService` (materialization and save), `ImportTemplateSelector`,
@@ -2547,7 +2585,8 @@ processor resolves those in dependency order.
 | Person 2 Account | reference(Organization) | computed | The second person, where people are person Accounts. |
 | Organization | reference(Organization) | computed | The organization this row resolved to. |
 | Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2); for a one-object template, the record the row created, updated or matched (R-IT12). Labelled Resulting Record. |
-| Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2). |
+| Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2); for a one-object template with related records, the related record the row created (R-IT17). Labelled Second Resulting Record. |
+| Related Status | text | computed | For a one-object template with related records, what the row's related record did or would do in a dry run: Created or Rejected; empty when the row has none (R-IT17). |
 | Person 1 Key | text | computed | In a dry run only, a digest of the matching key of the first person this row would create, so later chunks count that person once (R-IB12). Cleared when the row is processed again. |
 | Person 2 Key | text | computed | The same for the second person. |
 | Person 1 Name Key | text | computed | The same digest of the first person's key narrowed to their first name, so a later row finds them by either (R-IB12). |
@@ -2556,7 +2595,7 @@ processor resolves those in dependency order.
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
 | Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
-| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12). |
+| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12), or with related records the parent row's key digest, one form when its parent was saved and another when it failed (R-IT17). |
 
 ### Relationships
 
@@ -2571,8 +2610,8 @@ processor resolves those in dependency order.
 `SoftCredit` and `Tribute` in the template's mapping document, and they are resolved in
 dependency order: organization, household, people, membership and affiliation, gift,
 allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4). A row of a
-one-object template (R-IT12) is read as the one entity `Record` instead, and none of the
-others.
+one-object template (R-IT12) is read as the one entity `Record` instead, with `Related` when
+it loads related records (R-IT17), and none of the others.
 
 **R-IR1a What a row means for households.** A row is one household. The row's first
 person is saved first and is given a household by the ordinary creation path (R-H1 in
@@ -2686,6 +2725,7 @@ when the corrected row is loaded again.
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Several Matches | `Several_Matches__c` | Checkbox |
 | Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
+| Related Status | `Related_Status__c` | Text (20) |
 
 The six keys and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
@@ -6901,6 +6941,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Trial import (data tools parity rank 4). `Import_Batch__c` gains `Trial_Rows__c` and the Status value Trial complete; BarnCRM Settings gains `Import_Trial_Rows__c` (default 25). New rule R-IB16: commit the first N rows, then the remaining rows into the same batch, one undo for both. |
 | v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
 | v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
+| v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-NEXT, `NEXT-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
 
 ---
 ## 32. Entity ownership by package
