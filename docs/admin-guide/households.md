@@ -22,13 +22,14 @@ BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
 1. Open the **BarnCRM** app and click the **BarnCRM Settings** tab.
 2. Click **Households** in the left navigation.
-3. Check the three settings and change any that do not match how you work.
+3. Check the four settings and change any that do not match how you work.
 
 | Setting | What it does | Ships as |
 |---|---|---|
 | How people belong to a household | The simple way (one household per person) or the flexible way (a person can belong to more than one household, and you keep the history of who belonged when) | The simple way |
 | Create a household automatically | When you save a new person with no household, one is created for them. This works the same way in both ways of belonging, and for people stored as contacts and for people stored as accounts | On |
 | Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside BarnCRM still depends on its account record, so this never removes a household another product built. With Giving, a household that still has gifts or pledges credited to it is kept too, so they never lose their household | Off, switch it on if you want it |
+| Keep the households of deleted people | When you delete the last person in a household, the household stays at first, so you can still restore the people from the Recycle Bin. Once nobody from it is left in the Recycle Bin, a nightly tidy-up moves the household to the Recycle Bin too, unless anything else is still linked to it. Switch this on to keep those households instead | Off, so the tidy-up runs |
 
 4. Click **Save**. The change applies to the next record anyone saves.
 
@@ -135,9 +136,21 @@ were made in.
 Either "Delete a household once it is empty" is off, or BarnCRM deliberately
 left that one alone.
 
-Deleting people never deletes their household; moving them out still tidies it away.
+Deleting people never deletes their household straight away; moving them out still tidies it away.
 Deleting the household too would empty those people out of the Recycle Bin, and you could not
 restore them. If you meant to remove both, delete the household by hand.
+
+Unless "Keep the households of deleted people" is on, a nightly tidy-up comes back for the
+household once nobody who belonged to it is left in the Recycle Bin (the Recycle Bin empties
+itself after 15 days, or sooner if someone empties it). It then moves the household to the
+Recycle Bin, where you can still restore it. The household's own addresses go to the Recycle
+Bin with it, and the import that created it keeps its record. It leaves the household alone
+when anything else is still linked to it: gifts, pledges, relationships, tasks, files, the
+past membership of someone who moved out (or was erased), or any other record, whichever
+product made it. Those households stay on the "households with nobody in them" lists in
+Health Check and Data Hygiene for you to review. Households emptied before this
+tidy-up was added, and households a merge or a move emptied, are never part of it. Schedule
+it with Health Check's **Nightly jobs are not scheduled** fix.
 
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want
@@ -190,5 +203,6 @@ For report builders only. Maria never needs this to use the feature.
 | Household | Member Count | Current members of this household |
 | Household | Primary Contact | The person named when only one person can be. Cleared when that person leaves the household. In the flexible way of belonging it follows the member marked primary, and a person account appears as its person contact |
 | Household | Anniversary | A household date you steward, most often a wedding anniversary |
+| Household | Emptied By Deletion | The day the last person in this household was deleted. Cleared when someone joins again. Only households with this date are considered by the nightly tidy-up. Clear it to keep one household |
 | Person | Household Role | Head, Spouse or Partner, Child, or Other |
 | Household Member | Start Date and End Date | When the person joined and left (flexible mode only) |

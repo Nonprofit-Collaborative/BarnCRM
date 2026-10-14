@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Keep_Households_Of_Deleted_People__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether households emptied by deleting people are kept rather than moved to the Recycle Bin by the nightly tidy-up (R-H12a). Shipped false so the tidy-up is on, including on upgrade.</description>
+  <inlineHelpText>Keep a household after its people are deleted, instead of tidying it away once they cannot be restored.</inlineHelpText>
+  <label>Keep Households Of Deleted People</label>
+  <type>Checkbox</type>
+</CustomField>

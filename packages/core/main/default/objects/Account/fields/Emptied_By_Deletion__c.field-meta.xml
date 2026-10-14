@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Emptied_By_Deletion__c</fullName>
+  <description>The day deleting people left this household with no members (canonical model R-H12a). Only a household with this date is considered by the nightly empty household tidy-up.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    The day the last person in this household was deleted. Cleared when someone joins again. Clear it to keep this household.
+  </inlineHelpText>
+  <label>Emptied By Deletion</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

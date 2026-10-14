@@ -37,7 +37,8 @@ public with sharing class NightlyJobs {
             new RollupJob(),
             new SeasonalAddressJob(),
             new ErrorDigestJob(),
-            new ImportRowPurgeJob()
+            new ImportRowPurgeJob(),
+            new EmptyHouseholdTidyJob()
         };
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
@@ -193,6 +194,24 @@ public with sharing class NightlyJobs {
 
         public void schedule() {
             ImportRowPurgeScheduler.start();
+        }
+    }
+
+    /**
+     * The nightly empty household tidy-up (R-H12a). Whether it removes anything is a
+     * Households setting, so the job always belongs on the list.
+     */
+    public class EmptyHouseholdTidyJob implements NightlyJob {
+        public String label() {
+            return System.Label.Core_HealthCheck_JobEmptyHouseholds;
+        }
+
+        public Boolean isScheduled() {
+            return EmptyHouseholdTidyScheduler.isScheduled();
+        }
+
+        public void schedule() {
+            EmptyHouseholdTidyScheduler.start();
         }
     }
 }

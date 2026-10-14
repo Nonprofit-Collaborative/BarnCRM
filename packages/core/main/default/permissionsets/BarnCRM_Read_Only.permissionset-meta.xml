@@ -222,6 +222,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Account.Emptied_By_Deletion__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Account.Exclude_From_Greetings__c</field>
     <readable>true</readable>
   </fieldPermissions>
