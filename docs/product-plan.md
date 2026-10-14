@@ -981,6 +981,8 @@ Findings and decisions about the modules (Giving, Connect, Volunteers, Programs,
 - **Label descriptions.** Giving (66 labels) and Connect (38 labels) label descriptions still need the placeholder sweep before `scripts/ci/check-labels.py` covers them.
 - **`HouseholdSoftCreditRecompute` chain limit (2026-10-13).** It chains one Queueable per household, so it stops after 5 households in Developer Edition, trial and scratch orgs; inside another Queueable it can still take that job's one chained slot. Candidate fix: a batch like `SampleDataStageBatch`, or a ready event like `Rollup_Queue_Ready__e`.
 - **`GiftLookupSelector.selectHouseholdsWithGifts` runs without sharing (2026-10-13, #377).** The semi-join returns IDs only (ADR-0021 precedent), so a user who cannot see a household's gifts still queues `HouseholdSoftCreditRecompute`. Confirm against the Giving design when Giving work starts.
+- **Deleting the default fund (2026-10-14, scale test).** The fund named as the default in Giving settings can be deleted, and every new gift is then refused with "No default fund is set". Candidate fix: refuse deleting the configured default fund, or Health Check flags a deleted or inactive default.
+- **Re-splitting an existing gift's allocations (2026-10-14, scale test).** The gift entry screen is the only supported way, because allocation totals are validated after each DML statement, so no other path can change a split in place. Candidate fix: decide a supported path when Giving work starts.
 
 **Connect**
 - Label descriptions: see the note above (38 labels).

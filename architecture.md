@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-13.
+Last verified 2026-10-14.
 
 ## Pointers
 
@@ -87,4 +87,11 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - The org refuses Create on a platform event in a permission set without Read.
 - A long text area field cannot be filtered in SOQL.
 - The BarnCRM app's `navType` (Standard to Console) is not updateable by deploy: on an org that has the app, delete it first (destructive deploy), then deploy (done on `oi-test` 2026-10-13; D-57 for the other orgs).
+- Aggregate SOQL counts every aggregated row toward the 50,000 query-row limit, not just the rows returned.
+- A Queueable finalizer can enqueue at most 5 jobs in a row after failures.
+- Queueable chain depth is 5 in Developer Edition, trial and scratch orgs.
+- Anonymous Apex logs echo the script source, so scripts that parse output read `USER_DEBUG` lines only.
+- The `oi-test` running user lacks Bulk API Hard Delete: hard delete fails there, so scale cleanup falls back to soft delete.
+- `sf data delete bulk --json` returns the job id at `.result.jobInfo.id`.
+- The synced folder can create `name 2` duplicate git refs inside `.git` that break `git fetch`; check they are stale, then move them out of `.git`.
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).

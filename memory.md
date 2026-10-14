@@ -120,7 +120,7 @@ Donor portal and online giving; email marketing beyond export; grantmaking as a 
 
 ## Module notes (plan Section 11.5; not presented until each module starts, D-84)
 
-- Giving: receipt PDFs kept after Erase a person, deleted by hand (D-52); 66 label descriptions need the placeholder sweep; `HouseholdSoftCreditRecompute` chains one Queueable per household (stops after 5 in Developer Edition, trial and scratch orgs; candidate fix: a batch or a ready event); `GiftLookupSelector.selectHouseholdsWithGifts` semi-join runs without sharing (IDs only), to confirm against the Giving design.
+- Giving: receipt PDFs kept after Erase a person, deleted by hand (D-52); 66 label descriptions need the placeholder sweep; `HouseholdSoftCreditRecompute` chains one Queueable per household (stops after 5 in Developer Edition, trial and scratch orgs; candidate fix: a batch or a ready event); `GiftLookupSelector.selectHouseholdsWithGifts` semi-join runs without sharing (IDs only), to confirm against the Giving design; deleting the default fund leaves every new gift refused with "No default fund is set" (candidate: refuse the delete, or Health Check flags it); no supported way to re-split an existing gift's allocations except the gift entry screen (totals are validated after each DML statement).
 - Connect: 38 label descriptions need the placeholder sweep.
 
 ## Working agreements (owner instructions)
