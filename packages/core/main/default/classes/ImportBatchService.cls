@@ -253,9 +253,16 @@ public with sharing class ImportBatchService {
         }
         Integer total =
             (batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()) + staged.size();
-        batch.Row_Count__c = total;
-        batch.Status__c = retrying ? STATUS_RETRYING : STATUS_PARSING;
-        Database.update(batch, AccessLevel.USER_MODE);
+        // Only the two fields this writes: the read batch also holds fields no permission set
+        // may edit (Operation__c defaults to Import), which a user-mode save of it refuses.
+        Database.update(
+            new Import_Batch__c(
+                Id = batch.Id,
+                Row_Count__c = total,
+                Status__c = retrying ? STATUS_RETRYING : STATUS_PARSING
+            ),
+            AccessLevel.USER_MODE
+        );
         return total;
     }
 

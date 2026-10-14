@@ -357,7 +357,8 @@ private class ImportFirstNameMatchTest {
     @IsTest
     static void firstNamesAreComparedIgnoringCaseButNotAccents() {
         System.runAs(TestUsers.admin()) {
-            insert new List<Contact>{ smith('John'), smith('Jane') };
+            Contact jane = smith('Jane');
+            insert new List<Contact>{ smith('John'), jane };
 
             Test.startTest();
             List<Import_Row__c> rows = load(
@@ -368,15 +369,17 @@ private class ImportFirstNameMatchTest {
             );
             Test.stopTest();
 
-            Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Whatever the case.');
+            Assert.areEqual(jane.Id, rows[0].Contact_1__c, 'Whatever the case, Jane is found.');
             Assert.areEqual(
                 'Jáne',
                 firstNameOf(rows[1].Contact_1__c),
                 'An accent is a different name: created, not guessed.'
             );
             // A row with no first name at this couple matches both: ImportMatchingRulesTest (R-IT9).
+            // Jane takes the file's capitals, since a correction of capitals is a change (R-IT11),
+            // but nobody becomes somebody else.
             Assert.areEqual(
-                new List<String>{ 'John', 'Jane', 'Jáne' },
+                new List<String>{ 'John', 'JANE', 'Jáne' },
                 smiths(),
                 'Nobody renamed.'
             );

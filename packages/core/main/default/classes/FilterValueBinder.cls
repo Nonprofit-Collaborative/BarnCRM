@@ -261,7 +261,8 @@ public with sharing class FilterValueBinder {
                 shown.add(character);
             }
         }
-        displayByName.put(name, '\'' + String.escapeSingleQuotes(String.join(shown, '')) + '\'');
+        // Only quotes are escaped here: escapeSingleQuotes would double the backslashes again.
+        displayByName.put(name, '\'' + String.join(shown, '').replace('\'', '\\\'') + '\'');
         return ':' + name;
     }
 
@@ -289,7 +290,8 @@ public with sharing class FilterValueBinder {
             return String.valueOf(value);
         }
         // A backslash is written doubled, as SOQL text reads it: "C:\temp" must not read as a tab.
-        return '\'' + String.escapeSingleQuotes(String.valueOf(value).replace('\\', '\\\\')) + '\'';
+        // escapeSingleQuotes doubles it as well as escaping the quotes.
+        return '\'' + String.escapeSingleQuotes(String.valueOf(value)) + '\'';
     }
 
     private RollupFilterParser.RollupFilterException valueDoesNotFit() {

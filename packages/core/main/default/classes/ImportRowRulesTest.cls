@@ -87,10 +87,12 @@ private class ImportRowRulesTest {
                 Integer pending = counts.get(ImportRowProcessor.STATUS_PENDING);
                 Assert.areEqual(45, pending, 'One row per email loads.');
                 Assert.areEqual(MANY - 45, counts.get(ImportRowProcessor.STATUS_SKIPPED));
+                // In system mode: the key is bookkeeping in no permission set (ADR-0021).
                 Import_Row__c cancelled = [
                     SELECT Status__c, Error_Message__c, Row_Key__c
                     FROM Import_Row__c
                     WHERE Import_Batch__c = :batch.Id AND Row_Number__c = 2
+                    WITH SYSTEM_MODE
                 ];
                 Assert.isTrue(cancelled.Error_Message__c.contains('Status'), 'Says which rule.');
                 Assert.isNull(cancelled.Row_Key__c, 'A skipped row keeps no key.');

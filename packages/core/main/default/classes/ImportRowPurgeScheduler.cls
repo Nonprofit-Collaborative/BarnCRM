@@ -21,7 +21,7 @@ public with sharing class ImportRowPurgeScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(JOB_NAME, NIGHTLY_CRON, new ImportRowPurgeScheduler());
+        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new ImportRowPurgeScheduler());
     }
 
     /** True when the nightly cleanup is scheduled. */

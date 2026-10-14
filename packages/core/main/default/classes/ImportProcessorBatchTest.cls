@@ -138,7 +138,8 @@ private class ImportProcessorBatchTest {
                 ImportTemplateService.RULE_EMAIL
             );
             Import_Batch__c batch = ImportTestDataFactory.batch(template);
-            // Ana, and her organization, are new, and appear again in the second chunk.
+            // Ana, and her organization, are new, and appear again in the second chunk. Her email
+            // is written as before: other capitals would correct hers, an update (R-IT11).
             ImportTestDataFactory.rows(
                 batch,
                 new List<Map<String, String>>{
@@ -149,7 +150,7 @@ private class ImportProcessorBatchTest {
                         'Rose City'
                     ),
                     ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', null),
-                    ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ANA@example.org', 'Rose City')
+                    ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City')
                 }
             );
 

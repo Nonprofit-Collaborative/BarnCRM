@@ -226,7 +226,12 @@ private class DeleteByFileTest {
     @IsTest
     static void theDownloadFirstHoldsTheTwoHundredRecordsTheFileWouldDelete() {
         System.runAs(TestUsers.admin()) {
-            List<Contact> volunteers = makePeople(MANY, 10);
+            List<Contact> people = makePeople(MANY, 10);
+            // The file names the volunteers only, so the ten staff are not in the download.
+            List<Contact> volunteers = new List<Contact>();
+            for (Integer i = 0; i < MANY; i++) {
+                volunteers.add(people[i]);
+            }
             System.runAs(deleter()) {
                 Import_Batch__c batch = dryRun(deleteTemplate(), volunteers);
                 BulkDeleteService.BackupPage first = BulkDeleteController.backupPage(

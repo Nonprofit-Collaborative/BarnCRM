@@ -79,6 +79,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /** The relationships each object is checked through, described once per transaction. */
     private static final Map<Schema.SObjectType, List<Schema.ChildRelationship>> CHECKED = new Map<Schema.SObjectType, List<Schema.ChildRelationship>>();
 
+    /** Child objects among those checked that carry the import tag. */
+    private static final Set<Schema.SObjectType> TAGGED_CHILDREN = new Set<Schema.SObjectType>();
+
     private final Id batchId;
     private final Integer countedAtStart;
     private final String pass;
@@ -949,7 +952,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             'committedBy' => committedBy,
             'undoer' => UserInfo.getUserId(),
             'undoStartedAt' => undoStartedAt,
-            'checkedAt' => Datetime.now()
+            'checkedAt' => Datetime.now(),
+            'importBatch' => batchId
         };
         if (relationships.size() == 1) {
             List<SObject> rows = guardQuery(keep, ids, gainedQuery(type, relationships), binds);
@@ -1025,11 +1029,18 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             ') AND (CreatedById != :undoer OR CreatedDate < :undoStartedAt OR CreatedDate > :checkedAt)';
         List<String> subqueries = new List<String>();
         for (Schema.ChildRelationship relationship : relationships) {
+            // A related record this import created is undone with it, so it keeps nothing: an
+            // aborted commit's household names its new person as Primary Contact (R-IB13).
+            String own = TAGGED_CHILDREN.contains(relationship.getChildSObject())
+                ? ' AND ' + ImportEntityProcessors.TAG_FIELD + ' != :importBatch'
+                : '';
             subqueries.add(
                 '(SELECT Id FROM ' +
                     relationship.getRelationshipName() +
-                    ' WHERE ' +
+                    ' WHERE (' +
                     filter +
+                    ')' +
+                    own +
                     ' LIMIT 1)'
             );
         }
@@ -1076,6 +1087,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 (!child.isCustom() && !child.isCreateable())
             ) {
                 continue;
+            }
+            if (childFields.containsKey(NamespaceUtil.qualify(ImportEntityProcessors.TAG_FIELD))) {
+                TAGGED_CHILDREN.add(relationship.getChildSObject());
             }
             result.add(relationship);
         }
