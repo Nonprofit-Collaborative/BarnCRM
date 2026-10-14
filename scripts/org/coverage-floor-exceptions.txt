@@ -3,7 +3,6 @@
 # below the figure here; a class not listed has to meet the floor. Raise a figure when tests
 # improve, and take the line out once the class reaches 75%: the gate prints which ones have.
 # Read by scripts/org/run-org-tests.sh. Format: Name  percent  # note.
-AccountAddressHandler 80  # 16 of 20 lines; the afterUpdate catch only fires in a person-account org
 AcknowledgmentController 67  # 96 of 143 lines
 AcknowledgmentRunService 67  # 94 of 140 lines
 AcknowledgmentScheduler 33  # 11 of 33 lines
