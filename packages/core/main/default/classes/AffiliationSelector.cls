@@ -38,34 +38,4 @@ public with sharing class AffiliationSelector {
             LIMIT 10000
         ];
     }
-
-    /** Every affiliation pointing at one of these organizations, for the organization's card. */
-    public static List<Affiliation__c> selectByOrganizationIds(Set<Id> organizationIds) {
-        if (organizationIds == null || organizationIds.isEmpty()) {
-            return new List<Affiliation__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Name,
-                Contact__c,
-                Contact__r.Name,
-                Person_Account__c,
-                Person_Account__r.Name,
-                Organization__c,
-                Organization__r.Name,
-                Role__c,
-                Status__c,
-                Is_Primary__c,
-                Start_Date__c,
-                End_Date__c,
-                Description__c,
-                CreatedDate
-            FROM Affiliation__c
-            WHERE Organization__c IN :organizationIds
-            WITH USER_MODE
-            ORDER BY Status__c, CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
 }
