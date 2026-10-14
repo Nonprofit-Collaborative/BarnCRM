@@ -96,3 +96,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - The synced folder can create `name 2` duplicate git refs inside `.git` that break `git fetch`; check they are stale, then move them out of `.git`.
 - `FOR UPDATE` works on a hierarchy custom setting's org-level row; Core uses `Rollup_Run_Lock__c` as a run lock (#398, 2026-10-14).
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).
+- The journal cursor is `(CreatedDate, Id)` (keyset paging, #401).
+- Rollups can run as Automated Process, started by the `Rollup_Queue_Ready__e` platform event through `RollupQueueReadyTrigger`; code that judges who made a save must not assume a human user (ADR-0119).
+- `Merge_Settlement_Ready__e` (Publish After Commit) is consumed by `MergeSettlementReadyTrigger`, configured at batch size 50 by `PlatformEventSubscriberConfig` in the Apex stage of `deploy-packages.sh`; it runs as Automated Process (ADR-0118).
+- `barn-core` is the Platform-only org (expires 2026-10-17). `BarnCRM_Access_Manager` is an optional permission set holding the Salesforce-license permissions (Assign Permission Sets, View All Users); `Duplicate_Review` is the other optional Salesforce-license set (ADR-0121).
+- In a class with a field named `label`, reference custom labels as `System.Label.X`.
+- `ALL ROWS` returns deleted records until they are physically removed.
+- Person-account orgs rename some child relationships; do not hard-code relationship names.

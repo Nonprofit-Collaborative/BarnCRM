@@ -12,12 +12,13 @@ BarnCRM handles the everyday work of a development office: households and the pe
 
 Three things matter more to us than shipping features fast. First, the numbers have to be right: giving totals, receipts, and fund balances are the product's reputation, so every rollup shows you when it was last calculated instead of quietly going stale. Second, upgrades must be safe: nothing you configure is overwritten when a new version arrives, and nothing we ship is something you have to clone to use. Third, it is genuinely open: the source is public, the software is free, there is no paid tier, and no data leaves your Salesforce org (there are no external callouts by default, and optional usage telemetry is anonymous, opt-in, and off unless you turn it on).
 
-BarnCRM is in early development. The current work is v0.1, the foundation and the household model, and there is nothing installable yet: no package versions exist, and the namespace is not registered. Everything here is source code, a detailed product plan, and architecture decisions in the open. If you run a nonprofit and this sounds like what you need, the most useful thing you can do right now is watch the repository, open an issue describing how your organization works and what has been painful, and tell us which of the four Salesforce setups above you are on. If you write code or administer Salesforce, see the contributor guide below.
+BarnCRM is in development. Core is nearing its pilot, but nothing is installable yet: no package versions exist, and the namespace is not registered. Everything here is source code, a detailed product plan, and architecture decisions in the open. If you run a nonprofit and this sounds like what you need, the most useful thing you can do right now is watch the repository, open an issue describing how your organization works and what has been painful, and tell us which of the four Salesforce setups above you are on. If you write code or administer Salesforce, see the contributor guide below.
 
 ## Status
 
 - Phase 0 (planning and repository setup) complete.
-- v0.1 (foundation and households) in progress.
+- Core is nearing its pilot; Giving and Connect are built alongside it, and the other modules are planned (see docs/barncrm-features.md for each feature's status).
+- Not on AppExchange.
 - No releases yet. No package versions exist and nothing is installable.
 - Namespace pending: development is namespace-agnostic until the namespace is registered.
 - Name: the product is BarnCRM, chosen after the working title "Open Impact" was found to be in use. The packaged labels and API names carry the new name too (see ADR-0060 and docs/product-plan.md Section 8.3).

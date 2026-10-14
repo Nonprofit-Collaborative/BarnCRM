@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-14 (through D-89).
+Last refreshed from BMemory 2026-10-14 (through D-95).
 
 ## Decision log (plan Section 12)
 
@@ -54,7 +54,7 @@ Last refreshed from BMemory 2026-10-14 (through D-89).
 | D-44 | 2026-10-13 | Fundraising Staff permission set group includes Giving Staff (closes plan 11.2 item 12) |
 | D-45 | 2026-10-13 | The renamed import tab reads "Data Jobs" in Title Case (amends ADR-0047 wording) |
 | D-46 | 2026-10-13 | Dev Hub snapshot `BarnPA` from `oi-pa` approved (Q-12) |
-| D-47 | 2026-10-13 | Duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38); inventory under way |
+| D-47 | 2026-10-13 | Duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38); inventory done 2026-10-14 (#401 to #408) |
 | D-48 | 2026-10-13 | Core review recommendations approved: rollups recalculate only definitions that marked a target (ADR needed; narrows ADR-0082 decision 2); Instantly-mode fiscal-window rollups in the nightly run; Recalculate now checks budget and queues; import commit runs the previewed template; organizations created only for passing rows; people import reads values like Load one object; bulk delete undo covers deleted empty households; Health Check on Home shows last result plus Run now; one shared LWC helper module; faster test runs; namespace-safe object resolution. Code coverage still checked automatically on every gate, read via ApexCodeCoverageAggregate |
 | D-49 | 2026-10-13 | Affiliations return to Core imports: a people import links each person to the organization on their row by an affiliation. Reverses the affiliation part of D-41; plan Section 4.9 and C-32 restored |
 | D-50 | 2026-10-13 | Data tools parity (D-13 still holds): Data Manager hub with one job history and Undo; Org Optimizer page (Data Hygiene relabeled; Overview, Data quality, Duplicates moved from Settings, Field utilization embedded only here, Health Check on demand, Errors, Storage and limits, Unused setup admin-only, Automation and jobs); full results file; trial import (default 25 rows, a setting, per-file override, rest in the same job and undo); delete from a file of IDs; more transform steps; lookups and update matching on any Text, Email or Phone field; skip rows and one row per key; empty cells clear the field (off by default, journaled); delimiter and worksheet choice; download before delete; retry rejects into the same job; server-side export (C-36 remainder, in v1); parent and child loads. Not approved: seeding templates, files import. Scheduling and connectors stay C-38 on hold |
@@ -95,8 +95,14 @@ Last refreshed from BMemory 2026-10-14 (through D-89).
 | D-85 | 2026-10-13 | Working agreement: implement recommendations and tell the owner what is being changed, unless really important or contrary to his instructions. Module reviews or audits already in flight can finish; their findings are not processed with him now unless they relate to Core |
 | D-86 | 2026-10-13 | Erase a person: the preview lists activities and files for manual deletion (not erased automatically); Health Check skips erased people; PR #282 accepted at its size |
 | D-87 | 2026-10-13 | Release prerequisites after a v1.0 pilot: namespace registration, the Dev Hub and the steward entity (Section 11.2 items 1, 3, 4) settled after piloting v1.0; no package version until then; upgrade-path tests wait for the first version |
-| D-88 | 2026-10-13 | Deleting people never deletes their household, in every membership mode (R-H12, #377); moving people still tidies it. Reason: deleting a parent purges children deleted before it from the Recycle Bin, so deleted people could not be restored. Open option, tidy later after the Recycle Bin window: decided by D-89 |
-| D-89 | 2026-10-14 | A household left with no members after its people are deleted moves to the Recycle Bin, but only after its former members can no longer be restored from the Recycle Bin: a nightly Core job, on by default, switchable in Nonprofit Settings; households with other child records are kept and reported. Amends D-88, which protects restoring deleted people. In progress |
+| D-88 | 2026-10-13 | Deleting people never deletes their household, in every membership mode (R-H12, #377); moving people still tidies it. Reason: deleting a parent purges children deleted before it from the Recycle Bin, so deleted people could not be restored. Open option, tidy later after the Recycle Bin window: decided by D-89 (landed in #408) |
+| D-89 | 2026-10-14 | A household left with no members after its people are deleted moves to the Recycle Bin, but only after its former members can no longer be restored from the Recycle Bin: a nightly Core job, on by default, switchable in Nonprofit Settings; households with other child records are kept and reported. Amends D-88, which protects restoring deleted people. Landed 2026-10-14 (#408, ADR-0120) |
+| D-90 | 2026-10-14 | 25,000 rows is the scale bar for the pilot (Brandon); the 250,000-row import run comes later, in a sandbox (plan 7.3) |
+| D-91 | 2026-10-14 | Salesforce-license-only permissions (Assign Permission Sets, View All Users) move out of BarnCRM Admin into the optional `BarnCRM_Access_Manager` permission set, which has no role; `Duplicate_Review` stays Sales/Service-only (ADR-0121, #406). Reason: Core runs on a Platform-only license (ADR-0013) |
+| D-92 | 2026-10-14 | Product-branded names stay (Brandon; closes Section 11.2 item 24): BarnCRM Admin, Staff, Read Only, Duplicate Review, BarnCRM Settings |
+| D-93 | 2026-10-14 | No end date on per-automation switches (Brandon; closes Section 11.2 item 16): they stay off until an admin turns them back on; the org-wide pause still expires (ADR-0055) |
+| D-94 | 2026-10-14 | The pilot is a milestone below v1.0; Brandon decides version numbers |
+| D-95 | 2026-10-14 | BarnCRM is open to any Salesforce org regardless of size, and extra valuable for small to mid-sized teams that lack the resources for many licenses and customization; it comes with powerful tools preloaded. The pilot is likewise open to any org size (not limited to one to ten users). The Nonprofit Edition is described as "like NPSP for Nonprofit Cloud", plus other useful tools (Brandon) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
@@ -108,10 +114,10 @@ D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the 
 - 7: Telemetry (C-26): resolved 2026-10-12, deferred indefinitely (D-24).
 - 12: Permission set groups that contain only the staff set: resolved 2026-10-13, Fundraising Staff includes Giving Staff (D-44).
 - 14: Shipped import templates: resolved 2026-10-13, added at install and on upgrade (D-55).
-- 16: Per-automation switches: optional end date or stay off until turned on.
+- 16: Per-automation switches: dropped 2026-10-14 (Brandon); no end date, they stay off until turned on (D-93).
 - 19 to 22: Opportunity mirror defaults (NPSP mode direction, deleted gift, double thanks, record-type filter).
 - 23: A separate nonprofit app in Giving.
-- 24: Neutral labels for nonprofits (names become "BarnCRM ..." in the rename).
+- 24: Neutral labels for nonprofits: accepted 2026-10-14 (Brandon); the product-branded "BarnCRM ..." names stay (D-92).
 - 27: Plan corrections: resolved 2026-10-13, applied (D-80).
 - Provisional (confirm when the owner tests): 8 primary person through the person contact, 9 guards only, 10 membership-mode switch guard only.
 
