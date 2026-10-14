@@ -346,8 +346,12 @@ private class MergeSettlementTest {
 
         public void execute(QueueableContext context) {
             MergeSettlement.afterMerge(new Set<Id>(), new Set<Id>{ survivorId }, new Set<Id>());
+            queuedInsideTheJob = Limits.getQueueableJobs();
         }
     }
+
+    /** The jobs the Queueable above had queued once the merge's tidy-up was asked for. */
+    private static Integer queuedInsideTheJob;
 
     private static List<Error_Log__c> settlementWarnings() {
         return [
@@ -368,7 +372,7 @@ private class MergeSettlementTest {
     }
 
     @IsTest
-    static void aMergeWithNoQueueableJobsLeftNamesTheSurvivorsInTheErrorLog() {
+    static void aMergeWithNoQueueableJobsLeftPublishesItsSurvivors() {
         System.runAs(TestUsers.admin()) {
             Contact survivor = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert survivor;
@@ -384,19 +388,28 @@ private class MergeSettlementTest {
             );
             Test.stopTest();
 
-            Assert.isNull(MergeSettlement.lastQueued, 'No job was queued');
-            List<Error_Log__c> warnings = settlementWarnings();
-            Assert.areEqual(1, warnings.size(), 'The survivors are named once');
-            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, warnings[0].Severity__c);
             Assert.isTrue(
-                warnings[0].Message__c.contains(String.valueOf(survivor.Id)),
-                'So an administrator can check them: ' + warnings[0].Message__c
+                MergeSettlement.lastQueued.contains(survivor.Id),
+                'The subscriber queued the tidy-up once the event was delivered'
             );
+            Assert.areEqual(1, MergeSettlement.lastPublished.size(), 'One event names them');
+            Assert.areEqual(
+                String.valueOf(survivor.Id),
+                MergeSettlement.lastPublished[0].Owner_Ids__c,
+                'As an owner of addresses'
+            );
+            Assert.areEqual(
+                String.valueOf(survivor.Id),
+                MergeSettlement.lastPublished[0].Person_Ids__c,
+                'And as a person'
+            );
+            Assert.isNull(MergeSettlement.lastPublished[0].Household_Ids__c, 'No household');
+            Assert.areEqual(0, settlementWarnings().size(), 'Nothing for an administrator to do');
         }
     }
 
     @IsTest
-    static void aMergeInsideAQueueableIsNamedNotQueued() {
+    static void aMergeInsideAQueueablePublishesAndKeepsItsChain() {
         System.runAs(TestUsers.admin()) {
             Contact survivor = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert survivor;
@@ -405,11 +418,193 @@ private class MergeSettlementTest {
             System.enqueueJob(new MergesInsideAQueueable(survivor.Id));
             Test.stopTest();
 
-            Assert.isNull(MergeSettlement.lastQueued, 'The running Queueable keeps its chain');
-            List<Error_Log__c> warnings = settlementWarnings();
-            Assert.areEqual(1, warnings.size());
-            Assert.isTrue(warnings[0].Message__c.contains(String.valueOf(survivor.Id)));
+            Assert.areEqual(0, queuedInsideTheJob, 'The running Queueable keeps its chain');
+            Assert.areEqual(1, MergeSettlement.lastPublished.size(), 'One event names it');
+            Assert.areEqual(
+                String.valueOf(survivor.Id),
+                MergeSettlement.lastPublished[0].Owner_Ids__c
+            );
+            Assert.areEqual(0, settlementWarnings().size(), 'No warning: it will be settled');
         }
+    }
+
+    @IsTest
+    static void aMergeInABackgroundJobIsSettledAfterItCommits() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact kept = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact other = HouseholdTestDataFactory.newContact('Ms.', 'Mary', 'Garcia');
+            insert new List<Contact>{ kept, other };
+            insert defaultAddress(kept.Id, '1 Main Street', 'Oakland');
+            insert defaultAddress(other.Id, '2 Oak Avenue', 'Berkeley');
+            insertRelationships(
+                new List<Relationship__c>{
+                    RelationshipTestDataFactory.between(kept, other, 'Sibling'),
+                    RelationshipTestDataFactory.between(other, kept, 'Sibling')
+                }
+            );
+
+            Test.startTest();
+            MergeSettlement.queueableForTest = true;
+            Database.merge(new Contact(Id = kept.Id), other.Id);
+            MergeSettlement.queueableForTest = null;
+            Assert.isNull(MergeSettlement.lastQueued, 'The merge queues nothing itself');
+            Assert.areEqual(1, MergeSettlement.lastPublished.size(), 'It publishes one event');
+            Test.getEventBus().deliver();
+            Assert.isTrue(
+                MergeSettlement.lastQueued.contains(kept.Id),
+                'The subscriber queues the tidy-up for the survivor'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE
+                ],
+                'One default address'
+            );
+            Assert.areEqual(
+                0,
+                RelationshipTestDataFactory.allRelationships().size(),
+                'Nobody is related to themselves'
+            );
+            // The subscriber, and so the job it queues, runs as the Automated Process user;
+            // the tidy-up's user mode reads and writes still succeed for it.
+            AsyncApexJob job = [
+                SELECT CreatedBy.UserType, Status
+                FROM AsyncApexJob
+                WHERE ApexClass.Name = 'MergeSettlement'
+                LIMIT 1
+            ];
+            Assert.areEqual('AutomatedProcess', job.CreatedBy.UserType, 'Queued by the subscriber');
+            Assert.areEqual('Completed', job.Status, 'And it ran to the end');
+            Assert.areEqual(0, settlementWarnings().size(), 'Nothing for an administrator to do');
+        }
+    }
+
+    @IsTest
+    static void manySurvivorsArePublishedTwoHundredToAnEvent() {
+        System.runAs(TestUsers.admin()) {
+            String prefix = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getKeyPrefix();
+            Set<Id> people = new Set<Id>();
+            for (Integer i = 1; i <= 450; i++) {
+                people.add(Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0')));
+            }
+            String accountPrefix = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getKeyPrefix();
+            Set<Id> households = new Set<Id>{ Id.valueOf(accountPrefix + '1'.leftPad(12, '0')) };
+
+            MergeSettlement.queueableForTest = true;
+            MergeSettlement.afterMerge(households, people, people);
+
+            List<Merge_Settlement_Ready__e> events = MergeSettlement.lastPublished;
+            Assert.areEqual(3, events.size(), '450 identifiers make three events');
+            Set<Id> carried = new Set<Id>();
+            for (Merge_Settlement_Ready__e event : events) {
+                List<String> owners = event.Owner_Ids__c.split(',');
+                Assert.isTrue(owners.size() <= 200, 'At most 200 to an event');
+                Assert.areEqual(event.Owner_Ids__c, event.Person_Ids__c);
+                for (String part : owners) {
+                    carried.add(Id.valueOf(part));
+                }
+            }
+            Assert.areEqual(people, carried, 'Every survivor is carried once');
+            Assert.areEqual(
+                String.valueOf(new List<Id>(households)[0]),
+                events[0].Household_Ids__c,
+                'The household rides in the first event'
+            );
+            Assert.isNull(events[1].Household_Ids__c, 'And only there');
+        }
+    }
+
+    @IsTest
+    static void aPublishTheOrgRefusesNamesTheSurvivorsInTheErrorLog() {
+        System.runAs(TestUsers.admin()) {
+            Contact survivor = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert survivor;
+
+            Test.startTest();
+            MergeSettlement.queueableForTest = true;
+            MergeSettlement.publishFailureForTest = 'Event limit reached';
+            MergeSettlement.afterMerge(
+                new Set<Id>(),
+                new Set<Id>{ survivor.Id },
+                new Set<Id>{ survivor.Id }
+            );
+            Test.stopTest();
+
+            List<Error_Log__c> warnings = settlementWarnings();
+            Assert.areEqual(1, warnings.size(), 'The survivors are named once');
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, warnings[0].Severity__c);
+            Assert.isTrue(
+                warnings[0].Message__c.contains(String.valueOf(survivor.Id)),
+                'So an administrator can check them: ' + warnings[0].Message__c
+            );
+            Assert.isTrue(
+                warnings[0].Message__c.contains('Event limit reached'),
+                'With the reason: ' + warnings[0].Message__c
+            );
+        }
+    }
+
+    @IsTest
+    static void aPersonAccountSurvivorKeepsTheDefaultInItsMailingAddress() {
+        System.runAs(TestUsers.admin()) {
+            if (PersonAccountTestShape.skipReason() != null) {
+                // Needs real person accounts; the contact path above runs on every shape.
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account kept = personWithMailing('Okafor', '1 Main Street', 'Oakland');
+            insert kept;
+            Account other = personWithMailing('Lindqvist', '2 Oak Avenue', 'Berkeley');
+            insert other;
+            List<Address__c> captured = [
+                SELECT Id, Person_Account__c
+                FROM Address__c
+                WHERE
+                    Person_Account__c IN :new List<Id>{ kept.Id, other.Id }
+                    AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(2, captured.size(), 'Each person has a default from their mailing');
+            for (Address__c address : captured) {
+                if (address.Person_Account__c == kept.Id) {
+                    // The other person's default is the newer one, so newest alone would lose.
+                    Test.setCreatedDate(address.Id, Datetime.now().addDays(-1));
+                }
+            }
+
+            Test.startTest();
+            Database.merge(kept, other.Id);
+            Test.stopTest();
+
+            List<Address__c> defaults = [
+                SELECT City__c
+                FROM Address__c
+                WHERE Person_Account__c = :kept.Id AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(1, defaults.size(), 'One default address');
+            Assert.areEqual(
+                'Oakland',
+                defaults[0].City__c,
+                'The one in the kept person\'s mailing address, not the newest'
+            );
+        }
+    }
+
+    private static Account personWithMailing(String lastName, String street, String city) {
+        Account record = new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId());
+        record.put('FirstName', 'Pat');
+        record.put('LastName', lastName);
+        record.put('PersonMailingStreet', street);
+        record.put('PersonMailingCity', city);
+        record.put('PersonMailingPostalCode', '94612');
+        return record;
     }
 
     @IsTest
