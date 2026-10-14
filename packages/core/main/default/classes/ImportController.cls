@@ -623,6 +623,7 @@ public with sharing class ImportController {
                         column.target = fromTemplate;
                         column.lookupField = lookupFieldOf(saved, source);
                         column.blankClears = savedColumn(saved, source).blankClears;
+                        column.transforms = savedColumn(saved, source).transforms;
                     } else if (ignored.contains(source)) {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
