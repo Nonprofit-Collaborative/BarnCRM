@@ -62,6 +62,11 @@ to send them a letter.
    rows are shown.
 6. Press **Export to CSV**. Find reads every matching household, in pages, and downloads one
    file. If there are more than the export row limit, the file stops there and Find says so.
+   A date and time is written as `2026-01-05 09:30:00` in your own Salesforce time zone, the
+   time the table shows, and the workbook from **Export to Excel** uses the same clock. A text
+   value that starts with = + - or @ (such as `+44 20 7946 0000`) is written with a single
+   quote in front, so a spreadsheet never runs it as a formula; BarnCRM's import takes that
+   one quote off again.
 7. Press **Save**, name it "Springfield, no email", and tick **Show to everyone who uses
    Find** so the volunteer coordinator can run it too.
 
@@ -102,8 +107,9 @@ a value; the operators offered depend on the field:
 - The **Saved queries** list shows your own queries first, then the ones shared with you,
   with the name of the person who shared each. The list holds up to 500 queries; your own
   are always counted first, so shared queries never push one of yours off it.
-- A shared query that names a field someone cannot see opens with that condition or column
-  marked, and does not run for them until it is removed from their copy.
+- A shared query that names a field someone cannot see opens for them with that column left
+  out, and a notice names it; a condition on such a field opens marked, and the query does not
+  run for them until it is removed from their copy.
 - Another page, such as the Data Hygiene console, can open Find on a saved query. Find opens
   that query and runs it straight away, as if you had chosen it from the list and pressed
   **Run**. A query you cannot open (deleted, or not shared with you) is simply not opened.
@@ -194,8 +200,9 @@ a message pointing at the words it could not read. Use **Summarize** for totals.
 
 **Export to Excel** reads the same rows as **Export to CSV**, up to the same export row limit,
 and downloads an Excel workbook with one sheet, a header row of column labels, numbers as
-numbers and dates as dates. A very large export can take a while to build in the browser; for
-more than a few tens of thousands of rows, CSV is faster. One Excel cell holds at most 32,767
+numbers and dates as dates (a date and time as the clock reads in your Salesforce time zone).
+A very large export can take a while to build in the browser; for more than a few tens of
+thousands of rows, CSV is faster. One Excel cell holds at most 32,767
 characters, so a longer text value is cut to that length in the workbook; export to CSV to
 keep it whole.
 

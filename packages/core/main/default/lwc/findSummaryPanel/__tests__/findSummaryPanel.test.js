@@ -100,6 +100,24 @@ describe('c-find-summary-panel', () => {
     expect(groups).toEqual(['', 'Gift_Date__c', 'Status__c']);
   });
 
+  it('shows the lowest or highest date as a date', async () => {
+    const element = await mount();
+    choose(element, 'function', 'max');
+    await flush();
+    choose(element, 'field', 'Gift_Date__c');
+    await flush();
+    summarize.mockResolvedValue({
+      soql: 'SELECT ...',
+      capped: false,
+      lines: [{ groupValue: null, groupLabel: null, value: '2026-01-31' }]
+    });
+    element.shadowRoot.querySelector('[data-id="summarize"]').click();
+    await flush();
+
+    const table = element.shadowRoot.querySelector('[data-id="summary"]');
+    expect(table.columns[1].type).toBe('date-local');
+  });
+
   it('sends the query with the summary and shows one line per group', async () => {
     const changed = jest.fn();
     const element = await mount();

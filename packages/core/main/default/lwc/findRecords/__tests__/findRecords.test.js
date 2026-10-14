@@ -23,6 +23,15 @@ import { TextEncoder as NodeTextEncoder } from 'util';
 global.TextEncoder = global.TextEncoder || NodeTextEncoder;
 
 jest.mock(
+  '@salesforce/label/c.Core_Find_HiddenColumns',
+  () => ({ default: 'Left out columns you do not have access to: {0}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'America/New_York' }), {
+  virtual: true
+});
+
+jest.mock(
   '@salesforce/apex/FindController.listChildRelationships',
   () => ({ default: jest.fn() }),
   { virtual: true }
@@ -444,6 +453,72 @@ describe('c-find-records', () => {
     expect(JSON.parse(runQuery.mock.calls[0][0].queryJson)).toEqual(
       expect.objectContaining({ object: 'Gift__c', limit: 50 })
     );
+  });
+
+  it('leaves out a shared column the person cannot see, and says so', async () => {
+    const hidden = { ...PAGE.savedQueries[0] };
+    hidden.queryJson = JSON.stringify({
+      version: 1,
+      object: 'Gift__c',
+      fields: ['Name', 'Secret__c', 'Amount__c'],
+      limit: 50
+    });
+    getPage.mockResolvedValue({ ...PAGE, savedQueries: [hidden] });
+    const element = await render();
+    await flush();
+    await choose(one(element, 'saved'), hidden.recordId);
+    await flush();
+
+    expect(one(element, 'columns').value).toEqual(['Name', 'Amount__c']);
+    expect(one(element, 'notice-message').textContent).toBe(
+      'Left out columns you do not have access to: Secret__c.'
+    );
+  });
+
+  it('shows and exports a date-time with its time, in the person time zone', async () => {
+    const withTime = {
+      ...GIFT,
+      fields: [
+        ...GIFT.fields,
+        { apiName: 'Received__c', label: 'Received', dataType: 'datetime', filterable: true }
+      ]
+    };
+    getObjectInfo.mockImplementation(({ objectApiName }) =>
+      Promise.resolve(objectApiName === 'Contact' ? CONTACT : withTime)
+    );
+    runQuery.mockResolvedValue({
+      soql: 'SELECT ...',
+      rows: [{ Id: 'a01', Name: 'G-1', Received__c: '2026-01-05T03:00:00.000Z' }]
+    });
+    exportPage.mockResolvedValue({
+      rows: [{ Id: 'a01', Name: 'G-1', Received__c: '2026-01-05T03:00:00.000Z' }],
+      lastId: 'a01',
+      done: true
+    });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Received__c']);
+    one(element, 'run').click();
+    await flush();
+    await flush();
+
+    const shown = one(element, 'results').columns[1];
+    expect(shown.type).toBe('date');
+    expect(shown.typeAttributes).toEqual(
+      expect.objectContaining({ hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' })
+    );
+
+    one(element, 'export').click();
+    await flush();
+    await flush();
+    const blob = global.URL.createObjectURL.mock.calls[0][0];
+    const text = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsText(blob);
+    });
+    // Ten at night on the 4th in New York, not three in the morning UTC.
+    expect(text).toContain('G-1,2026-01-04 22:00:00');
   });
 
   it('loads a typed query into the builder', async () => {

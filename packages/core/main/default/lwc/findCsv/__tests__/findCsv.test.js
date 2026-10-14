@@ -1,4 +1,13 @@
-import { BYTE_ORDER_MARK, cell, fileName, toCsv, valueAt } from 'c/findCsv';
+import {
+  BYTE_ORDER_MARK,
+  cell,
+  fileName,
+  format,
+  messageFrom,
+  toCsv,
+  valueAt,
+  zonedDateTime
+} from 'c/findCsv';
 
 describe('c/findCsv', () => {
   it('reads a value through a parent path', () => {
@@ -50,5 +59,27 @@ describe('c/findCsv', () => {
 
   it('names the file after the object and the day', () => {
     expect(fileName('Gift__c', new Date('2026-10-12T10:00:00Z'))).toBe('Gift__c-2026-10-12.csv');
+    expect(fileName('Gift__c', new Date('2026-10-12T10:00:00Z'), 'xlsx')).toBe(
+      'Gift__c-2026-10-12.xlsx'
+    );
+  });
+
+  it('writes a date-time as the clock reads in the person time zone', () => {
+    const noonUtc = '2026-01-05T12:00:00.000Z';
+    expect(zonedDateTime(noonUtc, 'UTC')).toBe('2026-01-05 12:00:00');
+    expect(zonedDateTime(noonUtc, 'America/Los_Angeles')).toBe('2026-01-05 04:00:00');
+    expect(zonedDateTime('2026-01-05T03:00:00.000Z', 'America/New_York')).toBe(
+      '2026-01-04 22:00:00'
+    );
+    expect(zonedDateTime('2026-07-01T00:00:00.000Z', 'Europe/London')).toBe('2026-07-01 01:00:00');
+    expect(zonedDateTime('soon', 'UTC')).toBe('soon');
+    expect(zonedDateTime(null, 'UTC')).toBeNull();
+  });
+
+  it('fills a label and reads a failed call', () => {
+    expect(format('{0} of {1}', 'one', 'two')).toBe('one of two');
+    expect(messageFrom({ body: { message: 'From the server' } })).toBe('From the server');
+    expect(messageFrom(new Error('Thrown'))).toBe('Thrown');
+    expect(messageFrom('plain')).toBe('plain');
   });
 });

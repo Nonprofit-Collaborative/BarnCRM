@@ -1,4 +1,4 @@
-import { parseCsv, toRecords } from '../csv';
+import { parseCsv, toRecords, withoutFormulaGuard } from '../csv';
 import { toCsv } from 'c/findCsv';
 
 describe('the CSV reader', () => {
@@ -67,6 +67,18 @@ describe('the CSV reader', () => {
       const { headers, records } = toRecords(parseCsv('Email'));
       expect(headers).toEqual(['Email']);
       expect(records).toEqual([]);
+    });
+
+    it('takes off the one quote a Find export puts before = + - or @, and nothing else', () => {
+      const values = ['+44 20 7946 0000', '-', '@handle', '=SUM(A1)', "'quoted", "it's", 'plain'];
+      const exported = toCsv(
+        [{ label: 'Value', path: 'Value' }],
+        values.map((value) => ({ Value: value }))
+      );
+      expect(exported).toContain("'+44 20 7946 0000");
+      const { records } = toRecords(parseCsv(exported));
+      expect(records.map((record) => record.Value)).toEqual(values);
+      expect(withoutFormulaGuard("''+1")).toBe("''+1");
     });
   });
 
