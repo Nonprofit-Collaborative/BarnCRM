@@ -316,13 +316,13 @@
                         checked={matchOnly}
                         onchange={handleMatchOnlyChange}
                     ></lightning-input>
-                    <template lwc:if={loadsPeople}>
+                    <template lwc:if={showDuplicateRules}>
                         <lightning-input
                             class="slds-var-m-top_small"
                             type="checkbox"
                             data-id="duplicate-rules"
                             label={labels.duplicateRulesLabel}
-                            field-level-help={labels.duplicateRulesHelp}
+                            field-level-help={duplicateRulesHelpText}
                             checked={useDuplicateRules}
                             onchange={handleDuplicateRulesChange}
                         ></lightning-input>

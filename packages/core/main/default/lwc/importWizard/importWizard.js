@@ -139,6 +139,7 @@ import blankClearsLabel from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
+import duplicateRulesObjectHelp from '@salesforce/label/c.Core_Import_DuplicateRulesObjectHelp';
 import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
 import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
 import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
@@ -418,6 +419,7 @@ export default class ImportWizard extends LightningElement {
     duplicateRulesLabel,
     duplicateRulesHelp,
     duplicateRulesNone,
+    duplicateRulesObjectHelp,
     delimiterLabel,
     delimiterHelp,
     sheetLabel,
@@ -954,7 +956,7 @@ export default class ImportWizard extends LightningElement {
         severalMatches: this.severalMatches
       }
     };
-    if (this.loadsPeople && this.useDuplicateRules) {
+    if (this.showDuplicateRules && this.useDuplicateRules) {
       // Sent only when ticked: the server reads an absent choice as unticked (R-IT16).
       options.matching.useDuplicateRules = true;
     }
@@ -1110,10 +1112,29 @@ export default class ImportWizard extends LightningElement {
   }
 
   /**
+   * Whether the duplicate rules box is offered (R-IT16): always for people, and for one object
+   * under Insert or Upsert, the operations where a row can create a record. With no rule
+   * switched on, the run log says so.
+   */
+  get showDuplicateRules() {
+    return !this.loadsOneObject || this.loadOperation === INSERT || this.loadOperation === UPSERT;
+  }
+
+  get duplicateRulesHelpText() {
+    return this.loadsOneObject
+      ? this.labels.duplicateRulesObjectHelp
+      : this.labels.duplicateRulesHelp;
+  }
+
+  /**
    * True when the box is ticked and no rule is switched on for people (or, where the file has
    * organizations, for them), so the box would change nothing. Unknown is not warned about.
    */
   get duplicateRulesMissing() {
+    if (this.loadsOneObject) {
+      // People and organization rules say nothing about a one-object load (R-IT16).
+      return false;
+    }
     const template = this.selectedTemplate;
     const people =
       template && template.personMode === 'Person Accounts'

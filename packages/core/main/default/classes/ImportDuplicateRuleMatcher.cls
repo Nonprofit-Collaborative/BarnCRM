@@ -1,6 +1,7 @@
 /**
  * Asks the org's own active duplicate rules about the people and organizations of an import
- * chunk that the template's rule found nobody for (canonical model R-IT16, ADR-0081
+ * chunk that the template's rule found nobody for, and about the rows of a one-object template
+ * that would create a record (canonical model R-IT16, ADR-0081
  * `0081-data-transform-document.md`).
  *
  * Nothing here decides what a row is. The platform's matcher compares an unsaved record built
@@ -43,6 +44,13 @@ public with sharing class ImportDuplicateRuleMatcher {
     /** In a test, the object has no active rule, or the matcher raises, as the platform can. */
     @TestVisible
     private static Boolean stubUnavailable = false;
+
+    /** In a test, a rule is active but the matcher raises, as the platform can. */
+    @TestVisible
+    private static Boolean stubFailure = false;
+
+    /** Whether the last `matchesFor` answered null because asking failed, not for want of a rule. */
+    private static Boolean lastAskFailed = false;
 
     /** How many times the platform's matcher was called in this transaction. */
     @TestVisible
@@ -106,6 +114,7 @@ public with sharing class ImportDuplicateRuleMatcher {
     @NamespaceAccessible
     public static List<List<SObject>> matchesFor(List<SObject> probes, Set<Id> allowedRecordTypes) {
         List<List<SObject>> result = new List<List<SObject>>();
+        lastAskFailed = false;
         if (probes == null || probes.isEmpty()) {
             return result;
         }
@@ -114,11 +123,12 @@ public with sharing class ImportDuplicateRuleMatcher {
         if (active == false) {
             return null;
         }
-        List<List<Id>> matchedIds = stubMatches != null ||
-            stubUnavailable == true
+        List<List<Id>> matchedIds = isStubbed()
             ? stubbed(probes)
             : asked(probes, type, active == true);
         if (matchedIds == null) {
+            // A rule is active, or the rules could not be read: either way it was not asked.
+            lastAskFailed = true;
             return null;
         }
         Set<Id> all = new Set<Id>();
@@ -136,6 +146,20 @@ public with sharing class ImportDuplicateRuleMatcher {
             result.add(kept);
         }
         return result;
+    }
+
+    /**
+     * Whether the last `matchesFor` answered null because the matcher failed, with a rule
+     * active or the rules unreadable, rather than because the object has no active rule. A
+     * caller that must not create a duplicate rejects instead of creating then.
+     */
+    @NamespaceAccessible
+    public static Boolean lastAskFailed() {
+        return lastAskFailed;
+    }
+
+    private static Boolean isStubbed() {
+        return stubMatches != null || stubUnavailable == true || stubFailure == true;
     }
 
     /**
@@ -180,7 +204,7 @@ public with sharing class ImportDuplicateRuleMatcher {
      */
     @NamespaceAccessible
     public static Boolean hasActiveRule(Schema.SObjectType type, Boolean personAccounts) {
-        if (stubMatches != null || stubUnavailable == true) {
+        if (isStubbed()) {
             return stubUnavailable != true;
         }
         String objectName = type.getDescribe().getName();
@@ -264,19 +288,35 @@ public with sharing class ImportDuplicateRuleMatcher {
     }
 
     private static List<List<Id>> stubbed(List<SObject> probes) {
-        if (stubUnavailable == true) {
+        if (stubUnavailable == true || stubFailure == true) {
             return null;
         }
         List<List<Id>> result = new List<List<Id>>();
         for (SObject probe : probes) {
-            Map<String, Object> given = probe.getPopulatedFieldsAsMap();
-            String name = (String) (given.containsKey('LastName')
-                ? given.get('LastName')
-                : given.get('Name'));
-            List<Id> ids = name == null ? null : stubMatches.get(name.toLowerCase());
+            List<Id> ids = stubbedFor(probe.getPopulatedFieldsAsMap());
             result.add(ids == null ? new List<Id>() : ids);
         }
         return result;
+    }
+
+    /**
+     * The stubbed matches for a probe: by its last name or name, or, for an object with
+     * neither (a custom object whose name is an auto number), by any text value it carries.
+     */
+    private static List<Id> stubbedFor(Map<String, Object> given) {
+        for (String field : new List<String>{ 'LastName', 'Name' }) {
+            if (given.get(field) instanceof String) {
+                return stubMatches.get(((String) given.get(field)).toLowerCase());
+            }
+        }
+        for (Object value : given.values()) {
+            if (
+                value instanceof String && stubMatches.containsKey(((String) value).toLowerCase())
+            ) {
+                return stubMatches.get(((String) value).toLowerCase());
+            }
+        }
+        return null;
     }
 
     /** The matched records the user can see, of an allowed record type, read in user mode. */

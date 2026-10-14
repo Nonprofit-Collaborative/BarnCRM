@@ -547,7 +547,8 @@ person a contact rule matched, and a person account duplicate rule counts for th
 only, and an account rule for organizations; turn on the one you need. Turn a rule on as
 [Duplicates](duplicates.md) describes. A dry run matches only records that are already
 there: a person an earlier row of the same file creates is found by the rule above, never by a
-duplicate rule, so the commit can match a few more rows than the dry run did.
+duplicate rule, so the commit can match a few more rows than the dry run did. For a file that
+loads one object, see "Your duplicate rules" in section 9.
 
 **Your own fields.** The column list includes the fields your org added to people (contacts)
 and organizations (accounts), and the standard ones not already listed, wherever you may edit
@@ -626,6 +627,45 @@ the same dry run, results, journal and undo as any import.
 6. Select **Dry run**, read the results, and commit. After the import, **Download results**
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
+
+**Your duplicate rules.** Under **Insert** and **Upsert by external ID**, tick **Also match
+with my duplicate rules** (on the matching step) to stop a file from creating a second copy of
+a record you already have. Each row that would create a record is first looked for with the
+duplicate rules your org has switched on for that object (see [Duplicates](duplicates.md)),
+custom objects included; a record they match is updated with the row's values instead, and a
+row they match to nothing creates its record as usual. The box is not offered under **Update
+by record ID**, **Update by a field you choose** or **Delete by record ID**, which never create
+a record (so it never appears for contacts and accounts, which load by Update only).
+
+- **Which wins.** The record ID and the field rows are found by always come first: under
+  **Upsert by external ID**, a row whose external ID finds a record updates that record and the
+  duplicate rules are never asked about it. Only a row that would otherwise create a record is
+  asked.
+- **External IDs are never overwritten.** Under an upsert, a row the rules match to a record
+  whose external ID field is empty fills it in with the row's value. A row they match to a
+  record that already holds a different external ID is rejected, naming the field: check which
+  record is right, then fix the file or the record.
+- **More than one match.** When the rules match several records, **When more than one record
+  matches** decides, as in section 8: the row is rejected, or the most recently changed record
+  is updated.
+- **One record, one row.** A record that an earlier row of the file already creates or updates
+  is set aside before the choice. A row whose only matches are records earlier rows update is
+  rejected, so no record is changed twice by one file.
+- **Dry run and commit agree, with one limit.** The rules are asked only about records that
+  were there before the import, and records earlier rows load are set aside, so the commit
+  chooses as the dry run did. The limit: duplicate rules compare field values, so a value an
+  earlier row of the commit changes on some record can make the rules match that record (or
+  stop matching it) for a later row, where the dry run, which changed nothing, saw the old
+  values. Compare the commit's results with the dry run's when one file both updates and adds
+  similar records.
+- **Read before you commit.** Duplicate rules are looser than a record ID or key, so a row can
+  update a record that is only similar. Every row matched this way has **Matched By Duplicate
+  Rule** ticked and the run log says so: check those rows in the dry run.
+- **No rule, or a rule that fails.** If no duplicate rule is switched on for the object, the
+  run log says so and every row is matched by its ID or key alone. If a rule is switched on but
+  Salesforce could not run it, each row that would create a record is rejected with that reason
+  rather than risk a duplicate: import those rows again later, or untick the box. The choice is
+  saved with the mapping.
 
 **Which objects are listed.** Your org's own custom objects, and the standard objects
 Salesforce treats as business records (ones you can find in global search), where you
