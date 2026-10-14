@@ -34,6 +34,13 @@ how greetings are configured before he asks Maria to change them.
 Until BarnCRM's first-run setup is finished, the BarnCRM home page and this page both show
 the same setup window in front of everything else, and nothing behind it can be used.
 
+**On a new install, BarnCRM's automation does nothing until first-run setup is finished.**
+Every Core feature starts off, so its automation is held: no household is created for a new
+contact, no address is copied, no reciprocal relationship is made, no primary affiliation is
+set and no preferred email is filled in. Records added or imported before then are not
+processed later, when the feature is turned on, so finish first-run setup before you add or
+import people. An org upgraded from an earlier release keeps every feature on and is not held.
+
 - **Someone with the BarnCRM Admin role** (Manage BarnCRM Settings) sees two questions:
   1. **Which edition**: Standard Edition or Nonprofit Edition (see [Editions](editions.md)).
      This is the only place the edition is asked; the Setup Assistant's first step then shows
