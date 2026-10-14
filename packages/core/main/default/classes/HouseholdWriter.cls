@@ -29,6 +29,15 @@
  */
 public with sharing class HouseholdWriter {
     /**
+     * Test seam: true sends each new household with a name one character too long for the
+     * field, which the platform refuses. A test cannot add a validation rule, and every
+     * computed value now fits its field, so this is how a test reaches a refused household
+     * creation (R-C1).
+     */
+    @TestVisible
+    private static Boolean refuseCreatesForTest = false;
+
+    /**
      * Creates households the package is making on the user's behalf and returns one save
      * result per household, in the same order.
      *
@@ -41,6 +50,12 @@ public with sharing class HouseholdWriter {
     public static List<Database.SaveResult> createHouseholds(List<Account> households) {
         if (households == null || households.isEmpty()) {
             return new List<Database.SaveResult>();
+        }
+        if (refuseCreatesForTest) {
+            Integer tooLong = Account.Name.getDescribe().getLength() + 1;
+            for (Account household : households) {
+                household.Name = 'x'.repeat(tooLong);
+            }
         }
         List<Database.SaveResult> saves = Database.insert(
             households,

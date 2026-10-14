@@ -403,23 +403,17 @@ private class HouseholdServiceTest {
 
     /**
      * R-C1: every person gets a household. A household the platform refuses (a validation
-     * rule, a required field, here a name too long for the field) must not leave the
-     * person saved with none and nobody told: the person's own save fails, with the
-     * reason, where a data loader or a screen shows any other failed row.
+     * rule, a required field, here a value too long for its field, sent by the writer's test
+     * seam since naming now fits every value) must not leave the person saved with none and
+     * nobody told: the person's own save fails, with the reason, where a data loader or a
+     * screen shows any other failed row.
      */
     @IsTest
     static void aPersonWhoseHouseholdCannotBeCreatedIsNotSavedWithoutOne() {
         System.runAs(TestUsers.admin()) {
-            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-                HouseholdTestDataFactory.MODE_CONTACT
-            );
-            settings.Household_Name_Pattern__c = 'Z'.repeat(240) + ' {LastName}';
-            HouseholdTestDataFactory.save(settings);
-            Contact maria = HouseholdTestDataFactory.newContact(
-                'Ms.',
-                'Maria',
-                'Garcia' + 'x'.repeat(40)
-            );
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            HouseholdWriter.refuseCreatesForTest = true;
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 
             String message;
             Test.startTest();
@@ -464,16 +458,9 @@ private class HouseholdServiceTest {
     @IsTest
     static void aPersonWhoseHouseholdCannotBeCreatedIsNotSavedWithoutOneInJunctionMode() {
         System.runAs(TestUsers.admin()) {
-            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-                HouseholdTestDataFactory.MODE_JUNCTION
-            );
-            settings.Household_Name_Pattern__c = 'Z'.repeat(240) + ' {LastName}';
-            HouseholdTestDataFactory.save(settings);
-            Contact maria = HouseholdTestDataFactory.newContact(
-                'Ms.',
-                'Maria',
-                'Garcia' + 'x'.repeat(40)
-            );
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            HouseholdWriter.refuseCreatesForTest = true;
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 
             String message;
             Test.startTest();

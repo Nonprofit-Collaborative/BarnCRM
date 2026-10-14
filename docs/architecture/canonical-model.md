@@ -206,6 +206,13 @@ Default patterns (plan Section 4.6 and 10.2):
 | Members have differing surnames | "Smith and Jones Household" | Both members listed with their own salutations and surnames | Both first names |
 | One member | "The Smith Family" | "Mr. John Smith" | "John" |
 
+Each value fits its field, whose length is read from the describe (255 for all three). A list
+too long for it names as many leading members (or surnames) as fit and counts the rest, through
+the org-language labels `Core_Households_ListAndOthers` and `Core_Households_ListAndOneOther`:
+"Garcia, Lee and 28 others Household". A single value still too long is cut back to
+its last whole word. The household is saved either way; before this, a household of about 30
+was refused, leaving its name, greetings and member count stale.
+
 **R-H5 Member ordering.** Members are ordered by Household Role (Head first, then Spouse
 or Partner, then Child, then Other, then no role). Within a role the primary member comes
 first, then the earliest created member, then first name, so that a household's name and
@@ -1704,7 +1711,12 @@ the transaction publishes one `Rollup_Queue_Ready__e` (publish after commit, how
 entries it wrote), and its subscriber calls `RollupService.startQueuedRecalculation`, which
 starts the processor unless one is already waiting (ADR-0100). A job that rolls back publishes
 nothing. If the event cannot be published, the entries wait for the next processor a later save
-starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run.
+starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run. The
+processor's own chain respects the platform's chain depth limit: a run as deep as its chain may
+go (the chain's own maximum when one is set, otherwise five, the Developer Edition, trial and
+scratch org limit) publishes the same event instead of queuing the next run, so a fresh chain
+starts after it commits, and writes an Info entry to the Error Log. Before this the refused
+link stopped the chain and left Pending entries until the nightly run.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
@@ -7056,6 +7068,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
 | 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-0112, `0112-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
 | 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-0113, `0113-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
+| v0.6 | 2026-10-14 | Tier 1 scale test findings. No object or field added. R-H4: a name or greeting fits its field, a long list naming the first members and counting the rest. R-RQ3: the processor hands off to `Rollup_Queue_Ready__e` at the chain depth limit instead of queuing a run the platform refuses. |
 
 ---
 ## 32. Entity ownership by package

@@ -38,6 +38,9 @@ public with sharing class HouseholdNamingService {
     private static final String DEFAULT_FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
     private static final String DEFAULT_INFORMAL_PATTERN = '{FirstName}';
 
+    /** Field lengths read from the describe, by field; see fieldLength. */
+    private static final Map<String, Integer> FIELD_LENGTHS = new Map<String, Integer>();
+
     private static Boolean applying = false;
 
     // ------------------------------------------------------------------ names
@@ -69,15 +72,17 @@ public with sharing class HouseholdNamingService {
         if (surnames.size() > 1) {
             // Differing surnames read badly through a pattern, so they are listed instead:
             // "Garcia and Lee Household", "Garcia, Lee, and Smith Household".
-            return joinNames(surnames) +
-                ' ' +
-                storedLabel('Core_Households_NameSuffix', Label.Core_Households_NameSuffix);
+            return fittedList(
+                surnames,
+                ' ' + storedLabel('Core_Households_NameSuffix', Label.Core_Households_NameSuffix),
+                fieldLength(Account.Name)
+            );
         }
         String normalized = normalize(usable);
         Boolean perPerson =
             normalized.contains(TOKEN_FIRST_NAME) || normalized.contains(TOKEN_SALUTATION);
         if (!perPerson) {
-            return substitute(usable, eligible[0]);
+            return fitted(substitute(usable, eligible[0]), fieldLength(Account.Name));
         }
         List<String> parts = new List<String>();
         for (HouseholdService.Person person : eligible) {
@@ -86,7 +91,7 @@ public with sharing class HouseholdNamingService {
                 parts.add(part);
             }
         }
-        return parts.isEmpty() ? null : joinNames(parts);
+        return fittedList(parts, '', fieldLength(Account.Name));
     }
 
     // ------------------------------------------------------------------ greetings
@@ -104,7 +109,7 @@ public with sharing class HouseholdNamingService {
                 parts.add(part);
             }
         }
-        return parts.isEmpty() ? null : joinNames(parts);
+        return fittedList(parts, '', fieldLength(Account.Household_Informal_Greeting__c));
     }
 
     @NamespaceAccessible
@@ -126,9 +131,10 @@ public with sharing class HouseholdNamingService {
         if (eligible.isEmpty()) {
             return null;
         }
+        Integer maxLength = fieldLength(Account.Household_Formal_Greeting__c);
         String combined = combinedSalutation(eligible, usable);
         if (combined != null) {
-            return combined;
+            return fitted(combined, maxLength);
         }
         List<String> parts = new List<String>();
         for (HouseholdService.Person person : eligible) {
@@ -143,7 +149,7 @@ public with sharing class HouseholdNamingService {
             }
             parts.add(part);
         }
-        return parts.isEmpty() ? null : joinNames(parts);
+        return fittedList(parts, '', maxLength);
     }
 
     /**
@@ -451,6 +457,79 @@ public with sharing class HouseholdNamingService {
             conjunction +
             ' ' +
             parts[parts.size() - 1];
+    }
+
+    /**
+     * The parts read as a list and followed by `suffix`, in at most `maxLength` characters.
+     * A list too long for its field keeps as many leading names as fit and counts the rest
+     * ("Garcia, Lee and 28 others Household") rather than having the save refused. Null when
+     * there are no parts.
+     */
+    private static String fittedList(List<String> parts, String suffix, Integer maxLength) {
+        if (parts.isEmpty()) {
+            return null;
+        }
+        String full = joinNames(parts) + suffix;
+        if (full.length() <= maxLength) {
+            return full;
+        }
+        String separator =
+            storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
+        String best = null;
+        String leading = parts[0];
+        for (Integer kept = 1; kept < parts.size(); kept++) {
+            if (kept > 1) {
+                leading += separator + parts[kept - 1];
+            }
+            String candidate = andOthers(leading, parts.size() - kept) + suffix;
+            if (candidate.length() > maxLength) {
+                // Each further name only lengthens it, so the last one that fitted is kept.
+                break;
+            }
+            best = candidate;
+        }
+        return best != null ? best : fitted(full, maxLength);
+    }
+
+    private static String andOthers(String leading, Integer leftOut) {
+        if (leftOut == 1) {
+            return storedLabel(
+                    'Core_Households_ListAndOneOther',
+                    Label.Core_Households_ListAndOneOther
+                )
+                .replace('{0}', leading);
+        }
+        return storedLabel('Core_Households_ListAndOthers', Label.Core_Households_ListAndOthers)
+            .replace('{1}', String.valueOf(leftOut))
+            .replace('{0}', leading);
+    }
+
+    /**
+     * The value cut back to the last whole word that fits in `maxLength`, for a single name or
+     * greeting too long to shorten by counting people. Only a single word longer than the
+     * field is cut inside the word.
+     */
+    private static String fitted(String value, Integer maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        String cut = value.left(maxLength);
+        if (value.substring(maxLength, maxLength + 1).isWhitespace()) {
+            return cut.trim();
+        }
+        Integer lastSpace = cut.lastIndexOf(' ');
+        return lastSpace > 0 ? cut.left(lastSpace).trim() : cut;
+    }
+
+    /** How many characters the field holds, read from the describe once per field. */
+    private static Integer fieldLength(Schema.SObjectField field) {
+        String key = String.valueOf(field);
+        Integer length = FIELD_LENGTHS.get(key);
+        if (length == null) {
+            length = field.getDescribe().getLength();
+            FIELD_LENGTHS.put(key, length);
+        }
+        return length;
     }
 
     private static String substitute(String pattern, HouseholdService.Person person) {

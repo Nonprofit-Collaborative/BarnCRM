@@ -60,7 +60,7 @@ The patterns that ship are:
 | Formal greeting | `{Salutation} {FirstName} {LastName}` | Mr. and Mrs. John Smith |
 | Informal greeting | `{FirstName}` | John and Jane |
 
-Two rules are built in rather than written into a pattern, because they read badly any
+Three rules are built in rather than written into a pattern, because they read badly any
 other way:
 
 - When the people in a household do not share a last name, the name lists the surnames
@@ -69,6 +69,8 @@ other way:
 - When exactly two people share a last name and both have a title, the formal greeting
   combines them: "Mr. and Mrs. John Smith" rather than "Mr. John Smith and Mrs. Jane
   Smith".
+- A name or greeting holds at most 255 characters. In a very large household the list
+  names as many people as fit and counts the rest: "Garcia, Lee and 28 others Household".
 
 ## A five-minute walkthrough
 

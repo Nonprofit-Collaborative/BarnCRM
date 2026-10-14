@@ -455,4 +455,53 @@ private class RollupQueueTest {
             Test.stopTest();
         }
     }
+
+    private static List<Error_Log__c> infoLogs() {
+        return [
+            SELECT Message__c
+            FROM Error_Log__c
+            WHERE Context__c = 'RollupQueue' AND Severity__c = :ErrorLogger.SEVERITY_INFO
+        ];
+    }
+
+    @IsTest
+    static void aRunAtTheChainDepthLimitHandsOffToTheReadyEvent() {
+        System.runAs(TestUsers.admin()) {
+            // The run is the fifth link of its chain, the deepest a scratch org allows.
+            RollupQueue.stackDepthForTest = 5;
+            RollupQueue.queueableForTest = false;
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(450) });
+            Test.stopTest();
+
+            Assert.areEqual(2, entries().size(), 'Entries past the first slice still wait');
+            Assert.areEqual(
+                1,
+                RollupQueue.readyEventsPublished,
+                'The Ready event starts a fresh chain instead of a sixth link'
+            );
+            List<Error_Log__c> logged = infoLogs();
+            Assert.areEqual(1, logged.size(), 'The hand-off is logged once, at Info');
+            Assert.areEqual(
+                System.Label.Core_Rollups_QueueHandedOff,
+                logged[0].Message__c,
+                'Saying why'
+            );
+        }
+    }
+
+    @IsTest
+    static void aRunBelowTheChainDepthLimitChainsAsBefore() {
+        System.runAs(TestUsers.admin()) {
+            RollupQueue.stackDepthForTest = 4;
+            RollupQueue.queueableForTest = false;
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(450) });
+            Test.stopTest();
+
+            Assert.areEqual(0, RollupQueue.lastChainDelay, 'The next run is asked for now');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No hand-off below the limit');
+            Assert.areEqual(0, infoLogs().size(), 'Nothing to log');
+        }
+    }
 }
