@@ -9,9 +9,11 @@
  * Queueable, reads the due entries, merges and sorts their identifiers, recalculates a slice
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
- * and Failed after the fifth attempt (R-RQ4). A limit error the processor cannot catch is handled
- * by its finalizer, which charges the attempt to the entries it held and starts again with half
- * the slice.
+ * and Failed after the fifth attempt (R-RQ4). Records whose source rows are more than a Queueable
+ * may read go to `RollupLargeParentBatch` instead (R-RQ6, ADR-NEXT): those whose stored counts
+ * say so before the run, and the entries of a run that stopped on a limit error it could not
+ * catch, which its finalizer charges one attempt and hands to that batch before a fresh
+ * processor carries on with the rest.
  *
  * Recalculation recomputes (R-R11), so an entry processed twice, or two processors racing, give
  * the same totals; that is what lets this class stay this small.
@@ -46,7 +48,7 @@ public without sharing class RollupQueue implements Queueable {
     @TestVisible
     private static Integer stackDepthForTest;
 
-    /** Target records one run recalculates per target entity, before a failure halves it. */
+    /** Target records one run recalculates per target entity. */
     @TestVisible
     private static Integer defaultSliceSize = 200;
 
@@ -72,16 +74,6 @@ public without sharing class RollupQueue implements Queueable {
     /** Test seam: true or false stands in for `System.isQueueable()`; null reads the platform. */
     @TestVisible
     private static Boolean queueableForTest;
-
-    private final Integer sliceSize;
-
-    public RollupQueue() {
-        this(defaultSliceSize);
-    }
-
-    public RollupQueue(Integer sliceSize) {
-        this.sliceSize = sliceSize == null || sliceSize < 1 ? 1 : sliceSize;
-    }
 
     // ------------------------------------------------------------------------------- writers
 
@@ -400,23 +392,40 @@ public without sharing class RollupQueue implements Queueable {
             // R-RQ5: the entries wait; the nightly run puts Both totals right after the pause.
             return;
         }
-        Drain drain = new Drain(this.sliceSize);
+        Drain drain = new Drain();
         System.attachFinalizer(drain);
 
-        Slice slice = take(selectDue(entriesPerRun), this.sliceSize);
+        Slice slice = take(selectDue(entriesPerRun), defaultSliceSize);
         drain.held.addAll(slice.entries);
+        List<Rollup_Queue__c> large = new List<Rollup_Queue__c>();
         Integer failed = 0;
         for (String target : slice.idsByTarget.keySet()) {
             Set<Id> definitionIds = slice.definitionIdsFor(target);
-            RollupEngine.Result result = definitionIds == null
-                ? RollupEngine.recalculate(
-                      slice.idsByTarget.get(target),
-                      SettingsService.typeByName(target)
-                  )
-                : RollupEngine.recalculate(
-                      slice.idsByTarget.get(target),
-                      RollupSelector.selectActiveByIds(definitionIds)
-                  );
+            Schema.SObjectType targetType = SettingsService.typeByName(target);
+            List<Rollup_Definition__c> definitions = definitionIds != null
+                ? RollupSelector.selectActiveByIds(definitionIds)
+                : targetType == null
+                      ? new List<Rollup_Definition__c>()
+                      : RollupSelector.selectActiveForTarget(
+                            String.valueOf(targetType),
+                            RollupService.everyMode()
+                        );
+            // R-RQ6: a record whose source rows would stop this run goes to the batch route.
+            Set<Id> ids = new Set<Id>(slice.idsByTarget.get(target));
+            Set<Id> oversized = RollupLargeParentBatch.oversized(targetType, definitions, ids);
+            if (!oversized.isEmpty()) {
+                ids.removeAll(oversized);
+                large.addAll(
+                    entriesFor(
+                        target,
+                        oversized,
+                        slice.attemptsByTarget.get(target),
+                        null,
+                        definitionIds
+                    )
+                );
+            }
+            RollupEngine.Result result = RollupEngine.recalculate(ids, definitions);
             if (!result.failed.isEmpty()) {
                 retryLater(
                     target,
@@ -430,6 +439,10 @@ public without sharing class RollupQueue implements Queueable {
         // Partial success: an entry another run already finished is simply gone.
         Database.update(slice.remainders, false, AccessLevel.SYSTEM_MODE);
         Database.delete(slice.finished, false, AccessLevel.SYSTEM_MODE);
+        if (!large.isEmpty()) {
+            Database.insert(large, AccessLevel.SYSTEM_MODE);
+            RollupLargeParentBatch.begin(large);
+        }
         if (failed > 0) {
             ErrorLogger.logMessage(
                 String.format(
@@ -441,9 +454,7 @@ public without sharing class RollupQueue implements Queueable {
             );
         }
         drain.finished = true;
-        // A run that finished doubles a halved slice back towards the default (ROLLUPS-11), so
-        // one heavy record does not leave the rest of the backlog draining one at a time.
-        chainIfMoreDue(Math.min(defaultSliceSize, this.sliceSize * 2));
+        chainIfMoreDue();
     }
 
     /** What one run takes: the identifiers by target entity, and what becomes of each entry. */
@@ -573,7 +584,7 @@ public without sharing class RollupQueue implements Queueable {
      * Runs again while Pending entries remain: now when one is due, or when the earliest one
      * becomes due, up to the platform's ten minute limit on a delay.
      */
-    private static void chainIfMoreDue(Integer sliceSize) {
+    private static void chainIfMoreDue() {
         List<Rollup_Queue__c> next = [
             SELECT Next_Attempt__c
             FROM Rollup_Queue__c
@@ -593,7 +604,7 @@ public without sharing class RollupQueue implements Queueable {
             delay = Math.min(LONGEST_DELAY_MINUTES, Math.max(0, minutes));
         }
         lastChainDelay = delay;
-        enqueue(new RollupQueue(sliceSize), delay);
+        enqueue(new RollupQueue(), delay);
     }
 
     private static void enqueue(RollupQueue job, Integer delayMinutes) {
@@ -638,18 +649,17 @@ public without sharing class RollupQueue implements Queueable {
     }
 
     /**
-     * What happens when a run dies of something it could not catch, such as a governor limit:
-     * the entries it held are charged one attempt, with the reason, and a run with half the slice
-     * starts, so a slice too heavy for one transaction is worked through in smaller ones.
+     * What happens when a run dies of something it could not catch, such as a governor limit
+     * (R-RQ3, R-RQ6): the entries it held are charged one attempt, with the reason, and those not
+     * yet Failed go to `RollupLargeParentBatch`, which reads their source rows in chunks however
+     * many there are. The rest of the queue carries on in a fresh processor started by the Ready
+     * event, never by a job this finalizer queues: the platform stops re-queuing from finalizers
+     * after five failed jobs in a row and refuses a link past the chain depth limit, and on the
+     * tier 1 scale test either one left 826 entries Pending with nothing to process them.
      */
     public class Drain implements System.Finalizer {
-        private final Integer sliceSize;
         public List<Rollup_Queue__c> held = new List<Rollup_Queue__c>();
         public Boolean finished = false;
-
-        public Drain(Integer sliceSize) {
-            this.sliceSize = sliceSize;
-        }
 
         public void execute(System.FinalizerContext context) {
             if (
@@ -660,17 +670,43 @@ public without sharing class RollupQueue implements Queueable {
                 return;
             }
             Exception thrown = context.getException();
-            charge(this.held, thrown == null ? '' : thrown.getMessage());
             if (thrown != null) {
                 ErrorLogger.log(thrown, LOG_CONTEXT);
             }
-            enqueue(new RollupQueue(Math.max(1, this.sliceSize / 2)), 0);
+            stopped(this.held, thrown == null ? '' : thrown.getMessage());
         }
     }
 
-    /** One more attempt on each entry, with why it stopped, and Failed after the fifth. */
+    /**
+     * The entries of a run that stopped: charged one attempt, the ones still Pending handed to
+     * the large parent batch, and a fresh processor announced for everything else.
+     */
     @TestVisible
-    private static void charge(List<Rollup_Queue__c> entries, String reason) {
+    private static void stopped(List<Rollup_Queue__c> held, String reason) {
+        List<Rollup_Queue__c> retried = new List<Rollup_Queue__c>();
+        Map<Id, Rollup_Queue__c> heldById = new Map<Id, Rollup_Queue__c>(held);
+        for (Rollup_Queue__c charged : charge(held, reason)) {
+            if (charged.Status__c == STATUS_PENDING) {
+                Rollup_Queue__c entry = heldById.get(charged.Id).clone(true, false, false, false);
+                entry.Attempts__c = charged.Attempts__c;
+                retried.add(entry);
+            }
+        }
+        RollupLargeParentBatch.begin(retried);
+        announceReady();
+    }
+
+    /** The definitions an entry names; none means every active definition on its entity. */
+    public static List<Id> definitionIdsOf(Rollup_Queue__c entry) {
+        return idsIn(entry.Definition_Ids__c);
+    }
+
+    /**
+     * One more attempt on each entry, with why it stopped, and Failed after the fifth.
+     *
+     * @return the entries as charged
+     */
+    public static List<Rollup_Queue__c> charge(List<Rollup_Queue__c> entries, String reason) {
         String message = String.format(
                 System.Label.Core_Rollups_QueueRunStopped,
                 new List<String>{ reason }
@@ -690,5 +726,6 @@ public without sharing class RollupQueue implements Queueable {
             );
         }
         Database.update(charged, false, AccessLevel.SYSTEM_MODE);
+        return charged;
     }
 }

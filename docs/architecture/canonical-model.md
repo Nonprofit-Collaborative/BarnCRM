@@ -1716,7 +1716,14 @@ processor's own chain respects the platform's chain depth limit: a run as deep a
 go (the chain's own maximum when one is set, otherwise five, the Developer Edition, trial and
 scratch org limit) publishes the same event instead of queuing the next run, so a fresh chain
 starts after it commits, and writes an Info entry to the Error Log. Before this the refused
-link stopped the chain and left Pending entries until the nightly run.
+link stopped the chain and left Pending entries until the nightly run. A run that stops on
+something it cannot catch, such as a governor limit, is handled by its finalizer: the entries it
+held are charged one attempt with the reason in Last Error (Failed after the fifth, with an Error
+Log entry), those still Pending go to the large parent route (R-RQ6), and the finalizer publishes
+the same event rather than queuing the next run itself, because the platform queues at most five
+jobs in a row from the finalizers of failed jobs. Before this a stopped run halved its slice and
+queued the next one, and a record too large for any slice left every entry Pending with nothing
+to process it.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
@@ -1728,6 +1735,22 @@ entries, and Pending entries older than an hour.
 under ADR-0021, so a gift saved by a user who cannot see the queue still queues its totals.
 The engine's automation switch and the global pause (Section 10) stop entries being written
 and processed; the nightly run puts the totals right afterwards in Both mode.
+
+**R-RQ6 Large parents are recalculated by a batch.** An aggregate query counts every row it
+aggregates towards the rows one transaction may read (50,000), so a record with tens of
+thousands of source rows (a General Fund, a large organization donor) cannot be recalculated by
+the processor at any slice size (ADR-NEXT,
+`NEXT-rollup-large-parents-recalculated-by-a-batch.md`). Before a run recalculates its slice, a
+record whose stored COUNT totals times the queries its definitions plan reach a fifth of that
+limit is moved to a new entry and handed to the large parent batch; so are the entries of a run
+that stopped (R-RQ3). The batch reads each planned query's source rows in chunks, runs the query
+over each chunk's rows only and folds the partial answers together, which merge exactly as path
+alternatives do (R-R1), then writes each record once through the same target filters, currency
+handling and write as any other recalculation (R-R8, R-R13). It owns the entries it was given:
+they wait with Next Attempt an hour away while it runs, are deleted when the totals are written,
+and are charged one attempt (R-RQ3) when a chunk stops, so a run that never ends leaves them due
+again rather than lost. One batch runs at a time; entries routed while one runs wait two minutes
+and are routed again.
 
 ### Salesforce implementation
 
@@ -1747,6 +1770,8 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 
 - **Service:** `RollupQueue`, which writes entries and is the one processor (a Queueable with a
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
+- **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
+  rows of each planned query, Ids only, chained query by query and entity by entity.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
@@ -7069,6 +7094,7 @@ mirrors the primary member).
 | 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-0112, `0112-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
 | 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-0113, `0113-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
 | v0.6 | 2026-10-14 | Tier 1 scale test findings. No object or field added. R-H4: a name or greeting fits its field, a long list naming the first members and counting the rest. R-RQ3: the processor hands off to `Rollup_Queue_Ready__e` at the chain depth limit instead of queuing a run the platform refuses. |
+| v0.6 | 2026-10-14 | Large rollup parents (ADR-NEXT, `NEXT-rollup-large-parents-recalculated-by-a-batch.md`, tier 1 scale test). No object or field added. New R-RQ6: a record whose source rows are more than one transaction may read is recalculated by `RollupLargeParentBatch`, chunk by chunk over its source rows, with one write at the end. R-RQ3: a run that stops is charged and handed to that batch, and its finalizer starts the next processor through `Rollup_Queue_Ready__e` instead of halving the slice and queuing it, which the platform stopped after five failed jobs in a row and left 826 entries Pending. |
 
 ---
 ## 32. Entity ownership by package

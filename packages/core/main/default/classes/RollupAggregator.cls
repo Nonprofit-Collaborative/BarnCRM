@@ -222,7 +222,68 @@ public without sharing class RollupAggregator {
         return result;
     }
 
+    /**
+     * One source query of a plan for these target records, over these source rows only, folded
+     * into `answer` (ADR-NEXT, `RollupLargeParentBatch`). Partial answers merge exactly, as the
+     * alternatives of a path already do (R-R1), so a record whose source rows are more than one
+     * transaction may read is calculated chunk by chunk. A query that fails leaves its
+     * definitions out of the write, as in `calculate`.
+     *
+     * @param plan the planned pass
+     * @param queryIndex the query of the plan to run
+     * @param targetIds the target records to calculate
+     * @param rowIds the source rows of this chunk
+     * @param answer the answer so far, added to
+     */
+    public static void calculateRows(
+        RollupPlanner.Plan plan,
+        Integer queryIndex,
+        Set<Id> targetIds,
+        Set<Id> rowIds,
+        Answer answer
+    ) {
+        RollupPlanner.SourceQuery query = plan.queries[queryIndex];
+        try {
+            run(query, fanoutFor(query.token, targetIds), answer, rowIds);
+        } catch (Exception failedQuery) {
+            for (RollupPlanner.Measure measure : query.measures) {
+                answer.failed.add(measure.definitionIndex);
+                ErrorLogger.log(
+                    failedQuery,
+                    'RollupAggregator.calculateRows',
+                    plan.definitions[measure.definitionIndex].Id
+                );
+            }
+        }
+    }
+
+    /**
+     * The source rows one query of a plan reads for these target records, for a batch to read in
+     * chunks: only their Ids, so reading them costs no aggregate.
+     */
+    public static Database.QueryLocator sourceRows(
+        RollupPlanner.Plan plan,
+        Integer queryIndex,
+        Set<Id> targetIds
+    ) {
+        RollupPlanner.SourceQuery query = plan.queries[queryIndex];
+        return Database.getQueryLocatorWithBinds(
+            'SELECT Id FROM ' + query.sourceObject + whereFor(query),
+            new Map<String, Object>{ 'keys' => fanoutFor(query.token, targetIds).keys },
+            AccessLevel.SYSTEM_MODE
+        );
+    }
+
     private static void run(RollupPlanner.SourceQuery query, Fanout fanout, Answer answer) {
+        run(query, fanout, answer, null);
+    }
+
+    private static void run(
+        RollupPlanner.SourceQuery query,
+        Fanout fanout,
+        Answer answer,
+        Set<Id> rowIds
+    ) {
         List<Id> keys = new List<Id>(fanout.keys);
         for (Integer start = 0; start < keys.size(); start += keysPerQuery) {
             Set<Id> slice = new Set<Id>();
@@ -230,6 +291,9 @@ public without sharing class RollupAggregator {
                 slice.add(keys[i]);
             }
             Map<String, Object> binds = new Map<String, Object>{ 'keys' => slice };
+            if (rowIds != null) {
+                binds.put('rows', rowIds);
+            }
             if (query.kind == RollupPlanner.KIND_ORDERED) {
                 foldRows(query, fanout, binds, answer);
             } else if (query.kind == RollupPlanner.KIND_LISTED) {
@@ -253,6 +317,11 @@ public without sharing class RollupAggregator {
             conditions.add(query.orderBy + ' != null');
         }
         return ' WHERE ' + String.join(conditions, ' AND ');
+    }
+
+    /** As above, limited to one chunk's source rows when the binds hold them. */
+    private static String whereFor(RollupPlanner.SourceQuery query, Map<String, Object> binds) {
+        return whereFor(query) + (binds.containsKey('rows') ? ' AND Id IN :rows' : '');
     }
 
     /** One grouped query for every grouped measure, each distinct expression selected once. */
@@ -279,7 +348,7 @@ public without sharing class RollupAggregator {
             String.join(columns, ', ') +
             ' FROM ' +
             query.sourceObject +
-            whereFor(query) +
+            whereFor(query, binds) +
             ' GROUP BY ' +
             query.keyExpression;
         for (
@@ -397,7 +466,7 @@ public without sharing class RollupAggregator {
             String.join(new List<String>(columns), ', ') +
             ' FROM ' +
             query.sourceObject +
-            whereFor(query) +
+            whereFor(query, binds) +
             ' ORDER BY ' +
             query.orderBy +
             (query.descending ? ' DESC' : ' ASC') +
@@ -481,7 +550,7 @@ public without sharing class RollupAggregator {
             String.join(new List<String>(columns), ', ') +
             ' FROM ' +
             query.sourceObject +
-            whereFor(query) +
+            whereFor(query, binds) +
             ' ORDER BY Id';
         for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
             Set<Id> targets = fanout.targetsByKey.get((Id) valueAt(row, query.keyExpression));

@@ -347,6 +347,13 @@ Under the list, **Needs attention** shows what the engine has not finished:
   A long queue is worked through in a series of background runs. Salesforce limits how long
   such a series may be (five runs in Developer Edition, trial and scratch orgs), so at that
   point BarnCRM starts a fresh series and notes it in the Error Log as Info. Nothing to do.
+  A record with a very large number of gifts or allocations behind its totals (a General Fund
+  most gifts go to, an organization with tens of thousands of gifts) has more rows than one
+  background run may read. BarnCRM recalculates such a record in a separate background job that
+  reads its rows a few thousand at a time, so its totals take a few minutes rather than seconds.
+  While that job runs, the record shows among the records waiting. Nothing to do. If a run ever
+  stops partway, the records it held are counted as one try, picked up by that job, and the rest
+  of the queue carries on; after five tries a record appears under **Could not be saved**.
 - **Could not be saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or
