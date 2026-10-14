@@ -490,7 +490,10 @@ private class HealthCheckFixesTest {
 
             System.runAs(maria) {
                 List<String> scope = HealthCheckService.fixScope(fixKey);
-                Assert.isTrue(scope.contains(otherJob), 'The job of the deactivated owner is named');
+                Assert.isTrue(
+                    scope.contains(otherJob),
+                    'The job of the deactivated owner is named'
+                );
 
                 // No startTest: the scheduled run must not execute inside the test.
                 HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);

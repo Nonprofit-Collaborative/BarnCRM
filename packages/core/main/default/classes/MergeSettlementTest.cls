@@ -284,7 +284,9 @@ private class MergeSettlementTest {
             };
             AutomationControl.clearBypass(ADDRESS_PROPAGATION);
             insertRelationships(
-                new List<Relationship__c>{ RelationshipTestDataFactory.between(kept, kept, 'Friend') }
+                new List<Relationship__c>{
+                    RelationshipTestDataFactory.between(kept, kept, 'Friend')
+                }
             );
             Set<Id> ids = new Set<Id>{ kept.Id };
 
@@ -296,7 +298,11 @@ private class MergeSettlementTest {
 
             Assert.areEqual(
                 2,
-                [SELECT COUNT() FROM Address__c WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE],
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE
+                ],
                 'Where nothing can be saved, nothing is changed and nothing is thrown'
             );
             Assert.areEqual(
@@ -309,7 +315,11 @@ private class MergeSettlementTest {
 
             Assert.areEqual(
                 1,
-                [SELECT COUNT() FROM Address__c WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE],
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE
+                ],
                 'The next attempt settles the address'
             );
             Assert.areEqual(

@@ -630,7 +630,11 @@ private class PersonErasureTest {
 
         List<PersonErasureExtension> found = PersonErasureExtensions.installed();
 
-        Assert.areEqual(givingThere ? 2 : 1, found.size(), 'The Giving module is asked for by name');
+        Assert.areEqual(
+            givingThere ? 2 : 1,
+            found.size(),
+            'The Giving module is asked for by name'
+        );
         Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
     }
 
