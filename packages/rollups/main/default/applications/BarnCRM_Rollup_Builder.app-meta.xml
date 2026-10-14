@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <brand>
+    <headerColor>#0B5CAB</headerColor>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The BarnCRM Rollup Builder module: create and edit the totals BarnCRM keeps up to date, and
+    the module's own settings.
+  </description>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <label>BarnCRM Rollup Builder</label>
+  <navType>Standard</navType>
+  <tabs>Rollup_Builder</tabs>
+  <tabs>Rollup_Settings</tabs>
+  <uiType>Lightning</uiType>
+</CustomApplication>

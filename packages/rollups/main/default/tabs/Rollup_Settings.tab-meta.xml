@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Rollup Builder module's own settings, the same ones the Rollups section of BarnCRM Settings
+    shows.
+  </description>
+  <flexiPage>Rollup_Settings</flexiPage>
+  <label>Rollup Settings</label>
+  <motif>Custom67: Gears</motif>
+</CustomTab>

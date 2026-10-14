@@ -173,6 +173,30 @@ private class SettingsControllerTest {
         }
     }
 
+    /** A module's own settings page shows only its rows, so each row says whose it is. */
+    @IsTest
+    static void eachRowNamesTheModuleItBelongsTo() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            SettingDefinitionSelector.stubbedRows[1].Module__c = null;
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            Map<String, String> moduleByKey = new Map<String, String>();
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    moduleByKey.put(setting.key, setting.module);
+                }
+            }
+            Assert.areEqual('Core', moduleByKey.get(TEXT_KEY), 'A row naming Core is Core');
+            Assert.areEqual(
+                'Core',
+                moduleByKey.get(CHECKBOX_KEY),
+                'A row naming no module is Core'
+            );
+        }
+    }
+
     @IsTest
     static void offersAProductsCoexistenceModeOnlyWhereThatProductIsDetected() {
         System.runAs(TestUsers.admin()) {

@@ -98,8 +98,8 @@ totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. Open the **BarnCRM** app and choose the **Rollup Builder** tab. (In **BarnCRM Settings**,
-   the **Rollups** section opens the same page.)
+1. From the App Launcher, open the **BarnCRM Rollup Builder** app; it opens on the **Rollup
+   Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
    is scheduled for 2:00 AM."
@@ -124,7 +124,8 @@ rollup stays inactive across every upgrade, and the values it has already calcul
 on the records.
 
 Three settings in **BarnCRM Settings** change how every rollup behaves: the first is in the
-**General** section, the other two in the **Rollups** section.
+**General** section, the other two in the **Rollups** section. The **Rollup Settings** tab of
+the **BarnCRM Rollup Builder** app shows the same two Rollups settings on their own.
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
   begin. Choose the month your fiscal year starts from the list. Changing it and clicking
@@ -260,12 +261,21 @@ What to know about them:
 
 ## The Rollup Builder
 
-The **Rollup Builder** tab in the **BarnCRM** app is where you create a new total and edit any
-existing one, shipped or your own, without typing a query. It lists every rollup with its
-controls (mode, active, **Recalculate**, the nightly schedule, **Recalculate all** and
-**Restore shipped rollups**), and adds **New rollup**, and **Edit** and **Copy** on each row.
-The tab comes with the **BarnCRM Admin** permission set, and saving needs the **Manage BarnCRM
-Settings** permission. The Rollups section in BarnCRM Settings opens it.
+Rollups are their own module, **BarnCRM Rollup Builder**, with an app of the same name and two
+tabs: **Rollup Builder** and **Rollup Settings**.
+
+The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
+or your own, without typing a query. It lists every rollup with its controls (mode, active,
+**Recalculate**, the nightly schedule, **Recalculate all** and **Restore shipped rollups**),
+and adds **New rollup**, and **Edit** and **Copy** on each row. The tab comes with the
+**Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
+saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
+Settings opens it.
+
+The **Rollup Settings** tab shows the module's own settings and nothing else: **Default rollup
+mode**, **When instant totals are calculated**, and the link to the Builder. They are the same
+settings as the **Rollups** section of **BarnCRM Settings**, so a change in either place shows
+in both. **Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a

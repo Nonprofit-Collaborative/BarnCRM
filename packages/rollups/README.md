@@ -22,6 +22,9 @@ Giving depends on this module. Offered in both editions.
   the Rollups section of BarnCRM Settings (canonical model Sections 13, 14, 14A and 14B).
 - **Engine:** `RollupService`, `RollupEngine` and the classes it plans and writes with, the
   queue and its processors, `RollupFullRecalcBatch` and `RollupScheduler`.
+- **App:** `BarnCRM_Rollup_Builder` (label BarnCRM Rollup Builder) with two tabs: Rollup
+  Builder, and Rollup Settings, an app page hosting Core's `settingsConsole` with its `module`
+  property set to `Rollups`, so it shows only this module's settings rows.
 - **Screens:** the Rollup Builder tab and app page (`rollupBuilder`, `rollupDefinitions`,
   `rollupWizard`, `rollupFilterBuilder`, `rollupNeedsAttention`) and the Recalculate rollups
   Flow action and template.

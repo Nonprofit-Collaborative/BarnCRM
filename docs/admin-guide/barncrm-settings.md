@@ -14,6 +14,10 @@ done in Setup, the setup checklist on the Hub home page sends you there with ins
 and the section of this page that depends on it says so at the top (see "When a section
 needs a change in Setup" below).
 
+A module with an app of its own can also show its settings there, on their own: the
+**Rollup Settings** tab of the **BarnCRM Rollup Builder** app is this page showing only the
+Rollups settings. They are the same settings, so a change in either place shows in both.
+
 ## How to turn it on
 
 There is nothing to turn on, but there is one permission to give out.
