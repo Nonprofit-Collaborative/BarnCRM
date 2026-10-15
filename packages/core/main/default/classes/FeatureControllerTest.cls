@@ -22,8 +22,19 @@ private class FeatureControllerTest {
 
             Assert.isTrue(model.canEdit, 'Maria may turn features on');
             Assert.areEqual(8, model.features.size(), 'Three tools and five groups');
+            Map<String, String> labelNames = new Map<String, String>{
+                'DataManager' => System.Label.Core_Feature_DataManager_Name,
+                'DuplicateReview' => System.Label.Core_Feature_DuplicateReview_Name,
+                'OrgOptimizer' => System.Label.Core_Feature_OrgOptimizer_Name,
+                'HouseholdUpkeep' => System.Label.Core_Feature_HouseholdUpkeep_Name,
+                'Addresses' => System.Label.Core_Feature_Addresses_Name,
+                'Relationships' => System.Label.Core_Feature_Relationships_Name,
+                'Affiliations' => System.Label.Core_Feature_Affiliations_Name,
+                'PreferredEmail' => System.Label.Core_Feature_PreferredEmail_Name
+            };
             for (FeatureController.FeatureRow row : model.features) {
-                Assert.areNotEqual(row.key, row.name, 'Each feature has a label name: ' + row.key);
+                Assert.isTrue(labelNames.containsKey(row.key), 'A known feature: ' + row.key);
+                Assert.areEqual(labelNames.get(row.key), row.name, 'Its label name: ' + row.key);
                 Assert.isNotNull(row.description, 'And a description: ' + row.key);
                 Assert.isFalse(row.isOn, 'A new install has every feature off');
             }
