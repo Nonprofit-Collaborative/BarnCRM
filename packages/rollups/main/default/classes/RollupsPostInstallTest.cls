@@ -395,4 +395,57 @@ private class RollupsPostInstallTest {
             );
         }
     }
+
+    @IsTest
+    static void anInstallWithNoNamedInstallerStillQueuesTheRoleSync() {
+        System.runAs(admin()) {
+            RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>();
+
+            Test.startTest();
+            // No installer to name: the platform gives none for a push upgrade, say.
+            install(new RollupsPostInstall(), null);
+            Test.stopTest();
+
+            Assert.isTrue(
+                [SELECT COUNT() FROM AsyncApexJob WHERE JobType = 'Queueable'] > 0,
+                'The role sync is queued on its own, since there is no installer job to run it.'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'RollupsPostInstall.grantInstallerAccess'
+                ],
+                'Nothing failed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aGrantThePlatformRefusesIsLoggedAsAWarning() {
+        System.runAs(admin()) {
+            RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>();
+            // An Id that is no user, so the assignment insert is refused for a reason other
+            // than a duplicate.
+            Account notAUser = new Account(Name = 'Not a user');
+            insert notAUser;
+
+            Test.startTest();
+            install(new RollupsPostInstall(), notAUser.Id);
+            Test.stopTest();
+
+            List<Error_Log__c> logged = [
+                SELECT Severity__c
+                FROM Error_Log__c
+                WHERE Context__c = 'RollupsPostInstall.grantInstallerAccess'
+            ];
+            Assert.areEqual(1, logged.size(), 'The refusal is in the Error Log.');
+            Assert.areEqual(
+                ErrorLogger.SEVERITY_WARNING,
+                logged[0].Severity__c,
+                'It is a warning: the install is not aborted by it.'
+            );
+        }
+    }
 }
