@@ -4,6 +4,7 @@
  * decision 8). The rollup grants left Core's sets for the module's, so every package-owned read
  * and write on the save path has to run in system mode: a user mode read of the definitions, or a
  * user mode write to the queue, would fail this person's save or silently skip their totals.
+ * The one exception is a save inside a Queueable, whose ready event needs a Rollup Builder set.
  */
 @IsTest(testFor='ApexClass:RollupTriggerHandler, ApexClass:RollupQueue, ApexClass:RollupSelector')
 private class RollupsStaffSaveTest {
@@ -62,7 +63,7 @@ private class RollupsStaffSaveTest {
         }
     }
 
-    /** A Staff-only person's save made inside a Queueable, as an integration's job makes it. */
+    /** A person's save made inside a Queueable, as an integration's job makes it. */
     private class SaveInAQueueable implements Queueable {
         private final Id organizationId;
 
@@ -77,14 +78,18 @@ private class RollupsStaffSaveTest {
             Assert.areEqual(
                 1,
                 RollupQueue.readyEventsPublished,
-                'The Staff-only save inside a Queueable published Rollup_Queue_Ready__e'
+                'The save inside a Queueable announced its entries with Rollup_Queue_Ready__e'
             );
         }
     }
 
-    @IsTest
-    static void aStaffOnlySaveInsideAQueueablePublishesTheReadyEvent() {
-        User staff;
+    /**
+     * Saves one contact inside a Queueable as someone holding these permission sets.
+     *
+     * @return the organization the contact was saved under
+     */
+    private static Id saveInAQueueableAs(String lastName, List<String> permissionSets) {
+        User person;
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             insert new Rollup_Definition__c(
                 Name = 'People per organization',
@@ -98,11 +103,11 @@ private class RollupsStaffSaveTest {
                 Fiscal_Year_Aware__c = false,
                 Active__c = true
             );
-            staff = TestDataFactory.createUser('Staffqueued', new List<String>{ 'BarnCRM_Staff' });
+            person = TestDataFactory.createUser(lastName, permissionSets);
         }
         Account organization;
 
-        System.runAs(staff) {
+        System.runAs(person) {
             organization = new Account(
                 Name = 'Shelter',
                 RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
@@ -115,13 +120,50 @@ private class RollupsStaffSaveTest {
             System.enqueueJob(new SaveInAQueueable(organization.Id));
             Test.stopTest();
         }
+        return organization.Id;
+    }
+
+    /**
+     * Publishing a platform event needs Create on it, and only the Rollup Builder sets can grant
+     * Create on Rollup_Queue_Ready__e: Core's sets cannot name a module object. So a Staff-only
+     * save inside a Queueable still goes through and keeps its queue entry, the refused event is
+     * a warning in the Error Log, and the totals wait for the next processor run or the nightly
+     * run (ADR-0100).
+     */
+    @IsTest
+    static void aStaffOnlySaveInsideAQueueableKeepsItsEntryWhenTheEventIsRefused() {
+        Id organizationId = saveInAQueueableAs('Staffqueued', new List<String>{ 'BarnCRM_Staff' });
 
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Assert.areEqual(
                 1,
-                [SELECT COUNT() FROM Contact WHERE AccountId = :organization.Id],
+                [SELECT COUNT() FROM Contact WHERE AccountId = :organizationId],
                 'The save inside the Queueable went through'
             );
+            Assert.isTrue(
+                [SELECT COUNT() FROM Rollup_Queue__c] > 0,
+                'Its entry waits in the queue for the next run'
+            );
+            List<Error_Log__c> logged = [
+                SELECT Context__c, Severity__c
+                FROM Error_Log__c
+                WHERE Context__c LIKE 'Rollup%'
+            ];
+            Assert.areEqual(1, logged.size(), 'Only the refused event is logged');
+            Assert.areEqual('RollupQueue.announceReady', logged[0].Context__c);
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, logged[0].Severity__c);
+        }
+    }
+
+    /** Staff who also hold Rollup Builder User, as the Fundraising Staff group gives them. */
+    @IsTest
+    static void aSaveInsideAQueueableWithRollupBuilderUserPublishesTheReadyEvent() {
+        saveInAQueueableAs(
+            'Staffreader',
+            new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User' }
+        );
+
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Error_Log__c WHERE Context__c LIKE 'Rollup%'],
