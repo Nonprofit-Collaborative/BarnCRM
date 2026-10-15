@@ -39,6 +39,9 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 GENERATOR="$REPO_ROOT/scripts/data/generate-scale-data.py"
 DIR="${SCALE_TEST_DIR:-$REPO_ROOT/scale-test-data}"
 WAIT="${SCALE_TEST_WAIT_MINUTES:-120}"
+# Keep the CLI's update notice and other chatter out of the way; --json output is still parsed
+# defensively (json_only) because a warning can reach stdout on some CLI versions.
+export SF_SKIP_NEW_VERSION_CHECK=true SF_DISABLE_AUTOUPDATE=true SF_DISABLE_TELEMETRY=true
 LIMITS="DataStorageMB DailyAsyncApexExecutions DailyBulkV2QueryJobs DailyApiRequests"
 
 usage() {
@@ -123,10 +126,17 @@ job_error_hint() {
 # JOB_OK (1 when a job ran), JOB_PROCESSED, JOB_FAILED, JOB_SUCCESS (numbers, 0 when unknown).
 # The CLI returns .result.jobId (import) or .result.jobInfo.id (bulk delete) on success and
 # exits nonzero with the same under .data on partial failure.
-JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
+# JOB_UNREAD is 1 when a job ran but its results could not be read; delete_where then trusts
+# the record counts instead of counting that as a failure when the job state is JobComplete.
+JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0 JOB_UNREAD=0 JOB_STATE=""
+
+# json_only: stdin to stdout, from the first line that starts a JSON object (drops any
+# warning text the CLI printed before the JSON).
+json_only() { sed -n '/^{/,$p'; }
+
 job_report() {
   local label="$1" outfile="$2" id msg res failed_csv slug errors
-  JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
+  JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0 JOB_UNREAD=0 JOB_STATE=""
   id="$(jq -r '.result.jobId // .result.jobInfo.id // .data.jobId // .data.jobInfo.id // empty' "$outfile" 2>/dev/null)"
   if [[ -z "$id" ]]; then
     msg="$(jq -r '[.name, .message] | map(select(. != null)) | join(": ")' "$outfile" 2>/dev/null)"
@@ -136,11 +146,14 @@ job_report() {
     return
   fi
   JOB_OK=1
-  log "  job: $id, state: $(jq -r '.data.state // .result.state // .result.jobInfo.state // .data.jobInfo.state // "see results"' "$outfile" 2>/dev/null)"
+  JOB_STATE="$(json_only <"$outfile" | jq -r '.data.state // .result.state // .result.jobInfo.state // .data.jobInfo.state // empty' 2>/dev/null)"
+  log "  job: $id, state: ${JOB_STATE:-see results}"
   # The CLI writes <job id>-success-records.csv and -failed-records.csv into the current dir.
-  res="$( cd "$DIR/work" && sf data bulk results --job-id "$id" --target-org "$ALIAS" --json 2>&1 )"
+  # stderr stays separate: the CLI's update warning there broke the JSON parse (CLI 2.153.5).
+  res="$( cd "$DIR/work" && sf data bulk results --job-id "$id" --target-org "$ALIAS" --json 2>/dev/null </dev/null | json_only )"
   if ! printf '%s' "$res" | jq -e '.result' >/dev/null 2>&1; then
     log "  could not read the job results: $(printf '%s' "$res" | jq -r '.message // empty' 2>/dev/null | head -c 400)"
+    JOB_UNREAD=1
     JOB_FAILED=-1
     return
   fi
@@ -399,7 +412,11 @@ delete_where() {
     fi
     break
   done
-  if [[ "$JOB_OK" != "1" || "$JOB_FAILED" != "0" || "$JOB_SUCCESS" -le 0 ]]; then
+  if [[ "$JOB_OK" == "1" && "$JOB_UNREAD" == "1" && "$JOB_STATE" == "JobComplete" ]]; then
+    # Job completed but its results could not be read: not a failure by itself. The record
+    # counts after cleanup decide the verdict.
+    log "  job results unreadable; the record counts after cleanup decide."
+  elif [[ "$JOB_OK" != "1" || "$JOB_FAILED" != "0" || "$JOB_SUCCESS" -le 0 ]]; then
     CLEANUP_FAILED=1
     log "  NOTHING OR NOT EVERYTHING WAS DELETED for $1 ($JOB_SUCCESS of $n)."
     log "  stderr: $(head -c 300 "$DIR/work/last-delete.err" 2>/dev/null)"
