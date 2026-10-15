@@ -91,6 +91,50 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void givesAModuleSetToARolesHoldersAndTakesNothing() {
+        System.runAs(TestUsers.admin()) {
+            User reader = TestUsers.standardUser('Reader');
+            insert new PermissionSetAssignment(
+                AssigneeId = reader.Id,
+                PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Read_Only').Id
+            );
+            List<String> audience = new List<String>{ 'BarnCRM_Read_Only' };
+
+            Test.startTest();
+            Boolean noRoom = TabAccessService.giveToHolders(
+                TabAccessService.IMPORT_TAB,
+                audience,
+                0,
+                'Test'
+            );
+            Boolean more = TabAccessService.giveToHolders(
+                TabAccessService.IMPORT_TAB,
+                audience,
+                100,
+                'Test'
+            );
+            Boolean missing = TabAccessService.giveToHolders('No_Such_Set', audience, 100, 'Test');
+            Test.stopTest();
+
+            Assert.isTrue(noRoom, 'A budget of nothing leaves the role holder for later');
+            Assert.isFalse(more, 'Then everyone is done in one pass');
+            Assert.isFalse(missing, 'A set this org lacks is skipped');
+            Assert.isTrue(
+                tabSetsOf(reader.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Read Only role holder, through the group, gets the set'
+            );
+            Assert.isFalse(
+                tabSetsOf(userId(PRIYA)).contains(TabAccessService.IMPORT_TAB),
+                'Someone outside the audience does not'
+            );
+            Assert.isTrue(
+                tabSetsOf(userId(SAM)).contains(TabAccessService.IMPORT_TAB),
+                'And a set given by hand is never taken away'
+            );
+        }
+    }
+
+    @IsTest
     static void theNightlyCheckIsScheduledOnceAndQueuesASync() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();

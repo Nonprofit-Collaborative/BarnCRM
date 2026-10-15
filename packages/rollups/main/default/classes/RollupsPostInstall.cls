@@ -2,7 +2,7 @@
  * What the BarnCRM Rollup Builder module does at install and at every upgrade (ADR-NEXT
  * `NEXT-rollup-builder-module.md`, decision 5).
  *
- * Four things, each safe to run twice and none able to abort an install, since every failure
+ * Five things, each safe to run twice and none able to abort an install, since every failure
  * is written to the Error Log instead:
  *
  * 1. Carry over the two rollup settings an org saved on Core's settings object before the
@@ -15,6 +15,8 @@
  * 4. Queue the job that gives the installer the Rollup Builder Admin permission set. Queued
  *    because a permission set assignment is a setup object write, and this transaction has
  *    already written ordinary records (mixed DML).
+ * 5. Queue the sync that gives the Rollup Builder sets to BarnCRM's roles (`RollupAccessSync`,
+ *    D2), queued for the same reason.
  */
 public with sharing class RollupsPostInstall implements InstallHandler {
     @TestVisible
@@ -56,6 +58,7 @@ public with sharing class RollupsPostInstall implements InstallHandler {
         carryOverCoreSettings();
         RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        RollupAccessSync.requestSync();
         Id installerId = context.installerId();
         if (installerId == null) {
             return;

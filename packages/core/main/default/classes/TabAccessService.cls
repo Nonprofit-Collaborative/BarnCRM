@@ -16,7 +16,12 @@
  * `AUDIENCE`'s keys. A large org is done a slice at a time, the job queuing itself again until
  * nothing is left, and a nightly run (`TabAccessScheduler`) catches people given a role outside
  * BarnCRM's Access page.
+ *
+ * A module that keeps its own permission sets with BarnCRM's roles uses the same audience
+ * logic through `giveToHolders`, naming its sets and Core's (ADR-NEXT
+ * `NEXT-rollup-builder-module.md`, D2); Core names no module set.
  */
+@NamespaceAccessible
 public with sharing class TabAccessService {
     public static final String DATA_MANAGER_TAB = 'BarnCRM_Tab_Data_Manager';
     public static final String IMPORT_TAB = 'BarnCRM_Tab_Import';
@@ -129,6 +134,55 @@ public with sharing class TabAccessService {
                 toDelete.add(held.get(userId));
             }
         }
+        write(toInsert, toDelete, CONTEXT);
+        return more;
+    }
+
+    /**
+     * Gives the named permission set to every active person holding one of the audience sets,
+     * directly or through a permission set group such as a BarnCRM role, up to `budget`
+     * assignments. Never takes it away: a module's set may also be given by hand, to the person
+     * who installed the module or to an integration user. For a module keeping its own sets with
+     * BarnCRM's roles (ADR-NEXT `NEXT-rollup-builder-module.md`, D2); it names its set and the
+     * audience, and Core names no module set. Written in system mode, as the tab sync is, and a
+     * refused assignment is logged as a Warning under `context`. Returns true when more is left;
+     * does nothing when the set is not in this org.
+     */
+    @NamespaceAccessible
+    public static Boolean giveToHolders(
+        String setName,
+        List<String> audience,
+        Integer budget,
+        String context
+    ) {
+        Set<String> names = new Set<String>(audience);
+        names.add(setName);
+        Map<String, Id> setIds = packagedSetIds(names);
+        Id setId = setIds.get(setName);
+        if (setId == null) {
+            return false;
+        }
+        Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
+        Set<Id> wanted = holdersOf(audience, setIds, groupIdsBySet);
+        // Held already, directly or through a group, such as a module role that includes it.
+        wanted.removeAll(holdersOf(new List<String>{ setName }, setIds, groupIdsBySet));
+        List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
+        for (Id userId : wanted) {
+            if (toInsert.size() >= budget) {
+                break;
+            }
+            toInsert.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = setId));
+        }
+        write(toInsert, new List<PermissionSetAssignment>(), context);
+        return wanted.size() > toInsert.size();
+    }
+
+    /** Writes the assignments in system mode and logs each one refused as a Warning. */
+    private static void write(
+        List<PermissionSetAssignment> toInsert,
+        List<PermissionSetAssignment> toDelete,
+        String context
+    ) {
         List<String> refusals = new List<String>();
         if (!toInsert.isEmpty()) {
             List<Database.SaveResult> saved = Database.insert(
@@ -151,9 +205,8 @@ public with sharing class TabAccessService {
             }
         }
         if (!refusals.isEmpty()) {
-            ErrorLogger.logMessages(refusals, CONTEXT, ErrorLogger.SEVERITY_WARNING);
+            ErrorLogger.logMessages(refusals, context, ErrorLogger.SEVERITY_WARNING);
         }
-        return more;
     }
 
     private static void addErrors(List<String> refusals, List<Database.Error> errors) {
@@ -171,6 +224,11 @@ public with sharing class TabAccessService {
         for (List<String> sources : AUDIENCE.values()) {
             names.addAll(sources);
         }
+        return packagedSetIds(names);
+    }
+
+    /** The named permission sets this product ships, by name. */
+    private static Map<String, Id> packagedSetIds(Set<String> names) {
         String prefix = NamespaceUtil.prefix().removeEnd('__');
         String namespace = String.isBlank(prefix) ? null : prefix;
         Map<String, Id> ids = new Map<String, Id>();
