@@ -27,6 +27,8 @@ import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 
+/** The page state key a link to a section uses: `c__section`, or the namespace's. */
+const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
@@ -159,7 +161,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
     // The Setup Assistant links here with the section its step belongs to.
-    const requested = pageReference && pageReference.state && pageReference.state.c__section;
+    const state = (pageReference && pageReference.state) || {};
+    const key = Object.keys(state).find((name) => name.endsWith(SECTION_STATE));
+    const requested = key && state[key];
     if (requested) {
       this.requestedSection = requested;
       this.selectRequestedSection();
