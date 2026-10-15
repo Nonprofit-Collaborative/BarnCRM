@@ -125,3 +125,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - `sf ... --json 2>&1` mixes the CLI update warning into the JSON; scripts must tolerate it (#433).
 - A sandbox deploy from a different folder needs `--ignore-conflicts` (source tracking is per folder).
 - `barn-npc` settings custom settings and metadata deployed with visibility Public (a production-edition trial rejects Protected, see above).
+- CI checks for cross-package visibility (#446), production classes only: `scripts/ci/check-cross-package-visibility.py` (allowlist `scripts/ci/cross-package-visibility-allowlist.txt`, one entry: `HealthCheckService.Finding.detail`, B5 deferred) and `scripts/ci/check-dynamic-class-visibility.py`.
+- `OrgShape` fields are `@AuraEnabled`, so they cannot be `@NamespaceAccessible`; other packages use static accessors (`OrgShapeDetector.hasPersonAccounts()`).
+- A class Core builds by name (`Type.forName`, trigger handlers, registered module extensions) needs an explicit `@NamespaceAccessible` public no-arg constructor; the implicit one is not accepted by the check.
+- A PR branch created before a rename landed redeploys the old names when gated (`oi-test` got old Connect and Mirror back after such a gate; restored to main 6506cb52). Rebase open branches onto main after a rename lands, before gating them.
