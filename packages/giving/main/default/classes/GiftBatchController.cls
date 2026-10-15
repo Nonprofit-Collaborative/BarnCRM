@@ -277,7 +277,7 @@ public with sharing class GiftBatchController {
         result.posted = GiftBatchService.STATUS_POSTED.equals(batch.Status__c);
         result.controlTotal = batch.Control_Total__c;
         result.enteredTotal = GiftBatchService.enteredTotal(rows);
-        result.hasPersonAccounts = OrgShapeDetector.detect().hasPersonAccounts == true;
+        result.hasPersonAccounts = OrgShapeDetector.hasPersonAccounts();
         result.canEdit = GiftBatchSelector.canEdit(batch.Id);
         result.paymentMethods = paymentMethodOptions();
         for (Gift_Batch_Row__c row : rows) {
