@@ -136,15 +136,21 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /**
      * Starts a full recalculation of these definitions over every record they write. Does nothing
-     * while the module is turned off (ADR-NEXT decision 9) or all automation is paused (R-RQ5);
-     * the next run catches up. Starts nothing while another full run is going (R-R14): that
-     * run's job is answered and an Info entry says so.
+     * while the module is turned off (ADR-NEXT decision 9; Turn on recalculates every rollup)
+     * or all automation is paused (R-RQ5; the next run catches up), and an Info entry says so.
+     * Starts nothing while another full run is going (R-R14): that run's job is answered and an
+     * Info entry says so.
      *
      * @param definitions the definitions to recalculate, of any target entities
      * @return the first pass's job, the running job, or null when nothing started
      */
     public static Id begin(List<Rollup_Definition__c> definitions) {
         if (RollupService.isTurnedOff()) {
+            ErrorLogger.logMessage(
+                System.Label.Core_Rollups_FullRunTurnedOff,
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_INFO
+            );
             return null;
         }
         if (AutomationControl.isPaused()) {
@@ -356,7 +362,11 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
         }
     }
 
-    /** Follows up the held back records, then the heavy ones, then the next entity, then ends. */
+    /**
+     * Follows up the held back records, then the heavy ones, then the next entity, then ends.
+     * Chains nothing once the module is turned off (ADR-NEXT decision 9): the run stops there,
+     * unstamped, and Turn on recalculates every rollup.
+     */
     public void finish(Database.BatchableContext context) {
         Integer stopped = stoppedChunks(context);
         if (stopped > 0) {
@@ -366,6 +376,12 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
         RollupFullRecalcBatch next = nextPass();
         if (next == null) {
             complete();
+        } else if (RollupService.isTurnedOff()) {
+            ErrorLogger.logMessage(
+                System.Label.Core_Rollups_RunStoppedTurnedOff,
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_INFO
+            );
         } else if (Test.isRunningTest()) {
             // A test cannot chain batch jobs, so the rest of the run happens here.
             next.runInline();

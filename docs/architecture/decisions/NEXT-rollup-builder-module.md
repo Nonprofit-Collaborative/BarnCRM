@@ -77,6 +77,7 @@ subscriber migration.
    | Core extension point | Module class | Replaces | When the module is absent |
    |---|---|---|---|
    | `RollupEngineExtension` (new) with `afterMerge`, `forSurvivors`, `startQueuedRecalculation`, `processPending`, `lastCalculated`, `isStale`, `targetFieldsByObject`; resolver `RollupEngineExtensions.find()` | `RollupsEngineExtension`, delegating to `RollupService`, `RollupQueue`, `RollupSelector` | the calls in `AccountTriggerHandler`, `AutomationControl`, `SampleDataModules`, `HubController`, `DataProtectedFields` | merges complete with nothing to recalculate; resume and sample data skip the queue; the home rollups tile is hidden (`rollupsInstalled` false); no field is protected as a rollup target |
+   | `RollupEngineExtensionV2` (new, decision 9) with `afterModuleTurnedOn`; resolver `RollupEngineExtensions.findV2()` | `RollupsEngineExtension`, delegating to `RollupService.catchUpAfterTurnedOn` for `Rollups` only | `ModuleManagerService.turnOn` | Turn on only turns the module on |
    | `HealthCheckExtensions.EXTENSION_CLASSES` (existing) gains `RollupsHealthCheckExtension` | `RollupsHealthCheckExtension`, holding the shipped rollups, nightly rollups and rollup queue checks | the three `HealthCheckSettingsChecks` rollup checks | no rollup findings |
    | `HealthCheckFixExtension` (new, optional second interface on a Health Check extension) with `fixKeys`, `fixScope`, `fixLabel`, `runFix` | `RollupsHealthCheckExtension` | the `restoreShippedRollups` branches in `HealthCheckService.fixScope` and `HealthCheckController` | the key is unknown and the fix is refused, as for any unknown key |
    | `NightlyJobs.PROVIDER_CLASSES` (existing) gains `RollupsNightlyJobProvider` | `RollupsNightlyJobProvider`, returning the former `NightlyJobs.RollupJob` | `RollupJob` in Core's list | the nightly jobs finding and fix do not name the rollup run |
@@ -113,15 +114,22 @@ subscriber migration.
    `Rollup_Builder_User` (read the Builder and definitions, as Staff and Read Only can today).
    The engine's save path must run in system mode for every package-owned read and write
    (ADR-0021), so a user holding neither set still saves records and totals still update.
-9. **Turning the module off** (ADR-0073) stops its three registry rows through `Module__c`, and
-   the engine's entry points (`RollupTriggerHandler`, the queue processor, the nightly batch,
-   the Flow action) also return early while `Rollups` is turned off, so Giving's four rollup rows
-   stop too. One check, `RollupService.isTurnedOff`, reads `ModuleManagerService.turnedOff`;
-   the real-time, delete, merge and Flow paths (Core's merge seam included), the queue
-   processor and its start, the full runs (nightly, Recalculate all, Recalculate) and the
-   scheduler all return on it. Nothing is queued while it is off and queued entries wait; the
-   first nightly run after it is turned on puts every Both total right. Until this was built
-   the Module Manager offered `Rollups` no switch.
+9. **Turning the module off** (ADR-0073) stops its registry rows through `Module__c`, except
+   `Rollup_Definition_Validation`, which carries `Always_Runs__c` so a definition saved while
+   the module is off is still checked. The engine's entry points (`RollupTriggerHandler`, the
+   queue processor, the nightly batch, the Flow action) also return early while `Rollups` is
+   turned off, so Giving's four rollup rows stop too. One check, `RollupService.isTurnedOff`,
+   reads `ModuleManagerService.turnedOff`; the real-time, delete, merge and Flow paths (Core's
+   merge seam included), the queue processor and its start, the full runs (nightly,
+   Recalculate all, Recalculate) and the scheduler all return on it, and a full run, a
+   large-parent run or a merge's survivor job chains no next pass or job once it is off (an
+   Info entry says so). Recalculate, Recalculate all and Run tonight refuse with a message;
+   the Builder still saves and says the rollup is calculated once the module is on. Nothing is
+   processed while it is off and queued entries wait. Turn on (`ModuleManagerService.turnOn`)
+   calls the engine through `RollupEngineExtensionV2.afterModuleTurnedOn`, which starts the
+   processor for the waiting entries and a full recalculation of every active definition,
+   since saves made while it was off were not recorded (owner decision: totals are right after
+   Turn on). Until this was built the Module Manager offered `Rollups` no switch.
 10. **Giving depends on the module.** `sfdx-project.json`: Giving depends on Core and BarnCRM
     Rollup Builder; Funders and Connect list Core, BarnCRM Rollup Builder and Giving (2GP needs
     the transitive list, in install order). Giving's code, its 50 shipped defaults, its registry

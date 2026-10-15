@@ -397,8 +397,11 @@ public with sharing class RollupBuilderController {
             result.recordId = definition.Id;
             result.notice = Label.Core_RollupBuilder_Saved;
             if (calculateNow == true && definition.Active__c) {
-                // R-R14: one full run at a time. The rollup is saved either way.
-                if (RollupFullRecalcBatch.runningJobId() != null) {
+                // R-R14: one full run at a time. The rollup is saved either way; while the module
+                // is turned off, Turn on recalculates it with every other (ADR-NEXT decision 9).
+                if (RollupService.isTurnedOff()) {
+                    result.notice = Label.Core_RollupBuilder_SavedTurnedOff;
+                } else if (RollupFullRecalcBatch.runningJobId() != null) {
                     result.notice = Label.Core_RollupBuilder_SavedNotCalculated;
                 } else {
                     RollupService.recalculate(definition.Id);

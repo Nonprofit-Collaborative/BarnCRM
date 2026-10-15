@@ -4,7 +4,11 @@
   <protected>true</protected>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Checks that the field a rollup fills can hold its calculation: a checkbox for Any and None, a text field for a text list, a number for Count distinct. Switch this off and such a rollup still saves, but BarnCRM skips it on every run and records why in the Error Log.</value>
+    <value xsi:type="xsd:string">Checks that the field a rollup fills can hold its calculation: a checkbox for Any and None, a text field for a text list, a number for Count distinct. It always runs, also while BarnCRM Rollup Builder is turned off, so a rollup saved then is checked as well.</value>
+  </values>
+  <values>
+    <field>Always_Runs__c</field>
+    <value xsi:type="xsd:boolean">true</value>
   </values>
   <values>
     <field>Enabled_By_Default__c</field>

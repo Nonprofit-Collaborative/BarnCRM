@@ -218,8 +218,8 @@ contacts, then all funds), and calculate all of a record's totals together:
 Each rollup has a **calculation**, and the calculation decides what kind of field can show
 the result. BarnCRM refuses to save a rollup whose field cannot hold its result, and says
 which kind of field to choose instead. That check is the **Check rollups before saving**
-automation on the **Automation** page; if it is switched off, such a rollup still saves, but
-BarnCRM skips it on every run and the Error Log says why.
+automation on the **Automation** page. It always runs, also while BarnCRM Rollup Builder is
+turned off on **Modules**, so it has no switch.
 
 | Calculation | What it gives you | Shown in |
 |---|---|---|
@@ -549,10 +549,12 @@ afterwards.
 
 **Turning the module off and forgetting it.** **Turn off** on the BarnCRM Rollup Builder row
 of **BarnCRM Settings**, **Modules** stops every rollup at once, Giving's included: saves,
-the Flow action, the queue, the nightly run and **Recalculate** all do nothing, and nothing
-is queued for later. The values on your records stay. After **Turn on**, the next nightly
-run puts **Both** totals right; click **Recalculate all** for **Instantly** ones, or to have
-everything right at once. See [Module Manager](module-manager.md).
+the Flow action, the queue, the nightly run and a recalculation already running all stop,
+and nothing is processed while it is off. **Recalculate**, **Recalculate all** and **Run
+tonight** say the module is off; a rollup you save in the Builder then is saved and calculated
+once it is on. The values on your records stay. **Turn on** puts every total right: it starts
+the totals that waited and a recalculation of every active rollup, which runs in the
+background. See [Module Manager](module-manager.md).
 
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is

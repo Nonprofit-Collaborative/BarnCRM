@@ -15,7 +15,9 @@
 @NamespaceAccessible
 public with sharing class ModuleManagerService {
     public static final String STATUS_NOT_INSTALLED = 'NotInstalled';
+    @NamespaceAccessible
     public static final String STATUS_OFF = 'Off';
+    @NamespaceAccessible
     public static final String STATUS_ON = 'On';
 
     private static final String CORE = 'Core';
@@ -82,16 +84,20 @@ public with sharing class ModuleManagerService {
     public class ModuleManagerException extends Exception {
     }
 
-    /** One row of the Module Manager. */
+    /** One row of the Module Manager. A module's tests read its own row (ADR-0017 rule 1). */
+    @NamespaceAccessible
     public class ModuleStatus {
         @AuraEnabled
+        @NamespaceAccessible
         public String name;
         /** The name shown, such as BarnCRM Giving. */
         @AuraEnabled
         public String label;
         @AuraEnabled
+        @NamespaceAccessible
         public String status;
         @AuraEnabled
+        @NamespaceAccessible
         public Boolean canSwitch;
         @AuraEnabled
         public String docsUrl;
@@ -117,6 +123,7 @@ public with sharing class ModuleManagerService {
     }
 
     /** The modules this org is offered, in the order the Setup Assistant lists them. */
+    @NamespaceAccessible
     public static List<ModuleStatus> getModules() {
         Set<String> off = turnedOff();
         List<ModuleStatus> rows = new List<ModuleStatus>();
@@ -157,6 +164,7 @@ public with sharing class ModuleManagerService {
     }
 
     /** Stops an installed module's automation. Its records and switches are left as they are. */
+    @NamespaceAccessible
     public static void turnOff(String moduleName) {
         ModuleStatus row = switchable(moduleName);
         setTurnedOff(row.name, true);
@@ -165,11 +173,27 @@ public with sharing class ModuleManagerService {
     /**
      * Lets an installed module's automation run again, with each switch as it was, and creates
      * any switch row that is missing, which is Core's part of a module's post-install work.
+     * The rollup engine, when installed, then catches up on what it skipped while its module was
+     * off (ADR-NEXT decision 9), through its seam; Core names no module class.
      */
+    @NamespaceAccessible
     public static void turnOn(String moduleName) {
         ModuleStatus row = switchable(moduleName);
         setTurnedOff(row.name, false);
         AutomationControl.ensureDefaults();
+        afterTurnedOn(row.name);
+    }
+
+    /** Tells the rollup engine a module is on again; a failure is logged, never in the way. */
+    private static void afterTurnedOn(String moduleName) {
+        try {
+            RollupEngineExtensionV2 engine = RollupEngineExtensions.findV2();
+            if (engine != null) {
+                engine.afterModuleTurnedOn(moduleName);
+            }
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, 'ModuleManagerService.turnOn');
+        }
     }
 
     /**

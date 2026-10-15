@@ -137,6 +137,14 @@
         <value>Rollup saved. A full recalculation is already running, so click Recalculate on its row after that finishes.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_SavedTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice when a rollup is saved while the module is turned off.</shortDescription>
+        <value>Rollup saved. BarnCRM Rollup Builder is turned off on Modules, so it is calculated once you turn it on.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupFilter_AddCondition</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

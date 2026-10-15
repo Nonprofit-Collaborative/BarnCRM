@@ -47,6 +47,16 @@ public with sharing class RollupEngineExtensions {
         return find() != null;
     }
 
+    /**
+     * The installed engine's second seam (`RollupEngineExtensionV2`), or null when there is no
+     * engine or it predates that seam.
+     */
+    @NamespaceAccessible
+    public static RollupEngineExtensionV2 findV2() {
+        RollupEngineExtension engine = find();
+        return engine instanceof RollupEngineExtensionV2 ? (RollupEngineExtensionV2) engine : null;
+    }
+
     @TestVisible
     private static RollupEngineExtension resolve(String className) {
         Type extensionType = NamespaceUtil.resolveType(className);

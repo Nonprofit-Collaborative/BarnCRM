@@ -96,9 +96,9 @@ public with sharing class RollupService {
      * Whether BarnCRM Rollup Builder is turned off on the Module Manager (ADR-NEXT decision 9).
      * While it is, every entry point of the engine returns without doing anything: the trigger
      * handler on every object that registers it (Giving's rows too), the Flow action, Core's
-     * merge and queue calls, the Rollup Queue processor, the nightly and full runs and the
-     * scheduler. Nothing is queued and queued entries wait; the nightly run after it is turned
-     * on again puts every Both total right.
+     * merge and queue calls, the Rollup Queue processor, the nightly and full runs (and the
+     * passes they chain) and the scheduler. Nothing is processed and queued entries wait; Turn
+     * on drains them and recalculates every active rollup (`catchUpAfterTurnedOn`).
      */
     @NamespaceAccessible
     public static Boolean isTurnedOff() {
@@ -109,6 +109,21 @@ public with sharing class RollupService {
     @NamespaceAccessible
     public static Boolean isStopped() {
         return AutomationControl.isPaused() || isTurnedOff();
+    }
+
+    /**
+     * Puts every total right after the module is turned on again (ADR-NEXT decision 9, owner
+     * decision: totals are right after Turn on): starts the processor for the entries that
+     * waited, and a full recalculation of every active rollup, since nothing recorded the saves
+     * made while it was off. Core's Module Manager calls this through the engine seam.
+     */
+    @NamespaceAccessible
+    public static void catchUpAfterTurnedOn() {
+        if (isTurnedOff()) {
+            return;
+        }
+        RollupQueue.processPending();
+        startFullRunOfEveryDefinition();
     }
 
     /**
@@ -317,6 +332,20 @@ public with sharing class RollupService {
         }
 
         public void execute(QueueableContext context) {
+            if (isTurnedOff()) {
+                // Turned off since the merge (ADR-NEXT decision 9): the survivors wait in the
+                // queue, which Turn on drains.
+                ErrorLogger.logMessage(
+                    System.Label.Core_Rollups_RunStoppedTurnedOff,
+                    CONTEXT_REAL_TIME,
+                    ErrorLogger.SEVERITY_INFO
+                );
+                queue(
+                    new Map<String, Set<Id>>{ target => survivorIds },
+                    new Map<String, List<Rollup_Definition__c>>{ target => definitions }
+                );
+                return;
+            }
             try {
                 RollupQueue.retryLater(
                     target,

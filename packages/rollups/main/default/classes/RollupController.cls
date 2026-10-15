@@ -154,6 +154,7 @@ public with sharing class RollupController {
         try {
             requirePermission();
             require(definitionId);
+            refuseWhileTurnedOff();
             refuseWhileAFullRunIsGoing();
             RollupService.recalculate(definitionId);
             return currentPage();
@@ -167,6 +168,7 @@ public with sharing class RollupController {
     public static RollupPageView recalculateAll() {
         try {
             requirePermission();
+            refuseWhileTurnedOff();
             refuseWhileAFullRunIsGoing();
             RollupService.startFullRunOfEveryDefinition();
             return currentPage();
@@ -266,6 +268,7 @@ public with sharing class RollupController {
     public static String runTonight() {
         try {
             requirePermission();
+            refuseWhileTurnedOff();
             if (RollupScheduler.isScheduled()) {
                 return Label.Core_RollupBuilder_TonightAlreadyScheduled;
             }
@@ -370,6 +373,16 @@ public with sharing class RollupController {
             );
         }
         return definition;
+    }
+
+    /**
+     * Nothing recalculates while the module is turned off (ADR-NEXT decision 9), so the admin
+     * is told that rather than shown a recalculation that never starts.
+     */
+    private static void refuseWhileTurnedOff() {
+        if (RollupService.isTurnedOff()) {
+            throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorTurnedOff);
+        }
     }
 
     /** R-R14: one full run at a time, and the admin is told so rather than left guessing. */

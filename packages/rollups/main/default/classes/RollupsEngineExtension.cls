@@ -1,13 +1,20 @@
 /**
  * The rollup engine's answer to Core's `RollupEngineExtension` (ADR-NEXT,
  * `NEXT-rollup-builder-module.md`). It only delegates: each method is the engine call Core made
- * directly before the engine became the BarnCRM Rollup Builder module.
+ * directly before the engine became the BarnCRM Rollup Builder module. `RollupEngineExtensionV2`
+ * is the later seam Core's Module Manager calls on Turn on (decision 9).
  */
 @NamespaceAccessible
-public with sharing class RollupsEngineExtension implements RollupEngineExtension {
+public with sharing class RollupsEngineExtension implements RollupEngineExtension, RollupEngineExtensionV2 {
     @NamespaceAccessible
     public RollupsEngineExtension() {
         // Built by name from Core (RollupEngineExtensions), so it needs a public constructor.
+    }
+
+    public void afterModuleTurnedOn(String moduleName) {
+        if (RollupService.MODULE_NAME.equalsIgnoreCase(moduleName)) {
+            RollupService.catchUpAfterTurnedOn();
+        }
     }
 
     public void afterMerge(String targetObject, List<SObject> mergedRecords) {

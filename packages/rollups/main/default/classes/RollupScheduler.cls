@@ -43,10 +43,16 @@ public with sharing class RollupScheduler implements Schedulable {
     /**
      * The nightly run, and a processor for Rollup Queue entries no save started one for
      * (ROLLUPS-7), so a queued total never waits longer than a night. Nothing while the module
-     * is turned off (ADR-NEXT decision 9); the schedule stays, so it runs again once it is on.
+     * is turned off (ADR-NEXT decision 9), a one-off Run tonight included, and an Info entry
+     * says the run was skipped; the schedule stays, so it runs again once it is on.
      */
     public void execute(SchedulableContext context) {
         if (RollupService.isTurnedOff()) {
+            ErrorLogger.logMessage(
+                System.Label.Core_Rollups_ScheduledRunTurnedOff,
+                'RollupScheduler',
+                ErrorLogger.SEVERITY_INFO
+            );
             return;
         }
         if (this.everyDefinition == true) {

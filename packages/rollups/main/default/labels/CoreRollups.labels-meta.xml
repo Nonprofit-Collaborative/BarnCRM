@@ -305,6 +305,38 @@
         <value>The rollup recalculation did not run because all automation is paused. It runs again tonight, or click Recalculate all once automation is back on.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_FullRunTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full recalculation skipped while the module is turned off.</shortDescription>
+        <value>The rollup recalculation did not run because BarnCRM Rollup Builder is turned off on Modules. Turning it on recalculates every rollup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_RunStoppedTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a running recalculation stopped because the module was turned off.</shortDescription>
+        <value>A rollup recalculation stopped partway because BarnCRM Rollup Builder was turned off on Modules. Turning it on recalculates every rollup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ScheduledRunTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a scheduled rollup run skipped while the module is turned off.</shortDescription>
+        <value>The scheduled rollup run was skipped because BarnCRM Rollup Builder is turned off on Modules. Turning it on recalculates every rollup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error: Recalculate refused while the module is turned off.</shortDescription>
+        <value>BarnCRM Rollup Builder is turned off on Modules. Turn it on to recalculate.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_FullRunSummary</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

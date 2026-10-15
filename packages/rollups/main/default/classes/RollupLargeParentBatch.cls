@@ -496,13 +496,23 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
         proceed();
     }
 
-    /** Runs the next pass, writing each entity whose queries are all read on the way. */
+    /**
+     * Runs the next pass, writing each entity whose queries are all read on the way. Chains no
+     * pass once the module is turned off (ADR-NEXT decision 9): the held entries wait out their
+     * hold, and Turn on recalculates every rollup.
+     */
     @TestVisible
     private void proceed() {
         while (this.targetIndex < this.targets.size()) {
             RollupPlanner.Plan plan = currentPlan();
             if (currentTarget().stoppedReason == null && this.queryIndex < plan.queries.size()) {
-                if (Test.isRunningTest()) {
+                if (RollupService.isTurnedOff()) {
+                    ErrorLogger.logMessage(
+                        System.Label.Core_Rollups_RunStoppedTurnedOff,
+                        LOG_CONTEXT,
+                        ErrorLogger.SEVERITY_INFO
+                    );
+                } else if (Test.isRunningTest()) {
                     this.passWaiting = true;
                 } else {
                     Database.executeBatch(this, CHUNK_SIZE);
