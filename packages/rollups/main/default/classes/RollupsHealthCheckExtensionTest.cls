@@ -96,7 +96,7 @@ private class RollupsHealthCheckExtensionTest {
 
     /** Presses a fix the way the panel does: with the scope the finding carried. */
     private static HealthCheckService.Report press(HealthCheckService.Finding finding) {
-        return HealthCheckController.applyFix(
+        return HealthCheckController.applyFixFor(
             finding.fixTarget.substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
             finding.fixScope
         );
@@ -365,7 +365,7 @@ private class RollupsHealthCheckExtensionTest {
                     'Only somebody who can press the fix is told about it.'
                 );
                 try {
-                    HealthCheckController.applyFix(
+                    HealthCheckController.applyFixFor(
                         RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
                         new List<String>{ 'Household member count' }
                     );
@@ -387,7 +387,7 @@ private class RollupsHealthCheckExtensionTest {
             System.runAs(maria) {
                 try {
                     // The panel read one missing total; the org now has two missing.
-                    HealthCheckController.applyFix(
+                    HealthCheckController.applyFixFor(
                         RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
                         new List<String>{ 'Household member count' }
                     );
@@ -421,6 +421,27 @@ private class RollupsHealthCheckExtensionTest {
                     failedFound |= 'check_failed_rollup_queue'.equals(finding.key);
                 }
                 Assert.isTrue(failedFound, 'The broken queue check is reported as failed');
+            }
+        }
+    }
+
+    @IsTest
+    static void aSettingsManagerWithoutTheRollupPermissionSetGetsEveryCheck() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+            System.runAs(maria) {
+                Test.startTest();
+                List<HealthCheckService.Finding> found = new RollupsHealthCheckExtension()
+                    .findings();
+                Test.stopTest();
+
+                for (HealthCheckService.Finding finding : found) {
+                    Assert.isFalse(
+                        finding.key.startsWith('check_failed_'),
+                        'The queue counts run whatever object access she holds: ' + finding.key
+                    );
+                }
             }
         }
     }

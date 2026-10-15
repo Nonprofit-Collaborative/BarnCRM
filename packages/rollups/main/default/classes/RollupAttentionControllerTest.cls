@@ -12,7 +12,34 @@ private class RollupAttentionControllerTest {
     }
 
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        return TestDataFactory.createUser(
+            'Maria',
+            new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
+        );
+    }
+
+    @IsTest
+    static void staffSeeTheBuilderWithoutTheQueueBeingRead() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Account household = new Account(Name = 'Staff Household');
+            insert household;
+            insert entry(RollupQueue.STATUS_FAILED, new List<Id>{ household.Id }, 5);
+            User david = TestDataFactory.createUser(
+                'David',
+                new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User' }
+            );
+            RollupAttentionController.Attention attention;
+            Integer queries;
+            System.runAs(david) {
+                Integer before = Limits.getQueries();
+                attention = RollupAttentionController.getAttention();
+                queries = Limits.getQueries() - before;
+            }
+            System.Assert.isFalse(attention.canManage, 'Staff cannot act on the list.');
+            System.Assert.isNull(attention.failed, 'So the failed records are not read for them.');
+            System.Assert.isNull(attention.waiting, 'Nor what is waiting.');
+            System.Assert.areEqual(0, queries, 'The Rollup Queue is not queried at all.');
+        }
     }
 
     private static Rollup_Queue__c entry(String status, List<Id> ids, Integer attempts) {

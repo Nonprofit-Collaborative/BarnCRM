@@ -11,6 +11,14 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>RollupAttentionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupBuilderController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RollupController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

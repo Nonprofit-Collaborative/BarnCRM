@@ -3,8 +3,9 @@
  * 14A): the records waiting in the Rollup Queue, the ones that could not be saved with Retry,
  * whether the nightly run is scheduled, and how the last full run ended.
  *
- * Reads run in user mode, so only someone the BarnCRM Admin permission set lets read the queue
- * sees it. Retry needs the Manage BarnCRM Settings permission and goes through `RollupQueue`,
+ * The list is for whoever can act on it: someone who cannot manage settings (Staff and Read
+ * Only, through Rollup Builder User) gets only `canManage` false, the queue is not read for
+ * them, and the component shows nothing. Reads run in user mode. Retry needs the Manage BarnCRM Settings permission and goes through `RollupQueue`,
  * which writes entries in system mode (R-RQ5).
  */
 public with sharing class RollupAttentionController {
@@ -47,12 +48,18 @@ public with sharing class RollupAttentionController {
         public String lastRun { get; set; }
     }
 
-    /** Everything Needs attention shows, read fresh each time. */
+    /**
+     * Everything Needs attention shows, read fresh each time; for someone who cannot manage
+     * settings, only that they cannot, with nothing read.
+     */
     @AuraEnabled
     public static Attention getAttention() {
         try {
             Attention attention = new Attention();
             attention.canManage = BarnCRMPermissions.canManageSettings();
+            if (!attention.canManage) {
+                return attention;
+            }
             fillWaiting(attention);
             attention.failed = failedRecords();
             attention.nightlyScheduled = RollupScheduler.isScheduled();

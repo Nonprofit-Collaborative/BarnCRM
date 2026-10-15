@@ -87,7 +87,14 @@ subscriber migration.
    Giving ships); `OrgOptimizerObjectChecks` drops `Rollup_Definition__c` from Core's list.
    `CorePostInstall` stops calling the engine. Import and Duplicates need no seam: their saves
    reach the engine only through the registry rows, which are absent with the module.
-5. **The module's own post-install script.** `RollupsPostInstall` calls
+
+   `RollupEngineExtension` never gains a method once a module implements it: a class compiled
+   against the old interface would no longer satisfy it, and the resolver would treat the
+   installed module as absent. A new need gets a new interface (for example
+   `RollupEngineExtensionV2`) that the module implements beside the first, and Core's resolver
+   checks for it separately.
+5. **The module's own post-install script.** `RollupsPostInstall` carries over the two rollup
+   settings an org saved on `BarnCRM_Settings__c` (decision 6), calls
    `RollupService.ensureDefaultsDuringInstall` and assigns `Rollup_Builder_Admin` to the
    installer. ADR-0029's guarantees stand; Giving's script still runs its own call, now into the
    module.
@@ -157,8 +164,11 @@ subscriber migration.
   against the real classes.
 - Development orgs (`oi-test`, `oi-pa`, `mwdbdevsb`) already hold every component under the same
   API names, so a redeploy with the new stage order is enough. Two orphans remain until removed
-  with a one-time destructive deploy or a fresh org: the two fields left on `BarnCRM_Settings__c`,
-  whose values the new fields do not inherit.
+  with a one-time destructive deploy or a fresh org: the two fields left on `BarnCRM_Settings__c`.
+  Their values are carried over: `RollupsPostInstall.carryOverCoreSettings`, run at install and
+  by `deploy-packages.sh`, copies each non-blank value to `Rollup_Settings__c` while the module
+  has saved no settings of its own, reading the old fields by name since Core no longer defines
+  them. Once `Rollup_Settings__c` has a saved row it wins and nothing is copied again.
 - The PR breakdown is in the pull request that adds this ADR. Docs move with each PR:
   canonical model Sections 12, 14, 14A and 32 before the settings object is added, the admin
   guide's rollups, module manager, Health Check, settings and editions pages, the feature

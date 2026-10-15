@@ -272,4 +272,127 @@ private class RollupsPostInstallTest {
             Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c], 'Nothing ran.');
         }
     }
+
+    @IsTest
+    static void theInstallerGetsRollupBuilderAdminOnceEvenWhenTheyHoldItAlready() {
+        System.runAs(admin()) {
+            Id fresh = newInstaller();
+            Id alreadyHolding = TestDataFactory.createUser(
+                    'Holder',
+                    new List<String>{ RollupsPostInstall.ADMIN_PERMISSION_SET }
+                )
+                .Id;
+            RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>();
+
+            Test.startTest();
+            install(new RollupsPostInstall(), fresh);
+            install(new RollupsPostInstall(), alreadyHolding);
+            Test.stopTest();
+
+            Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Rollup Builder Admin.');
+            Assert.areEqual(
+                1,
+                adminSetsHeldBy(alreadyHolding),
+                'An installer who held it already is not given it twice.'
+            );
+        }
+    }
+
+    @IsTest
+    static void rollupSettingsSavedOnCoreAreCarriedOver() {
+        System.runAs(admin()) {
+            // Core no longer defines the old fields, so a test org cannot hold them: the read of
+            // the old values is stood in for, and the copy is what is measured.
+            RollupsPostInstall.oldCoreValuesForTest = new Map<String, Object>{
+                RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED,
+                RollupService.PROCESSING_SETTING => RollupService.PROCESSING_IN_SAVE
+            };
+
+            Test.startTest();
+            RollupsPostInstall.carryOverCoreSettings();
+            Test.stopTest();
+
+            Rollup_Settings__c saved = Rollup_Settings__c.getOrgDefaults();
+            Assert.isNotNull(saved.Id, 'The module settings are saved.');
+            Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                saved.Rollup_Mode_Default__c,
+                'The default mode the org chose on Core is kept.'
+            );
+            Assert.areEqual(
+                RollupService.PROCESSING_IN_SAVE,
+                saved.Rollup_Processing__c,
+                'And so is when real-time totals are recalculated.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aBlankOldValueIsLeftToTheShippedDefault() {
+        System.runAs(admin()) {
+            RollupsPostInstall.oldCoreValuesForTest = new Map<String, Object>{
+                RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED,
+                RollupService.PROCESSING_SETTING => ' '
+            };
+
+            RollupsPostInstall.carryOverCoreSettings();
+
+            Rollup_Settings__c saved = Rollup_Settings__c.getOrgDefaults();
+            Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                saved.Rollup_Mode_Default__c,
+                'The non-blank value is carried.'
+            );
+            Assert.areEqual(
+                RollupService.PROCESSING_BACKGROUND,
+                saved.Rollup_Processing__c,
+                'The blank one keeps the shipped default.'
+            );
+        }
+    }
+
+    @IsTest
+    static void settingsTheModuleAlreadySavedWin() {
+        System.runAs(admin()) {
+            Rollup_Settings__c existing = Rollup_Settings__c.getOrgDefaults();
+            existing.Rollup_Mode_Default__c = RollupService.MODE_BOTH;
+            Database.upsert(existing, AccessLevel.SYSTEM_MODE);
+            RollupsPostInstall.oldCoreValuesForTest = new Map<String, Object>{
+                RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED
+            };
+
+            RollupsPostInstall.carryOverCoreSettings();
+
+            Assert.areEqual(
+                RollupService.MODE_BOTH,
+                Rollup_Settings__c.getOrgDefaults().Rollup_Mode_Default__c,
+                'An upgrade never overwrites what the module settings already hold.'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing was saved.');
+        }
+    }
+
+    @IsTest
+    static void anOrgWithoutTheOldFieldsSavesNothing() {
+        System.runAs(admin()) {
+            // No stand-in: the real read finds no old field in this org.
+            Test.startTest();
+            RollupsPostInstall.carryOverCoreSettings();
+            Test.stopTest();
+
+            Assert.isNull(
+                Rollup_Settings__c.getOrgDefaults().Id,
+                'With nothing to carry, no settings row is created.'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = :RollupsPostInstall.CARRY_CONTEXT
+                ],
+                'And nothing failed.'
+            );
+        }
+    }
 }

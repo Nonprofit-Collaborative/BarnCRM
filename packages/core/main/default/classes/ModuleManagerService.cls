@@ -12,6 +12,7 @@
  * Callers check `Manage_BarnCRM_Settings` before any method that changes something or counts
  * records (`ModuleManagerController`).
  */
+@NamespaceAccessible
 public with sharing class ModuleManagerService {
     public static final String STATUS_NOT_INSTALLED = 'NotInstalled';
     public static final String STATUS_OFF = 'Off';
@@ -77,6 +78,15 @@ public with sharing class ModuleManagerService {
         'Rollups' => 'Rollup_Builder_Admin'
     };
 
+    /**
+     * Installed modules the Module Manager does not switch yet. Turning a module off stops only
+     * its own registry rows, and the Rollup Builder module's engine also runs from Giving's rows
+     * and its queue, nightly batch and Flow action. Until the engine checks the switch itself
+     * (ADR-NEXT `NEXT-rollup-builder-module.md`, decision 9), turning it off would stop part of
+     * it, so it is listed as on and offers no switch.
+     */
+    private static final Set<String> NOT_SWITCHABLE_YET = new Set<String>{ 'Rollups' };
+
     /** Raised for a module the org does not have, or one that cannot be switched. */
     public class ModuleManagerException extends Exception {
     }
@@ -123,7 +133,10 @@ public with sharing class ModuleManagerService {
             row.docsUrl = info.docsUrl;
             row.installUrl = info.installUrl;
             row.appUrl = info.appUrl;
-            row.canSwitch = info.present == true && info.name != CORE;
+            row.canSwitch =
+                info.present == true &&
+                info.name != CORE &&
+                !NOT_SWITCHABLE_YET.contains(info.name);
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED
                 : off.contains(info.name.toLowerCase()) && row.canSwitch ? STATUS_OFF : STATUS_ON;
@@ -132,7 +145,11 @@ public with sharing class ModuleManagerService {
         return rows;
     }
 
-    /** The modules listed as turned off, lower case. Read on every automation check. */
+    /**
+     * The modules listed as turned off, lower case. Read on every automation check, and by a
+     * module's own entry points that must stop while it is off.
+     */
+    @NamespaceAccessible
     public static Set<String> turnedOff() {
         Set<String> names = new Set<String>();
         String stored = SettingsService.getSettings().Modules_Turned_Off__c;

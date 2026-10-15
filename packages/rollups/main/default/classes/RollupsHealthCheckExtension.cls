@@ -173,6 +173,10 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
      * Totals the Rollup Queue could not finish (ADR-0098 async rollups): records whose
      * recalculation failed five times, or entries waiting longer than an hour, which means no
      * processor is running for them. The errors themselves are in the Error Log.
+     *
+     * Counts only, in system mode: the viewer already passed canManageSettings in findings(),
+     * and the Rollup Queue is the engine's own bookkeeping, which a settings manager without
+     * the Rollup Builder permission set cannot read. No row leaves this method.
      */
     @TestVisible
     private with sharing class RollupQueueCheck implements RollupCheck {
@@ -181,7 +185,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
                 SELECT COUNT()
                 FROM Rollup_Queue__c
                 WHERE Status__c = :RollupQueue.STATUS_FAILED
-                WITH USER_MODE
+                WITH SYSTEM_MODE
                 LIMIT 10000
             ];
             Datetime stuckBefore = Datetime.now().addMinutes(-queueStuckAfterMinutes);
@@ -189,7 +193,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
                 SELECT COUNT()
                 FROM Rollup_Queue__c
                 WHERE Status__c = :RollupQueue.STATUS_PENDING AND CreatedDate < :stuckBefore
-                WITH USER_MODE
+                WITH SYSTEM_MODE
                 LIMIT 10000
             ];
             if (failed == 0 && stuck == 0) {

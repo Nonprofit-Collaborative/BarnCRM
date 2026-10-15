@@ -120,4 +120,10 @@ describe('c-rollup-needs-attention', () => {
     const readOnly = await build({ ...ATTENTION, hasWaiting: true, canManage: false });
     expect(query(readOnly, 'start-now')).toBeNull();
   });
+
+  it('shows nothing to someone who cannot manage settings', async () => {
+    const staff = await build({ canManage: false });
+
+    expect(staff.shadowRoot.querySelector('section')).toBeNull();
+  });
 });

@@ -79,6 +79,14 @@ export default class RollupNeedsAttention extends LightningElement {
     return this.rows.length > 0;
   }
 
+  /**
+   * Shown to someone who can act on it, or with the error a load ended in. Staff and Read Only
+   * see the Builder without it: the queue is not read for them (RollupAttentionController).
+   */
+  get shown() {
+    return !!this.error || (!!this.attention && this.attention.canManage === true);
+  }
+
   get showNightlyOff() {
     return !!this.attention && this.attention.nightlyScheduled === false;
   }

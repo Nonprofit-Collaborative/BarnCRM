@@ -1,59 +1,61 @@
 <template>
-    <section class="slds-var-m-top_medium">
-        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h2>
-        <template lwc:if={error}>
-            <p class="slds-text-color_error" role="alert" data-id="error">{error}</p>
-        </template>
-        <template lwc:if={notice}>
-            <p role="status" data-id="notice">{notice}</p>
-        </template>
-        <template lwc:if={attention}>
-            <p data-id="waiting">{attention.waiting}</p>
-            <template lwc:if={canStart}>
-                <lightning-button
-                    class="slds-var-m-top_xx-small"
-                    data-id="start-now"
-                    label={labels.startNow}
-                    disabled={busy}
-                    onclick={handleStartNow}
-                ></lightning-button>
+    <template lwc:if={shown}>
+        <section class="slds-var-m-top_medium">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h2>
+            <template lwc:if={error}>
+                <p class="slds-text-color_error" role="alert" data-id="error">{error}</p>
             </template>
-            <template lwc:if={showNightlyOff}>
-                <p class="slds-text-color_error" data-id="nightly-off">{labels.nightlyOff}</p>
+            <template lwc:if={notice}>
+                <p role="status" data-id="notice">{notice}</p>
             </template>
-            <p data-id="last-run">{attention.lastRun}</p>
+            <template lwc:if={attention}>
+                <p data-id="waiting">{attention.waiting}</p>
+                <template lwc:if={canStart}>
+                    <lightning-button
+                        class="slds-var-m-top_xx-small"
+                        data-id="start-now"
+                        label={labels.startNow}
+                        disabled={busy}
+                        onclick={handleStartNow}
+                    ></lightning-button>
+                </template>
+                <template lwc:if={showNightlyOff}>
+                    <p class="slds-text-color_error" data-id="nightly-off">{labels.nightlyOff}</p>
+                </template>
+                <p data-id="last-run">{attention.lastRun}</p>
 
-            <h3 class="slds-text-title_bold slds-var-m-top_small">{labels.failedTitle}</h3>
-            <template lwc:if={hasFailed}>
-                <lightning-datatable
-                    data-id="failed"
-                    key-field="key"
-                    data={rows}
-                    columns={columns}
-                    hide-checkbox-column={hideCheckboxes}
-                    onrowselection={handleSelection}
-                ></lightning-datatable>
-                <template lwc:if={canRetry}>
-                    <div class="slds-var-m-top_x-small">
-                        <lightning-button
-                            data-id="retry"
-                            label={labels.retry}
-                            disabled={retryDisabled}
-                            onclick={handleRetry}
-                        ></lightning-button>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            data-id="retry-all"
-                            label={labels.retryAll}
-                            disabled={busy}
-                            onclick={handleRetryAll}
-                        ></lightning-button>
-                    </div>
+                <h3 class="slds-text-title_bold slds-var-m-top_small">{labels.failedTitle}</h3>
+                <template lwc:if={hasFailed}>
+                    <lightning-datatable
+                        data-id="failed"
+                        key-field="key"
+                        data={rows}
+                        columns={columns}
+                        hide-checkbox-column={hideCheckboxes}
+                        onrowselection={handleSelection}
+                    ></lightning-datatable>
+                    <template lwc:if={canRetry}>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning-button
+                                data-id="retry"
+                                label={labels.retry}
+                                disabled={retryDisabled}
+                                onclick={handleRetry}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                data-id="retry-all"
+                                label={labels.retryAll}
+                                disabled={busy}
+                                onclick={handleRetryAll}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </template>
+                <template lwc:else>
+                    <p data-id="nothing-failed">{labels.nothingFailed}</p>
                 </template>
             </template>
-            <template lwc:else>
-                <p data-id="nothing-failed">{labels.nothingFailed}</p>
-            </template>
-        </template>
-    </section>
+        </section>
+    </template>
 </template>

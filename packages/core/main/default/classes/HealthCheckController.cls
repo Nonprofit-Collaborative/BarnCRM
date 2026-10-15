@@ -111,8 +111,19 @@ public with sharing class HealthCheckController {
      * @param expectedScope the fix scope the confirmed finding carried
      */
     @AuraEnabled
-    @NamespaceAccessible
     public static HealthCheckService.Report applyFix(String fixKey, List<String> expectedScope) {
+        return applyFixFor(fixKey, expectedScope);
+    }
+
+    /**
+     * The same fix as applyFix, for a module package's Apex. NamespaceAccessible is not paired
+     * with AuraEnabled on one method, so module callers use this one.
+     *
+     * @param fixKey which fix, one of the FIX_KEY constants on HealthCheckService
+     * @param expectedScope the fix scope the confirmed finding carried
+     */
+    @NamespaceAccessible
+    public static HealthCheckService.Report applyFixFor(String fixKey, List<String> expectedScope) {
         requireManageSettings();
         String fixLabel = fixLabel(fixKey);
         if (fixLabel == null) {

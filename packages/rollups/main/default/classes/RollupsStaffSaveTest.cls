@@ -61,4 +61,72 @@ private class RollupsStaffSaveTest {
             );
         }
     }
+
+    /** A Staff-only person's save made inside a Queueable, as an integration's job makes it. */
+    private class SaveInAQueueable implements Queueable {
+        private final Id organizationId;
+
+        SaveInAQueueable(Id organizationId) {
+            this.organizationId = organizationId;
+        }
+
+        public void execute(QueueableContext context) {
+            insert new Contact(LastName = 'Queued Volunteer', AccountId = organizationId);
+            // Asserted here, where the job's own transaction state is: a Queueable leaves the
+            // processor job to its caller and announces the entries with the ready event.
+            Assert.areEqual(
+                1,
+                RollupQueue.readyEventsPublished,
+                'The Staff-only save inside a Queueable published Rollup_Queue_Ready__e'
+            );
+        }
+    }
+
+    @IsTest
+    static void aStaffOnlySaveInsideAQueueablePublishesTheReadyEvent() {
+        User staff;
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            insert new Rollup_Definition__c(
+                Name = 'People per organization',
+                Definition_Key__c = 'Test_Staff_Queueable_People',
+                Source_Object__c = 'Contact',
+                Relationship_Path__c = 'AccountId',
+                Aggregate__c = 'COUNT',
+                Target_Object__c = 'Account',
+                Target_Field__c = 'NumberOfEmployees',
+                Mode__c = RollupService.MODE_BOTH,
+                Fiscal_Year_Aware__c = false,
+                Active__c = true
+            );
+            staff = TestDataFactory.createUser('Staffqueued', new List<String>{ 'BarnCRM_Staff' });
+        }
+        Account organization;
+
+        System.runAs(staff) {
+            organization = new Account(
+                Name = 'Shelter',
+                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+                    .get('Organization')
+                    .getRecordTypeId()
+            );
+            insert organization;
+
+            Test.startTest();
+            System.enqueueJob(new SaveInAQueueable(organization.Id));
+            Test.stopTest();
+        }
+
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Contact WHERE AccountId = :organization.Id],
+                'The save inside the Queueable went through'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c LIKE 'Rollup%'],
+                'Publishing the ready event was not refused for want of a permission'
+            );
+        }
+    }
 }
