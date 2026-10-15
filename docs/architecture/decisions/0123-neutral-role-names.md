@@ -1,4 +1,4 @@
-# ADR-NEXT: Core roles have neutral names that fit any organization
+# ADR-0123: Core roles have neutral names that fit any organization
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-14)
 **Date:** 2026-10-14
