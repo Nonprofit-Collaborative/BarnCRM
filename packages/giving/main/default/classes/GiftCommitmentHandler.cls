@@ -3,7 +3,13 @@
  * run by the Core trigger dispatcher through the Automation Registry row
  * `Gift_Commitment_Application` at execution order 20, after the gift's own domain rules.
  */
+@NamespaceAccessible
 public with sharing class GiftCommitmentHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftCommitmentHandler() {
+        return;
+    }
+
     public override void afterInsert() {
         onAfterInsert((List<Gift__c>) newRecords());
     }

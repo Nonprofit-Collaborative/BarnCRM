@@ -2,7 +2,13 @@
  * Record-level rules for Fund__c: at most one fund is the default, and marking a new one
  * clears the old one rather than asking an administrator to remember (R-F1).
  */
+@NamespaceAccessible
 public with sharing class FundTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public FundTriggerHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'FundTriggerHandler';
     }

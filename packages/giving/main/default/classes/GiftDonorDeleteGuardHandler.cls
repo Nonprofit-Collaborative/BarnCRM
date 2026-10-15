@@ -7,7 +7,13 @@
  * with Always Runs (ADR-0024). A merge still works: the refusal is made after delete, where a
  * merged record carries its MasterRecordId.
  */
+@NamespaceAccessible
 public with sharing class GiftDonorDeleteGuardHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftDonorDeleteGuardHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftDonorDeleteGuardHandler';
     }

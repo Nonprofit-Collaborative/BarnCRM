@@ -11,7 +11,13 @@
  * lists, so the rules are unit tested without a trigger context and the handler stays a
  * three-line wrapper.
  */
+@NamespaceAccessible
 public with sharing class GiftTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftTriggerHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftTriggerHandler';
     }

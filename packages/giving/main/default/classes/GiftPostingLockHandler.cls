@@ -4,7 +4,13 @@
  * as the receipt lock's (ADR-0024). The rules are `GiftPostingLock` methods that take explicit
  * lists and are tested without a trigger context.
  */
+@NamespaceAccessible
 public with sharing class GiftPostingLockHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftPostingLockHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftPostingLockHandler';
     }

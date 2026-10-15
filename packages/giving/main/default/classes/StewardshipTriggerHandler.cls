@@ -10,8 +10,14 @@
  * on: a welcome sequence for a gift from three weeks ago is not a welcome, and the registry row
  * says so where the administrator reads it.
  */
+@NamespaceAccessible
 public with sharing class StewardshipTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'Stewardship plans';
+
+    @NamespaceAccessible
+    public StewardshipTriggerHandler() {
+        return;
+    }
 
     public override void afterInsert() {
         start();

@@ -19,6 +19,7 @@
  * field a rollup reads changed, and recalculation recomputes (ADR-0082), so running each update
  * is never wrong and costs nothing when nothing a rollup reads moved.
  */
+@NamespaceAccessible
 public with sharing class RollupTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'RollupTriggerHandler';
 
@@ -26,6 +27,11 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
     private static final String PHASE_INSERT = 'rollup.afterInsert';
     private static final String PHASE_DELETE = 'rollup.beforeDelete';
     private static final String PHASE_UNDELETE = 'rollup.afterUndelete';
+
+    @NamespaceAccessible
+    public RollupTriggerHandler() {
+        return;
+    }
 
     public override void afterInsert() {
         run(PHASE_INSERT, newRecords(), null);
