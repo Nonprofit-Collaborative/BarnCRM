@@ -30,7 +30,7 @@ gifts. Those gifts are not in the books until Jen exports them and marks them po
 Posting and closed periods arrive with the Giving module. Nothing is locked until someone marks
 a gift posted or closes a period.
 
-- **Marking gifts posted** is on the Accounting Export page, which needs the Connect module (see
+- **Marking gifts posted** is on the Accounting Export page, which needs the Mirror module (see
   [Accounting Export](accounting-export.md)). The **Accounting Export** permission set includes
   the **Post Gifts** permission, so Jen can mark gifts posted and unpost them. **Giving Admin**
   includes it too.

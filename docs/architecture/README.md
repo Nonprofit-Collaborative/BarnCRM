@@ -32,7 +32,7 @@ From plan Section 0 and Section 12:
    the workaround costs (plan Section 9.3). The design is never silently changed.
 3. Decisions listed in plan Section 11.4 are escalated to Brandon rather than made by
    the builder: adding a package dependency, adding a standard-object reference outside
-   Connect, adding a required Setup step, changing the household membership abstraction,
+   Mirror, adding a required Setup step, changing the household membership abstraction,
    changing versioning or namespace, and anything touching receipt immutability or gift
    amount mutability.
 4. An ADR is never edited to change its Decision after it is Accepted. It is superseded

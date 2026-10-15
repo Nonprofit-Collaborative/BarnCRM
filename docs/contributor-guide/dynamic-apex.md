@@ -13,7 +13,7 @@ at runtime.
 
 | Reached from | Target | Example | Decision |
 | --- | --- | --- | --- |
-| Connect | Campaign (and later Opportunity, Gift Transaction) | `CampaignSyncService`, `CampaignSyncSelector` | ADR-0056 |
+| Mirror | Campaign (and later Opportunity, Gift Transaction) | `CampaignSyncService`, `CampaignSyncSelector` | ADR-0056 |
 | Core | Person Account fields (`PersonEmail`, `PersonMailingPostalCode`, `...__pc`) | `ImportMatcher`, `ImportRowProcessor.storedName` | ADR-0013 |
 | Core | Giving behaviour (classes) | `ImportEntityProcessors`, `SampleDataModules`, `HealthCheckExtensions`, `SetupAssistantExtensions` | ADR-0017, ADR-0057, ADR-0059 |
 | Core | Industries, NPSP, Sales Cloud detection | `OrgShapeDetector` | ADR-0013 |
@@ -21,7 +21,7 @@ at runtime.
 The shape, from `CampaignSyncService`:
 
 ```apex
-// detection-only: Campaign is resolved through describe so Connect installs without it
+// detection-only: Campaign is resolved through describe so Mirror installs without it
 private static final String CAMPAIGN_OBJECT = 'Campaign';
 
 public static Schema.SObjectType campaignType() {
@@ -48,8 +48,8 @@ Rules:
 
 | Gate | Catches | Misses |
 | --- | --- | --- |
-| `check-standard-objects.sh` (denylist) | Opportunity, Campaign, Lead, Case, `PersonAccount`, `IsPersonAccount`, `GiftTransaction`, `__dlm`, and the Nonprofit Cloud objects, in Core, Giving, Volunteers, Programs and Funders; the same names in Connect's object and field declarations (`packages/connect/**/objects/`), outside their prose | Anything not on its list; Connect's Apex, which may name them as strings |
-| `check-object-allowlist.py` (allowlist, every package including Connect and the vendor tree) | Any standard object not listed, in `new X(`, `List<X>`, `X.SObjectType`, `FROM X` | Plain declarations (`Campaign c;`), field tokens (`Account.PersonEmail`) |
+| `check-standard-objects.sh` (denylist) | Opportunity, Campaign, Lead, Case, `PersonAccount`, `IsPersonAccount`, `GiftTransaction`, `__dlm`, and the Nonprofit Cloud objects, in Core, Giving, Volunteers, Programs and Funders; the same names in Mirror's object and field declarations (`packages/mirror/**/objects/`), outside their prose | Anything not on its list; Mirror's Apex, which may name them as strings |
+| `check-object-allowlist.py` (allowlist, every package including Mirror and the vendor tree) | Any standard object not listed, in `new X(`, `List<X>`, `X.SObjectType`, `FROM X` | Plain declarations (`Campaign c;`), field tokens (`Account.PersonEmail`) |
 | `check-person-account-fields.py` (every package except the vendor tree) | A Person Account field (`IsPersonAccount`, `PersonEmail`, `Person...`, `__pc`, `__pr`) outside Apex strings and comments, in an `@salesforce/schema` import, a `field-name` attribute, or metadata outside its prose | Custom metadata records (data); a name held as text, which is the allowed seam |
 | Offline Apex compile (`check:apex`) | Nothing about org shape: it compiles against a schema that has everything | |
 
@@ -287,7 +287,7 @@ insert runs it once per 200 records.
 - **Force the other shape with seams**, not with the org: `OrgShapeDetector.overrideShape`,
   `CustomPermissionSelector.holdersOverride`, the resolver overrides in section 3,
   `CampaignSyncService.unavailableForTest` (Campaign absent: `CampaignSyncUnavailableTest`),
-  `HealthCheckOrgShapeChecks.connectInstalledOverride`.
+  `HealthCheckOrgShapeChecks.mirrorInstalledOverride`.
 - **Test orgs:** `oi-test` and `oi-pa` both have Person Accounts and the Sales Cloud objects
   (see [ci.md](ci.md)). Every feature-present branch runs on them; no feature-absent branch
   does.
@@ -297,7 +297,7 @@ insert runs it once per 200 records.
   the static gates in section 2. A manual check on a real Platform-license org is scheduled for the
   v0.10 hardening iteration (ADR-0013).
 - **Opportunity absent:** `OpportunityMirrorService.unavailableForTest` hides Opportunity and
-  its contact roles; `OpportunityMirrorUnavailableTest` runs that path. Each Connect test that
+  its contact roles; `OpportunityMirrorUnavailableTest` runs that path. Each Mirror test that
   stops where Opportunity is absent first asserts the absent case through its class's
   `assertNothingMirrored()` (for the page `assertRefusedAsUnavailable`, for Health Check
   `assertNothingReported`).

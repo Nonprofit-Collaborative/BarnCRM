@@ -10,7 +10,7 @@ an entitlement, and is described below.
 | Shape           | Definition file                            | What it verifies                                                                                                                             |
 | --------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Platform only   | `config/scratch-defs/platform-only.json`   | The floor: Core, Giving, Volunteers, Programs, and Funders all work with no Opportunity, Lead, Campaign, Case, or Product objects available. |
-| Sales Cloud     | `config/scratch-defs/sales-cloud.json`     | Standard Sales/Service objects present; Connect's Opportunity mirror and Campaign sync have real targets.                                    |
+| Sales Cloud     | `config/scratch-defs/sales-cloud.json`     | Standard Sales/Service objects present; the Opportunity mirror and Campaign sync have real targets.                                         |
 | NPSP installed  | `config/scratch-defs/npsp.json`            | Sales Cloud plus NPSP installed; NPSP coexistence mode (Section 4.5).                                                                        |
 | Person Accounts | `config/scratch-defs/person-accounts.json` | Person Accounts enabled, simulating the Agentforce Nonprofit shape; junction household mode is required here.                                |
 | Nonprofit Cloud | `config/scratch-defs/nonprofit-cloud.json` | The real Agentforce Nonprofit shape, with the Nonprofit Cloud objects present. Needs an entitled Dev Hub: see below.                          |

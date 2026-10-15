@@ -31,7 +31,7 @@ The Setup Assistant's first step and BarnCRM Settings offer the same list.
 | Mode | Choose it when | What it changes |
 |---|---|---|
 | **Standalone** | Your org has no other household model. This is the default, and the recommendation in any org without NPSP or Nonprofit Cloud, including one with Person Accounts. | Nothing, in this version. How households group people is the separate **household membership** setting, which Standalone leaves as it is. In an org with Person Accounts, BarnCRM proposes junction membership (one membership record per person) because Person Accounts need it, but never overwrites a membership choice an administrator already made. |
-| **NPSP coexistence** (only with NPSP) | NPSP is installed and you still want it working while you move. | Nothing, in this version. It records that NPSP is here. BarnCRM builds its own households and leaves NPSP's records alone. Feeding NPSP's own totals arrives with the Connect module (v0.6). |
+| **NPSP coexistence** (only with NPSP) | NPSP is installed and you still want it working while you move. | Nothing, in this version. It records that NPSP is here. BarnCRM builds its own households and leaves NPSP's records alone. Feeding NPSP's own totals arrives with the Mirror module (v0.6). |
 | **Nonprofit Cloud coexistence** (only with Nonprofit Cloud) | Your org has Salesforce Nonprofit Cloud objects. | Household membership uses membership records rather than the person's account, so Person Accounts work properly and one person can belong to more than one household. Your Nonprofit Cloud objects are left alone. |
 
 BarnCRM recommends Nonprofit Cloud coexistence when it finds Nonprofit Cloud objects,

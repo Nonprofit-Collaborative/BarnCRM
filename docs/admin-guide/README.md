@@ -109,7 +109,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-07 | [Coexistence mode](coexistence-mode.md) | Core | v0.1 |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core | v0.1 |
 | C-10 Sample data loader | [sample-data.md](sample-data.md) | Core | v0.1 |
-| C-11 | [Health Check](health-check.md) | Core, with findings from Giving and Connect | v0.1 |
+| C-11 | [Health Check](health-check.md) | Core, with findings from Giving and Mirror | v0.1 |
 | C-03 BarnCRM app and setup checklist | [barncrm-app.md](barncrm-app.md) | Core | v0.1 |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core | v0.1 |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
@@ -146,11 +146,11 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving | v0.5 |
 | C-01 Household members | [household-members.md](household-members.md) | Core | v0.1 |
 | X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core, only in an org with Nonprofit Cloud | v0.6 |
-| X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Connect | v0.6 |
-| X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Connect | v0.6 |
-| X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Connect | v0.6 |
-| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Connect | v0.7 |
-| X-04 Accounting export | [accounting-export.md](accounting-export.md) | Connect | v0.6 |
+| X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Mirror | v0.6 |
+| X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Mirror | v0.6 |
+| X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Mirror | v0.6 |
+| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Mirror | v0.7 |
+| X-04 Accounting export | [accounting-export.md](accounting-export.md) | Mirror | v0.6 |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving | v0.6 |
 | UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |

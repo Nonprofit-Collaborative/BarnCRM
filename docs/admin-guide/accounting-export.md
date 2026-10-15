@@ -42,7 +42,7 @@ already exported turns up in her next file instead of being missed.
 
 ## How to turn it on
 
-The Connect module has to be installed. Then give the person who runs the export the
+The Mirror module has to be installed. Then give the person who runs the export the
 **Accounting Export** permission set, next to a Giving permission set that lets them see
 gifts (**Giving Read Only** is enough). Both are assigned in Setup: the roles on the Access
 page do not include a module's permission sets.

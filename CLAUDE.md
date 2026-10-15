@@ -4,7 +4,7 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 
 ## Non-negotiables
 - Namespace is deferred: keep `sfdx-project.json` namespace empty, never hard-code a prefix, never create 2GP package versions. CI runs `scripts/ci/check-namespace.sh`.
-- No dependency on Person Accounts, Industries objects, OmniStudio, Data Cloud, Experience Cloud, or any standard object outside `packages/connect` (Opportunity, Campaign, Case, Lead). CI runs `scripts/ci/check-standard-objects.sh`. Core must run on a Platform-only org (ADR-0013).
+- No dependency on Person Accounts, Industries objects, OmniStudio, Data Cloud, Experience Cloud, or any standard object outside `packages/mirror` (Opportunity, Campaign, Case, Lead). CI runs `scripts/ci/check-standard-objects.sh`. Core must run on a Platform-only org (ADR-0013).
 - Every admin setting lives in the in-app Nonprofit Settings console, never only in Setup.
 - Salesforce Code Analyzer: zero high or critical findings before merge.
 - No em dashes in documentation, labels, or commit messages. Use colons, commas, parentheses.

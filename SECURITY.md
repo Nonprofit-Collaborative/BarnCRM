@@ -24,7 +24,7 @@ If you cannot use private vulnerability reporting, say so in a GitHub issue that
 The more of this you can give us, the faster we can confirm and fix:
 
 - What the issue is and what an attacker could do with it.
-- Which package and which component (Core, Giving, Volunteers, Programs, Funders, Connect; object, Apex class, LWC, permission set, REST endpoint).
+- Which package and which component (Core, Giving, Volunteers, Programs, Funders, Mirror; object, Apex class, LWC, permission set, REST endpoint).
 - The org shape you saw it on: Platform only, Sales and Service Cloud, NPSP installed, or Person Accounts enabled.
 - Steps to reproduce, ideally in a fresh scratch org created with `scripts/org/create-scratch-org.sh`.
 - The commit or version you tested.
@@ -47,7 +47,7 @@ BarnCRM is a Salesforce managed package that runs inside your own Salesforce org
 - **No external callouts by default.** The packages do not call out to third-party services during normal operation.
 - **No data leaves the org.** There is no BarnCRM server, no hosted component, and no vendor copy of your constituent data.
 - **Telemetry is opt-in and off by default**, and anonymous when it is on.
-- **REST endpoints exist only in the Connect package** (the inbound gift API), are authenticated, and are documented. Connect is optional and is not installed unless you install it.
+- **REST endpoints exist only in the Mirror package** (the inbound gift API), are authenticated, and are documented. Mirror is optional and is not installed unless you install it.
 - Issues in Salesforce itself, rather than in this code, belong to Salesforce: report those through https://trust.salesforce.com. We are happy to help you tell the difference.
 - Org configuration mistakes made by an administrator (over-broad profiles, sharing settings, guest user access) are not vulnerabilities in this project, but if our defaults or our documentation encouraged the mistake, that is a real issue and we want to hear it.
 

@@ -2,11 +2,11 @@
 
 Status: research reference, not a settled decision. Feeds two later features:
 
-- **X-07 Gift Transaction mirror** (Connect package, v0.6; plan Sections 4.5, 4.12).
+- **X-07 Gift Transaction mirror** (Mirror package, v0.6; plan Sections 4.5, 4.12).
 - **C-14 Agentforce Nonprofit import templates** (Import framework, v0.2; plan Sections 4.9, 6.3).
 
 Nothing here changes the canonical model or creates a dependency. Every Nonprofit Cloud
-object named below is optional and is only ever touched from the Connect package behind
+object named below is optional and is only ever touched from the Mirror package behind
 dynamic Apex (plan Section 4.2 hard rules, Section 6.3 dependency rule). Last verified
 2026-09-09.
 
@@ -307,7 +307,7 @@ and actionable lists read.
   describes adding a member by hand, choosing a contact or a person account. Membership is
   **not** created automatically: it is added by hand or through the Group Definitions API,
   whose request body keys members on `contactId`
-  (`https://developer.salesforce.com/docs/atlas.en-us.nonprofit_cloud.meta/nonprofit_cloud/connect_resources_group_definitions.htm`).
+  (`https://developer.salesforce.com/docs/atlas.en-us.nonprofit_cloud.meta/nonprofit_cloud/mirror_resources_group_definitions.htm`).
   Still unconfirmed: whether an `AccountContactRelation` row exists between a person
   account's own Contact and its own Account.
 - **PartyRoleRelation**

@@ -8,7 +8,7 @@ for code generators and API tools, is
 [`inbound-gift-api.openapi.yaml`](../architecture/reference/inbound-gift-api.openapi.yaml);
 CI checks it against the Apex.
 
-This contract is permanent once the Connect package is released as a managed package: new
+This contract is permanent once the Mirror package is released as a managed package: new
 optional fields may be added, and nothing below will be removed or renamed.
 
 ## Endpoint

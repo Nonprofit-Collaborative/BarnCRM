@@ -1,6 +1,6 @@
 # The inbound gift API (feature X-03, ADR-0051) as an OpenAPI 3.1 document.
 #
-# It describes exactly what packages/connect accepts and returns: InboundGiftResource (the
+# It describes exactly what packages/mirror accepts and returns: InboundGiftResource (the
 # endpoint), InboundGift (the body), InboundGiftResult (the answer) and InboundGiftRequest and
 # InboundGiftService (the rules). The prose reference for developers is
 # docs/api/inbound-gift-api.md; the two say the same thing, and the code wins if they ever

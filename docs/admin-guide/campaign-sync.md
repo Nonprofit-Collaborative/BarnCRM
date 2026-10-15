@@ -35,7 +35,7 @@ removed again, so the next run does not leave a second one beside it.
 
 ## How to turn it on
 
-You need the Connect module installed, and a Salesforce edition that has Campaigns (Sales
+You need the Mirror module installed, and a Salesforce edition that has Campaigns (Sales
 Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform licenses only has no
 Campaigns, and the Campaign sync page says so.
 
