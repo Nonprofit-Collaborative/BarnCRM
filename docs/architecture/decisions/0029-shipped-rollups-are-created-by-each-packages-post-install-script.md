@@ -4,7 +4,10 @@
 **Date:** 2026-09-09
 **Amended by:** ADR-0056 (Campaign sync keeps its link on the appeal), under which Connect also has a
 post-install script, `ConnectPostInstall`; the statement below that Core is the only package with one
-describes the state before this ADR (Giving gained `GivingPostInstall` here).
+describes the state before this ADR (Giving gained `GivingPostInstall` here). Amended by ADR-NEXT
+(`NEXT-rollup-builder-module.md`): Core's post-install script no longer creates rollups; the
+BarnCRM Rollup Builder module's `RollupsPostInstall` makes the call Core made, and Giving's script
+still makes its own, now into the module.
 **Source:** defect in C-13 and G-02; canonical model Section 13 and rule R-R6; ADR-0006, ADR-0003,
 ADR-0021
 

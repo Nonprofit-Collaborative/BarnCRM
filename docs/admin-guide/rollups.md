@@ -4,14 +4,15 @@
 
 Rollups are the totals that appear on a household, a person, an organization, or another
 record without anyone adding them up: a count, a sum, a first or last date, a largest
-value. BarnCRM Core runs the rollup engine; the totals themselves are shipped by the
-modules that own the records being counted, and with the Giving module installed they
+value. The rollup engine is its own module, **BarnCRM Rollup Builder**, offered in both
+editions and needed by Giving; without it BarnCRM keeps no totals. The totals themselves are
+shipped by the modules that own the records being counted, and with the Giving module installed they
 include total giving, gift counts and dates, pledge balances and what a fund and an appeal
 have raised.
 
 The member count on a household is not one of them. It looks like a rollup and it is kept
 up to date for you, but it is maintained by the household automation every time somebody
-joins or leaves, so it is not on the Rollups page and Recalculate does not touch it. If a
+joins or leaves, so it is not in the Rollup Builder and Recalculate does not touch it. If a
 member count looks wrong, the Households page is where to fix it.
 
 BarnCRM calculates them for you and shows you when each one was last calculated, so
@@ -21,8 +22,8 @@ looking fresh.
 
 ## What BarnCRM calculates for you (with Giving)
 
-This section applies only when the Giving module is installed. Core on its own ships no
-totals, so its Rollups page lists only rollups you add yourself.
+This section applies only when the Giving module is installed. The Rollup Builder module on
+its own ships no totals, so without Giving it lists only rollups you add yourself.
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -91,10 +92,13 @@ about a number that looks wrong:
 
 ## How to turn it on
 
-Most of it is already on. Installing a module creates its rollups, active and ready to
-calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
-without touching a rollup you have changed. An org with Core alone starts with no shipped
-totals.
+Install the **BarnCRM Rollup Builder** module after Core; Giving cannot be installed without
+it. Installing it gives you, the installer, the **Rollup Builder Admin** permission set.
+
+After that most of it is already on. Installing a module creates its rollups, active and ready
+to calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
+without touching a rollup you have changed. An org with the Rollup Builder and no Giving starts
+with no shipped totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
@@ -189,8 +193,8 @@ contacts, then all funds), and calculate all of a record's totals together:
 - **A record is saved only when one of its totals changed.** Its **Rollups last calculated**
   time then moves to the time of that run. A record whose totals were already right is not
   saved, so it keeps its earlier time: the run checked it and found nothing to change. The
-  **Last calculated** time on the Rollups page is what tells you the run happened.
-- **The Rollups page marks a rollup calculated when the whole run has finished**, not when it
+  **Last calculated** time in the Rollup Builder is what tells you the run happened.
+- **The Rollup Builder marks a rollup calculated when the whole run has finished**, not when it
   starts. When the page shows a time, the totals from that run are already on the records.
 - **Records with a very large number of gifts are calculated separately.** A catch-all
   donor such as "Anonymous" is calculated on its own after the others, so it cannot hold up
@@ -473,12 +477,12 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 ## A five-minute walkthrough
 
 Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
-need the Giving module; with Core alone, do them on a rollup you have added.
+need the Giving module; without it, do them on a rollup you have added.
 
 1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
    into a warning and offers a link to the Rollups section of **BarnCRM Settings**, which
-   opens the Rollup Builder. Click that link, or open the **Rollup Builder** tab.
+   opens the Rollup Builder. Click that link, or open the **BarnCRM Rollup Builder** app.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("Sum Amount__c
    on Gift__c", or for a text list "Text list Name on Program__c, separated by semicolon"),
@@ -498,7 +502,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    any of them changed, the **Rollups last calculated** field on the record shows the time
    of that run; if none did, it keeps its earlier time, because the run found nothing to
    change. That field is
-   the answer to "is this number current" for one record; the Rollups page answers it for
+   the answer to "is this number current" for one record; the Rollup Builder answers it for
    the whole org.
 6. Go back to the BarnCRM home page. The Rollups tile shows the time you just recalculated.
 
@@ -568,7 +572,7 @@ For report builders only. Nothing on this page requires you to know these.
 | What you see | Field |
 |---|---|
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
-| Last calculated, on the Rollups page | `Last_Calculated__c` on Rollup Definition |
+| Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 

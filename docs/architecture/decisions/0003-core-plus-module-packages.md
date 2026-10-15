@@ -2,6 +2,8 @@
 
 **Status:** Accepted
 **Date:** 2026-09-06
+**Amended by:** ADR-NEXT (`NEXT-rollup-builder-module.md`): the rollup engine and the Rollup
+Builder leave Core for a module of their own, BarnCRM Rollup Builder, which Giving depends on.
 **Source:** plan Section 12, decision D-03
 
 ## Context
