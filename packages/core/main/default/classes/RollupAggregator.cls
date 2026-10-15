@@ -150,18 +150,31 @@ public without sharing class RollupAggregator {
     }
 
     /**
-     * Calculates every planned definition for these target records.
+     * Calculates every planned definition for these target records. With a row ceiling set
+     * (`limitQueryRows`), stops with `RowCeilingException` rather than start a query that would
+     * take the transaction past it.
      *
      * @param plan the planned pass
      * @param targetIds the target records to calculate
      */
     public static Answer calculate(RollupPlanner.Plan plan, Set<Id> targetIds) {
+        // One calculation only: the write that follows may set off triggers that calculate
+        // totals of their own, and those must not be held to the queue's ceiling.
+        Integer ceiling = rowCeiling;
+        rowCeiling = null;
         Answer answer = new Answer();
         if (plan == null || targetIds == null || targetIds.isEmpty()) {
             return answer;
         }
         Map<String, Fanout> fanoutByToken = new Map<String, Fanout>();
+        Integer largestQuery = 0;
         for (RollupPlanner.SourceQuery query : plan.queries) {
+            if (passesCeiling(Limits.getQueryRows(), largestQuery, ceiling)) {
+                throw new RowCeilingException(
+                    'The next rollup query would pass the query row ceiling of ' + ceiling
+                );
+            }
+            Integer rowsBefore = Limits.getQueryRows();
             try {
                 String tokenKey = String.valueOf(query.token);
                 if (!fanoutByToken.containsKey(tokenKey)) {
@@ -178,8 +191,51 @@ public without sharing class RollupAggregator {
                     );
                 }
             }
+            largestQuery = Math.max(largestQuery, Limits.getQueryRows() - rowsBefore);
         }
         return answer;
+    }
+
+    /**
+     * The query rows a transaction may have read before the next calculation starts a further
+     * query, or null for no ceiling (the default: the instant path, the full run and previews).
+     * The Rollup Queue sets it for each of its own recalculations (R-RQ6); a calculation takes
+     * it and leaves none behind.
+     */
+    private static Integer rowCeiling;
+
+    /**
+     * Sets, or clears with null, the ceiling the next `calculate` checks before each query after
+     * its first.
+     *
+     * @param ceiling the query rows the transaction may have read before a further query
+     */
+    public static void limitQueryRows(Integer ceiling) {
+        rowCeiling = ceiling;
+    }
+
+    /**
+     * Thrown by `calculate` instead of starting a query that would take the transaction past its
+     * row ceiling. Nothing has been written; the caller sends the records to the large parent
+     * route (`RollupLargeParentBatch`).
+     */
+    public class RowCeilingException extends Exception {
+    }
+
+    /**
+     * Whether a further query would pass the ceiling: the rows read so far plus the most one
+     * earlier query of this calculation read, as the next is taken to read as many. A plan's
+     * queries mostly read the same source rows under different filters: a fund's COUNT and its
+     * SUMs each read its allocations. The first query is never stopped (nothing is measured
+     * yet), so a record whose queries are small is never stopped at all.
+     *
+     * @param read the query rows the transaction has read
+     * @param largestQuery the most rows one earlier query of this calculation read
+     * @param ceiling the ceiling, or null for none
+     */
+    @TestVisible
+    private static Boolean passesCeiling(Integer read, Integer largestQuery, Integer ceiling) {
+        return ceiling != null && largestQuery > 0 && read + largestQuery > ceiling;
     }
 
     /** Which target records each reference read off a source row counts towards. */

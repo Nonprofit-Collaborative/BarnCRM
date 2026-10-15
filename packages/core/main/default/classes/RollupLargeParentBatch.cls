@@ -115,7 +115,8 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
      * always runs, within the run budget of three fifths), with the rest left for the queue's own
      * queries and the target records' triggers and flows, and for a filtered or stale COUNT that
      * makes the estimate low. A record at or above it comes here. An estimate that still falls
-     * short is caught when the record stops a run of its own (R-RQ6).
+     * short is caught by the run's row ceiling (`queueRowCeiling`), or when the record stops a
+     * run of its own (R-RQ6).
      */
     public static Integer largeParentRows() {
         return largeParentRowsForTest != null
@@ -133,6 +134,26 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
     /** Test seam: stands in for `sliceRowBudget`; null reads the platform's limit. */
     @TestVisible
     private static Integer sliceRowBudgetForTest;
+
+    /**
+     * The query rows a queue run may have read before its recalculation starts a further query:
+     * four fifths of what a transaction may read, leaving the rest for the target records' write
+     * and its triggers and flows. Stored counts go stale while a load adds children faster than
+     * the queue recalculates (the 25,000 row scale test's fund stored 3,200 of its 26,102
+     * allocations), so a record estimated small can still read more than a run may. The
+     * recalculation measures what each of its queries read and, before one would pass this
+     * ceiling, stops and the run sends the entity's records here, rather than the platform
+     * stopping the run (`RollupAggregator.limitQueryRows`, R-RQ6).
+     */
+    public static Integer queueRowCeiling() {
+        return queueRowCeilingForTest != null
+            ? queueRowCeilingForTest
+            : Limits.getLimitQueryRows() * 4 / 5;
+    }
+
+    /** Test seam: stands in for `queueRowCeiling`; null reads the platform's limit. */
+    @TestVisible
+    private static Integer queueRowCeilingForTest;
 
     /**
      * The source rows each record is expected to read: the largest COUNT total it stores (of every

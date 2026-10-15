@@ -1802,6 +1802,11 @@ Before a run recalculates its slice, a record estimated at two fifths of that li
 (below the run's row budget of three fifths, R-RQ3, leaving room for the run's other queries and
 the target records' automation, and for a low estimate) is moved to a new entry and handed to
 the large parent batch; a record below it stays in the queue, alone in a run if it must be. A
+stored count goes stale while a load adds children faster than the queue recalculates (a fund
+stored 3,200 of its 26,102 allocations), so the run also measures what each query of an entity's
+recalculation read: before a further query would take the transaction past four fifths of the
+limit, taken to read as much as the largest query before it, the recalculation stops with
+nothing written and that entity's records in the run go to the batch as an estimated one does. A
 single record that stopped its run on the query row limit (R-RQ3) goes to the batch too. No other failure goes there. The batch reads each
 planned query's source rows in chunks, runs the query over each chunk's rows only and folds the
 partial answers together, which merge exactly as path alternatives do (R-R1; a distinct count or
@@ -7217,6 +7222,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Merge settlement always runs (ADR-0118). New platform event `Merge_Settlement_Ready__e` (Publish After Commit; `Household_Ids__c`, `Owner_Ids__c`, `Person_Ids__c`, 200 identifiers each per event), subscribed by `MergeSettlementReadyTrigger`; the three packaged permission sets grant Read and Create on it. A merge inside a Queueable, or with no queueable job left, publishes it instead of only logging a warning, so its survivors are settled. A person account survivor keeps the default address matching its mailing fields, not the newest. |
 | v0.6 | 2026-10-14 | Import undo and rollup saves (ADR-0119, `0119-import-undo-judges-edits-before-deleting.md`, 25,000 row gift import scale test). No object or field added. R-IB9: a rollup save the import set off, told by the `Rollups_Last_Calculated__c` stamp written in it (whatever the running user's access) and dated within sixty minutes of the commit completing, is not an edit, whoever ran it; a later one keeps the record; the undo judges every tagged record for edits before it puts back or deletes anything, so a rollup either sets off, or the undo's own save, cannot hide an earlier edit. Before this, undoing an import that created people and gifts kept 7,229 of 8,333 people, saved by the Automated Process user as their totals were recalculated. |
 | v0.6 | 2026-10-14 | Rollup queue row budget (ADR-0116, 25,000 row gift import scale test). No object or field added. R-RQ6: a record's estimate reads the stored totals of every active COUNT definition on its entity, not only those the run calculates, so a large parent whose entries name only a SUM or MAX still goes to the batch. R-RQ3: rows a run's recalculation of one entity read count against its row budget in place of their estimate. Before this two Rollup Queue runs stopped on "Too many query rows: 50001" while a fund's allocations rose to 25,000. |
+| v0.6 | 2026-10-14 | Rollup queue row ceiling (ADR-0116, 25,000 row scale rerun). No object or field added. R-RQ6: a queue run measures what each query of an entity's recalculation read, and before a further query would pass four fifths of the query row limit it stops, writes nothing and sends that entity's records to the large parent batch. Before this a fund whose stored count was stale (3,200 of 26,102 allocations) was estimated small, its second query stopped four runs on "Too many query rows: 50001", and it was narrowing towards Failed. |
 
 ---
 ## 32. Entity ownership by package
