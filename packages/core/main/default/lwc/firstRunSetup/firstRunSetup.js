@@ -22,7 +22,7 @@ const ALL = 'all';
 const CHOOSE = 'choose';
 
 /**
- * First-run setup (ADR-NEXT): a blocking window on BarnCRM Home and BarnCRM Settings until setup
+ * First-run setup (ADR-0124): a blocking window on BarnCRM Home and BarnCRM Settings until setup
  * is finished (the server decides; a saved edition is pre-selected). Focus stays inside it. An administrator picks the edition and either every feature or the ones
  * left ticked, then lands on General; anyone else is told an administrator needs to finish.
  * It installs no module. Fires `setupfinished` so the page behind it can reload.

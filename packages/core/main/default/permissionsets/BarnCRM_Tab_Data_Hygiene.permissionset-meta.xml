@@ -4,7 +4,7 @@
   <label>BarnCRM Tab: Data Hygiene</label>
   <description>
     Shows the Data Hygiene tab (Org Optimizer) and nothing else. Given and taken by BarnCRM
-    while the Org Optimizer and Health Check feature is on (ADR-NEXT); do not assign by hand.
+    while the Org Optimizer and Health Check feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>
     <tab>Data_Hygiene</tab>

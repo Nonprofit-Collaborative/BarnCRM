@@ -4,7 +4,7 @@
   <label>BarnCRM Tab: Data Manager</label>
   <description>
     Shows the Data Manager tab and nothing else. Given and taken by BarnCRM while the Data
-    Manager feature is on (ADR-NEXT); do not assign by hand.
+    Manager feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>
     <tab>Data_Manager</tab>

@@ -432,7 +432,7 @@ public with sharing class AutomationControl {
      */
     private static void loadOffByModule() {
         // A Core feature that is not turned on yet stops its automations the same way
-        // (ADR-NEXT, features are off on a new install until turned on).
+        // (ADR-0124, features are off on a new install until turned on).
         offByModule = FeatureSwitchService.automationsOff();
         Set<String> modulesOff = ModuleManagerService.turnedOff();
         if (modulesOff.isEmpty()) {

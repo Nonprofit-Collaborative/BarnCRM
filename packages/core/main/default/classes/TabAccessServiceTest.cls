@@ -1,5 +1,5 @@
 /**
- * The feature tabs follow their feature (ADR-NEXT): once it is on, the BarnCRM Tab sets go to
+ * The feature tabs follow their feature (ADR-0124): once it is on, the BarnCRM Tab sets go to
  * the people who held those tabs before; while it is off, nobody holds them.
  */
 @IsTest(testFor='ApexClass:TabAccessService')

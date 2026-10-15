@@ -137,7 +137,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 
     /**
      * True when the org keeps the households of deleted people (R-H12a), or when household
-     * upkeep is off (ADR-NEXT): a feature that is off does no work, nightly jobs included.
+     * upkeep is off (ADR-0124): a feature that is off does no work, nightly jobs included.
      */
     private static Boolean keepsHouseholds() {
         if (!FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP)) {

@@ -34,7 +34,7 @@ public with sharing class ModuleDetectionService {
     /**
      * Stands in for the shipped module catalog (`BarnCRM_Module__mdt`) in tests. The catalog
      * says which editions offer each module and where its installer is; Core never installs
-     * anything, it only links to Salesforce's installer (ADR-NEXT).
+     * anything, it only links to Salesforce's installer (ADR-0124).
      */
     @TestVisible
     private static List<BarnCRM_Module__mdt> catalogOverride;
@@ -134,7 +134,7 @@ public with sharing class ModuleDetectionService {
     /**
      * The BarnCRM packages this org is offered, each saying whether it is here: Core, then
      * every module the catalog says the chosen edition offers (the Standard Edition's, before
-     * one is chosen), and any module that is already installed whatever the edition (ADR-NEXT).
+     * one is chosen), and any module that is already installed whatever the edition (ADR-0124).
      */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();

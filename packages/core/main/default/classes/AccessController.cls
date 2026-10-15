@@ -249,7 +249,7 @@ public with sharing class AccessController {
             } else {
                 AccessService.removeRole(assigneeId, roleDeveloperName);
             }
-            // The switchable tabs follow the role (ADR-NEXT).
+            // The switchable tabs follow the role (ADR-0124).
             TabAccessService.requestSync();
         } catch (AccessService.AccessException e) {
             result.success = false;

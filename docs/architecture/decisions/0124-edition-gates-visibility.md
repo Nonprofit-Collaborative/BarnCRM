@@ -1,4 +1,4 @@
-# ADR-NEXT: The edition, features, modules and first-run setup decide what BarnCRM shows
+# ADR-0124: The edition, features, modules and first-run setup decide what BarnCRM shows
 
 **Status:** Accepted (owner decisions, Brandon, 2026-10-14)
 **Date:** 2026-10-14
@@ -29,7 +29,7 @@ Terms (owner, 2026-10-14): a **feature** is installed with Core and is turned on
 **module** is a separate package, not installed with Core, installed from BarnCRM Settings,
 Modules, and named "BarnCRM" plus its name: BarnCRM Rollup Builder (both editions), BarnCRM
 Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect. Rollup
-Builder becomes a module (ADR-NEXT, rollup-builder-module, draft #417); its package split is
+Builder becomes a module (its own decision record, rollup-builder-module, draft #417); its package split is
 separate work, and BarnCRM Giving will depend on it.
 
 ## Decision

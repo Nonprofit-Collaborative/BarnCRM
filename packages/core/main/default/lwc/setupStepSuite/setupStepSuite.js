@@ -26,7 +26,7 @@ const EDITIONS_GUIDE =
  * saved and Giving not here, the step links to Salesforce's installer in a new tab and
  * offers Check again, so the administrator installs Giving herself
  * (0072-suite-choice-is-the-first-setup-step.md). The edition is chosen once: once saved,
- * the step shows it read-only and links to how to change it later (ADR-NEXT).
+ * the step shows it read-only and links to how to change it later (ADR-0124).
  */
 export default class SetupStepSuite extends LightningElement {
   @api canEdit = false;

@@ -1,5 +1,5 @@
 /**
- * The Core features of BarnCRM Settings, General, Features and of first-run setup (ADR-NEXT,
+ * The Core features of BarnCRM Settings, General, Features and of first-run setup (ADR-0124,
  * edition gates visibility): one place that knows what each feature covers and turns it on.
  *
  * A feature comes with Core; a module is a separate package with its own on and off (the

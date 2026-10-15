@@ -1,5 +1,5 @@
 /**
- * The household catch-up (ADR-NEXT, feature switches): when household upkeep is turned on, gives
+ * The household catch-up (ADR-0124, feature switches): when household upkeep is turned on, gives
  * a household to every contact added while it was off, exactly as the Contact trigger would have
  * on insert (R-H1, R-H2). `FeatureSwitchService.turnOn` queues it once, the moment the feature
  * goes on.

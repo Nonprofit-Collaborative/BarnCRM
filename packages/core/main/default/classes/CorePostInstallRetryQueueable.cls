@@ -99,7 +99,7 @@ public with sharing class CorePostInstallRetryQueueable implements Queueable {
                 installerId,
                 AccessService.ADMIN_PERMISSION_SET
             );
-            // The switchable tabs come from the BarnCRM Tab sets (ADR-NEXT): one pass here
+            // The switchable tabs come from the BarnCRM Tab sets (ADR-0124): one pass here
             // gives the installer theirs at once; the install's own queued sync does the rest.
             TabAccessService.syncNow();
         } catch (Exception e) {

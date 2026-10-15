@@ -346,12 +346,12 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     this.selectedSection = event.detail.name;
   }
 
-  /** First-run setup finished (ADR-NEXT): the edition and features changed what shows. */
+  /** First-run setup finished (ADR-0124): the edition and features changed what shows. */
   handleSetupFinished() {
     this.load();
   }
 
-  /** A feature turned on in General (ADR-NEXT): its settings rows now show, without a reload. */
+  /** A feature turned on in General (ADR-0124): its settings rows now show, without a reload. */
   handleFeatureTurnedOn() {
     this.load();
   }

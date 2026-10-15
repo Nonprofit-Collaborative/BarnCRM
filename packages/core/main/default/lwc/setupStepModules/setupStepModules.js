@@ -8,7 +8,7 @@ import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
 
 /**
  * The modules step: the BarnCRM packages this org is offered, by their "BarnCRM X" names
- * (ADR-NEXT), which of them are here, where to
+ * (ADR-0124), which of them are here, where to
  * read what each one does, and Salesforce's installer for a published one that is not here
  * (C-30). Turning a module on and off with one click is the Module Manager, and the notice
  * says so rather than pretending otherwise.

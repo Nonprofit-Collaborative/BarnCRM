@@ -9,7 +9,7 @@
 public with sharing class SettingSections {
     @NamespaceAccessible
     public static final String GENERAL = 'General';
-    /** The BarnCRM modules (ADR-NEXT): the one place a module is installed and opened from. */
+    /** The BarnCRM modules (ADR-0124): the one place a module is installed and opened from. */
     @NamespaceAccessible
     public static final String MODULES = 'Modules';
     @NamespaceAccessible

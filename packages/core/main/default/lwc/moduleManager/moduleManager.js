@@ -28,7 +28,7 @@ const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_I
 const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
 
 /**
- * The Module Manager (C-24), the BarnCRM Settings Modules section (ADR-NEXT): every module this
+ * The Module Manager (C-24), the BarnCRM Settings Modules section (ADR-0124): every module this
  * org is offered by its "BarnCRM X" name, whether it is installed and on, a link to an installed
  * module's own app, and the one thing to do next with it. Installing and uninstalling are Salesforce's own
  * screens, opened from here; nothing is installed or removed by BarnCRM

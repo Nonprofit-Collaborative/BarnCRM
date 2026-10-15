@@ -1,6 +1,6 @@
 /**
  * Maria finishes first-run setup: the edition and the features she ticked, in one step. David,
- * without Manage BarnCRM Settings, sees the window but cannot finish it (ADR-NEXT).
+ * without Manage BarnCRM Settings, sees the window but cannot finish it (ADR-0124).
  */
 @IsTest(testFor='ApexClass:FirstRunController')
 private class FirstRunControllerTest {

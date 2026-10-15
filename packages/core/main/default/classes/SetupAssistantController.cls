@@ -105,7 +105,7 @@ public with sharing class SetupAssistantController {
 
     /**
      * Step one: save the edition. The step finishes because the setting now has a value. It
-     * installs and removes nothing; it decides which modules Core shows (ADR-NEXT).
+     * installs and removes nothing; it decides which modules Core shows (ADR-0124).
      */
     @AuraEnabled
     public static SetupState applySuite(String suite) {
@@ -128,7 +128,7 @@ public with sharing class SetupAssistantController {
         public Boolean canEdit;
     }
 
-    /** The console's read-only Edition row (ADR-NEXT). */
+    /** The console's read-only Edition row (ADR-0124). */
     @AuraEnabled
     public static EditionModel getEdition() {
         try {

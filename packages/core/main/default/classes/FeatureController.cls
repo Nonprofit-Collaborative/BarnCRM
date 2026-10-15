@@ -1,5 +1,5 @@
 /**
- * BarnCRM Settings, General, Features (ADR-NEXT): the eight Core features with their names,
+ * BarnCRM Settings, General, Features (ADR-0124): the eight Core features with their names,
  * descriptions and state, and the one-way Turn on. First-run setup lists the same rows.
  */
 public with sharing class FeatureController {

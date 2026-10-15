@@ -12,7 +12,7 @@ import CANCEL from '@salesforce/label/c.Core_Feature_Cancel';
 import TURNED_ON from '@salesforce/label/c.Core_Feature_TurnedOn';
 
 /**
- * BarnCRM Settings, General, Features (ADR-NEXT): each Core feature with its description and
+ * BarnCRM Settings, General, Features (ADR-0124): each Core feature with its description and
  * state. A feature that is off has a Turn on button behind a confirmation; turning on is
  * one-way, which the warning above the list says, so a feature that is on has no control.
  */

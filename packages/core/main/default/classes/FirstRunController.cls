@@ -1,5 +1,5 @@
 /**
- * First-run setup (ADR-NEXT): the window in front of BarnCRM Home and BarnCRM Settings until it
+ * First-run setup (ADR-0124): the window in front of BarnCRM Home and BarnCRM Settings until it
  * is finished. It shows while no edition is saved, or while the features list still holds the
  * new install's `None`: an edition typed in Setup, Custom Settings before first-run setup does
  * not skip the feature choice, and the window pre-selects that edition. Finishing always

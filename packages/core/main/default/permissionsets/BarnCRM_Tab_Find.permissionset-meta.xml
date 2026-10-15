@@ -4,7 +4,7 @@
   <label>BarnCRM Tab: Find</label>
   <description>
     Shows the Find tab and nothing else. Given and taken by BarnCRM while the Data Manager
-    feature is on (ADR-NEXT); do not assign by hand.
+    feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>
     <tab>Find</tab>

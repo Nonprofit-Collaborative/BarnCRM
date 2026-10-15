@@ -20,7 +20,7 @@ const STANDARD = 'Community';
 const NONPROFIT = 'Impact';
 
 /**
- * The console's Edition row (ADR-NEXT): the edition chosen once in the Setup Assistant, shown
+ * The console's Edition row (ADR-0124): the edition chosen once in the Setup Assistant, shown
  * read-only, with a collapsed Change edition disclosure for those who may change settings.
  * Each switch asks for confirmation first, saying what changes.
  */

@@ -43,7 +43,7 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
         this.runDate = runDate == null ? Date.today() : runDate;
     }
 
-    /** No work while the Addresses feature is off (ADR-NEXT): the locator then finds nothing. */
+    /** No work while the Addresses feature is off (ADR-0124): the locator then finds nothing. */
     public Database.QueryLocator start(Database.BatchableContext context) {
         if (!addressesOn()) {
             return Database.getQueryLocator(

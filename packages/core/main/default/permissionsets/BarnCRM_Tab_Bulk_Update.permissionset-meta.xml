@@ -4,7 +4,7 @@
   <label>BarnCRM Tab: Bulk Update</label>
   <description>
     Shows the Bulk Update tab and nothing else. Given and taken by BarnCRM while the Data
-    Manager feature is on (ADR-NEXT); do not assign by hand.
+    Manager feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>
     <tab>Bulk_Update</tab>

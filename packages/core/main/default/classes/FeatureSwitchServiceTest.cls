@@ -1,6 +1,6 @@
 /**
  * Core features are off on a new install, all on after an upgrade, and turned on for good
- * (ADR-NEXT): a tool through Features Turned On, a feature group with its automations too.
+ * (ADR-0124): a tool through Features Turned On, a feature group with its automations too.
  */
 @IsTest(testFor='ApexClass:FeatureSwitchService')
 private class FeatureSwitchServiceTest {

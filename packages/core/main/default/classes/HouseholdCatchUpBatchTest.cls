@@ -1,5 +1,5 @@
 /**
- * Household upkeep follows its feature switch end to end (ADR-NEXT): off on a new install, so a
+ * Household upkeep follows its feature switch end to end (ADR-0124): off on a new install, so a
  * new contact gets no household; on in an upgraded org; and turning it on catches up everyone
  * added while it was off, in both membership modes.
  */

@@ -342,7 +342,7 @@ public with sharing class SettingsController {
             FeatureManagement.checkPermission(prefix + name);
     }
 
-    /** The rows of the Core features that are off, read once per transaction (ADR-NEXT). */
+    /** The rows of the Core features that are off, read once per transaction (ADR-0124). */
     private static Set<String> hiddenByFeature;
 
     private static Boolean isHiddenByFeature(Setting_Definition__mdt definition) {

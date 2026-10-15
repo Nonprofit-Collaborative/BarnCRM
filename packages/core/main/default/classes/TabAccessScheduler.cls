@@ -1,5 +1,5 @@
 /**
- * The nightly tab access check (ADR-NEXT, edition gates visibility): queues the sync that gives
+ * The nightly tab access check (ADR-0124, edition gates visibility): queues the sync that gives
  * the BarnCRM Tab permission sets to people given a role or an add-on outside BarnCRM's Access
  * page, and takes them from people who lost it. Health Check lists it among the nightly jobs
  * and its Schedule all nightly jobs fix starts it (`NightlyJobs`, ADR-0075).

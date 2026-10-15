@@ -47,7 +47,7 @@
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
  *
- * Alongside these (ADR-NEXT): a new install starts with every feature off, an upgrade with no
+ * Alongside these (ADR-0124): a new install starts with every feature off, an upgrade with no
  * edition saved gets the recommended one, and every run schedules the nightly tab access check
  * unless it is already scheduled.
  *
@@ -93,7 +93,7 @@ public with sharing class CorePostInstall implements InstallHandler {
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
         // Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
-        // whoever had those tabs before (ADR-NEXT); queued, since it writes setup objects. It
+        // whoever had those tabs before (ADR-0124); queued, since it writes setup objects. It
         // never throws.
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
@@ -105,7 +105,7 @@ public with sharing class CorePostInstall implements InstallHandler {
     }
 
     /**
-     * A new install starts with every Core feature off until first-run setup (ADR-NEXT). An
+     * A new install starts with every Core feature off until first-run setup (ADR-0124). An
      * upgrade leaves the list empty, which means every feature is on, so an existing org loses
      * nothing it used.
      */
@@ -123,7 +123,7 @@ public with sharing class CorePostInstall implements InstallHandler {
      * An upgraded org with no edition saved gets the one the Setup Assistant recommends, or the
      * Standard Edition when nothing points to the Nonprofit one (what BarnCRM already shows with
      * no edition). Its features are all on, so without this the first-run window would stand in
-     * front of an org that is already working (ADR-NEXT).
+     * front of an org that is already working (ADR-0124).
      */
     private void saveEditionOnAnUpgrade(InstallContext context) {
         try {
@@ -144,7 +144,7 @@ public with sharing class CorePostInstall implements InstallHandler {
 
     /**
      * Schedules the nightly tab access check, the safety net for roles given outside BarnCRM's
-     * Access page (ADR-NEXT). `start` finds a job already scheduled by name, so a reinstall or an
+     * Access page (ADR-0124). `start` finds a job already scheduled by name, so a reinstall or an
      * upgrade never doubles it. Skipped in tests unless a test asks, so that a test of something
      * else does not leave a scheduled job that runs at `Test.stopTest`.
      */
