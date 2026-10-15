@@ -43,7 +43,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 - `packages/core` (neutral Core; the vendored apex-rollup tree, `RollupAdapter` and `RollupEngineComparison` were deleted by rollup S9, #377), `packages/giving` (depends on Core), `packages/connect` (depends on Core and Giving; the only package that may touch Opportunity, Campaign, Case, Lead). `packages/volunteers`, `programs`, `funders` are placeholders.
 - Core never references Giving or Connect; no dependency on Person Accounts, Industries, OmniStudio, Data Cloud or Experience Cloud (ADR-0013).
-- Deploys to an org run in stages through `scripts/org/deploy-packages.sh`. Pending (follow-up after #426, not yet landed): the script calls `TabAccessService.requestSync()` after a deploy, because dev orgs otherwise lose the tool tabs.
+- Deploys to an org run in stages through `scripts/org/deploy-packages.sh`. The script queues `TabAccessService.requestSync()` after a deploy, because dev orgs otherwise lose the tool tabs (landed #435, 2026-10-15).
 - Planned, in review (not on `main`): `packages/rollups` ("BarnCRM Rollup Builder", a both-editions module, D-101; PRs #417 to #432); install order Core, Rollup Builder, Giving; permission sets `Rollup_Builder_Admin` and `Rollup_Builder_User`; a Rollup Builder stage in `deploy-packages.sh`; CI check `check-core-names-no-module.py`.
 - Namespace deferred (ADR-0001): `sfdx-project.json` namespace stays empty, no hard-coded prefix, no package versions; prefixed names come from `NamespaceUtil`.
 
@@ -113,7 +113,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Anything that sizes a record from stored totals must read every COUNT total on the entity, not only the named definitions (#412). The queue sends a parent to `RollupLargeParentBatch` when the estimate passes 40% of the query-row limit, or when its next query would pass four fifths (stale stored count, #434).
 - `oi-test` `DailyAsyncApexTests` limit is 7,260 test classes per rolling 24 hours (about 22 full runs of about 330 classes). When it is exhausted `sf apex run test` fails with `UNKNOWN_EXCEPTION` ("An unknown exception occurred") and the gate reports "sf CLI crashed". Check: `sf org list limits -o oi-test --json`, the `DailyAsyncApexTests` row. Fall back to `oi-pa`.
 - `NavType` is not updateable on an existing app: delete the in-app guidance prompts that reference it first, then the app (done on `oi-pa` 2026-10-14).
-- `gh pr merge --delete-branch` closes PRs stacked on that branch and does not retarget them (hit 2026-10-14 on #414 and #417); retarget dependents first.
+- `gh pr merge --delete-branch` closes PRs stacked on that branch and does not retarget them (hit 2026-10-14 on #414 and #417); retarget dependents first. CI workflows do not run after a PR is retargeted to main: close and reopen it.
+- `AsyncApexJob` has a `BatchApexWorker` row per batch chunk next to the `BatchApex` row, with the same class name; filter `JobType` when counting runs (`RollupModuleSwitchTest.jobsOf`, #438).
+- AuraEnabled fields cannot be `@NamespaceAccessible` (the deploy fails the whole Core Apex stage); CI runs `scripts/ci/check-aura-namespace-accessible.py` (#438).
+- A Lightning app needs `formFactors` (the Rollup Builder app got them with a Console `navType`, #429).
 - `sf ... --json 2>&1` mixes the CLI update warning into the JSON; scripts must tolerate it (#433).
 - A sandbox deploy from a different folder needs `--ignore-conflicts` (source tracking is per folder).
 - `barn-npc` settings custom settings and metadata deployed with visibility Public (a production-edition trial rejects Protected, see above).
