@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Opportunity mirror start date</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Opportunity_Mirror_Start__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Mirror_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Mirror</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">DateTime</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">94</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Opportunities to Gifts only: won Opportunities closed on this date or later, in your organization's time zone, become gifts; the time is ignored. Until you set it, none do, so an org with years of Opportunities does not get a gift, and a thank you, for every one.</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">opportunity-mirror.md</value>
+    </values>
+</CustomMetadata>

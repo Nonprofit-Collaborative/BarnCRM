@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The edition chosen once in the Setup Assistant. Both editions include BarnCRM's full core suite of tools. The Nonprofit Edition also shows and offers the nonprofit modules (Giving, Volunteers, Programs, Funders, Connect); the Standard Edition shows none that is not installed. Changing it installs and removes nothing.</value>
+    <value xsi:type="xsd:string">The edition chosen once in the Setup Assistant. Both editions include BarnCRM's full core suite of tools. The Nonprofit Edition also shows and offers the nonprofit modules (Giving, Volunteers, Programs, Funders, Mirror); the Standard Edition shows none that is not installed. Changing it installs and removes nothing.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

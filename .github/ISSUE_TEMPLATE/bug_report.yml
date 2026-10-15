@@ -64,7 +64,7 @@ body:
         - Volunteers
         - Programs
         - Funders
-        - Connect
+        - Mirror
         - Not sure
     validations:
       required: true

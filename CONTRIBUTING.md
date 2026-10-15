@@ -86,7 +86,7 @@ CI enforces what it can; reviewers enforce the rest.
 CI has a check for each of these, and a pull request that trips one does not merge.
 
 1. **Namespace-agnostic.** No namespace prefix hard-coded anywhere: Apex, SOQL, LWC imports, Flow, custom labels, static resources, permission set files. Use relative references inside the package and `Schema` describes for anything dynamic.
-2. **No standard object outside Connect.** No hard reference to Opportunity, Campaign, Case, Lead, or any Industries object in Core, Giving, Volunteers, Programs, or Funders. Connect may reference them, and only behind dynamic Apex (`Schema.getGlobalDescribe`, `Type.forName`) and generic `sObject` code so it degrades gracefully where the objects are absent. The patterns to copy are in [docs/contributor-guide/dynamic-apex.md](docs/contributor-guide/dynamic-apex.md).
+2. **No standard object outside Mirror.** No hard reference to Opportunity, Campaign, Case, Lead, or any Industries object in Core, Giving, Volunteers, Programs, or Funders. Mirror may reference them, and only behind dynamic Apex (`Schema.getGlobalDescribe`, `Type.forName`) and generic `sObject` code so it degrades gracefully where the objects are absent. The patterns to copy are in [docs/contributor-guide/dynamic-apex.md](docs/contributor-guide/dynamic-apex.md).
 3. **No Setup-only settings.** If a setting could live in the in-app Settings console, it lives there. Setup is only for things Salesforce does not allow an app to do, and then the Setup Assistant deep-links to it with instructions.
 4. **Code Analyzer clean.** Zero high or critical findings on every pull request.
 

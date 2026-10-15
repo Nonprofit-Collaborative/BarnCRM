@@ -16,7 +16,7 @@ BarnCRM has five such actions. Four are part of Core, so every BarnCRM org has t
 | **Create Person** | Creates a new person, either in a household that already exists or with a household of their own. | Change, merge or delete a person who already exists. |
 | **Get Data Job Status** | Reports how an import, bulk update or bulk delete is going: its status and row counts. With no job named, the most recent import. | Start, commit or undo a job. |
 
-The fifth, **Record Inbound Gift**, is part of the Connect module. It records a gift that has
+The fifth, **Record Inbound Gift**, is part of the Mirror module. It records a gift that has
 already arrived for a donor who is already in BarnCRM: "record a 25 dollar card gift from Luis
 Garcia for the Building Fund".
 
@@ -46,7 +46,7 @@ in BarnCRM changes: BarnCRM installs and works the same with or without Agentfor
 ## How to turn it on
 
 The four Core actions are there as soon as BarnCRM is installed. Record Inbound Gift needs the
-Connect module. Everything below is in Salesforce Setup, because agents and MCP servers belong
+Mirror module. Everything below is in Salesforce Setup, because agents and MCP servers belong
 to Salesforce, not to BarnCRM.
 
 1. **Decide who the assistant acts as.** An assistant always acts as a Salesforce user and can
@@ -63,7 +63,7 @@ to Salesforce, not to BarnCRM.
    - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household
      Summary. For an assistant that should only look things up, use a user with Read Only.
    - Record Inbound Gift needs **Giving Staff**, which covers the records involved, and
-     Connect's **Record Inbound Gift Action** permission set (Setup, Users, choose the person,
+     Mirror's **Record Inbound Gift Action** permission set (Setup, Users, choose the person,
      Permission Set Assignments), which runs that one action and grants nothing else. Assign it
      only to the users who may record gifts through an assistant; no BarnCRM role includes it,
      so no one gets the action without your decision.
@@ -155,7 +155,7 @@ right household.
 
 ## A five-minute walkthrough: recording a gift
 
-Do this as Maria, with the sample data loaded and the Connect module installed, in an org that
+Do this as Maria, with the sample data loaded and the Mirror module installed, in an org that
 has Agentforce and an agent you can edit. It shows the one thing that matters most: asking
 twice records the gift once.
 

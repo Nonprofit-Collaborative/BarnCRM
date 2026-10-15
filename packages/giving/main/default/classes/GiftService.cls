@@ -4,7 +4,7 @@
  *
  * Canonical model rules R-G2, R-G3, R-G4, R-G5, R-GA1, R-GA2 and R-GA3. This is the only
  * class other packages call for gift behavior (plan Section 7.1), so it is `@NamespaceAccessible`
- * where another package calls it (ADR-0017): Connect's inbound gift API uses applyChosenFunds.
+ * where another package calls it (ADR-0017): Mirror's inbound gift API uses applyChosenFunds.
  */
 @NamespaceAccessible
 public with sharing class GiftService {
@@ -497,7 +497,7 @@ public with sharing class GiftService {
 
     /**
      * `applyChosenFunds` gift by gift, for a caller whose gifts each succeed or fail on their own
-     * (Connect's inbound gift API): one allocation the platform refuses fails its own gift, not
+     * (Mirror's inbound gift API): one allocation the platform refuses fails its own gift, not
      * the others. Same queries and statements as `applyChosenFunds`, so it stays inside the
      * limits for 200 gifts.
      *

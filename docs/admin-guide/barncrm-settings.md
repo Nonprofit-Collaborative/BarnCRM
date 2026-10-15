@@ -128,7 +128,7 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
   later release.)
 
 The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
-Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect (Nonprofit Edition). The
+Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror (Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
 Builder is still part of Core while it is being split into its own package; until then it
 shows as installed, and its tab and settings show as they always have. See the
@@ -187,7 +187,7 @@ at something, you choose it:
 - **A record**, such as the default fund or the default appeal with Giving, is chosen with a
   search box. Start typing the record's name and pick it from the list. The box shows the
   name; clearing it leaves the setting empty.
-- **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Connect, are
+- **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
 - **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
@@ -233,9 +233,9 @@ form at the top of that page:
 | Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
 | Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
 | Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** (Setup, Users, Permission Set Assignments) | No |
-| Giving, Campaign sync (Connect) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
-| Giving, Opportunity mirror (Connect) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
-| Giving, Accounting export (Connect) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
+| Giving, Campaign sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
+| Giving, Opportunity mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
+| Giving, Accounting export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
 
 ## Common mistakes
 

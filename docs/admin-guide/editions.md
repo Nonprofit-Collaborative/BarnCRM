@@ -9,7 +9,7 @@ duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM 
 | Edition | For | What BarnCRM shows |
 |---|---|---|
 | **Standard Edition** | Any Salesforce org: businesses, clubs, associations, any organization | The core suite and the modules every edition offers: BarnCRM Rollup Builder. No nonprofit modules are listed or offered anywhere. |
-| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, and the nonprofit modules: BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect. |
+| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, and the nonprofit modules: BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror. |
 
 The edition decides what BarnCRM shows and offers. It never installs, removes or changes
 anything: every module is a separate package that you install yourself through Salesforce's
@@ -36,7 +36,7 @@ These are the places that depend on the edition.
 | Setup Assistant, module step | Core, BarnCRM Rollup Builder, plus any module that is already installed | Core, BarnCRM Rollup Builder and all five nonprofit modules, each Present or Not installed with its Install link |
 | BarnCRM Settings, Modules ([Module Manager](module-manager.md)) | The same list as the module step, Installed with an app link, or Not installed with Install | The same list as the module step, Installed with an app link, or Not installed with Install |
 | BarnCRM home page, Modules card | The same list | The same list |
-| Health Check, "The Gift Transaction mirror is in the Connect module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Connect is not installed |
+| Health Check, "The Gift Transaction mirror is in the Mirror module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Mirror is not installed |
 | Setup Assistant, first step | Edition shown read-only | Edition shown read-only, with the BarnCRM Giving install link while it is not installed |
 
 Before anyone has chosen an edition, BarnCRM shows what the Standard Edition shows.

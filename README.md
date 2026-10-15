@@ -19,7 +19,7 @@ BarnCRM is in development. Core is nearing its pilot, but nothing is installable
 ## Status
 
 - Phase 0 (planning and repository setup) complete.
-- Core is nearing its pilot; Giving and Connect are built alongside it, and the other modules are planned (see docs/barncrm-features.md for each feature's status).
+- Core is nearing its pilot; Giving and Mirror are built alongside it, and the other modules are planned (see docs/barncrm-features.md for each feature's status).
 - Not on AppExchange.
 - No releases yet. No package versions exist and nothing is installable.
 - Namespace pending: development is namespace-agnostic until the namespace is registered.
@@ -34,7 +34,7 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 |---|---|---|---|
 | Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine, Import framework, health check | (none) | v0.1 |
 | Giving | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core | v0.2 |
-| Connect | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), inbound gift REST API, accounting export | Core, Giving | v0.6 |
+| Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), inbound gift REST API, accounting export | Core, Giving | v0.6 |
 | Volunteers | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core | v0.7 |
 | Programs | Programs, services, enrollments, attendance, service deliveries, light case notes, outcomes | Core | v0.8 |
 | Funders | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Giving | v0.9 |

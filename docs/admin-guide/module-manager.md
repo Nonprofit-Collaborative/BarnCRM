@@ -25,7 +25,7 @@ Which modules are listed depends on the edition chosen in the first step of the
 [Setup Assistant](setup-assistant.md). The Standard Edition (or no edition chosen yet) lists
 Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all seven: Core, BarnCRM Rollup
 Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM
-Connect. A module that is installed is always listed, whatever the edition. See
+Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
 No module is installed with Core or by first-run setup: a module is installed only when you
@@ -52,8 +52,8 @@ cleans up her data, and check what removing a module would cost.
    says **On**. If a row says "No install link is published for this module yet.", there is
    no version to install yet; read about it with **Learn more**. If it says "Install these
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
-   first: Salesforce refuses Giving, Funders and Connect until BarnCRM Rollup Builder is
-   installed, and Funders and Connect until Giving is too.
+   first: Salesforce refuses Giving, Funders and Mirror until BarnCRM Rollup Builder is
+   installed, and Funders and Mirror until Giving is too.
 3. On the **Giving** row, click **Turn off**. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted
@@ -86,8 +86,8 @@ visibility. To hide a module from a colleague, take away its role on the
   need first.
 - **Looking for a version number.** Salesforce does not tell an app which version of another
   package is installed. Click **Open Installed Packages** to see versions in Setup.
-- **Turning off a module that another one needs.** Connect works with Giving's gifts: turning
-  Giving off stops the automation Connect relies on. Turn Connect off first, or leave both on.
+- **Turning off a module that another one needs.** Mirror works with Giving's gifts: turning
+  Giving off stops the automation Mirror relies on. Turn Mirror off first, or leave both on.
 - **Turning off BarnCRM Rollup Builder and expecting Giving's totals to keep up.** Turning it
   off stops every rollup at once, Giving's gift totals included: no save, Flow, queue run,
   nightly run or Recalculate updates a total while it is **Installed and off**, a

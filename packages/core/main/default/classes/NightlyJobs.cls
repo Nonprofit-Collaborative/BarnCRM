@@ -16,7 +16,7 @@ public with sharing class NightlyJobs {
     public static final List<String> PROVIDER_CLASSES = new List<String>{
         'RollupsNightlyJobProvider',
         'GivingNightlyJobProvider',
-        'ConnectNightlyJobProvider'
+        'MirrorNightlyJobProvider'
     };
 
     private static final String ERROR_CONTEXT = 'NightlyJobs';

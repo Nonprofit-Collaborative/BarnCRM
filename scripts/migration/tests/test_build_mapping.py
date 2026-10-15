@@ -121,8 +121,8 @@ class BuildMappingTest(unittest.TestCase):
         self.repo.field("core", "Account", "Greeting__c", "Text")
         self.repo.record_type("core", "Account", "Household")
         self.repo.field("giving", "Account", "Total__c", "Currency")
-        self.repo.field("connect", "Thing__c", "Link_Id__c", "Text")
-        mapping = self.build(("core", "giving", "connect"))
+        self.repo.field("mirror", "Thing__c", "Link_Id__c", "Text")
+        mapping = self.build(("core", "giving", "mirror"))
         self.assertEqual([o["name"] for o in mapping["objects"]], ["Account", "Thing__c"])
         account = self.entry(mapping, "Account")
         self.assertEqual([f["name"] for f in account["fields"]], ["Greeting__c", "Total__c"])
@@ -160,7 +160,7 @@ class RealSourceTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(build_mapping.HERE, "overrides.json"), encoding="utf-8") as handle:
             self.overrides = json.load(handle)
-        self.mapping = build_mapping.build(["core", "rollups", "giving", "connect"], self.overrides)
+        self.mapping = build_mapping.build(["core", "rollups", "giving", "mirror"], self.overrides)
 
     def test_every_override_names_a_real_object(self):
         names = {o["name"] for o in self.mapping["objects"]} | {s["name"] for s in self.mapping["skipped"]}

@@ -42,7 +42,7 @@ Salesforce org is needed for this job. Steps:
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
-   object is referenced outside `packages/connect`, and separately if any Apex or metadata
+   object is referenced outside `packages/mirror`, and separately if any Apex or metadata
    file names a Nonprofit Cloud object. The second half covers the fundraising objects, the
    objects a household is actually built out of there (`PartyRelationshipGroup`, whose Type
    of Household is what makes an Account a native household, and `AccountContactRelation`,
@@ -51,8 +51,8 @@ Salesforce org is needed for this job. Steps:
    our own component names are the same words. This half was added after an audit found the
    gate matched `GiftTransaction` alone, so Core could have named the two objects Nonprofit
    Cloud households are made of and the build would have passed.
-   It also checks Connect's object and field declarations (everything under
-   `packages/connect/**/objects/`): Connect's Apex may name Campaign or Opportunity as strings,
+   It also checks Mirror's object and field declarations (everything under
+   `packages/mirror/**/objects/`): Mirror's Apex may name Campaign or Opportunity as strings,
    but a lookup, formula or field declared on one of those objects is resolved at deploy time
    and refuses the install where the object is absent. A folder named after a denied object
    fails, and so does a denied name in the file outside its prose (label, description, help
@@ -201,7 +201,7 @@ Salesforce org is needed for this job. Steps:
    relied on the old system-mode default fails for a user without access, and only an org
    run as that user shows it.
    `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
-   in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
+   in Core, Giving or Mirror (the vendored engine excepted) never calls `System.runAs` and
    carries no `// runs-as: deploying user (reason)` comment (a `@TestSetup` that only calls
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
@@ -539,7 +539,7 @@ So every test is self-contained:
 
 - Every `@IsTest` method and every `@TestSetup` method runs its body inside
   `System.runAs(TestUsers.admin())` in Core, and `System.runAs(TestUsers.adminWith('Giving_Admin'))`
-  in Giving and Connect. `TestUsers` (Core, `@IsTest`, namespace accessible) creates a user
+  in Giving and Mirror. `TestUsers` (Core, `@IsTest`, namespace accessible) creates a user
   on the running user's own profile and assigns the packaged permission sets by their bare
   name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
   other list. It keeps one user per list of sets per transaction, and finds the user a
@@ -570,7 +570,7 @@ So every test is self-contained:
 
 The gate is the proof that a branch is self-contained: it assigns no permission set, so it
 runs the tests as whoever starts it, and that user should hold none of the BarnCRM, Giving or
-Connect permission sets. On `barn-core` the running user holds none. If you hold them in your
+Mirror permission sets. On `barn-core` the running user holds none. If you hold them in your
 own org, remove them (or run as a user who lacks them), so the run shows what a subscriber's
 administrator would see.
 
@@ -1064,7 +1064,7 @@ removed, so a list may start above 1.
 ### Next on the roadmap
 
 Product plan Section 6 is the source of truth:
-- **X-07 Gift Transaction mirror.** It shares `ConnectSync` with X-01.
+- **X-07 Gift Transaction mirror.** It shares `MirrorSync` with X-01.
 - **v0.7 items:**
   - C-32: import matching and per-file values;
   - C-33: load one object;

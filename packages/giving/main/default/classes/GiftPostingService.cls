@@ -6,8 +6,8 @@
  * them that does not come through `GiftPostingLock.whilePosting`, so "posted" always means this
  * class recorded who and when.
  *
- * `@NamespaceAccessible` because Connect's Accounting Export page marks the gifts it exported
- * (Connect depends on Giving, never the reverse).
+ * `@NamespaceAccessible` because Mirror's Accounting Export page marks the gifts it exported
+ * (Mirror depends on Giving, never the reverse).
  */
 @NamespaceAccessible
 public with sharing class GiftPostingService {

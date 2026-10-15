@@ -108,7 +108,7 @@ fi
 
 # WHY NO PERMISSION SET IS ASSIGNED. Every test runs inside System.runAs as a user that
 # TestUsers creates with the permission sets it needs (check-tests-run-as.py enforces it), so
-# the user running this script needs none of the BarnCRM, Giving or Connect permission sets.
+# the user running this script needs none of the BarnCRM, Giving or Mirror permission sets.
 # The gate used to assign BarnCRM_Admin and Giving_Admin first, which hid any test that still
 # leaned on the running user's access; a subscriber or another administrator holds none of
 # them. Running without them makes the gate prove the suite is self-contained.

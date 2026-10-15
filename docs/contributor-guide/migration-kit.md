@@ -18,13 +18,13 @@ Nothing in the kit is packaged, and it never creates a package version.
 
 ## The mapping
 
-`build_mapping.py --packages core,rollups,giving,connect --output mapping.json` collects, for each
+`build_mapping.py --packages core,rollups,giving,mirror --output mapping.json` collects, for each
 listed package:
 
 - every custom object, with its fields, except formula fields, auto-number fields, and objects
   that hold no records (custom metadata types, platform events);
 - the package's fields on Account and Contact, and their record types;
-- a field added to another package's object (Connect's fields on `Gift__c` and `Appeal__c`)
+- a field added to another package's object (Mirror's fields on `Gift__c` and `Appeal__c`)
   joins that object's entry.
 
 Each object records its kind (`custom`, `standard`, or `setting` for a hierarchy custom

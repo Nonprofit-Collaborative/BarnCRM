@@ -1177,7 +1177,7 @@ Automation Setting records (Section 10) on install and on upgrade.
 | `Handler_Class__c` | text | The Apex handler the trigger dispatcher invokes. |
 | `Object_Name__c` | text | The object whose trigger this automation runs on. |
 | `Execution_Order__c` | integer | The order in which handlers run for that object. |
-| `Module__c` | text (40) | The module that ships this automation, for example Giving or Connect; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
+| `Module__c` | text (40) | The module that ships this automation, for example Giving or Mirror; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -1297,7 +1297,7 @@ names the modules a module's package needs installed first (ADR-0125
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it; empty means no link yet. |
-| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Connect). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
+| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Rules
 
@@ -3217,7 +3217,7 @@ fund.
 Staff never type a gift name, and the number is not a receipt number.
 
 **R-G7 Idempotent intake.** External Id is unique. The importer and the inbound API in
-Connect both match on it, so re-sending a gift never creates a second one. The inbound API
+Mirror both match on it, so re-sending a gift never creates a second one. The inbound API
 answers a resend with the gift already recorded and never edits it, so it cannot change a
 receipted gift; a resend whose amount differs is refused as a conflict (ADR-0051).
 
@@ -3233,8 +3233,8 @@ later, which matters because altering a packaged object's field set after orgs h
 is the change that upgrades handle worst.
 
 **R-G10 No standard-object reference.** Nothing on this entity points at Opportunity or
-Campaign. The mirrors live in Connect (ADR-0004). The Opportunity mirror's Opportunity ID is a
-text attribute Connect adds to Gift, not a reference (Section 29C).
+Campaign. The mirrors live in Mirror (ADR-0004). The Opportunity mirror's Opportunity ID is a
+text attribute Mirror adds to Gift, not a reference (Section 29C).
 
 **R-G11 Matching gift linkage (G-10).** An employer's matching gift is linked to the
 employee's gift through Matched Gift, which both records carry, so the link is visible
@@ -3376,7 +3376,7 @@ receipt.
   `GiftPostingLockHandler` from registry record `Automation_Registry.Gift_Posting_Lock`
   (execution order 15, after `Gift_Core_Rules` fills in an empty date, Always Runs).
   `GiftPostingService` marks and unposts (R-G13) through `GiftPostingWriter`. Custom permissions
-  `Post_Gifts` (on `Giving_Admin` and Connect's `Accounting_Export`) and `Override_Posting_Lock`
+  `Post_Gifts` (on `Giving_Admin` and Mirror's `Accounting_Export`) and `Override_Posting_Lock`
   (granted to nobody). LWC `giftPosting` on the gift page shows the posting and offers Unpost; LWC
   `accountingPeriods` sets Books Closed Through.
 - **Named records (R-G15):** `GiftPostingLock.enforceOnDelete` refuses deleting an original;
@@ -3468,7 +3468,7 @@ is Fund (plan Section 7.1).
 | Description | long text | no | What this fund pays for and any restriction attached to it. |
 | Active | boolean | yes (defaults true) | Whether the fund is offered when allocating a new gift. |
 | Restricted | boolean | yes (defaults false) | Whether a donor or funder limited this money to a purpose, which makes its balance a compliance obligation. |
-| Accounting Code | text | no | The code this fund carries in the organization's accounting system, used by the export in Connect. |
+| Accounting Code | text | no | The code this fund carries in the organization's accounting system, used by the export in Mirror. |
 | Is Default | boolean | yes (defaults false) | Marks the fund that receives a gift with no explicit allocation. |
 
 ### Relationships
@@ -3563,8 +3563,8 @@ from Total Raised, Cost, and Goal at read time, so they carry no staleness and n
 recalculation.
 
 **R-AP4 No Campaign reference.** An optional link to a standard Campaign exists only in
-Connect (plan Section 4.12): the Campaign ID attribute and the one-way copy of Section 29B,
-both shipped by the Connect package, so Giving itself never names Campaign.
+Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Section 29B,
+both shipped by the Mirror package, so Giving itself never names Campaign.
 
 ### Salesforce implementation
 
@@ -6131,13 +6131,13 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
 
 ---
 
-# Part F: Connect additions for v0.6
+# Part F: Mirror additions for v0.6
 
-The Connect package is the only place a standard Salesforce object such as Campaign or
+The Mirror package is the only place a standard Salesforce object such as Campaign or
 Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
-Connect installs on an org where the object is absent and its feature says it is unavailable.
+Mirror installs on an org where the object is absent and its feature says it is unavailable.
 The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
-sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
+sync (X-02) adds one attribute to Appeal and Mirror's own settings object. The Opportunity
 mirror (X-01) adds one attribute to Gift and two keys to that settings object.
 
 ---
@@ -6151,8 +6151,8 @@ email tools and other marketing apps that only know Campaign see the organizatio
 (plan Section 4.12, feature X-02). The appeal is the record staff edit; the Campaign follows
 it. Nothing on a Campaign is ever copied back to an appeal.
 
-Campaign sync is not an entity of its own. It is one attribute on Appeal, held by Connect
-because Giving may not name Campaign, and a switch on Connect Settings. There is no link
+Campaign sync is not an entity of its own. It is one attribute on Appeal, held by Mirror
+because Giving may not name Campaign, and a switch on Mirror Settings. There is no link
 object: an appeal has at most one Campaign, so the link is the attribute (ADR-0056, Campaign
 sync keeps its link on the appeal).
 
@@ -6163,10 +6163,10 @@ sync keeps its link on the appeal).
 | Campaign ID | text (18) | no | The record identifier of the Campaign this appeal is copied to. Written by Campaign sync when it creates the Campaign; an administrator may type an existing Campaign's identifier to link to it, or clear it to have a new Campaign made. Unique, so two appeals never share one Campaign. |
 
 It is held as text rather than as a lookup because a lookup to Campaign is a compile-time
-reference: Connect would then refuse to install on an org without Campaign, which ADR-0013
+reference: Mirror would then refuse to install on an org without Campaign, which ADR-0013
 and plan Section 4.2 forbid.
 
-### Connect Settings keys (v0.6)
+### Mirror Settings keys (v0.6)
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -6234,13 +6234,13 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 ### Salesforce implementation
 
-- **Attribute on `Appeal__c`, shipped by Connect** (in `packages/connect`, not Giving):
+- **Attribute on `Appeal__c`, shipped by Mirror** (in `packages/mirror`, not Giving):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Campaign ID | `Campaign_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting:** `Connect_Settings__c`, hierarchy, protected, Connect's own under
+- **Custom setting:** `Mirror_Settings__c`, hierarchy, protected, Mirror's own under
   ADR-0017.
 
 | Attribute | API name | Type |
@@ -6249,7 +6249,7 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 - **Automation:** `Automation_Registry__mdt` row `Campaign_Sync` on `Appeal__c`, order 50,
   enabled by default, handler `CampaignSyncTriggerHandler`, running before insert and before
-  update. Its switch row is created by `ConnectPostInstall`, which Connect gains for this.
+  update. Its switch row is created by `MirrorPostInstall`, which Mirror gains for this.
 - **Service:** `CampaignSyncService` (the copy), `CampaignSyncSelector` (appeal and Campaign
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
@@ -6267,7 +6267,7 @@ writes Opportunities: each won Opportunity becomes a gift. The org chooses one d
 neither, never both, and a reconciliation page shows where the two sides disagree.
 
 The Opportunity mirror is not an entity of its own. It is one attribute on Gift, held by
-Connect because Giving may not name Opportunity, two keys on Connect Settings, and one
+Mirror because Giving may not name Opportunity, two keys on Mirror Settings, and one
 automation. There is no link object: a gift has at most one Opportunity, so the link is the
 attribute, as it is for Campaign sync (Section 29B, ADR-0058).
 
@@ -6278,9 +6278,9 @@ attribute, as it is for Campaign sync (Section 29B, ADR-0058).
 | Opportunity ID | text (18) | no | The record identifier of the Opportunity this gift is mirrored to or was made from. Written by the mirror; an administrator may type an existing Opportunity's identifier to link to it, or clear it. Unique, so two gifts never share one Opportunity. |
 
 It is text rather than a lookup for the reason Section 29B gives: a lookup to Opportunity would
-stop Connect installing on an org without Opportunity (ADR-0013).
+stop Mirror installing on an org without Opportunity (ADR-0013).
 
-### Connect Settings keys (v0.6)
+### Mirror Settings keys (v0.6)
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -6380,7 +6380,7 @@ user mode. While automation is paused (ADR-0055) or the `Opportunity_Mirror` swi
 run does nothing and writes one Info entry saying so, checked when it starts and before each
 chunk, because Giving's own rules are paused too and a gift made then would never get its
 household or allocation. A run that completes writes a summary at Info to the Error Log and
-records its start time and summary on Connect Settings, which the page shows. Health Check
+records its start time and summary on Mirror Settings, which the page shows. Health Check
 warns when the nightly run is scheduled, the direction is chosen, and no run has completed for
 more than two days (ADR-0055 point 7).
 
@@ -6416,13 +6416,13 @@ only, because a gift is never edited from its Opportunity.
 
 ### Salesforce implementation
 
-- **Attribute on `Gift__c`, shipped by Connect** (in `packages/connect`, not Giving):
+- **Attribute on `Gift__c`, shipped by Mirror** (in `packages/mirror`, not Giving):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Opportunity ID | `Opportunity_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting `Connect_Settings__c`** (Section 29B) gains:
+- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -6435,19 +6435,19 @@ only, because a gift is never edited from its Opportunity.
 - **Automation:** `Automation_Registry__mdt` row `Opportunity_Mirror` on `Gift__c`, order 50,
   after `Gift_Core_Rules` derives the household, enabled by default, handler
   `OpportunityMirrorTriggerHandler`, running before insert, before update and after delete. Its
-  switch row is created by `ConnectPostInstall`.
-- **Service:** `ConnectSync` (the comparisons, limit headroom, identifier checks and grouped
+  switch row is created by `MirrorPostInstall`.
+- **Service:** `MirrorSync` (the comparisons, limit headroom, identifier checks and grouped
   Warnings shared with Campaign sync), `OpportunityMirrorService` (Gifts to Opportunities),
   `OpportunityGiftService` (Opportunities to Gifts), `OpportunityMirrorSelector` (gift and
   Opportunity reads, Opportunity by dynamic query only), `OpportunityMirrorBatch` and
   `OpportunityMirrorSchedulable` (R-OM8), `OpportunityMirrorReconciliation` (R-OM11),
   `OpportunityMirrorController` and the `opportunityMirror` page reached from the Giving section
-  of BarnCRM Settings, `ConnectSettingsWriter` (the runs' record of their last completed run)
-  and `ConnectHealthCheckExtension` (the stale run finding, through the ADR-0057 seam).
+  of BarnCRM Settings, `MirrorSettingsWriter` (the runs' record of their last completed run)
+  and `MirrorHealthCheckExtension` (the stale run finding, through the ADR-0057 seam).
   Permission set: `Opportunity_Mirror`, which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
-- **List view** `Gifts_And_Opportunities` on Gift, shipped by Connect, where Opportunity ID is
+- **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror, where Opportunity ID is
   typed or cleared (R-OM10).
 
 ---
@@ -7082,7 +7082,7 @@ that builds it, before its metadata is created.
 | Volunteer, Job, Shift, Sign-up, Hours, Skill | Volunteers | v0.7 | Section 5.3 |
 | Program, Service, Enrollment, Attendance, Service Delivery, Outcome | Programs | v0.8 | Section 5.4 |
 | Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
-| Connect adapter entities and mirror mappings | Connect | v0.6 onward | Section 4.12 |
+| Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
 Receipt Number Sequence, Receipt Run and Receipt Template. Acknowledgment Rule left it in
@@ -7095,7 +7095,7 @@ as Stewardship Plan Template, Stewardship Plan Step and the running Stewardship 
 Gift Batch left this table in v0.5 and is specified in Section 25L, together with Gift
 Batch Row (25M), the line of a batch.
 
-The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Connect entity (the export is
+The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Mirror entity (the export is
 gated by the custom permission `Export_Accounting`, on the `Accounting_Export` permission set, see
 the 2026-10-12 accounting export row of Section 31): the
 API writes ordinary gifts through Giving, and the export reads gifts and allocations and
@@ -7103,11 +7103,11 @@ records nothing (ADR-0051). The posting flag plan Section 4.12 mentions is G-20'
 two attributes on Gift and one Giving settings key, and no new entity (R-G13, R-G14, ADR-0053).
 
 Campaign sync (X-02) left this table in v0.6 and is specified in Section 29B. It adds no
-entity: one attribute on Appeal, shipped by Connect, and Connect's own settings object. The
+entity: one attribute on Appeal, shipped by Mirror, and Mirror's own settings object. The
 Gift Transaction mirror and NPSP household adoption are still to come.
 
 The Opportunity mirror (X-01) left this table in v0.6 and is specified in Section 29C. It adds no
-entity either: one attribute on Gift, shipped by Connect, and two keys on Connect Settings.
+entity either: one attribute on Gift, shipped by Mirror, and two keys on Mirror Settings.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -7190,13 +7190,13 @@ mirrors the primary member).
 | v0.5 | 2026-09-23 | G-17 gift batch entry (ADR-0045). Two objects added: `Gift_Batch__c` (Section 25L) and its master-detail child `Gift_Batch_Row__c` (25M), with rules R-GB1 to R-GB6 and R-GR1 to R-GR4. The batch holds the control total and four defaults; a line holds only what varies, and its empty values are resolved from the batch at posting (R-GB1). The entered total is computed, never stored (R-GB2). Posting locks the batch, refuses an unbalanced or already posted batch, inserts ordinary gifts in user mode, and rolls everything back if any line fails. Status and a line's Gift are written only by posting; validation rules keep a posted batch and its lines unchanged. No trigger and no registry entry. The import framework is not used: ADR-0045 records why. No field added to an existing object. Gift Batch leaves Section 30. |
 | v0.5 | 2026-09-23 | C-21 Health Check v2 (ADR-0048). No object, field, settings key or rollup row added. Health Check reads state the model already defines: shipped rollup definitions, automation switch rows and import templates not yet materialized from their shipped defaults (Section 13), the nightly rollup run when an active definition is in Scheduled or Both mode (Section 14). Recorded against R-A2: an `Automation_Setting__c` row whose registry entry is no longer shipped is left alone, because no fix deletes a record. `Automation_Setting__c` rows are now materialized by Core's and Giving's post-install scripts, one per shipped registry entry not yet present, never touching an existing row (before C-21 nothing created them). Recorded against R-R6: a shipped rollup default is not materialized when an active, administrator-made definition (`Is_Package_Default__c` false) already writes the same target entity and attribute; shipped defaults are not counted against each other, because household and organization pairs write one attribute for different accounts. Health Check detects orphans without changing them (cleanup is C-28): a person in no household, reported only while `Auto_Create_Households__c` is on (R-C1), which in contact mode is a Contact with no Account (a Contact whose Account is an Organization belongs to it, Section 7) and in junction mode a Contact or person account with no current Household Member row (R-M2, R-M4; a Contact whose Account is a Household is left to the membership check); and a Household with no current member (in contact mode no Contact on it, in junction mode no current row naming a person). Person accounts are recognised by the org's person record types, never by a person account field. |
 | v0.5 | 2026-09-23 | C-20 duplicate detection (ADR-0050). One object added, `Duplicate_Dismissal__c` (Section 29A) with `Pair_Key__c` and `Reason__c`, which holds a decision rather than a finding. Detection is the org's own active duplicate rules; BarnCRM ships none, and the suggestions are the standard `DuplicateRecordSet` and `DuplicateRecordItem` records. A scan started from Nonprofit Settings evaluates those rules against the people and households already in the org. Rules R-DP1 to R-DP5 added. |
-| v0.6 | 2026-09-23 | X-03, X-04 and X-06, the Connect integration surface (ADR-0051). No object or field added. R-G7 is reworded: the inbound gift API answers a resend with the gift already recorded and never edits it, and refuses a resend whose amount differs. The accounting export reads `Gift__c`, `Gift_Allocation__c` and `Fund__c` and writes nothing: the posting flag plan Section 4.12 names belongs to G-20 in Giving, and no Connect object records export runs. Section 30 notes that X-03 and X-04 add no Connect entity. |
+| v0.6 | 2026-09-23 | X-03, X-04 and X-06, the Mirror integration surface (ADR-0051). No object or field added. R-G7 is reworded: the inbound gift API answers a resend with the gift already recorded and never edits it, and refuses a resend whose amount differs. The accounting export reads `Gift__c`, `Gift_Allocation__c` and `Fund__c` and writes nothing: the posting flag plan Section 4.12 names belongs to G-20 in Giving, and no Mirror object records export runs. Section 30 notes that X-03 and X-04 add no Mirror entity. |
 | v0.5 | 2026-09-23 | Removed the packaged Contact record type, its compact layout, and the list view that filtered on it, by the owner's decision (R-C4, ADR-0041). It drove no behavior: no code, rule or page branched on it, and the sample data loader was the only code that set it. People are now created with the org's default Contact record type. No field changed; the `Household_Role__c` picklist values it listed are all active on the master record type. |
 | v0.5 | 2026-09-23 | No object or field added. The Account, Contact, Gift and Commitment record pages show their fields with Dynamic Forms (ADR-0043). R-O3 now holds on the Account record page: the Name and Greetings section, which carries Member Count, Anniversary, Custom Name and the two greetings, shows only for the Household record type. Account keeps one fallback page layout for both record types, and no layout is assigned to a profile. |
 | v0.5 | 2026-09-23 | C-22, product-plan Section 11.2 item 8. No object or field added. R-M3's second half is implemented and its known-gaps row in Section 30 closed (ADR-0044, primary contact mirrors the primary member): in junction mode `Primary_Contact__c` mirrors the current member marked Is Primary, as that member's Contact or, for a Person Account, its person contact, and a hand edit of it on a household is refused. R-H5 now states the primary tiebreak the code already applied and which source each mode reads it from. R-H10 and the Household attribute table say which record is the mark in each mode. |
 | v0.5 | 2026-09-23 | C-19 Import 2.0. New Section 17A, `Import_Journal__c`, a page per chunk recording the updates an import made (value before and value written) and what an undo kept or did not put back, with rules R-IJ1 to R-IJ5. `Import_Batch__c` status gains Undoing and Undo failed; R-IB6 restated and R-IB7 (the undo window is stamped at commit), R-IB8 (one named batch, counted and confirmed, once, to the recycle bin) and R-IB9 (deletes only tagged records, keeps a tagged record that has gained something since, puts back only values nobody has changed since) added. R-IB3 now says the import tags the household it made a new person. R-IT6 added: a recurring template is listed on the Hub with its last import date, and nothing loads a file on a schedule. `Nonprofit_Settings__c` gains `Import_Undo_Retention_Days__c`. R-IR5 notes that undo does not read the staged rows. |
 | v0.5 | 2026-09-23 | C-19 review. No object or field added. R-IB1: a dry run is refused on a batch that has started a commit or is in an undo status. R-IB8: a chunk the platform stopped, or an undo job that is no longer running, ends Undo failed. R-IB9: a tagged record is kept when anything created since points at it through any reference the org can filter on (not only custom ones), when something was created during the commit by somebody else, when the record was edited since or has an activity, and when the person undoing cannot delete it; the system-mode reads and writes are recorded against ADR-0021. R-IJ1: a page holds at most 200 entries, and one oversized entry is logged rather than losing the chunk's journal. |
-| v0.6 | 2026-09-24 | X-02 Campaign sync (ADR-0056, Campaign sync keeps its link on the appeal). New Part F and Section 29B, rules R-CS1 to R-CS8. `Appeal__c` gains `Campaign_Id__c` (Text 18, unique, external ID), shipped by Connect rather than Giving, because Giving may not name Campaign and a lookup to Campaign would stop Connect installing where Campaign is absent. New custom setting `Connect_Settings__c` with `Campaign_Sync_Enabled__c` (default off). New automation `Campaign_Sync` on Appeal. No object added. R-AP4 points at Section 29B. Review changes of 2026-09-25: R-CS1 names the setting as the authoritative switch; R-CS4 logs a saver without access once, on create; R-CS5 writes refusals in one statement and skips a save too large to copy; R-CS7 lets Sync all appeals delete a Campaign it created and could not link. |
+| v0.6 | 2026-09-24 | X-02 Campaign sync (ADR-0056, Campaign sync keeps its link on the appeal). New Part F and Section 29B, rules R-CS1 to R-CS8. `Appeal__c` gains `Campaign_Id__c` (Text 18, unique, external ID), shipped by Mirror rather than Giving, because Giving may not name Campaign and a lookup to Campaign would stop Mirror installing where Campaign is absent. New custom setting `Mirror_Settings__c` with `Campaign_Sync_Enabled__c` (default off). New automation `Campaign_Sync` on Appeal. No object added. R-AP4 points at Section 29B. Review changes of 2026-09-25: R-CS1 names the setting as the authoritative switch; R-CS4 logs a saver without access once, on create; R-CS5 writes refusals in one statement and skips a save too large to copy; R-CS7 lets Sync all appeals delete a Campaign it created and could not link. |
 | v0.6 | 2026-09-24 | G-20 posting flag and period lock (ADR-0053). No object added. `Gift__c` gains `Accounting_Posted_At__c` (Date/Time) and `Accounting_Posted_By__c` (Lookup to User), both package written and read only in every permission set (R-G13). `Giving_Settings__c` gains `Books_Closed_Through__c` (Date), set on the Accounting Periods page and named by no Setting Definition row. New rules R-G13 (posting and unposting), R-G14 (a gift in the books that is posted or dated in a closed period is locked; nothing enters the books in a closed period) and R-GA5 (a locked gift's allocations are fixed). Two Always Runs automations, `Gift_Posting_Lock` and `Gift_Allocation_Posting_Lock`, and two custom permissions, `Post_Gifts` and `Override_Posting_Lock`, the second on no permission set. |
 | v0.6 | 2026-09-24 | Cancelled gift status, by the owner's decision (ADR-0054, amending G-04, ADR-0022, ADR-0023 and ADR-0031). No object added. `Gift__c.Status__c` gains Cancelled. New R-G16: a Pending gift that will never be paid is cancelled, with no negative gift, outside every total, the export and receipts, and allowed in a closed period; it moves only between Pending and Cancelled and unlinks its installment. R-G3: only a Received gift is refunded or written off. R-G14, R-AK8, R-RC8 and Section 26 name Cancelled. |
 | v0.6 | 2026-09-24 | C-23 automation pause with automatic resume, and the error digest (ADR-0055). No object added. `Nonprofit_Settings__c` gains five keys (Section 12, v0.6 keys): `Error_Digest_Recipients__c`, `Error_Digest_Frequency__c`, `Error_Digest_Covered_Until__c`, `Error_Digest_Last_Run__c` and `Error_Digest_Last_Run_Summary__c`. New rules R-A5 (a pause ends by itself through a one-time job that records the resume) and R-E5 (the digest counts and links, never quotes, and goes only to active users); R-E3 reworded to point at R-E5. |
@@ -7208,7 +7208,7 @@ mirrors the primary member).
 | v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
-| v0.6 | 2026-09-25 | X-01 Opportunity mirror (ADR-0058). New Section 29C, rules R-OM1 to R-OM11. `Gift__c` gains `Opportunity_Id__c` (Text 18, unique, external ID), shipped by Connect for the reason Section 29B gives. `Connect_Settings__c` gains `Opportunity_Mirror_Direction__c` (one direction or Off, empty reads as Off) and `Opportunity_Mirror_Start__c`. New automation `Opportunity_Mirror` on Gift. No object added. R-G10 names the attribute. Review changes of 2026-09-25: R-OM3 leaves a Pending gift's stage alone and omits Campaign where the saver cannot read it; R-OM5 needs only Opportunity create and edit; R-OM6 requires half the query and DML limits unspent and caps the distinct messages; R-OM7 gains an optional record type list (`Opportunity_Mirror_Record_Types__c`) and reads the start date in the org's time zone; R-OM8 rechecks linked gifts changed since the last completed run, skips a run while automation is paused or the switch is off, records the last completed run (`Opportunity_Mirror_Last_Run__c`, `Opportunity_Mirror_Last_Summary__c`) and has a Health Check finding; R-OM9 warns when a linked gift is deleted; R-OM11 caps its counts and refuses a viewer without read access. Setting Definition gains `Required_Permission__c`, and `HealthCheckExtensions` looks up Connect's extension as well as Giving's (ADR-0057 amended). |
+| v0.6 | 2026-09-25 | X-01 Opportunity mirror (ADR-0058). New Section 29C, rules R-OM1 to R-OM11. `Gift__c` gains `Opportunity_Id__c` (Text 18, unique, external ID), shipped by Mirror for the reason Section 29B gives. `Mirror_Settings__c` gains `Opportunity_Mirror_Direction__c` (one direction or Off, empty reads as Off) and `Opportunity_Mirror_Start__c`. New automation `Opportunity_Mirror` on Gift. No object added. R-G10 names the attribute. Review changes of 2026-09-25: R-OM3 leaves a Pending gift's stage alone and omits Campaign where the saver cannot read it; R-OM5 needs only Opportunity create and edit; R-OM6 requires half the query and DML limits unspent and caps the distinct messages; R-OM7 gains an optional record type list (`Opportunity_Mirror_Record_Types__c`) and reads the start date in the org's time zone; R-OM8 rechecks linked gifts changed since the last completed run, skips a run while automation is paused or the switch is off, records the last completed run (`Opportunity_Mirror_Last_Run__c`, `Opportunity_Mirror_Last_Summary__c`) and has a Health Check finding; R-OM9 warns when a linked gift is deleted; R-OM11 caps its counts and refuses a viewer without read access. Setting Definition gains `Required_Permission__c`, and `HealthCheckExtensions` looks up Mirror's extension as well as Giving's (ADR-0057 amended). |
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
 | v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
 | v0.6 | 2026-10-12 | Neutral Core wording (ADR-0062). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
@@ -7239,7 +7239,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
 | post-1.0 | 2026-10-13 | Core quality pass Q-04, job notifications. No object added. `BarnCRM_Settings__c` gains `Job_Notifications__c` (Section 12, job notification key), shipped on and registered in `SettingsService.SHIPPED_DEFAULTS` (ADR-0035). The notification is the platform custom notification type `BarnCRM_Job_Finished`. |
-| v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
+| v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Mirror gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Mirror_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Rollup Queue and Queueable jobs (rollup comparison run on `oi-test`). No object or field added. R-RQ3: a save inside a Queueable leaves the processor to a later save, to the job's own chain end (`RollupService.startQueuedRecalculation`) or to the nightly run, because taking the job's one chained job stopped the sample data load with "Too many queueable jobs added to the queue: 2". |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
@@ -7282,7 +7282,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Editions, features, modules and first-run setup (ADR-0124, `0124-edition-gates-visibility.md`). New field `Features_Turned_On__c` on BarnCRM Settings (the Core features turned on; one-way). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`, `Probe_Object__c`, `App_Name__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
 | v0.6 | 2026-10-14 | The rollup engine leaves Core for the BarnCRM Rollup Builder module (ADR-0125, `0125-rollup-builder-module.md`). No object or field added or renamed. Rollup Definition, Rollup Queue, Rollup Run Lock, `Rollup_Queue_Ready__e` and Rollup Definition Default (shipped default) move to `packages/rollups` with their API names unchanged (Section 32). Core reaches the engine only through `RollupEngineExtension`. `Rollup_Mode_Default__c` and `Rollup_Processing__c` stay on `BarnCRM_Settings__c` until the module's own settings object is added. |
 | v0.6 | 2026-10-14 | Rollup Settings added as Section 14B (ADR-0125, decision 6): `Rollup_Settings__c`, the BarnCRM Rollup Builder module's protected hierarchy custom setting, holds `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved from `BarnCRM_Settings__c` (Section 12) with their API names and definitions unchanged. Stored values are not carried over. |
-| v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Connect `Rollups;Giving`. |
+| v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Mirror `Rollups;Giving`. |
 
 ---
 ## 32. Entity ownership by package
@@ -7346,14 +7346,14 @@ included; standard objects the packages extend are named by the entity that gove
 | Stewardship Plan | Giving | v0.4 | 25K |
 | Gift Batch | Giving | v0.5 | 25L |
 | Gift Batch Row | Giving | v0.5 | 25M |
-| Gift Transaction mirror | Connect | v0.6 | 30 |
-| Opportunity mirror (Opportunity ID on Gift) | Connect | v0.6 | 29C |
-| Campaign sync (Campaign ID on Appeal) | Connect | v0.6 | 29B |
-| Connect Settings | Connect | v0.6 | 29B |
+| Gift Transaction mirror | Mirror | v0.6 | 30 |
+| Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
+| Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
+| Mirror Settings | Mirror | v0.6 | 29B |
 | Volunteers entities | Volunteers | v0.7 | 30 |
 | Programs entities | Programs | v0.8 | 30 |
 | Funders entities | Funders | v0.9 | 30 |
-| NPSP household adoption | Connect | v0.9 | 30 |
+| NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
 

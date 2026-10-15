@@ -39,7 +39,7 @@ scripts/org/create-scratch-org.sh reads the optional sets from this file
 Two limits the platform enforces only at deploy time are checked too: a permission set's label
 may be at most 80 characters and its description at most 255, counted as the platform counts
 them, with the line breaks and indentation the XML carries. Opportunity_Mirror's description
-broke the Connect deploy on oi-test at 272 characters while every static check passed.
+broke the Mirror deploy on oi-test at 272 characters while every static check passed.
 """
 
 import glob

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Mirror_AccountingExport_Title</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: heading</shortDescription>
+    <value>Accounting export</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_Intro</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: what it does</shortDescription>
+    <value>Download the gifts in a date range as a spreadsheet file for your accounting system: one row for each fund a gift went to, with refunds as negative rows on the day the money went back.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_Visibility</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: the file holds visible gifts</shortDescription>
+    <value>The file holds the gifts you can see. If gifts in your organization are private, the person who runs the export needs to see all of them.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_From</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: start date field</shortDescription>
+    <value>From</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_To</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: end date field</shortDescription>
+    <value>To</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_Fund</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: fund field</shortDescription>
+    <value>Fund</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_AllFunds</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: fund left empty</shortDescription>
+    <value>All funds</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_PaymentMethod</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: payment method field</shortDescription>
+    <value>Payment method</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_AllMethods</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: payment method left empty</shortDescription>
+    <value>All payment methods</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_Download</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: download button</shortDescription>
+    <value>Download file</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_Summary</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: what the file holds</shortDescription>
+    <value>{0} rows from {1} gifts. Net total {2}.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_NoGifts</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export page: nothing in the range</shortDescription>
+    <value>No gifts in this range.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorDatesRequired</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: a date is missing</shortDescription>
+    <value>Choose a From date and a To date.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorDateOrder</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: dates in the wrong order</shortDescription>
+    <value>The To date is before the From date.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorTooManyRows</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: over the row limit</shortDescription>
+    <value>More than 10,000 rows in this range. Choose a shorter range, or one fund.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorFund</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: the fund is not a fund</shortDescription>
+    <value>Choose a fund from the list.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorPaymentMethod</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: the method is not allowed</shortDescription>
+    <value>Choose a payment method from the list.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_NoExportPermission</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Export refused: no Accounting Export permission set</shortDescription>
+    <value>The accounting export needs the Accounting Export permission set. Ask your administrator for it.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_AccountingExport_ErrorFailed</fullName>
+    <categories>Mirror, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Accounting export: unexpected failure</shortDescription>
+    <value>The export could not be produced. The Error Log has the details.</value>
+  </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_OnlyUnposted</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Only unposted gifts checkbox</shortDescription>
+        <value>Only gifts not yet posted</value>
+    </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_MarkPosted</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mark posted button</shortDescription>
+        <value>Mark these gifts posted</value>
+    </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_MarkPostedHelp</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mark posted help</shortDescription>
+        <value>Once this file is in your accounting system, mark its gifts posted. A posted gift cannot be changed or deleted.</value>
+    </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_Marked</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gifts marked posted</shortDescription>
+        <value>Marked {0} gifts posted. Gifts already posted were left as they were.</value>
+    </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_MarkNeedsAllFunds</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Marking needs all funds</shortDescription>
+        <value>To mark gifts posted, download the export for all funds: a gift split across funds would be locked when only part of it is in this file.</value>
+    </labels>
+    <labels>
+        <fullName>Mirror_AccountingExport_ChangedSinceDownload</fullName>
+        <categories>Mirror, Accounting Export</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gifts changed since download</shortDescription>
+        <value>Gifts in this range changed since you downloaded the file, so nothing was marked. Download the file again, import it, and then mark.</value>
+    </labels>
+</CustomLabels>

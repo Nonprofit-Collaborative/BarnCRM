@@ -25,7 +25,7 @@ first (by hand or with [Importing](importing.md)) and then the gift sent again.
 
 ## How to turn it on
 
-The Connect module has to be installed. The Flow action needs nothing else.
+The Mirror module has to be installed. The Flow action needs nothing else.
 
 The web address needs a Salesforce user for the sending system to sign in as, and that
 sign-in is set up in Salesforce Setup. It cannot be avoided: how outside systems

@@ -48,7 +48,7 @@ had none).
 2. **Log the computer into the org.** Run `sf org login web --alias pilot` and sign in as the
    administrator. For the rehearsal, add `--instance-url https://test.salesforce.com`.
 3. **Build the mapping.** From the repository folder, run
-   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,connect --output mapping.json`,
+   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,mirror --output mapping.json`,
    listing the BarnCRM packages you have installed. It prints how many kinds of record it will
    copy and which it leaves out, and why.
 4. **Write down your settings.** Open **BarnCRM Settings** and go through every section. Step 7
@@ -57,7 +57,7 @@ had none).
 5. **Stop the scheduled jobs.** A package cannot be removed while one of its jobs is scheduled.
    With Rollup Builder, in the **BarnCRM Rollup Builder** app, click **Stop the nightly
    recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal address swap**, stop the nightly
-   swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Connect, on
+   swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Mirror, on
    **Opportunity mirror**, click **Stop nightly run**. If automation is paused, click **Resume
    automation**.
 6. **Check the kit can read everything.** Run
@@ -69,13 +69,13 @@ had none).
    It writes one file per kind of record into the `pilot-export` folder and prints a count for
    each. The folder holds every person's details: keep it on an encrypted disk, never email it,
    and delete it at step 16.
-8. **Remove the pilot packages**, last installed first: Connect, then any other module, then
+8. **Remove the pilot packages**, last installed first: Mirror, then any other module, then
    Giving, then Rollup Builder, then Core. In Setup, **Installed Packages**, click **Uninstall** beside each one, or
    run `sf package uninstall --package <04t of that package> --target-org pilot --wait 30`
    (`sf package installed list --target-org pilot` shows the identifiers). If Salesforce refuses
    because one of your own reports, flows or fields uses a BarnCRM component, it lists them:
    note each one, delete it (after saving a copy if you need it), and try again.
-9. **Install the managed packages**, Core first, then Rollup Builder, then Giving, then Connect
+9. **Install the managed packages**, Core first, then Rollup Builder, then Giving, then Mirror
    and any other module:
    `sf package install --package <04t> --target-org pilot --security-type AdminsOnly --wait 30`.
 10. **Get ready to load.** Give yourself the **BarnCRM Admin** role again on the **Access** page.

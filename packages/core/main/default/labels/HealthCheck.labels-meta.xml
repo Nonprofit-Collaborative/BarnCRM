@@ -153,20 +153,20 @@
         <value>The coexistence mode changes from {0} to {1}.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ConnectMissingDetail</fullName>
+        <fullName>Core_HealthCheck_MirrorMissingDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains which module holds the mirror for the detected objects.</shortDescription>
-        <value>This org has Nonprofit Cloud Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Connect module.</value>
+        <value>This org has Nonprofit Cloud Gift Transaction objects and the Mirror module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Mirror module.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ConnectMissingTitle</fullName>
+        <fullName>Core_HealthCheck_MirrorMissingTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the Connect module finding.</shortDescription>
-        <value>The Gift Transaction mirror is in the Connect module</value>
+        <shortDescription>Title of the Mirror module finding.</shortDescription>
+        <value>The Gift Transaction mirror is in the Mirror module</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CountOrMore</fullName>

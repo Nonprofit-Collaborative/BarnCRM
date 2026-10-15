@@ -60,7 +60,7 @@ every Opportunity and gift where it is.
 
 ## How to turn it on
 
-You need the Connect module and a Salesforce edition with Opportunities (Sales Cloud, Service
+You need the Mirror module and a Salesforce edition with Opportunities (Sales Cloud, Service
 Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has none, and the
 Opportunity mirror page says so.
 

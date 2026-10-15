@@ -2,7 +2,7 @@
 
 Core is the foundation package. Every other BarnCRM module depends on it, and it depends on
 nothing else. It contains no Opportunity, Campaign, Case, Lead, Person Account, or Industries
-object references: those live only in the Connect module, behind dynamic Apex.
+object references: those live only in the Mirror module, behind dynamic Apex.
 
 ## What Core contains
 
