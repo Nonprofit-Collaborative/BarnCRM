@@ -29,7 +29,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 5. `mwdbdevsb`: deployed 2026-10-14 at the owner's request (Core at e3f2db58, then plus #411 to #413); ask before every further deploy.
 6. Release prerequisites (namespace, Dev Hub, steward entity): after a v1.0 pilot (D-87).
 7. Rename Connect to Mirror (D-103, ADR-0126): Landed (#441, 98583f12, ADR-0126).
-8. Test org cleanup of old Connect metadata (destructive deploy; owner approved): `oi-test` done (176 components); `oi-pa` module record done; `oi-pa` rest, `barn-core` and `barn-npc` in progress.
+8. Test org cleanup of old Connect metadata (destructive deploy; owner approved): `oi-test` done (176 components); `oi-pa` done (module record, then 175 components); `barn-core` had no Connect module (nothing to remove). `barn-npc` waits on a Mirror deploy there first: its unchanged-name Connect components (Campaign classes, LWCs) still reference the old labels and `Connect_Settings__c`, so the delete is refused until Mirror replaces them.
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
 |---|---|---|
