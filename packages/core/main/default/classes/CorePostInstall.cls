@@ -30,8 +30,8 @@
  * administrator has chosen is a no-op here, whatever they chose.
  *
  * The shipped Rollup Definitions are not Core's: the BarnCRM Rollup Builder module creates
- * them from its own post-install script, `RollupsPostInstall` (ADR-0029, ADR-NEXT
- * `NEXT-rollup-builder-module.md`).
+ * them from its own post-install script, `RollupsPostInstall` (ADR-0029, ADR-0125
+ * `0125-rollup-builder-module.md`).
  *
  * The third is to create the switch rows of the Automation page, one per automation the
  * shipped registry names, so the page lists every automation from the first install rather

@@ -453,7 +453,7 @@ public without sharing class RollupQueue implements Queueable {
         processorRequested = true;
         processorComing = true;
         if (RollupService.isStopped()) {
-            // R-RQ5: the entries wait, also while the module is turned off (ADR-NEXT decision
+            // R-RQ5: the entries wait, also while the module is turned off (ADR-0125 decision
             // 9); the nightly run puts Both totals right after the pause.
             return;
         }

@@ -1,4 +1,4 @@
-# ADR-NEXT: The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module
+# ADR-0125: The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-14: the move, this design, and decisions
 D1 to D7 below as recommended)

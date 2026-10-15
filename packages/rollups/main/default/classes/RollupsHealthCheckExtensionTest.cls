@@ -1,6 +1,6 @@
 /**
  * The rollup findings and the Restore shipped rollups fix, which the Rollup Builder module adds
- * to Health Check through `RollupsHealthCheckExtension` (ADR-0048, ADR-NEXT). Moved here
+ * to Health Check through `RollupsHealthCheckExtension` (ADR-0048, ADR-0125). Moved here
  * unchanged from `HealthCheckFixesTest` when the checks left Core: each finding names what is
  * missing, counted from this org, and its fix creates exactly that, once. Everything runs as
  * Maria, who holds the permission the checks and the fixes are gated on; the refusal is asserted

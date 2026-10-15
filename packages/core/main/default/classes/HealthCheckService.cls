@@ -77,7 +77,7 @@ public with sharing class HealthCheckService {
      * The fixes HealthCheckController.applyFix runs (C-21, ADR-0048). Each one only creates
      * what is missing or schedules what is not scheduled, so pressing it twice is pressing it
      * once. The key is what follows the action prefix in the fix target. A dependent package's
-     * fixes are its own keys, answered by its `HealthCheckFixExtension` (ADR-NEXT).
+     * fixes are its own keys, answered by its `HealthCheckFixExtension` (ADR-0125).
      */
     public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
     public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
@@ -113,7 +113,7 @@ public with sharing class HealthCheckService {
 
     /**
      * The installed extension that owns this fix key, or null when none does. Core's own keys
-     * never reach here (ADR-NEXT).
+     * never reach here (ADR-0125).
      */
     public static HealthCheckFixExtension fixOwner(String fixKey) {
         if (String.isBlank(fixKey)) {
@@ -534,7 +534,7 @@ public with sharing class HealthCheckService {
                 )
             );
             // The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
-            // ADR-NEXT), asked with the other extensions after these.
+            // ADR-0125), asked with the other extensions after these.
         }
 
         return steps;

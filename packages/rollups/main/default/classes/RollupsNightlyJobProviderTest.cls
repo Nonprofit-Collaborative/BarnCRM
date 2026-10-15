@@ -1,6 +1,6 @@
 /**
  * The Rollup Builder module hands Health Check its nightly recalculation through the provider
- * Core finds by name (ADR-0075, ADR-NEXT `NEXT-rollup-builder-module.md`), so "Schedule all
+ * Core finds by name (ADR-0075, ADR-0125 `0125-rollup-builder-module.md`), so "Schedule all
  * nightly jobs" counts and schedules it. The job runs under a name of its own, so the test does
  * not depend on what the org it runs in has scheduled.
  */

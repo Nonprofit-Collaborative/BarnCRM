@@ -7,7 +7,7 @@
  * component.
  *
  * `applyFix` is also called by a module's tests, which press a fix the module owns the way the
- * panel does (ADR-NEXT `NEXT-rollup-builder-module.md`).
+ * panel does (ADR-0125 `0125-rollup-builder-module.md`).
  */
 @NamespaceAccessible
 public with sharing class HealthCheckController {

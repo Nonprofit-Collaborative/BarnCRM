@@ -463,8 +463,8 @@ deploy_stage "Core (UI and permissions)" \
   "packages/core/main/default/prompts" || exit $?
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
-  # The Rollup Builder module depends on Core only, and Giving depends on it (ADR-NEXT
-  # NEXT-rollup-builder-module.md), so it goes between them. --core-only leaves it out, which is
+  # The Rollup Builder module depends on Core only, and Giving depends on it (ADR-0125
+  # 0125-rollup-builder-module.md), so it goes between them. --core-only leaves it out, which is
   # how a Core-only org (no rollup engine at all) is built.
   deploy_stage "Rollup Builder" "packages/rollups" || exit $?
   deploy_stage "Giving" "packages/giving" || exit $?

@@ -1,5 +1,5 @@
 /**
- * Core finds the Rollup Builder module's engine by name, or works without it (ADR-NEXT): the
+ * Core finds the Rollup Builder module's engine by name, or works without it (ADR-0125): the
  * resolver's own answers, and each Core caller with an engine present and absent.
  */
 @IsTest(testFor='ApexClass:RollupEngineExtensions')

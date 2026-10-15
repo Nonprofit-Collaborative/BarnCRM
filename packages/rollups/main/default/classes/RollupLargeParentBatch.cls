@@ -498,7 +498,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 
     /**
      * Runs the next pass, writing each entity whose queries are all read on the way. Chains no
-     * pass once the module is turned off (ADR-NEXT decision 9): the held entries wait out their
+     * pass once the module is turned off (ADR-0125 decision 9): the held entries wait out their
      * hold, and Turn on recalculates every rollup.
      */
     @TestVisible

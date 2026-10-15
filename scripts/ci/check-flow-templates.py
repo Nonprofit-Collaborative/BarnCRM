@@ -29,8 +29,8 @@ import sys
 import xml.etree.ElementTree as ET
 
 NS = "http://soap.sforce.com/2006/04/metadata"
-# Core and the Rollup Builder module, whose registry rows were Core's until ADR-NEXT
-# (NEXT-rollup-builder-module.md) moved the engine out.
+# Core and the Rollup Builder module, whose registry rows were Core's until ADR-0125
+# (0125-rollup-builder-module.md) moved the engine out.
 PACKAGES = ("core", "rollups")
 REGISTRY_GLOBS = [
     f"packages/{package}/main/default/customMetadata/Automation_Registry.*.md-meta.xml"

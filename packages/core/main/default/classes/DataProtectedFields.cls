@@ -293,7 +293,7 @@ public with sharing class DataProtectedFields {
     /**
      * The target fields of every Rollup Definition, active or not, on the object of this name,
      * in lower case, as written and without a namespace, so either form matches. The Rollup
-     * Builder module reports them; without it there are none (ADR-NEXT).
+     * Builder module reports them; without it there are none (ADR-0125).
      */
     private static Set<String> rollupTargetsOf(String objectName) {
         if (rollupTargets == null) {

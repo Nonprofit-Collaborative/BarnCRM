@@ -5,7 +5,7 @@
  * (plan Section 4.8, feature C-11). Since C-21 it also asks whether the package defaults
  * materialized from shipped metadata are all here; those findings carry a fix button
  * (ADR-0048). The rollup checks belong to the Rollup Builder module
- * (`RollupsHealthCheckExtension`, ADR-NEXT).
+ * (`RollupsHealthCheckExtension`, ADR-0125).
  *
  * The fiscal year check reads Setup's fiscal year dynamically through FiscalYearSelector, so a
  * Platform-only org is told nothing rather than told zero (ADR-0009, ADR-0013). Whether

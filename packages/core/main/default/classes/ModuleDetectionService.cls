@@ -62,7 +62,7 @@ public with sharing class ModuleDetectionService {
         public String installUrl;
         /**
          * For a module that is not here, the modules its package needs that are not here
-         * either, by name shown, in install order (`Requires__c`, ADR-NEXT D3); otherwise null.
+         * either, by name shown, in install order (`Requires__c`, ADR-0125 D3); otherwise null.
          */
         @AuraEnabled
         public String installFirst;

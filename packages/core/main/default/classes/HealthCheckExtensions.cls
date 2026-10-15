@@ -12,7 +12,7 @@
 public with sharing class HealthCheckExtensions {
     /**
      * The class names dependent packages register to add findings, in the order they are asked:
-     * the Rollup Builder module's rollup checks (ADR-NEXT), Giving's (G-20 follow-up), then
+     * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
      * Connect's, for its nightly mirror run (X-01).
      */
     @NamespaceAccessible

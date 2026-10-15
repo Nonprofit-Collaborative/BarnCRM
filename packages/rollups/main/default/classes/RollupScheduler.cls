@@ -43,7 +43,7 @@ public with sharing class RollupScheduler implements Schedulable {
     /**
      * The nightly run, and a processor for Rollup Queue entries no save started one for
      * (ROLLUPS-7), so a queued total never waits longer than a night. Nothing while the module
-     * is turned off (ADR-NEXT decision 9), a one-off Run tonight included, and an Info entry
+     * is turned off (ADR-0125 decision 9), a one-off Run tonight included, and an Info entry
      * says the run was skipped; the schedule stays, so it runs again once it is on.
      * The nightly run also gives the Rollup Builder sets to anyone given a BarnCRM role since
      * (`RollupAccessSync`, D2).

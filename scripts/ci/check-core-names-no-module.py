@@ -2,8 +2,8 @@
 """Fails if Core names a class, component, object, field, label, tab, app or permission set
 another package ships.
 
-Core installs alone and depends on no module (plan Section 4.1, ADR-0003, ADR-NEXT
-`NEXT-rollup-builder-module.md`). It reaches a module only by name at run time
+Core installs alone and depends on no module (plan Section 4.1, ADR-0003, ADR-0125
+`0125-rollup-builder-module.md`). It reaches a module only by name at run time
 (`HealthCheckExtensions`, `NightlyJobs`, `RollupEngineExtensions` and the other resolvers),
 and those names are string literals. A static reference compiles or deploys only where the
 module is installed, so a Core-only deploy would fail, and nothing else would notice until it

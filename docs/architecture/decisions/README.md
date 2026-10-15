@@ -133,7 +133,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0122](0122-edition-names.md) | BarnCRM comes in two editions, the Nonprofit Edition and the Standard Edition | Accepted (owner decision) |
 | [0123](0123-neutral-role-names.md) | Core roles have neutral names that fit any organization | Accepted (owner decision) |
 | [0124](0124-edition-gates-visibility.md) | The edition, features, modules and first-run setup decide what BarnCRM shows | Accepted (owner decision) |
-| [NEXT](NEXT-rollup-builder-module.md) | The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module | Accepted (owner decision) |
+| [0125](0125-rollup-builder-module.md) | The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

@@ -1,5 +1,5 @@
 /**
- * BarnCRM's roles get the Rollup Builder sets (ADR-NEXT `NEXT-rollup-builder-module.md`, D2):
+ * BarnCRM's roles get the Rollup Builder sets (ADR-0125 `0125-rollup-builder-module.md`, D2):
  * Staff and Read Only holders get Rollup Builder User, Admin holders Rollup Builder Admin,
  * whether they hold the set directly or through a role, at install and with the nightly run.
  */

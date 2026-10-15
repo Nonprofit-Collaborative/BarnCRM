@@ -18,8 +18,8 @@
  * BarnCRM's Access page.
  *
  * A module that keeps its own permission sets with BarnCRM's roles uses the same audience
- * logic through `giveToHolders`, naming its sets and Core's (ADR-NEXT
- * `NEXT-rollup-builder-module.md`, D2); Core names no module set.
+ * logic through `giveToHolders`, naming its sets and Core's (ADR-0125
+ * `0125-rollup-builder-module.md`, D2); Core names no module set.
  */
 @NamespaceAccessible
 public with sharing class TabAccessService {
@@ -150,7 +150,7 @@ public with sharing class TabAccessService {
      * directly or through a permission set group such as a BarnCRM role, up to `budget`
      * assignments. Never takes it away: a module's set may also be given by hand, to the person
      * who installed the module or to an integration user. For a module keeping its own sets with
-     * BarnCRM's roles (ADR-NEXT `NEXT-rollup-builder-module.md`, D2); it names its set and the
+     * BarnCRM's roles (ADR-0125 `0125-rollup-builder-module.md`, D2); it names its set and the
      * audience, and Core names no module set. Written in system mode, as the tab sync is, and a
      * refused assignment is logged as a Warning under `context`. Returns true when more is left,
      * and false when every assignment of this slice was refused, so the caller does not queue

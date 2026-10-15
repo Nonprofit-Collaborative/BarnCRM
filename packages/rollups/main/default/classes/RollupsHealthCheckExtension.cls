@@ -1,6 +1,6 @@
 /**
- * The rollup engine's Health Check findings and its one fix (ADR-NEXT,
- * `NEXT-rollup-builder-module.md`): shipped rollups that are missing, nightly rollups with no
+ * The rollup engine's Health Check findings and its one fix (ADR-0125,
+ * `0125-rollup-builder-module.md`): shipped rollups that are missing, nightly rollups with no
  * nightly run, and a Rollup Queue that failed or stalled. Core finds this class by name
  * (`HealthCheckExtensions`) and folds the findings into its report; an org without the Rollup
  * Builder module has no rollups, so it has none of these findings.

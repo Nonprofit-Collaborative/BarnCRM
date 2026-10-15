@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Rollup Builder module does at install and at every upgrade (ADR-NEXT
- * `NEXT-rollup-builder-module.md`, decision 5).
+ * What the BarnCRM Rollup Builder module does at install and at every upgrade (ADR-0125
+ * `0125-rollup-builder-module.md`, decision 5).
  *
  * Five things, each safe to run twice and none able to abort an install, since every failure
  * is written to the Error Log instead:

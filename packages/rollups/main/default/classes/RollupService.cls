@@ -66,7 +66,7 @@ public with sharing class RollupService {
     @TestVisible
     private static Integer instantLimit = 50;
 
-    /** The module's own settings object (canonical model Section 14B, ADR-NEXT decision 6). */
+    /** The module's own settings object (canonical model Section 14B, ADR-0125 decision 6). */
     @NamespaceAccessible
     public static final String SETTINGS_OBJECT = 'Rollup_Settings__c';
     /** The setting that says when real-time totals are recalculated (R-R4, ADR-0098). */
@@ -88,12 +88,12 @@ public with sharing class RollupService {
      */
     private static final Integer QUERIES_PER_TARGET = 4;
 
-    /** The module's name on the Module Manager (ADR-NEXT D7). */
+    /** The module's name on the Module Manager (ADR-0125 D7). */
     @NamespaceAccessible
     public static final String MODULE_NAME = 'Rollups';
 
     /**
-     * Whether BarnCRM Rollup Builder is turned off on the Module Manager (ADR-NEXT decision 9).
+     * Whether BarnCRM Rollup Builder is turned off on the Module Manager (ADR-0125 decision 9).
      * While it is, every entry point of the engine returns without doing anything: the trigger
      * handler on every object that registers it (Giving's rows too), the Flow action, Core's
      * merge and queue calls, the Rollup Queue processor, the nightly and full runs (and the
@@ -112,7 +112,7 @@ public with sharing class RollupService {
     }
 
     /**
-     * Puts every total right after the module is turned on again (ADR-NEXT decision 9, owner
+     * Puts every total right after the module is turned on again (ADR-0125 decision 9, owner
      * decision: totals are right after Turn on): starts the processor for the entries that
      * waited, and a full recalculation of every active rollup, since nothing recorded the saves
      * made while it was off. Core's Module Manager calls this through the engine seam.
@@ -333,7 +333,7 @@ public with sharing class RollupService {
 
         public void execute(QueueableContext context) {
             if (isTurnedOff()) {
-                // Turned off since the merge (ADR-NEXT decision 9): the survivors wait in the
+                // Turned off since the merge (ADR-0125 decision 9): the survivors wait in the
                 // queue, which Turn on drains.
                 ErrorLogger.logMessage(
                     System.Label.Core_Rollups_RunStoppedTurnedOff,

@@ -8,7 +8,7 @@
  * no test depends on what the org it runs in happens to have. Import templates are the one
  * exception: their shipped rows are read as shipped, and Core ships two, which the test says
  * before it relies on them. A module's fix is run through `HealthCheckFixExtension` under the
- * same rules (ADR-NEXT); the rollup fix's own tests are `RollupsHealthCheckExtensionTest`.
+ * same rules (ADR-0125); the rollup fix's own tests are `RollupsHealthCheckExtensionTest`.
  */
 @IsTest(testFor='ApexClass:HealthCheckService, ApexClass:HealthCheckController')
 private class HealthCheckFixesTest {

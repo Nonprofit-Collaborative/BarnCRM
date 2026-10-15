@@ -1,6 +1,6 @@
 /**
  * Someone who holds only Core's BarnCRM Staff set, and neither Rollup Builder set, still saves
- * records and still has the totals over them kept current (ADR-NEXT `NEXT-rollup-builder-module.md`,
+ * records and still has the totals over them kept current (ADR-0125 `0125-rollup-builder-module.md`,
  * decision 8). The rollup grants left Core's sets for the module's, so every package-owned read
  * and write on the save path has to run in system mode: a user mode read of the definitions, or a
  * user mode write to the queue, would fail this person's save or silently skip their totals.

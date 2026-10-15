@@ -1,6 +1,6 @@
 /**
- * Gives the Rollup Builder permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-rollup-builder-module.md`, D2): Rollup Builder User to everyone holding BarnCRM Staff or
+ * Gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125
+ * `0125-rollup-builder-module.md`, D2): Rollup Builder User to everyone holding BarnCRM Staff or
  * BarnCRM Read Only, and Rollup Builder Admin to everyone holding BarnCRM Admin, directly or
  * through a role (a permission set group). Core's roles cannot carry the module's sets, so this
  * keeps them together the way Core keeps its tab sets, through `TabAccessService.giveToHolders`.

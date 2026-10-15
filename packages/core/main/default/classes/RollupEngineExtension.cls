@@ -1,6 +1,6 @@
 /**
  * The seam the BarnCRM Rollup Builder module uses to keep totals current when Core saves,
- * merges or loads records (ADR-NEXT, `NEXT-rollup-builder-module.md`), under the cross-package
+ * merges or loads records (ADR-0125, `0125-rollup-builder-module.md`), under the cross-package
  * mechanism ADR-0017 settled and in the shape of `HealthCheckExtension`.
  *
  * Core does not contain the rollup engine and may not name it. It looks up an implementation by

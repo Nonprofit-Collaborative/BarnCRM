@@ -3,7 +3,7 @@
  * person had. Their memberships go to the survivor, every household keeps exactly one current
  * primary member and its Primary Contact mirrors it (R-M3, ADR-0044), a household the merge
  * leaves empty is kept, and the rollup engine, when the Rollup Builder module is there, is
- * asked to recalculate the survivors only (ADR-NEXT; a stub stands in for the module).
+ * asked to recalculate the survivors only (ADR-0125; a stub stands in for the module).
  *
  * The first tests set the person overrides, so they hold on every org shape; the last one
  * needs real person accounts and returns early on an org without them.

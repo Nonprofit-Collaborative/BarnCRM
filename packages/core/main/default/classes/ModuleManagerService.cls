@@ -106,7 +106,7 @@ public with sharing class ModuleManagerService {
         /** The module's own app, where its Settings tab lives, or null. */
         @AuraEnabled
         public String appUrl;
-        /** The modules to install before this one, by name shown, or null (ADR-NEXT D3). */
+        /** The modules to install before this one, by name shown, or null (ADR-0125 D3). */
         @AuraEnabled
         public String installFirst;
     }
@@ -174,7 +174,7 @@ public with sharing class ModuleManagerService {
      * Lets an installed module's automation run again, with each switch as it was, and creates
      * any switch row that is missing, which is Core's part of a module's post-install work.
      * The rollup engine, when installed, then catches up on what it skipped while its module was
-     * off (ADR-NEXT decision 9), through its seam; Core names no module class.
+     * off (ADR-0125 decision 9), through its seam; Core names no module class.
      */
     @NamespaceAccessible
     public static void turnOn(String moduleName) {

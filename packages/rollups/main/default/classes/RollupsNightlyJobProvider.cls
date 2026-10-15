@@ -1,7 +1,7 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to have the nightly rollup
  * recalculation counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-0075,
- * ADR-NEXT `NEXT-rollup-builder-module.md`). Without the Rollup Builder module there is no
+ * ADR-0125 `0125-rollup-builder-module.md`). Without the Rollup Builder module there is no
  * nightly rollup run to schedule.
  */
 @NamespaceAccessible

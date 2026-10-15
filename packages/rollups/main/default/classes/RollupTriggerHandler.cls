@@ -76,7 +76,7 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
      * Hands the records to the engine. With a phase, once per record per transaction for that
      * event, so the second 200 of a 400 record load still run while a repeat of the same event
      * does not; without one (an update), every time. Nothing, and no claim, while the module is
-     * turned off, whichever package's registry row runs this handler (ADR-NEXT decision 9).
+     * turned off, whichever package's registry row runs this handler (ADR-0125 decision 9).
      */
     private void run(String phase, List<SObject> records, Map<Id, SObject> oldRecords) {
         if (records == null || records.isEmpty() || RollupService.isTurnedOff()) {

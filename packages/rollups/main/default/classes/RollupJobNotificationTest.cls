@@ -1,7 +1,7 @@
 /**
  * The nightly rollup recalculation tells the person who started it that it finished, and the
  * notification opens the Rollups section (Q-04). Moved from Core's JobNotificationPathsTest
- * with the engine (ADR-NEXT).
+ * with the engine (ADR-0125).
  */
 @IsTest(testFor='ApexClass:RollupFullRecalcBatch')
 private class RollupJobNotificationTest {

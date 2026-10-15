@@ -116,7 +116,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-30 Editions | [editions.md](editions.md) | Core | Core quality pass |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core | v0.8 |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core | Shipped |
-| C-13 Rollups | [rollups.md](rollups.md) | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.2 |
+| C-13 Rollups | [rollups.md](rollups.md) | BarnCRM Rollup Builder (Core until ADR-0125) | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package | v0.6 |
 | G-01 Gifts | [gifts.md](gifts.md) | Giving | v0.2 |

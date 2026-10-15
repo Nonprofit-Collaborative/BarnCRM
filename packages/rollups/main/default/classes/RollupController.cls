@@ -376,7 +376,7 @@ public with sharing class RollupController {
     }
 
     /**
-     * Nothing recalculates while the module is turned off (ADR-NEXT decision 9), so the admin
+     * Nothing recalculates while the module is turned off (ADR-0125 decision 9), so the admin
      * is told that rather than shown a recalculation that never starts.
      */
     private static void refuseWhileTurnedOff() {

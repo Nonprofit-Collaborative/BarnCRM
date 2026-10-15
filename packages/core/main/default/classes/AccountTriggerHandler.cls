@@ -208,7 +208,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
      * keeps behind it, which the merge changes too, so the survivors' person contacts are
      * recalculated as well. A failure is logged and never fails the merge: the nightly run
      * puts a total right, as for every rollup. Without the Rollup Builder module there are no
-     * totals, and the merge has nothing to recalculate (ADR-NEXT).
+     * totals, and the merge has nothing to recalculate (ADR-0125).
      */
     private static void recalculateSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
         if (survivorByMerged.isEmpty()) {

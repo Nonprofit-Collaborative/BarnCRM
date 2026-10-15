@@ -1,5 +1,5 @@
 /**
- * The engine answers Core's seam with what the engine itself says (ADR-NEXT): the targets of
+ * The engine answers Core's seam with what the engine itself says (ADR-0125): the targets of
  * its definitions, its freshness, and its queue, unchanged by the trip through the interface.
  */
 @IsTest(testFor='ApexClass:RollupsEngineExtension')

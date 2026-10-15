@@ -50,7 +50,7 @@ public with sharing class FiscalYearSelector {
     /**
      * The month BarnCRM starts its own fiscal year in, 1 through 12, defaulting to January when
      * the setting has never been touched or holds something the platform cannot mean. The
-     * rollup engine (the Rollup Builder module, ADR-NEXT) reads this same method rather than the
+     * rollup engine (the Rollup Builder module, ADR-0125) reads this same method rather than the
      * setting, so the number a check compares is the number the totals were computed from.
      */
     @NamespaceAccessible

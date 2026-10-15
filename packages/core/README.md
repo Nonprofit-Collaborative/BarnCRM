@@ -31,7 +31,7 @@ object references: those live only in the Connect module, behind dynamic Apex.
 - **Rollup seam**: `RollupEngineExtension`, the interface Core's saves and merges call to
   recalculate totals, and `RollupFilterParser`, the filter grammar Core's saved queries share.
   The engine itself, `Rollup_Definition__c` and the Rollup Builder are the BarnCRM Rollup
-  Builder module (`packages/rollups`, ADR-NEXT); without it Core's calls do nothing.
+  Builder module (`packages/rollups`, ADR-0125); without it Core's calls do nothing.
 - **Import framework**: `Import_Template__c`, `Import_Batch__c`, `Import_Row__c`, and the
   wizard that lets an admin load a spreadsheet without a consultant.
 - **Health Check**: org shape and license detection, missing permission assignments, orphaned
@@ -166,7 +166,7 @@ install must never fail because of a bootstrap step, so every failure goes to th
 instead.
 
 Core creates no Rollup Definitions: the engine is the BarnCRM Rollup Builder module, and
-its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-NEXT). Giving makes the
+its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-0125). Giving makes the
 same call from `GivingPostInstall` for its own.
 
 Once package versions exist, `sfdx-project.json` names it for the Core package directory:
@@ -186,7 +186,7 @@ a source deployment runs no post-install script.
 Core carries none. The vendored [apex-rollup](https://github.com/jamessimone/apex-rollup) engine
 (MIT, James Simone) was replaced by BarnCRM's own rollup engine and deleted in rollup slice S9
 ([decision](../../docs/architecture/decisions/0082-barncrm-owns-its-rollup-engine.md)).
-That engine is now the BarnCRM Rollup Builder module (ADR-NEXT).
+That engine is now the BarnCRM Rollup Builder module (ADR-0125).
 
 ## Iteration
 

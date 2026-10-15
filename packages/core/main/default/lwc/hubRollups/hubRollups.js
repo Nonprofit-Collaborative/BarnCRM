@@ -13,7 +13,7 @@ const ROLLUPS_SECTION = 'Rollups';
 
 /**
  * "Rollups last completed" on the BarnCRM home page, and a warning once the nightly run is overdue.
- * Shown only when the Rollup Builder module is installed (ADR-NEXT): an org that keeps its totals
+ * Shown only when the Rollup Builder module is installed (ADR-0125): an org that keeps its totals
  * with another tool sees no tile.
  */
 export default class HubRollups extends NavigationMixin(LightningElement) {

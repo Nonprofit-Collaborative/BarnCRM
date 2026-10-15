@@ -1,6 +1,6 @@
 /**
- * The rollup engine's answer to Core's `RollupEngineExtension` (ADR-NEXT,
- * `NEXT-rollup-builder-module.md`). It only delegates: each method is the engine call Core made
+ * The rollup engine's answer to Core's `RollupEngineExtension` (ADR-0125,
+ * `0125-rollup-builder-module.md`). It only delegates: each method is the engine call Core made
  * directly before the engine became the BarnCRM Rollup Builder module. `RollupEngineExtensionV2`
  * is the later seam Core's Module Manager calls on Turn on (decision 9).
  */

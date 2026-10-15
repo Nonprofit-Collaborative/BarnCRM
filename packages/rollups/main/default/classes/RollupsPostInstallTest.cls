@@ -2,7 +2,7 @@
  * Tests for RollupsPostInstall: Maria installs the Rollup Builder module and the shipped rollups
  * are in the org when she gets there, an upgrade changes none she edited, a bad shipped row
  * never breaks the install, and she can open the Rollup Builder straight away. Moved from
- * CorePostInstallTest with the engine (ADR-NEXT).
+ * CorePostInstallTest with the engine (ADR-0125).
  */
 @IsTest(testFor='ApexClass:RollupsPostInstall')
 private class RollupsPostInstallTest {

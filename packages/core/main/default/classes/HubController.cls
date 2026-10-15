@@ -120,7 +120,7 @@ public with sharing class HubController {
     /**
      * "Rollups last completed", and whether the nightly run is overdue (plan Section 4.10).
      * Optional like the rest: an org where the rollup engine cannot answer loses a tile, not the
-     * page. Without the Rollup Builder module there is no tile (ADR-NEXT).
+     * page. Without the Rollup Builder module there is no tile (ADR-0125).
      */
     private static void readRollupFreshness(HomeModel model) {
         model.rollupsInstalled = false;

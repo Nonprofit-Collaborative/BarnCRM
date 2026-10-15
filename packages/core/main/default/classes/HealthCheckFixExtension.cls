@@ -1,6 +1,6 @@
 /**
  * The fixes a dependent package's Health Check findings offer, run by Core's Health Check under
- * every ADR-0048 condition (ADR-NEXT, `NEXT-rollup-builder-module.md`). A `HealthCheckExtension`
+ * every ADR-0048 condition (ADR-0125, `0125-rollup-builder-module.md`). A `HealthCheckExtension`
  * that also implements this interface owns the fix keys it answers for: Core asks it only for a
  * key none of its own fixes has.
  *

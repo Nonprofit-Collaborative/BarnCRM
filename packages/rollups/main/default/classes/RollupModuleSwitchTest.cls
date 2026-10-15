@@ -1,6 +1,6 @@
 /**
  * Turning BarnCRM Rollup Builder off on the Module Manager stops the whole engine, not only the
- * module's own registry rows (ADR-NEXT `NEXT-rollup-builder-module.md`, decision 9): the trigger
+ * module's own registry rows (ADR-0125 `0125-rollup-builder-module.md`, decision 9): the trigger
  * handler wherever another package registers it, the Flow action, Core's merge seam, the queue
  * processor, the nightly and full runs and the scheduler. Recalculate is refused and says why.
  * Turning it on again drains what waited and recalculates every rollup.

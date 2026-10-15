@@ -136,7 +136,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /**
      * Starts a full recalculation of these definitions over every record they write. Does nothing
-     * while the module is turned off (ADR-NEXT decision 9; Turn on recalculates every rollup)
+     * while the module is turned off (ADR-0125 decision 9; Turn on recalculates every rollup)
      * or all automation is paused (R-RQ5; the next run catches up), and an Info entry says so.
      * Starts nothing while another full run is going (R-R14): that run's job is answered and an
      * Info entry says so.
@@ -364,7 +364,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /**
      * Follows up the held back records, then the heavy ones, then the next entity, then ends.
-     * Chains nothing once the module is turned off (ADR-NEXT decision 9): the run stops there,
+     * Chains nothing once the module is turned off (ADR-0125 decision 9): the run stops there,
      * unstamped, and Turn on recalculates every rollup.
      */
     public void finish(Database.BatchableContext context) {

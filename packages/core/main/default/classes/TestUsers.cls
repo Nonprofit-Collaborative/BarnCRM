@@ -44,7 +44,7 @@ public class TestUsers {
 
     /**
      * The admin sets of the modules a module depends on, which its admins hold too: Giving
-     * depends on the Rollup Builder module and reads its definitions (ADR-NEXT), so a Giving
+     * depends on the Rollup Builder module and reads its definitions (ADR-0125), so a Giving
      * admin in a test holds Rollup Builder Admin, as an installing administrator does.
      */
     private static final Map<String, List<String>> REQUIRED_ADMINS = new Map<String, List<String>>{

@@ -1,7 +1,7 @@
 /**
  * Finds the rollup engine the BarnCRM Rollup Builder module installs, or answers that there is
- * none, which is the ordinary case in an org that keeps its totals with another tool (ADR-NEXT,
- * `NEXT-rollup-builder-module.md`).
+ * none, which is the ordinary case in an org that keeps its totals with another tool (ADR-0125,
+ * `0125-rollup-builder-module.md`).
  *
  * Found by namespace and class name, as `HealthCheckExtensions` finds its extensions
  * (ADR-0017). A class that cannot be built, or does not implement the interface, is treated as
