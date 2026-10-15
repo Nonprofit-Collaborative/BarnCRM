@@ -140,6 +140,8 @@ Donor portal and online giving; email marketing beyond export; grantmaking as a 
 
 ## Working agreements (owner instructions)
 
+- Cross-package class construction (2026-10-15, #446): a class one package builds by name (trigger handlers, registered module extensions) needs an explicit `@NamespaceAccessible` public no-arg constructor; the implicit one is not accepted by `check-cross-package-visibility.py`.
+
 - Merge authority (2026-09-23): squash-merge without asking when every required check (Static checks, DCO sign-off, Org tests (local)) is green on the head, threads are resolved and nothing is open; hold and ask on an owner question, a failing or skipped check, or a design doubt. Report merges afterwards.
 - Test orgs (2026-09-23, 2026-09-24, 2026-10-12): only `oi-test`, `oi-pa`, `barn-core` and `barn-npc` (Nonprofit Cloud trial, never default; deploy approved once the landing batches, Builder and test self-containment merge); any other org needs approval; recreating `oi-pa` on expiry is pre-approved; agents share each org through a lock, one deploy or test run at a time.
 - Sandbox `mwdbdevsb` (2026-10-12): real built-out org; never the default; check-only first; ask before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only. Real deploy on hold ("Wait until the other tasks are completed then deploy to barn-npc").
