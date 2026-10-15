@@ -300,10 +300,7 @@ public with sharing class DataProtectedFields {
             rollupTargets = new Map<String, Set<String>>();
             Map<String, Set<String>> reported = targetsOverride;
             if (reported == null) {
-                RollupEngineExtension engine = RollupEngineExtensions.find();
-                reported = engine == null
-                    ? new Map<String, Set<String>>()
-                    : engine.targetFieldsByObject();
+                reported = reportedRollupTargets();
             }
             for (String objectKey : reported.keySet()) {
                 if (String.isBlank(objectKey) || reported.get(objectKey) == null) {
@@ -325,6 +322,23 @@ public with sharing class DataProtectedFields {
         }
         String key = localName(objectName.toLowerCase());
         return rollupTargets.containsKey(key) ? rollupTargets.get(key) : new Set<String>();
+    }
+
+    /**
+     * What the Rollup Builder module reports, or nothing when it is absent or fails. A failing
+     * module is logged and costs only its targets, as at every other engine seam caller.
+     */
+    private static Map<String, Set<String>> reportedRollupTargets() {
+        try {
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            Map<String, Set<String>> reported = engine == null
+                ? null
+                : engine.targetFieldsByObject();
+            return reported == null ? new Map<String, Set<String>>() : reported;
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'DataProtectedFields.rollupTargetsOf');
+            return new Map<String, Set<String>>();
+        }
     }
 
     /**

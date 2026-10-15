@@ -131,6 +131,30 @@ private class SampleDataModulesTest {
     }
 
     @IsTest
+    static void theEndOfALoadWithoutTheRollupModuleStillFinishes() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            RollupEngineExtensions.noneForTest = true;
+            StubModule only = new StubModule('Only', 3);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ only };
+
+            Test.startTest();
+            SampleDataModules.startAfter('Only');
+            Test.stopTest();
+
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Error_Log__c],
+                'with no engine to start, the load ends and says so without an error'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM AsyncApexJob WHERE JobType = 'Queueable'],
+                'and no rollup processor is queued'
+            );
+        }
+    }
+
+    @IsTest
     static void testStartAfterAnUnknownModuleStartsNothing() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule only = new StubModule('Only', 3);

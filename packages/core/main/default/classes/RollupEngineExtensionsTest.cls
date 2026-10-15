@@ -141,4 +141,79 @@ private class RollupEngineExtensionsTest {
             Assert.isFalse(description, 'No module, no rollup targets');
         }
     }
+
+    /** A module whose engine fails whatever Core asks of it. */
+    private class FailingEngine implements RollupEngineExtension {
+        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+            throw new IllegalArgumentException('afterMerge failed');
+        }
+        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+            throw new IllegalArgumentException('forSurvivors failed');
+        }
+        public void startQueuedRecalculation() {
+            throw new IllegalArgumentException('startQueuedRecalculation failed');
+        }
+        public void processPending() {
+            throw new IllegalArgumentException('processPending failed');
+        }
+        public Datetime lastCalculated() {
+            throw new IllegalArgumentException('lastCalculated failed');
+        }
+        public Boolean isStale() {
+            throw new IllegalArgumentException('isStale failed');
+        }
+        public Map<String, Set<String>> targetFieldsByObject() {
+            throw new IllegalArgumentException('targetFieldsByObject failed');
+        }
+    }
+
+    @IsTest
+    static void aFailingEngineCostsOnlyItsRollupTargetsAndIsLogged() {
+        System.runAs(TestUsers.admin()) {
+            RollupEngineExtensions.extensionOverride = new FailingEngine();
+
+            Test.startTest();
+            Boolean description = DataProtectedFields.isProtected(
+                Contact.SObjectType,
+                'Description'
+            );
+            Test.stopTest();
+
+            Assert.isFalse(description, 'No targets were reported, so none are kept');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'DataProtectedFields.rollupTargetsOf'
+                ],
+                'The failure is in the Error Log rather than thrown at the caller'
+            );
+        }
+    }
+
+    @IsTest
+    static void mergingAccountsWithoutTheModuleStillMerges() {
+        System.runAs(TestUsers.admin()) {
+            RollupEngineExtensions.noneForTest = true;
+            Account kept = new Account(Name = 'Riverside Food Bank');
+            Account merged = new Account(Name = 'Riverside Food Bank (old)');
+            insert new List<Account>{ kept, merged };
+
+            Test.startTest();
+            Database.merge(kept, merged.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id IN (:kept.Id, :merged.Id)],
+                'The merge went through: only the survivor is left'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AccountTriggerHandler'],
+                'With no engine there is nothing to recalculate and nothing fails'
+            );
+        }
+    }
 }
