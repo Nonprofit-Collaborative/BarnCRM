@@ -498,6 +498,20 @@ if ! printf '%s\n' 'TabAccessService.requestSync();' | sf apex run --target-org 
   echo "the tabs."
 fi
 
+if [[ "$CORE_ONLY" -eq 0 ]]; then
+  # The same gap for the Rollup Builder permission sets (ADR-0125 D2): RollupsPostInstall gives
+  # Rollup_Builder_Admin to BarnCRM_Admin holders and Rollup_Builder_User to BarnCRM_Staff and
+  # BarnCRM_Read_Only holders, and a deployment runs no post-install, so administrators could not
+  # open the Rollup Builder until the nightly run. requestSync() queues that sync and never
+  # throws. --core-only leaves the module out, so it leaves this out too.
+  echo ""
+  echo "== Queueing the Rollup Builder access sync =="
+  if ! printf '%s\n' 'RollupAccessSync.requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Rollup Builder access sync was not queued. Nothing else is affected: the nightly run"
+    echo "syncs the access."
+  fi
+fi
+
 echo ""
 if [[ "$STALLS_RECOVERED" -gt 0 ]]; then
   echo "== ${STALLS_RECOVERED} stalled deploy(s) cancelled and resubmitted successfully =="
