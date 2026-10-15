@@ -21,6 +21,11 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
     @TestVisible
     private static Datetime nowForTest;
 
+    @NamespaceAccessible
+    public MirrorHealthCheckExtension() {
+        return;
+    }
+
     public List<HealthCheckService.Finding> findings() {
         List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
         HealthCheckService.Finding stale = staleMirrorRun();

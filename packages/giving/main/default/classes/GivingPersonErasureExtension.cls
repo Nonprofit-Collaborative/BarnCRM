@@ -17,6 +17,11 @@
  */
 @NamespaceAccessible
 public with sharing class GivingPersonErasureExtension implements PersonErasureExtension {
+    @NamespaceAccessible
+    public GivingPersonErasureExtension() {
+        return;
+    }
+
     public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
         if (personType == Account.SObjectType) {
             return new Set<Schema.SObjectField>{

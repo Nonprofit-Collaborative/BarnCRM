@@ -13,6 +13,11 @@
  */
 @NamespaceAccessible
 public with sharing class MirrorNightlyJobProvider implements NightlyJobProvider {
+    @NamespaceAccessible
+    public MirrorNightlyJobProvider() {
+        return;
+    }
+
     public List<NightlyJob> nightlyJobs() {
         if (
             !OpportunityMirrorService.isAvailable() ||
