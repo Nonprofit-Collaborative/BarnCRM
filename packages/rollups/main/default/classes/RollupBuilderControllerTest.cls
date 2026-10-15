@@ -1,7 +1,8 @@
 /**
  * The Rollup Builder's reads and its save (R-R10, R-R8, slice S11). Core holds no giving objects,
  * so organizations count their child organizations (`ParentId`) into Account fields BarnCRM ships,
- * which the BarnCRM Admin permission set lets Maria edit.
+ * which the BarnCRM Admin permission set lets Maria edit. Maria is an administrator who builds
+ * rollups: BarnCRM Admin for Manage BarnCRM Settings, Rollup Builder Admin for the definitions.
  */
 @IsTest(testFor='ApexClass:RollupBuilderController')
 private class RollupBuilderControllerTest {
@@ -11,7 +12,10 @@ private class RollupBuilderControllerTest {
     }
 
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        return TestDataFactory.createUser(
+            'Maria',
+            new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
+        );
     }
 
     private static RollupBuilderController.Draft childCount() {

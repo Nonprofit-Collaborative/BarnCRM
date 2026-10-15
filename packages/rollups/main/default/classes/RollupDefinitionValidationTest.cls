@@ -74,7 +74,7 @@ private class RollupDefinitionValidationTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             User admin = TestDataFactory.createUser(
                 'RollupAdm',
-                new List<String>{ 'BarnCRM_Admin' }
+                new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
             );
             Map<String, Rollup_Definition__c> wrong = new Map<String, Rollup_Definition__c>{
                 Label.Core_Rollups_ErrorTargetNeedsText => definition(

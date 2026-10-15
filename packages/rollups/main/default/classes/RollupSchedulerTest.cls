@@ -144,7 +144,10 @@ private class RollupSchedulerTest {
                     false
                 )
             };
-            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+            User maria = TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
+            );
 
             Test.startTest();
             System.runAs(maria) {
