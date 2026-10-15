@@ -45,7 +45,7 @@ private class SetupAssistantControllerTest {
             Assert.areEqual(
                 2,
                 state.modules.size(),
-                'Core alone is offered Core and Volunteers, not the modules that need Giving'
+                'Before an edition is chosen, Core and Rollup Builder are listed, no nonprofit module'
             );
             Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
             Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');
@@ -177,7 +177,7 @@ private class SetupAssistantControllerTest {
                 state.suite.giving.docsUrl.endsWith('/giving/README.md'),
                 'The step can say where to read about Giving'
             );
-            Assert.areEqual(6, state.modules.size(), 'The modules step now offers all six');
+            Assert.areEqual(7, state.modules.size(), 'The modules step now offers all seven');
             Assert.areEqual(
                 8,
                 state.stepsTotal,
@@ -651,6 +651,81 @@ private class SetupAssistantControllerTest {
             Test.stopTest();
 
             Assert.isTrue(refused, 'Finishing a step without the permission is refused');
+        }
+    }
+
+    @IsTest
+    static void changesTheEditionFromTheConsoleAndAuditsIt() {
+        System.runAs(TestUsers.admin()) {
+            SetupAssistantController.applySuite(ModuleDetectionService.SUITE_IMPACT);
+
+            Test.startTest();
+            SetupAssistantController.EditionModel before = SetupAssistantController.getEdition();
+            SetupAssistantController.EditionModel after = SetupAssistantController.changeEdition(
+                ModuleDetectionService.SUITE_COMMUNITY
+            );
+            Test.stopTest();
+
+            Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, before.currentSuite, 'Read');
+            Assert.isTrue(before.canEdit, 'The admin may change it');
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_COMMUNITY,
+                after.currentSuite,
+                'The console is told what was saved'
+            );
+            Boolean audited = false;
+            for (Setting_Change__c change : SettingChangeSelector.getRecent(10)) {
+                if (
+                    change.Setting_Name__c != null &&
+                    change.Setting_Name__c.endsWithIgnoreCase('Suite__c') &&
+                    change.New_Value__c == ModuleDetectionService.SUITE_COMMUNITY
+                ) {
+                    audited = true;
+                }
+            }
+            Assert.isTrue(audited, 'The change is listed under Recent changes');
+        }
+    }
+
+    @IsTest
+    static void refusesAnUnknownEditionAndDavidsChange() {
+        System.runAs(TestUsers.admin()) {
+            User david = buildDavid();
+            System.runAs(new User(Id = UserInfo.getUserId())) {
+                insert david;
+            }
+            String unknownMessage;
+            String davidMessage;
+            Boolean davidMayEdit;
+
+            Test.startTest();
+            try {
+                SetupAssistantController.changeEdition('Standard');
+            } catch (AuraHandledException e) {
+                unknownMessage = e.getMessage();
+            }
+            System.runAs(david) {
+                davidMayEdit = SetupAssistantController.getEdition().canEdit;
+                try {
+                    SetupAssistantController.changeEdition(ModuleDetectionService.SUITE_IMPACT);
+                } catch (AuraHandledException e) {
+                    davidMessage = e.getMessage();
+                }
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                System.Label.Core_SuiteChoice_UnknownSuiteError,
+                unknownMessage,
+                'Only the two stored values are accepted'
+            );
+            Assert.isFalse(davidMayEdit, 'David is not offered the change');
+            Assert.areEqual(
+                System.Label.Core_Settings_PermissionRequiredError,
+                davidMessage,
+                'And it is refused if he tries'
+            );
+            Assert.isNull(ModuleDetectionService.chosenSuite(), 'Nothing was saved');
         }
     }
 

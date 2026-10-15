@@ -86,6 +86,30 @@ private class SettingsControllerTest {
         };
     }
 
+    @IsTest
+    static void hidesTheRowsOfAFeatureThatIsOff() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            FeatureSwitchService.markNewInstall();
+
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            Set<String> keys = new Set<String>();
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    keys.add(setting.key);
+                }
+            }
+            Assert.isFalse(
+                keys.contains(CHECKBOX_KEY),
+                'Household upkeep is off on a new install, so its row is hidden'
+            );
+            Assert.isTrue(keys.contains(TEXT_KEY), 'A row of no feature still shows');
+        }
+    }
+
     private static User buildDavid() {
         return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'david');
     }

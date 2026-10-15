@@ -92,6 +92,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FeatureController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FieldUtilizationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -101,6 +105,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>FindPeopleAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FirstRunController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -1734,26 +1742,6 @@
   </tabSettings>
   <tabSettings>
     <tab>Households</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Import</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Bulk_Update</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Data_Manager</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Find</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Data_Hygiene</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

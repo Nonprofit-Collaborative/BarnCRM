@@ -51,16 +51,4 @@
     <object>Saved_Query__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
-  <tabSettings>
-    <tab>Data_Hygiene</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Find</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Data_Manager</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
 </PermissionSet>

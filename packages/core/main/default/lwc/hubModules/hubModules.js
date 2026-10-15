@@ -8,7 +8,7 @@ import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 
 const SETTINGS_TAB = 'BarnCRM_Settings';
-const MODULES_SECTION = 'General';
+const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
 
 /**
@@ -29,6 +29,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
         .filter((module) => module.status !== NOT_INSTALLED)
         .map((module) => ({
           name: module.name,
+          displayName: module.label || module.name,
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
           badgeClass:
             module.status === 'Off'

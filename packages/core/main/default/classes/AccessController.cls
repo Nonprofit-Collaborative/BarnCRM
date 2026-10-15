@@ -149,6 +149,7 @@ public with sharing class AccessController {
                 // them and gives Salesforce's reason, and is already in the Error Log.
                 throw new AccessService.AccessException(String.join(refusals, ' '));
             }
+            TabAccessService.requestSync();
         } catch (AccessService.AccessException e) {
             result.success = false;
             result.errorCode = ERROR_FAILED;
@@ -248,6 +249,8 @@ public with sharing class AccessController {
             } else {
                 AccessService.removeRole(assigneeId, roleDeveloperName);
             }
+            // The switchable tabs follow the role (ADR-0124).
+            TabAccessService.requestSync();
         } catch (AccessService.AccessException e) {
             result.success = false;
             result.errorCode = ERROR_FAILED;

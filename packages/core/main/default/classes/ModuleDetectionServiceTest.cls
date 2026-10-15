@@ -10,18 +10,25 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void listsTheSixPackagesAndSaysWhichAreHere() {
+    static void listsTheSevenPackagesAndSaysWhichAreHere() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
+            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
 
             Test.startTest();
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(6, modules.size(), 'With Giving here, all six packages are offered');
+            Assert.areEqual(7, modules.size(), 'The Nonprofit Edition is offered all seven');
             Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
             Assert.isTrue(modules[0].present, 'Core is the package this code is in');
+            for (Integer i = 1; i < modules.size(); i++) {
+                Assert.isTrue(
+                    modules[i].label.startsWith('BarnCRM '),
+                    'Every module is shown as BarnCRM and its name: ' + modules[i].label
+                );
+            }
             for (ModuleDetectionService.ModuleInfo module : modules) {
                 Assert.isTrue(
                     module.docsUrl.endsWith('/README.md'),
@@ -33,7 +40,7 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void offersOnlyCoreAndVolunteersWithoutGiving() {
+    static void offersOnlyEveryEditionModulesBeforeAnEditionIsChosen() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
@@ -47,9 +54,13 @@ private class ModuleDetectionServiceTest {
                 names.add(module.name);
             }
             Assert.areEqual(
-                new List<String>{ 'Core', 'Volunteers' },
+                new List<String>{ 'Core', 'Rollups' },
                 names,
-                'An org without Giving is offered the modules that fit every organization only'
+                'No nonprofit module is shown until the Nonprofit Edition is chosen'
+            );
+            Assert.isTrue(
+                modules[1].present,
+                'Rollup Builder counts as installed while its objects ship in Core'
             );
         }
     }
@@ -72,7 +83,7 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(3, modules.size(), 'Core, Volunteers and the module that is installed');
+            Assert.areEqual(3, modules.size(), 'Core, Rollup Builder and the installed module');
             Assert.areEqual('Programs', modules[2].name, 'An installed module is never hidden');
             Assert.isTrue(modules[2].present, 'And it is shown as here');
         }
@@ -120,11 +131,13 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                6,
+                7,
                 modules.size(),
-                'Any org that chose the Nonprofit Edition is offered all six, before Giving is here'
+                'Any org that chose the Nonprofit Edition is offered all seven, before Giving is here'
             );
-            Assert.isFalse(modules[1].present, 'And Giving is still shown as not installed');
+            Assert.areEqual('Giving', modules[2].name, 'Giving follows Rollup Builder');
+            Assert.isFalse(modules[2].present, 'And Giving is still shown as not installed');
+            Assert.isNull(modules[2].appUrl, 'A module that is not here has no app to open');
         }
     }
 
@@ -145,11 +158,54 @@ private class ModuleDetectionServiceTest {
                 chosen,
                 'The saved choice is read'
             );
+            Assert.areEqual(2, modules.size(), 'Core and Rollup Builder, and no nonprofit module');
+        }
+    }
+
+    @IsTest
+    static void givingInstalledInTheStandardEditionShowsGivingAlone() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+
+            Test.startTest();
+            List<String> names = new List<String>();
+            for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+                names.add(module.name);
+            }
+            Test.stopTest();
+
             Assert.areEqual(
-                2,
-                modules.size(),
-                'Core and Volunteers, and nothing only for nonprofits'
+                new List<String>{ 'Core', 'Rollups', 'Giving' },
+                names,
+                'An installed module stays listed; the others stay hidden in the Standard Edition'
             );
+        }
+    }
+
+    @IsTest
+    static void aValueTypedInSetupCountsOnlyWhenItIsAnEdition() {
+        System.runAs(TestUsers.admin()) {
+            chooseSuite('impact');
+            String lowerCase = ModuleDetectionService.chosenSuite();
+            Boolean nonprofit = ModuleDetectionService.isNonprofitEdition();
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Suite__c = 'Standard';
+            update settings;
+            SettingsService.clearCaches();
+
+            Test.startTest();
+            String unknown = ModuleDetectionService.chosenSuite();
+            Test.stopTest();
+
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_IMPACT,
+                lowerCase,
+                'Lower case is forgiven'
+            );
+            Assert.isTrue(nonprofit, 'And it is the Nonprofit Edition');
+            Assert.isNull(unknown, 'Anything but Community or Impact is no edition');
         }
     }
 
@@ -158,9 +214,10 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => FakeIds.ofPrefix('04t', 1),
-                'Volunteers' => 'not a version id'
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', FakeIds.ofPrefix('04t', 1), 10),
+                catalogRow('Volunteers', 'Impact', 'not a version id', 20),
+                catalogRow('Programs', 'Impact', null, 30)
             };
             chooseSuite(ModuleDetectionService.SUITE_IMPACT);
 
@@ -199,9 +256,14 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => FakeIds.ofPrefix('04t', 1)
-            };
+            BarnCRM_Module__mdt row = catalogRow(
+                'Giving',
+                'Impact',
+                FakeIds.ofPrefix('04t', 1),
+                10
+            );
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
 
             Test.startTest();
             ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -209,11 +271,97 @@ private class ModuleDetectionServiceTest {
 
             Assert.isTrue(giving.present, 'Giving is here');
             Assert.isNull(giving.installUrl, 'So the step offers no installer');
+            Assert.areEqual(
+                '/lightning/app/' + NamespaceUtil.prefix() + 'Fundraising',
+                giving.appUrl,
+                'An installed module links to its own app, where its Settings tab lives'
+            );
             Assert.isTrue(
                 giving.docsUrl.endsWith('/giving/README.md'),
                 'Its description is linked'
             );
         }
+    }
+
+    @IsTest
+    static void aModuleBothEditionsOfferNeedsOnlyACatalogRow() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = false;
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', null, 10),
+                catalogRow('Events', 'Community; Impact', null, 5)
+            };
+            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+
+            Test.startTest();
+            List<String> names = new List<String>();
+            for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+                names.add(module.name);
+            }
+            Boolean eventsOffered = ModuleDetectionService.isOffered('Events');
+            Boolean givingOffered = ModuleDetectionService.isOffered('Giving');
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<String>{ 'Core', 'Events' },
+                names,
+                'The Standard Edition lists the module its row names, in Sort Order, and not Giving'
+            );
+            Assert.isTrue(eventsOffered, 'Offered to the Standard Edition');
+            Assert.isFalse(givingOffered, 'Giving is for the Nonprofit Edition only');
+        }
+    }
+
+    @IsTest
+    static void shipsANonprofitOnlyRowForEveryKnownModule() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Map<String, BarnCRM_Module__mdt> shipped = BarnCRM_Module__mdt.getAll();
+            Test.stopTest();
+
+            List<String> modules = new List<String>{
+                'Giving',
+                'Volunteers',
+                'Programs',
+                'Funders',
+                'Connect'
+            };
+            for (String name : modules) {
+                Assert.isTrue(shipped.containsKey(name), name + ' has a catalog row');
+                Assert.areEqual(
+                    'Impact',
+                    shipped.get(name).Editions__c,
+                    name + ' is nonprofit only'
+                );
+            }
+            Assert.isTrue(
+                ModuleDetectionService.offeredIn(
+                    shipped.get('Rollups'),
+                    ModuleDetectionService.SUITE_COMMUNITY
+                ) &&
+                ModuleDetectionService.offeredIn(
+                    shipped.get('Rollups'),
+                    ModuleDetectionService.SUITE_IMPACT
+                ),
+                'BarnCRM Rollup Builder is offered to both editions'
+            );
+        }
+    }
+
+    private static BarnCRM_Module__mdt catalogRow(
+        String name,
+        String editions,
+        String versionId,
+        Integer sortOrder
+    ) {
+        return new BarnCRM_Module__mdt(
+            DeveloperName = name,
+            Editions__c = editions,
+            Package_Folder__c = name.toLowerCase(),
+            Install_Version_Id__c = versionId,
+            Sort_Order__c = sortOrder
+        );
     }
 
     private static void chooseSuite(String suite) {

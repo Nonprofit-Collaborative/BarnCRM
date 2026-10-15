@@ -1,0 +1,88 @@
+<template>
+    <template lwc:if={loadError}>
+        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert" data-id="load-error">
+            <p>{loadError}</p>
+        </div>
+    </template>
+    <template lwc:if={show}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="first-run-heading"
+            class="slds-modal slds-fade-in-open"
+            data-id="first-run"
+            onkeydown={handleKeyDown}
+        >
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h1 id="first-run-heading" class="slds-modal__title slds-hyphenate">{labels.title}</h1>
+                </div>
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <template lwc:if={canFinish}>
+                        <p class="slds-var-m-bottom_medium">{labels.intro}</p>
+                        <lightning-radio-group
+                            name="edition"
+                            label={labels.editionQuestion}
+                            options={editionOptions}
+                            value={edition}
+                            required
+                            data-id="edition"
+                            onchange={handleEdition}
+                        ></lightning-radio-group>
+                        <lightning-radio-group
+                            class="slds-var-m-top_medium"
+                            name="mode"
+                            label={labels.featuresQuestion}
+                            options={modeOptions}
+                            value={mode}
+                            data-id="mode"
+                            onchange={handleMode}
+                        ></lightning-radio-group>
+                        <template lwc:if={isChoosing}>
+                            <p class="slds-text-body_small slds-var-m-vertical_small" data-id="choose-help">
+                                {labels.chooseHelp}
+                            </p>
+                            <template for:each={features} for:item="feature">
+                                <lightning-input
+                                    key={feature.key}
+                                    type="checkbox"
+                                    label={feature.name}
+                                    field-level-help={feature.description}
+                                    checked={feature.checked}
+                                    disabled={feature.disabled}
+                                    data-id="feature"
+                                    data-key={feature.key}
+                                    onchange={handleFeature}
+                                ></lightning-input>
+                            </template>
+                        </template>
+                        <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_medium">
+                            {labels.modulesNote}
+                        </p>
+                    </template>
+                    <template lwc:else>
+                        <p role="status" data-id="admin-needed">{labels.adminNeeded}</p>
+                    </template>
+                    <template lwc:if={errorMessage}>
+                        <p class="slds-text-color_error slds-var-m-top_small" role="alert" data-id="error">
+                            {errorMessage}
+                        </p>
+                    </template>
+                </div>
+                <template lwc:if={canFinish}>
+                    <div class="slds-modal__footer">
+                        <lightning-button
+                            variant="brand"
+                            label={labels.finish}
+                            disabled={finishDisabled}
+                            data-id="finish"
+                            onclick={handleFinish}
+                        ></lightning-button>
+                    </div>
+                </template>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

@@ -43,11 +43,24 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
         this.runDate = runDate == null ? Date.today() : runDate;
     }
 
+    /** No work while the Addresses feature is off (ADR-0124): the locator then finds nothing. */
     public Database.QueryLocator start(Database.BatchableContext context) {
+        if (!addressesOn()) {
+            return Database.getQueryLocator(
+                [SELECT Id FROM Address__c WHERE Id = NULL WITH SYSTEM_MODE]
+            );
+        }
         return new SeasonalAddressSelector().seasonalLocator();
     }
 
+    private static Boolean addressesOn() {
+        return FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES);
+    }
+
     public void execute(Database.BatchableContext context, List<Address__c> scope) {
+        if (!addressesOn()) {
+            return;
+        }
         try {
             Set<Id> ownerIds = new Set<Id>();
             for (Address__c address : scope) {

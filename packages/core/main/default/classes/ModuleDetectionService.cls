@@ -28,30 +28,16 @@ public with sharing class ModuleDetectionService {
     /** Salesforce's installer for one package version, relative to the org's own domain. */
     private static final String INSTALL_PATH = '/packaging/installPackage.apexp?p0=';
 
-    /**
-     * Each module's published package version Id (`04t`), blank until that module is first
-     * published. The release that publishes a module fills its Id in here: Core never installs
-     * anything, it only links to Salesforce's installer
-     * (0072-suite-choice-is-the-first-setup-step.md).
-     */
-    @TestVisible
-    private static Map<String, String> installVersionIds = new Map<String, String>{
-        MODULE_GIVING => '',
-        'Volunteers' => '',
-        'Programs' => '',
-        'Funders' => '',
-        'Connect' => ''
-    };
+    /** A Lightning app by its developer name, relative to the org's own domain. */
+    private static final String APP_PATH = '/lightning/app/';
 
     /**
-     * The modules every organization is offered (ADR-0046: the Standard Edition is Core with
-     * the modules that fit). The others are offered once the Nonprofit Edition is chosen
-     * (C-30) or Giving is installed (ADR-0062).
+     * Stands in for the shipped module catalog (`BarnCRM_Module__mdt`) in tests. The catalog
+     * says which editions offer each module and where its installer is; Core never installs
+     * anything, it only links to Salesforce's installer (ADR-0124).
      */
-    private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{
-        MODULE_CORE,
-        'Volunteers'
-    };
+    @TestVisible
+    private static List<BarnCRM_Module__mdt> catalogOverride;
 
     /** Stands in for the Giving probe in tests, whose answer otherwise depends on the org. */
     @TestVisible
@@ -61,8 +47,14 @@ public with sharing class ModuleDetectionService {
     public class ModuleInfo {
         @AuraEnabled
         public String name;
+        /** The name shown to administrators, such as BarnCRM Giving (the catalog's label). */
+        @AuraEnabled
+        public String label;
         @AuraEnabled
         public Boolean present;
+        /** The module's own app, where its Settings tab lives, or null when it has none yet. */
+        @AuraEnabled
+        public String appUrl;
         @AuraEnabled
         public String docsUrl;
         /** Salesforce's installer for this module, or null when it is here or not published. */
@@ -97,51 +89,137 @@ public with sharing class ModuleDetectionService {
         return objectExists(IMPORT_BATCH_OBJECT);
     }
 
-    /** The suite the administrator chose, `Community` or `Impact`, or null before anyone chose. */
+    /**
+     * The edition the administrator chose, `Community` or `Impact`, or null before anyone
+     * chose. A value typed in Setup that is neither counts as no choice.
+     */
     public static String chosenSuite() {
         String suite = SettingsService.getSettings().Suite__c;
-        return String.isBlank(suite) ? null : suite.trim();
+        if (String.isBlank(suite)) {
+            return null;
+        }
+        for (String known : new List<String>{ SUITE_COMMUNITY, SUITE_IMPACT }) {
+            if (known.equalsIgnoreCase(suite.trim())) {
+                return known;
+            }
+        }
+        return null;
+    }
+
+    /** True only when the Nonprofit Edition is chosen: the one switch for nonprofit modules. */
+    public static Boolean isNonprofitEdition() {
+        return chosenSuite() == SUITE_IMPACT;
     }
 
     /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
     public static ModuleInfo givingModule() {
-        return module(MODULE_GIVING, isGivingPresent(), 'giving');
+        BarnCRM_Module__mdt row = catalogRow(MODULE_GIVING);
+        if (row == null) {
+            row = new BarnCRM_Module__mdt(
+                DeveloperName = MODULE_GIVING,
+                Package_Folder__c = 'giving'
+            );
+        }
+        return module(row, isGivingPresent());
     }
 
-    /** Salesforce's installer for the given module, or null when no version is published. */
-    private static String installUrl(String moduleName) {
-        String versionId = installVersionIds.get(moduleName);
-        if (String.isBlank(versionId) || !versionId.startsWith('04t')) {
+    /** Salesforce's installer for a published version, or null when none is published. */
+    private static String installUrl(String versionId) {
+        if (String.isBlank(versionId) || !versionId.trim().startsWith('04t')) {
             return null;
         }
-        return INSTALL_PATH + versionId;
+        return INSTALL_PATH + versionId.trim();
     }
 
     /**
-     * The BarnCRM packages this org is offered, each saying whether it is here. Every org sees
-     * Core and Volunteers; the rest are listed once the Nonprofit Edition is chosen or Giving
-     * is installed, and any module that is already installed is always listed.
+     * The BarnCRM packages this org is offered, each saying whether it is here: Core, then
+     * every module the catalog says the chosen edition offers (the Standard Edition's, before
+     * one is chosen), and any module that is already installed whatever the edition (ADR-0124).
      */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
-        Boolean givingPresent =
-            givingPresent(announced) || announced.contains(MODULE_GIVING.toLowerCase());
-        Boolean offerAll = givingPresent || chosenSuite() == SUITE_IMPACT;
-        List<ModuleInfo> all = new List<ModuleInfo>{
-            module(MODULE_CORE, true, 'core'),
-            module(MODULE_GIVING, givingPresent, 'giving'),
-            module('Volunteers', announced.contains('volunteers'), 'volunteers'),
-            module('Programs', announced.contains('programs'), 'programs'),
-            module('Funders', announced.contains('funders'), 'funders'),
-            module('Connect', announced.contains('connect'), 'connect')
+        String edition = chosenSuite() == null ? SUITE_COMMUNITY : chosenSuite();
+        List<ModuleInfo> offered = new List<ModuleInfo>{
+            module(
+                new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'),
+                true
+            )
         };
-        List<ModuleInfo> offered = new List<ModuleInfo>();
-        for (ModuleInfo info : all) {
-            if (offerAll || info.present || OFFERED_TO_EVERY_ORG.contains(info.name)) {
-                offered.add(info);
+        for (BarnCRM_Module__mdt row : catalog()) {
+            Boolean present = isPresent(row, announced);
+            if (present || offeredIn(row, edition)) {
+                offered.add(module(row, present));
             }
         }
         return offered;
+    }
+
+    /**
+     * True when the module announced itself with Setting Definition rows, when the catalog
+     * names an object of its own that this package has, or, for Giving, when its probe says so.
+     */
+    private static Boolean isPresent(BarnCRM_Module__mdt row, Set<String> announced) {
+        String name = row.DeveloperName;
+        if (announced.contains(name.toLowerCase())) {
+            return true;
+        }
+        if (name == MODULE_GIVING && givingPresent(announced)) {
+            return true;
+        }
+        return String.isNotBlank(row.Probe_Object__c) && objectExists(row.Probe_Object__c.trim());
+    }
+
+    /** True when the catalog says the chosen edition (Standard before one is chosen) offers it. */
+    public static Boolean isOffered(String moduleName) {
+        String edition = chosenSuite() == null ? SUITE_COMMUNITY : chosenSuite();
+        return offeredIn(catalogRow(moduleName), edition);
+    }
+
+    /** True when the catalog row lists the given edition among those that offer it. */
+    @TestVisible
+    private static Boolean offeredIn(BarnCRM_Module__mdt row, String edition) {
+        if (row == null || String.isBlank(row.Editions__c) || String.isBlank(edition)) {
+            return false;
+        }
+        for (String part : row.Editions__c.split(';')) {
+            if (part.trim().equalsIgnoreCase(edition)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The shipped module catalog, lowest Sort Order first. */
+    private static List<BarnCRM_Module__mdt> catalog() {
+        List<BarnCRM_Module__mdt> rows = catalogOverride != null
+            ? catalogOverride
+            : BarnCRM_Module__mdt.getAll().values();
+        List<BarnCRM_Module__mdt> sorted = new List<BarnCRM_Module__mdt>();
+        for (BarnCRM_Module__mdt row : rows) {
+            Integer at = sorted.size();
+            while (at > 0 && orderOf(sorted[at - 1]) > orderOf(row)) {
+                at--;
+            }
+            if (at == sorted.size()) {
+                sorted.add(row);
+            } else {
+                sorted.add(at, row);
+            }
+        }
+        return sorted;
+    }
+
+    private static Decimal orderOf(BarnCRM_Module__mdt row) {
+        return row.Sort_Order__c == null ? 1000 : row.Sort_Order__c;
+    }
+
+    private static BarnCRM_Module__mdt catalogRow(String name) {
+        for (BarnCRM_Module__mdt row : catalog()) {
+            if (row.DeveloperName == name) {
+                return row;
+            }
+        }
+        return null;
     }
 
     /** The modules that have shipped settings console rows naming themselves. */
@@ -159,12 +237,16 @@ public with sharing class ModuleDetectionService {
         return names;
     }
 
-    private static ModuleInfo module(String name, Boolean present, String folder) {
+    private static ModuleInfo module(BarnCRM_Module__mdt row, Boolean present) {
         ModuleInfo info = new ModuleInfo();
-        info.name = name;
+        info.name = row.DeveloperName;
+        info.label = String.isBlank(row.MasterLabel) ? row.DeveloperName : row.MasterLabel;
         info.present = present;
-        info.docsUrl = DOCS_BASE + folder + '/README.md';
-        info.installUrl = present ? null : installUrl(name);
+        info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
+        info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
+        info.appUrl = present && String.isNotBlank(row.App_Name__c)
+            ? APP_PATH + NamespaceUtil.prefix() + row.App_Name__c.trim()
+            : null;
         return info;
     }
 

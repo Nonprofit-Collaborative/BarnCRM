@@ -1340,9 +1340,9 @@ public with sharing class HouseholdService {
     /**
      * Whether the org asks for a household to be made for a new person who has none. One
      * setting answers it for both membership modes and for both objects a person can be
-     * stored on (R-H1, R-H2, ADR-0037).
+     * stored on (R-H1, R-H2, ADR-0037). Public for the household catch-up batch.
      */
-    private static Boolean automaticCreationEnabled() {
+    public static Boolean automaticCreationEnabled() {
         if (automaticCreationSuspended) {
             return false;
         }

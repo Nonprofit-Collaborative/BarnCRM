@@ -11,14 +11,22 @@ import NO_INSTALL_LINK from '@salesforce/label/c.Core_SuiteChoice_NoInstallLink'
 import READ_ABOUT from '@salesforce/label/c.Core_SuiteChoice_ReadAbout';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
+import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
+import CHOSEN_ONCE from '@salesforce/label/c.Core_SuiteChoice_ChosenOnce';
+import CHANGE_HELP from '@salesforce/label/c.Core_SuiteChoice_ChangeHelpLink';
 
 const IMPACT_SUITE = 'Impact';
+const COMMUNITY_SUITE = 'Community';
+const EDITIONS_GUIDE =
+  'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/editions.md';
 
 /**
  * Step one: which edition (C-30). Saving it installs nothing: with the Nonprofit Edition
  * saved and Giving not here, the step links to Salesforce's installer in a new tab and
  * offers Check again, so the administrator installs Giving herself
- * (0072-suite-choice-is-the-first-setup-step.md).
+ * (0072-suite-choice-is-the-first-setup-step.md). The edition is chosen once: once saved,
+ * the step shows it read-only and links to how to change it later (ADR-0124).
  */
 export default class SetupStepSuite extends LightningElement {
   @api canEdit = false;
@@ -35,11 +43,15 @@ export default class SetupStepSuite extends LightningElement {
     noInstallLink: NO_INSTALL_LINK,
     readAbout: READ_ABOUT,
     checkAgain: CHECK_AGAIN,
-    newTab: NEW_TAB
+    newTab: NEW_TAB,
+    chosenOnce: CHOSEN_ONCE,
+    changeHelp: CHANGE_HELP
   };
 
+  changeHelpUrl = EDITIONS_GUIDE;
+
   options = [
-    { label: COMMUNITY, value: 'Community' },
+    { label: COMMUNITY, value: COMMUNITY_SUITE },
     { label: IMPACT, value: IMPACT_SUITE }
   ];
 
@@ -61,6 +73,15 @@ export default class SetupStepSuite extends LightningElement {
 
   get giving() {
     return this._suite.giving || {};
+  }
+
+  /** The saved edition's name, or null while none is saved and the choice is still offered. */
+  get savedName() {
+    const saved = this._suite.currentSuite;
+    if (saved === COMMUNITY_SUITE) {
+      return STANDARD_NAME;
+    }
+    return saved === IMPACT_SUITE ? NONPROFIT_NAME : null;
   }
 
   get isImpactSaved() {

@@ -91,6 +91,10 @@ function importCoreComponent(name) {
       return import('c/moduleManager');
     case 'customMetadataManager':
       return import('c/customMetadataManager');
+    case 'editionSetting':
+      return import('c/editionSetting');
+    case 'featureSettings':
+      return import('c/featureSettings');
     default:
       return null;
   }
@@ -340,6 +344,16 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   handleSectionSelect(event) {
     this.selectedSection = event.detail.name;
+  }
+
+  /** First-run setup finished (ADR-0124): the edition and features changed what shows. */
+  handleSetupFinished() {
+    this.load();
+  }
+
+  /** A feature turned on in General (ADR-0124): its settings rows now show, without a reload. */
+  handleFeatureTurnedOn() {
+    this.load();
   }
 
   handleSearchSelect(event) {

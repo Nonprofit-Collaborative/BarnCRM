@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Features_Turned_On__c</fullName>
+  <description>The comma separated keys of the Core features turned on (DataManager, DuplicateReview, OrgOptimizer, HouseholdUpkeep, Addresses, Relationships, Affiliations, PreferredEmail). Empty: all on (upgraded org). None: new install before first-run setup. NoneChosen: setup finished with none ticked. Keys stay: one-way (ADR-0124).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The Core features turned on in first-run setup or in BarnCRM Settings, General, Features. A feature cannot be turned off once on.</inlineHelpText>
+  <label>Features Turned On</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

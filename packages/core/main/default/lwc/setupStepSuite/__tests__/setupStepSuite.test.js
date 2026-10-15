@@ -105,9 +105,27 @@ describe('c-setup-step-suite', () => {
   });
 
   it('lets David read the choice without saving it', () => {
-    const element = build({ currentSuite: 'Community', giving: {} }, false);
+    const element = build({ currentSuite: null, recommendedSuite: 'Impact', giving: {} }, false);
 
     expect(find(element, 'suite-choice').disabled).toBe(true);
     expect(find(element, 'confirm')).toBeNull();
+  });
+
+  it('shows a saved edition read-only and no longer offers the choice', () => {
+    const element = build({ currentSuite: 'Community', giving: {} });
+
+    expect(find(element, 'suite-choice')).toBeNull();
+    expect(find(element, 'confirm')).toBeNull();
+    expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_StandardName');
+    const help = find(element, 'change-help');
+    expect(help.getAttribute('href')).toContain('docs/admin-guide/editions.md');
+    expect(help.target).toBe('_blank');
+  });
+
+  it('names the Nonprofit Edition when it is saved', () => {
+    const element = build({ currentSuite: 'Impact', giving: { present: true, docsUrl: DOCS } });
+
+    expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_NonprofitName');
+    expect(find(element, 'suite-choice')).toBeNull();
   });
 });

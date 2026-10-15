@@ -92,7 +92,23 @@ describe('c-hub-modules', () => {
     expect(all(element, 'module-row')).toHaveLength(0);
   });
 
-  it('opens the Module Manager in BarnCRM Settings by page reference', async () => {
+  it('names a module by its BarnCRM label when it has one', async () => {
+    getState.mockResolvedValue({
+      canEdit: true,
+      modules: [
+        { name: 'Core', status: 'On', canSwitch: false },
+        { name: 'Giving', label: 'BarnCRM Giving', status: 'On', canSwitch: true }
+      ]
+    });
+    const element = await build();
+
+    expect(all(element, 'module-name').map((n) => n.textContent)).toEqual([
+      'Core',
+      'BarnCRM Giving'
+    ]);
+  });
+
+  it('opens the Modules section of BarnCRM Settings by page reference', async () => {
     getState.mockResolvedValue({ canEdit: true, modules: [] });
     const element = await build();
 
@@ -100,7 +116,7 @@ describe('c-hub-modules', () => {
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'BarnCRM_Settings' },
-      state: { c__section: 'General' }
+      state: { c__section: 'Modules' }
     });
   });
 });

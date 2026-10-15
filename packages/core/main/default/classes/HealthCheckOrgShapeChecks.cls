@@ -75,7 +75,10 @@ public with sharing class HealthCheckOrgShapeChecks {
         }
     }
 
-    /** Whether an org with Industries objects has the Connect module that mirrors to them. */
+    /**
+     * Whether an org with Industries objects has the Connect module that mirrors to them.
+     * Asked only in the Nonprofit Edition.
+     */
     public class ConnectModuleCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return connectModuleFinding(OrgShapeDetector.detect());
@@ -373,7 +376,8 @@ public with sharing class HealthCheckOrgShapeChecks {
         if (shape == null || shape.hasIndustriesNonprofit != true) {
             return null;
         }
-        if (isConnectInstalled()) {
+        // Only an edition whose module catalog offers Connect is told about it (ADR-0124).
+        if (!ModuleDetectionService.isOffered('Connect') || isConnectInstalled()) {
             return null;
         }
 

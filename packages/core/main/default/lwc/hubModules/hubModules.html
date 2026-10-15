@@ -8,7 +8,7 @@
                 <ul>
                     <template for:each={rows} for:item="row">
                         <li key={row.name} data-id="module-row">
-                            <span data-id="module-name">{row.name}</span>
+                            <span data-id="module-name">{row.displayName}</span>
                             <span class={row.badgeClass} data-id="module-status">{row.statusText}</span>
                         </li>
                     </template>

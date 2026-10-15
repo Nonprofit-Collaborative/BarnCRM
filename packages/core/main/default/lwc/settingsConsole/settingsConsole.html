@@ -1,4 +1,5 @@
 <template>
+    <c-first-run-setup onsetupfinished={handleSetupFinished}></c-first-run-setup>
     <lightning-card title={labels.title} icon-name="standard:settings">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={loading}>
@@ -145,7 +146,10 @@
                                     {row.label}
                                 </h3>
                                 <template lwc:if={row.ctor}>
-                                    <lwc:component lwc:is={row.ctor}></lwc:component>
+                                    <lwc:component
+                                        lwc:is={row.ctor}
+                                        onfeatureturnedon={handleFeatureTurnedOn}
+                                    ></lwc:component>
                                 </template>
                                 <template lwc:elseif={row.navigatesAway}>
                                     <lightning-button

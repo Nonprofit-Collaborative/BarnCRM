@@ -178,6 +178,28 @@ let you remove it from is named with the reason ("BarnCRM Bulk Update could not 
 Priya Nair. Salesforce said: ..."), and the others are still removed. Nothing is written to the
 Error Log when it works.
 
+## Tabs that follow a feature
+
+Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
+General, Features: Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or
+extra permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
+(tab name)**, which BarnCRM gives automatically to the people who should see it once its
+feature is on:
+
+| Tab | Given to holders of |
+|---|---|
+| Data Manager | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
+| Import | BarnCRM Admin |
+| Find | BarnCRM Admin, Find and Export |
+| Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
+| Data Hygiene | BarnCRM Admin, Find and Export |
+
+This page keeps them in step when you give a role or extra permission. A role given in Setup or
+by a user access policy is caught up overnight, and every upgrade catches everyone up, so an
+upgraded org keeps exactly the tabs it had. The BarnCRM Tab sets are never listed on this
+page and should not be assigned by hand. Nobody needs Assign Permission Sets for this: BarnCRM
+does it itself, and the tab sets grant nothing but the tab.
+
 ## What still needs Setup
 
 BarnCRM can give a person a role, but it cannot create the person or hand out a

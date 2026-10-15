@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup note, Access: what to change for module access</shortDescription>
-        <value>Assign a module's own permission set (Giving Staff, for example) to people who need that module, alongside their role here.</value>
+        <value>Assign an installed module's own permission set to people who need that module, alongside their role here.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Users_Where</fullName>

@@ -16,25 +16,34 @@ app do that, and you should see and approve what goes into your org.
 There is nothing to turn on.
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
-2. Click **BarnCRM Settings**, then **General** in the left navigation.
-3. Scroll to **Modules**.
+2. Click **BarnCRM Settings**, then **Modules** in the left navigation.
 
 Everyone who can open BarnCRM Settings sees the list. You need the **Manage BarnCRM
 Settings** permission to install, turn on, turn off, or check what an uninstall would delete.
 
 Which modules are listed depends on the edition chosen in the first step of the
-[Setup Assistant](setup-assistant.md). The Standard Edition lists Core and Volunteers. The
-Nonprofit Edition, or an org that already has Giving, lists all six: Core, Giving,
-Volunteers, Programs, Funders and Connect. A module that is installed is always listed.
+[Setup Assistant](setup-assistant.md). The Standard Edition (or no edition chosen yet) lists
+Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all seven: Core, BarnCRM Rollup
+Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM
+Connect. A module that is installed is always listed, whatever the edition. See
+[Editions](editions.md).
+
+No module is installed with Core or by first-run setup: a module is installed only when you
+install it from this section. Each installed module has its own app with its own Settings
+tab, where its settings live; its row links there. (Some module settings still show in
+BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
+features are turned on in General instead (see
+[BarnCRM Settings, Features](barncrm-settings.md#features-general)).
 
 ## A five-minute walkthrough
 
 Maria's org has Core and Giving installed. She wants to see the list, pause Giving while she
 cleans up her data, and check what removing a module would cost.
 
-1. Open **BarnCRM Settings**, **General**, **Modules**. Each row has the module's name, a
-   status, a **Learn more** link to what it does, and its actions:
-   - **On**: installed and working. Core is always On.
+1. Open **BarnCRM Settings**, **Modules**. Each row has the module's name, a status, a
+   **Learn more** link to what it does, and its actions:
+   - **Installed** (On): installed and working, with a link to the module's own app. Core is
+     always On.
    - **Installed and off**: installed, and its automation is not running.
    - **Not installed**: not in your org.
 2. On a **Not installed** row, click **Install**. Salesforce's install screen opens in a new

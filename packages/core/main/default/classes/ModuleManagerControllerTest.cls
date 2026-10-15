@@ -48,8 +48,9 @@ private class ModuleManagerControllerTest {
             Test.stopTest();
 
             Assert.isTrue(opened.canEdit, 'Maria may switch modules');
-            Assert.areEqual(ModuleManagerService.STATUS_OFF, off.modules[1].status, 'Off is shown');
-            Assert.areEqual(ModuleManagerService.STATUS_ON, backOn.modules[1].status, 'On again');
+            // Core, then BarnCRM Rollup Builder (still shipped in Core), then Volunteers.
+            Assert.areEqual(ModuleManagerService.STATUS_OFF, off.modules[2].status, 'Off is shown');
+            Assert.areEqual(ModuleManagerService.STATUS_ON, backOn.modules[2].status, 'On again');
             Assert.isFalse(granted, 'No admin set to give for this module');
             Assert.areEqual(1, report.size(), 'The report has a line per object the module owns');
         }

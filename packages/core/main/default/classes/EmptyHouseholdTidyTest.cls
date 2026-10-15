@@ -144,6 +144,21 @@ private class EmptyHouseholdTidyTest {
     }
 
     @IsTest
+    static void nothingIsRemovedWhileHouseholdUpkeepIsOff() {
+        System.runAs(TestUsers.admin()) {
+            contactMode();
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Id household = deletedPersonsHousehold(maria);
+            purge(new List<Id>{ maria.Id });
+            FeatureSwitchService.markNewInstall();
+
+            runTidyUp();
+
+            Assert.isFalse(isInRecycleBin(household), 'A feature that is off does no work');
+        }
+    }
+
+    @IsTest
     static void aHouseholdEmptiedByAMoveIsNeverStamped() {
         System.runAs(TestUsers.admin()) {
             contactMode();

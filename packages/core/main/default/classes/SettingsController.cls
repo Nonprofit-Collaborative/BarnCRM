@@ -342,8 +342,18 @@ public with sharing class SettingsController {
             FeatureManagement.checkPermission(prefix + name);
     }
 
+    /** The rows of the Core features that are off, read once per transaction (ADR-0124). */
+    private static Set<String> hiddenByFeature;
+
+    private static Boolean isHiddenByFeature(Setting_Definition__mdt definition) {
+        if (hiddenByFeature == null) {
+            hiddenByFeature = FeatureSwitchService.hiddenSettingRows();
+        }
+        return hiddenByFeature.contains(definition.DeveloperName);
+    }
+
     private static SettingModel toSetting(Setting_Definition__mdt definition) {
-        if (!isVisible(definition)) {
+        if (!isVisible(definition) || isHiddenByFeature(definition)) {
             return null;
         }
         Boolean isComponent = TYPE_COMPONENT.equalsIgnoreCase(definition.Data_Type__c);

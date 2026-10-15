@@ -9,6 +9,9 @@
 public with sharing class SettingSections {
     @NamespaceAccessible
     public static final String GENERAL = 'General';
+    /** The BarnCRM modules (ADR-0124): the one place a module is installed and opened from. */
+    @NamespaceAccessible
+    public static final String MODULES = 'Modules';
     @NamespaceAccessible
     public static final String HOUSEHOLDS = 'Households';
     @NamespaceAccessible
@@ -41,6 +44,7 @@ public with sharing class SettingSections {
     public static List<String> all() {
         return new List<String>{
             GENERAL,
+            MODULES,
             ORGANIZATION,
             HOUSEHOLDS,
             RELATIONSHIPS,

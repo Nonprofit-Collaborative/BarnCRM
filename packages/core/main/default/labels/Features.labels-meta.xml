@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Feature_DataManager_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Data Manager feature in Settings, General.</shortDescription>
+        <value>Data Manager</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_DataManager_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Data Manager feature covers.</shortDescription>
+        <value>Import, find, update and delete records in bulk: the Data Manager, Import, Find and Bulk Update tabs.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_DuplicateReview_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Duplicate Review feature in Settings, General.</shortDescription>
+        <value>Duplicate Review</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_DuplicateReview_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Duplicate Review feature covers.</shortDescription>
+        <value>Suggests people and households that look like duplicates, for you to review and merge.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_OrgOptimizer_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Org Optimizer and Health Check feature.</shortDescription>
+        <value>Org Optimizer and Health Check</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_OrgOptimizer_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Org Optimizer and Health Check feature covers.</shortDescription>
+        <value>Checks your org's setup and data and suggests fixes: the Data Hygiene tab and Health Check.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_HouseholdUpkeep_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Household upkeep feature in Settings, General.</shortDescription>
+        <value>Household upkeep</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_HouseholdUpkeep_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Household upkeep feature covers.</shortDescription>
+        <value>Creates, names and tidies households as people are added, changed and removed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Addresses_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Addresses feature in Settings, General.</shortDescription>
+        <value>Addresses</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Addresses_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Addresses feature covers.</shortDescription>
+        <value>Records address changes and keeps each household's default address in step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Relationships_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Relationships feature in Settings, General.</shortDescription>
+        <value>Relationships</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Relationships_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Relationships feature covers.</shortDescription>
+        <value>Keeps both sides of a relationship between two people in step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Affiliations_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Affiliations feature in Settings, General.</shortDescription>
+        <value>Affiliations</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Affiliations_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Affiliations feature covers.</shortDescription>
+        <value>Keeps each person's primary affiliation with an organization current.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_PreferredEmail_Name</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the Preferred email feature in Settings, General.</shortDescription>
+        <value>Preferred email</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_PreferredEmail_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the Preferred email feature covers.</shortDescription>
+        <value>Copies the email address a person prefers into the standard Email field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_OneWayWarning</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Warning above the feature list that turning one on is permanent.</shortDescription>
+        <value>A feature can't be turned off once it is turned on. Turn on only what your organization will use.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_TurnOn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that turns a feature on, and the confirm button.</shortDescription>
+        <value>Turn on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_On</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>State of a feature that is on.</shortDescription>
+        <value>On</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Off</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>State of a feature that is off.</shortDescription>
+        <value>Off</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_ConfirmTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the confirmation before a feature is turned on. {0} is its name.</shortDescription>
+        <value>Turn on {0}?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_ConfirmMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Body of the confirmation before a feature is turned on. {0} is its name.</shortDescription>
+        <value>{0} will be turned on for everyone, with its tabs, settings and automations. It can't be turned off again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_Cancel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cancel button of the confirmation before a feature is turned on.</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_TurnedOn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Message after a feature is turned on. {0} is its name.</shortDescription>
+        <value>{0} is on. Its tabs appear for the right people within a few minutes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_LoadError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the feature list cannot be loaded.</shortDescription>
+        <value>The features could not be loaded. Reload the page to try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Feature_SaveError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a feature cannot be turned on.</shortDescription>
+        <value>The feature could not be turned on. Try again, and check the Error Log if it keeps happening.</value>
+    </labels>
+</CustomLabels>

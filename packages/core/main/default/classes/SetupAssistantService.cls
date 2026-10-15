@@ -634,7 +634,7 @@ public with sharing class SetupAssistantService {
                     System.Label.Core_SetupAssistant_Step6Label,
                     System.Label.Core_SetupAssistant_Step6Description
                 )
-                .withTarget(SettingSections.GENERAL)
+                .withTarget(SettingSections.MODULES)
         );
         steps.add(
             new Step(

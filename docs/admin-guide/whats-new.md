@@ -23,7 +23,9 @@ installed, and it fills itself from the notes each release ships.
 - **When it disappears:** when that person clicks Dismiss. Dismissing is personal: it hides the
   card for the person who clicked, not for anyone else.
 - **Modules:** a module such as Giving can ship its own notes. They appear in the same card,
-  under the same release, marked with the module's name.
+  under the same release, marked with the module's name. Only installed modules' notes
+  appear, so a Standard Edition org without nonprofit modules sees Core's notes alone. The
+  edition is chosen once in the Setup Assistant; [Editions](editions.md) explains it.
 
 ## A five-minute walkthrough
 
