@@ -5,7 +5,13 @@
  * the Opportunity's Account is taken from has already been derived. After a delete it reports
  * the Opportunities the deleted gifts leave behind (R-OM9).
  */
+@NamespaceAccessible
 public with sharing class OpportunityMirrorTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public OpportunityMirrorTriggerHandler() {
+        return;
+    }
+
     public override String getName() {
         return OpportunityMirrorService.AUTOMATION_NAME;
     }

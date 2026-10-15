@@ -15,8 +15,14 @@
  * switch this one off without also stopping the gifts her team enters from starting their plans
  * (R-SP1). Nothing is started retroactively when it is switched back on.
  */
+@NamespaceAccessible
 public with sharing class StewardshipCommitmentHandler extends TriggerHandler {
     private static final String CONTEXT = 'Stewardship plans';
+
+    @NamespaceAccessible
+    public StewardshipCommitmentHandler() {
+        return;
+    }
 
     public override void afterInsert() {
         start(enteredRunning());

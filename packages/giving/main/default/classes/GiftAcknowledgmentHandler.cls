@@ -9,7 +9,13 @@
  * `AcknowledgmentService` methods that take explicit lists and are unit tested without a trigger
  * context.
  */
+@NamespaceAccessible
 public with sharing class GiftAcknowledgmentHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftAcknowledgmentHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftAcknowledgmentHandler';
     }

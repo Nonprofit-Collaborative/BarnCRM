@@ -11,8 +11,14 @@
  * write means the level is right in the same transaction, with no second DML, no recursion guard,
  * and no elevated write. An after context would need all three.
  */
+@NamespaceAccessible
 public with sharing class DonorLevelTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'Donor level assignment';
+
+    @NamespaceAccessible
+    public DonorLevelTriggerHandler() {
+        return;
+    }
 
     public override void beforeInsert() {
         place();

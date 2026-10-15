@@ -2,7 +2,13 @@
  * The posting and closed period lock on allocations (G-20, R-GA5): the funds of a gift in the
  * books stay what the books hold. Always Runs, like the gift lock it belongs to (ADR-0024).
  */
+@NamespaceAccessible
 public with sharing class GiftAllocationPostingLockHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftAllocationPostingLockHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftAllocationPostingLockHandler';
     }

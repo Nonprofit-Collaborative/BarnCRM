@@ -7,7 +7,13 @@
  * schedule when the schedule itself changed (R-CM6), and before delete it refuses to
  * remove a commitment that has been paid.
  */
+@NamespaceAccessible
 public with sharing class CommitmentTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public CommitmentTriggerHandler() {
+        return;
+    }
+
     public override void beforeInsert() {
         deriveHouseholds((List<Commitment__c>) newRecords(), null);
     }

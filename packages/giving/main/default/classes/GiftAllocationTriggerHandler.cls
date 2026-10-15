@@ -2,7 +2,13 @@
  * Record-level rules for Gift_Allocation__c: the amount and percent are kept in step, and no
  * save may leave a gift over-allocated or under-allocated (R-GA1).
  */
+@NamespaceAccessible
 public with sharing class GiftAllocationTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftAllocationTriggerHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftAllocationTriggerHandler';
     }

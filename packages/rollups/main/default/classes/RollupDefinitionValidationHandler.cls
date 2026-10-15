@@ -9,7 +9,13 @@
  * the target or the source attribute. Switching a rollup on or off or changing its mode never
  * trips over an older definition.
  */
+@NamespaceAccessible
 public with sharing class RollupDefinitionValidationHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public RollupDefinitionValidationHandler() {
+        return;
+    }
+
     public override void beforeInsert() {
         validate((List<Rollup_Definition__c>) newRecords(), null);
     }
