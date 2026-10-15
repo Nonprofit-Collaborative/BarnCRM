@@ -97,7 +97,7 @@ describe('c-setup-step-suite', () => {
     expect(find(element, 'check-again')).toBeNull();
   });
 
-  it('shows nothing about Giving with the Community Suite saved', () => {
+  it('shows nothing about Giving with the Standard Edition saved', () => {
     const element = build({ currentSuite: 'Community', giving: { present: false } });
 
     expect(find(element, 'giving-needed')).toBeNull();

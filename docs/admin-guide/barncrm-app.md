@@ -80,8 +80,8 @@ Admin role.
    one sentence saying what that step is for and the count of how far you have got, for
    example "3 of 8" (eight steps with Core alone, nine with Giving). The steps are guided:
    each one is done here, on the home page, not somewhere else.
-3. The first step, **Choose your edition**, asks whether you want the Community Suite or
-   the Nonprofit Edition. Choose **Community Suite** and click **Confirm and continue**.
+3. The first step, **Choose your edition**, asks whether you want the Standard Edition or
+   the Nonprofit Edition. Choose **Standard Edition** and click **Confirm and continue**.
 4. The next step, **Confirm how BarnCRM fits your existing org**, says what it found in
    your org and recommends a fit. On a fresh org it says "This looks like a fresh org, with
    no other household model and no Person Accounts. BarnCRM can run on its own." and

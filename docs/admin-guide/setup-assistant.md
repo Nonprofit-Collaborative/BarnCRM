@@ -67,17 +67,17 @@ ready than to go and find:
 
 ### Step 1: Choose your edition
 
-BarnCRM comes in two editions built from the same parts. Any organization can choose either
+BarnCRM comes in two editions built from the same parts, and both include the full core suite of tools. Any organization can choose either
 one, and the choice can be changed later.
 
-- **Community Suite**: households, people, organizations, relationships, addresses,
+- **Standard Edition**: the full core suite of tools, including households, people, organizations, relationships, addresses,
   importing and everything else in BarnCRM Core. Nothing more to install.
-- **Nonprofit Edition (Impact Suite)**: everything in the Community Suite, plus the Giving
+- **Nonprofit Edition**: everything in the Standard Edition, plus the nonprofit tools, starting with the Giving
   module for gifts, funds and receipts. Giving is a separate package.
 
 Choose one and click **Confirm and continue**.
 
-- **Community Suite:** the assistant moves on to step two.
+- **Standard Edition:** the assistant moves on to step two.
 - **Nonprofit Edition, Giving already installed:** the step says "Giving is installed. Its
   steps are part of this setup." Click **Next**.
 - **Nonprofit Edition, Giving not installed yet:** the step stays open and says "The
@@ -243,7 +243,7 @@ installed**, with a **Learn more** link to that package's description (its READM
 GitHub). A module that is not installed and has a published version also has an
 **Install** link, which opens Salesforce's installer for it in a new tab.
 
-- With the Community Suite chosen in step one and Giving not installed, the list shows Core
+- With the Standard Edition chosen in step one and Giving not installed, the list shows Core
   and Volunteers, plus any other module already installed.
 - With the Nonprofit Edition chosen, or Giving installed, it shows all six: Core, Giving,
   Volunteers, Programs, Funders, and Connect.

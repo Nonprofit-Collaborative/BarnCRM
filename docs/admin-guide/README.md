@@ -93,7 +93,7 @@ these pages, so that everyone is talking about the same person.
 Each feature adds its row here when its page is written.
 
 The Package column says what has to be installed for the page to apply. BarnCRM Core on
-its own is the Community Suite, for organizations that are not nonprofits, so a Core page
+its own is the Standard Edition, the full core suite of tools for any organization, so a Core page
 describes only what every organization has: its wording is neutral, and anything about
 gifts, donors or receipts on a Core page is marked as coming from Giving (C-29), and anything
 about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
