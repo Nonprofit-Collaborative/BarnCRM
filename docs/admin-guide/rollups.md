@@ -261,8 +261,8 @@ What to know about them:
 
 ## The Rollup Builder
 
-Rollups are their own module, **BarnCRM Rollup Builder**, with an app of the same name and two
-tabs: **Rollup Builder** and **Rollup Settings**.
+Rollups are their own module, **BarnCRM Rollup Builder**, with a console app of the same name
+and two tabs: **Rollup Builder** and **Rollup Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
