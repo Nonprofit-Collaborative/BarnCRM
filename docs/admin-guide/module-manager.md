@@ -93,5 +93,7 @@ visibility. To hide a module from a colleague, take away its role on the
   nightly run or Recalculate updates a total while it is **Installed and off**, a
   recalculation already running stops, and nothing is processed while it is off. The values
   already on your records stay. **Turn on** puts every total right: it starts the totals that
-  waited and a recalculation of every active rollup in the background. See
-  [Rollups](rollups.md).
+  waited and a recalculation of every active rollup in the background. The check on a
+  rollup's save (**Check rollups before saving**) pauses with the module; a rollup saved while
+  it is off that cannot be calculated is skipped by that recalculation and logged in the Error
+  Log. See [Rollups](rollups.md).

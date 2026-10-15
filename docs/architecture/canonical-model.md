@@ -1672,9 +1672,10 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
-  target or the source attribute, so switching a definition on or off never re-checks it. The
-  row carries `Always_Runs__c` (ADR-0024), so it also runs while the module is turned off
-  (ADR-NEXT `NEXT-rollup-builder-module.md`, decision 9).
+  target or the source attribute, so switching a definition on or off never re-checks it. It
+  pauses while the module is turned off (ADR-NEXT `NEXT-rollup-builder-module.md`, decision
+  9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
+  on every run, so no total is written wrong.
 - **Settings keys:** `Fiscal_Year_Start_Month__c` (Section 12), `Rollup_Mode_Default__c`
   (Section 14B).
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,

@@ -55,7 +55,7 @@ offer it anywhere else.
 | Copy default address to standard fields | None | The copy reaches every member of a household, in either way of holding household membership, people held as accounts in orgs that use them, and seasonal addresses. A flow in Core cannot name the fields of a person held as an account, because an org without them would refuse to install BarnCRM. |
 | Update rollups when a person changes | None yet | Totals are worked out by the rollup engine. A flow that runs the engine for records you choose arrives with the next rollup update: see "Rollups on your own objects" below. |
 | Update rollups when membership changes | None yet | The same as above. |
-| Check rollups before saving | None | It checks a rollup definition against the field it fills, which only BarnCRM's rollup engine knows how to read. A flow copy could let a rollup save that the engine then skips on every run. It always runs, so it has no switch. |
+| Check rollups before saving | None | It checks a rollup definition against the field it fills, which only BarnCRM's rollup engine knows how to read. A flow copy could let a rollup save that the engine then skips on every run. Leave it on, or switch it off and read the Error Log. It also pauses while BarnCRM Rollup Builder is turned off on **Modules**; a rollup saved then that the engine cannot calculate is skipped and logged, never written wrong. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.

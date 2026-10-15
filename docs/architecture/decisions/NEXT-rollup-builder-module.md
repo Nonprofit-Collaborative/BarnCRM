@@ -114,9 +114,12 @@ subscriber migration.
    `Rollup_Builder_User` (read the Builder and definitions, as Staff and Read Only can today).
    The engine's save path must run in system mode for every package-owned read and write
    (ADR-0021), so a user holding neither set still saves records and totals still update.
-9. **Turning the module off** (ADR-0073) stops its registry rows through `Module__c`, except
-   `Rollup_Definition_Validation`, which carries `Always_Runs__c` so a definition saved while
-   the module is off is still checked. The engine's entry points (`RollupTriggerHandler`, the
+9. **Turning the module off** (ADR-0073) stops its three registry rows through `Module__c`,
+   `Rollup_Definition_Validation` included: it keeps its own switch (owner decision: no
+   functionality is dropped), so a definition saved while the module is off is not checked.
+   That is safe: `RollupPlanner` refuses a definition it cannot plan and logs it on every run,
+   so the full recalculation Turn on starts skips it rather than writing a wrong total. The
+   engine's entry points (`RollupTriggerHandler`, the
    queue processor, the nightly batch, the Flow action) also return early while `Rollups` is
    turned off, so Giving's four rollup rows stop too. One check, `RollupService.isTurnedOff`,
    reads `ModuleManagerService.turnedOff`; the real-time, delete, merge and Flow paths (Core's
