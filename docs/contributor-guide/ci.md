@@ -636,7 +636,9 @@ org for the component level report, by job id, in human form and then as JSON. A
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no
 post-install script and would otherwise leave the org without the rollup definitions a real
-install creates (ADR-0029). Before the first stage the script fails if a folder under
+install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
+tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
+for the nightly sync. Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.
 

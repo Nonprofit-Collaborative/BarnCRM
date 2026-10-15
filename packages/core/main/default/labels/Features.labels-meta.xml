@@ -201,6 +201,14 @@
         <value>The features could not be loaded. Reload the page to try again.</value>
     </labels>
     <labels>
+        <fullName>Core_Feature_UnknownKeyError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a feature key is not a feature in this org.</shortDescription>
+        <value>That feature does not exist in this org.</value>
+    </labels>
+    <labels>
         <fullName>Core_Feature_SaveError</fullName>
         <categories>Core</categories>
         <language>en_US</language>

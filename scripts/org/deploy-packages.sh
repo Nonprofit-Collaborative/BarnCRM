@@ -478,6 +478,17 @@ if ! printf '%s\n' 'RollupService.ensureDefaults();' | sf apex run --target-org 
   echo "rollups button on the Rollups page runs exactly the same step."
 fi
 
+# The same gap for tabs: the five tool tabs live only in the BarnCRM_Tab_* permission sets, and
+# a deployment runs no post-install, so users would not see them until TabAccessService next
+# syncs. requestSync() queues that sync and never throws. It runs in Core, so --core-only
+# keeps it.
+echo ""
+echo "== Queueing the tab access sync =="
+if ! printf '%s\n' 'TabAccessService.requestSync();' | sf apex run --target-org "$ALIAS"; then
+  echo "The tab access sync was not queued. Nothing else is affected: the nightly run syncs"
+  echo "the tabs."
+fi
+
 echo ""
 if [[ "$STALLS_RECOVERED" -gt 0 ]]; then
   echo "== ${STALLS_RECOVERED} stalled deploy(s) cancelled and resubmitted successfully =="

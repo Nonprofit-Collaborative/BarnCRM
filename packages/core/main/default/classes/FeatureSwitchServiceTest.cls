@@ -112,6 +112,11 @@ private class FeatureSwitchServiceTest {
             Test.stopTest();
 
             Assert.isNotNull(refused, 'Rollup Builder is a module, not a Core feature');
+            Assert.areEqual(
+                System.Label.Core_Feature_UnknownKeyError,
+                refused.getMessage(),
+                'The message names a feature, not a setting'
+            );
         }
     }
 
