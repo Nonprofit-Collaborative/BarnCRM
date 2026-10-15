@@ -26,7 +26,7 @@ public with sharing class QuickGiftEntryController {
             EntryDefaults defaults = new EntryDefaults();
             defaults.giftDate = Date.today();
             defaults.giftTypes = giftTypeOptions();
-            defaults.hasPersonAccounts = OrgShapeDetector.detect().hasPersonAccounts;
+            defaults.hasPersonAccounts = OrgShapeDetector.hasPersonAccounts();
             Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
             applyDefaultFund(defaults, settings);
             applyDefaultAppeal(defaults, settings);
