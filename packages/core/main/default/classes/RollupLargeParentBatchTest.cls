@@ -420,6 +420,113 @@ private class RollupLargeParentBatchTest {
         }
     }
 
+    /**
+     * The row ceiling with the 25,000 row scale test's counts: the fund's first query read its
+     * 26,102 allocations, so its second would have taken the run past 50,000 rows.
+     */
+    @IsTest
+    static void theRowCeilingStopsOnlyAQueryThatWouldPassIt() {
+        System.runAs(TestUsers.admin()) {
+            Integer ceiling = 40000;
+            Assert.isTrue(
+                RollupAggregator.passesCeiling(26150, 26102, ceiling),
+                'The fund: a second query of 26,102 rows would pass it'
+            );
+            Assert.isFalse(
+                RollupAggregator.passesCeiling(12000, 6000, ceiling),
+                'A slice of households reading 6,000 rows a query: the next one fits'
+            );
+            Assert.isFalse(
+                RollupAggregator.passesCeiling(45000, 0, ceiling),
+                'The first query is never stopped: nothing measured yet'
+            );
+            Assert.isFalse(
+                RollupAggregator.passesCeiling(26150, 26102, null),
+                'No ceiling (the instant path, the full run): never stopped'
+            );
+            Assert.areEqual(
+                Limits.getLimitQueryRows() * 4 / 5,
+                RollupLargeParentBatch.queueRowCeiling(),
+                'Four fifths of the limit'
+            );
+        }
+    }
+
+    /** Count and revenue in one grouped query, and the first child's name in an ordered one. */
+    private static void insertTwoQueryDefinitions() {
+        insertDefinitions();
+        Rollup_Definition__c first = definition(
+            'First',
+            'Account',
+            'ParentId',
+            'FIRST',
+            'Name',
+            'Preferred_Name__c'
+        );
+        first.Order_By_Field__c = 'AnnualRevenue';
+        insert first;
+    }
+
+    /**
+     * The shape of the 25,000 row scale rerun: the fund's stored count was stale (3,200 of its
+     * 26,102 allocations), so it was estimated small and taken by the run, and its second query
+     * stopped the run on the query row limit, run after run. Here the stored count says one row
+     * for thirty children: the first query reads them, the second would pass the ceiling, so
+     * nothing is written and the record goes to the batch, which then writes the right totals.
+     */
+    @IsTest
+    static void aStaleCountRecordWhoseNextQueryWouldPassTheCeilingGoesToTheBatch() {
+        System.runAs(TestUsers.admin()) {
+            insertTwoQueryDefinitions();
+            Account stale = parentWith(30, 1);
+            RollupLargeParentBatch.queueRowCeilingForTest = 50;
+
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ stale.Id } });
+            Test.stopTest();
+
+            Account untouched = totalsOf(stale.Id);
+            Assert.areEqual(1, untouched.NumberOfEmployees, 'The run wrote nothing');
+            Assert.isNull(untouched.AnnualRevenue, 'Not even the query it finished');
+            Assert.isTrue(RollupLargeParentBatch.startedForTest, 'A batch run was started');
+            List<Rollup_Queue__c> held = [SELECT Id FROM Rollup_Queue__c];
+            Assert.areEqual(1, held.size(), 'One entry, held by the batch');
+            Rollup_Queue__c entry = reread(held[0].Id);
+            Assert.areEqual(String.valueOf(stale.Id), entry.Record_Ids__c, 'For the record');
+            Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Pending, not Failed');
+            Assert.areEqual(1, entry.Attempts__c, 'Charged as the batch takes it, only once');
+
+            RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entry }).runInline(7);
+
+            Account written = totalsOf(stale.Id);
+            Assert.areEqual(30, written.NumberOfEmployees, 'Counted by the batch, in chunks');
+            Assert.areEqual(300, written.AnnualRevenue, 'Summed by the batch');
+            Assert.areEqual('Child 0', written.Preferred_Name__c, 'First: the tie to the lower Id');
+            Assert.isTrue(entries().isEmpty(), 'The entry is finished');
+        }
+    }
+
+    /** A record whose queries fit under the ceiling is recalculated by the run, as before. */
+    @IsTest
+    static void aRecordUnderTheRowCeilingIsRecalculatedByTheRun() {
+        System.runAs(TestUsers.admin()) {
+            insertTwoQueryDefinitions();
+            Account stale = parentWith(3, 1);
+            RollupLargeParentBatch.queueRowCeilingForTest = 1000;
+
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ stale.Id } });
+            Test.stopTest();
+
+            Account written = totalsOf(stale.Id);
+            Assert.areEqual(3, written.NumberOfEmployees, 'Counted by the run');
+            Assert.areEqual(30, written.AnnualRevenue, 'Summed by the run');
+            Assert.areEqual('Child 0', written.Preferred_Name__c, 'First by the run');
+            Assert.isFalse(RollupLargeParentBatch.startedForTest, 'No batch');
+            Assert.isTrue(entries().isEmpty(), 'Finished');
+        }
+    }
+
     // ------------------------------------------------------------------------------ merging
 
     @IsTest

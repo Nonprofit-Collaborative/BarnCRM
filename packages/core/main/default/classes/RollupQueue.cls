@@ -18,8 +18,9 @@
  * retries them alone and a quarter as many at a time, so only a record that stops every run
  * reaches Failed. Records whose
  * source rows are more than a Queueable may read go to `RollupLargeParentBatch` instead (R-RQ6,
- * ADR-0116): those whose stored counts say so before the run, and a lone record that stopped its
- * run on the query row limit.
+ * ADR-0116): those whose stored counts say so before the run, an entity's records whose
+ * recalculation would have passed the run's query row ceiling (`queueRowCeiling`), and a lone
+ * record that stopped its run on the query row limit.
  *
  * Recalculation recomputes (R-R11), so an entry processed twice, or two processors racing, give
  * the same totals; that is what lets this class stay this small.
@@ -512,7 +513,18 @@ public without sharing class RollupQueue implements Queueable {
             drain.takenIds.removeAll(oversized);
             drain.takenIds.removeAll(later);
             Integer rowsBefore = Limits.getQueryRows();
-            RollupEngine.Result result = RollupEngine.recalculate(ids, definitions);
+            RollupEngine.Result result = new RollupEngine.Result();
+            RollupAggregator.limitQueryRows(RollupLargeParentBatch.queueRowCeiling());
+            try {
+                result = RollupEngine.recalculate(ids, definitions);
+            } catch (RollupAggregator.RowCeilingException tooLarge) {
+                // R-RQ6: a stale or filtered count took a record as small, and its next query
+                // would have stopped the run. Nothing was written: the batch reads them in chunks.
+                large.addAll(entriesFor(target, ids, attempts, null, definitionIds));
+                drain.takenIds.removeAll(ids);
+            } finally {
+                RollupAggregator.limitQueryRows(null);
+            }
             recalculationRows += Limits.getQueryRows() - rowsBefore;
             if (!result.failed.isEmpty()) {
                 retryLater(
