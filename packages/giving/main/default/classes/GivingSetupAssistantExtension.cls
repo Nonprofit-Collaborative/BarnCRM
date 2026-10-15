@@ -23,6 +23,11 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
     /** The Giving tab the first gift check opens (ADR-0020: reached by navigation). */
     private static final String GIFT_ENTRY_TAB = 'Gift_Entry';
 
+    @NamespaceAccessible
+    public GivingSetupAssistantExtension() {
+        return;
+    }
+
     public List<SetupAssistantService.Step> contributions() {
         return new List<SetupAssistantService.Step>{ fundAndAppeal(), identity(), verify() };
     }

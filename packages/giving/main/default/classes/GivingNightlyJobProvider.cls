@@ -13,6 +13,11 @@
  */
 @NamespaceAccessible
 public with sharing class GivingNightlyJobProvider implements NightlyJobProvider {
+    @NamespaceAccessible
+    public GivingNightlyJobProvider() {
+        return;
+    }
+
     public List<NightlyJob> nightlyJobs() {
         return new List<NightlyJob>{
             new GivingJob(
