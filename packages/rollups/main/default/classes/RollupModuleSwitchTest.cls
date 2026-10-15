@@ -52,8 +52,16 @@ private class RollupModuleSwitchTest {
         return [SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_PENDING];
     }
 
+    /**
+     * Jobs started of this class: a batch's own BatchApex row or a Queueable. A batch also gets a
+     * BatchApexWorker row per chunk it runs, with the same class, so those are left out.
+     */
     private static Integer jobsOf(String className) {
-        return [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = :className];
+        return [
+            SELECT COUNT()
+            FROM AsyncApexJob
+            WHERE ApexClass.Name = :className AND JobType IN ('BatchApex', 'Queueable')
+        ];
     }
 
     private static Integer infoLogsSaying(String message) {
