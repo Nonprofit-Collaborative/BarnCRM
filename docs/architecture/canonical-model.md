@@ -1771,7 +1771,11 @@ the next run itself, because the platform queues at most five jobs in a row from
 of failed jobs. Before this a stopped run halved the next run's slice and queued it, and a record
 too large for any slice left every entry Pending with nothing to process it. A run also takes
 records only up to a row budget (60 percent of the rows a transaction may read), estimated as in
-R-RQ6, and returns the rest to the queue for the next run uncharged.
+R-RQ6, and returns the rest to the queue for the next run uncharged. Rows its recalculation of
+one target entity actually read count against the budget in place of their estimate, so an
+entity that read more than its estimate leaves less for the entities after it. This protects only
+the later entities: an entity's records are recalculated in one call, so its own records are
+taken on their estimates alone.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
@@ -1790,7 +1794,10 @@ thousands of source rows (a General Fund, a large organization donor) cannot be 
 the processor at any slice size (ADR-0116,
 `0116-rollup-large-parents-recalculated-by-a-batch.md`). A record's source rows are estimated
 as its largest stored COUNT total times the queries its definitions plan; a filtered or fiscal
-year COUNT is a floor, and a record with no COUNT to go by is taken as ten rows per query.
+year COUNT is a floor, and a record with no COUNT to go by is taken as ten rows per query. The
+stored totals of every active COUNT definition on the entity count, not only those of the
+definitions the run calculates: an entry that names only a SUM or MAX (ADR-0099) otherwise took
+a fund with 25,000 allocations as unknown, and its queries stopped the run.
 Before a run recalculates its slice, a record estimated at two fifths of that limit or more
 (below the run's row budget of three fifths, R-RQ3, leaving room for the run's other queries and
 the target records' automation, and for a low estimate) is moved to a new entry and handed to
@@ -7209,6 +7216,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Large parent route efficiency (ADR-0116, tier 1 scale rerun). New protected hierarchy custom setting `Rollup_Run_Lock__c` (no fields, Section 14A implementation). R-RQ6: a record goes to the batch only when its estimate reaches two fifths of the query row limit (was a fifth; the run budget stays three fifths), and a run starts only under a lock on that setting's org-level record, so concurrent processors no longer start batches side by side. R-RQ3: the hand-off at the chain depth limit is no longer logged. |
 | v0.6 | 2026-10-14 | Merge settlement always runs (ADR-0118). New platform event `Merge_Settlement_Ready__e` (Publish After Commit; `Household_Ids__c`, `Owner_Ids__c`, `Person_Ids__c`, 200 identifiers each per event), subscribed by `MergeSettlementReadyTrigger`; the three packaged permission sets grant Read and Create on it. A merge inside a Queueable, or with no queueable job left, publishes it instead of only logging a warning, so its survivors are settled. A person account survivor keeps the default address matching its mailing fields, not the newest. |
 | v0.6 | 2026-10-14 | Import undo and rollup saves (ADR-0119, `0119-import-undo-judges-edits-before-deleting.md`, 25,000 row gift import scale test). No object or field added. R-IB9: a rollup save the import set off, told by the `Rollups_Last_Calculated__c` stamp written in it (whatever the running user's access) and dated within sixty minutes of the commit completing, is not an edit, whoever ran it; a later one keeps the record; the undo judges every tagged record for edits before it puts back or deletes anything, so a rollup either sets off, or the undo's own save, cannot hide an earlier edit. Before this, undoing an import that created people and gifts kept 7,229 of 8,333 people, saved by the Automated Process user as their totals were recalculated. |
+| v0.6 | 2026-10-14 | Rollup queue row budget (ADR-0116, 25,000 row gift import scale test). No object or field added. R-RQ6: a record's estimate reads the stored totals of every active COUNT definition on its entity, not only those the run calculates, so a large parent whose entries name only a SUM or MAX still goes to the batch. R-RQ3: rows a run's recalculation of one entity read count against its row budget in place of their estimate. Before this two Rollup Queue runs stopped on "Too many query rows: 50001" while a fund's allocations rose to 25,000. |
 
 ---
 ## 32. Entity ownership by package
