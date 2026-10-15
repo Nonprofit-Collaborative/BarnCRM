@@ -84,20 +84,22 @@ public with sharing class ModuleManagerService {
     public class ModuleManagerException extends Exception {
     }
 
-    /** One row of the Module Manager. A module's tests read its own row (ADR-0017 rule 1). */
+    /**
+     * One row of the Module Manager. A module's tests read its own row (ADR-0017 rule 1). The
+     * fields carry `@AuraEnabled` only: the platform rejects `@NamespaceAccessible` on an
+     * `@AuraEnabled` field (see HealthCheckService), and the module tests read them as plain
+     * public fields on a row they get from the `@NamespaceAccessible` `getModules()`.
+     */
     @NamespaceAccessible
     public class ModuleStatus {
         @AuraEnabled
-        @NamespaceAccessible
         public String name;
         /** The name shown, such as BarnCRM Giving. */
         @AuraEnabled
         public String label;
         @AuraEnabled
-        @NamespaceAccessible
         public String status;
         @AuraEnabled
-        @NamespaceAccessible
         public Boolean canSwitch;
         @AuraEnabled
         public String docsUrl;
