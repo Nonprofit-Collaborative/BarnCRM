@@ -67,6 +67,7 @@ public with sharing class HealthCheckService {
      * "/" is a relative URL to navigate to, and anything else names a section of the
      * settings console. Null means there is nothing to click.
      */
+    @NamespaceAccessible
     public static final String FIX_ACTION_PREFIX = 'action:';
     public static final String FIX_APPLY_RECOMMENDED_MODE = 'action:applyRecommendedMode';
     public static final String FIX_APPLY_JUNCTION_MEMBERSHIP = 'action:applyJunctionMembership';
@@ -75,9 +76,9 @@ public with sharing class HealthCheckService {
     /**
      * The fixes HealthCheckController.applyFix runs (C-21, ADR-0048). Each one only creates
      * what is missing or schedules what is not scheduled, so pressing it twice is pressing it
-     * once. The key is what follows the action prefix in the fix target.
+     * once. The key is what follows the action prefix in the fix target. A dependent package's
+     * fixes are its own keys, answered by its `HealthCheckFixExtension` (ADR-0125).
      */
-    public static final String FIX_KEY_RESTORE_ROLLUPS = 'restoreShippedRollups';
     public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
     public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
     public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
@@ -94,9 +95,6 @@ public with sharing class HealthCheckService {
      * (ADR-0048 condition 5).
      */
     public static List<String> fixScope(String fixKey) {
-        if (FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)) {
-            return RollupService.missingDefaultNames();
-        }
         if (FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
             return AutomationControl.missingDefaultNames();
         }
@@ -108,6 +106,23 @@ public with sharing class HealthCheckService {
         }
         if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             return ScheduledJobSelector.namesOwnedByInactiveUsers();
+        }
+        HealthCheckFixExtension owner = fixOwner(fixKey);
+        return owner == null ? null : owner.fixScope(fixKey);
+    }
+
+    /**
+     * The installed extension that owns this fix key, or null when none does. Core's own keys
+     * never reach here (ADR-0125).
+     */
+    public static HealthCheckFixExtension fixOwner(String fixKey) {
+        if (String.isBlank(fixKey)) {
+            return null;
+        }
+        for (HealthCheckFixExtension fixer : HealthCheckExtensions.fixExtensions()) {
+            if (fixer.fixLabel(fixKey) != null) {
+                return fixer;
+            }
         }
         return null;
     }
@@ -217,6 +232,7 @@ public with sharing class HealthCheckService {
             return this;
         }
 
+        @NamespaceAccessible
         public Finding withScope(List<String> fixScope) {
             this.fixScope = fixScope;
             return this;
@@ -250,6 +266,7 @@ public with sharing class HealthCheckService {
     }
 
     /** Everything the panel needs in one round trip. */
+    @NamespaceAccessible
     public class Report {
         @AuraEnabled
         public List<Finding> findings;
@@ -497,12 +514,6 @@ public with sharing class HealthCheckService {
             );
             steps.add(
                 new CheckStep(
-                    'shipped_rollups',
-                    new HealthCheckSettingsChecks.ShippedRollupsCheck()
-                )
-            );
-            steps.add(
-                new CheckStep(
                     'automation_switches',
                     new HealthCheckSettingsChecks.AutomationSwitchesCheck()
                 )
@@ -522,15 +533,8 @@ public with sharing class HealthCheckService {
                     new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
                 )
             );
-            steps.add(
-                new CheckStep(
-                    'nightly_rollups',
-                    new HealthCheckSettingsChecks.NightlyRollupsCheck()
-                )
-            );
-            steps.add(
-                new CheckStep('rollup_queue', new HealthCheckSettingsChecks.RollupQueueCheck())
-            );
+            // The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
+            // ADR-0125), asked with the other extensions after these.
         }
 
         return steps;

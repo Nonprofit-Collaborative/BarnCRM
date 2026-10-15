@@ -8,7 +8,7 @@ only hand-kept part is overrides.json beside this file.
 
 Names are written without a namespace. migrate.py adds the namespace at run time.
 
-Usage: python3 scripts/migration/build_mapping.py --packages core,giving,connect --output mapping.json
+Usage: python3 scripts/migration/build_mapping.py --packages core,rollups,giving,connect --output mapping.json
 """
 
 import argparse
@@ -154,7 +154,7 @@ def build(packages, overrides, repo=REPO):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--packages", required=True, help="comma separated, for example core,giving,connect")
+    parser.add_argument("--packages", required=True, help="comma separated, for example core,rollups,giving,connect")
     parser.add_argument("--output", required=True)
     parser.add_argument("--overrides", default=os.path.join(HERE, "overrides.json"))
     args = parser.parse_args(argv)

@@ -11,12 +11,20 @@
       "versionNumber": "0.1.0.NEXT"
     },
     {
+      "path": "packages/rollups",
+      "default": false,
+      "package": "BarnCRM Rollup Builder",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/giving",
       "default": false,
       "package": "BarnCRM Giving",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Rollup Builder" }]
     },
     {
       "path": "packages/volunteers",
@@ -40,7 +48,11 @@
       "package": "BarnCRM Funders",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Giving" }]
+      "dependencies": [
+        { "package": "BarnCRM Core" },
+        { "package": "BarnCRM Rollup Builder" },
+        { "package": "BarnCRM Giving" }
+      ]
     },
     {
       "path": "packages/connect",
@@ -48,7 +60,11 @@
       "package": "BarnCRM Connect",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Giving" }]
+      "dependencies": [
+        { "package": "BarnCRM Core" },
+        { "package": "BarnCRM Rollup Builder" },
+        { "package": "BarnCRM Giving" }
+      ]
     }
   ]
 }

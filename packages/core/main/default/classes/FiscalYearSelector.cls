@@ -11,6 +11,7 @@
  * forbidden to touch (plan Section 4.2), so reading it costs Core nothing on a Platform-only
  * org. The query lives in a selector because every SOQL statement does (plan Section 7.1).
  */
+@NamespaceAccessible
 public with sharing class FiscalYearSelector {
     /**
      * Injected by the tests: the Setup fiscal year cannot be changed from Apex. Two fields
@@ -47,13 +48,24 @@ public with sharing class FiscalYearSelector {
     }
 
     /**
-     * The month BarnCRM starts its own fiscal year in. This is deliberately the same call
-     * the rollup engine makes rather than a second reading of the setting, including its
-     * January default when the setting has never been touched: the number the check compares
-     * has to be the number the totals were actually computed from.
+     * The month BarnCRM starts its own fiscal year in, 1 through 12, defaulting to January when
+     * the setting has never been touched or holds something the platform cannot mean. The
+     * rollup engine (the Rollup Builder module, ADR-0125) reads this same method rather than the
+     * setting, so the number a check compares is the number the totals were computed from.
      */
+    @NamespaceAccessible
     public static Integer settingsFiscalYearStartMonth() {
-        return RollupDateWindow.fiscalYearStartMonth();
+        Object stored = SettingsService.getValue('Fiscal_Year_Start_Month__c');
+        if (stored == null) {
+            return 1;
+        }
+        Integer month;
+        try {
+            month = Integer.valueOf(String.valueOf(stored));
+        } catch (Exception ignored) {
+            return 1;
+        }
+        return month >= 1 && month <= 12 ? month : 1;
     }
 
     /**

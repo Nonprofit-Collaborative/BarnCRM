@@ -10,6 +10,8 @@ public with sharing class SettingsController {
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
     private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
+    /** The module a Setting Definition row belongs to when it names none. */
+    private static final String CORE_MODULE = 'Core';
     /** The Setup prerequisites the console can check, by the key settingsSetupNotes reads. */
     @TestVisible
     private static final String CHECK_FISCAL_YEAR = 'fiscalYear';
@@ -47,6 +49,9 @@ public with sharing class SettingsController {
         public String section;
         @AuraEnabled
         public String settingsObject;
+        /** The module the row belongs to (Core when the row names none), for a module's page. */
+        @AuraEnabled
+        public String module;
         @AuraEnabled
         public String component;
         @AuraEnabled
@@ -365,6 +370,9 @@ public with sharing class SettingsController {
         }
         SettingModel setting = new SettingModel();
         setting.settingsObject = settingsObject;
+        setting.module = String.isBlank(definition.Module__c)
+            ? CORE_MODULE
+            : definition.Module__c.trim();
         setting.key = isComponent ? definition.DeveloperName : definition.Setting_Key__c;
         setting.label = definition.MasterLabel;
         setting.description = definition.Description__c;

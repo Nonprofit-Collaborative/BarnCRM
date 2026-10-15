@@ -13,8 +13,10 @@
  * describe of a named object and puts every value in a bind variable (FilterValueBinder), so
  * nothing typed is ever concatenated into the query (plan Section 4.9, ADR-0047).
  */
+@NamespaceAccessible
 public with sharing class RollupFilterParser {
     /** Raised when a filter document cannot be turned into a where clause. */
+    @NamespaceAccessible
     public class RollupFilterException extends Exception {
     }
 
@@ -66,6 +68,7 @@ public with sharing class RollupFilterParser {
      * Renders a filter document as a where clause fragment, or an empty string when the document
      * is empty. The caller joins the result with any other fragment it has.
      */
+    @NamespaceAccessible
     public static String toWhereClause(String filterDocument) {
         return compile(filterDocument, null, null);
     }
@@ -75,6 +78,7 @@ public with sharing class RollupFilterParser {
      * only when its attribute is a date or a date and time, and quoted as text otherwise, so
      * `2026-01-01` in a text attribute is compared as text (ROLLUPS-15).
      */
+    @NamespaceAccessible
     public static String toWhereClause(String filterDocument, Schema.SObjectType entity) {
         return compile(filterDocument, null, entity);
     }
@@ -84,6 +88,7 @@ public with sharing class RollupFilterParser {
      * the last N days. Such a total changes as the date moves on, with no record saved
      * (ROLLUPS-8). A document that cannot be read compares nothing.
      */
+    @NamespaceAccessible
     public static Boolean usesRelativeDate(String filterDocument) {
         if (String.isBlank(filterDocument)) {
             return false;

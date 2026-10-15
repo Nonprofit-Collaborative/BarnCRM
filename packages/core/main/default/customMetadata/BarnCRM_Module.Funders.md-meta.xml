@@ -18,4 +18,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">40</value>
   </values>
+  <values>
+    <field>Requires__c</field>
+    <value xsi:type="xsd:string">Rollups;Giving</value>
+  </values>
 </CustomMetadata>

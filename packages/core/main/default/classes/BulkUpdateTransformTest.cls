@@ -66,7 +66,7 @@ private class BulkUpdateTransformTest {
 
     /** `count` contacts titled Volunteer, each with its own last name. */
     private static List<Contact> makeVolunteers(Integer count) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();
@@ -265,7 +265,7 @@ private class BulkUpdateTransformTest {
     @IsTest
     static void stepsAreRefusedWhenEmptyInvalidOnALookupOrNamingAnUnknownField() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             List<String> refused = new List<String>{
                 transform('Title', new List<Map<String, Object>>()),
                 transform('Title', new List<Map<String, Object>>{ step(DataTransform.OP_REPLACE) }),
@@ -295,7 +295,7 @@ private class BulkUpdateTransformTest {
     @IsTest
     static void aJobsDefinitionKeepsTheStepsAndTheFieldsTheyRead() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             BulkUpdateService.Plan checked = BulkUpdateService.plan(
                 VOLUNTEERS,
                 transform(

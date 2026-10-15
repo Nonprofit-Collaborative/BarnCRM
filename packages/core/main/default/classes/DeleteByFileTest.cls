@@ -26,7 +26,7 @@ private class DeleteByFileTest {
 
     /** `volunteers` contacts titled Volunteer and `staff` titled Staff, in name order. */
     private static List<Contact> makePeople(Integer volunteers, Integer staff) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();

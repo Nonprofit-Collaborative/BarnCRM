@@ -34,7 +34,7 @@ private class FindExportBatchTest {
     );
 
     private static void makePeople(Integer volunteers, Integer staff) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield, "Food" Bank');
         insert organization;
         List<Contact> people = new List<Contact>();

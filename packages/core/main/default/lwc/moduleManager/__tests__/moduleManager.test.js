@@ -131,6 +131,16 @@ describe('c-module-manager', () => {
     expect(row(element, 'Programs').querySelector('[data-id="no-install-link"]')).not.toBeNull();
   });
 
+  it('says which modules to install first for one that needs them', async () => {
+    const needing = state('NotInstalled');
+    needing.modules[1].installFirst = 'BarnCRM Rollup Builder';
+    getState.mockResolvedValue(needing);
+    const element = await build();
+
+    expect(row(element, 'Giving').querySelector('[data-id="install-first"]')).not.toBeNull();
+    expect(row(element, 'Volunteers').querySelector('[data-id="install-first"]')).toBeNull();
+  });
+
   it('turns a module off through Apex', async () => {
     const element = await build();
 

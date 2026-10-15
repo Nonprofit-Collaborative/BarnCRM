@@ -42,7 +42,7 @@ private class BulkDeleteUndoTest {
 
     /** `count` volunteers, deleted by a bulk delete run now; returns the job's Id. */
     private static Id deleteVolunteers(Integer count) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();
@@ -151,7 +151,7 @@ private class BulkDeleteUndoTest {
     static void householdsEmptiedByTheDeleteAreKeptAndGetTheirPeopleBack() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             List<Account> households = new List<Account>();
             for (Integer index = 0; index < 200; index++) {
                 households.add(HouseholdTestDataFactory.newHousehold('Tidied ' + index));

@@ -125,6 +125,7 @@ private class HubControllerTest {
             TestDataFactory.defaultSettings();
             Datetime finished = Datetime.now().addHours(-2);
             SeasonalAddressWriter.recordRun(finished, '3 moved in, 1 moved back, 0 failed.');
+            RollupEngineExtensions.extensionOverride = new StubEngine();
 
             Test.startTest();
             HubController.HomeModel model = HubController.getHomeModel();
@@ -142,16 +143,59 @@ private class HubControllerTest {
                 'Whether the nightly swap is scheduled'
             );
             Assert.isFalse(model.seasonalAddressStale, 'A run two hours ago is not stale');
+            Assert.isTrue(model.rollupsInstalled, 'The Rollup Builder module answers');
             Assert.areEqual(
-                RollupService.lastCalculated(),
+                STUB_LAST_CALCULATED,
                 model.rollupsLastCalculated,
                 'When the rollups last completed'
             );
-            Assert.areEqual(
-                RollupService.isStale(),
-                model.rollupsStale,
-                'and whether that is too long ago'
-            );
+            Assert.isTrue(model.rollupsStale, 'and whether that is too long ago');
+        }
+    }
+
+    @IsTest
+    static void withoutTheRollupBuilderModuleThereIsNoRollupTile() {
+        System.runAs(TestUsers.admin()) {
+            SetupAssistantTestExtension.useNone();
+            RollupEngineExtensions.noneForTest = true;
+
+            Test.startTest();
+            HubController.HomeModel model = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.isFalse(model.rollupsInstalled, 'No module, no tile');
+            Assert.isNull(model.rollupsLastCalculated, 'and nothing to show');
+            Assert.isFalse(model.rollupsStale, 'and no false alarm');
+        }
+    }
+
+    private static final Datetime STUB_LAST_CALCULATED = Datetime.newInstanceGmt(
+        2026,
+        10,
+        1,
+        2,
+        0,
+        0
+    );
+
+    /** Stands in for the Rollup Builder module's engine, which Core cannot name. */
+    private class StubEngine implements RollupEngineExtension {
+        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+        }
+        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+        }
+        public void startQueuedRecalculation() {
+        }
+        public void processPending() {
+        }
+        public Datetime lastCalculated() {
+            return STUB_LAST_CALCULATED;
+        }
+        public Boolean isStale() {
+            return true;
+        }
+        public Map<String, Set<String>> targetFieldsByObject() {
+            return new Map<String, Set<String>>();
         }
     }
 

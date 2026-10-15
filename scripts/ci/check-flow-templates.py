@@ -29,8 +29,14 @@ import sys
 import xml.etree.ElementTree as ET
 
 NS = "http://soap.sforce.com/2006/04/metadata"
-REGISTRY_GLOB = "packages/core/main/default/customMetadata/Automation_Registry.*.md-meta.xml"
-FLOW_DIR = "packages/core/main/default/flows"
+# Core and the Rollup Builder module, whose registry rows were Core's until ADR-0125
+# (0125-rollup-builder-module.md) moved the engine out.
+PACKAGES = ("core", "rollups")
+REGISTRY_GLOBS = [
+    f"packages/{package}/main/default/customMetadata/Automation_Registry.*.md-meta.xml"
+    for package in PACKAGES
+]
+FLOW_DIRS = [f"packages/{package}/main/default/flows" for package in PACKAGES]
 GUIDE = "docs/admin-guide/flow-templates.md"
 
 # Templates that copy no registry row. The rollup template for an administrator's own object
@@ -45,7 +51,7 @@ def q(tag):
 def registry_rows():
     """(DeveloperName, label, always_runs) for every Core registry record."""
     rows = []
-    for path in sorted(glob.glob(REGISTRY_GLOB)):
+    for path in sorted(path for pattern in REGISTRY_GLOBS for path in glob.glob(pattern)):
         name = os.path.basename(path)[len("Automation_Registry.") : -len(".md-meta.xml")]
         root = ET.parse(path).getroot()
         label = (root.findtext(q("label")) or "").strip()
@@ -75,7 +81,12 @@ def main():
     rows = registry_rows()
     names = {name for name, _, _ in rows}
     templates = {}
-    for path in sorted(glob.glob(os.path.join(FLOW_DIR, "Template_*.flow-meta.xml"))):
+    flow_paths = [
+        path
+        for flow_dir in FLOW_DIRS
+        for path in glob.glob(os.path.join(flow_dir, "Template_*.flow-meta.xml"))
+    ]
+    for path in sorted(flow_paths):
         templates[os.path.basename(path)[: -len(".flow-meta.xml")]] = path
 
     for flow, path in templates.items():

@@ -91,6 +91,85 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void givesAModuleSetToARolesHoldersAndTakesNothing() {
+        System.runAs(TestUsers.admin()) {
+            User reader = TestUsers.standardUser('Reader');
+            insert new PermissionSetAssignment(
+                AssigneeId = reader.Id,
+                PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Read_Only').Id
+            );
+            List<String> audience = new List<String>{ 'BarnCRM_Read_Only' };
+            // Core's tests can name no module set, so a tab set stands in for one.
+            TabAccessService.coreSetPrefix = 'Not_Core_';
+
+            Test.startTest();
+            Boolean noRoom = TabAccessService.giveToHolders(
+                TabAccessService.IMPORT_TAB,
+                audience,
+                0,
+                'Test'
+            );
+            Boolean more = TabAccessService.giveToHolders(
+                TabAccessService.IMPORT_TAB,
+                audience,
+                100,
+                'Test'
+            );
+            Boolean missing = TabAccessService.giveToHolders('No_Such_Set', audience, 100, 'Test');
+            Test.stopTest();
+
+            Assert.isTrue(noRoom, 'A budget of nothing leaves the role holder for later');
+            Assert.isFalse(more, 'Then everyone is done in one pass');
+            Assert.isFalse(missing, 'A set this org lacks is skipped');
+            Assert.isTrue(
+                tabSetsOf(reader.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Read Only role holder, through the group, gets the set'
+            );
+            Assert.isFalse(
+                tabSetsOf(userId(PRIYA)).contains(TabAccessService.IMPORT_TAB),
+                'Someone outside the audience does not'
+            );
+            Assert.isTrue(
+                tabSetsOf(userId(SAM)).contains(TabAccessService.IMPORT_TAB),
+                'And a set given by hand is never taken away'
+            );
+        }
+    }
+
+    @IsTest
+    static void givesNoneOfCoresOwnSetsAndNothingWithoutAnAudience() {
+        System.runAs(TestUsers.admin()) {
+            List<String> refused = new List<String>();
+
+            Test.startTest();
+            for (
+                String coreSet : new List<String>{
+                    'BarnCRM_Staff',
+                    'BarnCRM_Admin',
+                    'BarnCRM_Metadata_Admin',
+                    TabAccessService.IMPORT_TAB
+                }
+            ) {
+                try {
+                    TabAccessService.giveToHolders(
+                        coreSet,
+                        new List<String>{ 'BarnCRM_Read_Only' },
+                        100,
+                        'Test'
+                    );
+                } catch (IllegalArgumentException expected) {
+                    refused.add(coreSet);
+                }
+            }
+            Boolean noAudience = TabAccessService.giveToHolders('Module_Set', null, 100, 'Test');
+            Test.stopTest();
+
+            Assert.areEqual(4, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
+            Assert.isFalse(noAudience, 'No audience gives nothing and leaves nothing for later');
+        }
+    }
+
+    @IsTest
     static void theNightlyCheckIsScheduledOnceAndQueuesASync() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();

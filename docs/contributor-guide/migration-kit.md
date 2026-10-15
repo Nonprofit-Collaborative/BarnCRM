@@ -18,7 +18,7 @@ Nothing in the kit is packaged, and it never creates a package version.
 
 ## The mapping
 
-`build_mapping.py --packages core,giving,connect --output mapping.json` collects, for each
+`build_mapping.py --packages core,rollups,giving,connect --output mapping.json` collects, for each
 listed package:
 
 - every custom object, with its fields, except formula fields, auto-number fields, and objects

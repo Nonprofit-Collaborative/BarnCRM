@@ -14,6 +14,7 @@ public with sharing class NightlyJobs {
     /** The provider classes dependent packages register, in the order they are asked. */
     @NamespaceAccessible
     public static final List<String> PROVIDER_CLASSES = new List<String>{
+        'RollupsNightlyJobProvider',
         'GivingNightlyJobProvider',
         'ConnectNightlyJobProvider'
     };
@@ -34,7 +35,6 @@ public with sharing class NightlyJobs {
             return jobsOverride;
         }
         List<NightlyJob> jobs = new List<NightlyJob>{
-            new RollupJob(),
             new SeasonalAddressJob(),
             new ErrorDigestJob(),
             new ImportRowPurgeJob(),
@@ -132,21 +132,6 @@ public with sharing class NightlyJobs {
             ERROR_CONTEXT
         );
         return null;
-    }
-
-    /** The nightly rollup recalculation, started and stopped on the Rollups page. */
-    public class RollupJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobRollups;
-        }
-
-        public Boolean isScheduled() {
-            return RollupScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            RollupScheduler.start();
-        }
     }
 
     /** The seasonal address swap, started and stopped in the Addresses section. */

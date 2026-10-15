@@ -41,7 +41,7 @@ private class BulkDeleteServiceTest {
 
     /** `volunteers` contacts titled Volunteer and `staff` titled Staff. */
     private static void makePeople(Integer volunteers, Integer staff) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();
@@ -94,7 +94,7 @@ private class BulkDeleteServiceTest {
     @IsTest
     static void refusesTheObjectsBarnCrmAndSetupKeep() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             for (
                 String objectName : new List<String>{
                     'Import_Batch__c',
@@ -181,7 +181,7 @@ private class BulkDeleteServiceTest {
     @IsTest
     static void aJobsDefinitionHoldsTheQueryAndTheCountAndLeavesTheImportHistory() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             BulkDeleteService.Plan checked = BulkDeleteService.plan(VOLUNTEERS);
             String definition = checked.definition(37);
             BulkDeleteService.Plan again = BulkDeleteService.planFromDefinition(definition);

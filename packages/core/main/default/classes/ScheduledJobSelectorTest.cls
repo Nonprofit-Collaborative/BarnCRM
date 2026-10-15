@@ -41,7 +41,7 @@ private class ScheduledJobSelectorTest {
             Integer before = Limits.getQueries();
             Id found = ScheduledJobSelector.triggerIdByName(OTHER_JOB);
             Datetime next = ScheduledJobSelector.nextFireTime(OTHER_JOB);
-            Boolean rollups = RollupScheduler.isScheduled();
+            Boolean tidy = EmptyHouseholdTidyScheduler.isScheduled();
             Boolean addresses = SeasonalAddressScheduler.isScheduled();
             Datetime digest = ErrorDigestScheduler.nextRunAt();
             Integer used = Limits.getQueries() - before;
@@ -50,7 +50,7 @@ private class ScheduledJobSelectorTest {
             Assert.isNotNull(found, 'The job is found by its name');
             Assert.isNotNull(next, 'with its next run');
             Assert.areEqual(1, used, 'Five questions about scheduled jobs cost one query');
-            Assert.isNotNull(rollups, 'Each scheduler answers from the same read');
+            Assert.isNotNull(tidy, 'Each scheduler answers from the same read');
             Assert.isNotNull(addresses, 'So does this one');
             Assert.areEqual(
                 ScheduledJobSelector.nextFireTime(ErrorDigestScheduler.JOB_NAME),

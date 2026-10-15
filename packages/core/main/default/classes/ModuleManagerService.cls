@@ -12,9 +12,12 @@
  * Callers check `Manage_BarnCRM_Settings` before any method that changes something or counts
  * records (`ModuleManagerController`).
  */
+@NamespaceAccessible
 public with sharing class ModuleManagerService {
     public static final String STATUS_NOT_INSTALLED = 'NotInstalled';
+    @NamespaceAccessible
     public static final String STATUS_OFF = 'Off';
+    @NamespaceAccessible
     public static final String STATUS_ON = 'On';
 
     private static final String CORE = 'Core';
@@ -66,20 +69,28 @@ public with sharing class ModuleManagerService {
             'Stewardship_Plan_Template__c',
             'Tribute__c'
         },
+        'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
         'Connect' => new List<String>()
     };
 
     /** The permission set Turn on gives the person who turned the module on. */
     @TestVisible
     private static Map<String, String> adminPermissionSets = new Map<String, String>{
-        'Giving' => 'Giving_Admin'
+        'Giving' => 'Giving_Admin',
+        'Rollups' => 'Rollup_Builder_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */
     public class ModuleManagerException extends Exception {
     }
 
-    /** One row of the Module Manager. */
+    /**
+     * One row of the Module Manager. A module's tests read its own row (ADR-0017 rule 1). The
+     * fields carry `@AuraEnabled` only: the platform rejects `@NamespaceAccessible` on an
+     * `@AuraEnabled` field (see HealthCheckService), and the module tests read them as plain
+     * public fields on a row they get from the `@NamespaceAccessible` `getModules()`.
+     */
+    @NamespaceAccessible
     public class ModuleStatus {
         @AuraEnabled
         public String name;
@@ -97,6 +108,9 @@ public with sharing class ModuleManagerService {
         /** The module's own app, where its Settings tab lives, or null. */
         @AuraEnabled
         public String appUrl;
+        /** The modules to install before this one, by name shown, or null (ADR-0125 D3). */
+        @AuraEnabled
+        public String installFirst;
     }
 
     /** One line of the uninstall report: a kind of record and how many there are. */
@@ -111,6 +125,7 @@ public with sharing class ModuleManagerService {
     }
 
     /** The modules this org is offered, in the order the Setup Assistant lists them. */
+    @NamespaceAccessible
     public static List<ModuleStatus> getModules() {
         Set<String> off = turnedOff();
         List<ModuleStatus> rows = new List<ModuleStatus>();
@@ -121,6 +136,7 @@ public with sharing class ModuleManagerService {
             row.docsUrl = info.docsUrl;
             row.installUrl = info.installUrl;
             row.appUrl = info.appUrl;
+            row.installFirst = info.installFirst;
             row.canSwitch = info.present == true && info.name != CORE;
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED
@@ -130,7 +146,11 @@ public with sharing class ModuleManagerService {
         return rows;
     }
 
-    /** The modules listed as turned off, lower case. Read on every automation check. */
+    /**
+     * The modules listed as turned off, lower case. Read on every automation check, and by a
+     * module's own entry points that must stop while it is off.
+     */
+    @NamespaceAccessible
     public static Set<String> turnedOff() {
         Set<String> names = new Set<String>();
         String stored = SettingsService.getSettings().Modules_Turned_Off__c;
@@ -146,6 +166,7 @@ public with sharing class ModuleManagerService {
     }
 
     /** Stops an installed module's automation. Its records and switches are left as they are. */
+    @NamespaceAccessible
     public static void turnOff(String moduleName) {
         ModuleStatus row = switchable(moduleName);
         setTurnedOff(row.name, true);
@@ -154,11 +175,27 @@ public with sharing class ModuleManagerService {
     /**
      * Lets an installed module's automation run again, with each switch as it was, and creates
      * any switch row that is missing, which is Core's part of a module's post-install work.
+     * The rollup engine, when installed, then catches up on what it skipped while its module was
+     * off (ADR-0125 decision 9), through its seam; Core names no module class.
      */
+    @NamespaceAccessible
     public static void turnOn(String moduleName) {
         ModuleStatus row = switchable(moduleName);
         setTurnedOff(row.name, false);
         AutomationControl.ensureDefaults();
+        afterTurnedOn(row.name);
+    }
+
+    /** Tells the rollup engine a module is on again; a failure is logged, never in the way. */
+    private static void afterTurnedOn(String moduleName) {
+        try {
+            RollupEngineExtensionV2 engine = RollupEngineExtensions.findV2();
+            if (engine != null) {
+                engine.afterModuleTurnedOn(moduleName);
+            }
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, 'ModuleManagerService.turnOn');
+        }
     }
 
     /**

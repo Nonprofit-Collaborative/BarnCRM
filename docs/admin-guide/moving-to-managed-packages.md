@@ -48,15 +48,15 @@ had none).
 2. **Log the computer into the org.** Run `sf org login web --alias pilot` and sign in as the
    administrator. For the rehearsal, add `--instance-url https://test.salesforce.com`.
 3. **Build the mapping.** From the repository folder, run
-   `python3 scripts/migration/build_mapping.py --packages core,giving,connect --output mapping.json`,
+   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,connect --output mapping.json`,
    listing the BarnCRM packages you have installed. It prints how many kinds of record it will
    copy and which it leaves out, and why.
 4. **Write down your settings.** Open **BarnCRM Settings** and go through every section. Step 7
    saves a list of them for you too, but Salesforce may not let the kit read every one, so a
    screenshot of each section is your backup.
 5. **Stop the scheduled jobs.** A package cannot be removed while one of its jobs is scheduled.
-   In BarnCRM Settings: on **Rollups**, click **Stop the nightly recalculation**; on **Error
-   Log**, click **Stop**; on **Addresses**, under **Seasonal address swap**, stop the nightly
+   With Rollup Builder, in the **BarnCRM Rollup Builder** app, click **Stop the nightly
+   recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal address swap**, stop the nightly
    swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Connect, on
    **Opportunity mirror**, click **Stop nightly run**. If automation is paused, click **Resume
    automation**.
@@ -70,12 +70,13 @@ had none).
    each. The folder holds every person's details: keep it on an encrypted disk, never email it,
    and delete it at step 16.
 8. **Remove the pilot packages**, last installed first: Connect, then any other module, then
-   Giving, then Core. In Setup, **Installed Packages**, click **Uninstall** beside each one, or
+   Giving, then Rollup Builder, then Core. In Setup, **Installed Packages**, click **Uninstall** beside each one, or
    run `sf package uninstall --package <04t of that package> --target-org pilot --wait 30`
    (`sf package installed list --target-org pilot` shows the identifiers). If Salesforce refuses
    because one of your own reports, flows or fields uses a BarnCRM component, it lists them:
    note each one, delete it (after saving a copy if you need it), and try again.
-9. **Install the managed packages**, Core first, then Giving, then Connect and any other module:
+9. **Install the managed packages**, Core first, then Rollup Builder, then Giving, then Connect
+   and any other module:
    `sf package install --package <04t> --target-org pilot --security-type AdminsOnly --wait 30`.
 10. **Get ready to load.** Give yourself the **BarnCRM Admin** role again on the **Access** page.
     With Giving, also give yourself the Override Receipt Lock and Override Posting Lock
@@ -97,8 +98,8 @@ had none).
     differences" is the result you want. Each difference is listed with the record and field.
 13. **Put your settings back.** Re-enter every value from step 4 in BarnCRM Settings (the kit's
     list is `pilot-export/settings.csv`), then schedule again each job you stopped in step 5.
-14. **Finish.** Remove the two override permissions from yourself. Resume automation. On
-    **Rollups**, click **Recalculate all**; on the household naming settings, click **Recompute
+14. **Finish.** Remove the two override permissions from yourself. Resume automation. In the
+    **Rollup Builder**, click **Recalculate all**; on the household naming settings, click **Recompute
     all households**. Then run Health Check: it should find nothing new.
 15. **Put back your own customizations** from step 8: reports, flows and fields that used
     BarnCRM. If the namespace changed, their references to BarnCRM fields need the new names.

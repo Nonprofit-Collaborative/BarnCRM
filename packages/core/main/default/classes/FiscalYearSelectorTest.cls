@@ -39,17 +39,12 @@ private class FiscalYearSelectorTest {
         System.runAs(TestUsers.admin()) {
             SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
 
+            // The rollup engine reads this same method (RollupDateWindowTest asserts it), so the
+            // number Health Check compares is the number the totals were computed from.
             System.assertEquals(
                 7,
                 FiscalYearSelector.settingsFiscalYearStartMonth(),
                 'The setting is read back as the month it was set to.'
-            );
-            System.assertEquals(
-                RollupDateWindow.fiscalYearStartMonth(),
-                FiscalYearSelector.settingsFiscalYearStartMonth(),
-                'The number Health Check compares is the number Giving This Year was computed ' +
-                    'from. Reading the setting a second way here would let the check pass while the ' +
-                    'totals were still measured on another boundary.'
             );
         }
     }

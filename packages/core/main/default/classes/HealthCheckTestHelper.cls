@@ -10,6 +10,7 @@
  * yet is the one failure mode a test exists to prevent.
  */
 @IsTest
+@NamespaceAccessible
 public class HealthCheckTestHelper {
     /** The packaged role an administrator of BarnCRM is given (admin guide, Access). */
     private static final String ADMIN_PERMISSION_SET = HealthCheckService.PERMISSION_SET_ADMIN;
@@ -26,6 +27,7 @@ public class HealthCheckTestHelper {
      * (ADR-0021 keeps the audit trail in user mode on purpose). Without it these tests failed
      * on the audit row rather than on anything they were written to check.
      */
+    @NamespaceAccessible
     public static User mariaWithManageSettings() {
         List<CustomPermission> permissions = [
             SELECT Id
@@ -79,6 +81,7 @@ public class HealthCheckTestHelper {
      * to that is an administrator holding the packaged permission sets, so a check that
      * correctly answers "yes" reads as a broken gate.
      */
+    @NamespaceAccessible
     public static User priyaWithoutManageSettings() {
         User priya = newUser('priya');
         System.runAs(currentUser()) {

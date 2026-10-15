@@ -23,6 +23,11 @@
                         >{labels.learnMore}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
                     >
                 </div>
+                <template lwc:if={module.installFirstText}>
+                    <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="install-first">
+                        {module.installFirstText}
+                    </p>
+                </template>
                 <template lwc:if={canEdit}>
                     <div class="slds-var-m-top_x-small">
                         <template lwc:if={module.showInstall}>

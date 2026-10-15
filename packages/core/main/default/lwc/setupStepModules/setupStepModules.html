@@ -21,6 +21,11 @@
                         <span class="slds-assistive-text">{module.displayName} {labels.newTab}</span>
                     </a>
                 </template>
+                <template lwc:if={module.installFirstText}>
+                    <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="install-first">
+                        {module.installFirstText}
+                    </p>
+                </template>
             </li>
         </template>
     </ul>

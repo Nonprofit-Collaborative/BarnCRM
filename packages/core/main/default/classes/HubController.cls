@@ -40,6 +40,9 @@ public with sharing class HubController {
         public Integer stepsCompleted;
         @AuraEnabled
         public Integer stepsTotal;
+        /** True when the Rollup Builder module is installed; the rollups tile shows only then. */
+        @AuraEnabled
+        public Boolean rollupsInstalled;
         @AuraEnabled
         public Datetime rollupsLastCalculated;
         @AuraEnabled
@@ -97,6 +100,7 @@ public with sharing class HubController {
             model.stepsCompleted = 0;
             model.newErrorCount = 0;
             model.newErrorCountCapped = false;
+            model.rollupsInstalled = false;
             model.rollupsStale = false;
             model.seasonalAddressScheduled = false;
             model.seasonalAddressStale = false;
@@ -116,13 +120,20 @@ public with sharing class HubController {
     /**
      * "Rollups last completed", and whether the nightly run is overdue (plan Section 4.10).
      * Optional like the rest: an org where the rollup engine cannot answer loses a tile, not the
-     * page.
+     * page. Without the Rollup Builder module there is no tile (ADR-0125).
      */
     private static void readRollupFreshness(HomeModel model) {
+        model.rollupsInstalled = false;
+        model.rollupsStale = false;
         try {
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            if (engine == null) {
+                return;
+            }
+            model.rollupsInstalled = true;
             failIfTestSaysSo(PART_ROLLUPS);
-            model.rollupsLastCalculated = RollupService.lastCalculated();
-            model.rollupsStale = RollupService.isStale();
+            model.rollupsLastCalculated = engine.lastCalculated();
+            model.rollupsStale = engine.isStale();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             model.rollupsStale = false;

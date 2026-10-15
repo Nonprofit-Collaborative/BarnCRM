@@ -70,4 +70,15 @@ describe('c-setup-step-modules', () => {
     const names = element.shadowRoot.querySelectorAll('[data-id="module-name"]');
     expect(Array.from(names).map((name) => name.textContent)).toEqual(['Core', 'BarnCRM Giving']);
   });
+
+  it('says which modules to install first for one that is not here', () => {
+    const element = createElement('c-setup-step-modules', { is: SetupStepModules });
+    element.modules = [
+      { ...MODULES[0], installFirst: 'Ignored once here' },
+      { ...MODULES[1], installFirst: 'BarnCRM Rollup Builder' }
+    ];
+    document.body.appendChild(element);
+
+    expect(element.shadowRoot.querySelectorAll('[data-id="install-first"]')).toHaveLength(1);
+  });
 });

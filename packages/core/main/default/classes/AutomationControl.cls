@@ -193,10 +193,14 @@ public with sharing class AutomationControl {
     /**
      * Totals queued during the pause wait for a processor that the pause stopped from starting
      * (ROLLUPS-7). Resuming starts it; a failure is logged, never in the way of the resume.
+     * Without the Rollup Builder module nothing waits (ADR-0125).
      */
     private static void startWaitingRollups() {
         try {
-            RollupQueue.processPending();
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            if (engine != null) {
+                engine.processPending();
+            }
         } catch (Exception failed) {
             ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
         }

@@ -22,4 +22,8 @@
     <field>App_Name__c</field>
     <value xsi:type="xsd:string">Fundraising</value>
   </values>
+  <values>
+    <field>Requires__c</field>
+    <value xsi:type="xsd:string">Rollups</value>
+  </values>
 </CustomMetadata>

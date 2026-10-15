@@ -82,7 +82,8 @@ public class TestDataFactory {
 
     /**
      * A shipped registry entry, built in memory. Custom metadata cannot be inserted by a test,
-     * so tests hand these to `AutomationRegistrySelector.registryOverride`.
+     * so tests hand these to `AutomationRegistrySelector.registryOverride`, or, from another
+     * package, to `useRegistry`.
      */
     @NamespaceAccessible
     public static Automation_Registry__mdt registryEntry(String developerName, Boolean enabled) {
@@ -95,6 +96,16 @@ public class TestDataFactory {
             Execution_Order__c = 20,
             Enabled_By_Default__c = enabled
         );
+    }
+
+    /**
+     * Makes these in-memory rows the whole registry for the rest of the test, in place of the
+     * shipped one. A module's test cannot set Core's private override itself (ADR-0017 rule 1).
+     */
+    @NamespaceAccessible
+    public static void useRegistry(List<Automation_Registry__mdt> rows) {
+        AutomationRegistrySelector.registryOverride = rows;
+        AutomationRegistrySelector.clearCache();
     }
 
     /**

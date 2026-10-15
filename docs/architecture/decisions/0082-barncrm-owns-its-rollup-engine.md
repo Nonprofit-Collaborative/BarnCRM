@@ -3,6 +3,9 @@
 **Status:** Accepted (owner decision, Brandon, 2026-10-12: decisions D1 to D9 of the rollup
 proposal, with amendments A1 and A2). Supersedes ADR-0015. Amends ADR-0011: its reuse-first
 rule does not apply to the rollup aggregation core.
+**Amended by:** ADR-0125 (`0125-rollup-builder-module.md`): the engine this ADR describes, with
+the Rollup Builder, is the BarnCRM Rollup Builder module (`packages/rollups`), not Core; Core
+reaches it only through `RollupEngineExtension` and the Health Check and nightly job seams.
 **Date:** 2026-10-12
 **Source:** owner decision 2026-10-12; plan Section 4.10; builds on ADR-0011, ADR-0015,
 ADR-0021, ADR-0022 and ADR-0040

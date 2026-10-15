@@ -130,6 +130,52 @@ private class ModuleManagerServiceTest {
         }
     }
 
+    /** An engine with the second seam, recording the modules it is told are on again. */
+    private class TurnOnEngine implements RollupEngineExtension, RollupEngineExtensionV2 {
+        public List<String> turnedOn = new List<String>();
+        public void afterModuleTurnedOn(String moduleName) {
+            turnedOn.add(moduleName);
+        }
+        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+        }
+        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+        }
+        public void startQueuedRecalculation() {
+        }
+        public void processPending() {
+        }
+        public Datetime lastCalculated() {
+            return null;
+        }
+        public Boolean isStale() {
+            return false;
+        }
+        public Map<String, Set<String>> targetFieldsByObject() {
+            return new Map<String, Set<String>>();
+        }
+    }
+
+    @IsTest
+    static void turningOnTellsTheRollupEngine() {
+        System.runAs(TestUsers.admin()) {
+            volunteersInstalled();
+            TurnOnEngine engine = new TurnOnEngine();
+            RollupEngineExtensions.extensionOverride = engine;
+            ModuleManagerService.turnOff(MODULE);
+
+            Test.startTest();
+            ModuleManagerService.turnOn(MODULE);
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<String>{ MODULE },
+                engine.turnedOn,
+                'Turn on tells the engine which module is on again, so it can catch up'
+            );
+            Assert.isTrue(ModuleManagerService.turnedOff().isEmpty(), 'And the module is on');
+        }
+    }
+
     @IsTest
     static void anAutomationThatAlwaysRunsIgnoresTurningOff() {
         System.runAs(TestUsers.admin()) {

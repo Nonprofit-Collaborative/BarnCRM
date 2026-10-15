@@ -114,9 +114,12 @@ public with sharing class DataProtectedFields {
         'lastreferenceddate'
     };
 
-    /** Set only by tests: the Rollup Definitions to read in place of the org's. */
+    /**
+     * Set only by tests: the rollup target fields by object to read in place of the ones the
+     * Rollup Builder module reports (`RollupEngineExtension.targetFieldsByObject`).
+     */
     @TestVisible
-    private static List<Rollup_Definition__c> definitionsOverride;
+    private static Map<String, Set<String>> targetsOverride;
 
     /**
      * Set only by tests: bookkeeping objects (lower-case local names) to treat as the org's own
@@ -289,32 +292,53 @@ public with sharing class DataProtectedFields {
 
     /**
      * The target fields of every Rollup Definition, active or not, on the object of this name,
-     * in lower case, as written and without a namespace, so either form matches.
+     * in lower case, as written and without a namespace, so either form matches. The Rollup
+     * Builder module reports them; without it there are none (ADR-0125).
      */
     private static Set<String> rollupTargetsOf(String objectName) {
         if (rollupTargets == null) {
             rollupTargets = new Map<String, Set<String>>();
-            List<Rollup_Definition__c> definitions = definitionsOverride != null
-                ? definitionsOverride
-                : RollupSelector.selectAll();
-            for (Rollup_Definition__c definition : definitions) {
-                if (
-                    String.isBlank(definition.Target_Object__c) ||
-                    String.isBlank(definition.Target_Field__c)
-                ) {
+            Map<String, Set<String>> reported = targetsOverride;
+            if (reported == null) {
+                reported = reportedRollupTargets();
+            }
+            for (String objectKey : reported.keySet()) {
+                if (String.isBlank(objectKey) || reported.get(objectKey) == null) {
                     continue;
                 }
-                String target = localName(definition.Target_Object__c.trim().toLowerCase());
+                String target = localName(objectKey.trim().toLowerCase());
                 if (!rollupTargets.containsKey(target)) {
                     rollupTargets.put(target, new Set<String>());
                 }
-                String field = definition.Target_Field__c.trim().toLowerCase();
-                rollupTargets.get(target).add(field);
-                rollupTargets.get(target).add(localName(field));
+                for (String fieldName : reported.get(objectKey)) {
+                    if (String.isBlank(fieldName)) {
+                        continue;
+                    }
+                    String field = fieldName.trim().toLowerCase();
+                    rollupTargets.get(target).add(field);
+                    rollupTargets.get(target).add(localName(field));
+                }
             }
         }
         String key = localName(objectName.toLowerCase());
         return rollupTargets.containsKey(key) ? rollupTargets.get(key) : new Set<String>();
+    }
+
+    /**
+     * What the Rollup Builder module reports, or nothing when it is absent or fails. A failing
+     * module is logged and costs only its targets, as at every other engine seam caller.
+     */
+    private static Map<String, Set<String>> reportedRollupTargets() {
+        try {
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            Map<String, Set<String>> reported = engine == null
+                ? null
+                : engine.targetFieldsByObject();
+            return reported == null ? new Map<String, Set<String>>() : reported;
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'DataProtectedFields.rollupTargetsOf');
+            return new Map<String, Set<String>>();
+        }
     }
 
     /**

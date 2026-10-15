@@ -160,7 +160,7 @@ class RealSourceTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(build_mapping.HERE, "overrides.json"), encoding="utf-8") as handle:
             self.overrides = json.load(handle)
-        self.mapping = build_mapping.build(["core", "giving", "connect"], self.overrides)
+        self.mapping = build_mapping.build(["core", "rollups", "giving", "connect"], self.overrides)
 
     def test_every_override_names_a_real_object(self):
         names = {o["name"] for o in self.mapping["objects"]} | {s["name"] for s in self.mapping["skipped"]}

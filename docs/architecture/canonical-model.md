@@ -924,13 +924,14 @@ Added by the v0.2 features: the rollup engine (C-13) and the import framework (C
 Setup Assistant (C-12) keys arrived early and are listed in the table above, where
 `Setup_Steps_Completed__c` and `Setup_Steps_Skipped__c` are what was planned here as
 `Setup_Assistant_Steps_Complete__c`, and the two default record identifiers shipped with the
-assistant that wrote them (they are Giving keys from v0.6, Section 21A).
+assistant that wrote them (they are Giving keys from v0.6, Section 21A). The two rollup keys
+published here, `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved with the engine to
+the BarnCRM Rollup Builder module's own `Rollup_Settings__c` (Section 14B, ADR-0125), with
+their API names and definitions unchanged.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
-| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
-| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 | `Import_Trial_Rows__c` | integer | 25 | How many of a file's first rows a trial import commits before the rest (R-IB16); the wizard starts from it and the administrator can change it per file. Held between 1 and 2,000. |
 
@@ -1282,9 +1283,9 @@ never materialized. Core ships the records, because a module that is not install
 announce itself. Whether a module is installed is still detected (`ModuleDetectionService`);
 this type says only which editions offer it, how to tell it is here, and where its
 description, installer and app are. A future module, or a Core feature that becomes a module
-(such as BarnCRM Rollup Builder, record `Rollups`), needs only a new record. The rollup
-module's ADR proposes a `Requires__c` field here (a module that must be installed first); it
-is added with that work.
+(such as BarnCRM Rollup Builder, record `Rollups`), needs only a new record. `Requires__c`
+names the modules a module's package needs installed first (ADR-0125
+`0125-rollup-builder-module.md`, D3).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1296,6 +1297,7 @@ is added with that work.
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it; empty means no link yet. |
+| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Connect). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Rules
 
@@ -1339,7 +1341,9 @@ configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
 administrator creates and edits these with a filter builder, and never types SOQL (plan
 Section 2.3), in the Rollup Builder, a tab of its own where every rollup, shipped or
 admin-made, is created and edited (`decisions/0082-barncrm-owns-its-rollup-engine.md`). The
-Rollups page of the settings console lists them with the same switches and links to it.
+Rollups section of the settings console opens it. The engine, this entity, the Rollup Queue
+(Section 14A) and the shipped defaults type belong to the BarnCRM Rollup Builder module, not
+Core (`decisions/0125-rollup-builder-module.md`).
 
 ### Attributes
 
@@ -1476,7 +1480,7 @@ change. By default a save marks the target records (R-R11), writes them to the R
 a minute; a bulk change (an import, a data loader run, a large update) goes the same way and
 finishes within minutes (ADR-0098
 `0098-real-time-rollups-recalculated-just-after-the-save.md`). With
-`Rollup_Processing__c` set to In_Save (Section 12), a normal save recalculates in the same save
+`Rollup_Processing__c` set to In_Save (Section 14B), a normal save recalculates in the same save
 instead, when the queries it is planned to spend fit what the transaction has left; a bulk
 change, a save already running in the background, or one without the room is queued. Scheduled (shown as Every night)
 recalculates in the nightly full run. Both (shown as Both (recommended)) does the first and
@@ -1668,8 +1672,12 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
-  target or the source attribute, so switching a definition on or off never re-checks it.
-- **Settings keys:** `Fiscal_Year_Start_Month__c`, `Rollup_Mode_Default__c` (Section 12).
+  target or the source attribute, so switching a definition on or off never re-checks it. It
+  pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
+  9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
+  on every run, so no total is written wrong.
+- **Settings keys:** `Fiscal_Year_Start_Month__c` (Section 12), `Rollup_Mode_Default__c`
+  (Section 14B).
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
   Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
   how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
@@ -1872,6 +1880,30 @@ uncharged, and are routed again.
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
+
+---
+
+## 14B. Rollup Settings
+
+### Definition
+
+The BarnCRM Rollup Builder module's own org-wide settings (ADR-0125,
+`0125-rollup-builder-module.md`, decision 6). ADR-0017 gives every module package its own
+protected hierarchy custom setting, so the two rollup keys Core held on `BarnCRM_Settings__c`
+(Section 12) moved here with the engine, with their API names and definitions unchanged. The
+values an org stored on the Core object are not carried over: an org that changed either one
+sets it again. Their Setting Definition rows name this object in `Settings_Object__c`, so the
+settings console shows them in its Rollups section as before.
+
+- **Custom setting:** `Rollup_Settings__c`, hierarchy, protected.
+- **Defaults (ADR-0035):** both keys are text, so the field default only fills a record the
+  platform creates; the readers in `RollupService` treat blank, and anything outside the
+  allowed values, as the shipped value.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 
 ---
 
@@ -7248,6 +7280,9 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Rollup queue row budget (ADR-0116, 25,000 row gift import scale test). No object or field added. R-RQ6: a record's estimate reads the stored totals of every active COUNT definition on its entity, not only those the run calculates, so a large parent whose entries name only a SUM or MAX still goes to the batch. R-RQ3: rows a run's recalculation of one entity read count against its row budget in place of their estimate. Before this two Rollup Queue runs stopped on "Too many query rows: 50001" while a fund's allocations rose to 25,000. |
 | v0.6 | 2026-10-14 | Rollup queue row ceiling (ADR-0116, 25,000 row scale rerun). No object or field added. R-RQ6: a queue run measures what each query of an entity's recalculation read, and before a further query would pass four fifths of the query row limit it stops, writes nothing and sends that entity's records to the large parent batch. Before this a fund whose stored count was stale (3,200 of 26,102 allocations) was estimated small, its second query stopped four runs on "Too many query rows: 50001", and it was narrowing towards Failed. |
 | v0.6 | 2026-10-14 | Editions, features, modules and first-run setup (ADR-0124, `0124-edition-gates-visibility.md`). New field `Features_Turned_On__c` on BarnCRM Settings (the Core features turned on; one-way). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`, `Probe_Object__c`, `App_Name__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
+| v0.6 | 2026-10-14 | The rollup engine leaves Core for the BarnCRM Rollup Builder module (ADR-0125, `0125-rollup-builder-module.md`). No object or field added or renamed. Rollup Definition, Rollup Queue, Rollup Run Lock, `Rollup_Queue_Ready__e` and Rollup Definition Default (shipped default) move to `packages/rollups` with their API names unchanged (Section 32). Core reaches the engine only through `RollupEngineExtension`. `Rollup_Mode_Default__c` and `Rollup_Processing__c` stay on `BarnCRM_Settings__c` until the module's own settings object is added. |
+| v0.6 | 2026-10-14 | Rollup Settings added as Section 14B (ADR-0125, decision 6): `Rollup_Settings__c`, the BarnCRM Rollup Builder module's protected hierarchy custom setting, holds `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved from `BarnCRM_Settings__c` (Section 12) with their API names and definitions unchanged. Stored values are not carried over. |
+| v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Connect `Rollups;Giving`. |
 
 ---
 ## 32. Entity ownership by package
@@ -7266,10 +7301,12 @@ included; standard objects the packages extend are named by the entity that gove
 | BarnCRM Settings | Core | v0.1, extended v0.2, v0.3, v0.5 and v0.6 | 12 |
 | Naming Pattern (shipped default) | Core | v0.1 | 13 |
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
-| Rollup Definition | Core | v0.2 | 14 |
-| Rollup Queue | Core | v0.6 (rollup engine) | 14A |
-| Rollup Run Lock | Core | v0.6 (rollup engine) | 14A |
-| Rollup Definition Default (shipped default) | Core | v0.2 | 13 |
+| Rollup Definition | BarnCRM Rollup Builder (Core until ADR-0125) | v0.2, moved 2026-10-14 | 14 |
+| Rollup Queue | BarnCRM Rollup Builder (Core until ADR-0125) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Run Lock | BarnCRM Rollup Builder (Core until ADR-0125) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Queue Ready (platform event) | BarnCRM Rollup Builder (Core until ADR-0125) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Definition Default (shipped default) | BarnCRM Rollup Builder (Core until ADR-0125) | v0.2, moved 2026-10-14 | 13 |
+| Rollup Settings | BarnCRM Rollup Builder | v0.6, keys from v0.2 (ADR-0125) | 14B |
 | Import Template | Core | v0.2 | 15 |
 | Import Template Default (shipped default) | Core | v0.2 | 13 |
 | Import Batch | Core | v0.2 | 16 |

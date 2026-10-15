@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default rollup mode</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Rollup_Mode_Default__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Rollup_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">Real-time:Instantly;Scheduled:Every night;Both:Both (recommended)</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">How a newly created rollup starts out. Instantly updates the number as records are saved, Every night updates it in the nightly run, Both does the first and checks it again every night.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+</CustomMetadata>

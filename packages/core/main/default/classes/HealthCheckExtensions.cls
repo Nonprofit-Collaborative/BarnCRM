@@ -12,10 +12,12 @@
 public with sharing class HealthCheckExtensions {
     /**
      * The class names dependent packages register to add findings, in the order they are asked:
-     * Giving's (G-20 follow-up), then Connect's, for its nightly mirror run (X-01).
+     * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
+     * Connect's, for its nightly mirror run (X-01).
      */
     @NamespaceAccessible
     public static final List<String> EXTENSION_CLASSES = new List<String>{
+        'RollupsHealthCheckExtension',
         'GivingHealthCheckExtension',
         'ConnectHealthCheckExtension'
     };
@@ -55,6 +57,21 @@ public with sharing class HealthCheckExtensions {
             }
         }
         return byKey;
+    }
+
+    /**
+     * The installed extensions that also offer fixes (`HealthCheckFixExtension`), in the order
+     * `findAll` lists them. Core asks these only for a fix key none of its own fixes has.
+     */
+    @NamespaceAccessible
+    public static List<HealthCheckFixExtension> fixExtensions() {
+        List<HealthCheckFixExtension> fixers = new List<HealthCheckFixExtension>();
+        for (HealthCheckExtension extension : findAll().values()) {
+            if (extension instanceof HealthCheckFixExtension) {
+                fixers.add((HealthCheckFixExtension) extension);
+            }
+        }
+        return fixers;
     }
 
     private static HealthCheckExtension resolve(String className) {

@@ -58,6 +58,13 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      */
     private static final Integer ROLLUP_WRITE_SECONDS = 5;
 
+    /**
+     * The freshness stamp a rollup writes with its totals (canonical model, Rollups Last
+     * Calculated). Named here, not read from the engine, because the engine is the Rollup
+     * Builder module, which Core may not name (ADR-0125); an org without it has no stamp.
+     */
+    private static final String ROLLUP_STAMP_FIELD = 'Rollups_Last_Calculated__c';
+
     /** Children never counted as something a record gained: the import's own bookkeeping. */
     private static final Set<String> NOT_GAINED = new Set<String>{
         'import_row__c',
@@ -1058,7 +1065,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      * null where it has none. Read in system mode, so the undo's own access does not matter.
      */
     private static String rollupStampField(Map<String, Schema.SObjectField> fields) {
-        Schema.SObjectField stamp = fields.get(RollupService.FRESHNESS_FIELD);
+        Schema.SObjectField stamp = fields.get(ROLLUP_STAMP_FIELD);
         if (stamp == null) {
             return null;
         }

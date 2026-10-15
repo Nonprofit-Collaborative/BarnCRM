@@ -25,6 +25,7 @@ public with sharing class JobNotifier {
     public static final String SECTION_GENERAL = 'General';
     public static final String SECTION_HOUSEHOLDS = 'Households';
     public static final String SECTION_ADDRESSES = 'Addresses';
+    @NamespaceAccessible
     public static final String SECTION_ROLLUPS = 'Rollups';
     public static final String SECTION_HEALTH = 'Health';
 

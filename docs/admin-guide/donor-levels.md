@@ -12,7 +12,7 @@ Each donor record also keeps the level they were on before and the date they mov
 view away.
 
 A level is a label on a total you already have. It reads the giving total that appears on
-the same record, the one the Rollups page maintains, so a donor's level and the number
+the same record, the one the Rollup Builder maintains, so a donor's level and the number
 printed next to it can never disagree.
 
 ## How to turn it on
@@ -118,4 +118,4 @@ mean it. If you want a ladder that never resets, the source is **Total giving**.
 
 **Wanting a window we do not offer, such as the last twelve months.** A level can only be
 measured on a total BarnCRM already keeps. If you need a different window, add the
-rollup you want on the Rollups page first; the level source then has a number to read.
+rollup you want in the Rollup Builder first; the level source then has a number to read.

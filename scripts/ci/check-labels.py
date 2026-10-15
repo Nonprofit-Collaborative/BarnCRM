@@ -10,8 +10,9 @@ value 1 to 1000.
 
 Translation readiness (v0.11): a translator sees the short description beside the value and
 nothing else, so a Core label with placeholders must say in its description what each one
-holds, writing each as it appears in the value ("{0} is the count"). Giving and Connect
-join PLACEHOLDER_PACKAGES once their labels are swept.
+holds, writing each as it appears in the value ("{0} is the count"). The Rollup Builder
+module's labels were Core's and were swept with them. Giving and Connect join
+PLACEHOLDER_PACKAGES once their labels are swept.
 """
 
 import glob
@@ -22,7 +23,7 @@ import sys
 LABEL = re.compile(r"<labels>(.*?)</labels>", re.DOTALL)
 LIMITS = {"fullName": 80, "shortDescription": 80, "value": 1000}
 PLACEHOLDER = re.compile(r"\{\d+\}")
-PLACEHOLDER_PACKAGES = {"core"}
+PLACEHOLDER_PACKAGES = {"core", "rollups"}
 
 
 def text_of(block, tag):

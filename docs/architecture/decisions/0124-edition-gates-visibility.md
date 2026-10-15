@@ -29,7 +29,7 @@ Terms (owner, 2026-10-14): a **feature** is installed with Core and is turned on
 **module** is a separate package, not installed with Core, installed from BarnCRM Settings,
 Modules, and named "BarnCRM" plus its name: BarnCRM Rollup Builder (both editions), BarnCRM
 Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect. Rollup
-Builder becomes a module (its own decision record, rollup-builder-module, draft #417); its package split is
+Builder becomes a module (its own decision record, ADR-0125); its package split is
 separate work, and BarnCRM Giving will depend on it.
 
 ## Decision
@@ -46,7 +46,7 @@ separate work, and BarnCRM Giving will depend on it.
   editions that offer it, its label, its README folder, its installer version, an optional
   probe object (so BarnCRM Rollup Builder, record `Rollups`, counts as installed while its
   objects still ship in Core) and its app name. A module both editions offer needs only a
-  record. A `Requires__c` field (proposed by the rollup-builder-module ADR, so Giving can say
+  record. A `Requires__c` field (proposed by ADR-0125, so Giving can say
   "install Rollup Builder first") fits the same type and is left to that work.
 - **Modules section.** Modules get their own BarnCRM Settings section, **Modules** (the Module
   Manager, ADR-0073), not General. It lists the modules the edition offers: Not installed with

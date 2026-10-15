@@ -5,7 +5,11 @@
  * it and tell an administrator what it says. Acting on a finding needs the
  * Manage_BarnCRM_Settings custom permission, checked here rather than trusted from the
  * component.
+ *
+ * `applyFix` is also called by a module's tests, which press a fix the module owns the way the
+ * panel does (ADR-0125 `0125-rollup-builder-module.md`).
  */
+@NamespaceAccessible
 public with sharing class HealthCheckController {
     /**
      * The whole report: findings, org shape, current and recommended mode.
@@ -108,6 +112,18 @@ public with sharing class HealthCheckController {
      */
     @AuraEnabled
     public static HealthCheckService.Report applyFix(String fixKey, List<String> expectedScope) {
+        return applyFixFor(fixKey, expectedScope);
+    }
+
+    /**
+     * The same fix as applyFix, for a module package's Apex. NamespaceAccessible is not paired
+     * with AuraEnabled on one method, so module callers use this one.
+     *
+     * @param fixKey which fix, one of the FIX_KEY constants on HealthCheckService
+     * @param expectedScope the fix scope the confirmed finding carried
+     */
+    @NamespaceAccessible
+    public static HealthCheckService.Report applyFixFor(String fixKey, List<String> expectedScope) {
         requireManageSettings();
         String fixLabel = fixLabel(fixKey);
         if (fixLabel == null) {
@@ -139,9 +155,6 @@ public with sharing class HealthCheckController {
 
     /** The button label of a fix, which also names it in the change history; null if unknown. */
     private static String fixLabel(String fixKey) {
-        if (HealthCheckService.FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)) {
-            return System.Label.Core_HealthCheck_RollupsMissingFix;
-        }
         if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
             return System.Label.Core_HealthCheck_SwitchesMissingFix;
         }
@@ -154,11 +167,16 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             return System.Label.Core_HealthCheck_InactiveOwnerJobsFix;
         }
-        return null;
+        HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
+        return owner == null ? null : owner.fixLabel(fixKey);
     }
 
     /** Runs the fix and returns the sentence that says what it did. */
     private static String runFix(String fixKey, List<String> scope) {
+        HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
+        if (owner != null) {
+            return owner.runFix(fixKey, scope);
+        }
         if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             List<String> stoppedOnly = NightlyJobs.rescheduleAsRunningUser(scope);
             List<String> again = new List<String>();
@@ -193,18 +211,7 @@ public with sharing class HealthCheckController {
             System.Label.Core_HealthCheck_FixCreated,
             new List<Object>{ String.join(scope, ', ') }
         );
-        if (HealthCheckService.FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)) {
-            List<String> skipped = RollupService.skippedDefaultNames();
-            RollupService.ensureDefaults();
-            if (!skipped.isEmpty()) {
-                outcome +=
-                    ' ' +
-                    String.format(
-                        System.Label.Core_HealthCheck_RollupsSkippedDetail,
-                        new List<Object>{ String.join(skipped, ', ') }
-                    );
-            }
-        } else if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
+        if (HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES.equals(fixKey)) {
             AutomationControl.ensureDefaults();
         } else {
             ImportTemplateService.materializeDefaults();

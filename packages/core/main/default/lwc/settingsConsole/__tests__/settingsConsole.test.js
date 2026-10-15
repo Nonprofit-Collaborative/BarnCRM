@@ -428,6 +428,45 @@ describe('c-settings-console', () => {
     expect(notes.section).toBe('General');
   });
 
+  it("shows only a module's rows, and no search, on that module's own page", async () => {
+    const row = (key, section, module) => ({
+      key,
+      label: key,
+      description: null,
+      dataType: 'Text',
+      section,
+      module,
+      component: null,
+      helpUrl: null,
+      value: 'x',
+      checked: false,
+      options: []
+    });
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        { name: 'General', settings: [row('Fiscal_Year_Start_Month__c', 'General', 'Core')] },
+        {
+          name: 'Rollups',
+          settings: [
+            row('Rollup_Mode_Default__c', 'Rollups', 'Rollups'),
+            row('Rollup_Processing__c', 'Rollups', 'Rollups')
+          ]
+        }
+      ]
+    });
+    const element = createElement('c-settings-console', { is: SettingsConsole });
+    element.module = 'Rollups';
+    document.body.appendChild(element);
+    await settle();
+
+    const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item');
+    expect(navItems).toHaveLength(1);
+    expect(navItems[0].name).toBe('Rollups');
+    expect(element.shadowRoot.querySelectorAll('lightning-input')).toHaveLength(2);
+    expect(element.shadowRoot.querySelector('c-settings-search')).toBeNull();
+  });
+
   it('offers a module its own page instead of trying to render it', async () => {
     const element = build();
     openSection('Giving');

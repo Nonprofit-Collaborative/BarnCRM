@@ -48,6 +48,9 @@ jobs:
       - name: Check standard object references
         run: bash scripts/ci/check-standard-objects.sh
 
+      - name: Check Core names no module class or component
+        run: python3 scripts/ci/check-core-names-no-module.py
+
       - name: Check Person Account fields are reached only by name
         run: python3 scripts/ci/check-person-account-fields.py
 
@@ -98,6 +101,9 @@ jobs:
 
       - name: Check every Apex class states its sharing and every query and DML its access mode
         run: python3 scripts/ci/check-apex-access-modes.py
+
+      - name: Check no @AuraEnabled field is also @NamespaceAccessible
+        run: python3 scripts/ci/check-aura-namespace-accessible.py
 
       - name: Check every Apex test runs as a user it creates, not as the deploying user
         run: python3 scripts/ci/check-tests-run-as.py
@@ -248,7 +254,7 @@ jobs:
       - name: Give the test user the packaged admin roles
         if: steps.check.outputs.enabled == 'true'
         run: |
-          for ps in BarnCRM_Admin Giving_Admin; do
+          for ps in BarnCRM_Admin Rollup_Builder_Admin Giving_Admin; do
             sf org assign permset --name "$ps" --target-org testorg --json > assign.json || true
             if jq -e '.result.failures[]? | select(.message | test("Duplicate") | not)' assign.json > /dev/null; then
               cat assign.json

@@ -4,14 +4,15 @@
 
 Rollups are the totals that appear on a household, a person, an organization, or another
 record without anyone adding them up: a count, a sum, a first or last date, a largest
-value. BarnCRM Core runs the rollup engine; the totals themselves are shipped by the
-modules that own the records being counted, and with the Giving module installed they
+value. The rollup engine is its own module, **BarnCRM Rollup Builder**, offered in both
+editions and needed by Giving; without it BarnCRM keeps no totals. The totals themselves are
+shipped by the modules that own the records being counted, and with the Giving module installed they
 include total giving, gift counts and dates, pledge balances and what a fund and an appeal
 have raised.
 
 The member count on a household is not one of them. It looks like a rollup and it is kept
 up to date for you, but it is maintained by the household automation every time somebody
-joins or leaves, so it is not on the Rollups page and Recalculate does not touch it. If a
+joins or leaves, so it is not in the Rollup Builder and Recalculate does not touch it. If a
 member count looks wrong, the Households page is where to fix it.
 
 BarnCRM calculates them for you and shows you when each one was last calculated, so
@@ -21,8 +22,8 @@ looking fresh.
 
 ## What BarnCRM calculates for you (with Giving)
 
-This section applies only when the Giving module is installed. Core on its own ships no
-totals, so its Rollups page lists only rollups you add yourself.
+This section applies only when the Giving module is installed. The Rollup Builder module on
+its own ships no totals, so without Giving it lists only rollups you add yourself.
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -91,16 +92,19 @@ about a number that looks wrong:
 
 ## How to turn it on
 
-Most of it is already on. Installing a module creates its rollups, active and ready to
-calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
-without touching a rollup you have changed. An org with Core alone starts with no shipped
-totals.
+Install the **BarnCRM Rollup Builder** module after Core; Giving cannot be installed without
+it. Installing it gives you, the installer, the **Rollup Builder Admin** permission set.
+
+After that most of it is already on. Installing a module creates its rollups, active and ready
+to calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
+without touching a rollup you have changed. An org with the Rollup Builder and no Giving starts
+with no shipped totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. Open the **BarnCRM** app and choose the **BarnCRM Settings** tab.
-2. Choose **Rollups** in the left navigation. You should see every total listed above, one
-   row each.
+1. From the App Launcher, open the **BarnCRM Rollup Builder** app; it opens on the **Rollup
+   Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
+2. You should see every total listed above, one row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
    is scheduled for 2:00 AM."
 
@@ -123,7 +127,9 @@ button. Clearing the **Active** box is the durable way to say no to a total: an 
 rollup stays inactive across every upgrade, and the values it has already calculated stay
 on the records.
 
-Three settings on the same page change how every rollup behaves:
+Three settings in **BarnCRM Settings** change how every rollup behaves: the first is in the
+**General** section, the other two in the **Rollups** section. The **Rollup Settings** tab of
+the **BarnCRM Rollup Builder** app shows the same two Rollups settings on their own.
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
   begin. Choose the month your fiscal year starts from the list. Changing it and clicking
@@ -137,8 +143,8 @@ Three settings on the same page change how every rollup behaves:
   it](#just-after-the-save-or-during-it) below.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
-the Rollups page still opens and still shows every total and its last calculated time; the
-controls are simply read only.
+the Rollup Builder page still opens and still shows every total and its last calculated
+time; the controls are simply read only.
 
 ## When a total is recalculated: the three modes
 
@@ -187,8 +193,8 @@ contacts, then all funds), and calculate all of a record's totals together:
 - **A record is saved only when one of its totals changed.** Its **Rollups last calculated**
   time then moves to the time of that run. A record whose totals were already right is not
   saved, so it keeps its earlier time: the run checked it and found nothing to change. The
-  **Last calculated** time on the Rollups page is what tells you the run happened.
-- **The Rollups page marks a rollup calculated when the whole run has finished**, not when it
+  **Last calculated** time in the Rollup Builder is what tells you the run happened.
+- **The Rollup Builder marks a rollup calculated when the whole run has finished**, not when it
   starts. When the page shows a time, the totals from that run are already on the records.
 - **Records with a very large number of gifts are calculated separately.** A catch-all
   donor such as "Anonymous" is calculated on its own after the others, so it cannot hold up
@@ -213,7 +219,10 @@ Each rollup has a **calculation**, and the calculation decides what kind of fiel
 the result. BarnCRM refuses to save a rollup whose field cannot hold its result, and says
 which kind of field to choose instead. That check is the **Check rollups before saving**
 automation on the **Automation** page; if it is switched off, such a rollup still saves, but
-BarnCRM skips it on every run and the Error Log says why.
+BarnCRM skips it on every run and the Error Log says why. It is part of the module, so it
+also pauses while BarnCRM Rollup Builder is turned off on **Modules**. A rollup saved then is
+not checked, but the engine still skips and logs one it cannot calculate, so the
+recalculation **Turn on** starts never writes a wrong total.
 
 | Calculation | What it gives you | Shown in |
 |---|---|---|
@@ -259,12 +268,39 @@ What to know about them:
 
 ## The Rollup Builder
 
-The **Rollup Builder** tab in the **BarnCRM** app is where you create a new total and edit any
-existing one, shipped or your own, without typing a query. It lists every rollup with the same
-controls as the Rollups page (mode, active, **Recalculate**, the nightly schedule and
-**Recalculate all**), and adds **New rollup**, and **Edit** and **Copy** on each row. The tab
-comes with the **BarnCRM Admin** permission set, and saving needs the **Manage BarnCRM
-Settings** permission. The Rollups page in BarnCRM Settings links to it.
+Rollups are their own module, **BarnCRM Rollup Builder**, with a console app of the same name
+and two tabs: **Rollup Builder** and **Rollup Settings**.
+
+The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
+or your own, without typing a query. It lists every rollup with its controls (mode, active,
+**Recalculate**, the nightly schedule, **Recalculate all** and **Restore shipped rollups**),
+and adds **New rollup**, and **Edit** and **Copy** on each row. The tab comes with the
+**Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
+saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
+Settings opens it.
+
+You do not assign these sets by hand for BarnCRM's roles. When the module is installed, each
+time it is turned on on **Modules**, and with each nightly run once that is scheduled,
+BarnCRM gives **Rollup Builder User** to everyone holding the **BarnCRM Staff** or **BarnCRM
+Read Only** permission set, and **Rollup Builder Admin** to everyone holding **BarnCRM
+Admin**, whether directly or through a role on the [Access](access.md) page, so someone given
+a role today has the set after tonight's run. It never takes a set away, so one you give by
+hand stays. While the module is turned off it gives nothing.
+
+**A user who holds neither Rollup Builder set, such as an integration user.** Some saves have
+to announce, once they are saved, that totals are waiting: saves that run inside a
+background job (a Queueable), and ordinary saves made while a recalculation was already
+asked for or could not be started. The announcement needs the **Rollup Builder User** or
+**Rollup Builder Admin** set. Without one, the save still goes through and its totals are
+queued, but they wait for the next queue run or the nightly run, and the Error Log gets a
+Warning from `RollupQueue.announceReady`. To have them catch up within minutes, give that
+user **Rollup Builder User**. People with a BarnCRM role get it at install, at each **Turn
+on** and with each nightly run; until then the same wait applies to them.
+
+The **Rollup Settings** tab shows the module's own settings and nothing else: **Default rollup
+mode**, **When instant totals are calculated**, and the link to the Builder. They are the same
+settings as the **Rollups** section of **BarnCRM Settings**, so a change in either place shows
+in both. **Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a
@@ -462,12 +498,12 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 ## A five-minute walkthrough
 
 Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
-need the Giving module; with Core alone, do them on a rollup you have added.
+need the Giving module; without it, do them on a rollup you have added.
 
 1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
-   into a warning and offers a link to the Rollups page. Click that link, or open
-   **BarnCRM Settings** and choose **Rollups**.
+   into a warning and offers a link to the Rollups section of **BarnCRM Settings**, which
+   opens the Rollup Builder. Click that link, or open the **BarnCRM Rollup Builder** app.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("Sum Amount__c
    on Gift__c", or for a text list "Text list Name on Program__c, separated by semicolon"),
@@ -487,7 +523,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    any of them changed, the **Rollups last calculated** field on the record shows the time
    of that run; if none did, it keeps its earlier time, because the run found nothing to
    change. That field is
-   the answer to "is this number current" for one record; the Rollups page answers it for
+   the answer to "is this number current" for one record; the Rollup Builder answers it for
    the whole org.
 6. Go back to the BarnCRM home page. The Rollups tile shows the time you just recalculated.
 
@@ -532,6 +568,17 @@ rollup in **Both (recommended)** mode is put right by the nightly run; one in **
 mode stays behind until you click **Recalculate** on its row. Switch the automation back on
 afterwards.
 
+**Turning the module off and forgetting it.** **Turn off** on the BarnCRM Rollup Builder row
+of **BarnCRM Settings**, **Modules** stops every rollup at once, Giving's included: saves,
+the Flow action, the queue, the nightly run and a recalculation already running all stop,
+and nothing is processed while it is off. **Recalculate**, **Recalculate all** and **Run
+tonight** say the module is off; a rollup you save in the Builder then is saved and calculated
+once it is on. The values on your records stay. **Turn on** puts every total right: it starts
+the totals that waited and a recalculation of every active rollup, which runs in the
+background. **Check rollups before saving** pauses with the module, so a rollup saved while
+it is off is not checked; the recalculation skips one whose field cannot hold its result and
+the Error Log says why. See [Module Manager](module-manager.md).
+
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
 deliberate, so that turning something off never destroys data. If you want the field
@@ -557,7 +604,7 @@ For report builders only. Nothing on this page requires you to know these.
 | What you see | Field |
 |---|---|
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
-| Last calculated, on the Rollups page | `Last_Calculated__c` on Rollup Definition |
+| Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
