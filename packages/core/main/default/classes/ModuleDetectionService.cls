@@ -60,6 +60,12 @@ public with sharing class ModuleDetectionService {
         /** Salesforce's installer for this module, or null when it is here or not published. */
         @AuraEnabled
         public String installUrl;
+        /**
+         * For a module that is not here, the modules its package needs that are not here
+         * either, by name shown, in install order (`Requires__c`, ADR-NEXT D3); otherwise null.
+         */
+        @AuraEnabled
+        public String installFirst;
     }
 
     /**
@@ -145,13 +151,48 @@ public with sharing class ModuleDetectionService {
                 true
             )
         };
-        for (BarnCRM_Module__mdt row : catalog()) {
-            Boolean present = isPresent(row, announced);
+        List<BarnCRM_Module__mdt> rows = catalog();
+        Map<String, Boolean> presentByName = new Map<String, Boolean>();
+        Map<String, String> labelByName = new Map<String, String>();
+        for (BarnCRM_Module__mdt row : rows) {
+            presentByName.put(row.DeveloperName, isPresent(row, announced));
+            labelByName.put(row.DeveloperName, labelOf(row));
+        }
+        for (BarnCRM_Module__mdt row : rows) {
+            Boolean present = presentByName.get(row.DeveloperName);
             if (present || offeredIn(row, edition)) {
-                offered.add(module(row, present));
+                ModuleInfo info = module(row, present);
+                info.installFirst = present ? null : missing(row, presentByName, labelByName);
+                offered.add(info);
             }
         }
         return offered;
+    }
+
+    /**
+     * The modules a module's package needs that are not here, by name shown and in the order
+     * `Requires__c` lists them, or null when none is missing. A key the catalog does not know
+     * is shown as it is written.
+     */
+    private static String missing(
+        BarnCRM_Module__mdt row,
+        Map<String, Boolean> presentByName,
+        Map<String, String> labelByName
+    ) {
+        List<String> names = new List<String>();
+        String required = row.Requires__c == null ? '' : row.Requires__c;
+        for (String part : required.split(';')) {
+            String key = part.trim();
+            if (String.isBlank(key) || presentByName.get(key) == true) {
+                continue;
+            }
+            names.add(labelByName.containsKey(key) ? labelByName.get(key) : key);
+        }
+        return names.isEmpty() ? null : String.join(names, ', ');
+    }
+
+    private static String labelOf(BarnCRM_Module__mdt row) {
+        return String.isBlank(row.MasterLabel) ? row.DeveloperName : row.MasterLabel;
     }
 
     /**
@@ -240,7 +281,7 @@ public with sharing class ModuleDetectionService {
     private static ModuleInfo module(BarnCRM_Module__mdt row, Boolean present) {
         ModuleInfo info = new ModuleInfo();
         info.name = row.DeveloperName;
-        info.label = String.isBlank(row.MasterLabel) ? row.DeveloperName : row.MasterLabel;
+        info.label = labelOf(row);
         info.present = present;
         info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
         info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);

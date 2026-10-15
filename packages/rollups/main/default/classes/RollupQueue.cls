@@ -339,7 +339,7 @@ public without sharing class RollupQueue implements Queueable {
      * commit, and its subscriber starts the processor (ADR-0100).
      */
     private static void requestProcessor() {
-        if (AutomationControl.isPaused()) {
+        if (RollupService.isStopped()) {
             return;
         }
         if (processorRequested) {
@@ -396,7 +396,7 @@ public without sharing class RollupQueue implements Queueable {
      * same covers a transaction with no queueable job left to give.
      */
     public static void startProcessor() {
-        if (processorRequested || AutomationControl.isPaused()) {
+        if (processorRequested || RollupService.isStopped()) {
             return;
         }
         processorRequested = true;
@@ -452,8 +452,9 @@ public without sharing class RollupQueue implements Queueable {
     public void execute(QueueableContext context) {
         processorRequested = true;
         processorComing = true;
-        if (AutomationControl.isPaused()) {
-            // R-RQ5: the entries wait; the nightly run puts Both totals right after the pause.
+        if (RollupService.isStopped()) {
+            // R-RQ5: the entries wait, also while the module is turned off (ADR-NEXT decision
+            // 9); the nightly run puts Both totals right after the pause.
             return;
         }
         Drain drain = new Drain();

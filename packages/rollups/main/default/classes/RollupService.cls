@@ -88,6 +88,29 @@ public with sharing class RollupService {
      */
     private static final Integer QUERIES_PER_TARGET = 4;
 
+    /** The module's name on the Module Manager (ADR-NEXT D7). */
+    @NamespaceAccessible
+    public static final String MODULE_NAME = 'Rollups';
+
+    /**
+     * Whether BarnCRM Rollup Builder is turned off on the Module Manager (ADR-NEXT decision 9).
+     * While it is, every entry point of the engine returns without doing anything: the trigger
+     * handler on every object that registers it (Giving's rows too), the Flow action, Core's
+     * merge and queue calls, the Rollup Queue processor, the nightly and full runs and the
+     * scheduler. Nothing is queued and queued entries wait; the nightly run after it is turned
+     * on again puts every Both total right.
+     */
+    @NamespaceAccessible
+    public static Boolean isTurnedOff() {
+        return ModuleManagerService.turnedOff().contains(MODULE_NAME.toLowerCase());
+    }
+
+    /** Whether the engine must not run now: automation paused, or the module turned off. */
+    @NamespaceAccessible
+    public static Boolean isStopped() {
+        return AutomationControl.isPaused() || isTurnedOff();
+    }
+
     /**
      * Whether a normal save recalculates its real-time totals itself. Anything but In the save,
      * including a setting never saved, means just after the save.
@@ -134,7 +157,12 @@ public with sharing class RollupService {
         List<SObject> changedRecords,
         Map<Id, SObject> oldRecords
     ) {
-        if (String.isBlank(sourceObject) || changedRecords == null || changedRecords.isEmpty()) {
+        if (
+            String.isBlank(sourceObject) ||
+            changedRecords == null ||
+            changedRecords.isEmpty() ||
+            isTurnedOff()
+        ) {
             return;
         }
         List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
@@ -171,7 +199,7 @@ public with sharing class RollupService {
      */
     @NamespaceAccessible
     public static void runAfterDelete(String sourceObject, List<SObject> deletedRecords) {
-        if (String.isBlank(sourceObject) || deletedRecords == null) {
+        if (String.isBlank(sourceObject) || deletedRecords == null || isTurnedOff()) {
             return;
         }
         List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
@@ -228,7 +256,7 @@ public with sharing class RollupService {
     @NamespaceAccessible
     public static void runForSurvivors(String targetObject, Set<Id> survivorIds) {
         Schema.SObjectType targetType = SettingsService.typeByName(targetObject);
-        if (targetType == null || survivorIds == null || survivorIds.isEmpty()) {
+        if (targetType == null || survivorIds == null || survivorIds.isEmpty() || isTurnedOff()) {
             return;
         }
         List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
@@ -327,12 +355,7 @@ public with sharing class RollupService {
         Map<Id, SObject> oldRecords,
         Boolean deleting
     ) {
-        if (
-            String.isBlank(sourceObject) ||
-            records == null ||
-            records.isEmpty() ||
-            AutomationControl.isPaused()
-        ) {
+        if (String.isBlank(sourceObject) || records == null || records.isEmpty() || isStopped()) {
             return;
         }
         List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(

@@ -152,9 +152,7 @@ private class ModuleManagerServiceTest {
             Integer refused = 0;
 
             Test.startTest();
-            // Rollups: the Rollup Builder module offers no switch until its engine checks it
-            // (ADR-NEXT decision 9).
-            for (String name : new List<String>{ 'Core', 'Rollups', 'Programs', null }) {
+            for (String name : new List<String>{ 'Core', 'Programs', null }) {
                 try {
                     ModuleManagerService.turnOff(name);
                 } catch (ModuleManagerService.ModuleManagerException e) {
@@ -167,11 +165,7 @@ private class ModuleManagerServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(
-                4,
-                refused,
-                'Core, Rollups, a missing module and no module are all refused'
-            );
+            Assert.areEqual(3, refused, 'Core, a missing module and no module are all refused');
             Assert.isTrue(ModuleManagerService.turnedOff().isEmpty(), 'And nothing was saved');
         }
     }

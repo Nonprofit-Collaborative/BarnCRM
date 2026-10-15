@@ -5,6 +5,7 @@ import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore'
 import MANAGER_NOTICE from '@salesforce/label/c.Core_SetupAssistant_ModuleManagerNotice';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
 import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 
 /**
  * The modules step: the BarnCRM packages this org is offered, by their "BarnCRM X" names
@@ -28,6 +29,10 @@ export default class SetupStepModules extends LightningElement {
       ...module,
       displayName: module.label || module.name,
       status: module.present ? PRESENT : ABSENT,
+      installFirstText:
+        !module.present && module.installFirst
+          ? INSTALL_FIRST.replace('{0}', module.installFirst)
+          : null,
       statusClass: module.present
         ? 'slds-badge slds-theme_success'
         : 'slds-badge slds-badge_inverse'

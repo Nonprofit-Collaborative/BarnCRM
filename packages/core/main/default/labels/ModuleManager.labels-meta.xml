@@ -73,6 +73,14 @@
         <value>No install link is published for this module yet.</value>
     </labels>
     <labels>
+        <fullName>Core_ModuleManager_InstallFirst</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: modules to install before this one; {0} is their names</shortDescription>
+        <value>Install {0} first: this module needs it.</value>
+    </labels>
+    <labels>
         <fullName>Core_ModuleManager_TurnOffButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -1283,9 +1283,9 @@ never materialized. Core ships the records, because a module that is not install
 announce itself. Whether a module is installed is still detected (`ModuleDetectionService`);
 this type says only which editions offer it, how to tell it is here, and where its
 description, installer and app are. A future module, or a Core feature that becomes a module
-(such as BarnCRM Rollup Builder, record `Rollups`), needs only a new record. The rollup
-module's ADR proposes a `Requires__c` field here (a module that must be installed first); it
-is added with that work.
+(such as BarnCRM Rollup Builder, record `Rollups`), needs only a new record. `Requires__c`
+names the modules a module's package needs installed first (ADR-NEXT
+`NEXT-rollup-builder-module.md`, D3).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1297,6 +1297,7 @@ is added with that work.
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it; empty means no link yet. |
+| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Connect). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Rules
 
@@ -7278,6 +7279,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Editions, features, modules and first-run setup (ADR-0124, `0124-edition-gates-visibility.md`). New field `Features_Turned_On__c` on BarnCRM Settings (the Core features turned on; one-way). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`, `Probe_Object__c`, `App_Name__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
 | v0.6 | 2026-10-14 | The rollup engine leaves Core for the BarnCRM Rollup Builder module (ADR-NEXT, `NEXT-rollup-builder-module.md`). No object or field added or renamed. Rollup Definition, Rollup Queue, Rollup Run Lock, `Rollup_Queue_Ready__e` and Rollup Definition Default (shipped default) move to `packages/rollups` with their API names unchanged (Section 32). Core reaches the engine only through `RollupEngineExtension`. `Rollup_Mode_Default__c` and `Rollup_Processing__c` stay on `BarnCRM_Settings__c` until the module's own settings object is added. |
 | v0.6 | 2026-10-14 | Rollup Settings added as Section 14B (ADR-NEXT, decision 6): `Rollup_Settings__c`, the BarnCRM Rollup Builder module's protected hierarchy custom setting, holds `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved from `BarnCRM_Settings__c` (Section 12) with their API names and definitions unchanged. Stored values are not carried over. |
+| v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-NEXT, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Connect `Rollups;Giving`. |
 
 ---
 ## 32. Entity ownership by package

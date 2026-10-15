@@ -78,15 +78,6 @@ public with sharing class ModuleManagerService {
         'Rollups' => 'Rollup_Builder_Admin'
     };
 
-    /**
-     * Installed modules the Module Manager does not switch yet. Turning a module off stops only
-     * its own registry rows, and the Rollup Builder module's engine also runs from Giving's rows
-     * and its queue, nightly batch and Flow action. Until the engine checks the switch itself
-     * (ADR-NEXT `NEXT-rollup-builder-module.md`, decision 9), turning it off would stop part of
-     * it, so it is listed as on and offers no switch.
-     */
-    private static final Set<String> NOT_SWITCHABLE_YET = new Set<String>{ 'Rollups' };
-
     /** Raised for a module the org does not have, or one that cannot be switched. */
     public class ModuleManagerException extends Exception {
     }
@@ -109,6 +100,9 @@ public with sharing class ModuleManagerService {
         /** The module's own app, where its Settings tab lives, or null. */
         @AuraEnabled
         public String appUrl;
+        /** The modules to install before this one, by name shown, or null (ADR-NEXT D3). */
+        @AuraEnabled
+        public String installFirst;
     }
 
     /** One line of the uninstall report: a kind of record and how many there are. */
@@ -133,10 +127,8 @@ public with sharing class ModuleManagerService {
             row.docsUrl = info.docsUrl;
             row.installUrl = info.installUrl;
             row.appUrl = info.appUrl;
-            row.canSwitch =
-                info.present == true &&
-                info.name != CORE &&
-                !NOT_SWITCHABLE_YET.contains(info.name);
+            row.installFirst = info.installFirst;
+            row.canSwitch = info.present == true && info.name != CORE;
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED
                 : off.contains(info.name.toLowerCase()) && row.canSwitch ? STATUS_OFF : STATUS_ON;

@@ -23,6 +23,7 @@ import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import READ_ONLY from '@salesforce/label/c.Core_ModuleManager_ReadOnlyNotice';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
+import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
@@ -89,6 +90,10 @@ export default class ModuleManager extends LightningElement {
         isOff: module.canSwitch && module.status === 'Off',
         showInstall: module.status === 'NotInstalled' && Boolean(module.installUrl),
         noInstallLink: module.status === 'NotInstalled' && !module.installUrl,
+        installFirstText:
+          module.status === 'NotInstalled' && module.installFirst
+            ? INSTALL_FIRST.replace('{0}', module.installFirst)
+            : null,
         hasReport: Boolean(report),
         reportEmpty: Boolean(report) && report.length === 0,
         report: (report || []).map((line) => ({

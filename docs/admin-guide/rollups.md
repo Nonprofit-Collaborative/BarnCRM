@@ -547,6 +547,13 @@ rollup in **Both (recommended)** mode is put right by the nightly run; one in **
 mode stays behind until you click **Recalculate** on its row. Switch the automation back on
 afterwards.
 
+**Turning the module off and forgetting it.** **Turn off** on the BarnCRM Rollup Builder row
+of **BarnCRM Settings**, **Modules** stops every rollup at once, Giving's included: saves,
+the Flow action, the queue, the nightly run and **Recalculate** all do nothing, and nothing
+is queued for later. The values on your records stay. After **Turn on**, the next nightly
+run puts **Both** totals right; click **Recalculate all** for **Instantly** ones, or to have
+everything right at once. See [Module Manager](module-manager.md).
+
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
 deliberate, so that turning something off never destroys data. If you want the field

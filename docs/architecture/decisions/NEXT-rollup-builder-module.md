@@ -116,7 +116,12 @@ subscriber migration.
 9. **Turning the module off** (ADR-0073) stops its three registry rows through `Module__c`, and
    the engine's entry points (`RollupTriggerHandler`, the queue processor, the nightly batch,
    the Flow action) also return early while `Rollups` is turned off, so Giving's four rollup rows
-   stop too.
+   stop too. One check, `RollupService.isTurnedOff`, reads `ModuleManagerService.turnedOff`;
+   the real-time, delete, merge and Flow paths (Core's merge seam included), the queue
+   processor and its start, the full runs (nightly, Recalculate all, Recalculate) and the
+   scheduler all return on it. Nothing is queued while it is off and queued entries wait; the
+   first nightly run after it is turned on puts every Both total right. Until this was built
+   the Module Manager offered `Rollups` no switch.
 10. **Giving depends on the module.** `sfdx-project.json`: Giving depends on Core and BarnCRM
     Rollup Builder; Funders and Connect list Core, BarnCRM Rollup Builder and Giving (2GP needs
     the transitive list, in install order). Giving's code, its 50 shipped defaults, its registry

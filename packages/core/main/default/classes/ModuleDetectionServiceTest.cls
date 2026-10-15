@@ -346,7 +346,73 @@ private class ModuleDetectionServiceTest {
                 ),
                 'BarnCRM Rollup Builder is offered to both editions'
             );
+            BarnCRM_Module__mdt rollups = shipped.get('Rollups');
+            Assert.areEqual('rollups', rollups.Package_Folder__c, 'Its own package folder');
+            Assert.areEqual('BarnCRM_Rollup_Builder', rollups.App_Name__c, 'Its own app');
+            Assert.areEqual(5, rollups.Sort_Order__c.intValue(), 'Listed before Giving');
+            Assert.areEqual('Rollups', shipped.get('Giving').Requires__c, 'Giving needs it');
         }
+    }
+
+    @IsTest
+    static void saysWhichModulesToInstallFirst() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = false;
+            BarnCRM_Module__mdt rollups = catalogRow('Rollups', 'Community;Impact', null, 5);
+            rollups.MasterLabel = 'BarnCRM Rollup Builder';
+            rollups.Probe_Object__c = 'No_Such_Object__c';
+            BarnCRM_Module__mdt giving = catalogRow('Giving', 'Impact', null, 10);
+            giving.MasterLabel = 'BarnCRM Giving';
+            giving.Requires__c = 'Rollups';
+            BarnCRM_Module__mdt funders = catalogRow('Funders', 'Impact', null, 40);
+            funders.Requires__c = 'Rollups; Giving;Elsewhere';
+            BarnCRM_Module__mdt programs = catalogRow('Programs', 'Impact', null, 30);
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                rollups,
+                giving,
+                funders,
+                programs
+            };
+            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+
+            Test.startTest();
+            Map<String, ModuleDetectionService.ModuleInfo> before = byName();
+            // Core's own object stands in for the Rollup Builder's, so it counts as installed.
+            rollups.Probe_Object__c = 'Error_Log__c';
+            Map<String, ModuleDetectionService.ModuleInfo> after = byName();
+            Test.stopTest();
+
+            Assert.areEqual(
+                'BarnCRM Rollup Builder',
+                before.get('Giving').installFirst,
+                'Giving says to install the Rollup Builder first'
+            );
+            Assert.areEqual(
+                'BarnCRM Rollup Builder, BarnCRM Giving, Elsewhere',
+                before.get('Funders').installFirst,
+                'Every missing module, in install order, by name shown'
+            );
+            Assert.isNull(before.get('Programs').installFirst, 'A module needing none says none');
+            Assert.isNull(
+                after.get('Giving').installFirst,
+                'Once the Rollup Builder is installed Giving needs nothing first'
+            );
+            Assert.areEqual(
+                'BarnCRM Giving, Elsewhere',
+                after.get('Funders').installFirst,
+                'Only what is still missing'
+            );
+            Assert.isNull(after.get('Rollups').installFirst, 'An installed module needs nothing');
+        }
+    }
+
+    private static Map<String, ModuleDetectionService.ModuleInfo> byName() {
+        Map<String, ModuleDetectionService.ModuleInfo> modules = new Map<String, ModuleDetectionService.ModuleInfo>();
+        for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+            modules.put(module.name, module);
+        }
+        return modules;
     }
 
     private static BarnCRM_Module__mdt catalogRow(

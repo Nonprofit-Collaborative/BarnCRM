@@ -136,13 +136,17 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /**
      * Starts a full recalculation of these definitions over every record they write. Does nothing
-     * while all automation is paused (R-RQ5); the next run catches up. Starts nothing while
-     * another full run is going (R-R14): that run's job is answered and an Info entry says so.
+     * while the module is turned off (ADR-NEXT decision 9) or all automation is paused (R-RQ5);
+     * the next run catches up. Starts nothing while another full run is going (R-R14): that
+     * run's job is answered and an Info entry says so.
      *
      * @param definitions the definitions to recalculate, of any target entities
      * @return the first pass's job, the running job, or null when nothing started
      */
     public static Id begin(List<Rollup_Definition__c> definitions) {
+        if (RollupService.isTurnedOff()) {
+            return null;
+        }
         if (AutomationControl.isPaused()) {
             ErrorLogger.logMessage(
                 System.Label.Core_Rollups_FullRunPaused,

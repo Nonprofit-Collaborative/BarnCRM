@@ -42,9 +42,13 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /**
      * The nightly run, and a processor for Rollup Queue entries no save started one for
-     * (ROLLUPS-7), so a queued total never waits longer than a night.
+     * (ROLLUPS-7), so a queued total never waits longer than a night. Nothing while the module
+     * is turned off (ADR-NEXT decision 9); the schedule stays, so it runs again once it is on.
      */
     public void execute(SchedulableContext context) {
+        if (RollupService.isTurnedOff()) {
+            return;
+        }
         if (this.everyDefinition == true) {
             RollupService.startFullRunOfEveryDefinition();
         } else {

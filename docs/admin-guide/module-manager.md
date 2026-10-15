@@ -50,7 +50,10 @@ cleans up her data, and check what removing a module would cost.
    tab. Choose who to install for (**Install for Admins Only** is the safe choice), click
    **Install**, and wait for Salesforce's email. Come back and click **Check again**: the row
    says **On**. If a row says "No install link is published for this module yet.", there is
-   no version to install yet; read about it with **Learn more**.
+   no version to install yet; read about it with **Learn more**. If it says "Install BarnCRM
+   Rollup Builder first: this module needs it.", install the module it names first:
+   Salesforce refuses Giving, Funders and Connect until BarnCRM Rollup Builder is installed,
+   and Funders and Connect until Giving is too.
 3. On the **Giving** row, click **Turn off**. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted
@@ -85,3 +88,9 @@ visibility. To hide a module from a colleague, take away its role on the
   package is installed. Click **Open Installed Packages** to see versions in Setup.
 - **Turning off a module that another one needs.** Connect works with Giving's gifts: turning
   Giving off stops the automation Connect relies on. Turn Connect off first, or leave both on.
+- **Turning off BarnCRM Rollup Builder and expecting Giving's totals to keep up.** Turning it
+  off stops every rollup, Giving's gift totals included: no save, Flow, queue run, nightly run
+  or Recalculate updates a total while it is **Installed and off**, and nothing is queued for
+  later. The values already on your records stay. After you turn it back on, the next nightly
+  run puts every total in **Both** mode right; click **Recalculate all** on the Rollup Builder
+  for the rest, or to have them right at once. See [Rollups](rollups.md).
