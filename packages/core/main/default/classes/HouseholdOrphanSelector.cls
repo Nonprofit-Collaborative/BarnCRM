@@ -211,6 +211,34 @@ public with sharing class HouseholdOrphanSelector {
         );
     }
 
+    /**
+     * Junction mode, for the household catch-up batch: every person stored as an account that
+     * no current membership row names, as `personAccountsWithoutMembership` reads them. Only
+     * the id is selected, so no person account field is named here (ADR-0013); the batch reads
+     * the naming fields through `PersonRecordSelector`. System mode for the reason above.
+     */
+    public static Database.QueryLocator personAccountsWithoutMembershipLocator(
+        Set<Id> personRecordTypeIds
+    ) {
+        Date today = Date.today();
+        Set<Id> erasedIds = erasedPeople();
+        return Database.getQueryLocator(
+            [
+                SELECT Id
+                FROM Account
+                WHERE
+                    RecordTypeId IN :personRecordTypeIds
+                    AND Id NOT IN :erasedIds
+                    AND Id NOT IN (
+                        SELECT Account__c
+                        FROM Household_Member__c
+                        WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+                    )
+                WITH SYSTEM_MODE
+            ]
+        );
+    }
+
     /** Junction mode, people stored as accounts: no current membership row names them. */
     public static Integer countPersonAccountsWithoutMembership(
         Set<Id> personRecordTypeIds,
