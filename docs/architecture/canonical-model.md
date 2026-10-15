@@ -7306,7 +7306,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
 | Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
-| Roles: Admin, Program Staff, Volunteer Coordinator, Read Only | Core | Permission set groups |
+| Roles: Admin, Team Member (`Program_Staff`), Coordinator (`Volunteer_Coordinator`), Read Only | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |

@@ -187,8 +187,8 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 |---|---|
 | BarnCRM Admin | Maria: everything, including settings |
 | Fundraising Staff (comes with Giving) | David: gifts, donors, receipts |
-| Program Staff | Priya: participants and services |
-| Volunteer Coordinator | Volunteer jobs, shifts, and hours |
+| Team Member | Priya: day to day work with people and households, plus programs and services when that module is on |
+| Coordinator | Whoever schedules people: shifts and hours when the Volunteers module is on |
 | Read Only | Tom and Jen: see everything, change nothing |
 
 The person has to exist as a Salesforce user first. If someone is missing from the list,

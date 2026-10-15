@@ -80,7 +80,7 @@ private class AccessServiceTest {
             Assert.areEqual(
                 1,
                 countAssignments(david.Id, PROGRAM_ROLE),
-                'David should hold the Program Staff role once Maria has given it to him.'
+                'David should hold the Team Member role once Maria has given it to him.'
             );
         }
     }
@@ -118,7 +118,7 @@ private class AccessServiceTest {
             Assert.areEqual(
                 0,
                 countAssignments(david.Id, PROGRAM_ROLE),
-                'David should not hold the Program Staff role after Maria removes it.'
+                'David should not hold the Team Member role after Maria removes it.'
             );
         }
     }
@@ -272,10 +272,7 @@ private class AccessServiceTest {
                 names.contains(AccessService.ADMIN_ROLE),
                 'The BarnCRM Admin role should be one of the packaged roles.'
             );
-            Assert.isTrue(
-                names.contains(PROGRAM_ROLE),
-                'The Program Staff role should be packaged.'
-            );
+            Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Team Member role should be packaged.');
         }
     }
 
@@ -300,7 +297,7 @@ private class AccessServiceTest {
             }
             Assert.isTrue(
                 davidIsListed,
-                'David should appear under Program Staff on the Access page.'
+                'David should appear under Team Member on the Access page.'
             );
         }
     }

@@ -3,7 +3,7 @@
 ## What it does
 
 Access lets you give a colleague what they need to do their job by picking their name and
-choosing a role, for example Program Staff or Read Only. You never have to learn what a
+choosing a role, for example Team Member or Read Only. You never have to learn what a
 permission set is, and you never have to open Salesforce Setup to change someone's role. The
 page also shows you, at a glance, who currently holds each role, so you can answer "who can
 change our settings?" in a few seconds.
@@ -29,9 +29,14 @@ so it is listed only where Giving is installed, which makes five:
 |---|---|---|
 | BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings |
 | Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
-| Program Staff | Program and services staff | Day to day work with people, households, and program records |
-| Volunteer Coordinator | Whoever schedules and tracks volunteers | Day to day work with people, households, and volunteer records |
+| Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus program and service records when the Programs module is on |
+| Coordinator | Whoever schedules people and tracks their time | Day to day work with people, households, and organizations, plus volunteer shifts and hours when the Volunteers module is on |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
+
+The role names fit any organization, nonprofit or not. In Setup, Team Member and Coordinator
+keep their original API names, `Program_Staff` and `Volunteer_Coordinator`, so that upgrades
+keep working; you only need those names for an
+[automatic access](automatic-access.md) policy.
 
 ## Who can read a donor's receipts and tax statements (with Giving)
 
@@ -44,8 +49,8 @@ to, not through the record it is about.
 | Maria, who configures BarnCRM | BarnCRM Admin, plus Giving Admin | Yes |
 | David, who enters the gifts | Fundraising Staff, which includes Giving Staff | Yes |
 | Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
-| Priya, who coordinates volunteers | Volunteer Coordinator, and no Giving set | No |
-| Sam, in programs | Program Staff, and no Giving set | No |
+| Priya, who coordinates volunteers | Coordinator, and no Giving set | No |
+| Sam, in programs | Team Member, and no Giving set | No |
 
 Priya and Sam can open the donor's household and the donor's contact record, because that is
 their job. What they cannot open is the receipt or the year-end statement, because a receipt PDF
@@ -108,21 +113,21 @@ Here is how she gives him access, checks it, and takes it away again.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
    each with their name and email address so you can tell two Davids apart.
 4. Choose **David Okafor**.
-5. Choose the role **Program Staff** and click **Give access**. A confirmation asks you
+5. Choose the role **Team Member** and click **Give access**. A confirmation asks you
    to confirm the person and the role. Click **Give access** again.
-6. A message says "David Okafor now has the Program Staff role." David's name appears
-   on the Program Staff card, and the number in brackets beside the role name goes up
+6. A message says "David Okafor now has the Team Member role." David's name appears
+   on the Team Member card, and the number in brackets beside the role name goes up
    by one.
 7. David can now sign in and see households and contacts. He does not see BarnCRM
    Settings, because that belongs to the BarnCRM Admin role. If your org has a module, he
    does not see what it adds yet either: for that he also needs the module's own permission
    set (for Giving, **Giving Staff**), which today is assigned in Salesforce Setup.
-8. To take the role away, find David's name on the Program Staff card and click
-   **Remove**. Confirm, and a message says "David Okafor no longer has the Program Staff
+8. To take the role away, find David's name on the Team Member card and click
+   **Remove**. Confirm, and a message says "David Okafor no longer has the Team Member
    role." His name disappears from the card.
 
-A person can hold more than one role. Giving David the Volunteer Coordinator role as well
-does not remove Program Staff, and removing one role leaves the other in place. Giving someone a
+A person can hold more than one role. Giving David the Coordinator role as well
+does not remove Team Member, and removing one role leaves the other in place. Giving someone a
 role they already have changes nothing and reports no error.
 
 ## Extra permissions

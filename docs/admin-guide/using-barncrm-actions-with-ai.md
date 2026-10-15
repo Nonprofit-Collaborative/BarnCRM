@@ -57,7 +57,7 @@ to Salesforce, not to BarnCRM.
 2. **Give that user what the actions need.** Each action needs the same access as doing the
    job by hand, and BarnCRM's own permission sets already include the four Core actions, so
    there is no Apex Class Access to add:
-   - **BarnCRM Staff** and **BarnCRM Admin** (and so Program Staff, Volunteer Coordinator and
+   - **BarnCRM Staff** and **BarnCRM Admin** (and so Team Member, Coordinator and
      BarnCRM Admin Group) give Find People, Get Household Summary, Create Person and Get Data
      Job Status.
    - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household

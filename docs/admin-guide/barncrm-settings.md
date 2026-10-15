@@ -63,7 +63,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    name, and the time. Nothing is ever changed silently: one row is written per setting you
    actually changed, and saving a page without changing anything writes nothing. Ticking or
    skipping a step in the setup checklist is not a settings change, so it is not listed.
-7. Now sign in as David, who has the Program Staff role and not Manage BarnCRM
+7. Now sign in as David, who has the Team Member role and not Manage BarnCRM
    Settings. He opens the same tab and sees the same sections and the same values, with a
    notice across the top: "You can read these settings but not change them. Ask your
    administrator for the Manage BarnCRM Settings permission." Every control is greyed

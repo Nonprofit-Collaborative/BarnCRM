@@ -133,7 +133,7 @@ function state(overrides = {}) {
     modules: [{ name: 'Core', present: true, docsUrl: 'https://example.invalid/core' }],
     roles: [
       { developerName: 'BarnCRM_Admin', label: 'BarnCRM Admin' },
-      { developerName: 'Program_Staff', label: 'Program Staff' }
+      { developerName: 'Program_Staff', label: 'Team Member' }
     ],
     importAvailable: false,
     ...overrides
@@ -339,7 +339,7 @@ describe('c-setup-assistant', () => {
     const options = element.shadowRoot.querySelector('lightning-combobox').options;
     expect(options).toEqual([
       { label: 'BarnCRM Admin', value: 'BarnCRM_Admin' },
-      { label: 'Program Staff', value: 'Program_Staff' }
+      { label: 'Team Member', value: 'Program_Staff' }
     ]);
   });
 

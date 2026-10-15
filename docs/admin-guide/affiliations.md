@@ -37,7 +37,7 @@ A people import links each row's first person to the organization on the row wit
 affiliation, or finds the one they already have (see [Importing](importing.md), section 8).
 
 To let your team see and manage affiliations, make sure they have one of the packaged access
-levels (BarnCRM Admin, Program Staff, or, with Giving installed, Fundraising Staff) on the **Access** page in
+levels (BarnCRM Admin, Team Member, Coordinator, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them.
 
 The upkeep does not depend on what the person saving can see or edit. Someone who may add an
