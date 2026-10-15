@@ -43,8 +43,13 @@ Every Core feature starts off, so its automation is held: no household is create
 contact, no address is copied, no reciprocal relationship is made, no primary affiliation is
 set and no preferred email is filled in. Households are caught up automatically: when
 **Household Upkeep** is turned on (in first-run setup or in **General**), BarnCRM gives a
-household to every contact added while it was off, in the background, usually within a few
-minutes. The other four features are not caught up: records added or imported before
+household to every person added while it was off, in the background, usually within a few
+minutes, exactly as it would have when they were saved. That includes people stored as
+accounts (Person Accounts) when your org uses the flexible way of belonging to a household:
+each gets a household of their own and is its primary member. In the simple way a person
+stored as an account is given no household, on save or in the catch-up. A person who already
+belongs to a household is left in it, and nobody is caught up while **Create households
+automatically** is off. The other four features are not caught up: records added or imported before
 Addresses, Relationships, Affiliations or Preferred Email is on are not processed when it is
 turned on, so finish first-run setup before you add or import people. An org upgraded from an
 earlier release keeps every feature on and is not held.

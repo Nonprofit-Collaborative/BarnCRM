@@ -174,6 +174,16 @@ public with sharing class PersonRecordSelector {
     }
 
     /**
+     * The same upkeep read, as the records themselves: for the household catch-up, which
+     * hands existing people to the creation pass a new person goes through on insert, and
+     * that pass takes records (so a refused household can be put on the record). Empty in an
+     * org that does not store people as accounts.
+     */
+    public static List<SObject> getPersonRecords(Set<Id> personRecordIds) {
+        return queryPersonRecords(personRecordIds);
+    }
+
+    /**
      * The same people as a screen may see them: nothing at all where the running user
      * cannot read the object, and otherwise every field they cannot read stripped from the
      * records before a person is built from them (ADR-0021). Stripping rather than a user
