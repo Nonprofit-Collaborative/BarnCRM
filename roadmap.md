@@ -2,7 +2,7 @@
 
 Purpose: planned work with status. Mirrors Section 6 of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 on `oi-test`). #219 landed batches 2 to 7; #377 landed batches 8a to 8e: the Core quality pass fix batches, Q-01 to Q-14, rollup S9, data tools parity, Erase a person, the console app and the gate fixes. `main` (at #221) deployed to `barn-npc` 2026-10-13 and passes. 2026-10-14: #401 to #408 landed (Core cleanups, Access add-on permission sets, merge settlement, coverage floor, import undo, Platform-license permission split, duplicate rule matching for Load one object, empty household tidy); the D-47 inventory is done. "Landed" means in `main`.
+Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 on `oi-test`). #219 landed batches 2 to 7; #377 landed batches 8a to 8e: the Core quality pass fix batches, Q-01 to Q-14, rollup S9, data tools parity, Erase a person, the console app and the gate fixes. `main` (at #221) deployed to `barn-npc` 2026-10-13 and passes. 2026-10-14: #401 to #408 landed (Core cleanups, Access add-on permission sets, merge settlement, coverage floor, import undo, Platform-license permission split, duplicate rule matching for Load one object, empty household tidy); the D-47 inventory is done. 2026-10-14 and 2026-10-15 (main at #426, squash b570b8ae, `oi-pa` gate 3,125 of 3,125): #411 edition names, #412 and #434 rollup queue row-limit fixes, #433 scale cleanup fix, #413 neutral role names, and #426 editions, feature switches, Modules section and first-run setup (D-96, D-97, D-99 to D-102). The Rollup Builder module stack (#417 to #432) and #435 are in review (below). "Landed" means in `main`.
 
 ## Near-term queue (plan 6.0, owner decisions 2026-10-13)
 
@@ -26,7 +26,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 2. On hold: C-38 scheduled imports and connections, until Brandon is ready to start the next version (D-39).
 3. After the Core quality pass: the non-core modules, in plan Section 6 order.
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
-5. Real deploy to `mwdbdevsb`: on hold (owner, 2026-10-12).
+5. `mwdbdevsb`: deployed 2026-10-14 at the owner's request (Core at e3f2db58, then plus #411 to #413); ask before every further deploy.
 6. Release prerequisites (namespace, Dev Hub, steward entity): after a v1.0 pilot (D-87).
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
@@ -84,8 +84,21 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | Tests run as permission-set users | D-33 | Landed (#219, self-containment #377) |
 | "Data Job" relabel | ADR-0047, D-45, D-51 | Landed (#377): object label Data Job, tab "Import" |
 | Deleting people keeps their household | D-88 | Landed (#377); the tidy-later option was decided by D-89 (2026-10-14), landed (#408): a nightly Core job moves empty households to the Recycle Bin once their former members can no longer be restored |
+| Edition names: Nonprofit Edition and Standard Edition | D-96 | Landed (#411, ADR-0122) |
+| Neutral Core role names (Team Member, Coordinator) | D-97 | Landed (#413, ADR-0123) |
+| Editions, features, modules: edition gates what Core shows; Core features off on a new install, turn-on one-way; Settings Modules section; first-run setup that holds Core automation until done | D-99, D-100, D-101, D-102 | Landed (#426, ADR-0124; #414 to #425 closed as landed in it) |
+| Rollup queue row-limit fixes (query-row budget, stale-count large-parent route) | Scale test, D-90 | Landed (#412, #434); scale cleanup script fix landed (#433) |
+| BarnCRM Rollup Builder module (engine and Builder move out of Core into `packages/rollups`; Giving depends on it; both editions) | D-101 | In review, stacked: #417 ADR and design, #419 engine seam, #423 Health Check and nightly seams, #424 Core access, #427 move to `packages/rollups`, #428 `Rollup_Settings__c`, #429 module app and Rollup Settings page, #430 docs, #431 and #432 review fixes (top #432 passed the `oi-test` gate 3,116 of 3,116). PR 7 in progress: catalog row, module switch, engine off gate (plan decision 9), `Rollup_Builder_User` auto-assigned to BarnCRM roles (D2), Rollups removed from `NOT_SWITCHABLE_YET`, ADR 0125 |
+| #435 | Follow-up after #426: `deploy-packages.sh` calls `TabAccessService.requestSync()` after deploy; the `turnOn` unknown-key message says "setting", not "feature" | In review |
+| Advanced Territory Management (C-40) and Grid tool (C-41) Super Tools | D-98 | Planned, after v1.0 |
+| Follow-up: household catch-up for person accounts (turning Household Upkeep on catches up contacts only) | #426 review | Open |
+| Follow-up: scale test duplicate-rule losses (the load lost 309 households and 1,328 contacts to the standard duplicate rules; failed-*.csv not kept) | Scale test | Open |
+| Follow-up: namespace readiness for the module split (module pages use Core components cross-package: `settingsConsole`, `c/workspaceTabs`; module tests use Core `@TestVisible` privates; module `appUrl` namespace) | Plan 4.10, D-101 | Open |
+| Follow-up: Staff-only Queueable saves cannot publish `Rollup_Queue_Ready__e` (Create on the event is only in module sets); totals lag to the next processor or nightly run with a Warning; PR 7 auto-assigns `Rollup_Builder_User`, ADR decision 8 documents the lag | Rollup module review | Open |
 | Namespace registration, first package version | D-01, ADR-0001, D-87 | After a v1.0 pilot |
 
 ## Post-1.0 (plan 6.1, parked)
 
-Memberships (G-22), Events, public volunteer sign-up (V-09), processor webhooks (X-08), donor scoring maturity and portfolios, multi-currency, AI-readiness pack, localization, CMDT Manager (landed), Analytics module (field utilization landed), data management 2 (C-36 and C-37 moved to v0.7 and landed), scheduled imports and connections (C-38; on hold until Brandon starts the next version, D-39).
+Memberships (G-22), Events, public volunteer sign-up (V-09), processor webhooks (X-08), donor scoring maturity and portfolios, multi-currency, AI-readiness pack, localization, CMDT Manager (landed), Analytics module (field utilization landed), data management 2 (C-36 and C-37 moved to v0.7 and landed), scheduled imports and connections (C-38; on hold until Brandon starts the next version, D-39), Advanced Territory Management (C-40) and Grid tool (C-41) (D-98).
+
+Plan 6.1.1 (proposed, recorded 2026-10-14, nothing approved except C-40 and C-41): 17 ranked ideas for Brandon to decide, in order: DLRS compatibility; Grid tool; Summit Events compatibility; advanced duplicate management; Memberships Essentials compatibility; document builder; access explorer; Advanced Territory Management; map and radius search; field history and restore; data cleanup and standardization; website and portal tool; data dictionary and org documentation; engagement score; archiving and storage relief; forms and surveys; scheduled backup export. Plan 6.1.2 holds the comparable-tools research (18 categories). Plan 6.1.3 lists ideas considered and not recommended: CPQ, e-signature, marketing automation and mass email, phone systems (CTI), payment processing in Core, AI features that call a paid service.

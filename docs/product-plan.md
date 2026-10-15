@@ -170,7 +170,7 @@ Person Account dependency, batch-only rollups with compute credits, permission s
 
 | Package | Contains | Depends on |
 |---|---|---|
-| **Core** | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine, Import framework, health check | (none) |
+| **Core** | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine (moving to the BarnCRM Rollup Builder module, D-101), Import framework, health check | (none) |
 | **Giving** | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core |
 | **Volunteers** | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core |
 | **Programs** | Programs, services, enrollments, attendance, service deliveries, light case notes | Core |
@@ -291,7 +291,7 @@ NPC has no address object; NPSP's was one of its most valued features for donor 
 
 ### 4.8 Settings, Setup Assistant, and Module Manager (Core)
 
-- **BarnCRM app** (Lightning app, Core) with tabs: Home (Setup Assistant and health), Households, Contacts, Organizations, Import, Find, Bulk Update, Data Hygiene (the Data tools, Section 4.9), **BarnCRM Settings**, Rollup Builder and Error Log (admin only). Giving ships its own Fundraising app for gifts, commitments, batches, funds and appeals, with reports and dashboards.
+- **BarnCRM app** (Lightning app, Core) with tabs: Home (Setup Assistant and health), Households, Contacts, Organizations, Import, Find, Bulk Update, Data Hygiene (the Data tools, Section 4.9), **BarnCRM Settings**, Rollup Builder and Error Log (admin only). Rollup Builder moves to the BarnCRM Rollup Builder module's own console app (D-101); the Data tool tabs show only once their feature is on (D-102). Giving ships its own Fundraising app for gifts, commitments, batches, funds and appeals, with reports and dashboards.
 - **BarnCRM Settings** is a single LWC-based settings console with a left navigation grouped by module, search across all settings, and plain-language descriptions with "Learn more" links to the admin guide. Access is governed by the `Manage_BarnCRM_Settings` custom permission ("Manage BarnCRM Settings"; packaged in the `BarnCRM_Admin` permission set).
 - **Storage strategy** (settled, Decision D-06):
   - *Simple org-wide toggles and values* (feature flags, naming rule selections, default record types): **protected hierarchy Custom Settings**, written synchronously by Apex from the console. Cached in Platform Cache with cache invalidation on write.
@@ -299,7 +299,7 @@ NPC has no address object; NPSP's was one of its most valued features for donor 
   - *Package-shipped defaults* (default rollups, default import templates, default levels): **Custom Metadata Types**, read-only to admins, copied into the corresponding custom object records by the post-install script on first install and on "Restore defaults." Upgrades update the metadata defaults without touching the admin's records. This is how Principle 6 (upgrade-safe) is achieved.
 - **Setup Assistant**: a guided checklist on the Hub home page, run by Maria in under 30 minutes: (1) confirm coexistence mode, (2) confirm household naming with preview, (3) pick default fund and appeal, (4) assign access to users (in-app, via `PermissionSetAssignment` inserts), (5) set organization identity for receipts (name, EIN, address, logo, signature), (6) choose which modules to turn on, (7) import your first spreadsheet or load sample data, (8) verify with a "first gift" walkthrough. Each step records completion; the checklist stays visible until done and can be re-run.
 - **Module Manager**: lists every module with status (Not installed, Installed and off, On), version, and an action. "Install" opens the package install URL for the module in a new tab with instructions (the platform does not allow an app to install another package silently; the Module Manager checks back via describe when the user returns). "Turn on" runs the module's post-install configuration and assigns permission sets. "Turn off" disables its automation and hides its tabs; "Uninstall" links to the platform uninstall with a pre-flight report of data that would be lost.
-- **Access page**: assign packaged permission set groups (`Nonprofit Admin`, `Fundraising Staff`, `Program Staff`, `Volunteer Coordinator`, `Read Only`) to users from the front end. Packaged permission sets are never meant to be cloned; org-specific additions go in the admin's own permission sets layered on top.
+- **Access page**: assign packaged permission set groups (`BarnCRM Admin`, `Fundraising Staff` (Giving), `Team Member`, `Coordinator`, `Read Only`) to users from the front end. Packaged permission sets are never meant to be cloned; org-specific additions go in the admin's own permission sets layered on top.
 - **Trigger and automation control**: a table of every packaged automation with a description and an on/off switch, plus a global "Pause all BarnCRM automation" for bulk loads, auto-expiring after a set time.
 - **Automation approach (owner decision, Brandon, 2026-09-22; ADR-0040):** simple business rules ship as packaged Flows so customers can read and copy them; engine logic (household naming, merge and split, rollups, membership mode guards) stays in Apex and is offered to Flow as invocable actions. Every packaged automation, Flow or Apex, is registered in the Automation Registry with its on/off switch, and a packaged Flow checks that switch as its first step rather than relying on activation state, which an upgrade can change. Customization is "switch ours off, run yours": each switchable automation has a Flow template a customer can Save As and own, and customers build their own record-triggered flows rather than editing packaged ones. A registry entry that runs a customer-named Flow is added only when a real need for ordering between packaged and customer automation is named.
 - **Error Log** (`Error_Log__c`): every caught exception with context, user, record, and a plain-language message; surfaced as a Hub tile and an optional daily digest email to the admin.
@@ -353,7 +353,7 @@ NPC has no address object; NPSP's was one of its most valued features for donor 
 
 **Bulk performance:** Batch Apex with the configurable chunk size; progress on the job record; results and undo on the History page.
 
-### 4.10 Rollup engine (Core; used by every module)
+### 4.10 Rollup engine (Core; used by every module) (moving to the BarnCRM Rollup Builder module, D-101)
 
 - `Rollup_Definition__c`: source object, target object, relationship path (supports the household membership abstraction), aggregate (SUM, COUNT, MIN, MAX, FIRST, LAST, AVG; the operations slice adds count distinct, a checkbox for Any or None, First or Last into a text field, and text lists with a delimiter, D-31), filters (declarative, with the shared `filterBuilder` component that Find also uses, no SOQL typed by admins; Find (Section 4.9) likewise compiles its queries from a document, and its typed queries (C-36) are parsed into that document in the browser, ADR-0078), fiscal-year awareness (fiscal year start month setting), and **mode**: Instantly (a normal save updates totals in the same save; a bulk load such as an import is queued and finishes within minutes), Every night (batch, the safety net), or Both (recommended: instant, with the nightly run as the safety net). Instant mode works on BarnCRM's own objects through shipped triggers and on an admin's own objects through a trigger the Rollup Builder generates and deploys (D-16). Built in S6: a save that affects 50 targets or fewer recalculates them in the same save; a larger one goes to the Rollup Queue with retry and backoff. Gift Allocation and Soft Credit are registered for real time. Every target field shows a `Last calculated` sibling value in the rollup UI.
 - Packaged default definitions for households, contacts, organizations, funds, appeals, and commitments are shipped as custom metadata and materialized as records on install (Section 4.8).
@@ -426,7 +426,7 @@ Priority: **P0** must ship before v1.0; **P1** should ship before v1.0 if the it
 | C-10 | Sample data loader (a realistic 200-household demo set) | m | P0 | 0.1 | Used by tests, demos, and the Setup Assistant. **Brandon, 2026-10-12:** Core's sample data uses neutral examples (no grant officers or mostly foundations and churches), and it is never added by default in the real package: only in test and scratch orgs, or when an admin chooses to add it after install. Sample data loads in Batch Apex (`SampleDataStageBatch`), not a queueable chain (#345, in `main` via #377). |
 | C-11 | Health Check v1 (org shape, license shape, access gaps) | m | P0 | 0.1 | |
 | C-12 | Setup Assistant (guided, resumable checklist) | M | P0 | 0.2 | Skeleton in 0.1, full in 0.2 |
-| C-13 | Rollup engine with declarative definitions, modes, filter builder, freshness | M | P0 | 0.2 | Section 4.10; engine ownership decided 2026-10-12 (D-16): BarnCRM's own engine replaces vendored apex-rollup. Planned work: the engine swap and the Rollup Builder, slices S1 to S14 of the approved rollup proposal (tests and Giving real-time registration first; old engine deleted only after a clean comparison run); extended scale cases and pass targets in Section 7.3. Added 2026-10-12 (D-18): S15 Metadata API connection spike, S16 generate and deploy trigger, S17 remove trigger with a Health Check; an operations slice after S8 (count distinct, checkbox Any or None, First or Last into text, text lists); multi-currency behavior and a Builder warning in S5; a queue-drain target in the v0.11 scale gate; a time estimate before Recalculate all. Deferred: sandbox-to-production export, last N days, failure emails, grandchild, hierarchy and Task or Event paths. Built, in `main` (#219): S1 to S8, the operations slice and the Rollup Builder S10 to S13 (ADR-0082, ADR-0083; D-30 to D-32). Next: S9 after a clean comparison run; S14 only if the scale test needs it; S15 to S17 |
+| C-13 | Rollup engine with declarative definitions, modes, filter builder, freshness (moving to the BarnCRM Rollup Builder module, D-101) | M | P0 | 0.2 | Section 4.10; engine ownership decided 2026-10-12 (D-16): BarnCRM's own engine replaces vendored apex-rollup. Planned work: the engine swap and the Rollup Builder, slices S1 to S14 of the approved rollup proposal (tests and Giving real-time registration first; old engine deleted only after a clean comparison run); extended scale cases and pass targets in Section 7.3. Added 2026-10-12 (D-18): S15 Metadata API connection spike, S16 generate and deploy trigger, S17 remove trigger with a Health Check; an operations slice after S8 (count distinct, checkbox Any or None, First or Last into text, text lists); multi-currency behavior and a Builder warning in S5; a queue-drain target in the v0.11 scale gate; a time estimate before Recalculate all. Deferred: sandbox-to-production export, last N days, failure emails, grandchild, hierarchy and Task or Event paths. Built, in `main` (#219): S1 to S8, the operations slice and the Rollup Builder S10 to S13 (ADR-0082, ADR-0083; D-30 to D-32). Next: S9 after a clean comparison run; S14 only if the scale test needs it; S15 to S17 |
 | C-14 | Import framework v1: upload, auto-mapping, dry run, commit, results | M | P0 | 0.2 | Section 4.9; gift rows need G-23 |
 | C-15 | Relationships (contact to contact, reciprocal, typed) | M | P0 | 0.3 | NPSP `npe4` successor |
 | C-16 | Affiliations (contact to organization, role, primary, dates) | m | P0 | 0.3 | NPSP `npe5` successor |
@@ -453,13 +453,15 @@ Priority: **P0** must ship before v1.0; **P1** should ship before v1.0 if the it
 | C-37 | Data transforms and dedupe: formulas and find-and-replace in mappings and bulk update; matching through the org's duplicate rules; bulk delete with undelete from the journal | M | P2 | 0.7 | dataimporter.io and Jetstream; bulk delete later by owner decision 2026-09-23; moved from 1.x to v0.7 on 2026-10-12. Part 1 built, in `main` (#219), ADR-0081 (D-28): import column changes with a before-and-after preview, and matching through the org's duplicate rules. Part 2 built, in `main` (#219): bulk update adopts the transforms, bulk delete with undelete from the journal (ADR-0091, D-34); merge survivors' totals are recalculated just after a merge (ADR-0092, D-35). Follow-ons built, in `main` (#377): delete from a file of IDs, download before delete, more transform steps, import row rules, trial import then the rest, retry rejects into the same job, full results file, delimiter and worksheet choice, match and update by any Text, Email or Phone field |
 | C-38 | Scheduled imports and external sources (SFTP, cloud storage, databases, other systems), with a scheduled dry run that commits only inside admin-set limits | M | P2 | 1.x | **[later]** Owner decision 2026-09-23; Section 6.1 theme; supersedes R-IT6 for that release; the only path that may add Named Credentials or the Bulk API. On hold until Brandon is ready to start the next version (D-39) |
 | C-39 | Interaction notes (lightweight major-gift contact reports on Contact and Account) | m | P1 | 0.9 | Copies the useful part of NPC Interaction Summaries. Decided 2026-10-12 (D-19, D-22): a note is a completed standard Task that follows the record's visibility; confidential notes are not built (Section 11.3). Built, in `main` (#219), ADR-0089 |
+| C-40 | Advanced Territory Management Super Tool: assign records (people, households, organizations) to territories and owners by rules (for example geography, postal code, type or size), with a preview before reassigning and undo, in the spirit of BarnCRM's other tools | M | P2 | 1.x | Planned, after v1.0. Owner decision (Brandon, 2026-10-14; D-98); Section 6.1 theme |
+| C-41 | Grid Super Tool: a spreadsheet-style editable grid to view and edit many related records on one screen (inline edit, related records in one view, saved grids), comparable to paid marketplace grid add-ons | M | P2 | 1.x | Planned, after v1.0. Owner decision (Brandon, 2026-10-14; D-98); Section 6.1 theme; relates to C-36 inline edit of Find results |
 
 ### 5.2 Giving package
 
 | ID | Feature | Size | Pri | Iter | Notes |
 |---|---|---|---|---|---|
 | G-01 | Gift, Allocation, Fund objects with auto-naming, donor rules, default allocation | M | P0 | 0.2 | Section 4.11 |
-| G-02 | Default giving rollups (household, contact, organization, fund) via engine | m | P0 | 0.2 | Ships as metadata defaults |
+| G-02 | Default giving rollups (household, contact, organization, fund) via engine | m | P0 | 0.2 | Ships as metadata defaults; the engine moves to the BarnCRM Rollup Builder module, which Giving requires (D-101) |
 | G-03 | Quick gift entry form (mobile-friendly) | m | P0 | 0.2 | One screen, defaults from settings |
 | G-04 | Refund and write-off as linked negative gifts | m | P0 | 0.2 | Amended 2026-09-24: an unpaid Pending gift is Cancelled, not written off (Section 4.11, D-14); built with G-20 in v0.6 |
 | G-05 | Appeal object with goal, cost, dates, parent, response rollups | m | P0 | 0.2 | |
@@ -625,6 +627,249 @@ Each iteration targets about three major and five minor features, plus engineeri
 10. Analytics module, with field utilization as its first feature (for consideration, not scheduled; Brandon, 2026-09-23). For each object, and each record type where one is used, the share of records that hold a value in each field, with trends from saved snapshots, so an administrator can see which fields nobody fills in, which are worth making required, and which can be retired. A batch job counts field values in the org and stores each run as snapshot records, reported through standard reports and dashboards, with no CRM Analytics dependency. It is neutral, so both suites get it. It works with the data hygiene console (C-28) and the data management tools: a low-use field can go straight into a query or a bulk update. "Where is this field used" (page layouts, record pages, reports, flows) needs the Tooling or Metadata API, which means a callout to the org's own API; that part waits for the same decision as connections to other systems. **Built, landing (PRs #217, #218)** (ADR-0086, D-26): it ships in Core, not as its own package; a weekly user-mode count (Sundays 04:00) per object and record type, kept 13 months as `Field_Utilization_Snapshot__c`, on BarnCRM Settings > Health; Account, Contact and custom objects only (other standard objects would belong in Connect).
 11. Data management 2 (C-36 typed SOQL, subqueries, aggregates, XLSX export, inline edit; C-37 transforms, dedupe on import, bulk delete). Moved into v0.7 on 2026-10-12: C-36 and C-37 (parts 1 and 2, including bulk delete) are built and in `main` (#219).
 12. Scheduled imports and connections to other systems (C-38), owner decision 2026-09-23.
+13. Advanced Territory Management (C-40), a Core Super Tool: assign records (people, households, organizations) to territories and owners by rules (for example geography, postal code, type or size), with a preview before reassigning and undo. Planned, after v1.0 (Brandon, 2026-10-14; D-98).
+14. Grid tool (C-41), a Core Super Tool: a spreadsheet-style editable grid to view and edit many related records on one screen (inline edit, related records in one view, saved grids), comparable to paid marketplace grid add-ons. Planned, after v1.0 (Brandon, 2026-10-14; D-98).
+
+#### 6.1.1 Proposed Super Tools and features (Brandon to decide, recorded 2026-10-14)
+
+None of these is approved or scheduled except C-40 and C-41 (D-98), which are listed here for ranking only. Approach for community tools: compatibility with existing Salesforce Open Source Commons solutions first, BarnCRM's own version later only if wanted (Brandon, 2026-10-14). Ranked best fit first. Comparable tools are researched in 6.1.2.
+
+| # | Idea | Edition | Approach | Comparable tools |
+|---|---|---|---|---|
+| 1 | DLRS compatibility | Both | Confirm DLRS rollups work on BarnCRM objects alongside BarnCRM's rollups and document it; later the Rollup Builder imports DLRS rollups. Rollup Builder becomes an optional module (D-101), so DLRS-only orgs need not install it. | DLRS, Rollup Helper, Easy Rollup, NPSP Customizable Rollups |
+| 2 | Grid tool (C-41, planned after v1.0) | Both | Spreadsheet-style editing of many related records, saved grids; builds on C-36 inline edit of Find results | GridBuddy Connect (Validity), Conga Grid, Grids (RavenApps), CMTD Enhanced Related List (Salesforce Labs), native list view inline edit |
+| 3 | Summit Events compatibility, BarnCRM events later | Both | Registrants land in BarnCRM correctly (households, no duplicates); Lead matching only in Connect or a small adapter (standard-object rule); the planned Events package becomes optional | Summit Events App, Blackthorn Events, Fonteva Events, Cvent, Click and Pledge, Eventbrite |
+| 4 | Advanced duplicate management | Both | Builds on Duplicate Review: whole-org scheduled scans, fuzzy and household-aware matching, merge rules for which value wins, auto-merge of exact matches, blocking on import | Plauti Deduplicate (was Duplicate Check), Validity DemandTools and DupeBlocker, Cloudingo, ZoomInfo Operations (was RingLead), DataGroomr, Insycle |
+| 5 | Memberships Essentials compatibility, BarnCRM membership later | Both (dues as gifts would be a Giving extra) | Compatibility with the Commons membership project first; a Core membership feature later if wanted (G-22 today is Giving only) | Memberships Essentials (Commons), Fonteva, Nimble AMS |
+| 6 | Document builder | Both | Letters, PDFs and mail merge from templates, generalizing the Giving receipts engine | Conga Composer, S-Docs, Nintex DocGen (was Drawloop), Docomotion, Formstack Documents (was WebMerge), Ascendix Composer, DocuSign Gen |
+| 7 | Access explorer | Both | Who can see and edit what, and why; extends the Access page and Health Check | Salesforce User Access Summary, User Access Policies, Security Center, Elements.cloud Permissions Explorer |
+| 8 | Advanced Territory Management (C-40, planned after v1.0) | Both | Rule-based assignment of records to territories and owners, with preview and undo | Salesforce Enterprise Territory Management, assignment rules, Distribution Engine, LeanData, Chili Piper, Kubaru |
+| 9 | Map and radius search | Both | Records on a map, radius search; pairs with C-40; geocoding needs an outside service | Salesforce Maps, Geopointe, Mapsly, native geolocation fields with SOQL DISTANCE |
+| 10 | Field history and restore | Both | History for any field beyond the 20-field limit, with restore | Salesforce Field Audit Trail (Shield), Salesforce Backup and Recover (was Own), Gearset |
+| 11 | Data cleanup and standardization | Both | Name, phone and address formatting and bulk fixes, extending bulk update | Validity DemandTools, Cloudingo, Plauti Record Validation, DataGroomr, Insycle |
+| 12 | Website and portal tool | Both | Public pages and sign-ups through Salesforce Sites at no license cost; a logged-in portal needs Experience Cloud licenses, so only as a separate optional package (ADR-0013) | Experience Cloud, Salesforce Sites, Titan Sites, LlamaSite for Salesforce (Avviato) |
+| 13 | Data dictionary and org documentation | Both | Exportable documentation of objects, fields and automation, extending Org Optimizer | Org Check (Salesforce Labs), Field Trip, Elements.cloud, Sonar, AbstraLinx, org-analyzer, Arovy |
+| 14 | Engagement score | Both (Giving's RFM, G-19, stays the Nonprofit Edition version) | Scores people by any activity | Marketing Cloud Account Engagement scoring and grading, Einstein Scoring |
+| 15 | Archiving and storage relief | Both | Moves old records out of primary storage, using Org Optimizer's storage view | Salesforce Archive (was Own Archive), Odaseva, DataArchiva, Gearset Archiving, Big Objects |
+| 16 | Forms and surveys | Both | Best built as part of #12; V-09 proves the public-page approach | FormAssembly, Formstack, Titan Forms, Salesforce Surveys |
+| 17 | Scheduled backup export | Both | A schedule and a check on Salesforce's data export; full restore is a much larger project | Salesforce Backup and Recover, Odaseva, Gearset, Spanning, Flosum, Weekly Data Export |
+
+#### 6.1.2 Comparable tools research (2026-10-14)
+
+Method: web search plus a few page fetches; AppExchange listings were not opened. Prices are indicative only (vendor blogs, review roundups; many are quote-based). Rows marked UNVERIFIED come from background knowledge or one weak source; confirm on the AppExchange listing or vendor page before relying on them. Corrections found: Own was acquired by Salesforce (closed 2024-11-18), its products now Salesforce Backup and Recover and Salesforce Archive; Plauti Duplicate Check is now Plauti Deduplicate; RingLead is part of ZoomInfo (2021); Pardot is Marketing Cloud Account Engagement; GridBuddy is now GridBuddy Connect; Salesforce Optimizer reported retired in favor of Org Check (one source); "Llama Sites" not found. Grid prices come from a SalesforceBen article whose author founded RavenApps.
+
+##### 1. Rollups
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Declarative Lookup Rollup Summaries (DLRS) | Open source community (Open Source Commons lineage, originally Andy Fawcett) | No-code rollups across lookups on any object, realtime or scheduled | Free, open source | https://cloud4good.com/?p=9607 |
+| Rollup Helper | Passage Technology | Count, sum, avg, min, max, text, hierarchy and multi-currency rollups on lookups | Paid (free tier UNVERIFIED) | https://www.salesforceben.com/how-to-create-roll-up-summary-fields-in-salesforce-with-rollup-helper/ |
+| Native roll-up summary fields | Salesforce | Count, sum, min, max on master-detail only | Included | https://www.salesforceben.com/4-ways-to-create-roll-up-summary-fields-on-lookup-relationships-in-salesforce/ |
+| NPSP Customizable Rollups | Salesforce (NPSP) | Admin UI rollups for Account, Contact, GAU from donations; NPSP only | Free with NPSP | https://trailhead.salesforce.com/trailblazer-community/feed/0D5KX00000pPYDa0AO |
+| Flow aggregation | Salesforce | DIY rollups via record-triggered or scheduled Flow | Included | same SalesforceBen article |
+| Easy Rollup | Cyntexa | Free rollup app (thinly sourced) | Free (UNVERIFIED) | https://products.cyntexa.com/easy-rollup-its-features-and-benefits |
+
+##### 2. Grid and spreadsheet-style editing
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| GridBuddy Connect (was GridBuddy Cloud) | Validity | Original AppExchange grid (2010); multi-object editable grids; Connect adds non-Salesforce sources and multi-org | Paid, from about $24/user/month, 10-user minimum | https://www.validity.com/press-releases/validity-reinvents-gridbuddy-connect-platform-to-enable-data-productivity/ |
+| Conga Grid | Conga | Lightning-native cross-object grid | Paid, from about $18/user/month, 10-user minimum | https://www.salesforceben.com/what-is-a-salesforce-appexchange-grid-solution/ |
+| Grids | RavenApps | Related-record grids | Freemium: 2 free grids, then about $8/user/month | same |
+| CMTD Enhanced Related List | Salesforce Labs | Related list with inline editing | Free | same |
+| List view and report inline editing | Salesforce | Inline row edits | Included | same |
+| Dynamic Related Lists | Salesforce | Configurable related lists, some inline edit | Included | same |
+| Flow screen Data Table | Salesforce | Multi-row edit in screen flows | Included | same |
+| lightning-datatable | Salesforce | Base component for custom grids | Included | same |
+| Kanban list view | Salesforce | Board view of list views | Included | UNVERIFIED |
+| Troops | Troops.ai lineage (UNVERIFIED) | Slack-based record edit, not a true grid | UNVERIFIED | https://tr-web.dev.trustradius.com/compare-products/gridbuddy-vs-troops |
+
+##### 3. Event management
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Summit Events App | Open Source Commons (SFDO-Community) | EDU and NGO events: registration, confirmation, public pages; Contact and Lead matching | Free, open source | https://github.com/SFDO-Community/Summit-Events-App |
+| Blackthorn Events | Blackthorn.io | Native events, registration, payments, check-in | Paid, quote | https://blackthorn.io/frequently-asked-questions/what-is-the-best-salesforce-native-event-management-app/ |
+| Fonteva Events | Fonteva | Events inside the membership platform | Paid, quote | https://fonteva.com/ |
+| Cvent | Cvent | Enterprise conference platform, Salesforce integration | Paid, quote | https://www.soapboxengage.com/blog/2889-best-nonprofit-event-management-software-2026 |
+| Eventbrite (connectors) | Eventbrite | Ticketing, shallow integration via middleware | Per-ticket fees (UNVERIFIED) | https://www.soapboxengage.com/blog/1773-salesforce-event-registration-apps |
+| Click and Pledge events | Click and Pledge | Events bundled with payment processing | Free with payments; processing fees | https://blackthorn.io/?p=26792 |
+| EVA | UNVERIFIED | Simpler registration | UNVERIFIED | soapboxengage.com |
+
+##### 4. Duplicate management
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Duplicate and matching rules | Salesforce | Native alert, block, report; limited fuzzy matching | Included | UNVERIFIED |
+| Plauti Deduplicate (was Duplicate Check) | Plauti | Native; real-time prevention, scheduled dedupe, merge; no undo | Paid; sources conflict (about $5K to $25K/yr) | https://www.plauti.com/blog/best-cloudingo-alternative-is-duplicate-check-right-for-you |
+| DemandTools | Validity | Bulk dedupe, mass update, import, standardize | Paid, quote | https://www.getclientell.com/demandtools-alternatives |
+| DupeBlocker | Validity | Real-time blocking at entry | Paid | UNVERIFIED |
+| Cloudingo | Symphonic Source (UNVERIFIED) | Dedupe and merge with rules and review UI | Paid, about $2,500/yr and up | https://pipeline.zoominfo.com/sales/cloudingo-vs-ringlead |
+| RingLead | ZoomInfo (acquired 2021) | Dedupe, import, routing | Paid | https://www.plauti.com/blog/ringlead-alternative |
+| DataGroomr | DataGroomr | ML-assisted dedupe | Paid | https://datagroomr.com/salesforce-deduplication-in-2025/ |
+| Insycle | Insycle | Scheduled dedupe and cleanup | Paid | https://prospeo.io/s/salesforce-deduplication |
+
+##### 5. Membership and association management
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Memberships Essentials (Commons Project: Memberships; repo MembershipSchemaAndBenefits; mapping inferred) | Open Source Commons (SFDO-Community-Sprints) | Open data model and automation for memberships and sponsorships; in the Aug 2026 sprint | Free, open source; release status unverified | https://github.com/SFDO-Community-Sprints/MembershipSchemaAndBenefits |
+| Fonteva | Fonteva | Membership, events, commerce, portal on Salesforce | Paid, quote | https://www.softwareadvice.com/community/fonteva-membernation-profile |
+| Nimble AMS | Nimble AMS | Tiered memberships, chapters, renewals, dues on Salesforce | Paid, quote | https://us.fitgap.com/products/nimble-ams |
+| NPSP and Nonprofit Cloud membership objects | Salesforce | Light native model | Included | https://www.salesforce.com/nonprofit/pricing/ |
+| YourMembership, MemberClicks | non-Salesforce | Comparison points | Paid | https://www.rfp.wiki/vendors/fonteva/yourmembership |
+
+##### 6. Document generation
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Conga Composer | Conga | Word, Excel, PowerPoint, PDF merge; complex setup | Paid | https://www.g2.com/products/conga-document-generation/reviews/conga-document-generation-review-2553263 |
+| S-Docs | S-Docs | Templates authored and stored in Salesforce | Paid | https://trustradius.com/compare-products/nintex-docgen-for-salesforce-vs-s-docs |
+| Nintex DocGen (was Drawloop) | Nintex | Bulk, multi-source assembly | Paid | https://g2.com/products/nintex-drawloop-docgen-for-salesforce/reviews/nintex-drawloop-docgen-for-salesforce-review-634171 |
+| Docomotion | Docomotion | Mid-market doc generation | Paid (UNVERIFIED) | https://www.g2.com/compare/conga-composer-vs-docomotion |
+| Formstack Documents (was WebMerge) | Formstack | Hosted PDF and Word generation | Paid; Suite about $299/month | https://trustradius.com/compare-products/formstack-documents-vs-nintex-docgen-for-salesforce |
+| Ascendix Composer, Nutrient Documents, DocuSign Gen | various | Further options in roundups | Paid | https://ascendix.com/blog/salesforce-document-generation-tools/ |
+
+##### 7. Access and permission analysis
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| User Access Summary | Salesforce | One view of a user's permissions and access (GA Summer '24) | Included | https://admin.salesforce.com/blog/2024/the-future-of-user-management-summer-24-be-release-ready |
+| User Access Policies | Salesforce | Criteria-based assignment of permission sets, groups, licenses | Included (limits UNVERIFIED) | https://salesforcegeek.in/the-future-of-user-access-management-in-salesforce/ |
+| Security Center | Salesforce | Multi-org security posture | Paid add-on (UNVERIFIED) | none |
+| Permissions Explorer | Elements.cloud | Who has access to what across metadata types | Paid | https://elements.cloud/blog/permissions-explorer-a-game-changer-in-salesforce-permissions-management/ |
+| Security and Access Manager Suite | vendor UNVERIFIED | Effective access, high-risk users | Paid | UNVERIFIED |
+
+##### 8. Territory management and routing
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Enterprise Territory Management | Salesforce | Territory hierarchy, rule-based account assignment | Included in Sales Cloud Enterprise and up | https://www.salesforceben.com/the-best-salesforce-lead-routing-software-a-buyers-guide/ |
+| Assignment rules and queues | Salesforce | Ordered rules, first match wins | Included | same |
+| Distribution Engine | NC Squared | Round robin, territory, skills, capacity on any object | Paid, about $20 to $55/user/month | https://coefficient.io/lead-routing/lead-routing-app-for-salesforce |
+| LeanData | LeanData | Visual routing flows, lead-to-account matching | Paid, quote | https://www.leandata.com/blog/salesforce-lead-routing-automation/ |
+| Chili Piper | Chili Piper | Form-to-meeting routing, round robin | Paid | https://prospeo.io/s/lead-routing-software |
+| Default | Default | Routing platform | Paid, about $1,250/month plus seats | https://www.default.com/post/salesforce-lead-routing |
+| Kubaru | Kubaru | Low-cost round robin and weighted routing | Paid | https://prospeo.io/s/lead-routing-software |
+| Omni-Channel | Salesforce | Queue and skills routing for service | Included with Service Cloud (UNVERIFIED) | none |
+
+##### 9. Mapping and radius search
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Salesforce Maps and Maps Advanced | Salesforce | Native maps, territories, routing | Paid, about $75; Advanced $125 to $150/user/month (sources conflict) | https://salesforce.com/sales/mapping-software/pricing |
+| Geopointe | Geopointe | Native mapping, territory, proximity | Paid, about $74 to $120/user/month | https://www.g2.com/compare/geopointe-vs-mapsly |
+| Mapsly | Mapsly | Mapping app, four plans | Paid | same |
+| Geolocation fields and SOQL DISTANCE | Salesforce | Native radius queries | Included (UNVERIFIED) | none |
+
+##### 10. Field history and restore
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Field History Tracking | Salesforce | 20 fields per object; 18 months in UI | Included | https://trailhead.salesforce.com/content/learn/modules/field-audit-trail-basics/get-started-with-field-audit-trail |
+| Field Audit Trail | Salesforce (Shield) | Up to 60 fields, up to 10 years (single vendor source) | Paid add-on | https://www.flosum.com/blog/salesforce-field-audit-trail |
+| Salesforce Backup and Recover (was Own Recover) | Salesforce | Backup, compare, restore | Paid | https://owndata.com/blog/salesforce-backup-and-recovery-solution |
+| Odaseva | Odaseva | Enterprise backup and restore | Paid, quote | https://www.g2.com/compare/odaseva-vs-salesforce-backup-recover-vs-spanning-backup |
+| Spanning Backup | Spanning | Per-user backup | Paid per user | https://gearset.com/compare/gearset-vs-spanning/ |
+| Gearset Backups | Gearset | Daily and on-demand backup, metadata restore | Paid | same |
+
+##### 11. Data cleanup and standardization
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| DemandTools | Validity | Mass update, dedupe, standardize, import | Paid | https://www.trustradius.com/compare-products/demandtools-vs-plauti |
+| Cloudingo | Symphonic Source (UNVERIFIED) | Cleanup and dedupe | About $2,500/yr and up | https://pipeline.zoominfo.com/sales/cloudingo-vs-ringlead |
+| Plauti Record Validation (name UNVERIFIED) | Plauti | Address, email, phone validation | Paid | https://www.plauti.com |
+| DataGroomr | DataGroomr | Cleanup and dedupe | Paid | https://datagroomr.com/salesforce-deduplication-in-2025/ |
+| Insycle | Insycle | Scheduled cleanup and mass edits | Paid | https://prospeo.io/s/salesforce-deduplication |
+| ZoomInfo Operations (was RingLead) | ZoomInfo | Hygiene and enrichment | Paid | https://www.trustradius.com/compare-products/gtm-studio-vs-plauti |
+
+##### 12. Website and portal
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Experience Cloud | Salesforce | CRM-driven portals and sites, no-code builder | Paid license per login type (nonprofit portal licensing UNVERIFIED) | https://www.salesforce.com/blog/experience-builder/ |
+| Salesforce Sites | Salesforce | Public pages on the platform | Included | https://developer.salesforce.com/docs/atlas.en-us.234.0.apexcode.meta/pages/apex_forcecom_sites.htm |
+| Titan Sites and Titan Platform | Titan | No-code builder with or instead of Experience Cloud | Paid, from about $150/month | https://titandxp.com/salesforce-sites-vs-experience-cloud |
+| Siteforce | Salesforce | Legacy CMS for Sites | Legacy | https://www.itcentralstation.com/products/siteforce |
+| LlamaSite for Salesforce | Avviato, Inc. | Website and portal builder running natively on Salesforce (managed package): CMS, drag-and-drop forms with uploads, member, volunteer and customer portals with login and registration, catalogs and payments, knowledge base, forums, fundraising, surveys; data shown as tables, grids, calendars. Whether logins need Experience Cloud licenses is not stated | Paid: AppExchange says from $499/company/month (site says $525/month), nonprofit discounts, free trial; AppExchange rating 5.00 (2 reviews) | https://llamasite.com/ ; https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3A00000G5spSUAR |
+
+##### 13. Data dictionary and org documentation
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Org Check | Salesforce Labs (open source) | Org analysis and technical debt; reported Optimizer replacement | Free | https://github.com/SalesforceLabs/OrgCheck |
+| Elements.cloud | Elements.cloud | Documentation, impact analysis, process maps | Paid | https://elements.cloud/ |
+| Field Trip | Salesforce Labs (status UNVERIFIED) | Field population and usage | Free (UNVERIFIED) | none |
+| Sonar | UNVERIFIED | Org documentation and change tracking | UNVERIFIED | none |
+| AbstraLinx | Soft-Builder | Data dictionary, model docs, Excel workbook | Paid | https://soft-builder.com/abstralinx/feature-matrix/ |
+| org-analyzer | open source CLI plugin | Data dictionary and ERD to Excel | Free | https://www.npmjs.com/package/org-analyzer |
+| Arovy | Arovy | Automated data dictionary | Paid | https://www.arovy.com/resources/webinars/webinar-salesforce-data-dictionary-build-it-yourself-or-automate-it |
+
+##### 14. Engagement scoring
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Account Engagement scoring and grading | Salesforce | Behavior score plus fit grade | Paid | https://trailhead.salesforce.com/content/learn/modules/lead-scoring-and-grading-in-account-engagement |
+| Einstein Scoring | Salesforce | Predictive scoring | Paid (UNVERIFIED) | none |
+
+No third-party Salesforce-native engagement scoring app was found.
+
+##### 15. Archiving
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Salesforce Archive (was Own Archive) | Salesforce | Inactive records to long-term storage, viewable on record pages | Paid | https://owndata.com/blog/salesforce-backup-and-recovery-solution |
+| Odaseva Data Archiving | Odaseva | Large, complex models; archive viewer | Paid, quote | https://odaseva.com/salesforce-data-archiving |
+| DataArchiva | DataArchiva | Native archiving to Big Objects, restore | Paid | https://www.carahsoft.com/data-archiva |
+| Gearset Archiving | Gearset | Archiving with retention | Paid | https://gearset.com/compare/gearset-vs-spanning/ |
+| Big Objects | Salesforce | Platform archive storage | Included with limits (UNVERIFIED) | none |
+
+##### 16. Forms and surveys
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| FormAssembly | FormAssembly | Salesforce-specialist forms, multi-object mapping | Paid, from about $89/month | https://paperform.co/form-builders/formassembly-vs-formstack.md |
+| Formstack | Formstack | Forms plus documents and signing | Paid: Forms $99/month, Suite $299/month | https://automationatlas.io/answers/formstack-pricing-explained-2026/ |
+| Titan Forms | Titan | Two-way Salesforce object read and write | Paid, from about $150/month | https://titandxp.com/?p=2262 |
+| Salesforce Surveys | Salesforce | Native surveys | Included or add-on (UNVERIFIED) | none |
+| Web-to-Lead and Screen Flow | Salesforce | Basic native capture | Included | UNVERIFIED |
+
+##### 17. Backup
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Salesforce Backup and Recover | Salesforce | Automated backup, compare, restore | Paid, free trial | https://www.g2.com/compare/odaseva-vs-salesforce-backup-recover-vs-spanning-backup |
+| Odaseva | Odaseva | Enterprise backup | Paid, quote | same |
+| Gearset Backups | Gearset | Daily and on-demand backup | Paid | https://gearset.com/compare/gearset-vs-spanning/ |
+| Spanning Backup | Spanning | Per-user backup | Paid per user | same |
+| Flosum | Flosum | DevOps with backup | Paid | https://www.g2.com/compare/flosum-vs-salesforce-backup-recover |
+| Weekly Data Export | Salesforce | Scheduled CSV export, no restore | Included | UNVERIFIED |
+
+##### 18. Data import and mass update (Data Manager comparison)
+
+| Tool | Vendor | Distinctive functionality | Price model | Source |
+|---|---|---|---|---|
+| Data Import Wizard | Salesforce | Browser import up to 50,000 records | Included | https://www.cdata.com/blog/data-import-wizard-vs-data-loader |
+| Data Loader | Salesforce | Desktop, Bulk API | Free | https://salesforceben.com/salesforce-data-import-wizard-vs-data-loader |
+| dataloader.io | MuleSoft (Salesforce) | Cloud loader, scheduled tasks | Freemium | https://coefficient.io/data-loaders-for-salesforce |
+| Jitterbit Data Loader | Jitterbit | Free-tier loader with scheduling | Freemium (UNVERIFIED) | https://www.getclientell.com/dataloader-alternatives |
+| Skyvia | Devart | Cloud import and sync | Freemium (UNVERIFIED) | https://coefficient.io/data-loaders-for-salesforce |
+| Coefficient | Coefficient | Spreadsheet-based import | Paid, from $49/month | same |
+| DemandTools and Cloudingo mass update | Validity, Symphonic Source | Mass update and import with matching | Paid | see 11 |
+
+#### 6.1.3 Considered and not recommended (recorded 2026-10-14)
+
+Reviewed with the 6.1.1 list and not recommended for BarnCRM; kept for reference so they are not re-proposed without a new reason.
+
+| Idea | Why not | Comparable tools |
+|---|---|---|
+| Quoting, pricing and configuration (CPQ) | Sales-pipeline tooling outside BarnCRM's people and households focus; needs Opportunity and Product objects, which Core may not use (standard-object rule) | Salesforce CPQ (Revenue Cloud), Conga CPQ, DealHub |
+| E-signature | Legal and compliance weight, paid signing services; better integrated than rebuilt | DocuSign, Adobe Acrobat Sign, Conga Sign |
+| Marketing automation and mass email | Salesforce mass email limits, deliverability and consent obligations; a specialist tool does it better | Marketing Cloud Account Engagement, Mailchimp connectors |
+| Phone systems (CTI) | Needs a paid telephony provider and per-user setup | Salesforce Voice, Dialpad, RingCentral |
+| Payment processing in Core | Belongs in Connect (planned processor webhooks, X-08) and the processors themselves | Stripe, Click and Pledge, iATS |
+| AI features that call a paid service | Conflicts with the no paid AI API rule; the AI-readiness pack (post-1.0) covers grounding other tools instead | Agentforce, Einstein |
 
 ### 6.2 Priority rules used (so future re-prioritization stays consistent)
 
@@ -1048,7 +1293,7 @@ Findings and decisions about the modules (Giving, Connect, Volunteers, Programs,
 | D-51 | The import tab label is "Import" (owner decision, Brandon, 2026-10-13; amends D-45 for the tab), reached from the Data Manager tab. Import and Bulk Update leave the app navigation; Find stays. The job object label stays "Data Job" | Keeping "Data Jobs" on the tab; keeping Import and Bulk Update in the navigation | The Data Manager hub is now the data jobs place, so the tool itself reads as what it does |
 | D-52 | Erase a person (right to be forgotten) is built in Core, with a Giving extension for gifts and receipts (owner decision, Brandon, 2026-10-13) | Leaving it out | Donors can ask for erasure under privacy laws; Core cannot reference Giving, so gifts and receipts are handled through an extension point |
 | D-53 | The Commitment page keeps Clone and Printable View off (owner decision, Brandon, 2026-10-13) | Turning them on | A cloned or printed commitment risks duplicate pledges and stale payment schedules |
-| D-54 | The Program Staff and Volunteer Coordinator permission set groups get their module permission sets when those modules ship (owner decision, Brandon, 2026-10-13); until then they stay as they are | Removing the groups now | The groups are the place those module permissions will attach |
+| D-54 | The Team Member (`Program_Staff`) and Coordinator (`Volunteer_Coordinator`) permission set groups get their module permission sets when those modules ship (owner decision, Brandon, 2026-10-13); until then they stay as they are | Removing the groups now | The groups are the place those module permissions will attach |
 | D-55 | Shipped import templates are added at install and on upgrade (owner decision, Brandon, 2026-10-13); closes Section 11.2 item 14 | Copying them at first use or from Health Check only | Matches Section 4; admins get new templates without a manual step |
 | D-56 | Org gates may batch several PRs into one combined org run and deploy only changed metadata; every test that would have run still runs (owner decision, Brandon, 2026-10-13) | One full gate per PR | Fewer deploys and runs with no test skipped |
 | D-57 | Console app rollout (owner decision, Brandon, 2026-10-13): on the test orgs `oi-test`, `oi-pa` and `barn-core` Claude deletes and redeploys the app; on `barn-npc` and `mwdbdevsb` the owner switches Navigation Style to Console in App Manager | Deploying over the existing app everywhere | A deployed app cannot change its navigation type in place; the real-org sandboxes stay under the owner's hand |
@@ -1086,11 +1331,17 @@ Findings and decisions about the modules (Giving, Connect, Volunteers, Programs,
 | D-89 | A household left with no members after its people are deleted moves to the Recycle Bin, but only after its former members can no longer be restored from the Recycle Bin (Brandon, 2026-10-14): a nightly Core job, on by default, switchable in Nonprofit Settings; households with other child records are kept and reported. Amends D-88, which protects restoring deleted people. Landed 2026-10-14 (#408, ADR-0120) | Deleting the emptied household in the same save (D-88 rejected it); never tidying empty households | The household is deleted only once restoring its people is no longer possible, so D-88's protection holds; the job is switchable, and households holding other child records are kept and reported rather than deleted |
 | D-90 | 25,000 rows is the scale bar for the pilot (Brandon, 2026-10-14): the 250,000-row import run comes later, in a sandbox (Section 7.3) | Running the 250k-row import before the pilot | The 25k tier passed on `oi-test`; a 250k run needs a sandbox, and the pilot does not need it |
 | D-91 | Salesforce-license-only permissions move out of BarnCRM Admin into the optional `BarnCRM_Access_Manager` permission set (ADR-0121, #406): Assign Permission Sets and View All Users; it has no role, `Duplicate_Review` stays Sales/Service-only, and the Access page checks up front and disables role and add-on changes without it | Keeping those permissions in BarnCRM Admin | Core must install and run on a Platform-only license (ADR-0013); a Platform-license user cannot hold those permissions |
-| D-92 | Product-branded names stay (Brandon, 2026-10-14; closes Section 11.2 item 24): BarnCRM Admin, Staff, Read Only, Duplicate Review and BarnCRM Settings | Neutral Core names | The names are the product's; no reason to split labels between Core and Giving |
+| D-92 | Product-branded names stay (Brandon, 2026-10-14; closes Section 11.2 item 24): BarnCRM Admin, Staff, Read Only, Duplicate Review and BarnCRM Settings. Superseded for the Core roles by D-97. | Neutral Core names | The names are the product's; no reason to split labels between Core and Giving |
 | D-93 | No end date on per-automation switches (Brandon, 2026-10-14; closes Section 11.2 item 16): they stay off until an admin turns them back on; the org-wide pause still expires (ADR-0055) | An optional end date per switch | Extra setting and job for little gain |
 | D-94 | The pilot is a milestone below v1.0 (Brandon, 2026-10-14): no version number is attached to it; Brandon decides version numbers | Naming the pilot as a version | Version numbers are the owner's call; D-87 already settles release prerequisites after a pilot |
 | D-95 | BarnCRM is open to any Salesforce org regardless of size, and extra valuable for small to mid-sized teams that lack the resources for many licenses and customization; it comes with powerful tools preloaded. The pilot is likewise open to any org size (Brandon, 2026-10-14). The Nonprofit Edition is described as "like NPSP for Nonprofit Cloud", plus other useful tools | Limiting the audience or the pilot to small teams (one to ten users) | Size is not the line; the value is highest where licenses and customization are scarce, and a pilot on varied org sizes gives better evidence |
 | D-96 | Edition names (Brandon, 2026-10-14): "BarnCRM is the suite of tools that come in two versions": the **Nonprofit Edition** (formerly "Impact Suite") and the **Standard Edition** (formerly "Community Suite", for any other Salesforce org). Both editions have the full core suite of tools (people, households, relationships, addresses, imports with undo, Find and bulk update, duplicate review, Org Optimizer, Health Check, settings and the rest of Core); the Nonprofit Edition is the Standard Edition plus the nonprofit tools (Giving and the other nonprofit modules). The Standard Edition is never described as reduced, basic or a subset. "Nonprofit Edition" already named the Setup Assistant's toggle (D-81, ADR-0072) and the Impact Suite was described as that same thing (D-95), so there is now one meaning: the Setup Assistant's first step chooses between the two editions. Supersedes the suite names in D-81 and ADR-0046; D-81 is kept as written | "Community Edition" (clashes with Salesforce Community Cloud and the Trailblazer Community, and in software usually means a cut-down free tier); keeping "Impact Suite" and "Community Suite" (two names for the same offering, and "Community" misleads) | One name per offering; the Standard Edition is a full product, so no edition reads as a lesser one |
+| D-97 | Core roles have neutral names (Brandon, 2026-10-14; supersedes D-92 for the Core roles): Program Staff becomes **Team Member** and Volunteer Coordinator becomes **Coordinator**, labels and descriptions only; API names `Program_Staff` and `Volunteer_Coordinator` unchanged; BarnCRM Admin, Read Only and Giving's Fundraising Staff unchanged (ADR neutral-role-names, PR #413) | Keeping the nonprofit role names (D-92) | Core is the whole Standard Edition (D-96); the names must fit any organization |
+| D-98 | Advanced Territory Management (C-40) and a Grid tool (C-41) are planned Core Super Tools, built after v1.0 (Brandon, 2026-10-14) | Not planned | Owner request; common paid add-ons small teams cannot afford |
+| D-99 | Edition gates what Core shows (Brandon, 2026-10-14): nonprofit modules (Giving, Volunteers, Programs, Funders, Connect) are shown and offered only in the Nonprofit Edition; installed modules keep working; the module-to-edition mapping is data-driven. The edition is chosen once (first-run setup); afterwards it is changed only from BarnCRM Settings > General > Change edition (with confirmation) or Setup > Custom Settings, documented in the admin guide editions page. Volunteers moves from both editions to the Nonprofit Edition. Amends ADR-0072 and ADR-0062 decision 4 (ADR edition-gates-visibility, PRs #414, #415) | Edition hides nothing and can be changed any time in the Setup Assistant | Standard Edition orgs should not see nonprofit tools; edition is a one-time choice |
+| D-100 | First-run setup and switches (Brandon, 2026-10-14): on first install, a setup overlay covers BarnCRM Home and BarnCRM Settings until an admin completes it (edition, then "turn on all defaults" or choose); non-admins see that an administrator must finish setup; it ends on Settings > General. General shows the edition and a panel of modules and features with on/off switches; when a feature or module is off, its app tabs and its Settings menu are hidden (tab visibility through permissions) | Setup Assistant step only; tabs left visible | Owner request for a clear first run and an uncluttered app |
+| D-101 | Modules versus features (Brandon, 2026-10-14): features are installed with Core and can be switched on or off (Data Manager with Import, Find and Bulk Update; Duplicate Review; Org Optimizer and Health Check). Modules are separate packages not installed with Core, installed from BarnCRM Settings, shown only for their editions, each with its own console app and its own Settings tab, and each named "BarnCRM <name>" (BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders, BarnCRM Connect, BarnCRM Rollup Builder). "Super Tools" is a website and marketing name only. The Rollup Builder and rollup engine move out of Core into a new both-editions module, BarnCRM Rollup Builder, so orgs using DLRS or Rollup Helper can run them alongside BarnCRM; BarnCRM Giving depends on it (ADR rollup-builder-module, in design) | Keep rollups in Core behind a switch | Install-time choice for orgs with an existing rollup tool; Core stays smaller |
+| D-102 | Features off by default, modules installed from Settings, first-run setup (Brandon, 2026-10-14 and 2026-10-15): Core features are off on a new install and are turned on only in first-run setup or later on Settings > General; turning one on is one-way, with a warning above the switches. Tabs and Settings menus stay hidden until their feature is on (packaged BarnCRM_Tab_* permission sets kept in step by a sync). Upgraded orgs count as every feature on. Modules are not installed with Core: they are installed only from the Settings > Modules section, which then shows "Installed" with a link to the module's app. A blocking first-run window on BarnCRM Home and BarnCRM Settings asks an admin for the edition, then "turn on all the default core features" or "let me choose" (all ticked); others see that an administrator needs to finish setup. A new install holds all Core automation, household creation included, until first-run setup turns features on; turning Household Upkeep on catches up people added before setup. Landed in #426 (ADR-0124) | Features on by default; modules bundled with Core | Admins choose what they use; nothing runs before it is chosen |
 
 ---
 
@@ -1112,3 +1363,4 @@ Findings and decisions about the modules (Giving, Connect, Volunteers, Programs,
 ---
 
 *End of document. Everything above is intended to be enough to begin. When in doubt, return to Section 1.3 and ask which principle the decision serves.*
+

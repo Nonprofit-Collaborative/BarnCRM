@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-14.
+Last verified 2026-10-15.
 
 ## Pointers
 
@@ -27,10 +27,10 @@ Last verified 2026-10-14.
 |---|---|---|
 | `devhub` | Dev Hub | Creates scratch orgs |
 | `oi-test` | Default scratch test org, Person Accounts shape | Named by the `SF_TEST_ORG_AUTH_URL` secret |
-| `oi-pa` | Person Account scratch org (D-15) | Expires 2026-10-24; recreation pre-approved. Cleaned 2026-10-12 (owner approved): old `Nonprofit_Admin` assignment, the 4 `Nonprofit_*` permission sets and their group deleted |
+| `oi-pa` | Person Account scratch org (D-15) | Expires 2026-10-24; recreation pre-approved; the successor alias is `barn-personaccount`. Cleaned 2026-10-12 (owner approved): old `Nonprofit_Admin` assignment, the 4 `Nonprofit_*` permission sets and their group deleted. 2026-10-14 (owner approved): stale BarnCRM app and its 4 in-app guidance prompts deleted. Fallback gate org when `oi-test` has no `DailyAsyncApexTests` left |
 | `barn-core` | Third scratch test org, Sales Cloud shape, for Core-only runs | Approved 2026-10-12 (alias was `bc-core`). Expires 2026-10-15; recreation pre-approved (owner, 2026-10-13) |
-| `barn-npc` | Nonprofit Cloud trial, production-type, Person Accounts on, API 68.0; for rollup S16 coverage and Nonprofit Cloud coexistence tests | Never the default. Enabled 2026-10-12 (owner approved): Fundraising_Admin and Program_Management_Administrator permission set groups on the admin; Contacts to Multiple Accounts on; Industries settings Fundraising, Gift Entry Grid, Group Membership, Program and Benefit Management on (irreversible). BarnCRM deploy approved once landing batches, Builder S10 to S14 and test self-containment merge |
-| `mwdbdevsb` | Sandbox of a real, built-out org, for Standard Edition (Core without Giving) tests; alias was `mwdsb` until 2026-10-12; Midwest Dreamin' sandbox `brandondev`, connected 2026-10-12, instance API 68.0 | Never the default; check-only first; ask the owner before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only. Real deploy on hold (owner, 2026-10-12). Lacks the Data Protection and Privacy objects, so vendored apex-rollup tests do not compile there |
+| `barn-npc` | Nonprofit Cloud trial, production-type, Person Accounts on, API 68.0; for rollup S16 coverage and Nonprofit Cloud coexistence tests | Never the default. Enabled 2026-10-12 (owner approved): Fundraising_Admin and Program_Management_Administrator permission set groups on the admin; Contacts to Multiple Accounts on; Industries settings Fundraising, Gift Entry Grid, Group Membership, Program and Benefit Management on (irreversible). BarnCRM deploy approved once landing batches, Builder S10 to S13 and test self-containment merge. Deployed 2026-10-13 (`main` at #221); real-org check 2026-10-15 at e1a71e43 passed (tab sync, one-way turn-on, NoneChosen, restore; permission set groups recalculated in 2 to 8 s); settings objects deployed Public (a trial rejects Protected); the BarnCRM app is still Standard navigation there (D-57: delete the app first, ask Brandon); an org-default `BarnCRM_Settings__c` row exists (null values) |
+| `mwdbdevsb` | Sandbox of a real, built-out org, for Standard Edition (Core without Giving) tests; alias was `mwdsb` until 2026-10-12; Midwest Dreamin' sandbox `brandondev`, connected 2026-10-12, instance API 68.0 | Never the default; check-only first; ask the owner before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only. Deployed 2026-10-14 (owner request): Core at e3f2db58, then e3f2db58 plus #411, #412 and #413; BarnCRM Admin group assigned to Brandon Mead and Michelle Hansen; no data or settings changes, no scheduled jobs. Ask before every further deploy. A deploy from another folder needs `--ignore-conflicts` (source tracking is per folder). Dev org admins need `Rollup_Builder_Admin` after the Rollup Builder module lands |
 
 Any other org (including other mwd sandboxes) needs owner approval. Agents share each scratch org one deploy or test run at a time, through a lock in the session scratchpad. Scratch org definitions: `config/scratch-defs/` (`person-accounts.json`, `sales-cloud.json`, `platform-only.json`, `npsp.json`, `nonprofit-cloud.json`).
 
@@ -43,7 +43,8 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 - `packages/core` (neutral Core; the vendored apex-rollup tree, `RollupAdapter` and `RollupEngineComparison` were deleted by rollup S9, #377), `packages/giving` (depends on Core), `packages/connect` (depends on Core and Giving; the only package that may touch Opportunity, Campaign, Case, Lead). `packages/volunteers`, `programs`, `funders` are placeholders.
 - Core never references Giving or Connect; no dependency on Person Accounts, Industries, OmniStudio, Data Cloud or Experience Cloud (ADR-0013).
-- Deploys to an org run in stages through `scripts/org/deploy-packages.sh`.
+- Deploys to an org run in stages through `scripts/org/deploy-packages.sh`. Pending (follow-up after #426, not yet landed): the script calls `TabAccessService.requestSync()` after a deploy, because dev orgs otherwise lose the tool tabs.
+- Planned, in review (not on `main`): `packages/rollups` ("BarnCRM Rollup Builder", a both-editions module, D-101; PRs #417 to #432); install order Core, Rollup Builder, Giving; permission sets `Rollup_Builder_Admin` and `Rollup_Builder_User`; a Rollup Builder stage in `deploy-packages.sh`; CI check `check-core-names-no-module.py`.
 - Namespace deferred (ADR-0001): `sfdx-project.json` namespace stays empty, no hard-coded prefix, no package versions; prefixed names come from `NamespaceUtil`.
 
 ## CI checks
@@ -103,3 +104,16 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - In a class with a field named `label`, reference custom labels as `System.Label.X`.
 - `ALL ROWS` returns deleted records until they are physically removed.
 - Person-account orgs rename some child relationships; do not hard-code relationship names.
+- `BarnCRM_Settings__c.Suite__c` accepts only `Community` or `Impact` (the API values of Standard and Nonprofit Edition); Setup edits are not audited. The edition is chosen once in first-run setup; first-run shows while `Suite__c` is blank (ADR-0124).
+- `Features_Turned_On__c`: blank means every feature on (upgraded org), `None` means a new install before setup, `NoneChosen` means setup finished with nothing turned on. Turning a feature on is one-way.
+- Turning Household Upkeep on queues `HouseholdCatchUpBatch` (contacts only; person accounts are not caught up, a roadmap follow-up). Tests that turn it on enqueue a batch (one `executeBatch` per test method).
+- `CorePostInstall` schedules "BarnCRM Tab Access Check" (nightly tab sync); skipped in tests unless `scheduleTabCheckInTests`. Settings has 14 sections, Modules second; `firstRunSetup` (LWC in `settingsConsole`) is first on `BarnCRM_Home`.
+- Core role labels differ from API names: Team Member is `Program_Staff`, Coordinator is `Volunteer_Coordinator`; never rename the API names (ADR-0123).
+- Module Apex calls `HealthCheckController.applyFixFor` (never `applyFix`). `RollupEngineExtension` is frozen: new needs go in a v2 interface. `check-core-names-no-module.py` has an `ALLOWED_LITERALS` list.
+- Anything that sizes a record from stored totals must read every COUNT total on the entity, not only the named definitions (#412). The queue sends a parent to `RollupLargeParentBatch` when the estimate passes 40% of the query-row limit, or when its next query would pass four fifths (stale stored count, #434).
+- `oi-test` `DailyAsyncApexTests` limit is 7,260 test classes per rolling 24 hours (about 22 full runs of about 330 classes). When it is exhausted `sf apex run test` fails with `UNKNOWN_EXCEPTION` ("An unknown exception occurred") and the gate reports "sf CLI crashed". Check: `sf org list limits -o oi-test --json`, the `DailyAsyncApexTests` row. Fall back to `oi-pa`.
+- `NavType` is not updateable on an existing app: delete the in-app guidance prompts that reference it first, then the app (done on `oi-pa` 2026-10-14).
+- `gh pr merge --delete-branch` closes PRs stacked on that branch and does not retarget them (hit 2026-10-14 on #414 and #417); retarget dependents first.
+- `sf ... --json 2>&1` mixes the CLI update warning into the JSON; scripts must tolerate it (#433).
+- A sandbox deploy from a different folder needs `--ignore-conflicts` (source tracking is per folder).
+- `barn-npc` settings custom settings and metadata deployed with visibility Public (a production-edition trial rejects Protected, see above).
