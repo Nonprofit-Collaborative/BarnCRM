@@ -115,11 +115,21 @@ subscriber migration.
    The engine's save path must run in system mode for every package-owned read and write
    (ADR-0021), so a user holding neither set still saves records and totals still update.
    One exception: publishing `Rollup_Queue_Ready__e` needs Create on the event, which only the
-   module's sets grant (Core's sets cannot name a module object). So a user with no BarnCRM
-   role (an integration user, say) whose saves run inside a Queueable cannot publish it: the
-   save goes through, its entries stay queued and wait for the next processor run or the
-   nightly run, and a Warning is logged. BarnCRM role holders get `Rollup_Builder_User`
-   automatically (D2, `RollupAccessSync`), so they are not affected.
+   module's sets grant (Core's sets cannot name a module object). A save publishes it whenever
+   it has to announce waiting totals after commit: a save inside a Queueable, and a
+   synchronous save whose processor request was already made or could not be queued
+   (`RollupQueue.askAgainAfterCommit`). A user holding neither module set (an integration
+   user, say) cannot publish it then: the save goes through, its entries stay queued and wait
+   for the next processor run or the nightly run, and a Warning is logged. BarnCRM role
+   holders get `Rollup_Builder_User` from `RollupAccessSync` (D2) at install, at each Turn on
+   and with each scheduled nightly run; until a role holder has it, the same lag applies.
+
+   `RollupAccessSync` reads, per set, every active holder of the audience sets and of the set
+   itself through `TabAccessService.giveToHolders`, unbounded, and gives up to 4,000 a run.
+   Both sets share one transaction's 50,000 query rows, so an org past about 20,000 BarnCRM
+   role holders would stop the sync with a limit error (logged; the nightly run tries again).
+   No org is near that; slicing the holder queries is the fix if one gets there. A slice whose
+   every assignment is refused does not queue itself again.
 9. **Turning the module off** (ADR-0073) stops its three registry rows through `Module__c`,
    `Rollup_Definition_Validation` included: it keeps its own switch (owner decision: no
    functionality is dropped), so a definition saved while the module is off is not checked.
@@ -202,7 +212,8 @@ subscriber migration.
   module-owned settings component.
 - **D2.** Staff and Read Only keep a read-only Builder through `Rollup_Builder_User`, assigned
   to holders of `BarnCRM_Staff` or `BarnCRM_Read_Only` when the module is turned on, as Giving
-  does for `Giving_Staff`. Built as `RollupAccessSync`: at install and with each nightly run it
+  does for `Giving_Staff`. Built as `RollupAccessSync`: at install (after the installer's own
+  grant, in the same job), at each Turn on and with each nightly run it
   gives `Rollup_Builder_User` to holders of those sets and `Rollup_Builder_Admin` to holders of
   `BarnCRM_Admin`, directly or through a permission set group, through Core's
   `TabAccessService.giveToHolders` (the module names the sets; Core names none of its). It

@@ -7,8 +7,9 @@
  *
  * It only gives, never takes away: a set may also be given by hand, to the person who installed
  * the module or to an integration user whose saves publish `Rollup_Queue_Ready__e` (decision 8).
- * It runs at install (`RollupsPostInstall`) and with the nightly run (`RollupScheduler`), which
- * also catches people given a role since, and does nothing while the module is turned off.
+ * It runs at install (`RollupsPostInstall`), at each Turn on (`RollupsEngineExtension`) and with
+ * the nightly run (`RollupScheduler`), which also catches people given a role since, and does
+ * nothing while the module is turned off.
  */
 public with sharing class RollupAccessSync {
     /** The read-only Builder set, for the Staff and Read Only roles. */

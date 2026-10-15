@@ -15,8 +15,9 @@
  * 4. Queue the job that gives the installer the Rollup Builder Admin permission set. Queued
  *    because a permission set assignment is a setup object write, and this transaction has
  *    already written ordinary records (mixed DML).
- * 5. Queue the sync that gives the Rollup Builder sets to BarnCRM's roles (`RollupAccessSync`,
- *    D2), queued for the same reason.
+ * 5. Give the Rollup Builder sets to BarnCRM's roles (`RollupAccessSync`, D2), queued for the
+ *    same reason. The installer's job runs it after its own grant, so the two never insert the
+ *    installer's Rollup Builder Admin at the same moment; with no installer it is queued alone.
  */
 public with sharing class RollupsPostInstall implements InstallHandler {
     @TestVisible
@@ -58,15 +59,16 @@ public with sharing class RollupsPostInstall implements InstallHandler {
         carryOverCoreSettings();
         RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-        RollupAccessSync.requestSync();
         Id installerId = context.installerId();
         if (installerId == null) {
+            RollupAccessSync.requestSync();
             return;
         }
         try {
             System.enqueueJob(new InstallerAccess(installerId));
         } catch (Exception e) {
             ErrorLogger.log(e, ACCESS_CONTEXT);
+            RollupAccessSync.requestSync();
         }
     }
 
@@ -110,7 +112,8 @@ public with sharing class RollupsPostInstall implements InstallHandler {
     }
 
     /**
-     * Gives the installer the Rollup Builder Admin permission set, unless they hold it already.
+     * Gives the installer the Rollup Builder Admin permission set, unless they hold it already,
+     * then BarnCRM's roles their sets (`RollupAccessSync`), which then skips the installer.
      * System mode: the install runs as the platform's package user, who holds no BarnCRM set.
      */
     public without sharing class InstallerAccess implements Queueable {
@@ -121,6 +124,18 @@ public with sharing class RollupsPostInstall implements InstallHandler {
         }
 
         public void execute(QueueableContext jobContext) {
+            giveInstaller();
+            try {
+                // A test cannot chain one queued job from another.
+                if (RollupAccessSync.syncOnce() && !Test.isRunningTest()) {
+                    System.enqueueJob(new RollupAccessSync.Job());
+                }
+            } catch (Exception e) {
+                ErrorLogger.log(e, ACCESS_CONTEXT);
+            }
+        }
+
+        private void giveInstaller() {
             try {
                 List<PermissionSet> sets = [
                     SELECT Id
@@ -138,14 +153,26 @@ public with sharing class RollupsPostInstall implements InstallHandler {
                     WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
                     WITH SYSTEM_MODE
                 ];
-                if (held == 0) {
-                    Database.insert(
-                        new PermissionSetAssignment(
-                            AssigneeId = installerId,
-                            PermissionSetId = sets[0].Id
-                        ),
-                        AccessLevel.SYSTEM_MODE
-                    );
+                if (held > 0) {
+                    return;
+                }
+                Database.SaveResult saved = Database.insert(
+                    new PermissionSetAssignment(
+                        AssigneeId = installerId,
+                        PermissionSetId = sets[0].Id
+                    ),
+                    false,
+                    AccessLevel.SYSTEM_MODE
+                );
+                // A duplicate means another job gave it a moment before: what was wanted.
+                for (Database.Error error : saved.getErrors()) {
+                    if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
+                        ErrorLogger.logMessage(
+                            error.getMessage(),
+                            ACCESS_CONTEXT,
+                            ErrorLogger.SEVERITY_WARNING
+                        );
+                    }
                 }
             } catch (Exception e) {
                 ErrorLogger.log(e, ACCESS_CONTEXT);

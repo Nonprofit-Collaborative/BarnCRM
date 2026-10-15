@@ -110,6 +110,101 @@ private class RollupAccessSyncTest {
     }
 
     @IsTest
+    static void turningTheModuleOnQueuesTheSync() {
+        Map<String, Id> ids;
+        // Its own block: Turn on also writes switch rows, which may not follow setup writes.
+        System.runAs(TestUsers.admin()) {
+            ids = people();
+        }
+        System.runAs(TestUsers.admin()) {
+            ModuleManagerService.turnOff(RollupService.MODULE_NAME);
+
+            Test.startTest();
+            ModuleManagerService.turnOn(RollupService.MODULE_NAME);
+            Test.stopTest();
+
+            Assert.isTrue(
+                setsOf(ids.get('Staffer')).contains(RollupAccessSync.USER_SET),
+                'Someone given a role while it was off gets the set once it is on'
+            );
+        }
+    }
+
+    @IsTest
+    static void skipsInactivePeopleAndThoseHoldingItThroughAGroup() {
+        System.runAs(TestUsers.admin()) {
+            List<String> staff = new List<String>{ 'BarnCRM_Staff' };
+            User gone = TestUsers.standardUserWith('Gone', staff);
+            gone.IsActive = false;
+            update gone;
+            // A role of the org's own that already includes Rollup Builder User.
+            PermissionSetGroup role = new PermissionSetGroup(
+                DeveloperName = 'Test_Rollup_Role',
+                MasterLabel = 'Test Rollup Role'
+            );
+            insert role;
+            insert new PermissionSetGroupComponent(
+                PermissionSetGroupId = role.Id,
+                PermissionSetId = [
+                    SELECT Id
+                    FROM PermissionSet
+                    WHERE Name = :RollupAccessSync.USER_SET
+                    LIMIT 1
+                ]
+                .Id
+            );
+            Test.calculatePermissionSetGroup(role.Id);
+            User grouped = TestUsers.standardUserWith('Grouped', staff);
+            insert new PermissionSetAssignment(
+                AssigneeId = grouped.Id,
+                PermissionSetGroupId = role.Id
+            );
+
+            Test.startTest();
+            Boolean more = RollupAccessSync.syncOnce();
+            Test.stopTest();
+
+            Assert.isFalse(more, 'Nothing is left');
+            Assert.isTrue(setsOf(gone.Id).isEmpty(), 'An inactive Staff holder is given nothing');
+            Assert.isTrue(
+                setsOf(grouped.Id).isEmpty(),
+                'Someone holding it through a group is not given it again directly'
+            );
+        }
+    }
+
+    @IsTest
+    static void theInstallerIsGivenRollupBuilderAdminOnce() {
+        System.runAs(TestUsers.admin()) {
+            Map<String, Id> ids = people();
+            Id installer = ids.get('Boss');
+
+            Test.startTest();
+            System.enqueueJob(new RollupsPostInstall.InstallerAccess(installer));
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE AssigneeId = :installer AND PermissionSet.Name = :ADMIN_SET
+                ],
+                'The installer, a BarnCRM Admin, holds Rollup Builder Admin once'
+            );
+            Assert.isTrue(
+                setsOf(ids.get('Reader')).contains(RollupAccessSync.USER_SET),
+                'The roles sync ran after the installer\'s grant'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c WHERE Severity__c != :ErrorLogger.SEVERITY_INFO],
+                'Nothing was refused'
+            );
+        }
+    }
+
+    @IsTest
     static void theInstallQueuesTheSync() {
         System.runAs(TestUsers.admin()) {
             Map<String, Id> ids = people();

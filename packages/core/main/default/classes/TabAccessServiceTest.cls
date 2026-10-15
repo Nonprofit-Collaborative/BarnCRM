@@ -99,6 +99,8 @@ private class TabAccessServiceTest {
                 PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Read_Only').Id
             );
             List<String> audience = new List<String>{ 'BarnCRM_Read_Only' };
+            // Core's tests can name no module set, so a tab set stands in for one.
+            TabAccessService.coreSetPrefix = 'Not_Core_';
 
             Test.startTest();
             Boolean noRoom = TabAccessService.giveToHolders(
@@ -131,6 +133,39 @@ private class TabAccessServiceTest {
                 tabSetsOf(userId(SAM)).contains(TabAccessService.IMPORT_TAB),
                 'And a set given by hand is never taken away'
             );
+        }
+    }
+
+    @IsTest
+    static void givesNoneOfCoresOwnSetsAndNothingWithoutAnAudience() {
+        System.runAs(TestUsers.admin()) {
+            List<String> refused = new List<String>();
+
+            Test.startTest();
+            for (
+                String coreSet : new List<String>{
+                    'BarnCRM_Staff',
+                    'BarnCRM_Admin',
+                    'BarnCRM_Metadata_Admin',
+                    TabAccessService.IMPORT_TAB
+                }
+            ) {
+                try {
+                    TabAccessService.giveToHolders(
+                        coreSet,
+                        new List<String>{ 'BarnCRM_Read_Only' },
+                        100,
+                        'Test'
+                    );
+                } catch (IllegalArgumentException expected) {
+                    refused.add(coreSet);
+                }
+            }
+            Boolean noAudience = TabAccessService.giveToHolders('Module_Set', null, 100, 'Test');
+            Test.stopTest();
+
+            Assert.areEqual(4, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
+            Assert.isFalse(noAudience, 'No audience gives nothing and leaves nothing for later');
         }
     }
 

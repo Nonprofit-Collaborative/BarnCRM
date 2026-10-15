@@ -50,6 +50,13 @@ public with sharing class TabAccessService {
 
     private static final String CONTEXT = 'TabAccessService.sync';
 
+    /**
+     * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
+     * tests, which can name no module set, change it to give a tab set instead.
+     */
+    @TestVisible
+    private static String coreSetPrefix = 'BarnCRM_';
+
     /** Whether this transaction has already queued a sync. */
     private static Boolean requested = false;
 
@@ -145,8 +152,14 @@ public with sharing class TabAccessService {
      * who installed the module or to an integration user. For a module keeping its own sets with
      * BarnCRM's roles (ADR-NEXT `NEXT-rollup-builder-module.md`, D2); it names its set and the
      * audience, and Core names no module set. Written in system mode, as the tab sync is, and a
-     * refused assignment is logged as a Warning under `context`. Returns true when more is left;
-     * does nothing when the set is not in this org.
+     * refused assignment is logged as a Warning under `context`. Returns true when more is left,
+     * and false when every assignment of this slice was refused, so the caller does not queue
+     * itself again only to be refused again (the nightly run tries again). Does nothing when the
+     * set is not in this org or no audience is named, and refuses Core's own sets (every one is
+     * named `BarnCRM_`): those follow the roles through `sync` and the Access page.
+     *
+     * Each run reads every holder of the audience sets and of the set, unbounded, against the
+     * transaction's 50,000 query rows: see the ADR's note on the ceiling.
      */
     @NamespaceAccessible
     public static Boolean giveToHolders(
@@ -155,6 +168,14 @@ public with sharing class TabAccessService {
         Integer budget,
         String context
     ) {
+        if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
+            throw new IllegalArgumentException(
+                'giveToHolders gives a module\'s own set, never Core\'s: ' + setName
+            );
+        }
+        if (audience == null || audience.isEmpty()) {
+            return false;
+        }
         Set<String> names = new Set<String>(audience);
         names.add(setName);
         Map<String, Id> setIds = packagedSetIds(names);
@@ -173,17 +194,25 @@ public with sharing class TabAccessService {
             }
             toInsert.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = setId));
         }
-        write(toInsert, new List<PermissionSetAssignment>(), context);
+        Integer refused = write(toInsert, new List<PermissionSetAssignment>(), context);
+        if (!toInsert.isEmpty() && refused == toInsert.size()) {
+            return false;
+        }
         return wanted.size() > toInsert.size();
     }
 
-    /** Writes the assignments in system mode and logs each one refused as a Warning. */
-    private static void write(
+    /**
+     * Writes the assignments in system mode and logs each one refused as a Warning. An insert
+     * refused as a duplicate is not logged: another job gave the same set a moment before, which
+     * is what was wanted. Returns how many inserts were refused for any other reason.
+     */
+    private static Integer write(
         List<PermissionSetAssignment> toInsert,
         List<PermissionSetAssignment> toDelete,
         String context
     ) {
         List<String> refusals = new List<String>();
+        Integer refusedInserts = 0;
         if (!toInsert.isEmpty()) {
             List<Database.SaveResult> saved = Database.insert(
                 toInsert,
@@ -191,7 +220,11 @@ public with sharing class TabAccessService {
                 AccessLevel.SYSTEM_MODE
             );
             for (Database.SaveResult result : saved) {
-                addErrors(refusals, result.isSuccess() ? null : result.getErrors());
+                if (result.isSuccess() || isDuplicate(result.getErrors())) {
+                    continue;
+                }
+                refusedInserts++;
+                addErrors(refusals, result.getErrors());
             }
         }
         if (!toDelete.isEmpty()) {
@@ -207,6 +240,16 @@ public with sharing class TabAccessService {
         if (!refusals.isEmpty()) {
             ErrorLogger.logMessages(refusals, context, ErrorLogger.SEVERITY_WARNING);
         }
+        return refusedInserts;
+    }
+
+    private static Boolean isDuplicate(List<Database.Error> errors) {
+        for (Database.Error error : errors) {
+            if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
+                return false;
+            }
+        }
+        return !errors.isEmpty();
     }
 
     private static void addErrors(List<String> refusals, List<Database.Error> errors) {

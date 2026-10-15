@@ -279,20 +279,23 @@ and adds **New rollup**, and **Edit** and **Copy** on each row. The tab comes wi
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
 
-You do not assign these sets by hand for BarnCRM's roles. When the module is installed, and
-again with each nightly run once it is scheduled, BarnCRM gives **Rollup Builder User** to everyone holding the **BarnCRM
-Staff** or **BarnCRM Read Only** permission set, and **Rollup Builder Admin** to everyone
-holding **BarnCRM Admin**, whether directly or through a role on the [Access](access.md)
-page, so someone given a role today has the set after tonight's run. It never takes a set away, so one
-you give by hand stays. While the module is turned off it gives nothing.
+You do not assign these sets by hand for BarnCRM's roles. When the module is installed, each
+time it is turned on on **Modules**, and with each nightly run once that is scheduled,
+BarnCRM gives **Rollup Builder User** to everyone holding the **BarnCRM Staff** or **BarnCRM
+Read Only** permission set, and **Rollup Builder Admin** to everyone holding **BarnCRM
+Admin**, whether directly or through a role on the [Access](access.md) page, so someone given
+a role today has the set after tonight's run. It never takes a set away, so one you give by
+hand stays. While the module is turned off it gives nothing.
 
-**A user with no BarnCRM role, such as an integration user.** When such a user's saves run
-inside a background job (a Queueable), the job cannot announce that totals are waiting:
-that needs the **Rollup Builder User** or **Rollup Builder Admin** set. The save still goes
-through and its totals are queued, but they wait for the next queue run or the nightly run,
-and the Error Log gets a Warning from `RollupQueue.announceReady`. To have them catch up within
-minutes, give that user **Rollup Builder User**. People with a BarnCRM role get it
-automatically, so they are not affected.
+**A user who holds neither Rollup Builder set, such as an integration user.** Some saves have
+to announce, once they are saved, that totals are waiting: saves that run inside a
+background job (a Queueable), and ordinary saves made while a recalculation was already
+asked for or could not be started. The announcement needs the **Rollup Builder User** or
+**Rollup Builder Admin** set. Without one, the save still goes through and its totals are
+queued, but they wait for the next queue run or the nightly run, and the Error Log gets a
+Warning from `RollupQueue.announceReady`. To have them catch up within minutes, give that
+user **Rollup Builder User**. People with a BarnCRM role get it at install, at each **Turn
+on** and with each nightly run; until then the same wait applies to them.
 
 The **Rollup Settings** tab shows the module's own settings and nothing else: **Default rollup
 mode**, **When instant totals are calculated**, and the link to the Builder. They are the same
