@@ -28,6 +28,8 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
 5. `mwdbdevsb`: deployed 2026-10-14 at the owner's request (Core at e3f2db58, then plus #411 to #413); ask before every further deploy.
 6. Release prerequisites (namespace, Dev Hub, steward entity): after a v1.0 pilot (D-87).
+7. Rename Connect to Mirror (D-103, ADR-0126): In review (PR #441).
+8. Test org cleanup of old Connect metadata (destructive deploy on `oi-test`, `oi-pa`, `barn-core`, `barn-npc`; owner approved): Planned, after #441 merges.
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
 |---|---|---|
@@ -55,7 +57,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | v0.3 | Commitments, relationships, addresses | G-07, C-15, C-17, C-16, G-08 to G-11 | Shipped |
 | v0.4 | Stewardship and receipting | G-12 to G-16, G-18, C-18 | Shipped |
 | v0.5 | Import 2.0, gift import, coexistence | C-19, G-17, C-22, G-23, C-20, C-21, G-24, import templates | Shipped |
-| v0.6 | Connect | X-01, X-02, X-03, X-04, X-06, C-23, G-20, C-29 | Shipped (C-29 PR #163). X-07 Gift Transaction mirror planned next (moved here by plan 6.3) |
+| v0.6 | Mirror (was Connect, D-103) | X-01, X-02, X-03, X-04, X-06, C-23, G-20, C-29 | Shipped (C-29 PR #163). X-07 Gift Transaction mirror planned next (moved here by plan 6.3) |
 | v0.7 | Data management | C-32, C-33, C-34, C-35, C-36, C-37 (C-36 and C-37 moved from 1.x 2026-10-12), C-28, G-25 | Landed (#219, #377), including C-36 server-side export and the C-37 follow-ons |
 | v0.8 | Volunteers | V-01 to V-08; C-24 and C-30 | C-24, C-30 landed (#219); V-items planned |
 | v0.9 | Programs and Logic Models | P-01, P-02, P-04 to P-08, L-01 to L-04; C-39; G-19 if capacity | C-39 landed (#219); rest planned |
