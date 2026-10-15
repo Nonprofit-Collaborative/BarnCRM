@@ -1,4 +1,4 @@
-# ADR-NEXT: Rename BarnCRM Connect to BarnCRM Mirror
+# ADR-0126: Rename BarnCRM Connect to BarnCRM Mirror
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-15)
 **Date:** 2026-10-15
