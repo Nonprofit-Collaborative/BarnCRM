@@ -8,6 +8,8 @@
     The BarnCRM Rollup Builder module: create and edit the totals BarnCRM keeps up to date, and
     the module's own settings.
   </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
   <label>BarnCRM Rollup Builder</label>
