@@ -94,6 +94,11 @@ belonging yet: if you chose the simple way on purpose, because your org has Pers
 switched on but stores everyone as a contact, an install or upgrade leaves your choice
 alone, and Health Check warns you if people stored as accounts appear later.
 
+In the flexible way, a new person stored as an account gets a household of their own when
+they are saved, as a contact does. People stored as accounts who were added while Household
+Upkeep was off are caught up when it is turned on, along with contacts: see "First-run setup" in
+the BarnCRM Settings guide.
+
 In the flexible way a contact's account can be an employer, so it is not the household by
 itself. When you save a new contact whose account is a household, though, BarnCRM joins them
 to that household with a membership record, so they are counted and named there and are not

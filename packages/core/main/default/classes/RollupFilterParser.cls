@@ -112,9 +112,13 @@ public with sharing class RollupFilterParser {
     }
 
     /** One `equals` or `not equals` test of a text attribute, for evaluation in Apex. */
+    @NamespaceAccessible
     public class TextEquality {
+        @NamespaceAccessible
         public String field;
+        @NamespaceAccessible
         public Boolean negated;
+        @NamespaceAccessible
         public String value;
     }
 
@@ -124,6 +128,7 @@ public with sharing class RollupFilterParser {
      * shape. The engine then tests target records it has already read instead of querying them
      * again (ROLLUPS-12); anything else keeps its query.
      */
+    @NamespaceAccessible
     public static List<TextEquality> textEqualities(
         String filterDocument,
         Schema.SObjectType entity
@@ -262,6 +267,7 @@ public with sharing class RollupFilterParser {
      * `Gift__r.Status__c`), so the engine can tell which changes move a total (R-R11). A document
      * that cannot be read names nothing; `toWhereClause` is what refuses it.
      */
+    @NamespaceAccessible
     public static Set<String> fieldsOf(String filterDocument) {
         Set<String> fields = new Set<String>();
         if (String.isBlank(filterDocument)) {

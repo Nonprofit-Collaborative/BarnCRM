@@ -4,7 +4,13 @@
  * Registered by Mirror in the automation registry, after Giving's hierarchy check, so it
  * never copies an appeal that check has already refused.
  */
+@NamespaceAccessible
 public with sharing class CampaignSyncTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public CampaignSyncTriggerHandler() {
+        return;
+    }
+
     public override String getName() {
         return CampaignSyncService.AUTOMATION_NAME;
     }

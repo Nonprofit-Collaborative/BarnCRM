@@ -11,6 +11,7 @@
  *
  * The result is cached for the transaction because a global describe is expensive.
  */
+@NamespaceAccessible
 public with sharing class OrgShapeDetector {
     // The four detection constants. Each is read by detect() below and by nothing else.
     private static final String NPSP_PREFIX = 'npsp__'; // detection-only: NPSP key prefix
@@ -132,7 +133,12 @@ public with sharing class OrgShapeDetector {
     private static Set<Id> cachedPersonTypes;
     private static Boolean cachedHasNativeHouseholdGroups;
 
-    /** Whether this org stores people as accounts: one Account field describe, cached. */
+    /**
+     * Whether this org stores people as accounts: one Account field describe, cached. Other
+     * packages ask here rather than reading `detect().hasPersonAccounts`, since an
+     * `@AuraEnabled` field cannot also be `@NamespaceAccessible`.
+     */
+    @NamespaceAccessible
     public static Boolean hasPersonAccounts() {
         if (overrideShape != null) {
             return overrideShape.hasPersonAccounts == true;

@@ -3,8 +3,14 @@
  * (R-AP2). An appeal that is its own parent is caught by a validation rule; this handler
  * catches the longer loops a validation rule cannot see.
  */
+@NamespaceAccessible
 public with sharing class AppealTriggerHandler extends TriggerHandler {
     private static final Integer MAX_DEPTH = 20;
+
+    @NamespaceAccessible
+    public AppealTriggerHandler() {
+        return;
+    }
 
     public override String getName() {
         return 'AppealTriggerHandler';

@@ -12,6 +12,11 @@
  */
 @NamespaceAccessible
 public with sharing class GivingDataProtectionExtension implements DataProtectionExtension {
+    @NamespaceAccessible
+    public GivingDataProtectionExtension() {
+        return;
+    }
+
     public Set<Schema.SObjectType> protectedObjects() {
         return new Set<Schema.SObjectType>{
             Receipt__c.SObjectType,

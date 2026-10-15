@@ -1437,6 +1437,38 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * The household catch-up for people stored as accounts (ADR-0124): each of these people
+     * that no current membership row names is given what a new person account is given on
+     * insert, through the same creation pass. Junction mode, a person account org and the
+     * automatic creation setting only, as on insert; anywhere else it does nothing. The
+     * membership is checked again here, so a person who joined a household after the batch
+     * started is left alone.
+     */
+    @NamespaceAccessible
+    public static void catchUpPersonAccounts(Set<Id> personIds) {
+        if (
+            personIds == null ||
+            personIds.isEmpty() ||
+            !isPersonAccountOrg() ||
+            !isJunctionMode() ||
+            !automaticCreationEnabled()
+        ) {
+            return;
+        }
+        Set<Id> waiting = new Set<Id>();
+        Map<Id, Id> householdByPerson = getHouseholdIdsFor(personIds);
+        for (Id personId : personIds) {
+            if (householdByPerson.get(personId) == null) {
+                waiting.add(personId);
+            }
+        }
+        if (waiting.isEmpty()) {
+            return;
+        }
+        createHouseholdsForPersonAccounts(PersonRecordSelector.getPersonRecords(waiting));
+    }
+
+    /**
      * Creates a household and a membership row for each new person that the org stores as
      * an account. R-H2. Called only when the org has person records and membership is in
      * junction mode; the caller has already read the automatic creation setting.

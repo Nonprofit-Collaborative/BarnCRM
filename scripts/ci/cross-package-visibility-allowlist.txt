@@ -1,0 +1,4 @@
+# References check-cross-package-visibility.py reports that are accepted for now.
+# One per line: ReferencingClass Target: reason. An entry that matches nothing fails the check.
+
+RollupsHealthCheckExtension HealthCheckService.Finding.detail: deferred (namespace readiness B5); detail is @AuraEnabled so it cannot also be @NamespaceAccessible, and whether fields of an annotated inner class cross packages is decided by the first namespaced build

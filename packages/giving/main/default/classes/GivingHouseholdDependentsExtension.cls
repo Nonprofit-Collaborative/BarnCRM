@@ -16,6 +16,11 @@
  */
 @NamespaceAccessible
 public without sharing class GivingHouseholdDependentsExtension implements HouseholdDependentsExtension {
+    @NamespaceAccessible
+    public GivingHouseholdDependentsExtension() {
+        return;
+    }
+
     public Set<Id> householdsWithDependents(Set<Id> householdIds) {
         Set<Id> dependent = new Set<Id>();
         if (householdIds == null || householdIds.isEmpty()) {

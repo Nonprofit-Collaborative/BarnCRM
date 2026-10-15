@@ -9,7 +9,13 @@
  * The handler is the same three-line wrapper every other one is: the rules themselves are
  * `GiftService` methods that take explicit lists and are unit tested without a trigger context.
  */
+@NamespaceAccessible
 public with sharing class GiftReceiptLockHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public GiftReceiptLockHandler() {
+        return;
+    }
+
     public override String getName() {
         return 'GiftReceiptLockHandler';
     }

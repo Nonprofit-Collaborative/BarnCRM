@@ -5,7 +5,13 @@
  * An installment a gift has been received against is part of the giving history, so it is
  * not deleted. Staff mark it Skipped instead (R-IN2).
  */
+@NamespaceAccessible
 public with sharing class InstallmentTriggerHandler extends TriggerHandler {
+    @NamespaceAccessible
+    public InstallmentTriggerHandler() {
+        return;
+    }
+
     public override void beforeDelete() {
         onBeforeDelete((List<Installment__c>) oldRecords());
     }

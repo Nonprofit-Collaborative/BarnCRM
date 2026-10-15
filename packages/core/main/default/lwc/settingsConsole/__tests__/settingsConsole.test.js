@@ -98,8 +98,8 @@ function householdsWithPanelModel() {
 
 // Reached through the module namespace rather than by name: a wire adapter may only be named
 // in a @wire decorator, and a test drives it through the stub's emit.
-function openSection(name) {
-  navigation.CurrentPageReference.emit({ state: { c__section: name } });
+function openSection(name, key = 'c__section') {
+  navigation.CurrentPageReference.emit({ state: { [key]: name } });
 }
 
 function model(canEdit) {
@@ -409,6 +409,16 @@ describe('c-settings-console', () => {
   it('opens the section a setup step asked for', async () => {
     const element = build();
     openSection('General');
+    await settle();
+
+    const combobox = element.shadowRoot.querySelector('lightning-combobox');
+    expect(combobox).not.toBeNull();
+    expect(combobox.value).toBe('Standalone');
+  });
+
+  it('opens the section a namespaced link asked for', async () => {
+    const element = build();
+    openSection('General', 'barn__section');
     await settle();
 
     const combobox = element.shadowRoot.querySelector('lightning-combobox');
