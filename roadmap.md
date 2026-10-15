@@ -14,7 +14,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
    - Field utilization on demand (D-37, D-63). Landed (#377).
    - Test self-containment. Landed (#377).
    - Rollup S9 (vendored apex-rollup removed). Landed (#377). S14 only if the scale test needs it; S15 spike built; S16 and S17 deferred to after v1 (D-64).
-   - Inventory of unfinished Core work (D-47). Done 2026-10-14 (#401 to #408, including duplicate rule matching for any object, #405). Related-records import stays insert-only (post-1.0); one org check of a parent and child file import is still to run.
+   - Inventory of unfinished Core work (D-47). Done 2026-10-14 (#401 to #408, including duplicate rule matching for any object, #405). Related-records import stays insert-only (post-1.0); org check of a parent and child file import passed 2026-10-15 on `oi-test` (Upsert by external ID, `Stewardship_Plan_Template__c` with `Stewardship_Plan_Step__c`, 3 parents and 7 children, dry run then commit, all linked, no errors).
    - Find, bulk update and duplicates fix batch. Landed (#377).
    - Approved review recommendations (D-48). Fix batches landed (#377); remainder per the feature catalog.
    - Affiliations in Core people imports, restored (D-49; C-32). Landed (#377).
@@ -28,8 +28,8 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
 5. `mwdbdevsb`: deployed 2026-10-14 at the owner's request (Core at e3f2db58, then plus #411 to #413); ask before every further deploy.
 6. Release prerequisites (namespace, Dev Hub, steward entity): after a v1.0 pilot (D-87).
-7. Rename Connect to Mirror (D-103, ADR-0126): In review (PR #441).
-8. Test org cleanup of old Connect metadata (destructive deploy on `oi-test`, `oi-pa`, `barn-core`, `barn-npc`; owner approved): Planned, after #441 merges.
+7. Rename Connect to Mirror (D-103, ADR-0126): Landed (#441, 98583f12, ADR-0126).
+8. Test org cleanup of old Connect metadata (destructive deploy; owner approved): `oi-test` done (176 components); `oi-pa` module record done; `oi-pa` rest, `barn-core` and `barn-npc` in progress.
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
 |---|---|---|
@@ -95,8 +95,9 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | Advanced Territory Management (C-40) and Grid tool (C-41) Super Tools | D-98 | Planned, after v1.0 |
 | Follow-up: household catch-up for person accounts (turning Household Upkeep on catches up contacts only) | #426 review | Open |
 | Follow-up: scale test duplicate-rule losses (the load lost 309 households and 1,328 contacts to the standard duplicate rules; failed-*.csv not kept) | Scale test | Open |
-| Follow-up: namespace readiness for the module split (module pages use Core components cross-package: `settingsConsole`, `c/workspaceTabs`; module tests use Core `@TestVisible` privates; module `appUrl` namespace) | Plan 4.10, D-101 | Open |
-| Follow-up: Staff-only Queueable saves cannot publish `Rollup_Queue_Ready__e` (Create on the event is only in module sets); totals lag to the next processor or nightly run with a Warning; PR 7 auto-assigns `Rollup_Builder_User`, ADR decision 8 documents the lag | Rollup module review | Open |
+| Follow-up: namespace readiness for the module split (module pages use Core components cross-package: `settingsConsole`, `c/workspaceTabs`; module tests use Core `@TestVisible` privates; module `appUrl` namespace). Review result, blocking before the first package version: B1 19 module trigger handlers not `@NamespaceAccessible` (`TriggerDispatcher` would silently skip them; in progress); B2 production module code calling unannotated Core members (`OrgShapeDetector`, `ErrorLogger.SEVERITY_*`, `SampleDataException`, `RollupFilterParser` members; in progress); B3 module tests using Core `@TestVisible` privates (needs public test hooks); B4 module tests using unannotated Core test factories; B5 cross-package inner-class field access to verify; B6 CI checks for cross-package visibility and dynamic lookups (in progress). Should fix: S1 `rollupBuilder` imports unexposed `c/workspaceTabs` (copy `labelTab` instead); S2 `settingsConsole` reads only `c__section` (PR #444); S3 explicit constructors on 8 extension classes; S4 a Mirror test uses Giving's protected label; S5 check the `/lightning/app/Fundraising` link; S6 more CI checks. Only a throwaway-namespace 2GP build can settle B3 to B5 (owner decision pending) | Plan 4.10, D-101 | Open |
+| PR #443: scale loader allow-save REST insert for Accounts and Contacts, plus a refused-row summary (the duplicate-rule losses row above stays Open until a live scale run shows 0 refused) | Scale test | In review |
+| PR #444: `settingsConsole` namespaced section key | Namespace readiness S2 | In review |
 | Namespace registration, first package version | D-01, ADR-0001, D-87 | After a v1.0 pilot |
 
 ## Post-1.0 (plan 6.1, parked)
