@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Mirror_Sync_OtherMessages</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Grouped refusals past the kept message count</shortDescription>
+    <value>Refused for other reasons, too many different ones to list one by one. Save one of these records by hand to see why it was refused.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_Sync_AndMore</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Grouped log line: names shown, and how many more</shortDescription>
+    <value>{0} and {1} more</value>
+  </labels>
+</CustomLabels>

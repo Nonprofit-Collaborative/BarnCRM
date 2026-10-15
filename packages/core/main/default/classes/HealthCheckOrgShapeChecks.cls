@@ -12,19 +12,19 @@
  */
 public with sharing class HealthCheckOrgShapeChecks {
     /**
-     * An Apex class the Connect package ships, used to tell whether Connect is installed
+     * An Apex class the Mirror package ships, used to tell whether Mirror is installed
      * without referencing it at compile time. It is the class Core already discovers for
-     * Connect's Health Check findings (`HealthCheckExtensions.EXTENSION_CLASSES`, ADR-0057),
-     * so the name is a contract Connect keeps anyway.
+     * Mirror's Health Check findings (`HealthCheckExtensions.EXTENSION_CLASSES`, ADR-0057),
+     * so the name is a contract Mirror keeps anyway.
      */
-    private static final String CONNECT_MARKER_CLASS = 'ConnectHealthCheckExtension';
+    private static final String MIRROR_MARKER_CLASS = 'MirrorHealthCheckExtension';
 
-    /** Set by tests to see Connect as installed (true) or absent (false) without the package. */
+    /** Set by tests to see Mirror as installed (true) or absent (false) without the package. */
     @TestVisible
-    private static Boolean connectInstalledOverride;
+    private static Boolean mirrorInstalledOverride;
 
-    /** Whether Connect is installed, looked up once per transaction. */
-    private static Boolean connectInstalled;
+    /** Whether Mirror is installed, looked up once per transaction. */
+    private static Boolean mirrorInstalled;
 
     /** What this org has installed, and the mode that shape recommends. */
     public class OrgShapeCheck implements HealthCheckService.Check {
@@ -76,12 +76,12 @@ public with sharing class HealthCheckOrgShapeChecks {
     }
 
     /**
-     * Whether an org with Industries objects has the Connect module that mirrors to them.
+     * Whether an org with Industries objects has the Mirror module that mirrors to them.
      * Asked only in the Nonprofit Edition.
      */
-    public class ConnectModuleCheck implements HealthCheckService.Check {
+    public class MirrorModuleCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
-            return connectModuleFinding(OrgShapeDetector.detect());
+            return mirrorModuleFinding(OrgShapeDetector.detect());
         }
     }
 
@@ -370,34 +370,32 @@ public with sharing class HealthCheckOrgShapeChecks {
         );
     }
 
-    private static HealthCheckService.Finding connectModuleFinding(
-        OrgShapeDetector.OrgShape shape
-    ) {
+    private static HealthCheckService.Finding mirrorModuleFinding(OrgShapeDetector.OrgShape shape) {
         if (shape == null || shape.hasIndustriesNonprofit != true) {
             return null;
         }
-        // Only an edition whose module catalog offers Connect is told about it (ADR-0124).
-        if (!ModuleDetectionService.isOffered('Connect') || isConnectInstalled()) {
+        // Only an edition whose module catalog offers Mirror is told about it (ADR-0124).
+        if (!ModuleDetectionService.isOffered('Mirror') || isMirrorInstalled()) {
             return null;
         }
 
         return new HealthCheckService.Finding(
-            'connect_module_absent',
-            System.Label.Core_HealthCheck_ConnectMissingTitle,
-            System.Label.Core_HealthCheck_ConnectMissingDetail,
+            'mirror_module_absent',
+            System.Label.Core_HealthCheck_MirrorMissingTitle,
+            System.Label.Core_HealthCheck_MirrorMissingDetail,
             HealthCheckService.SEVERITY_INFO,
             HealthCheckService.CATEGORY_ORG_SHAPE
         );
     }
 
-    private static Boolean isConnectInstalled() {
-        if (connectInstalledOverride != null) {
-            return connectInstalledOverride;
+    private static Boolean isMirrorInstalled() {
+        if (mirrorInstalledOverride != null) {
+            return mirrorInstalledOverride;
         }
-        if (connectInstalled == null) {
-            connectInstalled = classExists(CONNECT_MARKER_CLASS);
+        if (mirrorInstalled == null) {
+            mirrorInstalled = classExists(MIRROR_MARKER_CLASS);
         }
-        return connectInstalled;
+        return mirrorInstalled;
     }
 
     /** Whether an Apex class of this name is visible (`NamespaceUtil.resolveType`). */

@@ -11,7 +11,7 @@ value 1 to 1000.
 Translation readiness (v0.11): a translator sees the short description beside the value and
 nothing else, so a Core label with placeholders must say in its description what each one
 holds, writing each as it appears in the value ("{0} is the count"). The Rollup Builder
-module's labels were Core's and were swept with them. Giving and Connect join
+module's labels were Core's and were swept with them. Giving and Mirror join
 PLACEHOLDER_PACKAGES once their labels are swept.
 """
 

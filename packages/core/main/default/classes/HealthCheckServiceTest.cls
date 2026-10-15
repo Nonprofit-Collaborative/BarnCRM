@@ -360,34 +360,34 @@ private class HealthCheckServiceTest {
     }
 
     @IsTest
-    static void connectIsNotSuggestedOutsideTheNonprofitEdition() {
+    static void mirrorIsNotSuggestedOutsideTheNonprofitEdition() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
-            HealthCheckOrgShapeChecks.connectInstalledOverride = false;
+            HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
                 new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_COMMUNITY }
             );
 
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'connect_module_absent'),
-                'Connect is a nonprofit module, so the Standard Edition is not told about it.'
+                find(HealthCheckService.run(), 'mirror_module_absent'),
+                'Mirror is a nonprofit module, so the Standard Edition is not told about it.'
             );
         }
     }
 
     @IsTest
-    static void industriesObjectsWithoutConnectAreReported() {
+    static void industriesObjectsWithoutMirrorAreReported() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
-            HealthCheckOrgShapeChecks.connectInstalledOverride = false;
+            HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
                 new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
             );
 
             HealthCheckService.Finding finding = find(
                 HealthCheckService.run(),
-                'connect_module_absent'
+                'mirror_module_absent'
             );
 
             System.assertNotEquals(null, finding, 'The gift mirror is worth mentioning once.');
@@ -399,39 +399,39 @@ private class HealthCheckServiceTest {
             System.assertEquals(
                 null,
                 finding.fixTarget,
-                'There is nothing to click: Connect is a separate install in v0.6.'
+                'There is nothing to click: Mirror is a separate install in v0.6.'
             );
         }
     }
 
     @IsTest
-    static void industriesObjectsWithConnectInstalledAreNotReported() {
+    static void industriesObjectsWithMirrorInstalledAreNotReported() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
-            HealthCheckOrgShapeChecks.connectInstalledOverride = true;
+            HealthCheckOrgShapeChecks.mirrorInstalledOverride = true;
 
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'connect_module_absent'),
-                'With Connect installed there is nothing to suggest.'
+                find(HealthCheckService.run(), 'mirror_module_absent'),
+                'With Mirror installed there is nothing to suggest.'
             );
         }
     }
 
     /**
      * The real lookup, not the seam: a class that ships is found, namespace first or bare, and
-     * one that does not is absent. Core's own class stands in for Connect's, which Core's tests
+     * one that does not is absent. Core's own class stands in for Mirror's, which Core's tests
      * cannot rely on.
      */
     @IsTest
-    static void connectDetectionFindsAClassThatShipsAndNotOneThatDoesNot() {
+    static void mirrorDetectionFindsAClassThatShipsAndNotOneThatDoesNot() {
         System.runAs(TestUsers.admin()) {
             System.assert(
                 HealthCheckOrgShapeChecks.classExists('HealthCheckOrgShapeChecks'),
                 'A class that ships is found.'
             );
             System.assert(
-                !HealthCheckOrgShapeChecks.classExists('ConnectService'),
+                !HealthCheckOrgShapeChecks.classExists('MirrorService'),
                 'The old marker names a class nothing ships.'
             );
         }
@@ -1189,7 +1189,7 @@ private class HealthCheckServiceTest {
                 )
             );
             HealthCheckExtensions.overrides.put(
-                'ConnectHealthCheckExtension',
+                'MirrorHealthCheckExtension',
                 new BrokenExtension()
             );
 
@@ -1202,8 +1202,8 @@ private class HealthCheckServiceTest {
             );
             System.assertNotEquals(
                 null,
-                find(findings, 'check_failed_connect_extension'),
-                'Connect\'s failure is reported by its own name.'
+                find(findings, 'check_failed_mirror_extension'),
+                'Mirror\'s failure is reported by its own name.'
             );
         }
     }

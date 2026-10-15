@@ -1,7 +1,7 @@
 /**
  * Finds the Health Check extensions dependent packages installed, or answers that there are
- * none, which is the ordinary case in an org without Giving or Connect (G-20 follow-up,
- * ADR-0053, ADR-0057, amended by feature X-01 for Connect's).
+ * none, which is the ordinary case in an org without Giving or Mirror (G-20 follow-up,
+ * ADR-0053, ADR-0057, amended by feature X-01 for Mirror's).
  *
  * The class is found by namespace and name, the pattern `ImportEntityProcessors` uses for the
  * same reason (R-IR6): a class name is not an API name, so it takes no `__` prefix. A class
@@ -13,13 +13,13 @@ public with sharing class HealthCheckExtensions {
     /**
      * The class names dependent packages register to add findings, in the order they are asked:
      * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
-     * Connect's, for its nightly mirror run (X-01).
+     * Mirror's, for its nightly mirror run (X-01).
      */
     @NamespaceAccessible
     public static final List<String> EXTENSION_CLASSES = new List<String>{
         'RollupsHealthCheckExtension',
         'GivingHealthCheckExtension',
-        'ConnectHealthCheckExtension'
+        'MirrorHealthCheckExtension'
     };
 
     /** Injected by Core's tests by class name, since no other package is there to resolve. */
@@ -35,7 +35,7 @@ public with sharing class HealthCheckExtensions {
 
     /**
      * Every installed extension, keyed by the name a failure of it is reported under
-     * (`giving_extension`, `connect_extension`), so one that throws never hides another's. Each
+     * (`giving_extension`, `mirror_extension`), so one that throws never hides another's. Each
      * is looked up once per transaction.
      */
     @NamespaceAccessible

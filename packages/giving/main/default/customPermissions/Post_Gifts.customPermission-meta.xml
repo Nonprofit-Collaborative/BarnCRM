@@ -2,7 +2,7 @@
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     Mark gifts posted to the accounting system and unpost them (G-20). Granted to Giving Admin and
-    to Connect's Accounting Export permission set. Every unpost is logged at Warning.
+    to Mirror's Accounting Export permission set. Every unpost is logged at Warning.
   </description>
   <isLicensed>false</isLicensed>
   <label>Post Gifts</label>

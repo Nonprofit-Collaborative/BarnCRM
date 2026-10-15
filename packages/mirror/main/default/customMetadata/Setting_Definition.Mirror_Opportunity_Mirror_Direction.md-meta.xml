@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Opportunity mirror direction</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Opportunity_Mirror_Direction__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Mirror_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Mirror</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Picklist</value>
+    </values>
+    <values>
+        <field>Picklist_Values__c</field>
+        <value xsi:type="xsd:string">Off:Off;GiftsToOpportunities:Gifts to Opportunities;OpportunitiesToGifts:Opportunities to Gifts</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">93</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Gifts to Opportunities gives every gift a matching Salesforce Opportunity, so NPSP rollups and apps that read Opportunities keep working; an NPSP org usually wants this. Opportunities to Gifts makes a gift from every won Opportunity, for an online giving tool that writes Opportunities. Only one can be on. Needs an org with Opportunities.</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">opportunity-mirror.md</value>
+    </values>
+</CustomMetadata>

@@ -70,7 +70,7 @@ public with sharing class ModuleManagerService {
             'Tribute__c'
         },
         'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
-        'Connect' => new List<String>()
+        'Mirror' => new List<String>()
     };
 
     /** The permission set Turn on gives the person who turned the module on. */

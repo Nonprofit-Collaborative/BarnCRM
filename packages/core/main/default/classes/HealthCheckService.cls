@@ -452,7 +452,7 @@ public with sharing class HealthCheckService {
             )
         );
         steps.add(
-            new CheckStep('connect_module', new HealthCheckOrgShapeChecks.ConnectModuleCheck())
+            new CheckStep('mirror_module', new HealthCheckOrgShapeChecks.MirrorModuleCheck())
         );
         steps.add(
             new CheckStep('multi_currency', new HealthCheckOrgShapeChecks.MultiCurrencyCheck())

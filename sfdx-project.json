@@ -55,9 +55,9 @@
       ]
     },
     {
-      "path": "packages/connect",
+      "path": "packages/mirror",
       "default": false,
-      "package": "BarnCRM Connect",
+      "package": "BarnCRM Mirror",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
       "dependencies": [

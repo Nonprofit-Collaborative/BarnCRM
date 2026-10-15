@@ -66,7 +66,7 @@ describe('c-hub-modules', () => {
       modules: [
         { name: 'Core', status: 'On', canSwitch: false },
         { name: 'Giving', status: 'Off', canSwitch: true },
-        { name: 'Connect', status: 'On', canSwitch: true },
+        { name: 'Mirror', status: 'On', canSwitch: true },
         { name: 'Volunteers', status: 'NotInstalled', canSwitch: false }
       ]
     });
@@ -75,7 +75,7 @@ describe('c-hub-modules', () => {
     expect(all(element, 'module-name').map((n) => n.textContent)).toEqual([
       'Core',
       'Giving',
-      'Connect'
+      'Mirror'
     ]);
     expect(all(element, 'module-status').map((n) => n.textContent)).toEqual([
       'c.Core_ModuleManager_StatusOn',

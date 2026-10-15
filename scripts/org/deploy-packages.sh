@@ -468,8 +468,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # how a Core-only org (no rollup engine at all) is built.
   deploy_stage "Rollup Builder" "packages/rollups" || exit $?
   deploy_stage "Giving" "packages/giving" || exit $?
-  # Connect depends on Core and Giving (plan Section 4.1), so it goes last.
-  deploy_stage "Connect" "packages/connect" || exit $?
+  # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
+  deploy_stage "Mirror" "packages/mirror" || exit $?
 
   # A deployment is not an install, so no post-install script runs here and the shipped rollup
   # definitions would not exist in a development org (ADR-0029). This is the same call

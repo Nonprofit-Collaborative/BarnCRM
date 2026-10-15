@@ -30,7 +30,7 @@ const YAML = require('yaml');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const DOC = path.join(ROOT, 'docs', 'architecture', 'reference', 'inbound-gift-api.openapi.yaml');
-const CLASSES = path.join(ROOT, 'packages', 'connect', 'main', 'default', 'classes');
+const CLASSES = path.join(ROOT, 'packages', 'mirror', 'main', 'default', 'classes');
 const HTTP_METHODS = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'];
 
 const findings = [];

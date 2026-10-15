@@ -6,15 +6,15 @@
 # references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
 # CampaignMember, PersonAccount, IsPersonAccount, or any Industries GiftTransaction / __dlm
-# name. Those objects and fields may only be referenced from packages/connect, and even there
+# name. Those objects and fields may only be referenced from packages/mirror, and even there
 # behind dynamic Apex (see docs/product-plan.md Section 4.2).
 #
-# Connect's object and field declarations
+# Mirror's object and field declarations
 # ---------------------------------------
-# Connect's Apex may name these objects, as strings resolved through describe, but its
+# Mirror's Apex may name these objects, as strings resolved through describe, but its
 # metadata may not: a lookup to Campaign, a formula through Opportunity, or a field declared
 # on Opportunity is resolved at deploy time and refuses the install on an org without the
-# object (ADR-0013, ADR-0056, ADR-0058). So everything under packages/connect/**/objects/ is
+# object (ADR-0013, ADR-0056, ADR-0058). So everything under packages/mirror/**/objects/ is
 # checked too: a folder named after one of these objects fails, and so does one of these
 # names anywhere in an object, field or list view file outside its prose (label, description,
 # help text, and other human-readable values, which are text, not references). This is why
@@ -127,9 +127,9 @@ if [[ "${#VIOLATIONS[@]}" -gt 0 ]]; then
   FAILED=1
 fi
 
-# Connect's object and field declarations: see the note at the top. The prose is removed in
+# Mirror's object and field declarations: see the note at the top. The prose is removed in
 # Python because a description spans lines, which grep cannot follow.
-CONNECT_DECLARATIONS=$(
+MIRROR_DECLARATIONS=$(
   PATTERN="$PATTERN" NPC_PATTERN="$NPC_PATTERN" python3 - <<'PY'
 import os, re
 names = re.compile(os.environ["PATTERN"] + "|" + os.environ["NPC_PATTERN"])
@@ -140,7 +140,7 @@ prose = re.compile(
 comment = re.compile(r"<!--.*?-->", re.DOTALL)
 def blank(match):
     return re.sub(r"[^\n]", " ", match.group(0))
-for directory, subdirs, files in os.walk("packages/connect"):
+for directory, subdirs, files in os.walk("packages/mirror"):
     subdirs.sort()
     parts = directory.split(os.sep)
     if "objects" not in parts:
@@ -162,9 +162,9 @@ for directory, subdirs, files in os.walk("packages/connect"):
                 print("%s:%d:%s" % (path, number, text.split("\n")[number - 1]))
 PY
 )
-if [[ -n "$CONNECT_DECLARATIONS" ]]; then
-  printf '%s\n' "$CONNECT_DECLARATIONS"
-  echo "FAIL: a Connect object or field declaration names a standard/Industries object above." >&2
+if [[ -n "$MIRROR_DECLARATIONS" ]]; then
+  printf '%s\n' "$MIRROR_DECLARATIONS"
+  echo "FAIL: a Mirror object or field declaration names a standard/Industries object above." >&2
   echo "  Store the record ID as text and reach the object through dynamic Apex." >&2
   FAILED=1
 fi

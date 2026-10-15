@@ -148,7 +148,7 @@ fi
 # features; there is no scratch-org setting that removes them. So the platform-only shape
 # cannot be verified simply by inspecting what exists in the org. Instead we verify it two ways:
 #   (a) a CI static check (scripts/ci/check-standard-objects.sh) that fails if any file under
-#       packages/core (or any other non-Connect package) references a Sales/Service/Industries
+#       packages/core (or any other non-Mirror package) references a Sales/Service/Industries
 #       object, so the source itself never depends on what a real Platform-only org lacks; and
 #   (b) here, at org-creation time for the platform-only shape only: we create a user with the
 #       "Salesforce Platform" user license and the "Standard Platform User" profile, then assign
