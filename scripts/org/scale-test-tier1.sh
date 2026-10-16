@@ -9,7 +9,11 @@
 # allocations do not total it, so a second allocation cannot be Bulk loaded). Loads use
 # Bulk API 2.0 with Automation Control left on. Per load it records the job id, rows
 # processed and failed (from `sf data bulk results`), elapsed seconds and the top error
-# messages with counts; failed rows are saved under the work dir. Before and after it
+# messages with counts. Households and contacts load through the REST Collections API with
+# the duplicate rule header allowSave=true (scripts/data/rest-insert.py): the standard
+# duplicate rules refuse API inserts otherwise and Bulk API 2.0 cannot send the header. Failed
+# rows of every load are kept in the run folder ($SCALE_TEST_DIR/run-<mode>-<alias>-<stamp>/
+# failed-<load>.csv), and the run ends with the refused rows tallied by error code. Before and after it
 # records the org limits the plan names and the record counts.
 #
 # Refuses any alias other than oi-test unless SCALE_TEST_ALLOW=1. Take the shared org lock
@@ -37,6 +41,7 @@ set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 GENERATOR="$REPO_ROOT/scripts/data/generate-scale-data.py"
+REST_INSERT="$REPO_ROOT/scripts/data/rest-insert.py"
 DIR="${SCALE_TEST_DIR:-$REPO_ROOT/scale-test-data}"
 WAIT="${SCALE_TEST_WAIT_MINUTES:-120}"
 # Keep the CLI's update notice and other chatter out of the way; --json output is still parsed
@@ -69,9 +74,13 @@ for tool in sf jq python3; do
   command -v "$tool" >/dev/null 2>&1 || { echo "$tool is required" >&2; exit 1; }
 done
 
-mkdir -p "$DIR/work"
 STAMP="$(date +%Y%m%d-%H%M%S)"
+# One output folder per run: the failed rows of every load (failed-<load>.csv) and the refused
+# row tally by error code stay here, so a later run or cleanup cannot overwrite them.
+RUN_DIR="$DIR/run-$MODE-$ALIAS-$STAMP"
+mkdir -p "$DIR/work" "$RUN_DIR"
 RESULTS="$DIR/results-$MODE-$ALIAS-$STAMP.md"
+REFUSED="$RUN_DIR/refused-by-code.tsv"
 
 log() { printf '%s\n' "$*" | tee -a "$RESULTS"; }
 
@@ -121,6 +130,40 @@ job_error_hint() {
   fi
 }
 
+# record_refused <label> <failed csv>: appends "label<TAB>error code<TAB>rows" lines to the
+# run's tally. The code is the Salesforce status code (sf__StatusCode, or the text before the
+# first colon of sf__Error, which is how `sf data bulk results` writes it).
+record_refused() {
+  python3 - "$1" "$2" >>"$REFUSED" <<'PY'
+import collections, csv, sys
+label, path = sys.argv[1], sys.argv[2]
+counts = collections.Counter()
+with open(path, newline="", encoding="utf-8") as handle:
+    for row in csv.DictReader(handle):
+        code = (row.get("sf__StatusCode") or row.get("sf__Error", "").split(":")[0]).strip()
+        counts[code or "(no code)"] += 1
+for code, n in sorted(counts.items()):
+    print("%s\t%s\t%d" % (label, code, n))
+PY
+}
+
+# refused_summary: the refused rows of the whole run by error code, so a loss is visible.
+refused_summary() {
+  log ""
+  if [[ ! -s "$REFUSED" ]]; then
+    log "Refused rows: none (no load reported a failed row)."
+    return
+  fi
+  log "Refused rows by error code (failed rows kept in $RUN_DIR/failed-*.csv):"
+  awk -F'\t' '{ n[$2] += $3; t += $3; l[$2] = l[$2] " " $1 "=" $3 }
+    END { for (c in n) printf "  %7d  %s (%s )\n", n[c], c, l[c]; printf "  %7d  total refused\n", t }' "$REFUSED" \
+    | sort -rn | tee -a "$RESULTS"
+  if grep -q 'DUPLICATES_DETECTED' "$REFUSED"; then
+    log "  DUPLICATES_DETECTED: a standard duplicate rule refused rows a Bulk load cannot override."
+    log "  Households and contacts load through scripts/data/rest-insert.py, which sends allowSave."
+  fi
+}
+
 # job_report <label> <sf --json output file> [verb]: reads the job id, asks
 # `sf data bulk results` for the real counts and the failed rows, and logs them. Sets
 # JOB_OK (1 when a job ran), JOB_PROCESSED, JOB_FAILED, JOB_SUCCESS (numbers, 0 when unknown).
@@ -165,8 +208,9 @@ job_report() {
     slug="$(printf '%s' "$label" | tr -c 'A-Za-z0-9' '-')"
     failed_csv="$(ls "$DIR"/work/*"$id"*failed*.csv 2>/dev/null | head -n 1)"
     if [[ -n "$failed_csv" ]]; then
-      cp "$failed_csv" "$DIR/work/failed-$slug.csv"
-      log "  failed rows saved: $DIR/work/failed-$slug.csv"
+      cp "$failed_csv" "$RUN_DIR/failed-$slug.csv"
+      log "  failed rows saved: $RUN_DIR/failed-$slug.csv"
+      record_refused "$label" "$failed_csv"
       errors="$(python3 - "$failed_csv" <<'PY'
 import collections, csv, sys
 counts = collections.Counter()
@@ -209,6 +253,33 @@ load() {
     --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-load.err" </dev/null
   end="$(date +%s)"
   job_report "$label" "$outfile"
+  log "  elapsed: $((end - start)) s"
+}
+
+# load_rest <label> <sobject> <csv>: inserts through the REST Collections API with the duplicate
+# rule header allowSave=true (scripts/data/rest-insert.py). Used for Account and Contact only:
+# the standard duplicate rules alert on insert, which refuses an API insert unless that header
+# is sent, and Bulk API 2.0 cannot send it. Records the same lines and failed rows as load.
+load_rest() {
+  local label="$1" sobject="$2" file="$3" start end summary slug
+  slug="$(printf '%s' "$label" | tr -c 'A-Za-z0-9' '-')"
+  log ""
+  log "Load: $label ($sobject, $(($(wc -l <"$file") - 1)) rows in file, REST with duplicate rules allowed to save)"
+  start="$(date +%s)"
+  summary="$(python3 "$REST_INSERT" --sobject "$sobject" --file "$file" --org "$ALIAS" \
+    --out-dir "$DIR/work" --label "$slug" 2>"$DIR/work/last-load.err" </dev/null | tail -n 1)"
+  end="$(date +%s)"
+  if ! printf '%s' "$summary" | jq -e '.processed' >/dev/null 2>&1; then
+    log "  FAILED to run: $(printf '%s' "$summary" | jq -r '.error // empty' 2>/dev/null | head -c 400)$(head -c 300 "$DIR/work/last-load.err")"
+  else
+    log "  rows processed: $(jq -r .processed <<<"$summary"), succeeded: $(jq -r .succeeded <<<"$summary"), failed: $(jq -r .failed <<<"$summary")"
+    if [[ "$(jq -r .failed <<<"$summary")" != "0" ]]; then
+      cp "$DIR/work/$slug-failed-records.csv" "$RUN_DIR/failed-$slug.csv"
+      log "  failed rows saved: $RUN_DIR/failed-$slug.csv"
+      record_refused "$label" "$RUN_DIR/failed-$slug.csv"
+      log "  errors by code: $(jq -c .errors <<<"$summary")"
+    fi
+  fi
   log "  elapsed: $((end - start)) s"
 }
 
@@ -346,13 +417,13 @@ run() {
     | jq -r '.result.records[0].Id // empty')"
   [[ -z "$rt" ]] && { log "No Household record type on Account; stopping."; exit 1; }
   resolve "$DIR/households.csv" --out "$DIR/work/households.csv" --const "RecordTypeId=$rt"
-  load "households" Account "$DIR/work/households.csv"
+  load_rest "households" Account "$DIR/work/households.csv"
 
   export_to "SELECT Id, Sample_Data_Key__c FROM Account WHERE Sample_Data_Key__c LIKE 'SCALE-H-%'" \
     "$DIR/work/account-ids.csv"
   resolve "$DIR/contacts.csv" --out "$DIR/work/contacts.csv" --map "$DIR/work/account-ids.csv" \
     --key-col Household_Key --id-col AccountId
-  load "contacts" Contact "$DIR/work/contacts.csv"
+  load_rest "contacts" Contact "$DIR/work/contacts.csv"
 
   export_to "SELECT Id, Sample_Data_Key__c FROM Contact WHERE Sample_Data_Key__c LIKE 'SCALE-C-%'" \
     "$DIR/work/contact-ids.csv"
@@ -372,6 +443,7 @@ run() {
 
   record_limits "after"
   record_counts "after"
+  refused_summary
   log ""
   log "Results file: $RESULTS"
   log "Next: the runs table in the plan. Then 'scale-test-tier1.sh cleanup $ALIAS'."
@@ -394,7 +466,7 @@ delete_where() {
     [[ "$DELETE_SOFT" == "1" ]] && flag=""
     if [[ -n "$flag" ]]; then log "  $n Ids to delete (hard delete)"; else log "  $n Ids to delete (soft delete, Recycle Bin)"; fi
     start="$(date +%s)"
-    rm -f "$DIR/work/failed-$slug.csv"
+    rm -f "$RUN_DIR/failed-$slug.csv"
     # shellcheck disable=SC2086
     sf data delete bulk --sobject "$2" --file "$file" --target-org "$ALIAS" $flag \
       --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-delete.err" </dev/null
@@ -404,7 +476,7 @@ delete_where() {
     # No hard delete permission: the first delete says so. Fall back to soft delete for this
     # and the remaining steps unless the user forced hard delete.
     if [[ -n "$flag" && "$FORCE_HARD" != "1" && "$JOB_SUCCESS" -le 0 ]] \
-      && grep -qis 'HardDeletePermissionError' "$outfile" "$DIR/work/last-delete.err" "$DIR/work/failed-$slug.csv"; then
+      && grep -qis 'HardDeletePermissionError' "$outfile" "$DIR/work/last-delete.err" "$RUN_DIR/failed-$slug.csv"; then
       DELETE_SOFT=1
       log "  HardDeletePermissionError: the user lacks Bulk API Hard Delete. Falling back to soft"
       log "  delete (Recycle Bin) for this and the remaining steps."
@@ -461,6 +533,7 @@ cleanup() {
     delete_where "funds (not the default)" Fund__c "Accounting_Code__c LIKE 'SCALE-%' AND Is_Default__c = false"
   fi
   record_counts "after cleanup"
+  refused_summary
   log ""
   log "Gifts the import wizard created are not touched here: undo that import batch in the"
   log "wizard. Rerun scripts/org/seed-sample-data.sh $ALIAS if the sample data was removed."

@@ -20,8 +20,9 @@ Modes:
         with no sample data; --no-default-fund leaves the flag off for an org that already
         has a default fund (marking a second one would move the org's default).
         Households get a unique street address and contacts a unique name pair, email and
-        phone, so the org's standard duplicate rules (which Bulk API 2.0 cannot override)
-        do not reject rows.
+        phone, which keeps the org's standard duplicate rules from firing on most rows. The
+        rules match fuzzily, so the loader still sends the allow-save header for households
+        and contacts (scripts/data/rest-insert.py; Bulk API 2.0 cannot send it).
     python3 scripts/data/generate-scale-data.py --import-file [--import-rows 25000]
         Writes import-wizard-25k.csv: one gift per row with the donor's name and email, in the
         headings the "Generic gift list" default template maps without any column changes.

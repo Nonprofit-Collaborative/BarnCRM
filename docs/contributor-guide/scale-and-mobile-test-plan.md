@@ -89,10 +89,14 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   `--keep-funds`. Undo the import batch in the wizard, not in cleanup.
 - The load script records the four limits above, record counts, and per load the job id, rows
   processed and failed (read with `sf data bulk results`), elapsed seconds and the top error
-  messages with counts in `scale-test-data/results-run-<alias>-<time>.md`. Failed rows are
-  saved as `scale-test-data/work/failed-<load>.csv`. When a parent load had failed rows, the
-  next file drops the rows whose parent did not load and the results file says how many. It
-  refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
+  messages with counts in `scale-test-data/results-run-<alias>-<time>.md`. Each run also gets
+  its own folder, `scale-test-data/run-<mode>-<alias>-<time>/`, that keeps the failed rows of
+  every load as `failed-<load>.csv` (a later run or cleanup never overwrites them) and a
+  `refused-by-code.tsv` tally. The run ends with the refused rows by error code (for example
+  `DUPLICATES_DETECTED`) and the total, so a loss shows in the results file; read that summary
+  before trusting the record counts. When a parent load had failed rows, the next file drops
+  the rows whose parent did not load and the results file says how many (lost households take
+  their contacts with them). It refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
 - The tier 1 files hold 4,000 households, 10,000 contacts and 30,000 gifts, plus 3,000 soft
   credits, and 1,500 gifts to split across two funds. The gift trigger adds a default
   allocation to every gift, and each split adds one more allocation, so this loads about 78,500
@@ -107,9 +111,18 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   (`scale-test-data/split-apex/`), each upserting the default allocation (cut to 70%) and the
   new 30% allocation to another fund in one statement. The results file records gifts split,
   skipped and failed.
-- Test data avoids the org's standard duplicate rules, which Bulk API 2.0 cannot override:
-  every household has its own street address, and every contact its own first and last name
-  pair, email and phone.
+- The org's standard Account and Contact duplicate rules (action on insert: Allow, with an
+  Alert) refuse an API insert with `DUPLICATES_DETECTED` unless the caller sends the header
+  `Sforce-Duplicate-Rule-Header: allowSave=true`, and Bulk API 2.0 cannot send it. Unique
+  names are not enough: the rules match fuzzily, the generator's invented surnames
+  (prefix plus suffix, such as Ashford and Ashwood) are near twins of each other, and a
+  household's contacts share one mailing address. So households and contacts load through
+  `scripts/data/rest-insert.py`, the REST sObject Collections API (200 rows per call, `sf api
+  request rest`) with that header; gifts, soft credits and funds stay on Bulk API 2.0. Only
+  the test load saves through the rules; the product and the org's rules are unchanged. The
+  generator still gives each household its own street address and each contact its own name
+  pair, email and phone, which keeps the rules from firing on most rows. Never deactivate the
+  standard rules for this test.
 - The generated "Scale test General" fund is loaded as the default fund when the org has none,
   so the load works without sample data; an org that already has a default keeps it. Cleanup
   removes the generated funds.
