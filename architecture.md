@@ -128,4 +128,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - CI checks for cross-package visibility (#446), production classes only: `scripts/ci/check-cross-package-visibility.py` (allowlist `scripts/ci/cross-package-visibility-allowlist.txt`, one entry: `HealthCheckService.Finding.detail`, B5 deferred) and `scripts/ci/check-dynamic-class-visibility.py`.
 - `OrgShape` fields are `@AuraEnabled`, so they cannot be `@NamespaceAccessible`; other packages use static accessors (`OrgShapeDetector.hasPersonAccounts()`).
 - A class Core builds by name (`Type.forName`, trigger handlers, registered module extensions) needs an explicit `@NamespaceAccessible` public no-arg constructor; the implicit one is not accepted by the check.
+- `Contact.Description` is a long text field and cannot be filtered in SOQL; match test records on another field such as `Email`.
+- Pruning worktrees must skip any worktree with uncommitted changes (a prune on 2026-10-15 lost the `barn-npc` Public-visibility edits and an `mwdbdevsb` `.forceignore` tweak).
+- Bulk API 2.0 refuses rows the standard duplicate rules flag (`DUPLICATES_DETECTED`, Duplicate Alert); the scale loader uses the REST sObject Collections API with `Sforce-Duplicate-Rule-Header: allowSave=true` (#443).
 - A PR branch created before a rename landed redeploys the old names when gated (`oi-test` got old Connect and Mirror back after such a gate; restored to main 6506cb52). Rebase open branches onto main after a rename lands, before gating them.
