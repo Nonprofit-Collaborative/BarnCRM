@@ -1,6 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import HEADING from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
 import NEVER from '@salesforce/label/c.Core_SeasonalAddress_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Core_SeasonalAddress_NotScheduled';
@@ -9,7 +10,6 @@ import LINK from '@salesforce/label/c.Core_SeasonalAddress_HubLink';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
 
-const SETTINGS_TAB = 'BarnCRM_Settings';
 const ADDRESSES_SECTION = 'Addresses';
 
 /**
@@ -55,11 +55,17 @@ export default class HubSeasonalAddresses extends NavigationMixin(LightningEleme
     return this.loaded && !this.scheduled && !this.stale;
   }
 
-  handleOpenAddresses() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: SETTINGS_TAB },
-      state: { c__section: ADDRESSES_SECTION }
-    });
+  // The tab and the section key are qualified for the org's namespace in Apex.
+  async handleOpenAddresses() {
+    try {
+      const link = await getSettingsLink();
+      this[NavigationMixin.Navigate]({
+        type: 'standard__navItemPage',
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: ADDRESSES_SECTION }
+      });
+    } catch {
+      this.errorMessage = LOAD_ERROR;
+    }
   }
 }

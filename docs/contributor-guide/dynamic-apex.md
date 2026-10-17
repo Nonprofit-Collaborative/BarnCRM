@@ -149,8 +149,9 @@ A module component nests or imports a Core component only when Core exposes it
 own copy (`rollupTabLabel`, a copy of `workspaceTabs`' `labelTab`). Another package's label
 is used only when it is `<protected>false</protected>`. LWC never writes a literal `c__`
 page state key: the key comes from Apex (`NamespaceUtil.stateKey`) or is matched by its
-`__name` suffix. `check-namespace-readiness.py` enforces all three; five Core components that
-still write `c__section` are listed in its `DEFERRED`.
+`__name` suffix. `check-namespace-readiness.py` enforces all three, with no exceptions in its
+`DEFERRED`. A link to a console section takes the tab name and the section key from
+`SettingsController.getSettingsLink()`.
 
 ## 4. The namespace is empty today
 

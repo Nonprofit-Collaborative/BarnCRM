@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
@@ -49,7 +50,6 @@ const AUTOMATIC_ACCESS_GUIDE =
 // The tabs the assistant opens, by page reference rather than by URL, so the links keep
 // working on the mobile app and once a namespace is assigned (Decision D-01).
 const IMPORT_TAB = 'Import';
-const SETTINGS_TAB = 'BarnCRM_Settings';
 
 /**
  * The guided Setup Assistant: one step open at a time, Back and Next, Skip for now, and it
@@ -313,13 +313,19 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   }
 
   /** Opens the settings section this step's answers live in afterwards. */
-  handleOpenSection() {
+  async handleOpenSection() {
     const section = this.activeStep && this.activeStep.target ? this.activeStep.target : '';
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: SETTINGS_TAB },
-      state: { c__section: section }
-    });
+    try {
+      // The tab and the section key are qualified for the org's namespace in Apex.
+      const link = await getSettingsLink();
+      this[NavigationMixin.Navigate]({
+        type: 'standard__navItemPage',
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: section }
+      });
+    } catch (error) {
+      this.errorMessage = this.messageFrom(error);
+    }
   }
 
   handleOpenImport() {

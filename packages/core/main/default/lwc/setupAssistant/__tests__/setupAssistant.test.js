@@ -47,6 +47,17 @@ jest.mock(
   { virtual: true }
 );
 
+// A namespaced org answers with qualified names; the component writes none of its own.
+jest.mock(
+  '@salesforce/apex/SettingsController.getSettingsLink',
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({ tabApiName: 'ns__BarnCRM_Settings', sectionKey: 'ns__section' })
+    )
+  }),
+  { virtual: true }
+);
+
 const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
@@ -624,11 +635,12 @@ describe('c-setup-assistant', () => {
     await settle();
 
     click(element, 'section-link');
+    await settle();
 
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'BarnCRM_Settings' },
-      state: { c__section: 'General' }
+      attributes: { apiName: 'ns__BarnCRM_Settings' },
+      state: { ns__section: 'General' }
     });
   });
 

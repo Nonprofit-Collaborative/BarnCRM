@@ -168,6 +168,27 @@ public with sharing class SettingsController {
         }
     }
 
+    /** Where a link to a console section goes: the settings tab and the section state key. */
+    public class SettingsLink {
+        @AuraEnabled
+        public String tabApiName;
+        @AuraEnabled
+        public String sectionKey;
+    }
+
+    /**
+     * The names a page reference to a console section needs, qualified for this org, so no
+     * component writes a literal tab name or `c__section` (the key is `<ns>__section` once
+     * a namespace exists).
+     */
+    @AuraEnabled(cacheable=true)
+    public static SettingsLink getSettingsLink() {
+        SettingsLink link = new SettingsLink();
+        link.tabApiName = NamespaceUtil.qualify(HealthCheckService.SETTINGS_TAB);
+        link.sectionKey = NamespaceUtil.stateKey(HealthCheckService.SECTION_STATE_PARAMETER);
+        return link;
+    }
+
     @AuraEnabled(cacheable=true)
     public static List<SearchHit> search(String term) {
         List<SearchHit> hits = new List<SearchHit>();

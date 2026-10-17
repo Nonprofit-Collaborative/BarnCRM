@@ -35,17 +35,8 @@ PAGE_TARGETS = {
     "UtilityBar": "lightning__UtilityBar",
 }
 
-# path: reason. Core components that write `c__section` and need the key from Apex.
-DEFERRED = {
-    p: "deferred: the settings tab and its section key must come from Apex (HealthCheckService pattern)"
-    for p in (
-        "packages/core/main/default/lwc/firstRunSetup/firstRunSetup.js",
-        "packages/core/main/default/lwc/hubModules/hubModules.js",
-        "packages/core/main/default/lwc/hubRollups/hubRollups.js",
-        "packages/core/main/default/lwc/hubSeasonalAddresses/hubSeasonalAddresses.js",
-        "packages/core/main/default/lwc/setupAssistant/setupAssistant.js",
-    )
-}
+# path: reason. Components allowed to write a literal `c__` key. None today.
+DEFERRED = {}
 
 
 def package_of(path):
