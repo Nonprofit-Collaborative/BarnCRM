@@ -340,7 +340,9 @@ def generate_tier1(args):
                     gift_date(rng),
                     rng.choices(PAYMENT_TYPES, weights=PAYMENT_WEIGHTS)[0],
                     "Received",
-                    "Not required",
+                    "To acknowledge"
+                    if args.acknowledge_every and len(gift_ids) % args.acknowledge_every == 0
+                    else "Not required",
                     "SCALE-%07d" % (len(gift_ids) + 1),
                 ]
             )
@@ -532,6 +534,9 @@ def main():
     p.add_argument("--households", type=int, default=4000)
     p.add_argument("--contacts", type=int, default=10000)
     p.add_argument("--gifts", type=int, default=30000)
+    p.add_argument("--acknowledge-every", type=int, default=10, metavar="N",
+                   help="every Nth gift loads as 'To acknowledge' so AcknowledgmentBatch has "
+                        "work (default 10, so 3,000 gifts); 0 leaves every gift 'Not required'")
     p.add_argument("--resolve", metavar="IN")
     p.add_argument("--out")
     p.add_argument("--map")
