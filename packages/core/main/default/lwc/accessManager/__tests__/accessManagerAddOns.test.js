@@ -138,6 +138,7 @@ describe('c-access-manager extra permissions', () => {
     expect(element.shadowRoot.querySelector('[data-id="empty-add-on"]')).not.toBeNull();
     const remove = element.shadowRoot.querySelector('[data-id="add-on-remove-button"]');
     expect(remove.title).toBe('Remove Priya Nair');
+    expect(remove.getAttribute('aria-label')).toBe('Remove Priya Nair');
   });
 
   it('shows the description and warning of the chosen permission, then gives it after a warned confirmation', async () => {

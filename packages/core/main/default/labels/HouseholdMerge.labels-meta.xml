@@ -9,6 +9,14 @@
         <value>Cancel</value>
     </labels>
     <labels>
+        <fullName>Core_HouseholdMerge_ComparisonTable</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Accessible name of the household comparison table</shortDescription>
+        <value>Household comparison</value>
+    </labels>
+    <labels>
         <fullName>Core_HouseholdMerge_ColumnField</fullName>
         <categories>Households</categories>
         <language>en_US</language>

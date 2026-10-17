@@ -21,6 +21,7 @@ import SEARCH_LABEL from '@salesforce/label/c.Core_HouseholdMerge_SearchLabel';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdMerge_SearchPlaceholder';
 import NO_RESULTS from '@salesforce/label/c.Core_HouseholdMerge_NoResults';
 import SELECT_OTHER from '@salesforce/label/c.Core_HouseholdMerge_SelectOther';
+import COMPARISON_TABLE from '@salesforce/label/c.Core_HouseholdMerge_ComparisonTable';
 import COLUMN_FIELD from '@salesforce/label/c.Core_HouseholdMerge_ColumnField';
 import COLUMN_THIS from '@salesforce/label/c.Core_HouseholdMerge_ColumnThis';
 import COLUMN_OTHER from '@salesforce/label/c.Core_HouseholdMerge_ColumnOther';
@@ -66,6 +67,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     searchPlaceholder: SEARCH_PLACEHOLDER,
     noResults: NO_RESULTS,
     selectOther: SELECT_OTHER,
+    comparisonTable: COMPARISON_TABLE,
     columnField: COLUMN_FIELD,
     columnThis: COLUMN_THIS,
     columnOther: COLUMN_OTHER,

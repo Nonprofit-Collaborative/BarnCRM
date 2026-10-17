@@ -170,6 +170,6 @@ Read from the source; the device run above still has to confirm it.
   headers with `scope="col"`; icon buttons and icons carry alternative text; no clickable
   `div` or `span`; status and errors use `role="status"`, `role="alert"` or `aria-live`.
   Import results now announce their counts as a run finishes.
-- **Left for later, with the reason.** The merge comparison table has no name yet, and the
-  Access page Remove button gives the person's name only as a `title`: both components are
-  being changed on the Q-05 and Q-07 branches, so they follow once those land.
+- **Left for later: done.** The merge comparison table now takes an `aria-label` from the
+  `Core_HouseholdMerge_ComparisonTable` label, and the Access page Remove buttons carry
+  the person's name in an `aria-label` ("Remove {name}") as well as the `title`.

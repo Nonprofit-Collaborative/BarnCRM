@@ -212,6 +212,7 @@ describe('c-access-manager', () => {
     await flush();
     const remove = element.shadowRoot.querySelector('[data-id="remove-button"]');
     expect(remove.title).toBe('Remove Maria Alvarez');
+    expect(remove.getAttribute('aria-label')).toBe('Remove Maria Alvarez');
   });
 
   it('warns before someone removes their own BarnCRM Admin role', async () => {
