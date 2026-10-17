@@ -122,13 +122,39 @@ private class RollupFullRecalcBatchTest {
         }
     }
 
+    /** Queue entries naming this record, with the fields the large parent batch reads. */
+    private static List<Rollup_Queue__c> entriesFor(Id recordId) {
+        List<Rollup_Queue__c> found = new List<Rollup_Queue__c>();
+        for (Rollup_Queue__c entry : [
+            SELECT
+                Id,
+                Target_Object__c,
+                Record_Ids__c,
+                Definition_Ids__c,
+                Attempts__c,
+                Status__c,
+                Next_Attempt__c,
+                Last_Error__c
+            FROM Rollup_Queue__c
+        ]) {
+            if (RollupQueue.idsOf(entry).contains(recordId)) {
+                found.add(entry);
+            }
+        }
+        return found;
+    }
+
     /**
-     * A catch-all organization the last run counted 500 people on is calculated alone, and a
-     * chunk whose records together expect more rows than the budget is split: the records that
-     * do not fit are held back for a pass with smaller chunks. Every count is still right.
+     * The tier 1 scale test's failure: a fund holding all 30,000 allocations was calculated alone
+     * in a chunk, and its aggregate queries read past the 50,000 rows a transaction may read
+     * ("Too many query rows: 50001"), every run. Here a catch-all organization the last run
+     * counted 500 people on (the large parent threshold set to 100) is not calculated by any
+     * chunk: it goes to the Rollup Queue, which hands it to the large parent batch (R-RQ6). A
+     * chunk whose records together expect more rows than the budget is still split: the records
+     * that do not fit are held back for a pass with smaller chunks. Every count ends right.
      */
     @IsTest
-    static void aHeavyRecordIsCalculatedAloneAndADenseChunkIsSplit() {
+    static void aLargeParentGoesToTheBatchRouteAndADenseChunkIsSplit() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             List<Account> organizations = organizations(
                 new List<Integer>{ 500, 40, 40, 40, 40, 40 },
@@ -137,6 +163,7 @@ private class RollupFullRecalcBatchTest {
             Account anonymous = organizations[0];
             Rollup_Definition__c definition = peopleCount();
             RollupFullRecalcBatch.rowBudget = 100;
+            RollupLargeParentBatch.largeParentRowsForTest = 100;
             RollupFullRecalcBatch pass = RollupFullRecalcBatch.firstPass(
                 new List<Rollup_Definition__c>{ definition }
             );
@@ -146,25 +173,130 @@ private class RollupFullRecalcBatchTest {
                 null,
                 [SELECT Id, NumberOfEmployees FROM Account WHERE Id IN :organizations ORDER BY Id]
             );
-            Set<Id> alone = pass.alone.clone();
+            Set<Id> large = pass.large.clone();
             Integer heldBack = pass.later.size();
             pass.finish(null);
             Test.stopTest();
 
             Assert.areEqual(
                 new Set<Id>{ anonymous.Id },
-                alone,
-                'The heavy record waits to go alone'
+                large,
+                'The large parent goes to the batch route'
             );
             Assert.areEqual(3, heldBack, 'Two records of 40 fit a budget of 100, three wait');
             Map<Id, Integer> counts = countsOf(organizations);
-            Assert.areEqual(3, counts.get(anonymous.Id), 'The heavy record is calculated');
+            Assert.areEqual(500, counts.get(anonymous.Id), 'No chunk calculated the large parent');
             for (Account organization : organizations) {
                 if (organization.Id != anonymous.Id) {
-                    Assert.areEqual(2, counts.get(organization.Id), 'So is every other');
+                    Assert.areEqual(2, counts.get(organization.Id), 'Every other is calculated');
                 }
             }
             Assert.isNotNull(lastCalculated(definition), 'And the run marks the rollup calculated');
+            Assert.isTrue(RollupLargeParentBatch.startedForTest, 'The queue started the batch');
+            List<Rollup_Queue__c> held = entriesFor(anonymous.Id);
+            Assert.areEqual(1, held.size(), 'One entry, held by the batch');
+            Assert.areEqual(
+                new List<Id>{ definition.Id },
+                RollupQueue.definitionIdsOf(held[0]),
+                'Naming the run\'s definitions'
+            );
+
+            RollupLargeParentBatch.forEntries(held).runInline(2);
+
+            Assert.areEqual(3, countsOf(organizations).get(anonymous.Id), 'Counted by the batch');
+        }
+    }
+
+    /** A rollup of an organization's child organizations (Parent Account) into a field. */
+    private static Rollup_Definition__c childRollup(
+        String key,
+        String aggregate,
+        String sourceField,
+        String targetField
+    ) {
+        return new Rollup_Definition__c(
+            Name = key,
+            Definition_Key__c = 'Test_Children_' + key,
+            Source_Object__c = 'Account',
+            Relationship_Path__c = 'ParentId',
+            Aggregate__c = aggregate,
+            Source_Field__c = sourceField,
+            Target_Object__c = 'Account',
+            Target_Field__c = targetField,
+            Mode__c = RollupService.MODE_BOTH,
+            Fiscal_Year_Aware__c = false,
+            Active__c = true
+        );
+    }
+
+    /**
+     * R-RQ6 for a stale count (the scale rerun's fund stored 3,200 of its 26,102 allocations): an
+     * organization stored as one child has thirty, so it is estimated small, and its second query
+     * (a FIRST, ordered) would take the chunk past the row ceiling. Two records in the chunk are
+     * held back for smaller chunks with nothing written; alone, the record goes to the batch
+     * route, which writes the right totals.
+     */
+    @IsTest
+    static void aStaleCountRecordStopsAtTheRowCeilingAndGoesToTheBatch() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            List<Account> organizations = organizations(
+                new List<Integer>{ 1, 0 },
+                new List<Integer>{ 0, 0 }
+            );
+            Account stale = organizations[0];
+            List<Account> children = new List<Account>();
+            for (Integer i = 0; i < 31; i++) {
+                children.add(
+                    new Account(
+                        Name = 'Child ' + i,
+                        ParentId = organizations[i == 30 ? 1 : 0].Id,
+                        RecordTypeId = organizations[0].RecordTypeId,
+                        AnnualRevenue = 10
+                    )
+                );
+            }
+            insert children;
+            List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
+                childRollup('Count', 'COUNT', null, 'NumberOfEmployees'),
+                childRollup('Revenue', 'SUM', 'AnnualRevenue', 'AnnualRevenue'),
+                childRollup('First', 'FIRST', 'Name', 'Preferred_Name__c')
+            };
+            definitions[2].Order_By_Field__c = 'AnnualRevenue';
+            insert definitions;
+            RollupFullRecalcBatch both = RollupFullRecalcBatch.firstPass(definitions);
+            RollupFullRecalcBatch alone = RollupFullRecalcBatch.firstPass(definitions);
+            List<Account> chunk = [
+                SELECT Id, NumberOfEmployees
+                FROM Account
+                WHERE Id IN :organizations
+                ORDER BY Id
+            ];
+
+            Test.startTest();
+            RollupLargeParentBatch.queueRowCeilingForTest = Limits.getQueryRows() + 40;
+            both.execute(null, chunk);
+            RollupLargeParentBatch.queueRowCeilingForTest = Limits.getQueryRows() + 40;
+            alone.execute(null, new List<Account>{ stale });
+            // The queue's own run, which hands the record on, has the same ceiling.
+            RollupLargeParentBatch.queueRowCeilingForTest = 40;
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Map<Id, Account>(chunk).keySet(),
+                both.later,
+                'Two records: held back for smaller chunks'
+            );
+            Assert.isTrue(both.large.isEmpty(), 'Not sent to the batch route');
+            Assert.areEqual(new Set<Id>{ stale.Id }, alone.large, 'Alone: the batch route');
+            Map<Id, Integer> counts = countsOf(organizations);
+            Assert.areEqual(1, counts.get(stale.Id), 'Nothing was written');
+            Assert.areEqual(0, counts.get(organizations[1].Id), 'For either record');
+
+            List<Rollup_Queue__c> held = entriesFor(stale.Id);
+            Assert.areEqual(1, held.size(), 'One entry, held by the batch');
+            RollupLargeParentBatch.forEntries(held).runInline(7);
+
+            Assert.areEqual(30, countsOf(organizations).get(stale.Id), 'Counted by the batch');
         }
     }
 

@@ -442,7 +442,7 @@ private class RollupLargeParentBatchTest {
             );
             Assert.isFalse(
                 RollupAggregator.passesCeiling(26150, 26102, null),
-                'No ceiling (the instant path, the full run): never stopped'
+                'No ceiling (the instant path, previews): never stopped'
             );
             Assert.areEqual(
                 Limits.getLimitQueryRows() * 4 / 5,
