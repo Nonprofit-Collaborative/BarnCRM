@@ -5,6 +5,7 @@
 @IsTest(critical=true)
 private class HouseholdServiceTest {
     private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so the absent-object path runs for real where the object is absent
+    private static final String CONTACT_RELATION = 'AccountContactRelation'; // detection-only: describe key, so the real move-time tidy runs only where Contacts to Multiple Accounts is on
 
     @TestSetup
     static void createTestUser() {
@@ -1962,6 +1963,73 @@ private class HouseholdServiceTest {
     }
 
     // ------------------------------------- Contacts to Multiple Accounts (ADR-NEXT)
+
+    /**
+     * The content test a move applies to what it leaves behind: only the indirect relation
+     * between a moved person and the household they left, and only when nobody recorded
+     * roles or dates on it.
+     */
+    @IsTest
+    static void aMoveRemovesOnlyTheUnannotatedRelationItLeftBehind() {
+        System.runAs(TestUsers.admin()) {
+            Id left = FakeIds.of(Account.SObjectType, 1);
+            Id joined = FakeIds.of(Account.SObjectType, 2);
+            Id other = FakeIds.of(Account.SObjectType, 3);
+            Id maria = FakeIds.of(Contact.SObjectType, 1);
+            Id wei = FakeIds.of(Contact.SObjectType, 2);
+            Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>{ maria => left, wei => left };
+            List<HouseholdSelector.NativeMembership> rows = new List<HouseholdSelector.NativeMembership>{
+                // Left behind by the move, nothing recorded on it: removed.
+                new HouseholdSelector.NativeMembership(relationId(1), left, maria, false),
+                // Left behind, but with roles or dates: stays.
+                new HouseholdSelector.NativeMembership(relationId(2), left, wei, false, true),
+                // The person's new direct relation: stays.
+                new HouseholdSelector.NativeMembership(relationId(3), joined, maria, true),
+                // A relation to some other account: none of this move's business.
+                new HouseholdSelector.NativeMembership(relationId(4), other, maria, false)
+            };
+
+            Assert.areEqual(
+                new Set<Id>{ relationId(1) },
+                HouseholdService.relationsLeftBehind(leftHouseholdByContact, rows),
+                'Only the unannotated relation this move left behind goes'
+            );
+        }
+    }
+
+    /**
+     * Runs only where Contacts to Multiple Accounts is on: the relation a move leaves behind
+     * is removed, so the emptied household is tidied away again.
+     */
+    @IsTest
+    static void withRealContactRelationsAnEmptiedHouseholdIsTidied() {
+        System.runAs(TestUsers.admin()) {
+            if (!Schema.getGlobalDescribe().containsKey(CONTACT_RELATION)) {
+                return; // Contacts to Multiple Accounts is off in this org.
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
+                'The relation the move left behind no longer keeps the household'
+            );
+        }
+    }
+
+    private static Id relationId(Integer n) {
+        // Only compared, never queried; an Account prefix keeps it valid in every org.
+        return FakeIds.of(Account.SObjectType, 100 + n);
+    }
 
     /**
      * With Contacts to Multiple Accounts on, the platform leaves an indirect relation on the

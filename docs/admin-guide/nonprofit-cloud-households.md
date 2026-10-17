@@ -44,17 +44,18 @@ account relationship record, and moving a person to another household leaves an 
 behind. In an org without Nonprofit Cloud households, BarnCRM does not read those records as
 a Nonprofit Cloud household: naming, greetings, addresses and memberships work as usual.
 
-- **Merging.** BarnCRM removes the indirect relationship of each person related to both
-  households (Salesforce refuses the merge otherwise); the person's other relationship stays.
-  In an org with Nonprofit Cloud households BarnCRM never removes these records, because they
-  can hold roles and dates of their own, so a merge there may fail. Remove the extra
-  relationship yourself and merge again.
-- **Empty household tidy-up.** Unless your org has the Nonprofit Cloud household object and
-  BarnCRM could confirm it holds no households, a household emptied by a move still has the
-  indirect relationship left behind, so the tidy-up keeps it rather than risk deleting
-  something it cannot see, and notes it in the Error Log at Info severity. Delete such
-  households yourself once you have checked them. Import undo keeps an imported household
-  for the same reason.
+- **Moving people.** When BarnCRM moves a person to another household, it removes the
+  indirect relationship that move left on the old household, but only if nobody added roles
+  or start or end dates to it. Empty households are then tidied away as usual.
+- **Merging.** Merging moves everyone first, with the same tidy-up. If someone is still
+  related to both households afterwards (a relationship somebody added, or one with roles or
+  dates), BarnCRM does not delete it: the merge stops, nothing changes, and you are told the
+  households could not be combined. Remove or edit that relationship and merge again.
+- **Kept households.** A household emptied some other way (for example by changing a
+  contact's account on the contact record), or one that still has a relationship somebody
+  added, is kept and noted in the Error Log at Info severity. Import undo also keeps an
+  imported household that still has such relationships. Check these and delete any you no
+  longer need.
 
 ## A five-minute walkthrough
 

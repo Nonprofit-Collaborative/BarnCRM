@@ -245,8 +245,14 @@ public with sharing class HouseholdMergeService {
         Boolean keepsCustomName = applyChoices(survivor, victim, choices);
         Map<String, Object> chosenWording = chosenOtherWording(victim, choices);
 
-        List<String> reasons = removeSharedRelations(survivorId, victimId);
-        if (!reasons.isEmpty()) {
+        List<String> reasons = new List<String>();
+        Set<Id> shared = sharedRelatedPeople(
+            survivorId,
+            HouseholdSelector.nativeMembershipRows(new Set<Id>{ survivorId, victimId }, null)
+        );
+        if (!shared.isEmpty()) {
+            // The people the platform would refuse over, for the administrator to look at.
+            reasons.add(String.join(new List<Id>(shared), ', '));
             failMerge(beforeMerge, reasons, survivorId);
         }
 
@@ -291,45 +297,11 @@ public with sharing class HouseholdMergeService {
     }
 
     /**
-     * With Contacts to Multiple Accounts on, the platform refuses to merge two accounts that
-     * share a related contact, and a merge always makes them share one: moving a person to the
-     * surviving household leaves an indirect relation on the household going away (ADR-NEXT).
-     * For each person related to both, the indirect relation is removed, the one on the
-     * household going away by preference, since the merge folds it into the survivor anyway.
-     * Nothing happens where the org does not relate contacts to several accounts, and nothing
-     * where it may have native households: there these rows are Nonprofit Cloud membership,
-     * which can carry roles, dates and fields of their own, so they are not BarnCRM's to
-     * delete and the merge is left to fail with its plain message. The removal runs as the
-     * person merging. Answers the platform's reasons for any row it would not remove.
-     */
-    private static List<String> removeSharedRelations(Id survivorId, Id victimId) {
-        List<String> reasons = new List<String>();
-        if (OrgShapeDetector.hasNativeHouseholdGroups() != false) {
-            return reasons;
-        }
-        List<Id> blocking = new List<Id>(
-            relationsBlockingMerge(
-                survivorId,
-                HouseholdSelector.nativeMembershipRows(new Set<Id>{ survivorId, victimId })
-            )
-        );
-        if (blocking.isEmpty()) {
-            return reasons;
-        }
-        for (
-            Database.DeleteResult removed : Database.delete(blocking, false, AccessLevel.USER_MODE)
-        ) {
-            for (Database.Error problem : removed.getErrors()) {
-                reasons.add(problem.getMessage());
-            }
-        }
-        return reasons;
-    }
-
-    /**
-     * Undoes the move and anything else the merge did, logs the platform's own wording for the
-     * administrator (after the rollback, so the entry stays), and gives the person at the
-     * screen the plain message.
+     * Undoes the move and anything else the merge did, logs the reasons for the administrator,
+     * and gives the person at the screen the plain message. The rollback matters to a caller
+     * that catches the exception. HouseholdMergeController rethrows, so in the app the whole
+     * transaction rolls back and this Error Log entry goes with it; only a caller that catches
+     * keeps it.
      */
     private static void failMerge(Savepoint beforeMerge, List<String> reasons, Id survivorId) {
         Database.rollback(beforeMerge);
@@ -343,39 +315,29 @@ public with sharing class HouseholdMergeService {
     }
 
     /**
-     * The relations to remove so the platform will merge: for each person related to both
-     * households, the indirect one on the household going away, or, where that one is the
-     * person's own account, the indirect one on the survivor. A person has one direct
-     * relation, so two direct ones cannot occur.
+     * The people related to both households, which the platform refuses to merge over where
+     * Contacts to Multiple Accounts is on (ADR-NEXT). The move before the merge has already
+     * removed the unannotated relation each moved person left behind on the household going
+     * away (HouseholdService.removeRelationsLeftBehind), so anyone still here is a relation
+     * somebody made or annotated. BarnCRM deletes none of those: the merge is refused and
+     * nothing changes.
      */
     @TestVisible
-    private static Set<Id> relationsBlockingMerge(
+    private static Set<Id> sharedRelatedPeople(
         Id survivorId,
         List<HouseholdSelector.NativeMembership> rows
     ) {
-        Map<Id, HouseholdSelector.NativeMembership> onSurvivor = new Map<Id, HouseholdSelector.NativeMembership>();
-        Map<Id, HouseholdSelector.NativeMembership> onVictim = new Map<Id, HouseholdSelector.NativeMembership>();
+        Set<Id> onSurvivor = new Set<Id>();
+        Set<Id> onOther = new Set<Id>();
         for (HouseholdSelector.NativeMembership row : rows) {
             if (row.accountId == survivorId) {
-                onSurvivor.put(row.contactId, row);
+                onSurvivor.add(row.contactId);
             } else {
-                onVictim.put(row.contactId, row);
+                onOther.add(row.contactId);
             }
         }
-        Set<Id> blocking = new Set<Id>();
-        for (Id contactId : onVictim.keySet()) {
-            HouseholdSelector.NativeMembership survivorRow = onSurvivor.get(contactId);
-            if (survivorRow == null) {
-                continue;
-            }
-            HouseholdSelector.NativeMembership victimRow = onVictim.get(contactId);
-            if (!victimRow.isDirect) {
-                blocking.add(victimRow.id);
-            } else if (!survivorRow.isDirect) {
-                blocking.add(survivorRow.id);
-            }
-        }
-        return blocking;
+        onOther.retainAll(onSurvivor);
+        return onOther;
     }
 
     /** The wording fields naming computes, which a merge also offers as choices. */

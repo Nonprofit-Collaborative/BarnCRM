@@ -28,7 +28,8 @@ public with sharing class HouseholdSelector {
     private static final String NATIVE_HOUSEHOLD_GROUP_QUERY = 'SELECT AccountId FROM PartyRelationshipGroup WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice a native household group whose master-detail parent is the Account it is about to delete, because deleting the Account cascade-deletes the group
     private static final String NATIVE_MEMBERSHIP = 'AccountContactRelation'; // detection-only: describe key, so the delete guard can tell whether this org has native membership rows at all before it asks about one
     private static final String NATIVE_MEMBERSHIP_QUERY = 'SELECT AccountId FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice native household membership rows on the Account it is about to delete, because they make a household that reads as empty to BarnCRM
-    private static final String NATIVE_MEMBERSHIP_ROWS_QUERY = 'SELECT Id, AccountId, ContactId, IsDirect FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the household merge has to find a person related to both households, because the platform refuses to merge two accounts that share a related contact
+    private static final String NATIVE_MEMBERSHIP_ROWS_QUERY = 'SELECT Id, AccountId, ContactId, IsDirect, Roles, StartDate, EndDate FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the household merge has to find a person related to both households, because the platform refuses to merge two accounts that share a related contact
+    private static final String NATIVE_MEMBERSHIP_PAIRS_QUERY = 'SELECT Id, AccountId, ContactId, IsDirect, Roles, StartDate, EndDate FROM AccountContactRelation WHERE AccountId IN :accountIds AND ContactId IN :contactIds LIMIT 10000'; // detection-only: a household move has to find the relation it just left behind on the household a person left
     private static final String ACCOUNT_FIELD = 'AccountId';
 
     // The one question Health Check asks that getAccountsWithNativeDependents cannot answer:
@@ -68,8 +69,8 @@ public with sharing class HouseholdSelector {
     private static Set<Id> nativeMembershipAccountsOverride;
 
     /**
-     * Set only by tests: the native membership rows the household merge would find, for the
-     * same reason.
+     * Set only by tests: the native membership rows a household move or merge would find, for
+     * the same reason.
      */
     @TestVisible
     private static List<NativeMembership> nativeMembershipRowsOverride;
@@ -80,12 +81,25 @@ public with sharing class HouseholdSelector {
         public Id accountId;
         public Id contactId;
         public Boolean isDirect;
+        /** Whether somebody recorded anything on it: roles, a start date or an end date. */
+        public Boolean hasDetails;
 
         public NativeMembership(Id id, Id accountId, Id contactId, Boolean isDirect) {
+            this(id, accountId, contactId, isDirect, false);
+        }
+
+        public NativeMembership(
+            Id id,
+            Id accountId,
+            Id contactId,
+            Boolean isDirect,
+            Boolean hasDetails
+        ) {
             this.id = id;
             this.accountId = accountId;
             this.contactId = contactId;
             this.isDirect = isDirect == true;
+            this.hasDetails = hasDetails == true;
         }
     }
 
@@ -332,18 +346,22 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Every native membership row on these accounts, empty where the org does not have the
-     * object (Contacts to Multiple Accounts off). The household merge asks, because the
-     * platform refuses to merge two accounts that share a related contact (ADR-NEXT).
+     * Native membership rows on these accounts (for these contacts, when contactIds is not
+     * null), empty where the org does not have the object (Contacts to Multiple Accounts off).
+     * The household merge asks, because the platform refuses to merge two accounts that share
+     * a related contact, and a household move asks for the relation it left behind (ADR-NEXT).
      *
-     * An upkeep read (ADR-0021) in system mode: its only caller is the household merge, after
-     * the edit access check on both households; its only input is those two identifiers; it
-     * reads four fields of one object; and nothing else is elevated. A row the merging person
-     * cannot see blocks the platform merge all the same, so it has to be found. The removal
-     * that follows is not elevated: it runs as that person.
+     * An upkeep read (ADR-0021) in system mode: its only callers are the household move and
+     * merge, after their edit access checks; its only input is identifiers they computed for
+     * themselves; it reads seven fields of one object; and nothing else is elevated. A row the
+     * person cannot see blocks the platform merge all the same, so it has to be found. Any
+     * removal that follows is not elevated: it runs as that person.
      */
     @NamespaceAccessible
-    public static List<NativeMembership> nativeMembershipRows(Set<Id> accountIds) {
+    public static List<NativeMembership> nativeMembershipRows(
+        Set<Id> accountIds,
+        Set<Id> contactIds
+    ) {
         if (nativeMembershipRowsOverride != null) {
             return nativeMembershipRowsOverride;
         }
@@ -351,14 +369,19 @@ public with sharing class HouseholdSelector {
         if (
             accountIds == null ||
             accountIds.isEmpty() ||
+            (contactIds != null && contactIds.isEmpty()) ||
             !Schema.getGlobalDescribe().containsKey(NATIVE_MEMBERSHIP)
         ) {
             return rows;
         }
+        Map<String, Object> binds = new Map<String, Object>{ 'accountIds' => accountIds };
+        if (contactIds != null) {
+            binds.put('contactIds', contactIds);
+        }
         for (
             SObject row : Database.queryWithBinds(
-                NATIVE_MEMBERSHIP_ROWS_QUERY,
-                new Map<String, Object>{ 'accountIds' => accountIds },
+                contactIds == null ? NATIVE_MEMBERSHIP_ROWS_QUERY : NATIVE_MEMBERSHIP_PAIRS_QUERY,
+                binds,
                 AccessLevel.SYSTEM_MODE
             )
         ) {
@@ -367,7 +390,10 @@ public with sharing class HouseholdSelector {
                     row.Id,
                     (Id) row.get(ACCOUNT_FIELD),
                     (Id) row.get('ContactId'),
-                    (Boolean) row.get('IsDirect')
+                    (Boolean) row.get('IsDirect'),
+                    row.get('Roles') != null ||
+                        row.get('StartDate') != null ||
+                        row.get('EndDate') != null
                 )
             );
         }
