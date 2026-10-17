@@ -509,15 +509,15 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 4. Volunteers
 
-**Edition:** Nonprofit Edition (not shown in the Standard Edition, ADR-0124). Depends on Core. Package is an empty placeholder on main; an early draft from 2026-09-09 sits on a stale branch and is not active work.
+**Edition:** Nonprofit Edition only (not shown in the Standard Edition, ADR-0124). Depends on Core and BarnCRM Rollup Builder (install order Core, Rollup Builder, Volunteers; new ADR, volunteers module). Being built for v0.8; the design is in canonical model Sections 29I to 29O.
 
 ### 4.1 Volunteer Management
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Volunteer profiles, jobs and shifts | Major | Volunteer details on a person, with jobs and the shifts that fill them. | Planned (v0.8) | V-01 |
-| Sign-ups and hours with approval | Major | Staff record sign-ups and hours, with an approval step. | Planned (v0.8) | V-02 |
-| Hours rollups and coordinator dashboard | Major | Volunteer hours rolled up to people and households, with a coordinator dashboard. | Planned (v0.8) | V-03 |
+| Volunteer profiles, jobs and shifts | Major | Volunteer status, start date and emergency contact on the person (Contact, or Account where people are person accounts), shipped by the module, not Core. Jobs (with a coordinator and an Active switch; a used job is deactivated, not deleted) and their dated shifts (volunteers needed as a target, never a limit, with slots filled and remaining; cancelled shifts kept). | In progress (v0.8) | V-01 |
+| Sign-ups and hours with approval | Major | Staff book people onto shifts (one sign-up per person per shift) and enter hours; marking a sign-up Attended can write the hours. Hours are Submitted, then Approved or Rejected (with a reason) by a coordinator holding Manage Volunteers; an approved entry is locked against edits. A setting turns approval off. No portal. | In progress (v0.8) | V-02 |
+| Hours rollups and coordinator dashboard | Major | Approved hours (total, this year, last year, first and last date) on people, households, jobs and shifts through 19 shipped Rollup Builder definitions; a coordinator dashboard and reports (hours by job, awaiting approval, unfilled shifts, lapsing volunteers). Four permission sets (Admin, Coordinator, Staff, Read Only) given to the matching BarnCRM roles. | In progress (v0.8) | V-03 |
 | Public sign-up page | Major | An unauthenticated public sign-up page. | Planned (1.x) | V-09 |
 | Skills, availability, interests | Minor | Tracks what volunteers can do and when. | Planned (v0.8) | V-04 |
 | Onboarding status | Minor | Application, background check and orientation status. | Planned (v0.8) | V-05 |
