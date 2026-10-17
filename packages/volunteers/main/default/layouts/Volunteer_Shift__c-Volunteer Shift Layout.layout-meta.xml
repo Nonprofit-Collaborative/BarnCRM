@@ -16,7 +16,7 @@
         <field>Volunteer_Job__c</field>
       </layoutItems>
       <layoutItems>
-        <behavior>Edit</behavior>
+        <behavior>Required</behavior>
         <field>Status__c</field>
       </layoutItems>
     </layoutColumns>
@@ -43,7 +43,7 @@
     <style>TwoColumnsTopToBottom</style>
     <layoutColumns>
       <layoutItems>
-        <behavior>Edit</behavior>
+        <behavior>Required</behavior>
         <field>Volunteers_Needed__c</field>
       </layoutItems>
       <layoutItems>

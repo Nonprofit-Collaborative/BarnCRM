@@ -4,12 +4,16 @@
   <active>true</active>
   <description>
     R-VU1: a sign-up names a contact or an account, never both and never neither
-    (canonical model Section 4).
+    (canonical model Section 4). A row the platform emptied when its person was deleted is left
+    alone until somebody changes who it names.
   </description>
   <errorConditionFormula>
-OR(
-  AND(ISBLANK(Contact__c), ISBLANK(Account__c)),
-  AND(NOT(ISBLANK(Contact__c)), NOT(ISBLANK(Account__c)))
+AND(
+  OR(
+    AND(ISBLANK(Contact__c), ISBLANK(Account__c)),
+    AND(NOT(ISBLANK(Contact__c)), NOT(ISBLANK(Account__c)))
+  ),
+  OR(ISNEW(), ISCHANGED(Contact__c), ISCHANGED(Account__c))
 )
   </errorConditionFormula>
   <errorMessage>

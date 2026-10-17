@@ -7324,12 +7324,14 @@ Cancelled, so someone who drops out frees the place without the booking being de
 | Attribute | API name | Type |
 |---|---|---|
 | Volunteer Shift | `Volunteer_Shift__c` | Master-Detail to `Volunteer_Shift__c`, relationship name Signups |
-| Contact | `Contact__c` | Lookup to Contact |
-| Account | `Account__c` | Lookup to Account |
-| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull |
+| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled; required, default Signed up |
 | Notes | `Notes__c` | Text Area(255) |
 
-- **Validation rules:** `Exactly_One_Person` (R-VU1).
+- **Validation rules:** `Exactly_One_Person` (R-VU1), checked only when the sign-up is new or
+  its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
+  SetNull) can still be edited.
 - **Service:** `VolunteerSignupService`, `VolunteerSignupTriggerHandler`,
   `VolunteerSignupSelector`.
 
