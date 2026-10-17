@@ -44,8 +44,9 @@ other household), so every household merge failed.
    membership rows.
 3. **A move removes the relation it left behind, by a content test, not an org-shape test.**
    When BarnCRM changes a contact's account (`HouseholdService` contact mode move and join),
-   it then removes the relation between that contact and the household it just left, only
-   if the row is now indirect (it was the contact's own account until this move, so this
+   it then removes the relation between that contact and the household it just left (never
+   an organization account, whose link may be an employer or a board), only if the row is
+   now indirect (it was the contact's own account until this move, so this
    move turned it) and nobody recorded Roles, StartDate or EndDate on it. Any other row
    stays. Rows are read in system mode (upkeep read, ADR-0021) and deleted in user mode; a
    row the platform will not remove stays and the delete guard keeps the household. This
