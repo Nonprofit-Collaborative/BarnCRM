@@ -7073,7 +7073,7 @@ WhoId, WhatId, TaskRelation or EventRelation) and files linked to the person
 
 Built by the v0.8 iteration in the BarnCRM Volunteers module (`packages/volunteers`, module key
 `Volunteers`, Nonprofit Edition only), which depends on Core and BarnCRM Rollup Builder
-(ADR-NEXT, `NEXT-volunteers-module.md`). Sections 29I to 29O cover V-01 to V-03: who
+(ADR-0127). Sections 29I to 29O cover V-01 to V-03: who
 volunteers, what work there is, when it happens, who is booked, the hours actually given, and
 the totals. There is no Volunteer entity: a volunteer is a person the organization already
 knows, so the profile is a set of person attributes the module ships on Contact and Account.
@@ -7372,7 +7372,7 @@ attendance record, and attendance is a sign-up.
 **R-VG5 Approval is a status moved by a service.** Status, Approved By and Approved Date are
 moved only by `VolunteerHoursService`, which refuses a user without the custom permission
 `Manage_Volunteers`; a Status change made any other way is refused. It is not a Salesforce
-approval process (ADR-NEXT, decision 4).
+approval process (ADR-0127, decision 4).
 
 **R-VG6 Only approved hours count.** Every rollup in 29O filters on Status equals Approved.
 With Hours Require Approval off (29N), entries are created Approved, by the saving user at the
@@ -7453,7 +7453,7 @@ and the filled count on a shift (V-03). They follow Section 26: shipped as
 `Rollup_Definition_Default__mdt` rows with `Package__c` Volunteers, materialized by
 `VolunteersPostInstall` into the Rollup Builder module's `Rollup_Definition__c` (Section 14),
 each editable and deactivatable by the admin. Volunteers ships definitions, not aggregation
-code, and requires BarnCRM Rollup Builder (ADR-NEXT, decision 1).
+code, and requires BarnCRM Rollup Builder (ADR-0127, decision 1).
 
 Target scopes are Section 26's three disjoint ones, with paths from Volunteer Hours:
 Household (record type Household, `Household__c`), Account (record type not Household,
@@ -7560,7 +7560,7 @@ entity either: one attribute on Gift, shipped by Mirror, and two keys on Mirror 
 
 Volunteer Job, Shift, Sign-up and Hours left this table in v0.8 and are specified in Sections
 29I to 29O with the volunteer person attributes, Volunteer Settings and the shipped volunteer
-rollups (V-01 to V-03, ADR-NEXT `NEXT-volunteers-module.md`). There is no Volunteer entity.
+rollups (V-01 to V-03, ADR-0127). There is no Volunteer entity.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -7736,7 +7736,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | The rollup engine leaves Core for the BarnCRM Rollup Builder module (ADR-0125, `0125-rollup-builder-module.md`). No object or field added or renamed. Rollup Definition, Rollup Queue, Rollup Run Lock, `Rollup_Queue_Ready__e` and Rollup Definition Default (shipped default) move to `packages/rollups` with their API names unchanged (Section 32). Core reaches the engine only through `RollupEngineExtension`. `Rollup_Mode_Default__c` and `Rollup_Processing__c` stay on `BarnCRM_Settings__c` until the module's own settings object is added. |
 | v0.6 | 2026-10-14 | Rollup Settings added as Section 14B (ADR-0125, decision 6): `Rollup_Settings__c`, the BarnCRM Rollup Builder module's protected hierarchy custom setting, holds `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved from `BarnCRM_Settings__c` (Section 12) with their API names and definitions unchanged. Stored values are not carried over. |
 | v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Mirror `Rollups;Giving`. |
-| v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-NEXT, `NEXT-volunteers-module.md`). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
+| v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
 
 ---
 ## 32. Entity ownership by package
@@ -7832,7 +7832,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
-| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-NEXT) |
+| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

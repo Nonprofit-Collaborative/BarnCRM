@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Volunteers module: totals through Rollup Builder, person fields in the module, approval as a status
+# ADR-0127: The BarnCRM Volunteers module: totals through Rollup Builder, person fields in the module, approval as a status
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-17: decisions D1, D3, D4, D6, D7 and D8 of
 the v0.8 Volunteers build plan, each as recommended)

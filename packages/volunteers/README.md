@@ -5,8 +5,8 @@
 Volunteer profiles on the person, jobs, shifts, sign-ups, hours with coordinator approval,
 hours totals and a coordinator dashboard (V-01 to V-03), then skills, onboarding, an hours
 import template, recurring shifts and hour letters (V-04 to V-08). Module key `Volunteers`.
-Design: canonical model Part G and ADR-NEXT
-(`docs/architecture/decisions/NEXT-volunteers-module.md`).
+Design: canonical model Part G and ADR-0127
+(`docs/architecture/decisions/0127-volunteers-module.md`).
 
 ## First ships in
 

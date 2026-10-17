@@ -135,7 +135,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0124](0124-edition-gates-visibility.md) | The edition, features, modules and first-run setup decide what BarnCRM shows | Accepted (owner decision) |
 | [0125](0125-rollup-builder-module.md) | The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module | Accepted (owner decision) |
 | [0126](0126-rename-connect-to-mirror.md) | Rename BarnCRM Connect to BarnCRM Mirror | Accepted (owner decision) |
-| [NEXT](NEXT-volunteers-module.md) | The BarnCRM Volunteers module: totals through Rollup Builder, person fields in the module, approval as a status | Accepted (owner decision) |
+| [0127](0127-volunteers-module.md) | The BarnCRM Volunteers module: totals through Rollup Builder, person fields in the module, approval as a status | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
