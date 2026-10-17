@@ -44,7 +44,7 @@ private class FirstRunControllerTest {
             } else {
                 Assert.isTrue(
                     state.recommendedSuite == null ||
-                    state.recommendedSuite == ModuleDetectionService.SUITE_IMPACT,
+                        state.recommendedSuite == ModuleDetectionService.SUITE_IMPACT,
                     'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
                     state.recommendedSuite
                 );
