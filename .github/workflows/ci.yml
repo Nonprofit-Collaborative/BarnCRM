@@ -111,6 +111,9 @@ jobs:
       - name: Check every class built by name across packages is @NamespaceAccessible with a constructor
         run: python3 scripts/ci/check-dynamic-class-visibility.py
 
+      - name: Check cross-package components and labels are shared, and no LWC writes a c__ state key
+        run: python3 scripts/ci/check-namespace-readiness.py
+
       - name: Check every Apex test runs as a user it creates, not as the deploying user
         run: python3 scripts/ci/check-tests-run-as.py
 

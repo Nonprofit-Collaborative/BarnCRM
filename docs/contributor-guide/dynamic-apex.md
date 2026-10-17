@@ -142,6 +142,16 @@ private static Map<String, Object> asMap(HealthCheckService.Finding finding) {
 }
 ```
 
+### Components and labels across packages
+
+A module component nests or imports a Core component only when Core exposes it
+(`isExposed` true; a flexipage also needs the page's target); otherwise the module keeps its
+own copy (`rollupTabLabel`, a copy of `workspaceTabs`' `labelTab`). Another package's label
+is used only when it is `<protected>false</protected>`. LWC never writes a literal `c__`
+page state key: the key comes from Apex (`NamespaceUtil.stateKey`) or is matched by its
+`__name` suffix. `check-namespace-readiness.py` enforces all three; five Core components that
+still write `c__section` are listed in its `DEFERRED`.
+
 ## 4. The namespace is empty today
 
 `sfdx-project.json` has no namespace (ADR-0001). Never write a prefix; `check-namespace.sh`
