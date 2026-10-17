@@ -92,6 +92,7 @@ The pair is named the same way everywhere:
 | Import Row | Contact 1, Contact 2 | Person 1 Account, Person 2 Account |
 | Household Member | Contact | Account |
 | Volunteer Sign-up, Volunteer Hours | Contact | Account |
+| Volunteer Skill, Volunteer Requirement | Contact | Account |
 
 **No packaged metadata references a Person Account field** (plan Section 4.2 and
 ADR-0009). The Account side is a plain lookup to Account. Whether a given account is a
@@ -1190,8 +1191,8 @@ handlers.
 
 `Rollup_Definition_Default__mdt` (v0.2): the rollup definitions the package ships,
 materialized into `Rollup_Definition__c` records (Section 14) on install and on "Restore
-defaults", matched by Definition Key. Both Core and Giving ship rows; the metadata type
-itself belongs to Core.
+defaults", matched by Definition Key. The BarnCRM Rollup Builder module and Giving ship rows;
+the metadata type itself belongs to the BarnCRM Rollup Builder module (ADR-0125).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1230,8 +1231,11 @@ mirror the template's own attributes.
 | Column Mapping JSON | `Column_Mapping_JSON__c` | long text | The mapping document (R-IT1). |
 | Default Values JSON | `Default_Values_JSON__c` | long text | The defaults document (R-IT1). |
 | Matching Rule | `Matching_Rule__c` | picklist(Email exact, Name plus postal code, External ID) | The matching rule the template starts with. |
-| Person Mode | `Person_Mode__c` | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. |
+| Person Mode | `Person_Mode__c` | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. For a row with a Target Object it instead says which org the row is for (R-D3). |
 | Default Active | `Default_Active__c` | boolean | Whether the template is offered when it is first materialized. |
+| Target Object | `Target_Object__c` | text (255) | Optional. The API name of the one object the template loads, unprefixed (R-IT12); empty for a people template. Copied to the template's Target Object (V-06). |
+| Load Operation | `Load_Operation__c` | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID) | Optional. What a row of a one-object template does; empty means Insert. Copied to the template. |
+| Load Match Field | `Load_Match_Field__c` | text (255) | The field rows are found by under Upsert by external ID or Update by a matching field, unprefixed; required under both. Copied to the template. |
 
 ### Relationship Type
 
@@ -1316,6 +1320,18 @@ into custom object records (Rollup Definition Default, Import Template Default, 
 Template Default) and types that describe packaged code or pages (Automation Registry,
 Setting Definition) are not registered: the admin edits the materialized records instead,
 and a row they added to the code catalogs would point at nothing.
+**R-D3 Materializing a one-object template** (V-06). An Import Template Default row with a
+Target Object becomes a one-object template (R-IT12): its Target Object, Load Operation and Load
+Match Field are copied to the template, and its column mapping names the entity `Record`
+(R-IT1). It is materialized only when the target object exists in the org and every field and
+`lookupField` its mapping names is in the org's describe, so a row a module ships never becomes
+a template that cannot run; a row skipped for this is written to the Error Log once per run.
+Its Person Mode is not overridden: the row is materialized only where it matches the org's
+people (Contacts, or Person Accounts where the org has them), so a module ships one row per
+mode under the same Template Key when its mapping names a person's lookup or a person account
+field, and only one of them ever becomes a template. A Delete by record Id template is never
+shipped. A row's Matching Rule is copied as for any template and not used by a one-object
+load.
 
 ---
 
@@ -7517,6 +7533,401 @@ nightly run (mode Both), or at once with Recalculate all.
 
 ---
 
+## 29P. Skill
+
+Sections 29P to 29V cover V-04 to V-08, beside the volunteer profile, Job
+(`Volunteer_Job__c`), Shift (`Volunteer_Shift__c`), Sign-up (`Volunteer_Signup__c`), Hours
+(`Volunteer_Hours__c`) and Volunteer Settings (`Volunteer_Settings__c`) of Sections 29I to 29O
+(ADR-0127). Nothing here is added to Core except the three Import Template Default fields in
+Section 13. A person reference is the pair in Section 4: `Contact__c` and `Account__c`, exactly
+one set.
+
+### Definition
+
+One entry in the organization's list of volunteer skills and interests, for example "Spanish",
+"Forklift licence" or "Working with children" (feature V-04). The list is the admin's own; the
+package ships no skills.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The skill as staff see it in pickers and filters. |
+| Description | long text | no | What the skill means here, for example which licence counts. |
+| Active | boolean | yes (defaults true) | Whether the skill is offered when a skill is added to a person or a job. |
+
+### Relationships
+
+- **Skill to Volunteer Skill** and **Skill to Job Skill**, one to many.
+
+### Rules
+
+**R-SK1 Archive, do not delete.** A skill that a person or a job holds cannot be deleted; the
+admin clears Active instead. An inactive skill stays on the people and jobs that hold it and is
+not offered for new ones.
+
+### Salesforce implementation
+
+- **Object:** `Skill__c`, Text Name (80), sharing Read, tab in the Volunteers app.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area (2000) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29Q. Volunteer Skill
+
+### Definition
+
+That a person has a skill or is interested in one (feature V-04). When a person can volunteer
+is held on the person, in the multi-select attributes `Availability_Days__c` and
+`Availability_Times__c` that the volunteer profile defines.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | An identifier assigned automatically. |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Person Account | reference(Organization) | conditional | The person, where people are person Accounts. |
+| Skill | reference(Skill) | yes | The skill or interest. |
+| Type | picklist(Skill, Interest) | yes (defaults Skill) | Skill: the person can do it. Interest: the person would like to. |
+
+### Relationships
+
+- **Volunteer Skill to the person**, many to one, to exactly one of Contact or Person Account.
+- **Volunteer Skill to Skill**, many to one.
+
+### Rules
+
+**R-VK1 One person.** Exactly one of Contact and Person Account is set (Section 4).
+
+**R-VK2 Duplicates are harmless.** The skills editor on the person never adds a pair the person
+already holds. A duplicate written another way (an import, the API) changes no answer, because
+matching asks whether a person holds a skill, not how many times, so no automation guards it.
+
+**R-VK3 Matching a shift.** "Find volunteers" for a shift lists people whose Volunteer Status is
+Active, who hold every skill of Type Skill that the shift's job lists (Section 29R), and whose
+`Availability_Days__c` includes the shift's weekday and whose `Availability_Times__c` includes
+the part of the day the shift starts in (before 12:00, 12:00 to 17:00, from 17:00). A person
+with no availability recorded is listed last rather than left out. Interests matching the job's
+skills are shown beside each name; they never filter.
+
+### Salesforce implementation
+
+- **Object:** `Volunteer_Skill__c`, auto-number Name `VK-{000000}`, sharing Read.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
+| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
+| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Type | `Type__c` | Picklist: Skill, Interest |
+
+- **Validation rule:** `Volunteer_Skill_One_Person` (R-VK1).
+
+---
+
+## 29R. Job Skill
+
+### Definition
+
+A skill a job needs (feature V-04), used to find volunteers for its shifts (R-VK3).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | An identifier assigned automatically. |
+| Job | reference(Job) | yes | The job. |
+| Skill | reference(Skill) | yes | The skill the job needs. |
+
+### Relationships
+
+- **Job Skill to Job**, many to one; deleting the job deletes its job skills.
+- **Job Skill to Skill**, many to one.
+
+### Salesforce implementation
+
+- **Object:** `Job_Skill__c`, auto-number Name `JK-{000000}`, sharing controlled by the job.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
+| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+
+---
+
+## 29S. Volunteer Requirement
+
+### Definition
+
+One onboarding step for one person: an application, a background check or an orientation,
+with where it stands and when it lapses (feature V-05). A person has one requirement row per
+step they have started, and a new row when a lapsed step is done again.
+
+The result of a background check is kept here and nowhere else: no person field records it, so
+it is seen only by those who may see requirements and it leaves with them (R-VQ4).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | An identifier assigned automatically. |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Person Account | reference(Organization) | conditional | The person, where people are person Accounts. |
+| Type | picklist(Application, Background check, Orientation) | yes | Which onboarding step this is. The admin may add values. |
+| Status | picklist(Not started, In progress, Completed, Not approved) | yes (defaults Not started) | Where the step stands. |
+| Completed Date | date | conditional | The day the step was completed; required when Status is Completed. |
+| Expires | date | no | The day a completed step lapses, for example a background check valid for two years; empty means it does not lapse. |
+| Notes | text | no | A short note for the coordinator, such as the reference of the check. Never the findings of a check. |
+| Is Current | boolean | computed | True when Status is Completed and Expires is empty or not before today. |
+
+### Relationships
+
+- **Volunteer Requirement to the person**, many to one, to exactly one of Contact or Person
+  Account.
+
+### Rules
+
+**R-VQ1 One person.** Exactly one of Contact and Person Account is set (Section 4).
+
+**R-VQ2 Dates.** Completed Date is required when Status is Completed and may not be in the
+future; Expires may not be earlier than Completed Date.
+
+**R-VQ3 Readiness is shown, not enforced.** The volunteer profile shows each Type's most recent
+row and whether it is current. Nothing in v0.8 refuses a sign-up or hours for a person whose
+steps are not current; the coordinator decides.
+
+**R-VQ4 Kept to coordinators, erased with the person.** Requirements are private records: the
+Volunteers Admin and Volunteers Coordinator permission sets read and edit all of them, and the
+Volunteers Staff and Volunteers Read Only sets grant no access. Erasing a person (Section 29H)
+deletes their requirement rows and empties them from the Recycle Bin, through the Volunteers
+`PersonErasureExtension`, and the Erasure record lists them by Id only.
+
+### Salesforce implementation
+
+- **Object:** `Volunteer_Requirement__c`, auto-number Name `VR-{000000}`, sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
+| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
+| Type | `Type__c` | Picklist: Application, Background check, Orientation |
+| Status | `Status__c` | Picklist: Not started, In progress, Completed, Not approved |
+| Completed Date | `Completed_Date__c` | Date |
+| Expires | `Expires__c` | Date |
+| Notes | `Notes__c` | Text (255) |
+| Is Current | `Is_Current__c` | Formula (Checkbox) |
+
+- **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
+  (R-VQ2).
+- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8).
+
+---
+
+## 29T. Shift Schedule
+
+### Definition
+
+A repeating pattern of shifts for one job, for example "every Saturday, 9:00 to 12:00, four
+volunteers" or "Tuesdays and Thursdays every other week" (feature V-07). The schedule creates
+ordinary shifts a set number of weeks ahead, and the shifts are then signed up for, cancelled
+and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) records why.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the coordinator calls the schedule, for example "Saturday sorting". |
+| Job | reference(Job) | yes | The job whose shifts the schedule creates. |
+| Weekdays | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on. |
+| Every N Weeks | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
+| Start Time | time | yes | When each shift starts. |
+| End Time | time | yes | When each shift ends, later the same day. |
+| Start Date | date | yes | The first day a shift may fall on. |
+| End Date | date | no | The last day a shift may fall on; empty means the schedule runs until it is ended. |
+| Volunteers Needed | integer | yes (defaults 1) | The places on each shift, copied to the shift's Volunteers Needed. |
+| Location | text | no | Where the shifts happen, copied to each shift; empty means the job's location. |
+| Active | boolean | yes (defaults true) | Whether the schedule still creates shifts. |
+| Created Through | date | computed | The last day the schedule has created shifts for. Kept by the generator; never edited. |
+
+### Relationships
+
+- **Shift Schedule to Job**, many to one; deleting the job deletes its schedules.
+- **Shift Schedule to Shift**, one to many, through the shift's `Shift_Schedule__c` lookup.
+
+### Rules
+
+**R-SSC1 Which days.** A day is a shift day when its weekday is in Weekdays, it is on or after
+Start Date and on or before End Date (if any), and the number of whole weeks between the Monday
+of Start Date's week and the Monday of its own week divides by Every N Weeks. Start Time and End
+Time are read in the org's default time zone, so a 9:00 shift starts at 9:00 local time on both
+sides of a daylight saving change, whoever's job created it.
+
+**R-SSC2 A rolling horizon.** An active schedule keeps shifts created from today to
+`Shift_Horizon_Weeks__c` weeks ahead (Volunteer Settings, default 8). Each run creates the
+shift days after Created Through (or from today, if later), up to the horizon and End Date, then
+moves Created Through forward. A day that already has a shift from this schedule is skipped. Each
+created shift is Open, linked to the schedule, and takes the schedule's job, times, Volunteers
+Needed and Location.
+
+**R-SSC3 When it runs.** Saving a schedule queues a run for it, so its shifts appear without
+waiting for the night (the `Shift_Schedule_Rules` automation). Every night the Volunteers
+nightly job runs every active schedule in a batch (ADR-0128). A run takes a lock on the schedule's row first, so the
+queued run and the nightly run never create the same day twice. Nothing runs while the module
+is turned off; turning it back on catches up at the next nightly run.
+
+**R-SSC4 Editing changes only future shifts with no sign-ups.** When Weekdays, Every N Weeks,
+Start Time, End Time, Start Date, End Date, Volunteers Needed or Location changes, the
+schedule's shifts that start after now, are not Cancelled and have no sign-up record of any
+status are deleted, Created Through is cleared, and a run recreates them from the new pattern.
+Past shifts, shifts with sign-ups and Cancelled shifts are never changed, and a day holding one
+of them is not given a second shift. The save tells the coordinator how many future shifts were
+kept as they were. Changing only Name changes no shift.
+
+**R-SSC5 Ending a schedule.** Clearing Active, or setting End Date earlier, deletes the future
+shifts it no longer covers that have no sign-ups and are not Cancelled; the rest are kept.
+Deleting a schedule does the same for all its future shifts, and the shifts kept lose their
+link to it. A coordinator who wants one day off cancels that shift: a deleted shift is created
+again by the next edit of its schedule, a Cancelled one is not.
+
+**R-SSC6 Scale.** The nightly batch takes ten schedules per transaction, so one transaction
+creates at most ten schedules' worth of shifts at the longest horizon the setting allows.
+
+### Salesforce implementation
+
+- **Object:** `Shift_Schedule__c`, Text Name (80), sharing controlled by the job.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
+| Weekdays | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
+| Every N Weeks | `Every_N_Weeks__c` | Number (2, 0), default 1 |
+| Start Time | `Start_Time__c` | Time |
+| End Time | `End_Time__c` | Time |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Volunteers Needed | `Volunteers_Needed__c` | Number (4, 0), default 1 |
+| Location | `Location__c` | Text (255) |
+| Active | `Active__c` | Checkbox, default true |
+| Created Through | `Created_Through__c` | Date, read only in every permission set |
+
+- **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Every N Weeks 1 to 52, End
+  Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
+- **Automation:** registry row `Shift_Schedule_Rules` (`ShiftScheduleTriggerHandler`), which
+  applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`
+  supplied by `VolunteersNightlyJobProvider` (`NightlyJobProvider`).
+- **Health Check:** an active schedule whose Created Through is more than two days short of the
+  horizon (or End Date) is reported as "schedule horizon not filled".
+
+---
+
+## 29U. Volunteer Letter Template
+
+### Definition
+
+The wording of a volunteer hours letter or certificate: HTML with merge tokens for the
+organization, the person, the hours and the period (feature V-08). Letters are produced by the
+Volunteers package's own generator through the Visualforce PDF rendering service, not by
+Giving's receipts (ADR-0129, `0129-volunteer-letters.md`). The HTML is restricted to what that
+service renders, as for receipts (Section 25E).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the administrator calls this template. |
+| Type | picklist(Hours letter, Certificate) | yes | Which kind of document this template lays out. |
+| Body | long text | yes | The HTML with merge tokens. |
+| Active | boolean | yes (defaults false) | Whether this is the template used for its type. |
+| Template Key | text | no | The shipped default it came from; empty for a template the administrator wrote. Unique. |
+
+### Rules
+
+**R-VL1 One active template per type.** Activating a template deactivates the others of its
+type. Generating with no active template of the type asked for is refused with a readable
+message.
+
+**R-VL2 Tokens are a closed set.** `{OrganizationName}` and `{OrganizationAddress}` (Core's
+`Organization_Legal_Name__c` and `Organization_Address__c`), `{PersonName}`, `{FirstName}` (the
+Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
+hours in the period) and `{Today}`. Every merged value is HTML escaped. An unknown token is left
+as typed, so a typo shows on the proof.
+
+**R-VL3 What a letter counts.** Hours is the sum of the person's hours with Status Approved and
+a Date Worked from From Date to To Date, read in the user's own access. A person with no
+approved hours in the period gets no letter and is listed as skipped.
+
+**R-VL4 What a letter is.** Each letter is one PDF file linked to the person's record and to
+nothing else; the file is the record that it was sent. Generating needs the custom permission
+`Manage_Volunteers`; a list of people is generated in a batch of ten people per transaction.
+
+**R-VL5 The shipped templates arrive at install.** `Volunteer_Letter_Template_Default__mdt` is
+materialized by `VolunteersPostInstall` at install and at every upgrade, creating only the
+templates whose Template Key the org does not have and never changing an existing one
+(Section 13). A materialized template is Active when its type has no active template. The
+template list has a Restore the shipped templates action that does the same.
+
+### Salesforce implementation
+
+- **Object:** `Volunteer_Letter_Template__c`, Text Name (80), sharing Read; edited only through
+  the Volunteers Admin permission set.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist: Hours letter, Certificate |
+| Body | `Body__c` | Long Text Area (32768) |
+| Active | `Active__c` | Checkbox |
+| Template Key | `Template_Key__c` | Text (80), External ID, Unique |
+
+- **Shipped defaults:** `Volunteer_Letter_Template_Default__mdt`, one row per type
+  (`Hours_Letter`, `Certificate`), with `Template_Name__c` (Text 80), `Letter_Type__c` (Text 40)
+  and `Body__c` (Long Text Area 32768); DeveloperName is the Template Key.
+- **Service:** `VolunteerLetterService`, `VolunteerLetterBatch`, `VolunteerLetterRenderer`
+  (`Blob.toPdf`).
+
+---
+
+## 29V. Volunteer hours import template
+
+### Definition
+
+The shipped import template that loads a spreadsheet of volunteer hours with the Core import,
+one row per hours record (feature V-06). It adds no entity: it is an `Import_Template_Default__mdt`
+row shipped by Volunteers that loads one object (R-IT12, R-D3).
+
+### Rules
+
+**R-VH1 The shipped rows.** Volunteers ships two rows with the Template Key `volunteer_hours`:
+one with Person Mode Contacts, whose person column fills `Contact__c`, and one with Person Mode
+Person Accounts, whose person column fills `Account__c`. Only the one matching the org's people
+is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert.
+
+**R-VH2 Columns.**
+
+| Column | Loads | Found by |
+|---|---|---|
+| Email | The person (`Contact__c` or `Account__c`) | The person's email: `lookupField` `Email` on Contact, `PersonEmail` on Account |
+| Job | The job | The job's name |
+| Date | Date Worked | |
+| Hours | Hours | |
+| Notes | Notes | |
+
+Status is not a column; the template's default value sets it to Submitted, so imported hours
+wait for approval like hours entered by hand. A row whose email or job finds nobody is rejected
+(Lookup Not Found, Reject the row), and an email held by several people follows Several Matches
+(R-IT9). The household on each hours record is set by the hours automation, as for hours
+entered by hand.
+
+**R-VH3 Large orgs.** A standard Email field may always be matched on (R-IT13). Where people
+are person Accounts the lookup is on `PersonEmail`, which the large object guard must count as
+indexed for an org of more than 100,000 accounts; the V-06 Core work adds it, by name as text.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -7528,8 +7939,7 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Skill, Volunteer Skill, Job Skill, Volunteer Requirement, Shift Schedule, Volunteer Letter Template (V-04 to V-08) | Volunteers | v0.8 | Section 5.3 |
-| Program, Service, Enrollment, Attendance, Service Delivery, Outcome | Programs | v0.8 | Section 5.4 |
+| Program, Service, Enrollment, Attendance, Service Delivery, Outcome | Programs | v0.9 | Section 5.4 |
 | Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
@@ -7561,6 +7971,10 @@ entity either: one attribute on Gift, shipped by Mirror, and two keys on Mirror 
 Volunteer Job, Shift, Sign-up and Hours left this table in v0.8 and are specified in Sections
 29I to 29O with the volunteer person attributes, Volunteer Settings and the shipped volunteer
 rollups (V-01 to V-03, ADR-0127). There is no Volunteer entity.
+
+Skill, Volunteer Skill, Job Skill, Volunteer Requirement, Shift Schedule and Volunteer Letter
+Template left this table in v0.8 (V-04 to V-08) and are specified in Sections 29P to 29U, with
+the volunteer hours import template in 29V.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -7737,6 +8151,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Rollup Settings added as Section 14B (ADR-0125, decision 6): `Rollup_Settings__c`, the BarnCRM Rollup Builder module's protected hierarchy custom setting, holds `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved from `BarnCRM_Settings__c` (Section 12) with their API names and definitions unchanged. Stored values are not carried over. |
 | v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Mirror `Rollups;Giving`. |
 | v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
+| v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 
 ---
 ## 32. Entity ownership by package
@@ -7810,8 +8225,15 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Sign-up | Volunteers | v0.8 | 29L |
 | Volunteer Hours | Volunteers | v0.8 | 29M |
 | Volunteer Settings | Volunteers | v0.8 | 29N |
-| Volunteers entities for V-04 to V-08 | Volunteers | v0.8 | 30 |
-| Programs entities | Programs | v0.8 | 30 |
+| Skill | Volunteers | v0.8 | 29P |
+| Volunteer Skill | Volunteers | v0.8 | 29Q |
+| Job Skill | Volunteers | v0.8 | 29R |
+| Volunteer Requirement | Volunteers | v0.8 | 29S |
+| Shift Schedule | Volunteers | v0.8 | 29T |
+| Volunteer Letter Template | Volunteers | v0.8 | 29U |
+| Volunteer Letter Template Default (shipped default) | Volunteers | v0.8 | 29U |
+| Volunteer hours import template (Import Template Default rows) | Volunteers | v0.8 | 29V |
+| Programs entities | Programs | v0.9 | 30 |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
