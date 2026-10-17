@@ -29,6 +29,17 @@ public with sharing class NightlyJobs {
     @TestVisible
     private static Map<String, NightlyJobProvider> providerOverrides = new Map<String, NightlyJobProvider>();
 
+    /**
+     * Sets `jobsOverride` from a module's test, where `@TestVisible` does not reach once the
+     * packages are separate. Does nothing outside a test.
+     */
+    @NamespaceAccessible
+    public static void overrideJobsForTest(List<NightlyJob> jobs) {
+        if (Test.isRunningTest()) {
+            jobsOverride = jobs;
+        }
+    }
+
     /** Every job, Core's first, then each installed provider's. */
     public static List<NightlyJob> all() {
         if (jobsOverride != null) {
@@ -59,6 +70,7 @@ public with sharing class NightlyJobs {
     }
 
     /** The labels of the unscheduled jobs: what the finding names and the fix will schedule. */
+    @NamespaceAccessible
     public static List<String> unscheduledLabels() {
         List<String> labels = new List<String>();
         for (NightlyJob job : unscheduled()) {

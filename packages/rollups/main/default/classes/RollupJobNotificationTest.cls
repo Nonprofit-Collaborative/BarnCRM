@@ -37,13 +37,13 @@ private class RollupJobNotificationTest {
                 Active__c = true
             );
             insert definition;
-            JobNotifier.sent.clear();
+            JobNotifier.sentNotices().clear();
 
             RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition })
                 .runInline();
 
-            Assert.areEqual(1, JobNotifier.sent.size(), 'Exactly one notification');
-            JobNotifier.Notice notice = JobNotifier.sent[0];
+            Assert.areEqual(1, JobNotifier.sentNotices().size(), 'Exactly one notification');
+            JobNotifier.Notice notice = JobNotifier.sentNotices()[0];
             Assert.areEqual(
                 UserInfo.getUserId(),
                 notice.recipientId,

@@ -85,9 +85,9 @@ private class MigrationTemplatesTest {
         Map<String, String> sourceByTarget = new Map<String, String>();
         for (
             ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c)
-                .columns
+                .getColumns()
         ) {
-            sourceByTarget.put(column.target, column.source);
+            sourceByTarget.put(column.getTarget(), column.getSource());
         }
         List<Map<String, String>> file = new List<Map<String, String>>();
         for (Map<String, String> byTarget : rowsByTarget) {
@@ -636,7 +636,7 @@ private class MigrationTemplatesTest {
     static void giftTransactionsFindDonorsAlreadyHeldAsPersonAccounts() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
-            if (OrgShapeDetector.detect().hasPersonAccounts != true || personType == null) {
+            if (OrgShapeDetector.hasPersonAccounts() != true || personType == null) {
                 // Not a person accounts org, or none of its person types is given to the
                 // running user: nothing to test here (see the comment above).
                 return;

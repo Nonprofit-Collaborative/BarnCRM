@@ -81,11 +81,46 @@ class CrossPackageVisibility(unittest.TestCase):
     def test_flags_private_constructor(self):
         self.assertIn("Util.Built()", targets(module("Object o = new Util.Built();")))
 
-    def test_ignores_comments_strings_and_test_classes(self):
+    def test_ignores_comments_and_strings(self):
         self.assertEqual(targets(module("// Hidden.run();\n String s = 'Hidden.run()';")), [])
-        test_class = "@IsTest\nprivate class ModTest {\n    static void t() { Hidden.run(); }\n}\n"
-        found = targets(module(""), {"packages/rollups/main/default/classes/ModTest.cls": test_class})
-        self.assertEqual(found, [])
+
+    def test_scans_test_classes_and_flags_test_visible_privates(self):
+        core = (
+            "@NamespaceAccessible\npublic class Seam {\n    @TestVisible\n    private static Integer n;\n"
+            "    @NamespaceAccessible\n    public static void setN(Integer v) { n = v; }\n}\n"
+        )
+        test_class = "@IsTest\nprivate class ModTest {\n    static void t() { Hidden.run(); Seam.n = 1; Seam.setN(1); }\n}\n"
+        found = targets(
+            module(""),
+            {
+                "packages/core/main/default/classes/Seam.cls": core,
+                "packages/rollups/main/default/classes/ModTest.cls": test_class,
+            },
+        )
+        self.assertEqual(found, ["Hidden", "Hidden.run", "Seam.n"])
+
+    def test_shared_test_factory_must_be_annotated(self):
+        factory = "@IsTest\npublic class Factory {\n    public static void make() {}\n}\n"
+        test_class = "@IsTest\nprivate class ModTest {\n    static void t() { Factory.make(); }\n}\n"
+        found = targets(
+            module(""),
+            {
+                "packages/core/main/default/classes/Factory.cls": factory,
+                "packages/rollups/main/default/classes/ModTest.cls": test_class,
+            },
+        )
+        self.assertEqual(found, ["Factory", "Factory.make"])
+
+    def test_type_name_is_not_a_same_named_private_method(self):
+        core = (
+            "@NamespaceAccessible\npublic class Notifier {\n    @NamespaceAccessible\n    public class Notice {}\n"
+            "    private static Notice notice() { return null; }\n}\n"
+        )
+        found = targets(
+            module("Notifier.Notice n = null; Notifier.notice();"),
+            {"packages/core/main/default/classes/Notifier.cls": core},
+        )
+        self.assertEqual(found, ["Notifier.notice"])
 
     def test_own_inner_type_shadows_other_package(self):
         src = "public with sharing class Mod {\n    public class Hidden extends Exception {}\n    void go() { throw new Hidden(); }\n}\n"

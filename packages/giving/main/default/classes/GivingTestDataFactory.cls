@@ -4,6 +4,7 @@
  * as a story about David and Maria rather than as a pile of field assignments.
  */
 @IsTest
+@NamespaceAccessible
 public class GivingTestDataFactory {
     /**
      * A fund. Pass isDefault true for the one that undesignated gifts should go to.
@@ -32,6 +33,7 @@ public class GivingTestDataFactory {
      * only when there is a default fund to allocate it to, so any test that inserts gifts
      * without choosing funds itself calls this first.
      */
+    @NamespaceAccessible
     public static Fund__c ensureDefaultFund() {
         List<Fund__c> existing = [
             SELECT Id, Name, Active__c, Is_Default__c
@@ -45,6 +47,7 @@ public class GivingTestDataFactory {
     /**
      * An appeal, active, with no goal unless the test sets one.
      */
+    @NamespaceAccessible
     public static Appeal__c buildAppeal(String name) {
         return new Appeal__c(Name = name, Active__c = true, Start_Date__c = Date.today());
     }
@@ -52,6 +55,7 @@ public class GivingTestDataFactory {
     /**
      * A gift from a contact, ready to insert.
      */
+    @NamespaceAccessible
     public static Gift__c buildGift(Id donorContactId, Decimal amount) {
         return new Gift__c(
             Donor_Contact__c = donorContactId,
@@ -66,6 +70,7 @@ public class GivingTestDataFactory {
      * A gift from an account: an organization, a household giving in its own name, or a person
      * held as an account.
      */
+    @NamespaceAccessible
     public static Gift__c buildAccountGift(Id donorAccountId, Decimal amount) {
         return new Gift__c(
             Donor_Account__c = donorAccountId,
@@ -80,6 +85,7 @@ public class GivingTestDataFactory {
      * Many gifts from one donor, for the bulk tests that prove one save of two hundred records
      * stays inside the platform's limits (plan Section 7.2).
      */
+    @NamespaceAccessible
     public static List<Gift__c> buildGifts(Id donorContactId, Integer howMany, Decimal amount) {
         List<Gift__c> gifts = new List<Gift__c>();
         for (Integer i = 0; i < howMany; i++) {
@@ -113,6 +119,7 @@ public class GivingTestDataFactory {
      * A household account and a contact in it, named for the persona a test is about. Returns
      * the contact, whose AccountId is the household.
      */
+    @NamespaceAccessible
     public static Contact insertHouseholdContact(
         String householdName,
         String firstName,
@@ -137,6 +144,7 @@ public class GivingTestDataFactory {
     /**
      * An organization account, for the donor path where no household is derived.
      */
+    @NamespaceAccessible
     public static Account insertOrganization(String name) {
         Account organization = new Account(Name = name);
         insert organization;

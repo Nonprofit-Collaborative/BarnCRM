@@ -105,8 +105,11 @@ private class RollupQueueRecoveryTest {
 
             HealthCheckService.Finding finding = new RollupsHealthCheckExtension.RollupQueueCheck()
                 .run();
-            Assert.areEqual('rollup_queue_stuck', finding.key, 'Waiting two hours is stuck');
-            Assert.isTrue(finding.fixTarget.contains('Rollup_Builder'), 'Fixed in Needs attention');
+            Assert.areEqual('rollup_queue_stuck', finding.getKey(), 'Waiting two hours is stuck');
+            Assert.isTrue(
+                finding.getFixTarget().contains('Rollup_Builder'),
+                'Fixed in Needs attention'
+            );
 
             insert new Rollup_Queue__c(
                 Target_Object__c = 'Account',
@@ -118,12 +121,12 @@ private class RollupQueueRecoveryTest {
             finding = new RollupsHealthCheckExtension.RollupQueueCheck().run();
             Assert.areEqual(
                 'rollup_queue_failed',
-                finding.key,
+                finding.getKey(),
                 'A failed entry is the finding to act on first'
             );
             Assert.areEqual(
                 HealthCheckService.SEVERITY_WARNING,
-                finding.severity,
+                finding.getSeverity(),
                 'It is a warning'
             );
 

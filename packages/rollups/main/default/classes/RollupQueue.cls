@@ -29,8 +29,11 @@
  * engine's own bookkeeping and are written and read in system mode, so a gift saved by someone who
  * cannot see the queue still queues its totals.
  */
+@NamespaceAccessible
 public without sharing class RollupQueue implements Queueable {
+    @NamespaceAccessible
     public static final String STATUS_PENDING = 'Pending';
+    @NamespaceAccessible
     public static final String STATUS_FAILED = 'Failed';
 
     /** Identifiers per entry at most (R-RQ1). */

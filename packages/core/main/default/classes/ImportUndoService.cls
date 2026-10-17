@@ -47,6 +47,12 @@ public with sharing class ImportUndoService {
          */
         @AuraEnabled
         public List<TaggedCount> others = new List<TaggedCount>();
+
+        /** `total`, for another package: an @AuraEnabled field cannot be @NamespaceAccessible. */
+        @NamespaceAccessible
+        public Integer getTotal() {
+            return total;
+        }
     }
 
     /** How many records of one module object carry the batch's tag. */

@@ -17,13 +17,17 @@ class AuraNamespaceAccessible(unittest.TestCase):
         src = "public class A {\n @NamespaceAccessible @AuraEnabled public String n { get; set; }\n}"
         self.assertEqual(len(cana.check_text(src)), 1)
 
-    def test_allows_method_class_and_single_annotations(self):
+    def test_allows_class_and_single_annotations(self):
         src = (
             "@NamespaceAccessible\npublic class A {\n @AuraEnabled\n public String a;\n"
             " @NamespaceAccessible\n public String b;\n"
-            " @AuraEnabled(cacheable=true)\n @NamespaceAccessible\n public static String m() { return null; }\n}"
+            " @NamespaceAccessible\n public static String m() { return null; }\n}"
         )
         self.assertEqual(cana.check_text(src), [])
+
+    def test_flags_method_with_both(self):
+        src = "public class A {\n @AuraEnabled(cacheable=true)\n @NamespaceAccessible\n public static String m() { return null; }\n}"
+        self.assertEqual(len(cana.check_text(src)), 1)
 
     def test_ignores_comments(self):
         src = "public class A {\n // @AuraEnabled @NamespaceAccessible\n public String a;\n}"

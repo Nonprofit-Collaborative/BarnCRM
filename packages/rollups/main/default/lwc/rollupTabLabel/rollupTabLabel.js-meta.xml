@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Names the console tab a Rollups component sits in, through the Workspace API. A Rollups copy
+    of Core's workspaceTabs labelTab, which is not exposed. Imported by rollupBuilder.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

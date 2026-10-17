@@ -144,8 +144,10 @@ private class RollupDefinitionValidationTest {
             Rollup_Definition__c recalculated = before.clone(true);
             recalculated.Aggregate__c = 'MAX';
 
-            TriggerHandler.testNew = new List<SObject>{ switchedOff, recalculated };
-            TriggerHandler.testOldMap = new Map<Id, SObject>{ before.Id => before };
+            TriggerHandler.setTestRecords(
+                new List<SObject>{ switchedOff, recalculated },
+                new Map<Id, SObject>{ before.Id => before }
+            );
             new RollupDefinitionValidationHandler().beforeUpdate();
 
             Assert.isFalse(switchedOff.hasErrors(), 'An old definition can still be switched off');

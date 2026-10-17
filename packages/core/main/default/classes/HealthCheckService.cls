@@ -38,13 +38,12 @@
  *
  * `Finding`'s own fields (`key`, `title`, `severity`, `category`, `fixLabel`, `fixTarget`,
  * `links`) carry `@AuraEnabled` and nothing else: the platform rejects `@NamespaceAccessible` on
- * a field that is already `@AuraEnabled` (a compile error, not a style choice). Giving reads
- * them today as ordinary public fields on a `Finding` instance it only ever gets back from an
- * already-`@NamespaceAccessible` constructor or method (the constructor, `withFix`,
- * `withLinks`), the same way `HealthCheckGivingChecksTest` and `GivingHealthCheckExtensionTest`
- * read them now. If a namespace is registered and a future compile shows these fields are not
- * actually reachable from Giving, the fix is a `@NamespaceAccessible` getter for the one field
- * that fails, not re-attempting this annotation on the field itself.
+ * a field that is already `@AuraEnabled` (a compile error, not a style choice). Whether another
+ * package can read such a field is unproven until a namespaced build, so another package reads
+ * one only through a `@NamespaceAccessible` getter (`getKey`, `getDetail`, `getSeverity`,
+ * `getFixTarget`, `getFixScope`, and `Report.getFindings`, `getFixOutcome`) or through JSON,
+ * as `GivingHealthCheckExtensionTest` does. A getter is added for a field when another package
+ * first needs it; `check-cross-package-visibility.py` fails on a direct read.
  */
 @NamespaceAccessible
 public with sharing class HealthCheckService {
@@ -243,6 +242,31 @@ public with sharing class HealthCheckService {
             this.links = links;
             return this;
         }
+
+        @NamespaceAccessible
+        public String getKey() {
+            return key;
+        }
+
+        @NamespaceAccessible
+        public String getDetail() {
+            return detail;
+        }
+
+        @NamespaceAccessible
+        public String getSeverity() {
+            return severity;
+        }
+
+        @NamespaceAccessible
+        public String getFixTarget() {
+            return fixTarget;
+        }
+
+        @NamespaceAccessible
+        public List<String> getFixScope() {
+            return fixScope;
+        }
     }
 
     /** One record a finding names, with where to open it. */
@@ -307,6 +331,16 @@ public with sharing class HealthCheckService {
             this.canManageSettings = false;
             this.settingsTabApiName = NamespaceUtil.qualify(SETTINGS_TAB);
             this.sectionStateKey = NamespaceUtil.stateKey(SECTION_STATE_PARAMETER);
+        }
+
+        @NamespaceAccessible
+        public List<Finding> getFindings() {
+            return findings;
+        }
+
+        @NamespaceAccessible
+        public String getFixOutcome() {
+            return fixOutcome;
         }
     }
 

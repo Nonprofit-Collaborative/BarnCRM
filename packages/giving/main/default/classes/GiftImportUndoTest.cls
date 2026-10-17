@@ -47,11 +47,11 @@ public class GiftImportUndoTest {
         GivingTestDataFactory.insertDefaultFund();
         GivingRollupTestData.installShippedRollups();
         ImportMapping mapping = new ImportMapping();
-        mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
-        mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
-        mapping.columns.add(new ImportMapping.Column('Payment Method', 'Gift.Type__c'));
-        mapping.columns.add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
-        mapping.columns.add(new ImportMapping.Column('Date', 'Gift.Gift_Date__c'));
+        mapping.getColumns().add(new ImportMapping.Column('Email', 'Contact1.Email'));
+        mapping.getColumns().add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
+        mapping.getColumns().add(new ImportMapping.Column('Payment Method', 'Gift.Type__c'));
+        mapping.getColumns().add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
+        mapping.getColumns().add(new ImportMapping.Column('Date', 'Gift.Gift_Date__c'));
         Import_Template__c template = ImportTestDataFactory.template(
             mapping.serialize(),
             ImportTemplateService.RULE_EMAIL
@@ -128,7 +128,7 @@ public class GiftImportUndoTest {
             'One gift a donor was imported.'
         );
         GivingRollupTestData.nextSave();
-        Integer total = ImportUndoService.preview(batchId).total;
+        Integer total = ImportUndoService.preview(batchId).getTotal();
         // Latched only: the passes below are the only ones that run.
         System.abortJob(ImportUndoService.start(batchId, total));
         ImportUndoTestSupport.Run run = new ImportUndoTestSupport.Run(

@@ -263,7 +263,7 @@ private class DonationMatcherTest {
                 'Gift.Type__c' => 'Card'
             };
             for (String target : row.keySet()) {
-                mapping.columns.add(new ImportMapping.Column(target, target));
+                mapping.getColumns().add(new ImportMapping.Column(target, target));
             }
             Import_Template__c template = ImportTestDataFactory.template(
                 mapping.serialize(),
@@ -337,7 +337,7 @@ private class DonationMatcherTest {
                 'Gift.Type__c' => 'Card'
             };
             for (String target : row.keySet()) {
-                mapping.columns.add(new ImportMapping.Column(target, target));
+                mapping.getColumns().add(new ImportMapping.Column(target, target));
             }
             Import_Template__c template = ImportTestDataFactory.template(
                 mapping.serialize(),
@@ -471,7 +471,7 @@ private class DonationMatcherTest {
                 'Gift.Type__c' => 'Card'
             };
             for (String target : row.keySet()) {
-                mapping.columns.add(new ImportMapping.Column(target, target));
+                mapping.getColumns().add(new ImportMapping.Column(target, target));
             }
             Import_Template__c template = ImportTestDataFactory.template(
                 mapping.serialize(),
@@ -536,7 +536,7 @@ private class DonationMatcherTest {
                 'Gift.Type__c' => 'Card'
             };
             for (String target : row.keySet()) {
-                mapping.columns.add(new ImportMapping.Column(target, target));
+                mapping.getColumns().add(new ImportMapping.Column(target, target));
             }
             Import_Template__c template = ImportTestDataFactory.template(
                 mapping.serialize(),

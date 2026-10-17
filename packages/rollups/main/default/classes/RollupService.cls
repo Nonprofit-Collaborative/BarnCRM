@@ -541,10 +541,11 @@ public with sharing class RollupService {
      * The queries a recalculation of these definitions spends at most: one per definition (the
      * planner folds some together, never splits one), one more for a path through a household
      * token, and the fixed cost of each target entity. Counted, not planned, so a definition
-     * that cannot be planned is not logged twice.
+     * that cannot be planned is not logged twice. A pure count with no side effects, so it is
+     * shared rather than test visible: Giving's save cost test budgets against it.
      */
-    @TestVisible
-    private static Integer plannedQueries(
+    @NamespaceAccessible
+    public static Integer plannedQueries(
         Map<String, List<Rollup_Definition__c>> definitionsByTarget
     ) {
         Integer planned = 0;

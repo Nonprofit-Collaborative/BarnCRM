@@ -90,7 +90,7 @@ private class RollupModuleSwitchTest {
 
     private static ModuleManagerService.ModuleStatus moduleRow() {
         for (ModuleManagerService.ModuleStatus row : ModuleManagerService.getModules()) {
-            if (row.name == RollupService.MODULE_NAME) {
+            if (row.getName() == RollupService.MODULE_NAME) {
                 return row;
             }
         }
@@ -123,10 +123,10 @@ private class RollupModuleSwitchTest {
             Assert.isTrue(RollupService.isTurnedOff(), 'The module is off');
             Assert.areEqual(
                 ModuleManagerService.STATUS_OFF,
-                moduleRow().status,
+                moduleRow().getStatus(),
                 'The Module Manager says so'
             );
-            Assert.isTrue(moduleRow().canSwitch, 'And offers the switch');
+            Assert.isTrue(moduleRow().getCanSwitch(), 'And offers the switch');
             Assert.areEqual(0, countOn(employer.Id), 'No entry point counted Ames');
             Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'Nothing was queued');
             Assert.isNull(nightly, 'The nightly run did not start');
@@ -302,7 +302,7 @@ private class RollupModuleSwitchTest {
             Test.stopTest();
 
             Assert.isFalse(RollupService.isTurnedOff(), 'The module is on');
-            Assert.areEqual(ModuleManagerService.STATUS_ON, moduleRow().status);
+            Assert.areEqual(ModuleManagerService.STATUS_ON, moduleRow().getStatus());
             Assert.areEqual(1, countOn(employer.Id), 'Just after the save the queue counted Ames');
         }
     }
