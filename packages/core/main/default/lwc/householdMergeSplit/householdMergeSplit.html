@@ -71,7 +71,7 @@
 
                         <template if:true={hasComparison}>
                             <div class="slds-scrollable_x slds-var-m-top_medium">
-                                <table class="slds-table slds-table_bordered comparison-table">
+                                <table class="slds-table slds-table_bordered comparison-table" aria-label={label.comparisonTable}>
                                     <thead>
                                         <tr class="slds-line-height_reset">
                                             <th scope="col">{label.columnField}</th>

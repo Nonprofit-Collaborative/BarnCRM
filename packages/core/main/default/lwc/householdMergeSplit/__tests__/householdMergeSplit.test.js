@@ -244,6 +244,8 @@ describe('c-household-merge-split', () => {
     });
     const rows = element.shadowRoot.querySelectorAll('.comparison-row');
     expect(rows.length).toBe(2);
+    const table = element.shadowRoot.querySelector('.comparison-table');
+    expect(table.getAttribute('aria-label')).toBeTruthy();
     const choices = element.shadowRoot.querySelectorAll('.field-choice');
     expect(choices.length).toBe(1);
     expect(element.shadowRoot.querySelectorAll('.merge-member').length).toBe(2);
