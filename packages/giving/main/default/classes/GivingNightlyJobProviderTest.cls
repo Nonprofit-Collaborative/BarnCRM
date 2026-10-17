@@ -95,8 +95,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void healthCheckSeesTheJobsAsWaitingUntilTheyAreScheduled() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            NightlyJobs.providerOverrides.remove('GivingNightlyJobProvider');
-
+            // No override is set: Core resolves the installed provider by name.
             List<String> before = NightlyJobs.unscheduledLabels();
             Assert.isTrue(
                 before.contains(System.Label.Giving_NightlyJobs_LevelsName),

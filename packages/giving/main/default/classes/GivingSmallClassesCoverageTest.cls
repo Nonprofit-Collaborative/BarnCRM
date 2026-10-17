@@ -138,11 +138,11 @@ private class GivingSmallClassesCoverageTest {
             User outsider = TestDataFactory.createUser('NoAccess', new List<String>());
 
             System.runAs(outsider) {
-                TriggerHandler.testNew = gifts;
+                TriggerHandler.setTestRecords(gifts, null);
                 try {
                     new StewardshipTriggerHandler().afterInsert();
                 } finally {
-                    TriggerHandler.testNew = null;
+                    TriggerHandler.setTestRecords(null, null);
                 }
             }
 
@@ -159,11 +159,11 @@ private class GivingSmallClassesCoverageTest {
     @IsTest
     static void aStewardshipStarterGivenNothingDoesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            TriggerHandler.testNew = null;
+            TriggerHandler.setTestRecords(null, null);
             new StewardshipTriggerHandler().afterInsert();
-            TriggerHandler.testNew = new List<SObject>();
+            TriggerHandler.setTestRecords(new List<SObject>(), null);
             new StewardshipTriggerHandler().afterInsert();
-            TriggerHandler.testNew = null;
+            TriggerHandler.setTestRecords(null, null);
 
             Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'No gifts, no plans');
         }

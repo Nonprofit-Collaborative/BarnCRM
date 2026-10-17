@@ -104,23 +104,29 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
                 String.valueOf(missingNames.size()),
                 String.join(missingNames, ', ')
             };
-            HealthCheckService.Finding finding = new HealthCheckService.Finding(
-                    'shipped_rollups_missing',
-                    String.format(System.Label.Core_HealthCheck_RollupsMissingTitle, values),
-                    String.format(System.Label.Core_HealthCheck_RollupsMissingDetail, values),
-                    HealthCheckService.SEVERITY_WARNING,
-                    HealthCheckService.CATEGORY_SETTINGS
-                )
-                .withScope(missingNames);
+            // The detail is complete before the Finding is built: another package writes a
+            // Finding only through its @NamespaceAccessible constructor and methods.
+            String detail = String.format(
+                System.Label.Core_HealthCheck_RollupsMissingDetail,
+                values
+            );
             List<String> skipped = RollupService.skippedDefaultNames();
             if (!skipped.isEmpty()) {
-                finding.detail +=
+                detail +=
                     ' ' +
                     String.format(
                         System.Label.Core_HealthCheck_RollupsSkippedDetail,
                         new List<Object>{ String.join(skipped, ', ') }
                     );
             }
+            HealthCheckService.Finding finding = new HealthCheckService.Finding(
+                    'shipped_rollups_missing',
+                    String.format(System.Label.Core_HealthCheck_RollupsMissingTitle, values),
+                    detail,
+                    HealthCheckService.SEVERITY_WARNING,
+                    HealthCheckService.CATEGORY_SETTINGS
+                )
+                .withScope(missingNames);
             return finding.withFix(
                 System.Label.Core_HealthCheck_RollupsMissingFix,
                 HealthCheckService.FIX_ACTION_PREFIX + FIX_KEY_RESTORE_ROLLUPS

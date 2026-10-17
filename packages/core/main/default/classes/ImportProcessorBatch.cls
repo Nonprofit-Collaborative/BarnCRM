@@ -11,6 +11,7 @@
  * chunk to the next. The counts are not carried here: they are read back from the rows when
  * the run finishes, so a resumed or retried run still reports the truth.
  */
+@NamespaceAccessible
 public with sharing class ImportProcessorBatch implements Database.Batchable<SObject>, Database.Stateful {
     /** How many lines of the run log are kept. A chunk failure is worth more than a note. */
     private static final Integer MAX_LOG_LINES = 200;
@@ -41,6 +42,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     /** The rest of a trial: only rows after this row number, or null for every row. */
     private final Decimal afterRow;
 
+    @NamespaceAccessible
     public ImportProcessorBatch(Id batchId, Boolean dryRun) {
         this(batchId, dryRun, null, null);
     }
@@ -52,6 +54,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         this.afterRow = afterRow;
     }
 
+    @NamespaceAccessible
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
         Decimal after = afterRow == null ? -1 : afterRow;
@@ -180,6 +183,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     @TestVisible
     private static Boolean failAfterProcessForTest = false;
 
+    @NamespaceAccessible
     public void execute(Database.BatchableContext context, List<Import_Row__c> scope) {
         chunksRun++;
         // A chunk that dies part way must leave none of its writes behind (R-IB5): without the
@@ -234,6 +238,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         }
     }
 
+    @NamespaceAccessible
     public void finish(Database.BatchableContext context) {
         try {
             List<String> lines = new List<String>();

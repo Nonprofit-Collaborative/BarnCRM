@@ -7,7 +7,7 @@ import COPY_OF from '@salesforce/label/c.Core_RollupBuilder_CopyOf';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
-import { labelTab } from 'c/workspaceTabs';
+import { labelTab } from 'c/rollupTabLabel';
 
 const TAB_ICON = 'utility:builder';
 

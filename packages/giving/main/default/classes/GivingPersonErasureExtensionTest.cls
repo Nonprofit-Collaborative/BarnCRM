@@ -106,10 +106,10 @@ private class GivingPersonErasureExtensionTest {
                 'Plan cancelled'
             );
             Boolean giftsReported = false;
-            for (PersonErasure.Change change : result.changes) {
+            for (PersonErasure.Change change : result.getChanges()) {
                 giftsReported |=
-                    change.action == PersonErasure.KEPT &&
-                    change.objectLabel ==
+                    change.getAction() == PersonErasure.KEPT &&
+                    change.getObjectLabel() ==
                     Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                         .getLabelPlural();
             }

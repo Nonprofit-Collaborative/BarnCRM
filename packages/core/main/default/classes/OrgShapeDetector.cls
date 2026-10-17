@@ -157,6 +157,7 @@ public with sharing class OrgShapeDetector {
     }
 
     /** Every Account record type that is a person type; empty, with no query, without them. */
+    @NamespaceAccessible
     public static Set<Id> personAccountRecordTypeIds() {
         if (overrideShape != null) {
             return overrideShape.personAccountRecordTypeIds == null
@@ -206,6 +207,7 @@ public with sharing class OrgShapeDetector {
      * the available person type whose developer name sorts first, so the answer is the same
      * every time. Not cached: the describe follows System.runAs.
      */
+    @NamespaceAccessible
     public static Id creatablePersonRecordTypeId() {
         Set<Id> personTypes = personAccountRecordTypeIds();
         if (personTypes == null || personTypes.isEmpty()) {

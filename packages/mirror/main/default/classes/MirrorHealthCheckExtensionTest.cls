@@ -25,7 +25,7 @@ private class MirrorHealthCheckExtensionTest {
 
     private static Boolean reported(List<HealthCheckService.Finding> findings) {
         for (HealthCheckService.Finding finding : findings) {
-            if (finding.key == MirrorHealthCheckExtension.MIRROR_STALE_KEY) {
+            if (finding.getKey() == MirrorHealthCheckExtension.MIRROR_STALE_KEY) {
                 return true;
             }
         }

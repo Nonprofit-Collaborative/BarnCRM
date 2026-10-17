@@ -93,7 +93,7 @@ private class QuickGiftEntryControllerTest {
             );
             Assert.isFalse(defaults.giftTypes.isEmpty(), 'The gift types come from the picklist.');
             Assert.areEqual(
-                OrgShapeDetector.detect().hasPersonAccounts,
+                OrgShapeDetector.hasPersonAccounts(),
                 defaults.hasPersonAccounts,
                 'The form is told whether people in this org are accounts.'
             );

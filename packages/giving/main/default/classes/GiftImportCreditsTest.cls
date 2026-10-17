@@ -35,7 +35,7 @@ private class GiftImportCreditsTest {
         };
         row.putAll(extra);
         for (String target : row.keySet()) {
-            mapping.columns.add(new ImportMapping.Column(target, target));
+            mapping.getColumns().add(new ImportMapping.Column(target, target));
         }
         template = ImportTestDataFactory.template(
             mapping.serialize(),

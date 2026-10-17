@@ -105,7 +105,7 @@ jobs:
       - name: Check no @AuraEnabled field is also @NamespaceAccessible
         run: python3 scripts/ci/check-aura-namespace-accessible.py
 
-      - name: Check module production Apex reaches only @NamespaceAccessible Apex in other packages
+      - name: Check module Apex and its tests reach only @NamespaceAccessible Apex in other packages
         run: python3 scripts/ci/check-cross-package-visibility.py
 
       - name: Check every class built by name across packages is @NamespaceAccessible with a constructor

@@ -12,13 +12,16 @@
  * saved through the settings service, as the console saves it.
  */
 @IsTest
+@NamespaceAccessible
 public class RollupTestSupport {
     /** Real-time totals are recalculated in the save, as before ADR-0098. */
+    @NamespaceAccessible
     public static void recalculateInTheSave() {
         saveProcessing(RollupService.PROCESSING_IN_SAVE);
     }
 
     /** Real-time totals are queued and recalculated just after the save: the default. */
+    @NamespaceAccessible
     public static void recalculateJustAfterTheSave() {
         saveProcessing(RollupService.PROCESSING_BACKGROUND);
     }

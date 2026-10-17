@@ -549,7 +549,14 @@ private class AccountingExportServiceTest {
                     );
                     Assert.fail('Refused without Post Gifts');
                 } catch (AccountingExportService.ExportException refused) {
-                    Assert.areEqual(Label.Giving_Posting_NoPermission, refused.getMessage());
+                    // The wording is Giving's protected label, which Giving's tests assert; this
+                    // package checks only that the refusal is Giving's, not one of its own.
+                    Assert.isFalse(String.isBlank(refused.getMessage()), 'Refused with a reason');
+                    Assert.areNotEqual(
+                        Label.Mirror_AccountingExport_ChangedSinceDownload,
+                        refused.getMessage(),
+                        'Refused for the missing permission, not for a changed file'
+                    );
                 }
             }
 

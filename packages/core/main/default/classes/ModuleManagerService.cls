@@ -87,8 +87,8 @@ public with sharing class ModuleManagerService {
     /**
      * One row of the Module Manager. A module's tests read its own row (ADR-0017 rule 1). The
      * fields carry `@AuraEnabled` only: the platform rejects `@NamespaceAccessible` on an
-     * `@AuraEnabled` field (see HealthCheckService), and the module tests read them as plain
-     * public fields on a row they get from the `@NamespaceAccessible` `getModules()`.
+     * `@AuraEnabled` field (see HealthCheckService), so the module tests read them through the
+     * `@NamespaceAccessible` getters below, on a row they get from `getModules()`.
      */
     @NamespaceAccessible
     public class ModuleStatus {
@@ -111,6 +111,21 @@ public with sharing class ModuleManagerService {
         /** The modules to install before this one, by name shown, or null (ADR-0125 D3). */
         @AuraEnabled
         public String installFirst;
+
+        @NamespaceAccessible
+        public String getName() {
+            return name;
+        }
+
+        @NamespaceAccessible
+        public String getStatus() {
+            return status;
+        }
+
+        @NamespaceAccessible
+        public Boolean getCanSwitch() {
+            return canSwitch;
+        }
     }
 
     /** One line of the uninstall report: a kind of record and how many there are. */
