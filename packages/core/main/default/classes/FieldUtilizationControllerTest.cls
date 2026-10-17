@@ -152,7 +152,9 @@ private class FieldUtilizationControllerTest {
                 List<Account> accounts = new List<Account>();
                 for (Integer i = 0; i < 20; i++) {
                     accounts.add(AddressTestDataFactory.newOrganization('Barn Org ' + i));
-                    accounts.add(HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family'));
+                    accounts.add(
+                        HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family')
+                    );
                 }
                 insert accounts;
                 Test.startTest();
