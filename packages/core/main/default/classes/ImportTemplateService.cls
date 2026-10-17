@@ -310,7 +310,7 @@ public with sharing class ImportTemplateService {
      */
     @NamespaceAccessible
     public static Integer materializeDefaults() {
-        List<Import_Template__c> toCreate = missingDefaults();
+        List<Import_Template__c> toCreate = missingDefaults(true);
         if (toCreate.isEmpty()) {
             return 0;
         }
@@ -336,7 +336,7 @@ public with sharing class ImportTemplateService {
     @NamespaceAccessible
     public static Integer materializeDefaultsDuringInstall(String context) {
         try {
-            List<Import_Template__c> toCreate = missingDefaults();
+            List<Import_Template__c> toCreate = missingDefaults(true);
             if (toCreate.isEmpty()) {
                 return 0;
             }
@@ -355,14 +355,14 @@ public with sharing class ImportTemplateService {
     @NamespaceAccessible
     public static List<String> missingDefaultNames() {
         List<String> names = new List<String>();
-        for (Import_Template__c template : missingDefaults()) {
+        for (Import_Template__c template : missingDefaults(false)) {
             names.add(template.Name);
         }
         return names;
     }
 
     /** The templates materializeDefaults would create: one per shipped default not yet here. */
-    private static List<Import_Template__c> missingDefaults() {
+    private static List<Import_Template__c> missingDefaults(Boolean logSkips) {
         List<Import_Template__c> toCreate = new List<Import_Template__c>();
         List<Import_Template_Default__mdt> shipped = ImportTemplateSelector.selectShippedDefaults();
         if (shipped.isEmpty()) {
@@ -376,8 +376,21 @@ public with sharing class ImportTemplateService {
         }
         Map<String, Import_Template__c> existing = ImportTemplateSelector.selectByKeys(keys);
         String personMode = defaultPersonMode();
+        Set<String> added = new Set<String>();
         for (Import_Template_Default__mdt row : shipped) {
-            if (String.isBlank(row.Template_Key__c) || existing.containsKey(row.Template_Key__c)) {
+            if (
+                String.isBlank(row.Template_Key__c) ||
+                existing.containsKey(row.Template_Key__c) ||
+                added.contains(row.Template_Key__c)
+            ) {
+                continue;
+            }
+            if (String.isNotBlank(row.Target_Object__c)) {
+                Import_Template__c loadOne = oneObjectTemplate(row, personMode, logSkips);
+                if (loadOne != null) {
+                    added.add(row.Template_Key__c);
+                    toCreate.add(loadOne);
+                }
                 continue;
             }
             toCreate.add(
@@ -396,6 +409,117 @@ public with sharing class ImportTemplateService {
             );
         }
         return toCreate;
+    }
+
+    /** What a skipped one-object default is logged under (R-D3). */
+    private static final String SKIP_CONTEXT = 'ImportTemplateService.oneObjectTemplate';
+
+    /** Skipped defaults already logged in this transaction, so each is logged once per run. */
+    private static Set<String> loggedSkips = new Set<String>();
+
+    /**
+     * The template a shipped row that loads one object becomes, or null when it is not for this
+     * org (R-D3). A row for the other people mode is passed over silently. A row whose object,
+     * mapped field, lookup field or match field this org lacks, or whose operation needs a match
+     * field it does not name, is skipped and written to the Error Log once per run.
+     */
+    private static Import_Template__c oneObjectTemplate(
+        Import_Template_Default__mdt row,
+        String personMode,
+        Boolean logSkips
+    ) {
+        if (String.isNotBlank(row.Person_Mode__c) && row.Person_Mode__c != personMode) {
+            return null;
+        }
+        Schema.SObjectType type = ImportObjectSchema.typeNamed(row.Target_Object__c);
+        String severity = ErrorLogger.SEVERITY_WARNING;
+        String problem = null;
+        if (type == null) {
+            severity = ErrorLogger.SEVERITY_INFO;
+            problem = 'the object ' + row.Target_Object__c + ' is not in this org';
+        } else {
+            problem = oneObjectFieldProblem(type, row);
+        }
+        if (problem != null) {
+            String message =
+                'The shipped import template ' +
+                row.MasterLabel +
+                ' was not added: ' +
+                problem +
+                '.';
+            if (logSkips && loggedSkips.add(row.DeveloperName)) {
+                ErrorLogger.logMessage(message, SKIP_CONTEXT, severity);
+            }
+            return null;
+        }
+        String operation = String.isBlank(row.Load_Operation__c)
+            ? ImportObjectSchema.OPERATION_INSERT
+            : row.Load_Operation__c;
+        Boolean needsField =
+            operation == ImportObjectSchema.OPERATION_UPSERT ||
+            operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
+        Schema.SObjectField matchToken = ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c);
+        return new Import_Template__c(
+            Name = row.MasterLabel,
+            Description__c = row.Description__c,
+            Template_Key__c = row.Template_Key__c,
+            Column_Mapping_JSON__c = row.Column_Mapping_JSON__c,
+            Default_Values_JSON__c = row.Default_Values_JSON__c,
+            Matching_Rule__c = normalizedRule(row.Matching_Rule__c),
+            Person_Mode__c = personMode,
+            Is_Package_Default__c = true,
+            Is_Recurring__c = false,
+            Active__c = row.Default_Active__c == true,
+            Target_Object__c = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
+            Load_Operation__c = operation,
+            Load_Match_Field__c = needsField && matchToken != null
+                ? matchToken.getDescribe().getName()
+                : null,
+            Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_REJECT,
+            Several_Matches__c = SEVERAL_REJECT
+        );
+    }
+
+    /** Why a one-object row cannot run on this org's schema, or null when every name exists. */
+    private static String oneObjectFieldProblem(
+        Schema.SObjectType type,
+        Import_Template_Default__mdt row
+    ) {
+        ImportMapping mapping = ImportMapping.parse(
+            row.Column_Mapping_JSON__c,
+            row.Default_Values_JSON__c
+        );
+        for (String attribute : mapping.recordAttributes()) {
+            if (
+                attribute != null &&
+                attribute != 'id' &&
+                ImportObjectSchema.fieldNamed(type, attribute) == null
+            ) {
+                return 'the field ' + attribute + ' is not on ' + row.Target_Object__c;
+            }
+        }
+        Map<String, String> lookups = mapping.lookupFieldsByAttribute();
+        for (String attribute : lookups.keySet()) {
+            Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, attribute);
+            Boolean found = false;
+            if (token != null) {
+                for (Schema.SObjectType parent : token.getDescribe().getReferenceTo()) {
+                    found = found || ImportObjectSchema.fieldNamed(parent, lookups.get(attribute)) != null;
+                }
+            }
+            if (!found) {
+                return 'the lookup field ' + lookups.get(attribute) + ' for ' + attribute + ' is not in this org';
+            }
+        }
+        String operation = row.Load_Operation__c;
+        if (
+            (operation == ImportObjectSchema.OPERATION_UPSERT ||
+            operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD) &&
+            ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c) == null
+        ) {
+            return 'its match field ' + row.Load_Match_Field__c + ' is not on ' + row.Target_Object__c;
+        }
+        return null;
     }
 
     /**

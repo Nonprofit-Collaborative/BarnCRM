@@ -23,6 +23,23 @@ private class ImportObjectSchemaTest {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
+    @IsTest
+    static void aPersonEmailFieldCountsAsIndexedLikeEmail() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isTrue(ImportObjectSchema.isIndexed(Contact.SObjectType, 'Email'), 'Email.');
+            if (Schema.SObjectType.Account.fields.getMap().containsKey('PersonEmail')) {
+                Assert.isTrue(
+                    ImportObjectSchema.isIndexed(Account.SObjectType, 'PersonEmail'),
+                    'PersonEmail on a person Account (R-VH3).'
+                );
+            }
+            Assert.isFalse(
+                ImportObjectSchema.isIndexed(Contact.SObjectType, 'Work_Email__c'),
+                'A custom email field is not indexed.'
+            );
+        }
+    }
+
     private static Import_Template__c template(String objectName, String operation, String key) {
         return new Import_Template__c(
             Name = 'One object',
