@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Load_Match_Field__c</fullName>
+  <description>The field rows of a shipped one-object template are found by, unprefixed, copied to the materialized template. Required under Update by a matching field and Upsert by external ID; otherwise empty (canonical model R-IT12, R-D3).</description>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Load Match Field</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

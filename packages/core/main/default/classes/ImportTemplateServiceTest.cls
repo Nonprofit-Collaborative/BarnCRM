@@ -356,4 +356,190 @@ private class ImportTemplateServiceTest {
             Assert.isNull(cleared.Match_Date_Window_Days__c, 'And the setting is used.');
         }
     }
+
+    private static final String ONE_OBJECT_MAPPING = '{"version":1,"columns":[{"source":"Context","target":"Record.Context__c"}]}';
+
+    /** An in-memory shipped row loading one object; custom metadata cannot be inserted. */
+    private static Import_Template_Default__mdt oneObjectRow(
+        String name,
+        String objectName,
+        String mapping,
+        String operation,
+        String matchField,
+        String personMode
+    ) {
+        return new Import_Template_Default__mdt(
+            DeveloperName = name,
+            MasterLabel = name,
+            Template_Key__c = 'one_object_key',
+            Column_Mapping_JSON__c = mapping,
+            Default_Values_JSON__c = '{"version":1,"defaults":[]}',
+            Matching_Rule__c = ImportTemplateService.RULE_EMAIL,
+            Person_Mode__c = personMode,
+            Default_Active__c = true,
+            Target_Object__c = objectName,
+            Load_Operation__c = operation,
+            Load_Match_Field__c = matchField
+        );
+    }
+
+    private static List<Import_Template__c> templatesWithKey() {
+        return [
+            SELECT Name, Target_Object__c, Load_Operation__c, Load_Match_Field__c, Person_Mode__c
+            FROM Import_Template__c
+            WHERE Template_Key__c = 'one_object_key'
+        ];
+    }
+
+    private static String otherMode() {
+        return ImportTemplateService.defaultPersonMode() ==
+            ImportTemplateService.PERSON_MODE_CONTACTS
+            ? ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS
+            : ImportTemplateService.PERSON_MODE_CONTACTS;
+    }
+
+    @IsTest
+    static void aOneObjectDefaultMaterializesWithItsOperationAndMatchField() {
+        System.runAs(TestUsers.admin()) {
+            ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
+                oneObjectRow(
+                    'Load_One',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
+                    'Context__c',
+                    null
+                )
+            };
+
+            Test.startTest();
+            Integer created = ImportTemplateService.materializeDefaults();
+            Integer again = ImportTemplateService.materializeDefaults();
+            Test.stopTest();
+
+            Assert.areEqual(1, created, 'The row becomes one template.');
+            Assert.areEqual(0, again, 'And only once.');
+            Import_Template__c template = templatesWithKey()[0];
+            Assert.areEqual('Error_Log__c', template.Target_Object__c, 'The object is copied.');
+            Assert.areEqual(
+                ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
+                template.Load_Operation__c,
+                'The operation is copied.'
+            );
+            Assert.areEqual('Context__c', template.Load_Match_Field__c, 'The match field too.');
+            Assert.areEqual(
+                ImportTemplateService.defaultPersonMode(),
+                template.Person_Mode__c,
+                'The people mode is the org\'s.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aBlankOperationInsertsAndNeedsNoMatchField() {
+        System.runAs(TestUsers.admin()) {
+            ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
+                oneObjectRow('Load_One', 'Error_Log__c', ONE_OBJECT_MAPPING, null, null, null)
+            };
+
+            ImportTemplateService.materializeDefaults();
+
+            Import_Template__c template = templatesWithKey()[0];
+            Assert.areEqual(ImportObjectSchema.OPERATION_INSERT, template.Load_Operation__c);
+            Assert.isNull(template.Load_Match_Field__c, 'Insert finds nothing.');
+        }
+    }
+
+    @IsTest
+    static void aDefaultNamingAMissingObjectOrFieldIsSkippedAndLogged() {
+        System.runAs(TestUsers.admin()) {
+            String missingField = '{"version":1,"columns":[{"source":"X","target":"Record.No_Such_Field__c"}]}';
+            String missingLookup = '{"version":1,"columns":[{"source":"X","target":"Record.User__c","lookupField":"No_Such_Lookup__c"}]}';
+            ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
+                oneObjectRow(
+                    'No_Object',
+                    'No_Such_Object__c',
+                    ONE_OBJECT_MAPPING,
+                    null,
+                    null,
+                    null
+                ),
+                oneObjectRow('No_Field', 'Error_Log__c', missingField, null, null, null),
+                oneObjectRow('No_Lookup', 'Error_Log__c', missingLookup, null, null, null),
+                oneObjectRow(
+                    'No_Match',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    ImportObjectSchema.OPERATION_UPSERT,
+                    'No_Such_Key__c',
+                    null
+                ),
+                oneObjectRow(
+                    'Not_External_Id',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    ImportObjectSchema.OPERATION_UPSERT,
+                    'Context__c',
+                    null
+                )
+            };
+
+            Test.startTest();
+            Integer created = ImportTemplateService.materializeDefaults();
+            ImportTemplateService.materializeDefaults();
+            Test.stopTest();
+
+            Assert.areEqual(0, created, 'Nothing that cannot run is added.');
+            Assert.areEqual(0, templatesWithKey().size());
+            Assert.areEqual(
+                5,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'ImportTemplateService.oneObjectTemplate'
+                ],
+                'Each skipped row is logged once per run.'
+            );
+        }
+    }
+
+    @IsTest
+    static void onlyTheRowForTheOrgsPeopleModeIsMaterialized() {
+        System.runAs(TestUsers.admin()) {
+            ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
+                oneObjectRow(
+                    'Other_Mode',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    null,
+                    null,
+                    otherMode()
+                ),
+                oneObjectRow(
+                    'This_Mode',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    null,
+                    null,
+                    ImportTemplateService.defaultPersonMode()
+                )
+            };
+
+            Integer created = ImportTemplateService.materializeDefaults();
+
+            Assert.areEqual(1, created, 'One template for the one key.');
+            List<Import_Template__c> templates = templatesWithKey();
+            Assert.areEqual(1, templates.size());
+            Assert.areEqual('This_Mode', templates[0].Name, 'The matching row, not the other.');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'ImportTemplateService.oneObjectTemplate'
+                ],
+                'A row for the other mode is passed over without a log entry.'
+            );
+        }
+    }
 }

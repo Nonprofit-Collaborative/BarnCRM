@@ -592,6 +592,12 @@ own objects, or volunteer hours from a sign-in sheet each describe one kind of r
 one object** loads a file into a single object, including your org's own custom objects, with
 the same dry run, results, journal and undo as any import.
 
+A module can also ship a ready-made template that loads one object, such as a sheet of
+volunteer hours. It appears in the template list like any shipped template, but only in an org
+that has the object and every field it uses, and where the template's people (Contacts or
+person Accounts) match yours; otherwise it is left out, and the reason is on the Error Log
+(Health Check). You can edit it or switch it off like any other template.
+
 1. Open the **Import** tab and select **Load one object**.
 2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
    and select **Create**. The new mapping is chosen for you. Select **Next**.
