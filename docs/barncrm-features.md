@@ -519,11 +519,11 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Sign-ups and hours with approval | Major | Staff book people onto shifts (one sign-up per person per shift) and enter hours; marking a sign-up Attended can write the hours. Hours are Submitted, then Approved or Rejected (with a reason) by a coordinator holding Manage Volunteers; an approved entry is locked against edits. A setting turns approval off. No portal. | In progress (v0.8) | V-02 |
 | Hours rollups and coordinator dashboard | Major | Approved hours (total, this year, last year, first and last date) on people, households, jobs and shifts through 19 shipped Rollup Builder definitions; a coordinator dashboard and reports (hours by job, awaiting approval, unfilled shifts, lapsing volunteers). Four permission sets (Admin, Coordinator, Staff, Read Only) given to the matching BarnCRM roles. | In progress (v0.8) | V-03 |
 | Public sign-up page | Major | An unauthenticated public sign-up page. | Planned (1.x) | V-09 |
-| Skills, availability, interests | Minor | Tracks what volunteers can do and when. | Planned (v0.8) | V-04 |
-| Onboarding status | Minor | Application, background check and orientation status. | Planned (v0.8) | V-05 |
-| Volunteer hours import template | Minor | Loads a volunteer hours sheet with the Core import. | Planned (v0.8) | V-06 |
-| Recurring shifts | Minor | Shifts that repeat on a schedule. | Planned (v0.8) | V-07 |
-| Hour letters and certificates | Minor | Hour letters and certificates through the receipts engine. | Planned (v0.8) | V-08 |
+| Skills, availability, interests | Minor | An admin list of skills; each person holds skills and interests, and each job lists the skills it needs. Availability is two choices on the person (days, and parts of the day). Find volunteers for a shift lists active volunteers with the job's skills who are free that day and time. | In progress (v0.8, design) | V-04 |
+| Onboarding status | Minor | One record per onboarding step (application, background check, orientation) with status, completed date and expiry; the profile shows which are current. Background check results stay on these records, seen only by coordinators and admins, and are erased with the person. | In progress (v0.8, design) | V-05 |
+| Volunteer hours import template | Minor | A shipped template that loads a sheet of hours (email, job, date, hours, notes) with the Core import's load one object, finding each person by email and each job by name; imported hours wait for approval. The Core half lets a shipped template load one object. | In progress (v0.8, design) | V-06 |
+| Recurring shifts | Minor | A shift schedule on a job (weekdays, every N weeks, times, dates, places) creates ordinary shifts a set number of weeks ahead (8 by default), nightly and on save. Editing a schedule changes only future shifts nobody signed up for. | In progress (v0.8, design; ADR-0128) | V-07 |
+| Hour letters and certificates | Minor | Hour letters and certificates from editable templates, as PDFs filed on the person, counting approved hours in a chosen period, for one person or a list. Volunteers' own small generator, so Giving is not needed. | In progress (v0.8, design; ADR-0129) | V-08 |
 
 ---
 
