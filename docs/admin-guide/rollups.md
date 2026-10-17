@@ -196,9 +196,14 @@ contacts, then all funds), and calculate all of a record's totals together:
   **Last calculated** time in the Rollup Builder is what tells you the run happened.
 - **The Rollup Builder marks a rollup calculated when the whole run has finished**, not when it
   starts. When the page shows a time, the totals from that run are already on the records.
-- **Records with a very large number of gifts are calculated separately.** A catch-all
-  donor such as "Anonymous" is calculated on its own after the others, so it cannot hold up
-  everyone else's totals.
+- **Records with a very large number of gifts are calculated separately.** A record with
+  about 20,000 or more gifts or allocations behind its totals (a General Fund most gifts go to,
+  a catch-all donor such as "Anonymous") has more rows than one step of the run may read. The
+  run hands it to the queue's separate background job for large records, which reads its rows
+  a few thousand at a time, so it cannot hold up everyone else's totals. Its totals arrive a
+  few minutes after the run finishes; until then it shows among the records waiting. A record
+  that has grown since its count was last calculated (a large import into one fund) is caught
+  while it is being recalculated and handed on the same way. Nothing to do.
 - **A record that cannot be saved is tried again.** If someone was editing it, or a
   validation rule refused it, BarnCRM tries again automatically; after five tries it waits
   in the **Needs attention** list. The next nightly run that saves it takes it off the list.

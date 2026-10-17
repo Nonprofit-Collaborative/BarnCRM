@@ -1710,7 +1710,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
   `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
   nightly recalculation: one batch pass per target entity in turn, records with many source rows
-  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13, one
+  in smaller chunks, large parents to the batch route (R-RQ6), Last Calculated stamped when the last pass finishes, R-R13, one
   run at a time, R-R14) with `RollupRecalcErrorHandler` queueing a stopped chunk's records from
   `BatchApexErrorEvent` (R-R14).
 - **Flow action and template (R-R12):** `RollupRecalcAction`, the invocable action "Recalculate
@@ -1840,7 +1840,13 @@ stored 3,200 of its 26,102 allocations), so the run also measures what each quer
 recalculation read: before a further query would take the transaction past four fifths of the
 limit, taken to read as much as the largest query before it, the recalculation stops with
 nothing written and that entity's records in the run go to the batch as an estimated one does. A
-single record that stopped its run on the query row limit (R-RQ3) goes to the batch too. No other failure goes there. The batch reads each
+single record that stopped its run on the query row limit (R-RQ3) goes to the batch too. No other failure goes there.
+The full run (R-R14) applies the same protection: it estimates each record as above, queues a
+record at the threshold or more, naming the run's definitions, instead of calculating it in a
+chunk (the tier 1 scale test's fund of 30,000 allocations, calculated alone, stopped its chunk on
+the query row limit every run), and recalculates each chunk under the same ceiling; a chunk the
+ceiling stops is held back for smaller chunks, and a lone record it stops is queued the same way.
+The queue then hands such records to the batch. The batch reads each
 planned query's source rows in chunks, runs the query over each chunk's rows only and folds the
 partial answers together, which merge exactly as path alternatives do (R-R1; a distinct count or
 distinct list keeps one entry per value), then writes each record once, with partial success,

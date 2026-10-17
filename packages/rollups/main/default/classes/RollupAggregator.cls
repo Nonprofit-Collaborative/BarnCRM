@@ -198,9 +198,9 @@ public without sharing class RollupAggregator {
 
     /**
      * The query rows a transaction may have read before the next calculation starts a further
-     * query, or null for no ceiling (the default: the instant path, the full run and previews).
-     * The Rollup Queue sets it for each of its own recalculations (R-RQ6); a calculation takes
-     * it and leaves none behind.
+     * query, or null for no ceiling (the default: the instant path and previews). The Rollup
+     * Queue and the full run set it for each of their own recalculations (R-RQ6); a calculation
+     * takes it and leaves none behind.
      */
     private static Integer rowCeiling;
 

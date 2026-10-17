@@ -212,9 +212,13 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
      * definitions alone took a fund with 25,000 allocations as unknown (ten rows a query)
      * whenever its entries named no COUNT, and its queries stopped the run on the query row
      * limit. A COUNT over a different source, path or filter than the named SUM or MAX is
-     * only a guide to that query's rows: at best a floor, never the answer.
+     * only a guide to that query's rows: at best a floor, never the answer. The full run
+     * (`RollupFullRecalcBatch`) estimates its records from the same fields.
+     *
+     * @param targetType the entity
+     * @return the API names of the fields
      */
-    private static Set<String> storedCountFields(Schema.SObjectType targetType) {
+    public static Set<String> storedCountFields(Schema.SObjectType targetType) {
         Map<String, Schema.SObjectField> fieldMap = targetType.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             )
