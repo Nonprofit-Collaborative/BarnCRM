@@ -28,6 +28,7 @@ public with sharing class HouseholdSelector {
     private static final String NATIVE_HOUSEHOLD_GROUP_QUERY = 'SELECT AccountId FROM PartyRelationshipGroup WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice a native household group whose master-detail parent is the Account it is about to delete, because deleting the Account cascade-deletes the group
     private static final String NATIVE_MEMBERSHIP = 'AccountContactRelation'; // detection-only: describe key, so the delete guard can tell whether this org has native membership rows at all before it asks about one
     private static final String NATIVE_MEMBERSHIP_QUERY = 'SELECT AccountId FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice native household membership rows on the Account it is about to delete, because they make a household that reads as empty to BarnCRM
+    private static final String NATIVE_MEMBERSHIP_ROWS_QUERY = 'SELECT Id, AccountId, ContactId, IsDirect FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the household merge has to find a person related to both households, because the platform refuses to merge two accounts that share a related contact
     private static final String ACCOUNT_FIELD = 'AccountId';
 
     // The one question Health Check asks that getAccountsWithNativeDependents cannot answer:
@@ -58,6 +59,35 @@ public with sharing class HouseholdSelector {
      */
     @TestVisible
     private static Set<Id> accountsWithNativeHouseholdGroupsOverride;
+
+    /**
+     * Set only by tests: the accounts the native membership probe would find, so that an org
+     * with Contacts to Multiple Accounts on can be simulated where the object does not exist.
+     */
+    @TestVisible
+    private static Set<Id> nativeMembershipAccountsOverride;
+
+    /**
+     * Set only by tests: the native membership rows the household merge would find, for the
+     * same reason.
+     */
+    @TestVisible
+    private static List<NativeMembership> nativeMembershipRowsOverride;
+
+    /** One native membership row, read without naming its object at compile time. */
+    public class NativeMembership {
+        public Id id;
+        public Id accountId;
+        public Id contactId;
+        public Boolean isDirect;
+
+        public NativeMembership(Id id, Id accountId, Id contactId, Boolean isDirect) {
+            this.id = id;
+            this.accountId = accountId;
+            this.contactId = contactId;
+            this.isDirect = isDirect == true;
+        }
+    }
 
     @NamespaceAccessible
     public static List<Contact> getContactsByHouseholdIds(Set<Id> householdIds) {
@@ -257,6 +287,14 @@ public with sharing class HouseholdSelector {
      * would be worse than useless here: a row that user cannot see would come back missing,
      * the household would read as safe to delete, and the cascade this guard exists to
      * prevent would happen anyway.
+     *
+     * Native membership rows count only in an org that has native household groups
+     * (OrgShapeDetector.hasNativeHouseholdGroups, where unknown is yes). With Contacts to
+     * Multiple Accounts on, the platform gives every contact a membership row on its account,
+     * and keeps an indirect one on the account a contact leaves, so in an org without native
+     * households these rows say nothing about Nonprofit Cloud and would keep every household
+     * from being named, addressed or tidied (ADR-NEXT). The group itself is always asked
+     * about: a group on the Account is cascade-deleted with it whatever the org's shape.
      */
     @NamespaceAccessible
     public static Set<Id> getAccountsWithNativeDependents(Set<Id> accountIds) {
@@ -273,8 +311,62 @@ public with sharing class HouseholdSelector {
             NATIVE_HOUSEHOLD_GROUP_QUERY,
             accountIds
         );
+        if (OrgShapeDetector.hasNativeHouseholdGroups() != true) {
+            return dependent;
+        }
+        if (nativeMembershipAccountsOverride != null) {
+            for (Id accountId : accountIds) {
+                if (nativeMembershipAccountsOverride.contains(accountId)) {
+                    dependent.add(accountId);
+                }
+            }
+            return dependent;
+        }
         addNativeDependents(dependent, NATIVE_MEMBERSHIP, NATIVE_MEMBERSHIP_QUERY, accountIds);
         return dependent;
+    }
+
+    /**
+     * Every native membership row on these accounts, empty where the org does not have the
+     * object (Contacts to Multiple Accounts off). The household merge asks, because the
+     * platform refuses to merge two accounts that share a related contact (ADR-NEXT).
+     *
+     * An upkeep read (ADR-0021) in system mode: its only caller is the household merge, after
+     * the edit access check on both households; its only input is those two identifiers; it
+     * reads four fields of one object; and nothing else is elevated. A row the merging person
+     * cannot see blocks the platform merge all the same, so it has to be found. The removal
+     * that follows is not elevated: it runs as that person.
+     */
+    @NamespaceAccessible
+    public static List<NativeMembership> nativeMembershipRows(Set<Id> accountIds) {
+        if (nativeMembershipRowsOverride != null) {
+            return nativeMembershipRowsOverride;
+        }
+        List<NativeMembership> rows = new List<NativeMembership>();
+        if (
+            accountIds == null ||
+            accountIds.isEmpty() ||
+            !Schema.getGlobalDescribe().containsKey(NATIVE_MEMBERSHIP)
+        ) {
+            return rows;
+        }
+        for (
+            SObject row : Database.queryWithBinds(
+                NATIVE_MEMBERSHIP_ROWS_QUERY,
+                new Map<String, Object>{ 'accountIds' => accountIds },
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
+            rows.add(
+                new NativeMembership(
+                    row.Id,
+                    (Id) row.get(ACCOUNT_FIELD),
+                    (Id) row.get('ContactId'),
+                    (Boolean) row.get('IsDirect')
+                )
+            );
+        }
+        return rows;
     }
 
     /**

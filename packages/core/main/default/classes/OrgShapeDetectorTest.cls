@@ -110,7 +110,7 @@ private class OrgShapeDetectorTest {
      * Platform-only org. The fourth is the real probe on an org without the object.
      */
     @IsTest
-    static void anAbsentObjectIsUnknownRatherThanNone() {
+    static void anAbsentObjectIsNoneRatherThanUnknown() {
         System.runAs(TestUsers.admin()) {
             if (Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP)) {
                 // This org has the object, so there is no absent path to exercise here. The
@@ -122,15 +122,18 @@ private class OrgShapeDetectorTest {
             OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
 
             System.assertEquals(
-                null,
+                0,
                 shape.nativeHouseholdGroupCount,
-                'An object this org does not describe leaves the count unknown, not zero.'
+                'An org without the object has no native household (ADR-NEXT).'
             );
             System.assertEquals(
-                true,
+                false,
                 shape.hasNativeHouseholdGroups,
-                'Unknown is assumed to be yes, so a later guard stays cautious (ADR-0036).'
+                'So nothing here is treated as a Nonprofit Cloud household.'
             );
+            OrgShapeDetector.reset();
+            Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'The facet agrees');
+            Assert.isFalse(OrgShapeSelector.anyNativeHouseholdGroup(), 'The one-row probe too');
         }
     }
 

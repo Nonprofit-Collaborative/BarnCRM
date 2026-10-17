@@ -65,10 +65,15 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      */
     private static final String ROLLUP_STAMP_FIELD = 'Rollups_Last_Calculated__c';
 
-    /** Children never counted as something a record gained: the import's own bookkeeping. */
+    /**
+     * Children never counted as something a record gained: the import's own bookkeeping, and
+     * the contact-to-account relation the platform creates by itself for every contact where
+     * Contacts to Multiple Accounts is on (ADR-NEXT), which is nobody's later work.
+     */
     private static final Set<String> NOT_GAINED = new Set<String>{
         'import_row__c',
-        'import_journal__c'
+        'import_journal__c',
+        'accountcontactrelation'
     };
 
     /**

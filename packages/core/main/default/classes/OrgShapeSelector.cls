@@ -69,12 +69,16 @@ public with sharing class OrgShapeSelector {
      * How many native Nonprofit Cloud households this org has, or null when the question
      * could not be answered.
      *
-     * Null means unknown, and unknown is not zero. The object may be missing from the global
-     * describe, the running user may not be able to read it, or the query may fail; none of
-     * those three is evidence that the org has no native households. Schema.getGlobalDescribe
-     * is itself filtered by the running user's permission set licences, and the household
-     * group is documented as gated by the Group Membership permission set, so an org that has
-     * the object can still describe as though it does not.
+     * Zero when the object is not in the global describe at all (ADR-NEXT, narrowing
+     * ADR-0036). Treating that absence as unknown made every org without Nonprofit Cloud look
+     * as though it had native households, and in an org with Contacts to Multiple Accounts on,
+     * where every contact has a native membership row, every BarnCRM household then read as a
+     * native one: naming, addresses, memberships, tidy-up, merges and import undo all stood
+     * aside. Null still means unknown, and unknown is not zero, when the object is described
+     * but the running user cannot read it (the Group Membership permission set gates it) or
+     * when the query fails. The residual risk ADR-NEXT names: the global describe is filtered
+     * by the running user's permission set licences, so a user without the licence in a
+     * Nonprofit Cloud org can see no object at all. HouseholdSelector names the same risk.
      *
      * The caller treats unknown as "assume they exist" (OrgShapeDetector.detect). The two
      * mistakes do not cost the same, which is the reasoning ADR-0036 uses for the delete
@@ -110,7 +114,11 @@ public with sharing class OrgShapeSelector {
                 return nativeHouseholdGroupCountOverride;
             }
             Schema.SObjectType groupType = Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
-            if (groupType == null || !groupType.getDescribe().isAccessible()) {
+            if (groupType == null) {
+                // Not in this org: a known none, not an unknown (ADR-NEXT).
+                return 0;
+            }
+            if (!groupType.getDescribe().isAccessible()) {
                 return null;
             }
             if (anyIsEnough) {

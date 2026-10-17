@@ -71,6 +71,63 @@ private class HouseholdMergeServiceTest {
 
     // ------------------------------------------------------------------ merge, contact mode
 
+    /**
+     * With Contacts to Multiple Accounts on, the platform refuses to merge two accounts that
+     * share a related contact (ADR-NEXT). The rows are built in memory, since the object does
+     * not exist in every org these tests run in.
+     */
+    @IsTest
+    static void theRelationsThatWouldBlockTheMergeAreTheSharedIndirectOnes() {
+        System.runAs(TestUsers.admin()) {
+            Id survivorId = FakeIds.of(Account.SObjectType, 1);
+            Id victimId = FakeIds.of(Account.SObjectType, 2);
+            Id moved = FakeIds.of(Contact.SObjectType, 1);
+            Id stayedOnVictim = FakeIds.of(Contact.SObjectType, 2);
+            Id onlyVictim = FakeIds.of(Contact.SObjectType, 3);
+            List<HouseholdSelector.NativeMembership> rows = new List<HouseholdSelector.NativeMembership>{
+                // Moved to the survivor: direct there, indirect left on the other household.
+                new HouseholdSelector.NativeMembership(relation(1), survivorId, moved, true),
+                new HouseholdSelector.NativeMembership(relation(2), victimId, moved, false),
+                // Still the other household's own person, also related to the survivor.
+                new HouseholdSelector.NativeMembership(
+                    relation(3),
+                    victimId,
+                    stayedOnVictim,
+                    true
+                ),
+                new HouseholdSelector.NativeMembership(
+                    relation(4),
+                    survivorId,
+                    stayedOnVictim,
+                    false
+                ),
+                // Related to one household only: the merge carries it over untouched.
+                new HouseholdSelector.NativeMembership(relation(5), victimId, onlyVictim, true)
+            };
+
+            Set<Id> blocking = HouseholdMergeService.relationsBlockingMerge(survivorId, rows);
+
+            Assert.areEqual(
+                new Set<Id>{ relation(2), relation(4) },
+                blocking,
+                'Only the indirect relation of each person related to both households goes'
+            );
+            Assert.isTrue(
+                HouseholdMergeService.relationsBlockingMerge(
+                        survivorId,
+                        new List<HouseholdSelector.NativeMembership>()
+                    )
+                    .isEmpty(),
+                'Without Contacts to Multiple Accounts there is nothing to remove'
+            );
+        }
+    }
+
+    private static Id relation(Integer n) {
+        // Only compared, never queried; an Account prefix keeps it valid in every org.
+        return FakeIds.of(Account.SObjectType, 100 + n);
+    }
+
     @IsTest
     static void mergeMovesEveryoneAndRemovesTheOtherHousehold() {
         System.runAs(TestUsers.admin()) {

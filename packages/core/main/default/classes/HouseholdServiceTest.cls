@@ -4,6 +4,8 @@
  */
 @IsTest(critical=true)
 private class HouseholdServiceTest {
+    private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so the absent-object path runs for real where the object is absent
+
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
@@ -1955,6 +1957,113 @@ private class HouseholdServiceTest {
             Assert.isTrue(
                 reported[0].Message__c.contains(String.valueOf(fromHousehold)),
                 'The message carries the household record identifier'
+            );
+        }
+    }
+
+    // ------------------------------------- Contacts to Multiple Accounts (ADR-NEXT)
+
+    /**
+     * With Contacts to Multiple Accounts on, the platform leaves an indirect relation on the
+     * household a person leaves. Simulated through the membership seam, since the object does
+     * not exist in every org these tests run in.
+     */
+    @IsTest
+    static void aContactRelationAloneDoesNotKeepAnEmptyHouseholdWithoutNativeHouseholds() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+            OrgShapeDetector.reset();
+            if (Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP)) {
+                // Where the object exists, say it holds no household. Elsewhere the real
+                // probe runs, and an absent object has to answer no by itself.
+                OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            }
+            HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{
+                fromHousehold,
+                toHousehold
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
+                'A leftover contact relation is not a Nonprofit Cloud household'
+            );
+            Assert.isTrue(
+                [SELECT Name FROM Account WHERE Id = :toHousehold].Name.contains('Garcia'),
+                'The household the person joined is renamed for its new member as usual'
+            );
+        }
+    }
+
+    @IsTest
+    static void aContactRelationStillKeepsAnEmptyHouseholdWhereNativeHouseholdsExist() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 1;
+            HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{ fromHousehold };
+
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
+                'Where native households exist, membership rows still keep a household (ADR-0036)'
+            );
+        }
+    }
+
+    @IsTest
+    static void contactRelationsCountOnlyWhereNativeHouseholdsExist() {
+        System.runAs(TestUsers.admin()) {
+            Account household = HouseholdTestDataFactory.newHousehold('Garcia Household');
+            insert household;
+            Set<Id> ids = new Set<Id>{ household.Id };
+            HouseholdSelector.nativeMembershipAccountsOverride = ids;
+
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Assert.isTrue(
+                HouseholdSelector.getAccountsWithNativeDependents(ids).isEmpty(),
+                'No native households: a relation row is not a dependent'
+            );
+            Assert.isTrue(
+                HouseholdSelector.nativeHouseholdAccountsAmong(ids).isEmpty(),
+                'And not a native household'
+            );
+
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
+            Assert.areEqual(
+                ids,
+                HouseholdSelector.getAccountsWithNativeDependents(ids),
+                'Native households: the relation row counts'
+            );
+            Assert.areEqual(ids, HouseholdSelector.nativeHouseholdAccountsAmong(ids), 'Both ways');
+
+            OrgShapeDetector.reset();
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = null;
+            OrgShapeSelector.failNativeHouseholdGroupProbe = true;
+            Assert.areEqual(
+                ids,
+                HouseholdSelector.getAccountsWithNativeDependents(ids),
+                'Unknown is still yes (ADR-0036)'
             );
         }
     }
