@@ -271,6 +271,11 @@ submit_and_follow() {
 # went wrong. A deploy can report only "Status: Failed" with no detail, which is why the
 # report is asked for by job id and then again as JSON: the JSON carries errorMessage and
 # every component error.
+# True when packages/volunteers holds any file besides .gitkeep, so an empty module folder is a no-op.
+volunteers_has_metadata() {
+  [[ -n "$(find packages/volunteers/main -type f ! -name .gitkeep 2> /dev/null | head -1)" ]]
+}
+
 deploy_stage() {
   local label="$1"
   shift
@@ -468,6 +473,13 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # how a Core-only org (no rollup engine at all) is built.
   deploy_stage "Rollup Builder" "packages/rollups" || exit $?
   deploy_stage "Giving" "packages/giving" || exit $?
+  # Volunteers depends on Core and the Rollup Builder module. While packages/volunteers holds
+  # no metadata the stage is skipped (volunteers_has_metadata), so it costs nothing until PR4.
+  if volunteers_has_metadata; then
+    deploy_stage "Volunteers" "packages/volunteers" || exit $?
+  else
+    echo "== Skipping Volunteers: packages/volunteers holds no metadata yet =="
+  fi
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   deploy_stage "Mirror" "packages/mirror" || exit $?
 

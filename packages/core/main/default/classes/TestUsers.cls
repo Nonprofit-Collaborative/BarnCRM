@@ -39,7 +39,8 @@ public class TestUsers {
      */
     private static final List<String> MODULE_ADMINS = new List<String>{
         'Rollup_Builder_Admin',
-        'Giving_Admin'
+        'Giving_Admin',
+        'Volunteers_Admin'
     };
 
     /**

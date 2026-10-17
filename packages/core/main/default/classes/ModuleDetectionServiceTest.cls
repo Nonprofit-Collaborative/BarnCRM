@@ -423,6 +423,10 @@ private class ModuleDetectionServiceTest {
             Assert.areEqual('BarnCRM_Rollup_Builder', rollups.App_Name__c, 'Its own app');
             Assert.areEqual(5, rollups.Sort_Order__c.intValue(), 'Listed before Giving');
             Assert.areEqual('Rollups', shipped.get('Giving').Requires__c, 'Giving needs it');
+            BarnCRM_Module__mdt volunteers = shipped.get('Volunteers');
+            Assert.areEqual('Rollups', volunteers.Requires__c, 'Volunteers needs it too');
+            Assert.areEqual('BarnCRM_Volunteers', volunteers.App_Name__c, 'Its own app');
+            Assert.areEqual('Volunteer_Hours__c', volunteers.Probe_Object__c, 'Its probe object');
         }
     }
 
