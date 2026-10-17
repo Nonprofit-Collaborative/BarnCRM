@@ -144,7 +144,7 @@ public class TestUsers {
         person.Alias = 'barntest';
         person.Email = 'barn-test' + DOMAIN;
         person.FirstName = 'BarnCRM';
-        return insertWith(person, names);
+        return insertWith(person, names, true);
     }
 
     /**
@@ -170,7 +170,7 @@ public class TestUsers {
      */
     @NamespaceAccessible
     public static User standardUserWith(String lastName, List<String> permissionSetNames) {
-        return insertWith(newStandardUser(lastName), permissionSetNames);
+        return insertWith(newStandardUser(lastName), permissionSetNames, false);
     }
 
     /**
@@ -185,7 +185,8 @@ public class TestUsers {
     public static User onRunningProfileWith(String lastName, List<String> permissionSetNames) {
         return insertWith(
             newUser(lastName, UserInfo.getProfileId(), usernameStart(lastName)),
-            permissionSetNames
+            permissionSetNames,
+            true
         );
     }
 
@@ -237,7 +238,8 @@ public class TestUsers {
         );
         User person = insertWith(
             newUser(lastName, profileId, usernameStart(lastName)),
-            permissionSetNames
+            permissionSetNames,
+            false
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             String name = 'Barn_Read_All_People_' + Math.abs(Crypto.getRandomInteger());
@@ -321,7 +323,93 @@ public class TestUsers {
         );
     }
 
-    private static User insertWith(User person, List<String> names) {
+    /**
+     * The optional standard fields the suite's test data reads and writes, which an org's own
+     * System Administrator profile may hide: a real org can grant only the fields it uses, and
+     * a test that inserts or queries one then fails with "fields being inaccessible" or "No such
+     * column". A test user gets them from a permission set built here. Fields every profile
+     * grants, and the compound address and name parts, are not listed.
+     */
+    private static final Map<String, List<String>> OPTIONAL_STANDARD_FIELDS = new Map<String, List<String>>{
+        'Account' => new List<String>{
+            'AnnualRevenue',
+            'Description',
+            'Industry',
+            'NumberOfEmployees',
+            'Site',
+            'Type'
+        },
+        'Contact' => new List<String>{
+            'AssistantName',
+            'Birthdate',
+            'Department',
+            'Description',
+            'HomePhone',
+            'Title'
+        }
+    };
+
+    private static Id cachedFieldAccessSetId;
+
+    /**
+     * Gives a user Read and Edit on the optional standard fields the suite's tests use
+     * (`OPTIONAL_STANDARD_FIELDS`), from a permission set built in the test, so the test no
+     * longer depends on which of them the org's profiles grant. For a user built outside
+     * `TestUsers`, for example by `TestDataFactory.createUser`. Never given to the `standardUser*`
+     * users, whose tests prove what least privilege denies.
+     *
+     * @param person the inserted user
+     * @return the same user
+     */
+    @NamespaceAccessible
+    public static User grantStandardFieldAccess(User person) {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            assignFieldAccess(person);
+        }
+        return person;
+    }
+
+    /** Must run in a system context (a runAs of the running user): it writes setup objects. */
+    private static void assignFieldAccess(User person) {
+        if (cachedFieldAccessSetId == null) {
+            String name = 'Barn_Test_Field_Access_' + Math.abs(Crypto.getRandomInteger());
+            PermissionSet fieldAccess = new PermissionSet(Name = name, Label = name);
+            insert as system fieldAccess;
+            // Read on Account depends on Read on Contact, so Contact is written first.
+            insert as system new ObjectPermissions(
+                ParentId = fieldAccess.Id,
+                SobjectType = 'Contact',
+                PermissionsRead = true
+            );
+            insert as system new ObjectPermissions(
+                ParentId = fieldAccess.Id,
+                SobjectType = 'Account',
+                PermissionsRead = true
+            );
+            List<FieldPermissions> grants = new List<FieldPermissions>();
+            for (String objectName : OPTIONAL_STANDARD_FIELDS.keySet()) {
+                for (String fieldName : OPTIONAL_STANDARD_FIELDS.get(objectName)) {
+                    grants.add(
+                        new FieldPermissions(
+                            ParentId = fieldAccess.Id,
+                            SobjectType = objectName,
+                            Field = objectName + '.' + fieldName,
+                            PermissionsRead = true,
+                            PermissionsEdit = true
+                        )
+                    );
+                }
+            }
+            insert as system grants;
+            cachedFieldAccessSetId = fieldAccess.Id;
+        }
+        insert as system new PermissionSetAssignment(
+            AssigneeId = person.Id,
+            PermissionSetId = cachedFieldAccessSetId
+        );
+    }
+
+    private static User insertWith(User person, List<String> names, Boolean withFieldAccess) {
         List<PermissionSet> packaged = packagedPermissionSets(names);
         // A user and its assignments are setup objects: written in their own context, so the
         // data the test writes next does not break the mixed DML rule.
@@ -337,6 +425,9 @@ public class TestUsers {
                 );
             }
             insert as system assignments;
+            if (withFieldAccess) {
+                assignFieldAccess(person);
+            }
         }
         return person;
     }
