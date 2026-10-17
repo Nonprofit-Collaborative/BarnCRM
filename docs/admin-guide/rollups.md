@@ -195,7 +195,9 @@ contacts, then all funds), and calculate all of a record's totals together:
   saved, so it keeps its earlier time: the run checked it and found nothing to change. The
   **Last calculated** time in the Rollup Builder is what tells you the run happened.
 - **The Rollup Builder marks a rollup calculated when the whole run has finished**, not when it
-  starts. When the page shows a time, the totals from that run are already on the records.
+  starts. When the page shows a time, the totals from that run are on the records, except for
+  records with a very large number of gifts (next bullet), whose totals follow a few minutes
+  later.
 - **Records with a very large number of gifts are calculated separately.** A record with
   about 20,000 or more gifts or allocations behind its totals (a General Fund most gifts go to,
   a catch-all donor such as "Anonymous") has more rows than one step of the run may read. The
