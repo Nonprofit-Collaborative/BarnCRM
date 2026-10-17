@@ -84,7 +84,7 @@ private class RollupBuilderControllerTest {
             }
             System.Assert.isTrue(targets.contains('account'), 'Account can show a total');
             // BarnCRM's own objects by exact name, bare and qualified: another package's object
-            // may end the same way (an inov8__pmt_error_log__c) and is rightly offered.
+            // may end the same way (another vendor's error log object) and is rightly offered.
             for (String bookkeeping : new List<String>{ 'Rollup_Queue__c', 'Error_Log__c' }) {
                 System.Assert.isFalse(
                     targets.contains(bookkeeping.toLowerCase()) ||
