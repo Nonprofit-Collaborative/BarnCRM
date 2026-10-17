@@ -288,13 +288,15 @@ public with sharing class HouseholdSelector {
      * the household would read as safe to delete, and the cascade this guard exists to
      * prevent would happen anyway.
      *
-     * Native membership rows count only in an org that has native household groups
-     * (OrgShapeDetector.hasNativeHouseholdGroups, where unknown is yes). With Contacts to
-     * Multiple Accounts on, the platform gives every contact a membership row on its account,
-     * and keeps an indirect one on the account a contact leaves, so in an org without native
-     * households these rows say nothing about Nonprofit Cloud and would keep every household
-     * from being named, addressed or tidied (ADR-NEXT). The group itself is always asked
-     * about: a group on the Account is cascade-deleted with it whatever the org's shape.
+     * Native membership rows are left out only when the native household group is described
+     * and the probe counted none of it (ADR-NEXT). With Contacts to Multiple Accounts on, the
+     * platform gives every contact a membership row on its account and keeps an indirect one
+     * on the account a contact leaves, so where native households are ruled out those rows
+     * say nothing about Nonprofit Cloud. An object merely absent from the describe does not
+     * rule them out here, unlike for naming and addresses: this answer decides a delete, and
+     * the describe is filtered by the running user's licences, so the rows stay the backstop.
+     * The group itself is always asked about: a group on the Account is cascade-deleted with
+     * it whatever the org's shape.
      */
     @NamespaceAccessible
     public static Set<Id> getAccountsWithNativeDependents(Set<Id> accountIds) {
@@ -311,7 +313,10 @@ public with sharing class HouseholdSelector {
             NATIVE_HOUSEHOLD_GROUP_QUERY,
             accountIds
         );
-        if (OrgShapeDetector.hasNativeHouseholdGroups() != true) {
+        if (
+            OrgShapeDetector.hasNativeHouseholdGroups() == false &&
+            OrgShapeSelector.nativeHouseholdGroupObjectDescribed()
+        ) {
             return dependent;
         }
         if (nativeMembershipAccountsOverride != null) {

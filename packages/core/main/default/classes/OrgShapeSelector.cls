@@ -76,9 +76,12 @@ public with sharing class OrgShapeSelector {
      * native one: naming, addresses, memberships, tidy-up, merges and import undo all stood
      * aside. Null still means unknown, and unknown is not zero, when the object is described
      * but the running user cannot read it (the Group Membership permission set gates it) or
-     * when the query fails. The residual risk ADR-NEXT names: the global describe is filtered
-     * by the running user's permission set licences, so a user without the licence in a
-     * Nonprofit Cloud org can see no object at all. HouseholdSelector names the same risk.
+     * when the query fails. Zero for an absent object is an answer for the paths that only
+     * leave a household alone (naming, greetings, addresses, memberships). It is not enough
+     * for a path that deletes: the global describe is filtered by the running user's
+     * permission set licences, so a user without the licence in a Nonprofit Cloud org can see
+     * no object at all, and no signal Apex offers was confirmed to see past that filter. The
+     * deleting paths therefore also ask nativeHouseholdGroupObjectDescribed (ADR-NEXT).
      *
      * The caller treats unknown as "assume they exist" (OrgShapeDetector.detect). The two
      * mistakes do not cost the same, which is the reasoning ADR-0036 uses for the delete
@@ -103,6 +106,19 @@ public with sharing class OrgShapeSelector {
     public static Boolean anyNativeHouseholdGroup() {
         Integer found = probeNativeHouseholdGroups(true);
         return found == null ? null : found > 0;
+    }
+
+    /**
+     * Whether the native household group is in this transaction's global describe, so that a
+     * zero count is one the probe actually made. False is not proof the org lacks the object:
+     * the describe is filtered by the running user's licences (ADR-NEXT). A test that injects a
+     * count is treated as describing the object, since the count stands for a probe that ran.
+     */
+    public static Boolean nativeHouseholdGroupObjectDescribed() {
+        if (nativeHouseholdGroupCountOverride != null) {
+            return true;
+        }
+        return Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
     }
 
     private static Integer probeNativeHouseholdGroups(Boolean anyIsEnough) {

@@ -290,10 +290,11 @@ see, so a household that also carries a Salesforce Nonprofit Cloud household gro
 membership rows reads as empty here while being anything but. The account is the master of
 that group, so deleting the account would destroy it rather than orphan it. A household
 left in place for that reason is reported to the Error Log at Info severity, naming the
-household: it is a correct outcome, not a failure. Membership rows count only in an org that
-has native household groups (an org without the group object has none): with Contacts to
-Multiple Accounts on, every contact has such a row and a person who moves leaves an indirect
-one behind, which says nothing about Nonprofit Cloud (ADR-NEXT).
+household: it is a correct outcome, not a failure. With Contacts to Multiple Accounts on,
+every contact has a membership row and a person who moves leaves an indirect one behind.
+For this delete the rows are ignored only when the group object is described and holds no
+household; an object merely absent from the describe may be hidden by the user's licences,
+so the rows still keep the household (ADR-NEXT).
 
 Deleting people never deletes their household at the time; moving them still tidies it as above. Deleting
 a household purges from the Recycle Bin the contacts and membership rows already deleted from
@@ -340,9 +341,10 @@ actions on the record page, not Setup operations.
 
 Two households only: an organization is never a merge target, and the two records must
 be different. A merge moves membership first, in whichever membership mode is active,
-then applies the field values a person chose, then (with Contacts to Multiple Accounts on)
-removes the indirect contact relation of each person related to both households, which the
-platform would otherwise refuse to merge (ADR-NEXT), then uses the platform's own account merge
+then applies the field values a person chose, then (with Contacts to Multiple Accounts on and
+no native households) removes the indirect contact relation of each person related to both
+households, which the platform would otherwise refuse to merge (ADR-NEXT), then uses the
+platform's own account merge
 so that activities, files, notes, and every lookup from another entity follow the record
 that goes away. A merge is not reversible and is audited by the platform's own record
 history rather than by a log this model defines. Membership changes made by a merge or a

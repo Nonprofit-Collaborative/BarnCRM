@@ -42,10 +42,19 @@ and BarnCRM treats it that way.
 **Contacts to Multiple Accounts.** With this Salesforce setting on, every contact gets an
 account relationship record, and moving a person to another household leaves an indirect one
 behind. In an org without Nonprofit Cloud households, BarnCRM does not read those records as
-a Nonprofit Cloud household: naming, greetings, addresses, memberships and the empty household
-tidy-up work as usual. When you merge two households, BarnCRM removes the indirect
-relationship of each person related to both (Salesforce refuses the merge otherwise); the
-person's other relationship stays.
+a Nonprofit Cloud household: naming, greetings, addresses and memberships work as usual.
+
+- **Merging.** BarnCRM removes the indirect relationship of each person related to both
+  households (Salesforce refuses the merge otherwise); the person's other relationship stays.
+  In an org with Nonprofit Cloud households BarnCRM never removes these records, because they
+  can hold roles and dates of their own, so a merge there may fail. Remove the extra
+  relationship yourself and merge again.
+- **Empty household tidy-up.** Unless your org has the Nonprofit Cloud household object and
+  BarnCRM could confirm it holds no households, a household emptied by a move still has the
+  indirect relationship left behind, so the tidy-up keeps it rather than risk deleting
+  something it cannot see, and notes it in the Error Log at Info severity. Delete such
+  households yourself once you have checked them. Import undo keeps an imported household
+  for the same reason.
 
 ## A five-minute walkthrough
 

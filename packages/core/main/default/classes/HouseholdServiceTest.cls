@@ -1978,11 +1978,8 @@ private class HouseholdServiceTest {
             Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
             Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
             OrgShapeDetector.reset();
-            if (Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP)) {
-                // Where the object exists, say it holds no household. Elsewhere the real
-                // probe runs, and an absent object has to answer no by itself.
-                OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
-            }
+            // The object described and counted empty: native households are ruled out.
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
             HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{
                 fromHousehold,
                 toHousehold
@@ -2000,6 +1997,44 @@ private class HouseholdServiceTest {
             Assert.isTrue(
                 [SELECT Name FROM Account WHERE Id = :toHousehold].Name.contains('Garcia'),
                 'The household the person joined is renamed for its new member as usual'
+            );
+        }
+    }
+
+    /**
+     * An object merely absent from the describe may be hidden by the running user's licences,
+     * so the delete guard keeps contact relations as its backstop, while naming goes ahead.
+     */
+    @IsTest
+    static void anAbsentGroupObjectNamesAsUsualButKeepsTheRelationBackstopForDeletes() {
+        System.runAs(TestUsers.admin()) {
+            if (Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP)) {
+                return; // This org has the object, so there is no absent path to exercise.
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+            OrgShapeDetector.reset();
+            HouseholdSelector.nativeMembershipAccountsOverride = new Set<Id>{
+                fromHousehold,
+                toHousehold
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
+                'Without a confirmed answer, a household with relations is not deleted'
+            );
+            Assert.isTrue(
+                [SELECT Name FROM Account WHERE Id = :toHousehold].Name.contains('Garcia'),
+                'Naming does not wait for that answer'
             );
         }
     }

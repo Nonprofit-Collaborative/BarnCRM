@@ -65,16 +65,19 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      */
     private static final String ROLLUP_STAMP_FIELD = 'Rollups_Last_Calculated__c';
 
-    /**
-     * Children never counted as something a record gained: the import's own bookkeeping, and
-     * the contact-to-account relation the platform creates by itself for every contact where
-     * Contacts to Multiple Accounts is on (ADR-NEXT), which is nobody's later work.
-     */
+    /** Children never counted as something a record gained: the import's own bookkeeping. */
     private static final Set<String> NOT_GAINED = new Set<String>{
         'import_row__c',
-        'import_journal__c',
-        'accountcontactrelation'
+        'import_journal__c'
     };
+
+    /**
+     * The contact-to-account relation the platform creates by itself for every contact where
+     * Contacts to Multiple Accounts is on. Not counted as gained where the org has no native
+     * households, since there it is nobody's later work; counted where it may be Nonprofit
+     * Cloud membership (ADR-NEXT). Lower case, compared with the child's local name.
+     */
+    private static final String PLATFORM_RELATION = 'accountcontactrelation';
 
     /**
      * The most records one delete chunk takes. Smaller than a save's usual 200, because the
@@ -1245,6 +1248,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             Map<String, Schema.SObjectField> childFields = child.fields.getMap();
             if (
                 NOT_GAINED.contains(localName.toLowerCase()) ||
+                (PLATFORM_RELATION.equals(localName.toLowerCase()) &&
+                OrgShapeDetector.hasNativeHouseholdGroups() == false) ||
                 !childFields.containsKey('createddate') ||
                 !childFields.containsKey('createdbyid') ||
                 (!child.isCustom() && !child.isCreateable())

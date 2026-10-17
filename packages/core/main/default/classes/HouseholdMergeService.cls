@@ -224,6 +224,9 @@ public with sharing class HouseholdMergeService {
             throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNoEditAccess);
         }
 
+        // Everything below is undone together if the merge cannot finish, so a refusal leaves
+        // both households as they were rather than emptying one and keeping it.
+        Savepoint beforeMerge = Database.setSavepoint();
         Set<Id> movedPeople = HouseholdService.getMemberPersonIds(new Set<Id>{ victimId })
             .get(victimId);
         if (movedPeople != null && !movedPeople.isEmpty()) {
@@ -242,7 +245,10 @@ public with sharing class HouseholdMergeService {
         Boolean keepsCustomName = applyChoices(survivor, victim, choices);
         Map<String, Object> chosenWording = chosenOtherWording(victim, choices);
 
-        removeSharedRelations(survivorId, victimId);
+        List<String> reasons = removeSharedRelations(survivorId, victimId);
+        if (!reasons.isEmpty()) {
+            failMerge(beforeMerge, reasons, survivorId);
+        }
 
         // The platform's own merge, so that activities, files, notes, and every lookup
         // another package points at this household follow the record that goes away.
@@ -253,22 +259,10 @@ public with sharing class HouseholdMergeService {
             AccessLevel.USER_MODE
         );
         if (!merged.isSuccess()) {
-            // The people have already moved. Throwing here rolls the whole transaction
-            // back, so a merge that cannot finish leaves both households as they were
-            // rather than emptying one and keeping it.
-            // The platform's own wording is for the administrator reading the Error Log,
-            // which survives the rollback; the person at the screen gets the plain message.
-            List<String> reasons = new List<String>();
             for (Database.Error problem : merged.getErrors()) {
                 reasons.add(problem.getMessage());
             }
-            ErrorLogger.logMessage(
-                Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
-                Label.Core_HouseholdMerge_ErrorContext,
-                ErrorLogger.SEVERITY_ERROR,
-                survivorId
-            );
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+            failMerge(beforeMerge, reasons, survivorId);
         }
 
         Set<Id> survivorOnly = new Set<Id>{ survivorId };
@@ -302,11 +296,17 @@ public with sharing class HouseholdMergeService {
      * surviving household leaves an indirect relation on the household going away (ADR-NEXT).
      * For each person related to both, the indirect relation is removed, the one on the
      * household going away by preference, since the merge folds it into the survivor anyway.
-     * Nothing happens where the org does not relate contacts to several accounts. The removal
-     * runs as the person merging; a refusal is logged and stops the merge like the platform's
-     * own refusal, and the throw rolls the move back.
+     * Nothing happens where the org does not relate contacts to several accounts, and nothing
+     * where it may have native households: there these rows are Nonprofit Cloud membership,
+     * which can carry roles, dates and fields of their own, so they are not BarnCRM's to
+     * delete and the merge is left to fail with its plain message. The removal runs as the
+     * person merging. Answers the platform's reasons for any row it would not remove.
      */
-    private static void removeSharedRelations(Id survivorId, Id victimId) {
+    private static List<String> removeSharedRelations(Id survivorId, Id victimId) {
+        List<String> reasons = new List<String>();
+        if (OrgShapeDetector.hasNativeHouseholdGroups() != false) {
+            return reasons;
+        }
         List<Id> blocking = new List<Id>(
             relationsBlockingMerge(
                 survivorId,
@@ -314,23 +314,32 @@ public with sharing class HouseholdMergeService {
             )
         );
         if (blocking.isEmpty()) {
-            return;
+            return reasons;
         }
-        List<String> reasons = new List<String>();
-        for (Database.DeleteResult removed : Database.delete(blocking, false, AccessLevel.USER_MODE)) {
+        for (
+            Database.DeleteResult removed : Database.delete(blocking, false, AccessLevel.USER_MODE)
+        ) {
             for (Database.Error problem : removed.getErrors()) {
                 reasons.add(problem.getMessage());
             }
         }
-        if (!reasons.isEmpty()) {
-            ErrorLogger.logMessage(
-                Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
-                Label.Core_HouseholdMerge_ErrorContext,
-                ErrorLogger.SEVERITY_ERROR,
-                survivorId
-            );
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
-        }
+        return reasons;
+    }
+
+    /**
+     * Undoes the move and anything else the merge did, logs the platform's own wording for the
+     * administrator (after the rollback, so the entry stays), and gives the person at the
+     * screen the plain message.
+     */
+    private static void failMerge(Savepoint beforeMerge, List<String> reasons, Id survivorId) {
+        Database.rollback(beforeMerge);
+        ErrorLogger.logMessage(
+            Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
+            Label.Core_HouseholdMerge_ErrorContext,
+            ErrorLogger.SEVERITY_ERROR,
+            survivorId
+        );
+        throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
     }
 
     /**

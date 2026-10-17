@@ -26,22 +26,32 @@ other household), so every household merge failed.
 
 ## Decision
 
-1. **An object the org does not have is a known "no", not an unknown.**
+1. **For the paths that only leave a household alone, an absent object is a "no".**
    `OrgShapeSelector` counts zero native households when `PartyRelationshipGroup` is absent
-   from the global describe. A described object the running user cannot read, or a query
-   that fails, is still unknown, and unknown is still "yes" (ADR-0036 unchanged there).
-2. **Native membership rows count as a native household signal only in an org that has
-   native household groups** (`OrgShapeDetector.hasNativeHouseholdGroups`, unknown counting
-   as yes). `HouseholdSelector.getAccountsWithNativeDependents` asks about membership rows
-   only then; the group itself is always asked about, because it is cascade-deleted with the
-   Account whatever the org's shape. The merge and duplicate guards already ignored
+   from the global describe, so naming, greetings, addresses and memberships run. A
+   described object the running user cannot read, or a query that fails, is still unknown,
+   and unknown is still "yes" (ADR-0036 unchanged there).
+2. **For the paths that delete, absence is not enough.** The global describe is filtered by
+   the running user's permission set licences, so a user without the Nonprofit Cloud licence
+   (or an automated user) may not see the object in an org that has it. No licence-neutral
+   signal was confirmed: `EntityDefinition` reports the object to an administrator in a
+   Nonprofit Cloud org and not in a Platform-only org, but whether it is filtered the same
+   way for an unlicensed user could not be tested read-only. So
+   `HouseholdSelector.getAccountsWithNativeDependents` (empty household delete guard, tidy
+   batch, import undo account pass) leaves out membership rows only when the object is
+   described and the probe counted none of it; otherwise the rows stay the backstop. The
+   group itself is always asked about. The merge and duplicate guards already ignored
    membership rows.
-3. **A household merge removes the relations that would block it.** Before
+3. **A household merge removes the relations that would block it, only where native
+   households are ruled out for naming** (`hasNativeHouseholdGroups()` false). Before
    `Database.merge`, for each contact related to both households, the indirect relation is
    deleted: the one on the household going away by preference, otherwise the one on the
-   survivor. The rows are read in system mode (upkeep read, ADR-0021) and deleted in user
-   mode; a refusal is logged and stops the merge, and the throw rolls the member move back.
-4. **Import undo does not count the platform's own membership row as something gained.**
+   survivor. Rows are read in system mode (upkeep read, ADR-0021) and deleted in user mode.
+   Where native households may exist, membership rows can carry roles, dates and fields of
+   their own, so nothing is deleted and the merge fails with its plain message. Any failure
+   rolls back to a savepoint taken before the member move, is logged, and stops the merge.
+4. **Import undo does not count the platform's own membership row as something gained**,
+   on the same condition as 3.
 
 ## Alternatives considered
 
@@ -56,14 +66,21 @@ other household), so every household merge failed.
 
 ## Consequences
 
-- Residual risk, named rather than hidden: the global describe is filtered by the running
-  user's permission set licences, so in a Nonprofit Cloud org a user without the licence can
-  see no `PartyRelationshipGroup` at all and the org then reads as having no native
-  households for that transaction. `HouseholdSelector` already named this risk for the
-  delete guard. A user with the licence but without the Group Membership permission set
-  still sees the object and stays on the cautious side.
-- A merge in an org with Contacts to Multiple Accounts deletes the indirect relation of each
-  shared contact, with any role or dates recorded on it. The surviving relation remains.
+- **Tidy-up in an org with Contacts to Multiple Accounts and no Nonprofit Cloud** (for
+  example mwdbdevsb): a household emptied by a move keeps the indirect relation the platform
+  leaves on it, so the empty household delete guard and the tidy batch keep it and log it at
+  Info, as ADR-0036 does for any dependent. Import undo likewise keeps an imported household
+  that still has relation rows. Naming, addresses, memberships, merges and the import undo
+  contact pass work. Revisit if a licence-neutral existence signal is confirmed (for example
+  `EntityDefinition` read by an unlicensed user in a Nonprofit Cloud org).
+- Residual risk for the non-deleting paths: in a Nonprofit Cloud org, a user who cannot see
+  the object at all reads the org as having no native households for that transaction, so
+  naming or an address save could touch a native household, and a merge could delete shared
+  indirect relations. A user with the licence but without the Group Membership permission
+  set still sees the object and stays on the cautious side.
+- A merge in an org with Contacts to Multiple Accounts and no native households deletes the
+  indirect relation of each shared contact, with any role or dates recorded on it. The
+  surviving relation remains.
 - Tests simulate membership rows through `HouseholdSelector.nativeMembershipAccountsOverride`
   and `nativeMembershipRowsOverride`, since the object is absent in scratch orgs. A scratch
   shape with Contacts to Multiple Accounts on would test the real platform behaviour; adding
