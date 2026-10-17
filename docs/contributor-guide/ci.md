@@ -559,6 +559,16 @@ So every test is self-contained:
   create people) and loses only the dependence on permission set assignments. A test that has
   something to prove about least privilege still builds its own user with
   `TestDataFactory.createUser` on the Standard User profile, inside the outer `runAs`.
+- A real org's System Administrator profile may hide optional standard fields (a sandbox of
+  a production org had no field access to `Account.AnnualRevenue`, `Contact.Description` or
+  `Contact.AssistantName`), and 55 tests that insert or query them failed with "fields being
+  inaccessible" or "No such column". So `TestUsers` also builds a permission set in the test,
+  once per transaction, granting Read and Edit on the optional standard fields the suite
+  uses (`OPTIONAL_STANDARD_FIELDS`), and assigns it to the users on the running user's
+  profile (`admin()`, `adminWith`, `withPermissionSets`, `onRunningProfileWith`) and to
+  `TestDataFactory.createUser` users. The `standardUser*` helpers and `peopleReaderWith` never
+  get it, because their tests prove least privilege. A test that uses a new optional standard
+  field adds it to the list rather than relying on the org's profile.
 - Users and permission set assignments are setup objects. `TestUsers` writes them in a
   context of their own; a test that creates more people does the same with a nested
   `System.runAs(new User(Id = UserInfo.getUserId()))`, as before.

@@ -33,7 +33,22 @@ private class FirstRunControllerTest {
 
             Assert.isTrue(state.needsSetup, 'No edition is saved yet');
             Assert.isTrue(state.canFinish, 'Maria may finish it');
-            Assert.isNotNull(state.recommendedSuite, 'An edition is suggested');
+            // Suggested only when Giving, NPSP or Nonprofit Cloud is there; otherwise null by
+            // design, so the administrator picks (ADR-0072). The test holds in either org.
+            if (ModuleDetectionService.isGivingPresent()) {
+                Assert.areEqual(
+                    ModuleDetectionService.SUITE_IMPACT,
+                    state.recommendedSuite,
+                    'The Nonprofit Edition is suggested when Giving is installed'
+                );
+            } else {
+                Assert.isTrue(
+                    state.recommendedSuite == null ||
+                    state.recommendedSuite == ModuleDetectionService.SUITE_IMPACT,
+                    'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
+                    state.recommendedSuite
+                );
+            }
             Assert.areEqual(8, state.features.size(), 'Every feature is offered');
         }
     }

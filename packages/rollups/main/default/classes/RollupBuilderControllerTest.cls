@@ -83,10 +83,13 @@ private class RollupBuilderControllerTest {
                 targets.add(option.value.toLowerCase());
             }
             System.Assert.isTrue(targets.contains('account'), 'Account can show a total');
-            for (String target : targets) {
+            // BarnCRM's own objects by exact name, bare and qualified: another package's object
+            // may end the same way (an inov8__pmt_error_log__c) and is rightly offered.
+            for (String bookkeeping : new List<String>{ 'Rollup_Queue__c', 'Error_Log__c' }) {
                 System.Assert.isFalse(
-                    target.endsWith('rollup_queue__c') || target.endsWith('error_log__c'),
-                    'BarnCRM bookkeeping is never offered: ' + target
+                    targets.contains(bookkeeping.toLowerCase()) ||
+                    targets.contains(NamespaceUtil.qualify(bookkeeping).toLowerCase()),
+                    'BarnCRM bookkeeping is never offered: ' + bookkeeping
                 );
             }
             System.Assert.isFalse(model.aggregates.isEmpty(), 'Every calculation is offered');
