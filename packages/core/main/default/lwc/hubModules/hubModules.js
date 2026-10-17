@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import HEADING from '@salesforce/label/c.Core_HubModules_Title';
 import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
@@ -7,7 +8,6 @@ import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 
-const SETTINGS_TAB = 'BarnCRM_Settings';
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
 
@@ -42,11 +42,17 @@ export default class HubModules extends NavigationMixin(LightningElement) {
     }
   }
 
-  handleOpenManager() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: SETTINGS_TAB },
-      state: { c__section: MODULES_SECTION }
-    });
+  // The tab and the section key are qualified for the org's namespace in Apex.
+  async handleOpenManager() {
+    try {
+      const link = await getSettingsLink();
+      this[NavigationMixin.Navigate]({
+        type: 'standard__navItemPage',
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: MODULES_SECTION }
+      });
+    } catch {
+      this.errorMessage = LOAD_ERROR;
+    }
   }
 }

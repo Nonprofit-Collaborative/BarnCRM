@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/FirstRunController.getState';
 import finish from '@salesforce/apex/FirstRunController.finish';
 import TITLE from '@salesforce/label/c.Core_FirstRun_Title';
@@ -16,7 +17,6 @@ import LOAD_ERROR from '@salesforce/label/c.Core_FirstRun_LoadError';
 import COMMUNITY from '@salesforce/label/c.Core_SuiteChoice_CommunityOption';
 import IMPACT from '@salesforce/label/c.Core_SuiteChoice_ImpactOption';
 
-const SETTINGS_TAB = 'BarnCRM_Settings';
 const GENERAL_SECTION = 'General';
 const ALL = 'all';
 const CHOOSE = 'choose';
@@ -168,10 +168,12 @@ export default class FirstRunSetup extends NavigationMixin(LightningElement) {
     try {
       this.state = await finish({ suite: this.edition, featureKeys: keys });
       this.dispatchEvent(new CustomEvent('setupfinished'));
+      // The tab and the section key are qualified for the org's namespace in Apex.
+      const link = await getSettingsLink();
       this[NavigationMixin.Navigate]({
         type: 'standard__navItemPage',
-        attributes: { apiName: SETTINGS_TAB },
-        state: { c__section: GENERAL_SECTION }
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: GENERAL_SECTION }
       });
     } catch (error) {
       this.errorMessage = messageOf(error);

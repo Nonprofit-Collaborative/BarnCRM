@@ -87,6 +87,25 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void settingsLinkNamesTheTabAndSectionKeyThisOrgNeeds() {
+        System.runAs(TestUsers.admin()) {
+            SettingsController.SettingsLink link = SettingsController.getSettingsLink();
+
+            Assert.areEqual(
+                NamespaceUtil.qualify('BarnCRM_Settings'),
+                link.tabApiName,
+                'A page reference names the settings tab with this org\'s prefix'
+            );
+            Assert.areEqual(
+                NamespaceUtil.stateKey('section'),
+                link.sectionKey,
+                'The section state key follows the namespace, as the console reads it'
+            );
+            Assert.isTrue(link.sectionKey.endsWith('__section'), 'The console matches the suffix');
+        }
+    }
+
+    @IsTest
     static void hidesTheRowsOfAFeatureThatIsOff() {
         System.runAs(TestUsers.admin()) {
             stubDefinitions();

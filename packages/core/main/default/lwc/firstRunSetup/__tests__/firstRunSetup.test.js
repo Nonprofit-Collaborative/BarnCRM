@@ -3,6 +3,17 @@ import FirstRunSetup from 'c/firstRunSetup';
 import getState from '@salesforce/apex/FirstRunController.getState';
 import finish from '@salesforce/apex/FirstRunController.finish';
 
+// A namespaced org answers with qualified names; the component writes none of its own.
+jest.mock(
+  '@salesforce/apex/SettingsController.getSettingsLink',
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({ tabApiName: 'ns__BarnCRM_Settings', sectionKey: 'ns__section' })
+    )
+  }),
+  { virtual: true }
+);
+
 const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
@@ -183,8 +194,8 @@ describe('c-first-run-setup', () => {
     expect(finished).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'BarnCRM_Settings' },
-      state: { c__section: 'General' }
+      attributes: { apiName: 'ns__BarnCRM_Settings' },
+      state: { ns__section: 'General' }
     });
     expect(byId(element, 'first-run')).toBeNull();
   });

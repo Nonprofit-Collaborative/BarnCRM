@@ -1,6 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import HEADING from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
 import NEVER from '@salesforce/label/c.Core_Rollups_FreshnessNever';
 import STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
@@ -8,7 +9,6 @@ import LINK from '@salesforce/label/c.Core_Rollups_FreshnessLink';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
 
-const SETTINGS_TAB = 'BarnCRM_Settings';
 const ROLLUPS_SECTION = 'Rollups';
 
 /**
@@ -43,11 +43,17 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
     }
   }
 
-  handleOpenRollups() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: SETTINGS_TAB },
-      state: { c__section: ROLLUPS_SECTION }
-    });
+  // The tab and the section key are qualified for the org's namespace in Apex.
+  async handleOpenRollups() {
+    try {
+      const link = await getSettingsLink();
+      this[NavigationMixin.Navigate]({
+        type: 'standard__navItemPage',
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: ROLLUPS_SECTION }
+      });
+    } catch {
+      this.errorMessage = LOAD_ERROR;
+    }
   }
 }
