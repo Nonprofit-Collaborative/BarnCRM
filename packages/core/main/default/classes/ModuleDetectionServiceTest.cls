@@ -356,6 +356,26 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
+    static void anAppThatIsNotInTheOrgYetFallsBackToTheNameFormWithoutError() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'BarnCRM_Volunteers';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            NamespaceUtil.cachedPrefix = '';
+
+            ModuleDetectionService.ModuleInfo info = ModuleDetectionService.givingModule();
+
+            Assert.areEqual(
+                '/lightning/app/c__BarnCRM_Volunteers',
+                info.appUrl,
+                'Volunteers ships no app yet, so its link uses the name form'
+            );
+        }
+    }
+
+    @IsTest
     static void aModuleBothEditionsOfferNeedsOnlyACatalogRow() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
