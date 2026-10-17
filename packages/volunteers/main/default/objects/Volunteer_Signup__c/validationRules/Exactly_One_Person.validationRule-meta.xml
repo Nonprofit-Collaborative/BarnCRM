@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Exactly_One_Person</fullName>
+  <active>true</active>
+  <description>
+    R-VU1: a sign-up names a contact or an account, never both and never neither
+    (canonical model Section 4).
+  </description>
+  <errorConditionFormula>
+OR(
+  AND(ISBLANK(Contact__c), ISBLANK(Account__c)),
+  AND(NOT(ISBLANK(Contact__c)), NOT(ISBLANK(Account__c)))
+)
+  </errorConditionFormula>
+  <errorMessage>
+    Enter a contact or an account, not both. A sign-up is one person.
+  </errorMessage>
+</ValidationRule>

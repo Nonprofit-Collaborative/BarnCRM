@@ -7112,7 +7112,7 @@ references").
 | Emergency Contact Name | text | no | Who to call if something happens to this person on site. |
 | Emergency Contact Phone | text | no | The number to call for that person. |
 | Availability Days | multi-select picklist(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | no | The days this person is usually free to volunteer (V-04). |
-| Availability Times | multi-select picklist(Morning, Afternoon, Evening) | no | The parts of the day this person is usually free (V-04). |
+| Availability Times | multi-select picklist(Morning, Afternoon, Evening) | no | The parts of the day this person is usually free (V-04): Morning is before 12:00, Afternoon is 12:00 to 17:00, Evening is from 17:00. |
 
 The rollup targets that carry a person's hours are on the same two objects and are listed in
 Section 29O.
@@ -7264,7 +7264,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Volunteers Needed | `Volunteers_Needed__c` | Number(4, 0), default 1 |
 | Location | `Location__c` | Text(255) |
 | Status | `Status__c` | Picklist: Open, Cancelled, Completed |
-| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c` (clears on delete) |
+| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07), not in the first build of this section |
 | Slots Filled | `Slots_Filled__c` | Number(4, 0) |
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
@@ -7443,7 +7443,7 @@ the module's own Volunteer Settings page, never in Setup. Defaults are applied i
 |---|---|---|---|
 | `Hours_Require_Approval__c` | boolean | true | Whether hours are entered as Submitted and wait for a coordinator. Off means an entry is Approved as it is saved and counts at once (R-VG6). |
 | `Attendance_Creates_Hours__c` | boolean | true | Whether marking a sign-up Attended writes the hours for that shift (R-VU3). |
-| `Shift_Horizon_Weeks__c` | integer, 1 to 52 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
+| `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
 
 ### Salesforce implementation
 

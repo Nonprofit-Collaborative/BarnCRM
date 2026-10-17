@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>End_After_Start</fullName>
+  <active>true</active>
+  <description>
+    R-VS3: a shift ends after it starts. A validation rule rather than Apex, so it holds
+    when the automation is switched off.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Start_Time__c)),
+  NOT(ISBLANK(End_Time__c)),
+  End_Time__c &lt;= Start_Time__c
+)
+  </errorConditionFormula>
+  <errorMessage>
+    This shift ends before it starts. Check the start and end times.
+  </errorMessage>
+</ValidationRule>
