@@ -1976,9 +1976,16 @@ private class HouseholdServiceTest {
             Id left = FakeIds.of(Account.SObjectType, 1);
             Id joined = FakeIds.of(Account.SObjectType, 2);
             Id other = FakeIds.of(Account.SObjectType, 3);
+            Id acme = FakeIds.of(Account.SObjectType, 4);
             Id maria = FakeIds.of(Contact.SObjectType, 1);
             Id wei = FakeIds.of(Contact.SObjectType, 2);
-            Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>{ maria => left, wei => left };
+            Id ana = FakeIds.of(Contact.SObjectType, 3);
+            Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>{
+                maria => left,
+                wei => left,
+                ana => acme
+            };
+            Set<Id> households = new Set<Id>{ left, joined, other };
             List<HouseholdSelector.NativeMembership> rows = new List<HouseholdSelector.NativeMembership>{
                 // Left behind by the move, nothing recorded on it: removed.
                 new HouseholdSelector.NativeMembership(relationId(1), left, maria, false),
@@ -1987,13 +1994,15 @@ private class HouseholdServiceTest {
                 // The person's new direct relation: stays.
                 new HouseholdSelector.NativeMembership(relationId(3), joined, maria, true),
                 // A relation to some other account: none of this move's business.
-                new HouseholdSelector.NativeMembership(relationId(4), other, maria, false)
+                new HouseholdSelector.NativeMembership(relationId(4), other, maria, false),
+                // Ana left an organization, not a household: her employer link stays.
+                new HouseholdSelector.NativeMembership(relationId(5), acme, ana, false)
             };
 
             Assert.areEqual(
                 new Set<Id>{ relationId(1) },
-                HouseholdService.relationsLeftBehind(leftHouseholdByContact, rows),
-                'Only the unannotated relation this move left behind goes'
+                HouseholdService.relationsLeftBehind(leftHouseholdByContact, households, rows),
+                'Only the unannotated relation this move left on a household goes'
             );
         }
     }
@@ -2106,27 +2115,6 @@ private class HouseholdServiceTest {
                 AccessLevel.SYSTEM_MODE
             )
             .size();
-    }
-
-    @IsTest
-    static void onlyARelationToAHouseholdIsLeftBehindForRemoval() {
-        System.runAs(TestUsers.admin()) {
-            Id accountId = FakeIds.of(Account.SObjectType, 1);
-            Contact toHousehold = new Contact(AccountId = accountId);
-            toHousehold.Account = new Account(
-                Id = accountId,
-                RecordTypeId = HouseholdService.householdRecordTypeId()
-            );
-            Contact toOrganization = new Contact(AccountId = accountId);
-            toOrganization.Account = new Account(Id = accountId);
-
-            Assert.isTrue(HouseholdService.leftAHousehold(toHousehold), 'A household');
-            Assert.isFalse(
-                HouseholdService.leftAHousehold(toOrganization),
-                'An organization keeps the link a move leaves behind'
-            );
-            Assert.isFalse(HouseholdService.leftAHousehold(new Contact()), 'No account at all');
-        }
     }
 
     private static Id relationId(Integer n) {

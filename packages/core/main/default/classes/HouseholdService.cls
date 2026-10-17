@@ -1935,9 +1935,7 @@ public with sharing class HouseholdService {
             }
             if (person.AccountId != null) {
                 affected.add(person.AccountId);
-                if (leftAHousehold(person)) {
-                    leftHouseholdByContact.put(person.Id, person.AccountId);
-                }
+                leftHouseholdByContact.put(person.Id, person.AccountId);
             }
             updates.add(new Contact(Id = person.Id, AccountId = targetHouseholdId));
         }
@@ -1948,51 +1946,52 @@ public with sharing class HouseholdService {
     }
 
     /**
-     * Whether the account a contact is leaving is a household. Only then is the relation the
-     * move leaves behind removed: a contact moved off an organization keeps that link (an
-     * employer, a board), which is not BarnCRM's to delete (ADR-NEXT). Reads
-     * Account.RecordTypeId from HouseholdSelector.getContactsByIds.
-     */
-    @TestVisible
-    private static Boolean leftAHousehold(Contact person) {
-        return person.AccountId != null &&
-            person.Account != null &&
-            person.Account.RecordTypeId != null &&
-            person.Account.RecordTypeId == householdRecordTypeId();
-    }
-
-    /**
      * With Contacts to Multiple Accounts on, changing a contact's account can leave the old
      * direct relation behind as an indirect one, which keeps the emptied household from being
      * tidied and blocks a later merge (ADR-NEXT). A content test, not an org-shape test: only
      * the relation between each moved contact and the household this move took them out of
      * is removed, only once it is indirect (this move turned it so, since that household was
      * the contact's own account until now), and only when nobody recorded roles or dates on
-     * it. Anything else stays. Runs as the person moving; a row the platform will not remove
-     * stays too, and the delete guard then keeps the household, as before.
+     * it. Only a household's relation goes: a contact moved off an organization keeps that
+     * link (an employer, a board), which is not BarnCRM's to delete. Anything else stays. Runs
+     * as the person moving; a row the platform will not remove stays too, and the delete guard
+     * then keeps the household, as before. Without Contacts to Multiple Accounts there are no
+     * rows and no further query.
      */
     private static void removeRelationsLeftBehind(Map<Id, Id> leftHouseholdByContact) {
         if (leftHouseholdByContact.isEmpty()) {
             return;
         }
+        Set<Id> leftAccounts = new Set<Id>(leftHouseholdByContact.values());
+        List<HouseholdSelector.NativeMembership> rows = HouseholdSelector.nativeMembershipRows(
+            leftAccounts,
+            leftHouseholdByContact.keySet()
+        );
+        if (rows.isEmpty()) {
+            return;
+        }
+        Set<Id> households = new Set<Id>();
+        for (Account left : HouseholdSelector.getHouseholdsByIds(leftAccounts)) {
+            if (left.RecordTypeId == householdRecordTypeId()) {
+                households.add(left.Id);
+            }
+        }
         List<Id> leftBehind = new List<Id>(
-            relationsLeftBehind(
-                leftHouseholdByContact,
-                HouseholdSelector.nativeMembershipRows(
-                    new Set<Id>(leftHouseholdByContact.values()),
-                    leftHouseholdByContact.keySet()
-                )
-            )
+            relationsLeftBehind(leftHouseholdByContact, households, rows)
         );
         if (!leftBehind.isEmpty()) {
             Database.delete(leftBehind, false, AccessLevel.USER_MODE);
         }
     }
 
-    /** Of these rows, the indirect, unannotated ones between a moved contact and the household left. */
+    /**
+     * Of these rows, the indirect, unannotated ones between a moved contact and the household
+     * (never an organization) the move took them out of.
+     */
     @TestVisible
     private static Set<Id> relationsLeftBehind(
         Map<Id, Id> leftHouseholdByContact,
+        Set<Id> households,
         List<HouseholdSelector.NativeMembership> rows
     ) {
         Set<Id> leftBehind = new Set<Id>();
@@ -2000,7 +1999,7 @@ public with sharing class HouseholdService {
             if (
                 !row.isDirect &&
                 !row.hasDetails &&
-                row.accountId != null &&
+                households.contains(row.accountId) &&
                 row.accountId == leftHouseholdByContact.get(row.contactId)
             ) {
                 leftBehind.add(row.id);
@@ -2293,9 +2292,7 @@ public with sharing class HouseholdService {
                 }
                 if (person.AccountId != null) {
                     affected.add(person.AccountId);
-                    if (leftAHousehold(person)) {
-                        leftHouseholdByContact.put(personId, person.AccountId);
-                    }
+                    leftHouseholdByContact.put(personId, person.AccountId);
                 }
                 updates.add(new Contact(Id = personId, AccountId = householdId));
             }
