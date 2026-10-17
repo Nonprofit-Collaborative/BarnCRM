@@ -173,8 +173,8 @@ private class HouseholdMergeServiceTest {
     @IsTest
     static void withRealContactRelationsTheMergeGoesThrough() {
         System.runAs(TestUsers.admin()) {
-            if (!Schema.getGlobalDescribe().containsKey(CONTACT_RELATION)) {
-                return; // Contacts to Multiple Accounts is off in this org.
+            if (!contactRelationsOn('withRealContactRelationsTheMergeGoesThrough')) {
+                return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -207,10 +207,10 @@ private class HouseholdMergeServiceTest {
     @IsTest
     static void withARealRelationSomebodyMadeTheMergeIsRefused() {
         System.runAs(TestUsers.admin()) {
-            Schema.SObjectType relationType = Schema.getGlobalDescribe().get(CONTACT_RELATION);
-            if (relationType == null) {
-                return; // Contacts to Multiple Accounts is off in this org.
+            if (!contactRelationsOn('withARealRelationSomebodyMadeTheMergeIsRefused')) {
+                return;
             }
+            Schema.SObjectType relationType = Schema.getGlobalDescribe().get(CONTACT_RELATION);
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
@@ -247,6 +247,16 @@ private class HouseholdMergeServiceTest {
                 'The relation somebody made is still there'
             );
         }
+    }
+
+    /** Whether this org relates contacts to several accounts, with a debug line either way. */
+    private static Boolean contactRelationsOn(String testName) {
+        Boolean isOn = Schema.getGlobalDescribe().containsKey(CONTACT_RELATION);
+        System.debug(
+            LoggingLevel.INFO,
+            testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off')
+        );
+        return isOn;
     }
 
     private static Id relation(Integer n) {

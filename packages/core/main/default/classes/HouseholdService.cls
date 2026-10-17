@@ -1935,7 +1935,9 @@ public with sharing class HouseholdService {
             }
             if (person.AccountId != null) {
                 affected.add(person.AccountId);
-                leftHouseholdByContact.put(person.Id, person.AccountId);
+                if (leftAHousehold(person)) {
+                    leftHouseholdByContact.put(person.Id, person.AccountId);
+                }
             }
             updates.add(new Contact(Id = person.Id, AccountId = targetHouseholdId));
         }
@@ -1943,6 +1945,20 @@ public with sharing class HouseholdService {
             Database.update(updates, AccessLevel.USER_MODE);
             removeRelationsLeftBehind(leftHouseholdByContact);
         }
+    }
+
+    /**
+     * Whether the account a contact is leaving is a household. Only then is the relation the
+     * move leaves behind removed: a contact moved off an organization keeps that link (an
+     * employer, a board), which is not BarnCRM's to delete (ADR-NEXT). Reads
+     * Account.RecordTypeId from HouseholdSelector.getContactsByIds.
+     */
+    @TestVisible
+    private static Boolean leftAHousehold(Contact person) {
+        return person.AccountId != null &&
+            person.Account != null &&
+            person.Account.RecordTypeId != null &&
+            person.Account.RecordTypeId == householdRecordTypeId();
     }
 
     /**
@@ -2277,7 +2293,9 @@ public with sharing class HouseholdService {
                 }
                 if (person.AccountId != null) {
                     affected.add(person.AccountId);
-                    leftHouseholdByContact.put(personId, person.AccountId);
+                    if (leftAHousehold(person)) {
+                        leftHouseholdByContact.put(personId, person.AccountId);
+                    }
                 }
                 updates.add(new Contact(Id = personId, AccountId = householdId));
             }

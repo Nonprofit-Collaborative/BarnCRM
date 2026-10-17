@@ -137,6 +137,39 @@ private class OrgShapeDetectorTest {
         }
     }
 
+    /**
+     * The present-object path, run on any org: a stand-in type makes the object look described,
+     * and where the object is really absent the query fails and the answer is unknown.
+     */
+    @IsTest
+    static void aDescribedObjectIsProbedAndAFailedQueryIsUnknown() {
+        System.runAs(TestUsers.admin()) {
+            Boolean reallyThere = Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
+            Assert.areEqual(
+                reallyThere,
+                OrgShapeSelector.nativeHouseholdGroupObjectDescribed(),
+                'Described exactly when the describe has it'
+            );
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Assert.isTrue(
+                OrgShapeSelector.nativeHouseholdGroupObjectDescribed(),
+                'An injected count stands for a probe that ran'
+            );
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = null;
+
+            OrgShapeSelector.nativeHouseholdGroupTypeOverride = Account.SObjectType;
+            Integer counted = OrgShapeSelector.nativeHouseholdGroupCount();
+            Boolean anyFound = OrgShapeSelector.anyNativeHouseholdGroup();
+
+            // Where the object exists, the answer depends on this user's access to it, so only
+            // the absent case has one answer to assert.
+            if (!reallyThere) {
+                Assert.isNull(counted, 'A query on an object the org lacks cannot answer');
+                Assert.isNull(anyFound, 'Nor can the one-row probe');
+            }
+        }
+    }
+
     @IsTest
     static void aFailedProbeIsUnknownRatherThanNone() {
         System.runAs(TestUsers.admin()) {

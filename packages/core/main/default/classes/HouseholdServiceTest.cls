@@ -6,6 +6,7 @@
 private class HouseholdServiceTest {
     private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so the absent-object path runs for real where the object is absent
     private static final String CONTACT_RELATION = 'AccountContactRelation'; // detection-only: describe key, so the real move-time tidy runs only where Contacts to Multiple Accounts is on
+    private static final String RELATION_QUERY = 'SELECT Id FROM AccountContactRelation WHERE AccountId = :accountId AND ContactId = :contactId'; // detection-only: the relation between one account and one contact, read only where the object exists
 
     @TestSetup
     static void createTestUser() {
@@ -2004,8 +2005,8 @@ private class HouseholdServiceTest {
     @IsTest
     static void withRealContactRelationsAnEmptiedHouseholdIsTidied() {
         System.runAs(TestUsers.admin()) {
-            if (!Schema.getGlobalDescribe().containsKey(CONTACT_RELATION)) {
-                return; // Contacts to Multiple Accounts is off in this org.
+            if (!contactRelationsOn('withRealContactRelationsAnEmptiedHouseholdIsTidied')) {
+                return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -2023,6 +2024,108 @@ private class HouseholdServiceTest {
                 [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
                 'The relation the move left behind no longer keeps the household'
             );
+        }
+    }
+
+    /** Runs only where Contacts to Multiple Accounts is on: an employer link is kept. */
+    @IsTest
+    static void withRealContactRelationsAMoveOffAnOrganizationKeepsThatLink() {
+        System.runAs(TestUsers.admin()) {
+            if (
+                !contactRelationsOn('withRealContactRelationsAMoveOffAnOrganizationKeepsThatLink')
+            ) {
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account acme = new Account(Name = 'Acme Corp');
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert new List<Account>{ acme, household };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Ruiz');
+            ana.AccountId = acme.Id;
+            insert ana;
+
+            Test.startTest();
+            HouseholdService.moveContact(ana.Id, household.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                relationCount(acme.Id, ana.Id),
+                'A person moved off an organization keeps their link to it'
+            );
+        }
+    }
+
+    /** Runs only where Contacts to Multiple Accounts is on: an annotated relation stays. */
+    @IsTest
+    static void withRealContactRelationsAnAnnotatedRelationSurvivesAMove() {
+        System.runAs(TestUsers.admin()) {
+            if (!contactRelationsOn('withRealContactRelationsAnAnnotatedRelationSurvivesAMove')) {
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+            List<SObject> relation = Database.queryWithBinds(
+                RELATION_QUERY,
+                new Map<String, Object>{ 'accountId' => fromHousehold, 'contactId' => maria.Id },
+                AccessLevel.SYSTEM_MODE
+            );
+            relation[0].put('StartDate', Date.today().addYears(-3));
+            update relation;
+
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                relationCount(fromHousehold, maria.Id),
+                'A relation somebody put a date on is not BarnCRM\'s to remove'
+            );
+        }
+    }
+
+    /** Whether this org relates contacts to several accounts, with a debug line either way. */
+    private static Boolean contactRelationsOn(String testName) {
+        Boolean isOn = Schema.getGlobalDescribe().containsKey(CONTACT_RELATION);
+        System.debug(
+            LoggingLevel.INFO,
+            testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off')
+        );
+        return isOn;
+    }
+
+    private static Integer relationCount(Id accountId, Id contactId) {
+        return Database.queryWithBinds(
+                RELATION_QUERY,
+                new Map<String, Object>{ 'accountId' => accountId, 'contactId' => contactId },
+                AccessLevel.SYSTEM_MODE
+            )
+            .size();
+    }
+
+    @IsTest
+    static void onlyARelationToAHouseholdIsLeftBehindForRemoval() {
+        System.runAs(TestUsers.admin()) {
+            Id accountId = FakeIds.of(Account.SObjectType, 1);
+            Contact toHousehold = new Contact(AccountId = accountId);
+            toHousehold.Account = new Account(
+                Id = accountId,
+                RecordTypeId = HouseholdService.householdRecordTypeId()
+            );
+            Contact toOrganization = new Contact(AccountId = accountId);
+            toOrganization.Account = new Account(Id = accountId);
+
+            Assert.isTrue(HouseholdService.leftAHousehold(toHousehold), 'A household');
+            Assert.isFalse(
+                HouseholdService.leftAHousehold(toOrganization),
+                'An organization keeps the link a move leaves behind'
+            );
+            Assert.isFalse(HouseholdService.leftAHousehold(new Contact()), 'No account at all');
         }
     }
 

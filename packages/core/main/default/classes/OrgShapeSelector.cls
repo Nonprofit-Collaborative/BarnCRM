@@ -46,6 +46,14 @@ public with sharing class OrgShapeSelector {
     private static Boolean failNativeHouseholdGroupProbe = false;
 
     /**
+     * Set only by tests: stands in for the native household group in the describe, so the
+     * present-object path runs on an org without the object. The query still names the real
+     * object, so there it fails and the answer is unknown. Production code never sets it.
+     */
+    @TestVisible
+    private static Schema.SObjectType nativeHouseholdGroupTypeOverride;
+
+    /**
      * The Account record types that describe themselves as person types.
      *
      * Empty, without querying, when the org has no Person Accounts. RecordType.IsPersonType
@@ -129,7 +137,9 @@ public with sharing class OrgShapeSelector {
             if (nativeHouseholdGroupCountOverride != null) {
                 return nativeHouseholdGroupCountOverride;
             }
-            Schema.SObjectType groupType = Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
+            Schema.SObjectType groupType = nativeHouseholdGroupTypeOverride != null
+                ? nativeHouseholdGroupTypeOverride
+                : Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
             if (groupType == null) {
                 // Not in this org: a known none, not an unknown (ADR-NEXT).
                 return 0;
