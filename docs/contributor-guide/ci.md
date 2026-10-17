@@ -201,7 +201,7 @@ Salesforce org is needed for this job. Steps:
    relied on the old system-mode default fails for a user without access, and only an org
    run as that user shows it.
    `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
-   in Core, Giving or Mirror (the vendored engine excepted) never calls `System.runAs` and
+   in Core, Giving, Volunteers or Mirror (the vendored engine excepted) never calls `System.runAs` and
    carries no `// runs-as: deploying user (reason)` comment (a `@TestSetup` that only calls
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
@@ -631,7 +631,8 @@ about one shape and no other.
 The deploy goes in stages through `scripts/org/deploy-packages.sh`: Core (one stage per object under `packages/core/main/default/objects`, then
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
 flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
-applications, tabs, quick actions, Lightning components), then Giving. A failed stage asks the
+applications, tabs, quick actions, Lightning components), then Giving, then Volunteers (a no-op while `packages/volunteers` holds
+no metadata, and left out by `--core-only`), then Mirror. A failed stage asks the
 org for the component level report, by job id, in human form and then as JSON. After the last
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no

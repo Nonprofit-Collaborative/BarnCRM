@@ -14,9 +14,13 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                14,
+                15,
                 sections.size(),
-                'Fourteen section names are agreed across the suite'
+                'Fifteen section names are agreed across the suite'
+            );
+            Assert.isTrue(
+                SettingSections.isKnown(SettingSections.VOLUNTEERS),
+                'Volunteers is a section its module ships rows into, so Core has to know the name'
             );
             Assert.areEqual(
                 SettingSections.MODULES,

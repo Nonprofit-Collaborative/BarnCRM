@@ -356,6 +356,26 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
+    static void anAppThatIsNotInTheOrgYetFallsBackToTheNameFormWithoutError() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'BarnCRM_Volunteers';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            NamespaceUtil.cachedPrefix = '';
+
+            ModuleDetectionService.ModuleInfo info = ModuleDetectionService.givingModule();
+
+            Assert.areEqual(
+                '/lightning/app/c__BarnCRM_Volunteers',
+                info.appUrl,
+                'Volunteers ships no app yet, so its link uses the name form'
+            );
+        }
+    }
+
+    @IsTest
     static void aModuleBothEditionsOfferNeedsOnlyACatalogRow() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
@@ -423,6 +443,10 @@ private class ModuleDetectionServiceTest {
             Assert.areEqual('BarnCRM_Rollup_Builder', rollups.App_Name__c, 'Its own app');
             Assert.areEqual(5, rollups.Sort_Order__c.intValue(), 'Listed before Giving');
             Assert.areEqual('Rollups', shipped.get('Giving').Requires__c, 'Giving needs it');
+            BarnCRM_Module__mdt volunteers = shipped.get('Volunteers');
+            Assert.areEqual('Rollups', volunteers.Requires__c, 'Volunteers needs it too');
+            Assert.areEqual('BarnCRM_Volunteers', volunteers.App_Name__c, 'Its own app');
+            Assert.areEqual('Volunteer_Hours__c', volunteers.Probe_Object__c, 'Its probe object');
         }
     }
 

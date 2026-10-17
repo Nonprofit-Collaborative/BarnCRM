@@ -35,6 +35,8 @@ public with sharing class SettingSections {
     @NamespaceAccessible
     public static final String ROLLUPS = 'Rollups';
     @NamespaceAccessible
+    public static final String VOLUNTEERS = 'Volunteers';
+    @NamespaceAccessible
     public static final String ADDRESSES = 'Addresses';
     @NamespaceAccessible
     public static final String RELATIONSHIPS = 'Relationships';
@@ -52,6 +54,7 @@ public with sharing class SettingSections {
             GIVING,
             RECEIPTS,
             ROLLUPS,
+            VOLUNTEERS,
             AUTOMATION,
             ERROR_LOG,
             ACCESS,

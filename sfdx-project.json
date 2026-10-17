@@ -32,7 +32,7 @@
       "package": "BarnCRM Volunteers",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Rollup Builder" }]
     },
     {
       "path": "packages/programs",

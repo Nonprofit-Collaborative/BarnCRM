@@ -307,6 +307,17 @@ private class ModuleManagerServiceTest {
     }
 
     @IsTest
+    static void namesTheShippedAdminSetOfEachModuleThatHasOne() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'Volunteers_Admin',
+                ModuleManagerService.adminPermissionSets.get('Volunteers'),
+                'Turning Volunteers on gives its admin set'
+            );
+        }
+    }
+
+    @IsTest
     static void givesNothingForAModuleWithNoAdminSet() {
         System.runAs(TestUsers.admin()) {
             volunteersInstalled();

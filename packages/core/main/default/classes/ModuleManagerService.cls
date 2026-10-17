@@ -77,7 +77,8 @@ public with sharing class ModuleManagerService {
     @TestVisible
     private static Map<String, String> adminPermissionSets = new Map<String, String>{
         'Giving' => 'Giving_Admin',
-        'Rollups' => 'Rollup_Builder_Admin'
+        'Rollups' => 'Rollup_Builder_Admin',
+        'Volunteers' => 'Volunteers_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */

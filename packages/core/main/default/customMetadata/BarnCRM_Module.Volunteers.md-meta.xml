@@ -18,4 +18,16 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">20</value>
   </values>
+  <values>
+    <field>App_Name__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Volunteers</value>
+  </values>
+  <values>
+    <field>Probe_Object__c</field>
+    <value xsi:type="xsd:string">Volunteer_Hours__c</value>
+  </values>
+  <values>
+    <field>Requires__c</field>
+    <value xsi:type="xsd:string">Rollups</value>
+  </values>
 </CustomMetadata>
