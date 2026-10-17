@@ -44,6 +44,18 @@ public virtual with sharing class TriggerHandler {
     @TestVisible
     private static Map<Id, SObject> testOldMap;
 
+    /**
+     * Sets `testNew` and `testOldMap` from a module's test, where `@TestVisible` does not reach
+     * once the packages are separate. Does nothing outside a test.
+     */
+    @NamespaceAccessible
+    public static void setTestRecords(List<SObject> newRecords, Map<Id, SObject> oldRecordsById) {
+        if (Test.isRunningTest()) {
+            testNew = newRecords;
+            testOldMap = oldRecordsById;
+        }
+    }
+
     @NamespaceAccessible
     public virtual void beforeInsert() {
         return;

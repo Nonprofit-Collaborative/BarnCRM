@@ -103,7 +103,7 @@ private class GiftTriggerHandlerTest {
     @IsTest
     static void personHeldAsAnAccountGetsItsHouseholdFromCore() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            if (!OrgShapeDetector.detect().hasPersonAccounts) {
+            if (!OrgShapeDetector.hasPersonAccounts()) {
                 return;
             }
             // A person type the running user is given: one they are not is refused on insert.

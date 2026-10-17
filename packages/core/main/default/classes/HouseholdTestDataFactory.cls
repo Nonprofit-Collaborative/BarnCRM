@@ -3,14 +3,18 @@
  * feature can add helpers without touching a file every other feature also edits.
  */
 @IsTest
+@NamespaceAccessible
 public class HouseholdTestDataFactory {
+    @NamespaceAccessible
     public static final String MODE_CONTACT = 'Contact';
+    @NamespaceAccessible
     public static final String MODE_JUNCTION = 'Junction';
 
     /**
      * Org level settings with the shipped defaults, so that a test never depends on what
      * another test left behind.
      */
+    @NamespaceAccessible
     public static BarnCRM_Settings__c settings(String membershipMode) {
         BarnCRM_Settings__c record = BarnCRM_Settings__c.getOrgDefaults();
         record.Household_Membership_Mode__c = membershipMode;
@@ -32,6 +36,7 @@ public class HouseholdTestDataFactory {
      * their own first (R-H2, ADR-0037), so it is switched off rather than worked around.
      * The tests of automatic creation itself use the shipped settings.
      */
+    @NamespaceAccessible
     public static BarnCRM_Settings__c junctionSettingsWithoutAutomaticHouseholds() {
         BarnCRM_Settings__c record = settings(MODE_JUNCTION);
         record.Auto_Create_Households__c = false;
@@ -50,6 +55,7 @@ public class HouseholdTestDataFactory {
         return record;
     }
 
+    @NamespaceAccessible
     public static Contact newContact(String firstName, String lastName) {
         return new Contact(FirstName = firstName, LastName = lastName, Salutation = 'Ms.');
     }
@@ -58,6 +64,7 @@ public class HouseholdTestDataFactory {
         return new Contact(Salutation = salutation, FirstName = firstName, LastName = lastName);
     }
 
+    @NamespaceAccessible
     public static Account newHousehold(String name) {
         return new Account(
             Name = name,

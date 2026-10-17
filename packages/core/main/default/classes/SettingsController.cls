@@ -22,11 +22,19 @@ public with sharing class SettingsController {
     @TestVisible
     private static Boolean emailAllowedOverride;
 
+    // A module test saves across modules (ConsoleSaveAcrossModulesTest), so the two models it
+    // reads are reachable from another package; an @AuraEnabled field is read by its getter.
+    @NamespaceAccessible
     public class ConsoleModel {
         @AuraEnabled
         public Boolean canEdit;
         @AuraEnabled
         public List<SectionModel> sections;
+
+        @NamespaceAccessible
+        public Boolean getCanEdit() {
+            return canEdit;
+        }
     }
 
     public class SectionModel {
@@ -90,6 +98,7 @@ public with sharing class SettingsController {
         public String section;
     }
 
+    @NamespaceAccessible
     public class ChangeModel {
         @AuraEnabled
         public Id id;
@@ -103,6 +112,11 @@ public with sharing class SettingsController {
         public String changedBy;
         @AuraEnabled
         public Datetime changedAt;
+
+        @NamespaceAccessible
+        public String getSettingName() {
+            return settingName;
+        }
     }
 
     // Not cacheable: the console calls it again after a save, and a cached answer would show
@@ -115,6 +129,20 @@ public with sharing class SettingsController {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw asAuraException(System.Label.Core_Settings_LoadErrorMessage);
         }
+    }
+
+    /**
+     * `saveSettings` and `getRecentChanges` for another package (ConsoleSaveAcrossModulesTest):
+     * the platform rejects `@NamespaceAccessible` on an `@AuraEnabled` method.
+     */
+    @NamespaceAccessible
+    public static ConsoleModel save(Map<String, Object> values) {
+        return saveSettings(values);
+    }
+
+    @NamespaceAccessible
+    public static List<ChangeModel> recentChanges(Integer limitCount) {
+        return getRecentChanges(limitCount);
     }
 
     @AuraEnabled

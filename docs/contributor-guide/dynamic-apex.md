@@ -114,22 +114,33 @@ Rules:
   `GivingSampleData`.
 - Every Core member a dependent package calls is `@NamespaceAccessible`: the class, the
   method, the inner class and its constructor. Annotate what is reached, not ahead of need
-  (`HealthCheckService` header lists exactly which members).
+  (`HealthCheckService` header lists exactly which members). This holds for a module's tests
+  too: a shared `@IsTest` factory (`TestDataFactory`, `GivingTestDataFactory`) is
+  `@IsTest @NamespaceAccessible public`, with each method a module test calls annotated.
+- `@TestVisible` does not cross a package boundary. A module test sets Core's test state
+  through an `@NamespaceAccessible` seam that does nothing outside a test
+  (`if (Test.isRunningTest())`): `TriggerHandler.setTestRecords`,
+  `NightlyJobs.overrideJobsForTest`, and `JobNotifier.sentNotices()` to read what was sent.
+- `check-cross-package-visibility.py` enforces both, over production and test classes.
 
-### `@AuraEnabled` fields cannot also be `@NamespaceAccessible`
+### `@AuraEnabled` members cannot also be `@NamespaceAccessible`
 
-The platform rejects both on one field (compile error). So `HealthCheckService.Finding`'s
-fields are `@AuraEnabled` only. A test in another package reads them the way Lightning does,
-through JSON (`GivingHealthCheckExtensionTest`):
+The platform rejects both on one field or method (compile error; an `@AuraEnabled` method
+another package calls gets a plain annotated wrapper, `SettingsController.save`), and whether
+another package can read an `@AuraEnabled` field of an annotated inner class is unproven
+until a namespaced build. So another package reads such a field through an
+`@NamespaceAccessible` getter
+(`Finding.getKey()`, `ImportMapping.getColumns()`, `ModuleStatus.getName()`), and writes one
+only through an annotated constructor or method (`RollupsHealthCheckExtension` builds the
+detail before the `Finding`). A field that is not `@AuraEnabled` is annotated directly
+(`JobNotifier.Notice`). A test may instead read the way Lightning does, through JSON
+(`GivingHealthCheckExtensionTest`):
 
 ```apex
 private static Map<String, Object> asMap(HealthCheckService.Finding finding) {
     return (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(finding));
 }
 ```
-
-If a registered namespace later shows production code cannot read such a field, add an
-`@NamespaceAccessible` getter for that field.
 
 ## 4. The namespace is empty today
 

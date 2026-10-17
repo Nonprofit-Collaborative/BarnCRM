@@ -8,6 +8,7 @@
  * object writes the tests make.
  */
 @IsTest
+@NamespaceAccessible
 public class SettingsTestPermissions {
     private static final String CUSTOM_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final List<String> AUDIT_FIELDS = new List<String>{
@@ -62,6 +63,7 @@ public class SettingsTestPermissions {
     }
 
     /** Builds the permission set and assigns it to the given user. */
+    @NamespaceAccessible
     public static void grantTo(String name, Id userId) {
         insert new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = build(name).Id);
     }
@@ -70,6 +72,7 @@ public class SettingsTestPermissions {
      * A user on the Standard User profile, not yet inserted, so a test can prove a
      * non-administrator can save. Built by `TestUsers.newStandardUser`.
      */
+    @NamespaceAccessible
     public static User buildStandardUser(String firstName, String lastName, String alias) {
         User person = TestUsers.newStandardUser(lastName);
         person.FirstName = firstName;

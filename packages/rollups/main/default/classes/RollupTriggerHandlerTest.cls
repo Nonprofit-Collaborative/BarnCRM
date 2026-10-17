@@ -54,7 +54,7 @@ private class RollupTriggerHandlerTest {
             insert child;
 
             TriggerHandler.clearRunClaims();
-            TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.setTestRecords(new List<SObject>{ child }, null);
 
             Test.startTest();
             new RollupTriggerHandler().afterInsert();
@@ -78,7 +78,7 @@ private class RollupTriggerHandlerTest {
             insert child;
 
             TriggerHandler.clearRunClaims();
-            TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.setTestRecords(new List<SObject>{ child }, null);
             RollupTriggerHandler handler = new RollupTriggerHandler();
             handler.afterInsert();
             update new Account(Id = parent.Id, NumberOfEmployees = 99);
@@ -112,8 +112,10 @@ private class RollupTriggerHandlerTest {
             TriggerHandler.clearRunClaims();
             Account renamed = child.clone(true);
             renamed.Name = 'Child, renamed';
-            TriggerHandler.testNew = new List<SObject>{ renamed };
-            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => child };
+            TriggerHandler.setTestRecords(
+                new List<SObject>{ renamed },
+                new Map<Id, SObject>{ child.Id => child }
+            );
             RollupTriggerHandler handler = new RollupTriggerHandler();
 
             Test.startTest();
@@ -122,8 +124,7 @@ private class RollupTriggerHandlerTest {
                 countOn(parent.Id),
                 'The nested update changed nothing a rollup reads, so it marked nothing'
             );
-            TriggerHandler.testNew = new List<SObject>{ child };
-            TriggerHandler.testOldMap = null;
+            TriggerHandler.setTestRecords(new List<SObject>{ child }, null);
             handler.afterInsert();
             Test.stopTest();
 
@@ -155,12 +156,16 @@ private class RollupTriggerHandlerTest {
 
             Test.startTest();
             update underFirst;
-            TriggerHandler.testNew = new List<SObject>{ underFirst };
-            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => child };
+            TriggerHandler.setTestRecords(
+                new List<SObject>{ underFirst },
+                new Map<Id, SObject>{ child.Id => child }
+            );
             handler.afterUpdate();
             update underSecond;
-            TriggerHandler.testNew = new List<SObject>{ underSecond };
-            TriggerHandler.testOldMap = new Map<Id, SObject>{ child.Id => underFirst };
+            TriggerHandler.setTestRecords(
+                new List<SObject>{ underSecond },
+                new Map<Id, SObject>{ child.Id => underFirst }
+            );
             handler.afterUpdate();
             Test.stopTest();
 
@@ -195,7 +200,7 @@ private class RollupTriggerHandlerTest {
             insert broken;
 
             TriggerHandler.clearRunClaims();
-            TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.setTestRecords(new List<SObject>{ child }, null);
 
             Test.startTest();
             new RollupTriggerHandler().afterInsert();
@@ -226,7 +231,10 @@ private class RollupTriggerHandlerTest {
                 'So the entry can be grouped by what it is about'
             );
             System.Assert.areEqual(
-                ErrorLogger.friendlyMessage('RollupPlanner.plan'),
+                String.format(
+                    System.Label.Core_ErrorLog_UnexpectedFailureIn,
+                    new List<Object>{ 'RollupPlanner.plan' }
+                ),
                 logged[0].Message__c,
                 'What Maria reads is plain language'
             );

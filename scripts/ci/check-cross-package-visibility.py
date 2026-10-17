@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Fails when production Apex in one package reaches Apex another package cannot share.
+"""Fails when Apex in one package reaches Apex another package cannot share.
 
 Every package shares one namespace (ADR-0017), and a `public` member of one 2GP package is
 invisible to another unless it is also `@NamespaceAccessible` (or `global`, which BarnCRM never
 uses). Unmanaged deploys see everything, so neither org tests nor deploys catch a missing
-annotation: it surfaces only when a module's package version is first built. This check reads
-each package's PRODUCTION classes (test classes are skipped for now) and, for every reference
-into a package it depends on (sfdx-project.json `dependencies`), requires that:
+annotation: it surfaces only when a module's package version is first built, which compiles
+the module's test classes too. This check reads each package's classes, test classes included,
+and, for every reference into a package it depends on (sfdx-project.json `dependencies`,
+shared `@IsTest` factories included), requires that:
 
 - the class named (`Core.member`, `new Core()`, a type in a declaration) is visible;
 - a static member, inner type or member of that inner type reached as `Class.member` or
@@ -16,6 +17,9 @@ into a package it depends on (sfdx-project.json `dependencies`), requires that:
 - a field or method read through a local variable, parameter or field declared with that type
   (`OrgShapeDetector.OrgShape shape; shape.hasNpsp`), or through a static call's result
   (`OrgShapeDetector.detect().hasNpsp`), is visible.
+
+A `@TestVisible private` member counts as not visible: `@TestVisible` does not cross a package
+boundary, so a module test needs a `@NamespaceAccessible` seam (`TriggerHandler.setTestRecords`).
 
 It is token based, not a compiler: longer call chains, inherited members called without a
 qualifier, and overloads (any visible overload passes) are not resolved, and a member it cannot
@@ -38,12 +42,18 @@ def _line(text, pos):
     return text.count("\n", 0, pos) + 1
 
 
-def _member_targets(index, owner, name):
-    """[(target, visible)] for a name looked up in a type: members and inner types."""
+def _member_targets(index, owner, name, called=True):
+    """[(target, visible)] for a name looked up in a type: members and inner types.
+
+    Apex names ignore case, so `JobNotifier.Notice` (a type) and `notice(...)` (a method) share
+    a key; a name not followed by `(` is the type when there is one.
+    """
     out = []
     for entry in owner.members.get(name.lower(), []):
         if isinstance(entry, av.Type):
             out.append((entry.qualified, entry.visible(), entry))
+    if out and not called:
+        return out
     members = [m for m in owner.members.get(name.lower(), []) if isinstance(m, av.Member)]
     if members:
         ok = any(av.member_visible(owner, m) for m in members)
@@ -76,7 +86,7 @@ def references(index, name):
     deps = index.deps.get(me.package, set())
     found = []
     for cname, target in index.types.items():
-        if target.package not in deps or target.is_test:
+        if target.package not in deps:
             continue
         if any(isinstance(t, av.Type) for t in me.members.get(cname.lower(), [])):
             continue  # the class's own inner type of that name shadows the other package's
@@ -88,7 +98,8 @@ def references(index, name):
         found.append((_line(text, first.start()), target.qualified, target.visible()))
         # Class.member and Class.Inner.member
         for m in re.finditer(pattern + r"\s*\.\s*(\w+)(?:\s*\.\s*(\w+))?", text):
-            for qualified, ok, inner in _member_targets(index, target, m.group(1)):
+            called = text[m.end(1) :].lstrip().startswith("(")
+            for qualified, ok, inner in _member_targets(index, target, m.group(1), called):
                 found.append((_line(text, m.start()), qualified, ok))
                 if inner is not None and m.group(2):
                     for q2, ok2, _ in _member_targets(index, inner, m.group(2)):
@@ -122,7 +133,7 @@ def violations(index):
     """{(referencing class, target): (path, line)} for every reference that is not visible."""
     out = {}
     for name, me in sorted(index.types.items()):
-        if me.is_test or not index.deps.get(me.package):
+        if not index.deps.get(me.package):
             continue
         for line, target, ok in references(index, name):
             if not ok and (name, target) not in out:
@@ -153,8 +164,8 @@ def main():
             "or add a reasoned allowlist entry for a false positive."
         )
         return 1
-    scanned = sum(1 for t in index.types.values() if not t.is_test and index.deps.get(t.package))
-    print(f"Every cross-package reference in {scanned} production module classes is @NamespaceAccessible.")
+    scanned = sum(1 for t in index.types.values() if index.deps.get(t.package))
+    print(f"Every cross-package reference in {scanned} module classes is @NamespaceAccessible.")
     return 0
 
 

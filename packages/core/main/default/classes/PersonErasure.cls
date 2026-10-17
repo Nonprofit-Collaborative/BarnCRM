@@ -121,6 +121,17 @@ public with sharing class PersonErasure {
             this.count = count == null ? 0 : count;
             this.note = note;
         }
+
+        // Getters for other packages: an @AuraEnabled field cannot also be @NamespaceAccessible.
+        @NamespaceAccessible
+        public String getAction() {
+            return action;
+        }
+
+        @NamespaceAccessible
+        public String getObjectLabel() {
+            return objectLabel;
+        }
     }
 
     /** What an erasure or a preview did. */
@@ -134,6 +145,11 @@ public with sharing class PersonErasure {
         public String personName;
         @AuraEnabled
         public List<Change> changes = new List<Change>();
+
+        @NamespaceAccessible
+        public List<Change> getChanges() {
+            return changes;
+        }
     }
 
     /** A refusal the person erasing can act on. Its message is always a custom label. */

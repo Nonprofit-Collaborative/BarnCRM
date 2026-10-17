@@ -7,7 +7,7 @@
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportUndoPersonAccountsTest {
     private static Boolean personAccountsOrg() {
-        return OrgShapeDetector.detect().hasPersonAccounts == true &&
+        return OrgShapeDetector.hasPersonAccounts() == true &&
             OrgShapeDetector.creatablePersonRecordTypeId() != null;
     }
 
@@ -29,7 +29,7 @@ private class GiftImportUndoPersonAccountsTest {
                 return;
             }
             Id batchId = GiftImportUndoTest.batch().Id;
-            Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
+            Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
             Assert.areEqual(
                 3,
                 [

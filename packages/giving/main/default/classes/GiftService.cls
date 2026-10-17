@@ -851,6 +851,7 @@ public with sharing class GiftService {
      *
      * Returns the identifier of the gift that records the refund.
      */
+    @NamespaceAccessible
     public static Id refund(Id giftId, Decimal amount, String reason) {
         Gift__c original = loadReversible(giftId);
         Decimal remaining = remainingAmount(original);

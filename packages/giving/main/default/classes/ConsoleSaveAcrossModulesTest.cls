@@ -18,7 +18,7 @@ private class ConsoleSaveAcrossModulesTest {
             );
 
             Test.startTest();
-            SettingsController.ConsoleModel model = SettingsController.saveSettings(
+            SettingsController.ConsoleModel model = SettingsController.save(
                 new Map<String, Object>{
                     CORE_KEY => 'The {LastName} Household',
                     GIVING_KEY => '12-3456789'
@@ -26,7 +26,7 @@ private class ConsoleSaveAcrossModulesTest {
             );
             Test.stopTest();
 
-            Assert.isTrue(model.canEdit, 'The page comes back editable');
+            Assert.isTrue(model.getCanEdit(), 'The page comes back editable');
             Assert.areEqual(
                 'The {LastName} Household',
                 SettingsService.getValue(CORE_KEY),
@@ -38,8 +38,8 @@ private class ConsoleSaveAcrossModulesTest {
                 'and the Giving setting on Giving Settings, in the same Save'
             );
             Set<String> audited = new Set<String>();
-            for (SettingsController.ChangeModel change : SettingsController.getRecentChanges(10)) {
-                audited.add(change.settingName);
+            for (SettingsController.ChangeModel change : SettingsController.recentChanges(10)) {
+                audited.add(change.getSettingName());
             }
             Assert.areEqual(2, audited.size(), 'Both changes are in the history: ' + audited);
         }

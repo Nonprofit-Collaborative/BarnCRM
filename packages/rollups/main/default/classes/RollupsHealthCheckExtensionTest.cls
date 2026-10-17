@@ -78,7 +78,7 @@ private class RollupsHealthCheckExtensionTest {
 
     private static HealthCheckService.Finding find(String key) {
         for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-            if (key.equals(finding.key)) {
+            if (key.equals(finding.getKey())) {
                 return finding;
             }
         }
@@ -86,8 +86,8 @@ private class RollupsHealthCheckExtensionTest {
     }
 
     private static HealthCheckService.Finding find(HealthCheckService.Report report, String key) {
-        for (HealthCheckService.Finding finding : report.findings) {
-            if (key.equals(finding.key)) {
+        for (HealthCheckService.Finding finding : report.getFindings()) {
+            if (key.equals(finding.getKey())) {
                 return finding;
             }
         }
@@ -97,8 +97,8 @@ private class RollupsHealthCheckExtensionTest {
     /** Presses a fix the way the panel does: with the scope the finding carried. */
     private static HealthCheckService.Report press(HealthCheckService.Finding finding) {
         return HealthCheckController.applyFixFor(
-            finding.fixTarget.substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
-            finding.fixScope
+            finding.getFixTarget().substring(HealthCheckService.FIX_ACTION_PREFIX.length()),
+            finding.getFixScope()
         );
     }
 
@@ -130,18 +130,18 @@ private class RollupsHealthCheckExtensionTest {
                 HealthCheckService.Finding finding = find('shipped_rollups_missing');
                 Assert.isNotNull(finding, 'A shipped rollup the org does not have is reported.');
                 Assert.isTrue(
-                    finding.detail.contains('Household member count'),
+                    finding.getDetail().contains('Household member count'),
                     'The finding names what the fix will create.'
                 );
                 Assert.areEqual(
                     HealthCheckService.FIX_ACTION_PREFIX +
                     RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
-                    finding.fixTarget,
+                    finding.getFixTarget(),
                     'It carries the restore fix.'
                 );
                 Assert.areEqual(
                     new List<String>{ 'Household member count' },
-                    finding.fixScope,
+                    finding.getFixScope(),
                     'And the names the fix is allowed to create.'
                 );
 
@@ -155,7 +155,7 @@ private class RollupsHealthCheckExtensionTest {
                     'The re-run report no longer has the finding.'
                 );
                 Assert.isTrue(
-                    report.fixOutcome.contains('Household member count'),
+                    report.getFixOutcome().contains('Household member count'),
                     'The panel is told what the fix created.'
                 );
                 Assert.areEqual(
@@ -194,7 +194,7 @@ private class RollupsHealthCheckExtensionTest {
                 HealthCheckService.Finding finding = find('shipped_rollups_missing');
                 Assert.areEqual(
                     new List<String>{ 'Other total' },
-                    finding.fixScope,
+                    finding.getFixScope(),
                     'Only the total the org does not have is offered.'
                 );
 
@@ -229,11 +229,11 @@ private class RollupsHealthCheckExtensionTest {
                 HealthCheckService.Finding finding = find('shipped_rollups_missing');
                 Assert.areEqual(
                     new List<String>{ 'Other total' },
-                    finding.fixScope,
+                    finding.getFixScope(),
                     'The shipped member count is not offered: it would write her field twice.'
                 );
                 Assert.isTrue(
-                    finding.detail.contains('Household member count'),
+                    finding.getDetail().contains('Household member count'),
                     'The finding says which total is left out, rather than hiding it.'
                 );
 
@@ -242,7 +242,7 @@ private class RollupsHealthCheckExtensionTest {
                 Test.stopTest();
 
                 Assert.isTrue(
-                    report.fixOutcome.contains('Household member count'),
+                    report.getFixOutcome().contains('Household member count'),
                     'The result lists the skipped total.'
                 );
             }
@@ -278,9 +278,9 @@ private class RollupsHealthCheckExtensionTest {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
             shipOneRollup(RollupService.MODE_SCHEDULED);
             RollupScheduler.jobNameInUse = TEST_JOB_NAME;
-            NightlyJobs.jobsOverride = new List<NightlyJob>{
-                new RollupsNightlyJobProvider.RollupJob()
-            };
+            NightlyJobs.overrideJobsForTest(
+                new List<NightlyJob>{ new RollupsNightlyJobProvider.RollupJob() }
+            );
 
             System.runAs(maria) {
                 RollupService.ensureDefaults();
@@ -291,15 +291,18 @@ private class RollupsHealthCheckExtensionTest {
                 );
                 Assert.areEqual(
                     HealthCheckService.SEVERITY_WARNING,
-                    finding.severity,
+                    finding.getSeverity(),
                     'A rollup that recalculates only at night is going stale.'
                 );
-                Assert.isNull(finding.fixTarget, 'One cause, one button: the nightly jobs fix.');
+                Assert.isNull(
+                    finding.getFixTarget(),
+                    'One cause, one button: the nightly jobs fix.'
+                );
 
                 HealthCheckService.Finding jobs = find('nightly_jobs_not_scheduled');
                 Assert.areEqual(
                     new List<String>{ System.Label.Core_HealthCheck_JobRollups },
-                    jobs.fixScope,
+                    jobs.getFixScope(),
                     'The nightly jobs finding names the rollup run.'
                 );
 
@@ -321,7 +324,7 @@ private class RollupsHealthCheckExtensionTest {
                         System.Label.Core_HealthCheck_FixScheduled,
                         new List<Object>{ System.Label.Core_HealthCheck_JobRollups }
                     ),
-                    report.fixOutcome,
+                    report.getFixOutcome(),
                     'The panel is told which jobs were scheduled.'
                 );
                 Assert.areEqual(
@@ -346,7 +349,7 @@ private class RollupsHealthCheckExtensionTest {
                 Assert.isNotNull(finding, 'The unscheduled run is still reported.');
                 Assert.areEqual(
                     HealthCheckService.SEVERITY_INFO,
-                    finding.severity,
+                    finding.getSeverity(),
                     'It still updates as records change; only the nightly correction is missed.'
                 );
             }
@@ -418,7 +421,7 @@ private class RollupsHealthCheckExtensionTest {
 
                 Boolean failedFound = false;
                 for (HealthCheckService.Finding finding : found) {
-                    failedFound |= 'check_failed_rollup_queue'.equals(finding.key);
+                    failedFound |= 'check_failed_rollup_queue'.equals(finding.getKey());
                 }
                 Assert.isTrue(failedFound, 'The broken queue check is reported as failed');
             }
@@ -438,8 +441,8 @@ private class RollupsHealthCheckExtensionTest {
 
                 for (HealthCheckService.Finding finding : found) {
                     Assert.isFalse(
-                        finding.key.startsWith('check_failed_'),
-                        'The queue counts run whatever object access she holds: ' + finding.key
+                        finding.getKey().startsWith('check_failed_'),
+                        'The queue counts run whatever object access she holds: ' + finding.getKey()
                     );
                 }
             }

@@ -41,14 +41,14 @@ private class GiftImportProcessorTest {
     private static void given(List<String> giftTargets, List<List<String>> values) {
         TestDataFactory.defaultSettings();
         ImportMapping mapping = new ImportMapping();
-        mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
-        mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
+        mapping.getColumns().add(new ImportMapping.Column('Email', 'Contact1.Email'));
+        mapping.getColumns().add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
         Boolean typed = giftTargets.contains('Gift.Type__c');
         if (!typed) {
-            mapping.columns.add(new ImportMapping.Column('Payment Method', 'Gift.Type__c'));
+            mapping.getColumns().add(new ImportMapping.Column('Payment Method', 'Gift.Type__c'));
         }
         for (String target : giftTargets) {
-            mapping.columns.add(new ImportMapping.Column(target, target));
+            mapping.getColumns().add(new ImportMapping.Column(target, target));
         }
         template = ImportTestDataFactory.template(
             mapping.serialize(),
@@ -535,12 +535,12 @@ private class GiftImportProcessorTest {
             fund('General', null, true);
             TestDataFactory.defaultSettings();
             ImportMapping mapping = new ImportMapping();
-            mapping.columns.add(new ImportMapping.Column('Contact', 'Contact1.LastName'));
-            mapping.columns.add(new ImportMapping.Column('Company', 'Organization.Name'));
-            mapping.columns.add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
-            mapping.columns.add(new ImportMapping.Column('Date', 'Gift.Gift_Date__c'));
-            mapping.defaults.add(new ImportMapping.Assignment('Gift.Donor', 'Organization'));
-            mapping.defaults.add(new ImportMapping.Assignment('Gift.Type__c', 'Check'));
+            mapping.getColumns().add(new ImportMapping.Column('Contact', 'Contact1.LastName'));
+            mapping.getColumns().add(new ImportMapping.Column('Company', 'Organization.Name'));
+            mapping.getColumns().add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
+            mapping.getColumns().add(new ImportMapping.Column('Date', 'Gift.Gift_Date__c'));
+            mapping.getDefaults().add(new ImportMapping.Assignment('Gift.Donor', 'Organization'));
+            mapping.getDefaults().add(new ImportMapping.Assignment('Gift.Type__c', 'Check'));
             template = ImportTestDataFactory.template(
                 mapping.serialize(),
                 ImportTemplateService.RULE_EMAIL

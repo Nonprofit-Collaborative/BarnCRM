@@ -53,12 +53,16 @@ public with sharing class JobNotifier {
     /** One notification: who it is for, what it says, and what it opens. */
     @NamespaceAccessible
     public class Notice {
+        @NamespaceAccessible
         public Id recipientId;
+        @NamespaceAccessible
         public String title;
         public String body;
         /** The record it opens, or null when it opens a settings page. */
+        @NamespaceAccessible
         public Id targetId;
         /** The settings console section it opens, or null when it opens a record. */
+        @NamespaceAccessible
         public String section;
     }
 

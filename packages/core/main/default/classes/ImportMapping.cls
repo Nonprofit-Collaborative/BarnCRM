@@ -101,6 +101,17 @@ public with sharing class ImportMapping {
             this.source = source;
             this.target = target;
         }
+
+        // Getters for other packages: an @AuraEnabled field cannot also be @NamespaceAccessible.
+        @NamespaceAccessible
+        public String getSource() {
+            return source;
+        }
+
+        @NamespaceAccessible
+        public String getTarget() {
+            return target;
+        }
     }
 
     /**
@@ -184,6 +195,18 @@ public with sharing class ImportMapping {
         this.version = DataTransform.DOCUMENT_VERSION;
         this.columns = new List<Column>();
         this.defaults = new List<Assignment>();
+    }
+
+    /** The live column list, for another package to read or add to (fields are @AuraEnabled). */
+    @NamespaceAccessible
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    /** The live defaults list, for another package to read or add to. */
+    @NamespaceAccessible
+    public List<Assignment> getDefaults() {
+        return defaults;
     }
 
     /**
