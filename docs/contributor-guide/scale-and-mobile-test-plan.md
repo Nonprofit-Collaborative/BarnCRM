@@ -25,7 +25,7 @@ does not fit in any scratch org. Run it in two tiers:
 
 | Tier | Where | Volume | Proves |
 | ---- | ----- | ------ | ------ |
-| 1 | `oi-test` | 10,000 contacts, 4,000 households, 30,000 gifts (about 78,500 records loaded, with each gift's automatic default allocation; keep the total under about 90,000) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
+| 1 | `oi-test` | 10,000 contacts, 4,000 households, 30,000 gifts (about 78,500 records from the files and each gift's automatic default allocation, plus about 62,000 automatic household member soft credits, so about 140,000 in all; see "How to run tier 1" for the storage this takes) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
 | 2 | A Partial or Full Copy sandbox, or a Developer Pro sandbox with extra storage, owner approval needed | The full Section 7.3 target | The absolute numbers in the plan |
 
 Tier 1 is the v0.11 exit evidence unless the owner provides a tier 2 org. Report the
@@ -55,10 +55,34 @@ time, failed rows and the top errors.
 | Full rollup recalculation | Rollups page, **Recalculate all** (`RollupFullRecalcBatch`) | Completes with no failed batches; Error Log has no limit errors; spot check 20 households and 20 contacts against a SOQL aggregate |
 | Household naming | **Recompute all households** on the household naming settings (`HouseholdNamingBatch`) | Completes; names match the naming preview for a sample |
 | Duplicate scan | **Scan for duplicates** (`DuplicateScanBatch`) | Completes; no batch reported as not checked; no CPU limit errors on the largest match groups |
-| Donor levels and acknowledgments | `DonorLevelBatch` and `AcknowledgmentBatch`, started from anonymous Apex with `Database.executeBatch` if the scheduler is not due | Complete with no failed batches |
-| Field utilization | Org Optimizer, Field utilization section, choose the gift object and Contact (`FieldUtilizationController`, 10 fields per call above 100,000 records) | Each call returns in under 30 seconds; no limit errors |
+| Donor levels | Turn the feature on and build a ladder first (see "Donor levels and acknowledgments" below), then **Recalculate now** on the Donor levels page (`DonorLevelController.recalculate()`, which starts `DonorLevelBatch`) | Completes with no failed batches; the rungs show donor counts that add up |
+| Acknowledgments | `AcknowledgmentRunService.startEmailRun()` from anonymous Apex (starts `AcknowledgmentBatch`), after the acknowledgment setup below | Completes with no failed batches; processed items match the "To acknowledge" gifts |
+| Field utilization | Org Optimizer, Field utilization section, choose the gift object and Contact (`FieldUtilizationController`) | Each call returns in under 30 seconds; no limit errors; no Error Log rows |
 | Import | Import wizard with a 250k-row file on tier 2 (a 25k-row file on tier 1), contacts plus gifts | Completes; rows processed per minute recorded; undo of the whole batch (`ImportUndoBatch`) completes |
 | Interactive pages | Open a household with 30 members, a contact with 500 gifts, the Giving dashboard, Find with a broad search | Each page usable in under 5 seconds; no `Too many query rows` error |
+
+Donor levels and acknowledgments need setup the load does not do, so do it after the loads (levels
+and a rule switched on earlier run in the gift triggers and change the load timings):
+
+- **Donor levels.** The feature is off until the organization turns it on, and
+  `DonorLevelController.recalculate()` refuses in two cases: the running user lacks the
+  `Manage_BarnCRM_Settings` custom permission (in the BarnCRM Admin permission set; a plain
+  System Administrator does not have it), or **Donor levels** is off in the Giving settings
+  (`Donor_Levels_Enabled__c`). The 2026-10-17 run hit one of these and ran the batch directly,
+  which skips the ladder. Supported start: as a user with BarnCRM Admin, open BarnCRM Settings,
+  Giving, **Donor levels**, create three rungs (for example Friend 100 to 1,000, Sustainer 1,000
+  to 5,000, Leadership Circle 5,000 and up, as in the donor levels admin guide), turn **Donor
+  levels** on in Giving, then **Recalculate now**.
+- **Acknowledgments.** The generator loads every 10th gift (3,000) as "To acknowledge"
+  (`--acknowledge-every`, 0 turns it off); the rest are "Not required". Gifts are only queued by a
+  rule (the trigger leaves a gift with no matching rule as loaded), so the loaded status is what
+  `AcknowledgmentBatch` finds. The batch still sends nothing without an active **Email** rule, so
+  for the full send path create one on the Acknowledgments page before starting the run, and
+  remember that every match sends an email (about 3,000 against the org's daily email limit; use
+  a larger `--acknowledge-every` to shrink it).
+- **Field utilization** uses the 10-fields-per-call path only above 100,000 records of the
+  object. Tier 1 has 30,000 gifts and about 10,000 contacts, so it uses the larger chunk and
+  cannot measure the 10-field path; that needs tier 2.
 
 For each batch record: `AsyncApexJob` total and failed job items, elapsed time, and the
 largest CPU time in a debug log of one chunk. A chunk using more than 70% of a limit is a
@@ -101,8 +125,18 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   credits, and 1,500 gifts to split across two funds. The gift trigger adds a default
   allocation to every gift, and each split adds one more allocation, so this loads about 78,500
   records (47,000 file rows, 30,000 automatic allocations, 1,500 second allocations); the
-  plan's original 60,000 gifts would have loaded about 157,000, over the roughly 100,000 a
-  scratch org's 200 MB holds. Check `DataStorageMB` before loading. To change the size, set for
+  plan's original 60,000 gifts would have loaded about 157,000 (before soft credits), over the
+  roughly 100,000 a scratch org's 200 MB holds.
+- The 3,000 soft credits in the file are not the only ones. With **Automatic household soft
+  credits** on (the default, `Automatic_Household_Soft_Credits__c`), every gift also gets one
+  automatic "Household Member" soft credit for each other current member of the donor's
+  household (`SoftCreditService.createHouseholdMemberCredits`, run by the gift trigger). With
+  about 2.5 contacts per household and a few large households, the 2026-10-17 run ended with
+  65,299 `Soft_Credit__c` rows (857 before), about 62,000 more than the file, so expect about 2
+  extra per gift and about 140,000 records in all. That run used about 230 MB of data storage
+  (450 MB free before, 220 MB after, on a 500 MB org), so check the free storage covers that
+  before loading. This is the product working as designed, not a load fault. Cleanup removes
+  them with their gifts. Check `DataStorageMB` before loading. To change the size, set for
   example `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
 - Splits are not Bulk loaded. Giving refuses any save that leaves a gift's allocations not
   totalling the gift (see "Splitting a gift one row at a time" in the gifts admin guide), and

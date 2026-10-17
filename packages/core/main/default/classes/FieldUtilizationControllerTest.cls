@@ -145,6 +145,32 @@ private class FieldUtilizationControllerTest {
     }
 
     @IsTest
+    static void theRecordTypeFieldItselfIsCountedWithoutAnError() {
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.Chunk chunk;
+            System.runAs(maria()) {
+                List<Account> accounts = new List<Account>();
+                for (Integer i = 0; i < 20; i++) {
+                    accounts.add(AddressTestDataFactory.newOrganization('Barn Org ' + i));
+                    accounts.add(HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family'));
+                }
+                insert accounts;
+                Test.startTest();
+                chunk = countOne(ACCOUNT_TYPE, 'RecordTypeId');
+                Test.stopTest();
+            }
+
+            Map<String, FieldUtilizationController.CountRow> rows = byRecordType(chunk.rows);
+            Assert.areEqual(20, rows.get('Organization').total, 'Every organization is counted.');
+            Assert.areEqual(
+                20,
+                rows.get('Household').filled,
+                'Every household has a type: the field is sampled, not lost to a duplicate select.'
+            );
+        }
+    }
+
+    @IsTest
     static void aLongTextFieldIsSampledOnRecentRecords() {
         System.runAs(TestUsers.admin()) {
             String description = Account.Description.getDescribe().getName();
