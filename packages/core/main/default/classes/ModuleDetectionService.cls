@@ -166,7 +166,7 @@ public with sharing class ModuleDetectionService {
                 hereRows.add(row);
             }
         }
-        Map<String, Id> appIds = appIds(hereRows);
+        Map<String, String> appIds = appIds(hereRows);
         for (BarnCRM_Module__mdt row : rows) {
             Boolean present = presentByName.get(row.DeveloperName);
             if (present || offeredIn(row, edition)) {
@@ -290,7 +290,7 @@ public with sharing class ModuleDetectionService {
     private static ModuleInfo module(
         BarnCRM_Module__mdt row,
         Boolean present,
-        Map<String, Id> appIds
+        Map<String, String> appIds
     ) {
         ModuleInfo info = new ModuleInfo();
         info.name = row.DeveloperName;
@@ -309,9 +309,9 @@ public with sharing class ModuleDetectionService {
      * app is not found (not installed, or not visible to the user). Lightning addresses an
      * unmanaged app as `c__Name`, a managed one as `namespace__Name`.
      */
-    private static String appUrl(String appName, Map<String, Id> appIds) {
-        Id appId = appIds == null ? null : appIds.get(appName);
-        if (appId != null) {
+    private static String appUrl(String appName, Map<String, String> appIds) {
+        String appId = appIds == null ? null : appIds.get(appName);
+        if (String.isNotBlank(appId)) {
             return APP_PATH + appId;
         }
         String prefix = NamespaceUtil.prefix();
@@ -319,19 +319,19 @@ public with sharing class ModuleDetectionService {
     }
 
     /**
-     * Stands in for the app menu in tests, by app developer name: the Id `AppMenuItem` gives
-     * it. An empty map means no app is found.
+     * Stands in for the app list in tests, by app developer name: the DurableId `AppDefinition`
+     * gives it. An empty map means no app is found.
      */
     @TestVisible
-    private static Map<String, Id> appIdsOverride;
+    private static Map<String, String> appIdsOverride;
 
     /**
-     * The Ids of the apps these catalog rows name, by developer name, from one `AppMenuItem`
-     * query. Only an app in this package's namespace counts (none today), so another package's
+     * The DurableIds (06m) Lightning addresses the apps these catalog rows name by, by
+     * developer name, from one `AppDefinition` query. Only an app in this package's namespace counts (none today), so another package's
      * app with the same developer name is not picked up.
      */
-    private static Map<String, Id> appIds(List<BarnCRM_Module__mdt> rows) {
-        Map<String, Id> found = new Map<String, Id>();
+    private static Map<String, String> appIds(List<BarnCRM_Module__mdt> rows) {
+        Map<String, String> found = new Map<String, String>();
         Set<String> names = new Set<String>();
         for (BarnCRM_Module__mdt row : rows) {
             if (String.isNotBlank(row.App_Name__c)) {
@@ -346,14 +346,14 @@ public with sharing class ModuleDetectionService {
         }
         String namespace = NamespaceUtil.prefix().removeEnd('__');
         try {
-            for (AppMenuItem item : [
-                SELECT ApplicationId, Name, NamespacePrefix
-                FROM AppMenuItem
-                WHERE Type = 'TabSet' AND Name IN :names
+            for (AppDefinition item : [
+                SELECT DurableId, DeveloperName, NamespacePrefix
+                FROM AppDefinition
+                WHERE DeveloperName IN :names
                 WITH USER_MODE
             ]) {
                 if ((item.NamespacePrefix == null ? '' : item.NamespacePrefix) == namespace) {
-                    found.put(item.Name, item.ApplicationId);
+                    found.put(item.DeveloperName, item.DurableId);
                 }
             }
         } catch (Exception e) {

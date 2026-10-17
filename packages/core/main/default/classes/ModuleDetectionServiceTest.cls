@@ -264,8 +264,10 @@ private class ModuleDetectionServiceTest {
             );
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
-            Id appId = FakeIds.ofPrefix('02u', 1);
-            ModuleDetectionService.appIdsOverride = new Map<String, Id>{ 'Fundraising' => appId };
+            String appId = FakeIds.ofPrefix('06m', 1);
+            ModuleDetectionService.appIdsOverride = new Map<String, String>{
+                'Fundraising' => appId
+            };
 
             Test.startTest();
             ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -293,7 +295,7 @@ private class ModuleDetectionServiceTest {
             BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
-            ModuleDetectionService.appIdsOverride = new Map<String, Id>();
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
             NamespaceUtil.cachedPrefix = '';
 
             Test.startTest();
@@ -316,7 +318,7 @@ private class ModuleDetectionServiceTest {
             BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
-            ModuleDetectionService.appIdsOverride = new Map<String, Id>();
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
             NamespaceUtil.cachedPrefix = 'barn__';
 
             Test.startTest();
