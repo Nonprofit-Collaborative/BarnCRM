@@ -105,6 +105,7 @@ SYSTEM_TYPES = {
 # org BarnCRM claims to support has this object.
 ALLOWED = {
     "Account": "the constituent and household record, plan Section 4.3. Core cannot exist without it.",
+    "AppDefinition": "the Lightning app's DurableId for the Hub's module links (S5). Platform setup object, every edition.",
     "Contact": "the person record, plan Section 4.3. Same.",
     "ContentDocument": "receipt and acknowledgment files, G-13. Platform feature, every edition.",
     "ContentDocumentLink": "attaches a receipt file to its record, G-13; files about a person, counted by Erase a person (R-ER10).",

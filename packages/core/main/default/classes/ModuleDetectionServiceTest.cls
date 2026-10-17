@@ -264,6 +264,10 @@ private class ModuleDetectionServiceTest {
             );
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            String appId = FakeIds.ofPrefix('06m', 1);
+            ModuleDetectionService.appIdsOverride = new Map<String, String>{
+                'Fundraising' => appId
+            };
 
             Test.startTest();
             ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -272,13 +276,81 @@ private class ModuleDetectionServiceTest {
             Assert.isTrue(giving.present, 'Giving is here');
             Assert.isNull(giving.installUrl, 'So the step offers no installer');
             Assert.areEqual(
-                '/lightning/app/' + NamespaceUtil.prefix() + 'Fundraising',
+                '/lightning/app/' + appId,
                 giving.appUrl,
-                'An installed module links to its own app, where its Settings tab lives'
+                'An installed module links to its own app by Id, where its Settings tab lives'
             );
             Assert.isTrue(
                 giving.docsUrl.endsWith('/giving/README.md'),
                 'Its description is linked'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkFallsBackToTheCustomAppFormWithNoNamespace() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
+            NamespaceUtil.cachedPrefix = '';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/c__Fundraising',
+                giving.appUrl,
+                'An app not found is addressed as an unmanaged custom app'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkFallsBackToTheNamespaceWhenThereIsOne() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
+            NamespaceUtil.cachedPrefix = 'barn__';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/barn__Fundraising',
+                giving.appUrl,
+                'An app not found is addressed by its namespace'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkUsesTheOrgsOwnAppMenuWhenNothingIsStubbed() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'NoSuchBarnCrmApp';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            NamespaceUtil.cachedPrefix = '';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/c__NoSuchBarnCrmApp',
+                giving.appUrl,
+                'The real query finds nothing for an unknown app, so the name form is used'
             );
         }
     }
