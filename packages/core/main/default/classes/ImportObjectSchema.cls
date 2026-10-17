@@ -356,7 +356,9 @@ public with sharing class ImportObjectSchema {
     /**
      * Whether the platform indexes this field, so a search by it stays quick on any number of
      * records (R-IT13): the record ID, the name field, a field marked External ID or Unique, and
-     * a standard Email field (Email, or PersonEmail on a person Account, R-VH3). Custom indexes cannot be seen from Apex, so they are not counted.
+     * a standard Email field (Email, or PersonEmail on a person Account, R-VH3; the query planner
+     * leads an Account PersonEmail filter with the Contact Email index). Custom indexes cannot be
+     * seen from Apex, so they are not counted.
      */
     @NamespaceAccessible
     public static Boolean isIndexed(Schema.SObjectType type, String fieldName) {
@@ -373,7 +375,8 @@ public with sharing class ImportObjectSchema {
             field.isUnique() ||
             (!field.isCustom() &&
             field.getType() == Schema.DisplayType.EMAIL &&
-            (field.getName() == 'Email' || field.getName() == 'PersonEmail'));
+            (field.getName() == 'Email' ||
+            field.getName() == 'PersonEmail'));
     }
 
     /**

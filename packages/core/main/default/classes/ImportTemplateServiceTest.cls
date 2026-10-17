@@ -473,6 +473,14 @@ private class ImportTemplateServiceTest {
                     ImportObjectSchema.OPERATION_UPSERT,
                     'No_Such_Key__c',
                     null
+                ),
+                oneObjectRow(
+                    'Not_External_Id',
+                    'Error_Log__c',
+                    ONE_OBJECT_MAPPING,
+                    ImportObjectSchema.OPERATION_UPSERT,
+                    'Context__c',
+                    null
                 )
             };
 
@@ -484,7 +492,7 @@ private class ImportTemplateServiceTest {
             Assert.areEqual(0, created, 'Nothing that cannot run is added.');
             Assert.areEqual(0, templatesWithKey().size());
             Assert.areEqual(
-                4,
+                5,
                 [
                     SELECT COUNT()
                     FROM Error_Log__c

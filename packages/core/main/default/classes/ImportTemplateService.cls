@@ -458,7 +458,10 @@ public with sharing class ImportTemplateService {
         Boolean needsField =
             operation == ImportObjectSchema.OPERATION_UPSERT ||
             operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
-        Schema.SObjectField matchToken = ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c);
+        Schema.SObjectField matchToken = ImportObjectSchema.fieldNamed(
+            type,
+            row.Load_Match_Field__c
+        );
         return new Import_Template__c(
             Name = row.MasterLabel,
             Description__c = row.Description__c,
@@ -504,11 +507,17 @@ public with sharing class ImportTemplateService {
             Boolean found = false;
             if (token != null) {
                 for (Schema.SObjectType parent : token.getDescribe().getReferenceTo()) {
-                    found = found || ImportObjectSchema.fieldNamed(parent, lookups.get(attribute)) != null;
+                    found =
+                        found ||
+                        ImportObjectSchema.fieldNamed(parent, lookups.get(attribute)) != null;
                 }
             }
             if (!found) {
-                return 'the lookup field ' + lookups.get(attribute) + ' for ' + attribute + ' is not in this org';
+                return 'the lookup field ' +
+                    lookups.get(attribute) +
+                    ' for ' +
+                    attribute +
+                    ' is not in this org';
             }
         }
         String operation = row.Load_Operation__c;
@@ -517,7 +526,21 @@ public with sharing class ImportTemplateService {
             operation == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD) &&
             ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c) == null
         ) {
-            return 'its match field ' + row.Load_Match_Field__c + ' is not on ' + row.Target_Object__c;
+            return 'its match field ' +
+                row.Load_Match_Field__c +
+                ' is not on ' +
+                row.Target_Object__c;
+        }
+        if (
+            operation == ImportObjectSchema.OPERATION_UPSERT &&
+            !ImportObjectSchema.fieldNamed(type, row.Load_Match_Field__c)
+                .getDescribe()
+                .isExternalId()
+        ) {
+            return 'its match field ' +
+                row.Load_Match_Field__c +
+                ' is not an external ID on ' +
+                row.Target_Object__c;
         }
         return null;
     }
