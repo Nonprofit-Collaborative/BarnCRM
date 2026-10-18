@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Attendance creates hours</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Attendance_Creates_Hours__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Checkbox</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">20</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Whether marking a sign-up Attended writes the volunteer hours for that shift.</value>
+    </values>
+</CustomMetadata>

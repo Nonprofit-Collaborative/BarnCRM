@@ -53,7 +53,7 @@ private class ModuleDetectionServiceTest {
             for (ModuleDetectionService.ModuleInfo module : modules) {
                 names.add(module.name);
             }
-            Assert.areEqual(
+            assertListed(
                 new List<String>{ 'Core', 'Rollups' },
                 names,
                 'No nonprofit module is shown until the Nonprofit Edition is chosen'
@@ -83,9 +83,19 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(3, modules.size(), 'Core, Rollup Builder and the installed module');
-            Assert.areEqual('Programs', modules[2].name, 'An installed module is never hidden');
-            Assert.isTrue(modules[2].present, 'And it is shown as here');
+            Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
+            for (ModuleDetectionService.ModuleInfo module : modules) {
+                byName.put(module.name, module);
+            }
+            Set<String> expected = installedModules();
+            expected.add('Programs');
+            Assert.areEqual(
+                3 + expected.size() - 1,
+                modules.size(),
+                'Core, Rollup Builder, the announcing module and any module whose objects are here'
+            );
+            Assert.isTrue(byName.containsKey('Programs'), 'An installed module is never hidden');
+            Assert.isTrue(byName.get('Programs').present, 'And it is shown as here');
         }
     }
 
@@ -158,7 +168,11 @@ private class ModuleDetectionServiceTest {
                 chosen,
                 'The saved choice is read'
             );
-            Assert.areEqual(2, modules.size(), 'Core and Rollup Builder, and no nonprofit module');
+            Assert.areEqual(
+                2 + installedModules().size(),
+                modules.size(),
+                'Core and Rollup Builder, any module whose objects are here, and no other nonprofit module'
+            );
         }
     }
 
@@ -176,7 +190,7 @@ private class ModuleDetectionServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(
+            assertListed(
                 new List<String>{ 'Core', 'Rollups', 'Giving' },
                 names,
                 'An installed module stays listed; the others stay hidden in the Standard Edition'
@@ -524,6 +538,37 @@ private class ModuleDetectionServiceTest {
             Install_Version_Id__c = versionId,
             Sort_Order__c = sortOrder
         );
+    }
+
+    /**
+     * The modules other than Core, Rollup Builder and Giving whose probe object is in this org.
+     * Detection lists an installed module in any edition, so a test that expects a short list
+     * adds these to it and holds whether or not such a package is installed beside Core.
+     */
+    private static Set<String> installedModules() {
+        Set<String> names = new Set<String>();
+        for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+            if (
+                row.DeveloperName != 'Rollups' &&
+                row.DeveloperName != 'Giving' &&
+                String.isNotBlank(row.Probe_Object__c) &&
+                ModuleDetectionService.resolveObject(row.Probe_Object__c.trim()) != null
+            ) {
+                names.add(row.DeveloperName);
+            }
+        }
+        return names;
+    }
+
+    /** The expected modules first, then exactly the installed ones this org also has. */
+    private static void assertListed(List<String> expected, List<String> actual, String message) {
+        Assert.areEqual(expected.size() + installedModules().size(), actual.size(), message);
+        for (Integer i = 0; i < expected.size(); i++) {
+            Assert.areEqual(expected[i], actual[i], message);
+        }
+        Set<String> rest = new Set<String>(actual);
+        rest.removeAll(new Set<String>(expected));
+        Assert.areEqual(installedModules(), rest, message);
     }
 
     private static void chooseSuite(String suite) {

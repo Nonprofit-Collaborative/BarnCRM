@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Signup__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The sign-up these hours came from, if any. Hours stay if the sign-up is deleted.</inlineHelpText>
+  <label>Volunteer Sign-up</label>
+  <referenceTo>Volunteer_Signup__c</referenceTo>
+  <relationshipLabel>Volunteer Hours</relationshipLabel>
+  <relationshipName>Volunteer_Hours</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>
