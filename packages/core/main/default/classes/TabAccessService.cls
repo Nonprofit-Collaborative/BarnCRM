@@ -19,7 +19,8 @@
  *
  * A module that keeps its own permission sets with BarnCRM's roles uses the same audience
  * logic through `giveToHolders`, naming its sets and Core's (ADR-0125
- * `0125-rollup-builder-module.md`, D2); Core names no module set.
+ * `0125-rollup-builder-module.md`, D2), or through `giveToGroupHolders`, naming the roles
+ * themselves (ADR-NEXT `NEXT-module-access-sync-by-role.md`); Core names no module set.
  */
 @NamespaceAccessible
 public with sharing class TabAccessService {
@@ -168,23 +169,78 @@ public with sharing class TabAccessService {
         Integer budget,
         String context
     ) {
-        if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
-            throw new IllegalArgumentException(
-                'giveToHolders gives a module\'s own set, never Core\'s: ' + setName
-            );
-        }
+        refuseCoreSet(setName);
         if (audience == null || audience.isEmpty()) {
             return false;
         }
         Set<String> names = new Set<String>(audience);
         names.add(setName);
         Map<String, Id> setIds = packagedSetIds(names);
-        Id setId = setIds.get(setName);
-        if (setId == null) {
+        if (!setIds.containsKey(setName)) {
             return false;
         }
         Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
         Set<Id> wanted = holdersOf(audience, setIds, groupIdsBySet);
+        return give(setName, setIds, groupIdsBySet, wanted, budget, context);
+    }
+
+    /**
+     * Gives the named permission set to every active person assigned one of the named permission
+     * set groups, such as a BarnCRM role, up to `budget` assignments, with the rules of
+     * `giveToHolders`. For a module whose sets follow roles that hold the same Core sets, such as
+     * the Coordinator and Team Member roles (ADR-NEXT `NEXT-module-access-sync-by-role.md`).
+     * Only the groups this product ships count. Returns true when more is left.
+     */
+    @NamespaceAccessible
+    public static Boolean giveToGroupHolders(
+        String setName,
+        List<String> groupNames,
+        Integer budget,
+        String context
+    ) {
+        refuseCoreSet(setName);
+        if (groupNames == null || groupNames.isEmpty()) {
+            return false;
+        }
+        Map<String, Id> setIds = packagedSetIds(new Set<String>{ setName });
+        if (!setIds.containsKey(setName)) {
+            return false;
+        }
+        String namespace = namespace();
+        Set<Id> wanted = new Set<Id>();
+        for (PermissionSetAssignment row : [
+            SELECT AssigneeId
+            FROM PermissionSetAssignment
+            WHERE
+                PermissionSetGroup.DeveloperName IN :groupNames
+                AND PermissionSetGroup.NamespacePrefix = :namespace
+                AND Assignee.IsActive = TRUE
+            WITH SYSTEM_MODE
+        ]) {
+            wanted.add(row.AssigneeId);
+        }
+        Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
+        return give(setName, setIds, groupIdsBySet, wanted, budget, context);
+    }
+
+    private static void refuseCoreSet(String setName) {
+        if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
+            throw new IllegalArgumentException(
+                'A module sync gives a module\'s own set, never Core\'s: ' + setName
+            );
+        }
+    }
+
+    /** Gives the set to each wanted person who does not hold it yet, up to `budget`. */
+    private static Boolean give(
+        String setName,
+        Map<String, Id> setIds,
+        Map<Id, Set<Id>> groupIdsBySet,
+        Set<Id> wanted,
+        Integer budget,
+        String context
+    ) {
+        Id setId = setIds.get(setName);
         // Held already, directly or through a group, such as a module role that includes it.
         wanted.removeAll(holdersOf(new List<String>{ setName }, setIds, groupIdsBySet));
         List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
@@ -272,8 +328,7 @@ public with sharing class TabAccessService {
 
     /** The named permission sets this product ships, by name. */
     private static Map<String, Id> packagedSetIds(Set<String> names) {
-        String prefix = NamespaceUtil.prefix().removeEnd('__');
-        String namespace = String.isBlank(prefix) ? null : prefix;
+        String namespace = namespace();
         Map<String, Id> ids = new Map<String, Id>();
         for (PermissionSet row : [
             SELECT Id, Name
@@ -284,6 +339,12 @@ public with sharing class TabAccessService {
             ids.put(row.Name, row.Id);
         }
         return ids;
+    }
+
+    /** This product's namespace, or null while it has none. */
+    private static String namespace() {
+        String prefix = NamespaceUtil.prefix().removeEnd('__');
+        return String.isBlank(prefix) ? null : prefix;
     }
 
     /** The permission set groups, BarnCRM roles or an org's own, holding each set. */

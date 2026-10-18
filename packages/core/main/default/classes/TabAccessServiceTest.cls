@@ -137,6 +137,65 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void givesAModuleSetToOneRoleNotAnotherHoldingTheSameSets() {
+        System.runAs(TestUsers.admin()) {
+            User coordinator = TestUsers.standardUser('Coordinator');
+            User member = TestUsers.standardUser('Member');
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(
+                    AssigneeId = coordinator.Id,
+                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator')
+                        .Id
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = member.Id,
+                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Program_Staff').Id
+                )
+            };
+            List<String> roles = new List<String>{ 'Volunteer_Coordinator' };
+            // Core's tests can name no module set, so a tab set stands in for one.
+            TabAccessService.coreSetPrefix = 'Not_Core_';
+
+            Test.startTest();
+            Boolean noRoom = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                0,
+                'Test'
+            );
+            Boolean more = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                100,
+                'Test'
+            );
+            Boolean again = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                100,
+                'Test'
+            );
+            Boolean missing = TabAccessService.giveToGroupHolders('No_Such_Set', roles, 100, 'T');
+            Boolean noRoles = TabAccessService.giveToGroupHolders('Module_Set', null, 100, 'T');
+            Test.stopTest();
+
+            Assert.isTrue(noRoom, 'A budget of nothing leaves the role holder for later');
+            Assert.isFalse(more, 'Then everyone is done in one pass');
+            Assert.isFalse(again, 'And a second pass finds nobody left');
+            Assert.isFalse(missing, 'A set this org lacks is skipped');
+            Assert.isFalse(noRoles, 'No roles gives nothing');
+            Assert.isTrue(
+                tabSetsOf(coordinator.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Coordinator role holder gets the set'
+            );
+            Assert.isFalse(
+                tabSetsOf(member.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Team Member, holding the same Core set, does not'
+            );
+        }
+    }
+
+    @IsTest
     static void givesNoneOfCoresOwnSetsAndNothingWithoutAnAudience() {
         System.runAs(TestUsers.admin()) {
             List<String> refused = new List<String>();
@@ -161,10 +220,20 @@ private class TabAccessServiceTest {
                     refused.add(coreSet);
                 }
             }
+            try {
+                TabAccessService.giveToGroupHolders(
+                    'BarnCRM_Staff',
+                    new List<String>{ 'Read_Only' },
+                    100,
+                    'Test'
+                );
+            } catch (IllegalArgumentException expected) {
+                refused.add('BarnCRM_Staff by role');
+            }
             Boolean noAudience = TabAccessService.giveToHolders('Module_Set', null, 100, 'Test');
             Test.stopTest();
 
-            Assert.areEqual(4, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
+            Assert.areEqual(5, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
             Assert.isFalse(noAudience, 'No audience gives nothing and leaves nothing for later');
         }
     }
