@@ -115,18 +115,32 @@ made:
 A token spelled wrong is printed as typed, so a test letter shows the mistake. Names and job
 titles are printed as plain text, so a person or job name can never change the layout. Keep the
 HTML simple (paragraphs, headings, lists, inline styles): the PDF service does not run scripts.
+Fill in your legal name and address in the Organization section of BarnCRM Settings first;
+until you do, those tokens print nothing.
 
-**One person.** Add the **Volunteer letter** action to your contact page (and, if your people
-are held as person accounts, your account page): in Setup, **Object Manager**, **Contact**,
-**Page Layouts** (or the Lightning page), add the action. On a person, click **Volunteer
-letter**, choose the template and the period, click **Preview** to read it, then **Generate**.
-A person with no approved hours in the period gets no letter, and the action says so. On a
-household or organization account the action says that letters are for people.
+The shipped templates come back at every upgrade if you delete them (inactive when their type
+already has an active template). To stop using one, clear its **Active** box rather than
+deleting it.
+
+**One person.** The **Volunteer letter** action is on no page until you add it. In Setup, go to
+**Object Manager**, **Contact**, **Page Layouts**, open each layout your people use, choose
+**Mobile & Lightning Actions** in the palette, and drag **Volunteer letter** into the
+**Salesforce Mobile and Lightning Experience Actions** section. If that section says its actions
+are predefined, click **override the predefined actions** first. If your people are held as
+person accounts, do the same under **Object Manager**, **Person Account**, **Page Layouts**.
+
+On a person, click **Volunteer letter**, choose the template and the period, click **Preview**
+to read it, then **Generate**. The action offers the active template of each type, so make a
+new template active to try it. A person with no approved hours in the period gets no letter,
+and the action says so. On a household or organization account the action says that letters
+are for people.
 
 **A list of people.** In Flow Builder, the **Generate volunteer letters** action takes a list of
 person Ids, a template Id and the period, and makes the letters in the background, ten people
-at a time; each appears in that person's **Files** within a few minutes. People with no approved
-hours in the period are skipped.
+at a time; each appears in that person's **Files** within a few minutes. To find a template's
+Id, open the template: the Id is the 18-character code in the address, just before `/view`.
+People with no approved hours in the period are skipped. The run sends no message when it ends;
+if a letter you expected is missing, check the person's hours and the [Error Log](error-log.md).
 
 ## Turning it off
 
