@@ -18,6 +18,7 @@
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Hours__c</tabs>
+  <tabs>Skill__c</tabs>
   <tabs>Volunteer_Settings</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -26,6 +27,9 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Job__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Skill__c</tab>
     </mappings>
     <mappings>
       <tab>Volunteer_Settings</tab>

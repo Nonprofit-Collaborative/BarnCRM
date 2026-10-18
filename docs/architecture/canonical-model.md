@@ -7122,9 +7122,18 @@ Coordinator deletes only hours, since the platform gives Modify All only with De
 | `Volunteers_Staff` | the Team Member role (`Program_Staff`) | create, edit | create, edit their own entries (sharing Private) | edit |
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
-Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab. The custom permission `Manage_Volunteers`
+Each set shows the BarnCRM Volunteers app and the Jobs, Shifts, Hours and Skills tabs; only the
+Admin set shows the Volunteer Settings tab. The custom permission `Manage_Volunteers`
 (created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
+
+**Skills (V-04).** Skill, Volunteer Skill and Job Skill have no rule that refuses a user, so
+the sets follow the list's purpose. Skill (the admin's own list): Admin and Coordinator create,
+edit and delete (Modify All, since Skill sharing is Read and the platform lets a user edit
+another's record only with it; deleting a skill in use is refused anyway, R-SK1); Staff and
+Read Only read. Volunteer Skill: Admin and Coordinator the same; Staff create, edit and delete
+the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coordinator and
+Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
+the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
 ## 29I. Volunteer profile
 
@@ -7705,10 +7714,10 @@ skills are shown beside each name; they never filter.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
-| Type | `Type__c` | Picklist: Skill, Interest |
+| Contact | `Contact__c` | Lookup to Contact (emptied when the person is deleted: a lookup cannot delete its row, as for the other person pairs) |
+| Person Account | `Account__c` | Lookup to Account (emptied when the person is deleted) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Type | `Type__c` | Required picklist: Skill, Interest (default Skill) |
 
 - **Validation rule:** `Volunteer_Skill_One_Person` (R-VK1).
 
@@ -7740,7 +7749,7 @@ A skill a job needs (feature V-04), used to find volunteers for its shifts (R-VK
 | Attribute | API name | Type |
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
 
 ---
 
@@ -8237,6 +8246,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
+| v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 
 ---
 ## 32. Entity ownership by package

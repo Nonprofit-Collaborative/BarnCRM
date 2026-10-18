@@ -37,7 +37,7 @@ finishes, BarnCRM does three things on its own:
    (next section). This runs in the background and takes a minute or two in a large org.
 
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
-**Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, and
+**Volunteer Shifts**, **Volunteer Hours** and **Skills** for everyone with a Volunteers set, and
 **Volunteer Settings** for admins only.
 
 ## Roles and permission sets
@@ -70,6 +70,37 @@ their Volunteers set too, in Setup under **Users**, **Permission Set Assignments
 themselves; a Coordinator or Admin sees everyone's. A Read Only user enters none, so sees no
 hours entries at all. The totals on a person (when they arrive) count every approved entry
 whoever entered it, and everyone who can see the person sees them.
+
+## Skills and interests
+
+The module keeps your own list of skills and interests, for example "Spanish", "Forklift
+licence" or "Working with children". It ships none: you write the list.
+
+**Build the list.** Open the **Skills** tab and create one record per skill, with an optional
+description (for example which licence counts). **Active** is on by default.
+
+**Give skills to people.** On a person (a Contact, or an Account where your people are person
+accounts), add a **Volunteer Skill**: pick the skill and a **Type**. **Skill** means the person
+can do it; **Interest** means they would like to. A volunteer skill belongs to one person:
+fill in the contact or the account, never both.
+
+**Say which skills a job needs.** On a job, add a **Job Skill** for each skill the job needs.
+Deleting the job deletes its job skills.
+
+**Retire a skill, do not delete it.** A skill that any person holds or any job needs cannot be
+deleted. Untick **Active** instead: it stays on the people and jobs that have it and is no
+longer offered for new ones. A skill nobody holds or needs can be deleted.
+
+**Repeats do no harm.** Nothing stops the same skill being added to a person twice (an import,
+for example), and it changes no answer: matching asks whether a person holds a skill, not how
+many times.
+
+Who can do what: Admins and Coordinators manage the list and anyone's skills. Team Members add
+skills to people and remove the ones they added, and can read the list. Read Only users read.
+Admins, Coordinators and Team Members all add and remove a job's skills.
+
+Finding volunteers for a shift by skill and availability arrives with a later part of the
+module; until then the records are the data it will use.
 
 ## Settings
 

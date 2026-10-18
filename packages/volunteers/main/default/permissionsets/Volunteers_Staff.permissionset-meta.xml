@@ -195,6 +195,26 @@
     <field>Volunteer_Signup__c.Notes__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Skill__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Skill__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Skill__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Skill__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
@@ -231,6 +251,37 @@
     <object>Volunteer_Signup__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Job_Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Volunteer_Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>Skill__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Volunteer_Hours__c</tab>
     <visibility>Visible</visibility>
