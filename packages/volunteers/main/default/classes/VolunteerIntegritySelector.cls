@@ -11,43 +11,51 @@
  * record is shown, and nothing reaches a dynamic query.
  */
 public without sharing class VolunteerIntegritySelector {
-    /** How many shifts each of these jobs has. A job with none is absent. */
-    public static Map<Id, Integer> countShiftsByJob(Set<Id> jobIds) {
-        Map<Id, Integer> counts = new Map<Id, Integer>();
-        if (jobIds == null || jobIds.isEmpty()) {
-            return counts;
-        }
-        for (AggregateResult row : [
-            SELECT Volunteer_Job__c jobId, COUNT(Id) total
-            FROM Volunteer_Shift__c
-            WHERE Volunteer_Job__c IN :jobIds
-            WITH SYSTEM_MODE
-            GROUP BY Volunteer_Job__c
-        ]) {
-            counts.put((Id) row.get('jobId'), (Integer) row.get('total'));
-        }
-        return counts;
-    }
-
     /**
-     * How many hours entries, of any status, each of these jobs carries. Hours outlive their
-     * shift (R-VG3), so they are counted on their own rather than through the shifts.
+     * Which of these jobs have at least one shift or one hours entry, of any status, for R-VJ1.
+     * Hours outlive their shift (R-VG3), so both are asked. Existence, not a count: each query
+     * returns at most one row per job however many shifts or entries it has, so deleting many
+     * busy jobs at once stays far inside the query row limit.
      */
-    public static Map<Id, Integer> countHoursByJob(Set<Id> jobIds) {
-        Map<Id, Integer> counts = new Map<Id, Integer>();
+    public static Set<Id> selectJobIdsInUse(Set<Id> jobIds) {
+        Set<Id> inUse = new Set<Id>();
         if (jobIds == null || jobIds.isEmpty()) {
-            return counts;
+            return inUse;
         }
-        for (AggregateResult row : [
-            SELECT Volunteer_Job__c jobId, COUNT(Id) total
-            FROM Volunteer_Hours__c
-            WHERE Volunteer_Job__c IN :jobIds
+        for (Volunteer_Job__c job : [
+            SELECT Id
+            FROM Volunteer_Job__c
+            WHERE
+                Id IN :jobIds
+                AND Id IN (
+                    SELECT Volunteer_Job__c
+                    FROM Volunteer_Shift__c
+                    WHERE Volunteer_Job__c IN :jobIds
+                )
             WITH SYSTEM_MODE
-            GROUP BY Volunteer_Job__c
         ]) {
-            counts.put((Id) row.get('jobId'), (Integer) row.get('total'));
+            inUse.add(job.Id);
         }
-        return counts;
+        Set<Id> unanswered = new Set<Id>(jobIds);
+        unanswered.removeAll(inUse);
+        if (unanswered.isEmpty()) {
+            return inUse;
+        }
+        for (Volunteer_Job__c job : [
+            SELECT Id
+            FROM Volunteer_Job__c
+            WHERE
+                Id IN :unanswered
+                AND Id IN (
+                    SELECT Volunteer_Job__c
+                    FROM Volunteer_Hours__c
+                    WHERE Volunteer_Job__c IN :unanswered
+                )
+            WITH SYSTEM_MODE
+        ]) {
+            inUse.add(job.Id);
+        }
+        return inUse;
     }
 
     /** The sign-ups on these shifts that name one of these people, for R-VU2. */
@@ -66,6 +74,19 @@ public without sharing class VolunteerIntegritySelector {
                 Volunteer_Shift__c IN :shiftIds
                 AND (Contact__c IN :contactIds
                 OR Account__c IN :accountIds)
+            WITH SYSTEM_MODE
+        ];
+    }
+
+    /** The live entries naming these sign-ups, for R-VU3 when an old entry is undeleted. */
+    public static List<Volunteer_Hours__c> selectHoursNamingSignups(Set<Id> signupIds) {
+        if (signupIds == null || signupIds.isEmpty()) {
+            return new List<Volunteer_Hours__c>();
+        }
+        return [
+            SELECT Id, Volunteer_Signup__c
+            FROM Volunteer_Hours__c
+            WHERE Volunteer_Signup__c IN :signupIds
             WITH SYSTEM_MODE
         ];
     }

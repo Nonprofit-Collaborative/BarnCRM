@@ -201,4 +201,97 @@ private class VolunteerSignupServiceTest {
             );
         }
     }
+
+    @IsTest
+    static void restoringASecondSignupIsRefused() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Shift__c shift = theShift();
+            Volunteer_Signup__c first = VolunteersTestData.newSignup(shift.Id, person().Id);
+            insert first;
+            delete first;
+            insert VolunteersTestData.newSignup(shift.Id, person().Id);
+            String message = '';
+
+            Test.startTest();
+            try {
+                undelete first;
+            } catch (DmlException refused) {
+                message = refused.getDmlMessage(0);
+            }
+            Test.stopTest();
+
+            Assert.isTrue(message.contains(shift.Name), 'R-VU2 holds on undelete: ' + message);
+            Assert.areEqual(1, [SELECT COUNT() FROM Volunteer_Signup__c], 'One booking.');
+        }
+    }
+
+    @IsTest
+    static void restoringAnOldAttendanceEntryIsRefused() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Signup__c signup = VolunteersTestData.newSignup(theShift().Id, person().Id);
+            signup.Status__c = 'Attended';
+            insert signup;
+            Volunteer_Hours__c old = [SELECT Id FROM Volunteer_Hours__c];
+            delete old;
+            update new Volunteer_Signup__c(Id = signup.Id, Status__c = 'No show');
+            update new Volunteer_Signup__c(Id = signup.Id, Status__c = 'Attended');
+            String message = '';
+
+            Test.startTest();
+            try {
+                undelete old;
+            } catch (DmlException refused) {
+                message = refused.getDmlMessage(0);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Volunteers_Hours_SecondEntryForSignup,
+                message,
+                'One attendance stays one entry (R-VU3).'
+            );
+            Assert.areEqual(1, [SELECT COUNT() FROM Volunteer_Hours__c], 'One entry.');
+        }
+    }
+
+    @IsTest
+    static void attendanceOnAShiftThatCannotBeReadIsLogged() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Shift__c gone = VolunteersTestData.shift(theShift().Volunteer_Job__c);
+            Volunteer_Signup__c signup = VolunteersTestData.newSignup(theShift().Id, person().Id);
+            insert signup;
+            Id goneId = gone.Id;
+            delete gone;
+            Volunteer_Signup__c attended = new Volunteer_Signup__c(
+                Id = signup.Id,
+                Contact__c = person().Id,
+                Volunteer_Shift__c = goneId,
+                Status__c = 'Attended'
+            );
+
+            Test.startTest();
+            VolunteerSignupService.createHoursForAttendance(
+                new List<Volunteer_Signup__c>{ attended },
+                null
+            );
+            Test.stopTest();
+
+            Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Hours__c], 'No hours to write.');
+            Integer naming = 0;
+            for (Error_Log__c entry : [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Severity__c = 'Warning'
+            ]) {
+                if (entry.Message__c.contains(String.valueOf(signup.Id))) {
+                    naming++;
+                }
+            }
+            Assert.areEqual(
+                1,
+                naming,
+                'A Warning names the sign-up, so the hours are typed by hand.'
+            );
+        }
+    }
 }

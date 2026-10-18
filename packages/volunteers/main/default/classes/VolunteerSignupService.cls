@@ -6,6 +6,7 @@
 public with sharing class VolunteerSignupService {
     public static final String STATUS_ATTENDED = 'Attended';
     private static final Decimal MILLISECONDS_PER_HOUR = 3600000;
+    private static final String LOG_CONTEXT = 'VolunteerSignupService.createHoursForAttendance';
 
     /**
      * R-VU2: a second sign-up for the same person on the same shift is refused, naming the
@@ -117,13 +118,21 @@ public with sharing class VolunteerSignupService {
 
         List<Volunteer_Signup__c> sources = new List<Volunteer_Signup__c>();
         List<Volunteer_Hours__c> entries = new List<Volunteer_Hours__c>();
+        List<String> skipped = new List<String>();
         for (Volunteer_Signup__c signup : attended) {
-            Volunteer_Shift__c shift = shifts.get(signup.Volunteer_Shift__c);
-            if (alreadyRecorded.contains(signup.Id) || shift == null) {
+            if (alreadyRecorded.contains(signup.Id)) {
                 continue;
             }
-            Decimal hours = lengthInHours(shift);
+            Volunteer_Shift__c shift = shifts.get(signup.Volunteer_Shift__c);
+            Decimal hours = shift == null ? null : lengthInHours(shift);
             if (hours == null || hours <= 0) {
+                // Attendance is still saved; the Error Log says which hours to type by hand.
+                skipped.add(
+                    String.format(
+                        Label.Volunteers_Signup_NoHoursWritten,
+                        new List<String>{ String.valueOf(signup.Id) }
+                    )
+                );
                 continue;
             }
             sources.add(signup);
@@ -140,10 +149,44 @@ public with sharing class VolunteerSignupService {
             );
         }
 
+        if (!skipped.isEmpty()) {
+            ErrorLogger.logMessages(skipped, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
+        }
+
         List<Database.SaveResult> results = VolunteerHoursService.submit(entries);
         for (Integer i = 0; i < results.size(); i++) {
             if (!results[i].isSuccess()) {
                 sources[i].addError(results[i].getErrors()[0].getMessage());
+            }
+        }
+    }
+
+    /**
+     * R-VU3, the other way round: an entry attendance wrote, deleted and then restored after the
+     * sign-up was marked Attended again (which wrote a new one), would be a second entry for one
+     * attendance. Undeleting it is refused while another entry names the same sign-up.
+     */
+    public static void refuseRestoringASecondEntry(List<Volunteer_Hours__c> restored) {
+        Set<Id> signupIds = new Set<Id>();
+        for (Volunteer_Hours__c entry : restored) {
+            if (entry.Volunteer_Signup__c != null) {
+                signupIds.add(entry.Volunteer_Signup__c);
+            }
+        }
+        if (signupIds.isEmpty()) {
+            return;
+        }
+        Map<Id, Integer> entriesBySignup = new Map<Id, Integer>();
+        for (
+            Volunteer_Hours__c live : VolunteerIntegritySelector.selectHoursNamingSignups(signupIds)
+        ) {
+            Integer seen = entriesBySignup.get(live.Volunteer_Signup__c);
+            entriesBySignup.put(live.Volunteer_Signup__c, seen == null ? 1 : seen + 1);
+        }
+        for (Volunteer_Hours__c entry : restored) {
+            Integer named = entriesBySignup.get(entry.Volunteer_Signup__c);
+            if (named != null && named > 1) {
+                entry.addError(Label.Volunteers_Hours_SecondEntryForSignup);
             }
         }
     }

@@ -43,6 +43,14 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
         );
     }
 
+    /**
+     * R-VU2 on undelete: restoring a sign-up for a person who has since been booked onto the
+     * same shift again is refused. Undeleting writes no attendance hours.
+     */
+    public override void afterUndelete() {
+        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) Trigger.new);
+    }
+
     public override void afterUpdate() {
         VolunteerSignupService.createHoursForAttendance(
             (List<Volunteer_Signup__c>) Trigger.new,

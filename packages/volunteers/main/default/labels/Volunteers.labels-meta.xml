@@ -48,4 +48,20 @@
         <shortDescription>Second sign-up refused; {0} is the shift name</shortDescription>
         <value>This person is already signed up for {0}. Change the sign-up that is there instead of adding another.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Signup_NoHoursWritten</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendance wrote no hours; {0} is the sign-up ID</shortDescription>
+        <value>Sign-up {0} was marked Attended, but no hours were written: its shift has no end time, ends before it starts, or could not be read. Enter the hours by hand.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Hours_SecondEntryForSignup</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Restoring would make a second entry for one sign-up</shortDescription>
+        <value>These hours cannot be restored: another hours entry already records this sign-up's attendance.</value>
+    </labels>
 </CustomLabels>

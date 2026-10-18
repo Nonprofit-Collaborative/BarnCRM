@@ -21,10 +21,9 @@ public with sharing class VolunteerJobTriggerHandler extends TriggerHandler {
     public override void beforeDelete() {
         List<Volunteer_Job__c> jobs = (List<Volunteer_Job__c>) Trigger.old;
         Set<Id> jobIds = new Map<Id, Volunteer_Job__c>(jobs).keySet();
-        Map<Id, Integer> shifts = VolunteerIntegritySelector.countShiftsByJob(jobIds);
-        Map<Id, Integer> hours = VolunteerIntegritySelector.countHoursByJob(jobIds);
+        Set<Id> inUse = VolunteerIntegritySelector.selectJobIdsInUse(jobIds);
         for (Volunteer_Job__c job : jobs) {
-            if (shifts.containsKey(job.Id) || hours.containsKey(job.Id)) {
+            if (inUse.contains(job.Id)) {
                 job.addError(Label.Volunteers_Job_InUseNotDeletable);
             }
         }
