@@ -120,6 +120,7 @@ Nothing is broken today.
 | Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
+| Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, and shift schedules that have not created shifts far enough ahead. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 
 Five of those are new: the two fiscal years, and, with a module installed, the Override
 Receipt Lock permission, the failed receipts, the unposted gifts in a closed period (all

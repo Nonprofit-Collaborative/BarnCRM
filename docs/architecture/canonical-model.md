@@ -7153,6 +7153,18 @@ the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coo
 Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
 the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
+**Health Check.** `VolunteersHealthCheckExtension`, registered in
+`HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds three findings to Core's one report,
+read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
+settings) and asked only of a viewer who may manage settings, and not at all while the module is
+turned off. Counts stop at 1,000 and the first five records are linked.
+
+| Key | Severity | Reports | Fix |
+|---|---|---|---|
+| `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
+| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list. |
+| `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
+
 ## 29I. Volunteer profile
 
 ### Definition
@@ -8029,7 +8041,8 @@ creates at most ten schedules' worth of shifts at the longest horizon the settin
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
 - **Health Check:** an active schedule whose Created Through is more than two days short of the
-  horizon (or End Date) is reported as "schedule horizon not filled".
+  horizon (or End Date) is reported as "schedule horizon not filled"
+  (`volunteer_schedule_horizon`, Part G "Health Check").
 
 ---
 
@@ -8229,7 +8242,6 @@ is closed deliberately rather than discovered.
 | Rule | Gap | Why it is open |
 |---|---|---|
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
-| 29T Health Check | No "schedule horizon not filled" finding yet: an active schedule whose nightly run stopped shows only as shifts missing ahead. Health Check does list the nightly schedule run when it is not scheduled. | The finding needs a Volunteers Health Check extension, which the module does not have yet; it follows V-07 as its own change. |
 
 Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
 mirrors the primary member).
@@ -8402,6 +8414,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 | v0.8 | 2026-10-18 | Volunteers lifecycle: erasure and household dependents. No object or field added. New rules R-VG10, R-VU5 and R-VK5: erasing a person keeps their hours and sign-ups with notes emptied, cancels their bookings on shifts still to come, deletes their volunteer skills, and keeps the five volunteer totals on the person even where no rollup definition reports them (`VolunteersErasureExtension`). R-H12 and R-VG2: `VolunteersHouseholdDependentsExtension`, registered in `HouseholdDependentsExtensions.EXTENSION_CLASSES`, keeps a household a Volunteer Hours entry names. |
+| v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: three findings from `VolunteersHealthCheckExtension` (hours waiting, past shifts Open, schedule horizon), registered in `HealthCheckExtensions.EXTENSION_CLASSES`. The 29T known gap ("schedule horizon not filled") is closed. |
 
 ---
 ## 32. Entity ownership by package

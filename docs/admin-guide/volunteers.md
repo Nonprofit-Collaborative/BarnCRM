@@ -442,6 +442,18 @@ activate the page for the BarnCRM Volunteers app.
 **Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
 schedule you pick.
 
+## Health Check findings
+
+With Volunteers installed, [Health Check](health-check.md) also asks three questions about it.
+They are asked only of someone who may manage BarnCRM Settings, and not at all while Volunteers
+is turned off. Counts stop at 1,000, and each finding about records links the first five.
+
+| Finding | Why it matters | How to fix it |
+|---|---|---|
+| **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
+| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list**, open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Shift Horizon Weeks** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+
 ## Erasing a volunteer
 
 When someone asks to be forgotten, [Erasing a person](erase-a-person.md) anonymizes their record.
