@@ -728,4 +728,20 @@
         <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
         <value>Something went wrong with sign-ups. The details are in the Error Log.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_NightlyJobs_SchedulesName</fullName>
+        <categories>Volunteers, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the shift schedule run and when it runs</shortDescription>
+        <value>Volunteer shift schedules, 3:00 AM</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Schedules_SkippedTurnedOff</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error log: the nightly schedule run skipped, module off</shortDescription>
+        <value>The nightly run of volunteer shift schedules was skipped because Volunteers is turned off. It catches up on the first night after you turn it back on.</value>
+    </labels>
 </CustomLabels>

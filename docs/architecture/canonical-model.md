@@ -7124,10 +7124,11 @@ Every attribute here, the person attributes included, is shipped by Volunteers, 
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
 BarnCRM role by `VolunteersAccessSync`, which never takes one away. Approved By, Approved Date,
-Household and every rollup total are read only in each. Staff and Read Only delete nothing; the
-Coordinator deletes only hours, since the platform gives Modify All only with Delete.
+Household, a schedule's Created Through and Shifts Kept, and every rollup total are read only in
+each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
+gives Modify All only with Delete.
 
-| Permission set | Given to | Job, Shift, Sign-up | Hours | Person attributes |
+| Permission set | Given to | Job, Shift, Sign-up, Shift Schedule | Hours | Person attributes |
 |---|---|---|---|---|
 | `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
 | `Volunteers_Coordinator` | the Coordinator role (`Volunteer_Coordinator`) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
@@ -7316,7 +7317,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Volunteers Needed | `Volunteers_Needed__c` | Number(4, 0), default 1 |
 | Location | `Location__c` | Text(255) |
 | Status | `Status__c` | Picklist: Open, Cancelled, Completed |
-| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07), not in the first build of this section |
+| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07) |
 | Slots Filled | `Slots_Filled__c` | Number(4, 0) |
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
@@ -7851,6 +7852,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 | Location | text | no | Where the shifts happen, copied to each shift; empty means the job's location. |
 | Active | boolean | yes (defaults true) | Whether the schedule still creates shifts. |
 | Created Through | date | computed | The last day the schedule has created shifts for. Kept by the generator; never edited. |
+| Shifts Kept | integer | computed | How many future shifts the last edit that removed shifts (R-SSC4, R-SSC5) kept as they were, because they have sign-ups or hours or are Cancelled. Kept by the automation; never edited. |
 
 ### Relationships
 
@@ -7868,9 +7870,10 @@ sides of a daylight saving change, whoever's job created it.
 **R-SSC2 A rolling horizon.** An active schedule keeps shifts created from today to
 `Shift_Horizon_Weeks__c` weeks ahead (Volunteer Settings, default 8). Each run creates the
 shift days after Created Through (or from today, if later), up to the horizon and End Date, then
-moves Created Through forward. A day that already has a shift from this schedule is skipped. Each
-created shift is Open, linked to the schedule, and takes the schedule's job, times, Volunteers
-Needed and Location.
+moves Created Through forward. A day that already has a shift from this schedule is skipped, and
+so is a shift today whose start has already passed. Each created shift is Open, linked to the
+schedule, and takes the schedule's job, times, Volunteers Needed and Location; it is named as
+R-VS2 names a shift, from its job and start, with the start written in the org's time zone.
 
 **R-SSC3 When it runs.** Saving a schedule queues a run for it, so its shifts appear without
 waiting for the night (the `Shift_Schedule_Rules` automation). Every night the Volunteers
@@ -7879,15 +7882,19 @@ queued run and the nightly run never create the same day twice. Nothing runs whi
 is turned off; turning it back on catches up at the next nightly run.
 
 **R-SSC4 Editing changes only future shifts with no sign-ups.** When Weekdays, Every N Weeks,
-Start Time, End Time, Start Date, End Date, Volunteers Needed or Location changes, the
-schedule's shifts that start after now, are not Cancelled and have no sign-up record of any
-status are deleted, Created Through is cleared, and a run recreates them from the new pattern.
-Past shifts, shifts with sign-ups and Cancelled shifts are never changed, and a day holding one
-of them is not given a second shift. The save tells the coordinator how many future shifts were
-kept as they were. Changing only Name changes no shift.
+Start Time, End Time, Start Date, Volunteers Needed or Location changes, the schedule's shifts
+that start after now, are not Cancelled and have no sign-up record of any status and no hours
+record are deleted, Created Through is cleared, and a run recreates them from the new pattern.
+Past shifts, shifts with sign-ups or hours and Cancelled shifts are never changed, and a day holding one of them is not given
+a second shift. The save records on the schedule, in Shifts Kept, how many future shifts were
+kept as they were. Changing only Name changes no shift. A change to End Date with none of the
+others is ending (R-SSC5): a later or empty End Date only lets the next run go further.
 
 **R-SSC5 Ending a schedule.** Clearing Active, or setting End Date earlier, deletes the future
-shifts it no longer covers that have no sign-ups and are not Cancelled; the rest are kept.
+shifts it no longer covers that have no sign-ups or hours and are not Cancelled; the rest are
+kept, and Shifts Kept counts those it no longer covers. Clearing Active also clears Created
+Through, so setting it again fills the horizon from today; an earlier End Date moves Created
+Through back to it, so a later End Date creates those days again.
 Deleting a schedule does the same for all its future shifts, and the shifts kept lose their
 link to it. A coordinator who wants one day off cancels that shift: a deleted shift is created
 again by the next edit of its schedule, a Cancelled one is not.
@@ -7912,12 +7919,18 @@ creates at most ten schedules' worth of shifts at the longest horizon the settin
 | Location | `Location__c` | Text (255) |
 | Active | `Active__c` | Checkbox, default true |
 | Created Through | `Created_Through__c` | Date, read only in every permission set |
+| Shifts Kept | `Shifts_Kept__c` | Number (5, 0), read only in every permission set |
 
 - **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Every N Weeks 1 to 52, End
   Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
 - **Automation:** registry row `Shift_Schedule_Rules` (`ShiftScheduleTriggerHandler`), which
-  applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`
-  supplied by `VolunteersNightlyJobProvider` (`NightlyJobProvider`).
+  applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
+  started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`), which
+  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
+  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  Through and Shifts Kept run in system mode: they are the schedule's own bookkeeping, which a
+  Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
+  access. Shifts are created in user mode.
 - **Health Check:** an active schedule whose Created Through is more than two days short of the
   horizon (or End Date) is reported as "schedule horizon not filled".
 
@@ -8119,6 +8132,7 @@ is closed deliberately rather than discovered.
 | Rule | Gap | Why it is open |
 |---|---|---|
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
+| 29T Health Check | No "schedule horizon not filled" finding yet: an active schedule whose nightly run stopped shows only as shifts missing ahead. Health Check does list the nightly schedule run when it is not scheduled. | The finding needs a Volunteers Health Check extension, which the module does not have yet; it follows V-07 as its own change. |
 
 Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
 mirrors the primary member).
@@ -8285,6 +8299,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Rollup targets writable by the engine, not the saving user. No object or field added. R-R10: at run time the planner checks that the engine can write a target attribute (it exists, is not a formula, roll-up summary, auto number or system attribute), never the running user's field-level security; the Rollup Builder's save still checks the administrator's own. Before this, a staff member's save, on whom every module keeps the totals read only, had every definition refused and the totals waited for the nightly run. |
 | v0.8 | 2026-10-18 | Volunteer letters built (V-08, ADR-0129). No object or field added beyond 29U. Section 29U states the template access per Volunteers set, the registry row `Volunteer_Letter_Template_Rules` for R-VL1, that a person account's letter counts hours by `Account__c`, and where a letter is started (record action and flow action). |
 | v0.8 | 2026-10-18 | Volunteers screens (V-02). No object or field added. The access paragraph of Part G names the Approve Hours tab, shown by the Coordinator and Admin sets. |
+| v0.8 | 2026-10-18 | Recurring shifts built (V-07, ADR-0128). New field `Shifts_Kept__c` on `Shift_Schedule__c` (29T): how many future shifts the last edit kept, which is how the save tells the coordinator (R-SSC4). R-SSC2 skips a shift today that has already started and names shifts as R-VS2 does; R-SSC4 leaves an End Date only change to R-SSC5; clearing Active clears Created Through; R-SSC4 and R-SSC5 keep a shift with hours as well as one with a sign-up; an earlier End Date moves Created Through back to it. The access table gains Shift Schedule beside Job, Shift and Sign-up. The schedule Health Check finding is listed as a known gap. |
 
 ---
 ## 32. Entity ownership by package

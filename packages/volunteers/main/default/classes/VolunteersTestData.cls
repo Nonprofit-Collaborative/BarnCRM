@@ -122,6 +122,32 @@ public class VolunteersTestData {
         SettingsService.clearCaches();
     }
 
+    /** Saves how many weeks ahead recurring schedules keep their shifts (V-07). */
+    public static void shiftHorizonWeeks(Integer weeks) {
+        OrgSettingsSystemWriter.save(
+            Volunteer_Settings__c.SObjectType,
+            new Map<Schema.SObjectField, Object>{
+                Volunteer_Settings__c.Shift_Horizon_Weeks__c => weeks
+            }
+        );
+        SettingsService.clearCaches();
+    }
+
+    /** An active schedule from 9:00 to 12:00 on the given days, every week, four places. */
+    public static Shift_Schedule__c newSchedule(Id jobId, String weekdays, Date startDate) {
+        return new Shift_Schedule__c(
+            Name = 'Saturday sorting',
+            Job__c = jobId,
+            Weekdays__c = weekdays,
+            Every_N_Weeks__c = 1,
+            Start_Time__c = Time.newInstance(9, 0, 0, 0),
+            End_Time__c = Time.newInstance(12, 0, 0, 0),
+            Start_Date__c = startDate,
+            Volunteers_Needed__c = 4,
+            Active__c = true
+        );
+    }
+
     public static Account household(String name) {
         Account record = HouseholdTestDataFactory.newHousehold(name);
         insert record;

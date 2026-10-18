@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Created_Through__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The last day this schedule has created shifts for. BarnCRM keeps it; you never edit it.</inlineHelpText>
+  <label>Created Through</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>
