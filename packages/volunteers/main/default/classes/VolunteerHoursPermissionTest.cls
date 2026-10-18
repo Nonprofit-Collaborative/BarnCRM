@@ -131,6 +131,61 @@ private class VolunteerHoursPermissionTest {
     }
 
     @IsTest
+    static void aBulkDeleteKeepsOnlyTheApprovedEntries() {
+        Contact person = ownedContact('Mensah', null);
+        Integer approvedCount = 100;
+        List<Database.DeleteResult> results;
+
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Hours__c template = VolunteersTestData.newHours(person.Id, jobId(), 2);
+            List<Volunteer_Hours__c> entries = new List<Volunteer_Hours__c>();
+            for (Integer i = 0; i < 251; i++) {
+                entries.add(template.clone());
+            }
+            insert entries;
+            Set<Id> toApprove = new Set<Id>();
+            for (Integer i = 0; i < approvedCount; i++) {
+                toApprove.add(entries[i].Id);
+            }
+            VolunteerHoursService.approve(toApprove);
+
+            Test.startTest();
+            results = Database.delete(entries, false);
+            Test.stopTest();
+        }
+
+        Integer refused = 0;
+        for (Database.DeleteResult result : results) {
+            if (!result.isSuccess()) {
+                refused++;
+                Assert.areEqual(
+                    Label.Volunteers_Hours_ApprovedNotDeletable,
+                    result.getErrors()[0].getMessage(),
+                    'Each refusal says to reopen first.'
+                );
+            }
+        }
+        Assert.areEqual(approvedCount, refused, 'Only the approved entries are refused (R-VG9).');
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Assert.areEqual(
+                approvedCount,
+                [SELECT COUNT() FROM Volunteer_Hours__c WHERE Status__c = 'Approved'],
+                'The approved entries remain; the submitted ones are deleted.'
+            );
+            Assert.areEqual(
+                approvedCount,
+                [SELECT COUNT() FROM Volunteer_Hours__c],
+                'Nothing else.'
+            );
+        }
+        Assert.areEqual(
+            'VolunteerHoursDeleteGuardHandler',
+            new VolunteerHoursDeleteGuardHandler().getName(),
+            'The guard names itself in the log.'
+        );
+    }
+
+    @IsTest
     static void anEntryTheCoordinatorCannotEditIsReportedNotThrown() {
         Contact person = ownedContact('Nolan', null);
         Volunteer_Hours__c hours = VolunteersTestData.newHours(person.Id, jobId(), 2);
