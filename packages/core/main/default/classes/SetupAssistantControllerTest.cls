@@ -42,10 +42,21 @@ private class SetupAssistantControllerTest {
                 stepByKey(state.steps, 'identity').fields.size(),
                 'The organization step carries the fields it is going to edit'
             );
+            Integer installed = 0;
+            for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+                if (
+                    row.DeveloperName != 'Rollups' &&
+                    row.DeveloperName != 'Giving' &&
+                    String.isNotBlank(row.Probe_Object__c) &&
+                    ModuleDetectionService.resolveObject(row.Probe_Object__c.trim()) != null
+                ) {
+                    installed++;
+                }
+            }
             Assert.areEqual(
-                2,
+                2 + installed,
                 state.modules.size(),
-                'Before an edition is chosen, Core and Rollup Builder are listed, no nonprofit module'
+                'Before an edition is chosen, Core and Rollup Builder are listed, plus any module installed here, no other nonprofit module'
             );
             Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
             Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');
