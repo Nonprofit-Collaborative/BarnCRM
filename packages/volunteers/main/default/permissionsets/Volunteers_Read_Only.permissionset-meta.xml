@@ -10,6 +10,10 @@
     <application>BarnCRM_Volunteers</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <classAccesses>
+    <apexClass>VolunteerLetterController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Availability_Days__c</field>
