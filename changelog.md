@@ -8,12 +8,30 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- BMemory plan edited: D-104 (v0.8 Volunteers started, design approved), v0.8 exit row (built and tested unmanaged; install-link testing waits for the first package versions), V-08 row (Volunteers' own letter generator), Standard Edition line (Volunteers nonprofit-only). `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed from it.
+- `mwdbdevsb` (owner approved): check-only validation of 8 classes of the #464 household fix, 249 tests, 0 failures (`ImportUndoBatch` left out: its only covering test fails there on Contact field access, a pre-existing org dependency, follow-up), then quick deploy of that validated job (8 components). Household tests rerun there: 242 of 242 pass (32 failed before). The `ImportUndoBatch` change is not on `mwdbdevsb`. Correction to the cf861610 entry below: Brandon and Michelle already held `Rollup_Builder_Admin` there (the assignment returned Duplicate). Core test run there before the fix: 2,149 of 2,240 passing.
+- Remote branches: the 167 reviewed branches deleted (owner approved); remote is now `main` plus 3 kept (X-07 salvage, `feature/v-01-v-02-v-03-volunteers`, `feature/rollup-s15-spike`).
+- #464 (households in orgs with Contacts to Multiple Accounts and no Nonprofit Cloud) is open and awaits owner approval of ADR 0130.
 - Live tier 1 scale run on `oi-test` at main 1f159c4b: households 4,000 of 4,000 and contacts 10,000 of 10,000 through the REST allow-save loader, gifts 30,000 of 30,000, soft credits 3,000 of 3,000, 0 refused rows; cleaned up. A first attempt refused to load because data from the 2026-10-14 run was still there (3,691 households, 8,672 contacts, 26,102 gifts); cleanup removed it to the Recycle Bin (the running user lacks Bulk API Hard Delete).
 - `mwdbdevsb` deployed (owner approved) at cf861610: check-only first (Core plus Rollup Builder, 3,067 of 3,067, 0 errors), then `deploy-packages.sh --core-only` and the Rollup Builder package (318 of 318); rollup settings carried over, access sync queued; no shipped rollup definitions created (they ship with Giving, not deployed there). `Rollup_Builder_Admin` assignment to the two admins left to the owner.
 - Branch review: the 170 remote branches without a PR were checked; 167 landed or superseded (contained in PR heads squash-merged as #219, #377, #181, or replaced); 3 kept (the X-07 salvage branch, `feature/v-01-v-02-v-03-volunteers`, `feature/rollup-s15-spike`). Plan 11.3 salvage note corrected in BMemory; `docs/product-plan.md` refreshed.
 
 ### Merged to main
 
+- #470 (squash a459aa35, gate `oi-pa` 3,244 of 3,244): Volunteers V-02 sign-up, shift and job domain (PR6 part 2).
+- #469 (squash ee55453c, gate `oi-test` 3,228 of 3,228): Volunteers V-02 hours domain; validation rule limits status, approver and rejection changes on saved hours to `Manage_Volunteers`; Approved hours cannot be deleted.
+- #465 (squash b91229e7, gate `oi-pa` 3,205 of 3,205): Volunteers V-01 data model B (`Volunteer_Hours__c`, `Volunteer_Settings__c`, Setting Definition rows, `Volunteers_Admin`).
+- #463 (squash df6647ca, gate `oi-test` 3,198 of 3,198): Volunteers V-01 data model A (person fields, Job, Shift, Sign-up).
+- #460 (squash 2ff3a52b, gate `oi-pa` 3,194 of 3,194): field utilization duplicate `RecordTypeId` fix; scale test coverage follow-ups.
+- #458 (squash 8029a5ef, gate `oi-test` 3,193 of 3,193): tests independent of org field access on optional standard fields.
+- #462 (squash 3b53d9ef, gate `oi-pa` 3,198 of 3,198): V-06 Core, shipped import templates can load one object.
+- #461 (squash e9ae58a2, gate `oi-test` 3,194 of 3,194): full rollup recalculation and the nightly run send very large parents to the large parent batch instead of stopping on "Too many query rows: 50001".
+- #459 (squash 57b8565b, gate `oi-pa` 3,198 of 3,198): V-00 Volunteers Core and repo seams.
+- #455 (squash b6cee9a4): Module Hub app links open the app by Id (S5).
+- #457 (squash c18227a1): design for Volunteers V-04 to V-08, ADR-0128 recurring shifts, ADR-0129 letters, canonical model 29P to 29V.
+- #456 (squash c9bc84a4): design for Volunteers V-01 to V-03, ADR-0127, canonical model 29I to 29O.
+- #454 (squash bbfba291): Core a11y, the household merge comparison table and the Access Remove buttons are named.
+- #453 (squash 56356285): docs for the earlier 2026-10-17 landings.
 - #452 (squash 44abf031, gate `oi-test` 3,193 of 3,193, coverage 92%): `SettingsController.getSettingsLink()`; `firstRunSetup`, `hubModules`, `hubRollups`, `hubSeasonalAddresses` and `setupAssistant` take the settings tab and `<ns>__section` key from it; the readiness check has no exceptions.
 - #451 (squash fd83577d): namespace readiness S6, new `scripts/ci/check-namespace-readiness.py` (cross-package LWC needs `isExposed`, cross-package labels unprotected, no literal `c__` state key).
 - #450 (squash ce9a9c92, full gate `oi-test` 3,192 of 3,192, coverage 92%): namespace readiness B3 to B5, S1, S4: module tests use `@NamespaceAccessible` test hooks (`TriggerHandler.setTestRecords`, `NightlyJobs.overrideJobsForTest`) and annotated getters instead of `@TestVisible` privates and `@AuraEnabled` fields; shared test factories annotated; `rollupBuilder` uses a Rollups-local `rollupTabLabel`; `check-cross-package-visibility.py` covers test classes; `check-aura-namespace-accessible.py` now also flags methods.
