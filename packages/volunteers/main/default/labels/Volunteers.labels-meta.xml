@@ -64,4 +64,76 @@
         <shortDescription>Restoring would make a second entry for one sign-up</shortDescription>
         <value>These hours cannot be restored: another hours entry already records this sign-up's attendance.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NeedManagePermission</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Letters need the Manage Volunteers permission</shortDescription>
+        <value>Volunteer letters need the Manage Volunteers permission, which the Volunteers Coordinator and Volunteers Admin sets give.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_TemplateNotFound</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No usable letter template was chosen</shortDescription>
+        <value>Choose a volunteer letter template. If none is offered, ask your admin to activate one on the Volunteer Letter Templates tab.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_BadPeriod</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The letter period is missing or reversed</shortDescription>
+        <value>Choose a From date and a To date, with the From date on or before the To date.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoHours</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: no approved hours in the period</shortDescription>
+        <value>No letter: this person has no approved volunteer hours in the period.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NotAPerson</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: the account is not a person</shortDescription>
+        <value>No letter: this account is a household or organization, not a person. Open the person instead.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_PersonNotVisible</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: the person cannot be read</shortDescription>
+        <value>No letter: you cannot see this person.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_JobLine</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>One job in a letter: {0} is the job, {1} the hours</shortDescription>
+        <value>{0}: {1} hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoJob</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The job line for hours that name no job</shortDescription>
+        <value>Other volunteer work</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_FileTitle</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>File title: {0} template, {1} person, {2} from, {3} to</shortDescription>
+        <value>{0} for {1}, {2} to {3}</value>
+    </labels>
 </CustomLabels>
