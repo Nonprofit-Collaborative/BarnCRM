@@ -11,8 +11,13 @@
  *   Date removes those after it and moves Created Through back to it; deleting the schedule removes every one of them, and the shifts
  *   kept lose their link through the lookup's SetNull.
  *
- * Shifts Kept records how many future shifts such a save kept, which is how the save tells the
- * coordinator. The removal runs before the save, so a save that fails removes nothing.
+ * Shifts Kept records how many future shifts with a sign-up or hours such a save kept (Cancelled
+ * shifts are kept but not counted), which is how the save tells the coordinator. A later save that
+ * changes neither the pattern nor the end clears it. The removal runs before the save, so a save
+ * that fails removes nothing.
+ *
+ * R-SSC6: a save removes shifts inline only while the transaction has DML rows to spare; the rest
+ * of its schedules go to `ShiftScheduleBatch`, which removes and recreates a chunk at a time.
  */
 @NamespaceAccessible
 public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
@@ -26,6 +31,12 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
         Shift_Schedule__c.Volunteers_Needed__c,
         Shift_Schedule__c.Location__c
     };
+
+    /**
+     * Schedules a save left for the batch to remove the future shifts of, each with the day it
+     * keeps shifts through, from the save's before step to its after step (R-SSC6).
+     */
+    private static Map<Id, Date> deferred = new Map<Id, Date>();
 
     @NamespaceAccessible
     public ShiftScheduleTriggerHandler() {
@@ -60,13 +71,31 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
                 keepThrough.put(schedule.Id, schedule.End_Date__c);
             }
         }
-        if (keepThrough.isEmpty()) {
-            return;
+        Map<Id, Date> inline = new Map<Id, Date>();
+        deferred = new Map<Id, Date>();
+        Integer budget = ShiftScheduleService.inlineScheduleBudget();
+        for (Id scheduleId : keepThrough.keySet()) {
+            if (inline.size() < budget) {
+                inline.put(scheduleId, keepThrough.get(scheduleId));
+            } else {
+                deferred.put(scheduleId, keepThrough.get(scheduleId));
+            }
         }
-        Map<Id, Integer> kept = ShiftScheduleService.removeFutureShifts(keepThrough);
+        Map<Id, Integer> kept = ShiftScheduleService.removeFutureShifts(inline);
         for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
+            Shift_Schedule__c old = oldById.get(schedule.Id);
             if (kept.containsKey(schedule.Id)) {
                 schedule.Shifts_Kept__c = kept.get(schedule.Id);
+            } else if (deferred.containsKey(schedule.Id)) {
+                // The batch records it once it has removed the shifts.
+                schedule.Shifts_Kept__c = null;
+            } else if (
+                schedule.Shifts_Kept__c == old.Shifts_Kept__c &&
+                schedule.Created_Through__c == old.Created_Through__c
+            ) {
+                // A save that changes neither the pattern nor the end: the last count is stale.
+                // A run moving Created Through, or the batch writing the count, keeps it.
+                schedule.Shifts_Kept__c = null;
             }
             if (restart.contains(schedule.Id)) {
                 schedule.Created_Through__c = null;
@@ -89,7 +118,8 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
         Set<Id> toRun = new Set<Id>();
         for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
             Shift_Schedule__c old = oldById.get(schedule.Id);
-            if (schedule.Active__c != true) {
+            if (schedule.Active__c != true || deferred.containsKey(schedule.Id)) {
+                // A deferred schedule is run by the rebuild, after its old shifts are gone.
                 continue;
             }
             if (
@@ -101,6 +131,8 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
             }
         }
         ShiftScheduleGenerator.queue(toRun);
+        ShiftScheduleGenerator.queueRebuild(deferred);
+        deferred = new Map<Id, Date>();
     }
 
     public override void beforeDelete() {

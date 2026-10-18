@@ -7919,7 +7919,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 | Location | text | no | Where the shifts happen, copied to each shift; empty means the job's location. |
 | Active | boolean | yes (defaults true) | Whether the schedule still creates shifts. |
 | Created Through | date | computed | The last day the schedule has created shifts for. Kept by the generator; never edited. |
-| Shifts Kept | integer | computed | How many future shifts the last edit that removed shifts (R-SSC4, R-SSC5) kept as they were, because they have sign-ups or hours or are Cancelled. Kept by the automation; never edited. |
+| Shifts Kept | integer | computed | How many future shifts the last edit that removed shifts (R-SSC4, R-SSC5) kept as they were, because they have sign-ups or hours; Cancelled shifts are kept too but not counted. Cleared by a later save that changes neither the pattern nor the end. Kept by the automation; never edited. |
 
 ### Relationships
 
@@ -7953,13 +7953,15 @@ Start Time, End Time, Start Date, Volunteers Needed or Location changes, the sch
 that start after now, are not Cancelled and have no sign-up record of any status and no hours
 record are deleted, Created Through is cleared, and a run recreates them from the new pattern.
 Past shifts, shifts with sign-ups or hours and Cancelled shifts are never changed, and a day holding one of them is not given
-a second shift. The save records on the schedule, in Shifts Kept, how many future shifts were
-kept as they were. Changing only Name changes no shift. A change to End Date with none of the
+a second shift. The save records on the schedule, in Shifts Kept, how many future shifts with a
+sign-up or hours were kept as they were (Cancelled shifts are kept but not counted). A later save
+that changes neither the pattern nor the end, a name-only edit for one, clears Shifts Kept; the
+automation's own bookkeeping saves do not. Changing only Name changes no shift. A change to End Date with none of the
 others is ending (R-SSC5): a later or empty End Date only lets the next run go further.
 
 **R-SSC5 Ending a schedule.** Clearing Active, or setting End Date earlier, deletes the future
 shifts it no longer covers that have no sign-ups or hours and are not Cancelled; the rest are
-kept, and Shifts Kept counts those it no longer covers. Clearing Active also clears Created
+kept, and Shifts Kept counts those with a sign-up or hours that it no longer covers. Clearing Active also clears Created
 Through, so setting it again fills the horizon from today; an earlier End Date moves Created
 Through back to it, so a later End Date creates those days again.
 Deleting a schedule does the same for all its future shifts, and the shifts kept lose their
@@ -7967,7 +7969,13 @@ link to it. A coordinator who wants one day off cancels that shift: a deleted sh
 again by the next edit of its schedule, a Cancelled one is not.
 
 **R-SSC6 Scale.** The nightly batch takes ten schedules per transaction, so one transaction
-creates at most ten schedules' worth of shifts at the longest horizon the setting allows.
+creates at most ten schedules' worth of shifts at the longest horizon the setting allows. A save
+that changes the pattern of, or ends, many schedules removes shifts in the save only for as many
+schedules as the transaction's DML rows allow (the rows still free, less a reserve of 2,000,
+over seven shifts a week to the horizon: about 49 at 26 weeks). The rest are rebuilt by the same
+batch, ten per transaction, which removes their future shifts as R-SSC4 and R-SSC5 say, records
+Shifts Kept, clears Created Through and creates the new shifts; until it has run, those
+schedules show no Shifts Kept and still hold their old shifts.
 
 ### Salesforce implementation
 
@@ -8370,6 +8378,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
+| v0.8 | 2026-10-18 | Volunteers hardening. No object or field added. R-SSC6: a save that changes or ends many schedules removes shifts inline only within the transaction's DML rows and hands the rest to the batch. R-SSC4 and R-SSC5: Shifts Kept counts only kept shifts with a sign-up or hours (Cancelled are not counted) and is cleared by a later save that changes neither pattern nor end. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 
 ---

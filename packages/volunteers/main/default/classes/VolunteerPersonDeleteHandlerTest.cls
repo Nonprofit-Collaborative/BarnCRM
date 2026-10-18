@@ -110,6 +110,76 @@ private class VolunteerPersonDeleteHandlerTest {
         }
     }
 
+    /** The people as the trigger hands them to the handler: by Id, with their MasterRecordId. */
+    private static Map<Id, SObject> triggerOld(List<Contact> people) {
+        return new Map<Id, SObject>(
+            [SELECT Id, MasterRecordId FROM Contact WHERE Id IN :people ORDER BY Id]
+        );
+    }
+
+    private static void runDeletePass(Map<Id, SObject> people) {
+        TriggerHandler.setTestRecords(null, people);
+        VolunteerPersonDeleteHandler handler = new VolunteerPersonDeleteHandler();
+        handler.beforeDelete();
+        handler.afterDelete();
+    }
+
+    @IsTest
+    static void aRetriedBatchStillDeletesTheRowsOfThePeopleThatRemain() {
+        System.runAs(volunteersAdmin()) {
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            Id spanish = skill().Id;
+            List<Contact> people = VolunteersTestData.contacts(3);
+            giveRows(people, spanish);
+            Map<Id, SObject> everyone = triggerOld(people);
+            Savepoint beforeFirstPass = Database.setSavepoint();
+
+            runDeletePass(everyone);
+            Assert.areEqual(0, rowsLeft(), 'The first pass deleted every row.');
+
+            // One person's delete fails, so the platform rolls the batch back and runs the
+            // triggers again for the two that remain.
+            Database.rollback(beforeFirstPass);
+            Assert.areEqual(6, rowsLeft(), 'The rollback brought the rows back.');
+            everyone.remove(people[2].Id);
+            runDeletePass(everyone);
+
+            Assert.areEqual(
+                2,
+                rowsLeft(),
+                'The retry deleted the rows of the two that remain and left the third person\'s.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aBatchWhereOneDeleteFailsStillDeletesTheRowsOfTheOthers() {
+        System.runAs(volunteersAdmin()) {
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            Id spanish = skill().Id;
+            List<Contact> people = VolunteersTestData.contacts(3);
+            giveRows(people, spanish);
+            Contact gone = people[2];
+            delete gone;
+            Assert.areEqual(4, rowsLeft(), 'Deleting the third took its two rows.');
+            // The third is already deleted, so its row of the list fails and the others go.
+            Test.startTest();
+            List<Database.DeleteResult> results = Database.delete(people, false);
+            Test.stopTest();
+
+            Integer failed = 0;
+            for (Database.DeleteResult result : results) {
+                failed += result.isSuccess() ? 0 : 1;
+            }
+            Assert.areEqual(1, failed, 'One row of the batch failed.');
+            Assert.areEqual(
+                0,
+                rowsLeft(),
+                'The rows of the people whose delete succeeded are deleted.'
+            );
+        }
+    }
+
     @IsTest
     static void aMergeKeepsTheBackgroundCheckOnThePersonKept() {
         System.runAs(volunteersAdmin()) {

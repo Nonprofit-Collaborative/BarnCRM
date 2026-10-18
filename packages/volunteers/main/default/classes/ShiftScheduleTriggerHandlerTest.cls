@@ -178,9 +178,9 @@ private class ShiftScheduleTriggerHandlerTest {
 
             List<Volunteer_Shift__c> shifts = shiftsOf(before.Id);
             Assert.areEqual(
-                2,
+                1,
                 schedule().Shifts_Kept__c,
-                'The booked and the cancelled shift were kept.'
+                'The booked shift is counted; the cancelled one is kept but not counted.'
             );
             Assert.areEqual(
                 8,
@@ -232,6 +232,70 @@ private class ShiftScheduleTriggerHandlerTest {
     }
 
     @IsTest
+    static void aLaterSaveThatChangesNeitherPatternNorEndClearsShiftsKept() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+            Test.startTest();
+            System.runAs(user(COORDINATOR)) {
+                update new Shift_Schedule__c(
+                    Id = before.Id,
+                    Start_Time__c = Time.newInstance(10, 0, 0, 0)
+                );
+            }
+            Test.stopTest();
+            Assert.areEqual(
+                1,
+                schedule().Shifts_Kept__c,
+                'The pattern edit and its queued run leave the count in place.'
+            );
+
+            update new Shift_Schedule__c(Id = before.Id, Name = 'Saturday morning sort');
+
+            Assert.isNull(schedule().Shifts_Kept__c, 'A name-only edit clears the stale count.');
+        }
+    }
+
+    @IsTest
+    static void aLaterEndDateClearsShiftsKeptToo() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+            update new Shift_Schedule__c(
+                Id = before.Id,
+                End_Date__c = Date.newInstance(2026, 3, 1)
+            );
+            Assert.areEqual(
+                1,
+                schedule().Shifts_Kept__c,
+                'The earlier end kept the booked 7 March.'
+            );
+
+            update new Shift_Schedule__c(
+                Id = before.Id,
+                End_Date__c = Date.newInstance(2026, 4, 30)
+            );
+
+            Assert.isNull(schedule().Shifts_Kept__c, 'A later end changes no shift and clears it.');
+        }
+    }
+
+    @IsTest
+    static void aCancelledShiftIsKeptButNotCounted() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+
+            update new Shift_Schedule__c(Id = before.Id, Active__c = false);
+
+            List<Volunteer_Shift__c> left = shiftsOf(before.Id);
+            Assert.areEqual(1, schedule().Shifts_Kept__c, 'Only the booked shift is counted.');
+            Assert.areEqual(4, left.size(), 'Two past, the booked and the cancelled shift remain.');
+            Assert.areEqual('Cancelled', left[3].Status__c, 'The cancelled shift is still there.');
+        }
+    }
+
+    @IsTest
     static void endingRemovesUnbookedFutureShiftsAndTurningBackOnRefills() {
         System.runAs(admin()) {
             useMondayClock();
@@ -255,9 +319,9 @@ private class ShiftScheduleTriggerHandlerTest {
                 'Staff ended it: 21 and 28 March went, the past two and the kept two stay.'
             );
             Assert.areEqual(
-                2,
+                1,
                 ended.Shifts_Kept__c,
-                'The booked and the cancelled shift were kept.'
+                'The booked shift is counted; the cancelled one is not.'
             );
             Assert.isNull(ended.Created_Through__c, 'Created Through is cleared.');
             Assert.areEqual(
@@ -380,9 +444,9 @@ private class ShiftScheduleTriggerHandlerTest {
 
             List<Volunteer_Shift__c> shifts = shiftsOf(before.Id);
             Assert.areEqual(
-                3,
+                2,
                 schedule().Shifts_Kept__c,
-                'The booked, the cancelled and the shift with hours were kept.'
+                'The booked and the shift with hours are counted; the cancelled one is not.'
             );
             Assert.areEqual(original[4].Id, shifts[4].Id, '21 March, which has hours, stays.');
             Assert.areEqual(

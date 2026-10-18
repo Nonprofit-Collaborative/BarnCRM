@@ -61,6 +61,13 @@ public with sharing class ShiftScheduleSelector {
         );
     }
 
+    /** These schedules, active or not, for the rebuild a large save hands to the batch. */
+    public static Database.QueryLocator byIdLocator(Set<Id> scheduleIds) {
+        return Database.getQueryLocator(
+            [SELECT Id FROM Shift_Schedule__c WHERE Id IN :scheduleIds WITH USER_MODE ORDER BY Id]
+        );
+    }
+
     /** The schedules' shifts starting at or after `fromTime`: their schedule and start. */
     public static List<Volunteer_Shift__c> shiftsFrom(Set<Id> scheduleIds, Datetime fromTime) {
         return [

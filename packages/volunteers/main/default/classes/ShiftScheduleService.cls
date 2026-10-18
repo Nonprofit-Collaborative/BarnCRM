@@ -19,6 +19,12 @@ public with sharing class ShiftScheduleService {
     public static final String STATUS_OPEN = 'Open';
     public static final String STATUS_CANCELLED = 'Cancelled';
 
+    /**
+     * DML rows a save leaves unused for everything else in its transaction (the save's own rows,
+     * other triggers), before it removes shifts inline (R-SSC6).
+     */
+    private static final Integer ROW_RESERVE = 2000;
+
     private static final String NAME_FORMAT = 'd MMM yyyy, h:mm a';
     private static final Integer NAME_LENGTH = 80;
     /** Monday first. Not named WEEKDAYS: Apex names are case-insensitive. */
@@ -140,7 +146,8 @@ public with sharing class ShiftScheduleService {
      * Removes the schedules' future shifts that have no sign-up or hours record and are not
      * Cancelled (R-SSC4, R-SSC5). A schedule mapped to a date keeps the shifts on or before that day (an
      * earlier End Date); one mapped to null loses every future shift. Returns, per schedule, how
-     * many shifts it would have removed but kept.
+     * many shifts it would have removed but kept because they have a sign-up or hours; a
+     * Cancelled shift is kept too but is not counted.
      */
     public static Map<Id, Integer> removeFutureShifts(Map<Id, Date> keepThrough) {
         Map<Id, Integer> kept = new Map<Id, Integer>();
@@ -169,7 +176,10 @@ public with sharing class ShiftScheduleService {
         );
         List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
         for (Volunteer_Shift__c shift : future) {
-            if (booked.contains(shift.Id) || shift.Status__c == STATUS_CANCELLED) {
+            if (shift.Status__c == STATUS_CANCELLED) {
+                continue;
+            }
+            if (booked.contains(shift.Id)) {
                 kept.put(shift.Shift_Schedule__c, kept.get(shift.Shift_Schedule__c) + 1);
             } else {
                 removed.add(shift);
@@ -181,6 +191,42 @@ public with sharing class ShiftScheduleService {
             delete as system removed;
         }
         return kept;
+    }
+
+    /**
+     * How many schedules a save may remove the future shifts of inline (R-SSC6): the DML rows
+     * still free in this transaction, less a reserve, over the most shifts one schedule can hold
+     * (every day to the horizon). The rest are rebuilt by `ShiftScheduleBatch`.
+     */
+    public static Integer inlineScheduleBudget() {
+        Integer free = Limits.getLimitDmlRows() - Limits.getDmlRows() - ROW_RESERVE;
+        return Math.max(0, free / (7 * VolunteerSettings.shiftHorizonWeeks()));
+    }
+
+    /**
+     * The deferred half of R-SSC4 and R-SSC5, run a chunk of schedules per transaction: removes
+     * their future shifts as the save would have, records Shifts Kept, clears Created Through
+     * where the save would have, and creates the shifts the pattern now calls for.
+     */
+    public static void rebuild(Map<Id, Date> keepThrough) {
+        if (keepThrough == null || keepThrough.isEmpty() || isTurnedOff()) {
+            return;
+        }
+        Map<Id, Integer> kept = removeFutureShifts(keepThrough);
+        List<Shift_Schedule__c> marks = new List<Shift_Schedule__c>();
+        for (Id scheduleId : keepThrough.keySet()) {
+            Shift_Schedule__c mark = new Shift_Schedule__c(
+                Id = scheduleId,
+                Shifts_Kept__c = kept.get(scheduleId)
+            );
+            if (keepThrough.get(scheduleId) == null) {
+                mark.Created_Through__c = null;
+            }
+            marks.add(mark);
+        }
+        // System mode: Shifts Kept and Created Through are read only in every permission set (29T).
+        update as system marks;
+        run(keepThrough.keySet());
     }
 
     /** A Datetime for this local day and time in the org's time zone, across daylight saving. */

@@ -23,14 +23,25 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
     /** Null for the nightly run of every runnable schedule. */
     private final Set<Id> onlyIds;
 
+    /**
+     * Null for a plain run. Otherwise the schedules a save left to remove the future shifts of
+     * (see `ShiftScheduleService.rebuild`), each with the day it keeps shifts through.
+     */
+    private final Map<Id, Date> rebuild;
+
     /** The nightly run of every active schedule. */
     public ShiftScheduleBatch() {
-        this(null);
+        this((Set<Id>) null);
     }
 
     /** A run of these schedules only. */
     public ShiftScheduleBatch(Set<Id> onlyIds) {
         this.onlyIds = onlyIds;
+    }
+
+    /** The removal and recreation of shifts a save was too large to do itself (R-SSC6). */
+    public ShiftScheduleBatch(Map<Id, Date> rebuild) {
+        this.rebuild = rebuild;
     }
 
     public static Integer chunkSize() {
@@ -46,12 +57,24 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
+        if (rebuild != null) {
+            return ShiftScheduleSelector.byIdLocator(rebuild.keySet());
+        }
         return ShiftScheduleSelector.runnableLocator(onlyIds, ShiftScheduleService.today());
     }
 
     public void execute(Database.BatchableContext context, List<Shift_Schedule__c> scope) {
         try {
-            ShiftScheduleService.run(new Map<Id, Shift_Schedule__c>(scope).keySet());
+            Set<Id> ids = new Map<Id, Shift_Schedule__c>(scope).keySet();
+            if (rebuild == null) {
+                ShiftScheduleService.run(ids);
+                return;
+            }
+            Map<Id, Date> chunk = new Map<Id, Date>();
+            for (Id scheduleId : ids) {
+                chunk.put(scheduleId, rebuild.get(scheduleId));
+            }
+            ShiftScheduleService.rebuild(chunk);
         } catch (Exception chunkFailure) {
             ErrorLogger.log(chunkFailure, LOG_CONTEXT);
         }

@@ -1,6 +1,8 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import REQUIREMENT_OBJECT from '@salesforce/schema/Volunteer_Requirement__c';
 import getReadiness from '@salesforce/apex/VolunteerReadinessController.getReadiness';
 
 import TITLE from '@salesforce/label/c.Volunteers_Readiness_Title';
@@ -31,7 +33,15 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
   steps = [];
   errorMessage;
   loaded = false;
+  failed = false;
   wiredResult;
+
+  /**
+   * Whether the user may read requirements at all. A failed load cannot say, so this is what
+   * decides if the failure is shown: a user who cannot see requirements has no card to fail.
+   */
+  @wire(getObjectInfo, { objectApiName: REQUIREMENT_OBJECT })
+  requirementInfo;
 
   @wire(getReadiness, { personId: '$recordId' })
   wiredReadiness(result) {
@@ -41,12 +51,14 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
       this.canSee = data.canSee === true;
       this.steps = (data.steps || []).map((step) => this.toRow(step));
       this.errorMessage = undefined;
+      this.failed = false;
       this.loaded = true;
     } else if (error) {
-      // Shown only to someone the card is for; a failure is not a reason to hide that it failed.
-      this.canSee = true;
+      // A short generic message, never the error's own text, and see showCard for who gets it.
+      this.canSee = false;
       this.steps = [];
       this.errorMessage = LOAD_FAILED;
+      this.failed = true;
       this.loaded = true;
     }
   }
@@ -68,7 +80,13 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
 
   /** Nothing until the answer arrives, so a user the card is not for never sees it flash. */
   get showCard() {
-    return this.loaded && this.canSee;
+    if (!this.loaded) {
+      return false;
+    }
+    if (this.failed) {
+      return this.requirementInfo?.data?.queryable === true;
+    }
+    return this.canSee;
   }
 
   handleRefresh() {
