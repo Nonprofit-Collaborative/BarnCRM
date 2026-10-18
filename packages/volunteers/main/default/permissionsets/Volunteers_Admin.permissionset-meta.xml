@@ -240,6 +240,10 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Volunteer_Approve_Hours</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Volunteer_Hours__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

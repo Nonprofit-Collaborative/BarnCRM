@@ -18,9 +18,13 @@
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Hours__c</tabs>
+  <tabs>Volunteer_Approve_Hours</tabs>
   <tabs>Volunteer_Settings</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Volunteer_Approve_Hours</tab>
+    </mappings>
     <mappings>
       <tab>Volunteer_Hours__c</tab>
     </mappings>

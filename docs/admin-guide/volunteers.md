@@ -15,9 +15,9 @@ setting, on by default), so nobody types them twice. While automation is paused,
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
 
-This page covers installing the module, who gets which access, and its settings. Approving hours
-on screen, the hour totals on people, the coordinator dashboard and recurring shifts each come
-with a later part of the module, and this page will say so as each arrives.
+This page covers installing the module, who gets which access, its settings and the **Approve
+Hours** screen. The hour totals on people, the coordinator dashboard and recurring shifts each
+come with a later part of the module, and this page will say so as each arrives.
 
 ## Before you install
 
@@ -37,8 +37,8 @@ finishes, BarnCRM does three things on its own:
    (next section). This runs in the background and takes a minute or two in a large org.
 
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
-**Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, and
-**Volunteer Settings** for admins only.
+**Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, **Approve
+Hours** for coordinators and admins, and **Volunteer Settings** for admins only.
 
 ## Roles and permission sets
 
@@ -84,6 +84,34 @@ with recurring shifts, and until then changing it changes nothing.
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | With recurring shifts |
 
+## Approving hours
+
+Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
+Hours** tab of the BarnCRM Volunteers app. It lists hours entries oldest first, 50 to a page,
+with the person, job, shift, date worked and hours of each.
+
+- **Show** picks which entries are listed: **Submitted** (the default, the ones waiting for
+  you), **Approved** or **Rejected**. **Job**, **From** and **To** narrow the list to one job and
+  a range of dates worked. The list changes as you change a filter.
+- Tick the entries to act on, or tick the box in the heading row to select the whole page.
+- **Approve** approves the selected entries: they count in totals from now on, and record you
+  and the time as who approved them.
+- **Reject** asks for a reason, which is required, then rejects the selected entries with it. The
+  person who entered them sees the reason on the entry.
+- **Reopen**, on the Approved and Rejected lists, moves the selected entries back to Submitted, so
+  they can be corrected, deleted or decided again. An approved entry cannot be edited or deleted
+  until it is reopened.
+
+A message under the buttons, also shown as a toast, says how many entries moved. An entry that
+could not be moved (one you can see but not edit, for example) is named there with the reason,
+and the others still move. **Previous** and **Next** move between pages.
+
+Someone without Manage Volunteers who opens the screen sees a note saying approving needs that
+permission, and the list without the buttons. Read Only users see no hours at all.
+
+Approving here is the only way an entry's status changes: editing the Status field on the record
+is refused, for everyone.
+
 ## Turning it off
 
 Turning Volunteers off in Module Manager stops its automations; the records stay. Hours saved
@@ -105,7 +133,11 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    person on that shift now exists. It is **Submitted** and appears in the **Hours awaiting
    approval** list view (or **Approved** if Hours require approval is off). You can also enter
    hours by hand there.
-7. Open **Volunteer Settings** and read the three settings. Leave them as they are.
+7. Open **Approve Hours**. The entry is listed under **Submitted**. Tick it and click
+   **Approve**: the message says one entry was approved, and the list is empty.
+8. Change **Show** to **Approved**, tick the entry and click **Reopen**. It is back under
+   **Submitted**. Tick it, click **Reject**, type "Wrong date" as the reason and confirm.
+9. Open **Volunteer Settings** and read the three settings. Leave them as they are.
 
 ## Common mistakes
 
