@@ -14,6 +14,10 @@
     <apexClass>VolunteerHoursApprovalController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerShiftSignupsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Availability_Days__c</field>

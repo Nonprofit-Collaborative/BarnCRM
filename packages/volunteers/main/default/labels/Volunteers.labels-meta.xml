@@ -344,4 +344,188 @@
         <shortDescription>Some entries did not move; {0} is how many</shortDescription>
         <value>Not moved: {0}. The reasons are listed on the screen.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sign-ups panel title</shortDescription>
+        <value>Sign-ups</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Needed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteers needed figure label</shortDescription>
+        <value>Volunteers needed</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Filled</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slots filled figure label</shortDescription>
+        <value>Slots filled</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Remaining</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slots remaining figure label</shortDescription>
+        <value>Slots remaining</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Add</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that opens the add sign-up form</shortDescription>
+        <value>Add sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Person</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person picker label and column heading</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Status</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status picker label and column heading</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Actions</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendance buttons column heading</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Save</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Cancel</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Caption</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Table caption; {0} is the shift name</shortDescription>
+        <value>Sign-ups for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_StatusFor</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Row status picker label; {0} is the person</shortDescription>
+        <value>Status for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Attended</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Mark attended button</shortDescription>
+        <value>Attended</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MarkAttended</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attended button name for screen readers; {0} is the person</shortDescription>
+        <value>Mark {0} attended</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_NoShow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Mark no show button</shortDescription>
+        <value>No show</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MarkNoShow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No show button name for screen readers; {0} is the person</shortDescription>
+        <value>Mark {0} as a no show</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Empty</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nobody is signed up</shortDescription>
+        <value>Nobody is signed up for this shift yet.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Added</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After adding a sign-up</shortDescription>
+        <value>Sign-up added.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Changed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After a status change; {0} is the person, {1} the new status</shortDescription>
+        <value>{0}: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_HoursWritten</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendance wrote an hours entry</shortDescription>
+        <value>An hours entry was recorded for this attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MoreThanShown</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>More sign-ups than listed; {0} is how many are shown</shortDescription>
+        <value>Showing the first {0} sign-ups.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_PersonRequired</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Adding a sign-up with no person</shortDescription>
+        <value>Choose the person to sign up first.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_ActionFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
+        <value>Something went wrong with sign-ups. The details are in the Error Log.</value>
+    </labels>
 </CustomLabels>
