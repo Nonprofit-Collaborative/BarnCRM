@@ -159,6 +159,11 @@ public with sharing class PersonErasure {
 
     /** History objects whose rows the queued cleanup deletes once the erasure has committed. */
     private static Map<String, Set<Id>> historyToDelete;
+    /**
+     * What the erasure deleted, emptied from the Recycle Bin once it commits. Visible to tests,
+     * which still read purged rows with ALL ROWS and so cannot see the Recycle Bin empty.
+     */
+    @TestVisible
     private static List<Id> deletedIds;
     private static Map<Schema.SObjectType, Map<String, Schema.DescribeFieldResult>> describedFields = new Map<Schema.SObjectType, Map<String, Schema.DescribeFieldResult>>();
 
@@ -376,6 +381,12 @@ public with sharing class PersonErasure {
                 List<Change> changes = extension.erase(personId);
                 if (changes != null) {
                     result.changes.addAll(changes);
+                    // Records a module deleted leave the Recycle Bin with the rest (R-ER8).
+                    for (Change change : changes) {
+                        if (change.action == DELETED) {
+                            deletedIds.addAll(change.recordIds);
+                        }
+                    }
                 }
             }
         } catch (ErasureException refusal) {

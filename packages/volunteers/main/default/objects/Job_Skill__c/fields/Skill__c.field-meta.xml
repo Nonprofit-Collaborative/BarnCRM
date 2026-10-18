@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Skill__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>A skill this job needs. A skill that jobs need cannot be deleted: untick Active on it instead.</inlineHelpText>
+  <label>Skill</label>
+  <referenceTo>Skill__c</referenceTo>
+  <relationshipLabel>Job Skills</relationshipLabel>
+  <relationshipName>Job_Skills</relationshipName>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

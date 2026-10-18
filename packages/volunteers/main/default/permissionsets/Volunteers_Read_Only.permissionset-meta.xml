@@ -10,6 +10,18 @@
     <application>BarnCRM_Volunteers</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <classAccesses>
+    <apexClass>VolunteerHoursApprovalController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerLetterController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerShiftSignupsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Availability_Days__c</field>
@@ -122,6 +134,36 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Shift_Schedule__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Shift_Schedule__c.Created_Through__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Shift_Schedule__c.End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Shift_Schedule__c.Location__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Shift_Schedule__c.Shifts_Kept__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Shift_Schedule__c.Weekdays__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Volunteer_Hours__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -217,6 +259,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Volunteer_Shift__c.Shift_Schedule__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Volunteer_Shift__c.Slots_Filled__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -245,6 +292,35 @@
     <field>Volunteer_Signup__c.Notes__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Skill__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Skill__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Volunteer_Skill__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Volunteer_Skill__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Shift_Schedule__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
@@ -281,6 +357,37 @@
     <object>Volunteer_Signup__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Job_Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Volunteer_Skill__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>Skill__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Volunteer_Hours__c</tab>
     <visibility>Visible</visibility>
@@ -293,4 +400,16 @@
     <tab>Volunteer_Shift__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>RunReports</name>
+  </userPermissions>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ViewPublicDashboards</name>
+  </userPermissions>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ViewPublicReports</name>
+  </userPermissions>
 </PermissionSet>

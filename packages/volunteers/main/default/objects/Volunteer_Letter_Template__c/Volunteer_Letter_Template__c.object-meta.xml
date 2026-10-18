@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    The wording of a volunteer hours letter or certificate: HTML with merge tokens, one active per type (ADR-0129, R-VL1).
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>false</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Volunteer Letter Template</label>
+  <nameField>
+    <label>Template Name</label>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Volunteer Letter Templates</pluralLabel>
+  <sharingModel>Read</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

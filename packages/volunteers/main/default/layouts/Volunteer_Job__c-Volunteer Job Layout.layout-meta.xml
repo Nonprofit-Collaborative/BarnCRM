@@ -54,6 +54,27 @@
       </layoutItems>
     </layoutColumns>
   </layoutSections>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Start_Time__c</fields>
+    <fields>Status__c</fields>
+    <fields>Slots_Filled__c</fields>
+    <relatedList>Volunteer_Shift__c.Volunteer_Job__c</relatedList>
+    <sortField>Start_Time__c</sortField>
+    <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Weekdays__c</fields>
+    <fields>Start_Time__c</fields>
+    <fields>Active__c</fields>
+    <relatedList>Shift_Schedule__c.Job__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Skill__c</fields>
+    <relatedList>Job_Skill__c.Job__c</relatedList>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

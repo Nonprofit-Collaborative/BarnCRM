@@ -1,0 +1,61 @@
+<template>
+    <template lwc:if={showCard}>
+        <lightning-card title={label.title} icon-name="standard:approval">
+            <lightning-button-icon
+                slot="actions"
+                icon-name="utility:refresh"
+                alternative-text={label.refresh}
+                title={label.refresh}
+                size="small"
+                onclick={handleRefresh}
+                class="refresh"
+            ></lightning-button-icon>
+            <div class="slds-var-p-horizontal_medium">
+                <template lwc:if={errorMessage}>
+                    <p class="slds-text-color_error error" role="alert">{errorMessage}</p>
+                </template>
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={steps} for:item="step">
+                        <li key={step.key} class="slds-item step">
+                            <div class="slds-grid slds-wrap slds-grid_align-spread slds-grid_vertical-align-center">
+                                <template lwc:if={step.started}>
+                                    <a
+                                        href={step.url}
+                                        class="slds-text-heading_small step-type"
+                                        data-record-id={step.requirementId}
+                                        onclick={handleOpen}
+                                    >{step.typeLabel}</a>
+                                </template>
+                                <template lwc:else>
+                                    <span class="slds-text-heading_small step-type">{step.typeLabel}</span>
+                                </template>
+                                <span class={step.stateClass}>{step.stateText}</span>
+                            </div>
+                            <p class="slds-text-body_regular status">{step.statusText}</p>
+                            <template lwc:if={step.completedDate}>
+                                <p class="slds-text-body_small slds-text-color_weak completed">
+                                    {label.completed}
+                                    <lightning-formatted-date-time
+                                        value={step.completedDate}
+                                        time-zone="UTC"
+                                        class="slds-var-m-left_xx-small"
+                                    ></lightning-formatted-date-time>
+                                </p>
+                            </template>
+                            <template lwc:if={step.expires}>
+                                <p class="slds-text-body_small slds-text-color_weak expires">
+                                    {label.expires}
+                                    <lightning-formatted-date-time
+                                        value={step.expires}
+                                        time-zone="UTC"
+                                        class="slds-var-m-left_xx-small"
+                                    ></lightning-formatted-date-time>
+                                </p>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </lightning-card>
+    </template>
+</template>

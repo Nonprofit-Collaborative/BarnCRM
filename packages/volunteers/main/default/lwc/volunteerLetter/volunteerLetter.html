@@ -1,0 +1,83 @@
+<template>
+  <div class="slds-p-around_medium">
+    <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
+
+    <template lwc:if={blocker}>
+      <p role="alert" class="slds-text-color_error" data-id="blocker">{blocker}</p>
+    </template>
+
+    <template lwc:if={showForm}>
+      <lightning-combobox
+        data-id="template"
+        label={labels.template}
+        options={templateOptions}
+        value={templateId}
+        required
+        onchange={handleTemplateChange}
+      ></lightning-combobox>
+      <div class="slds-grid slds-wrap slds-gutters_x-small">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+          <lightning-input
+            data-id="from"
+            type="date"
+            label={labels.fromDate}
+            value={fromDate}
+            required
+            onchange={handleFromChange}
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+          <lightning-input
+            data-id="to"
+            type="date"
+            label={labels.toDate}
+            value={toDate}
+            required
+            onchange={handleToChange}
+          ></lightning-input>
+        </div>
+      </div>
+
+      <div aria-live="polite">
+        <template lwc:if={notice}>
+          <p class="slds-text-color_error slds-m-top_small" data-id="notice">{notice}</p>
+        </template>
+      </div>
+
+      <template lwc:if={previewBody}>
+        <section
+          class="slds-box slds-m-top_small slds-scrollable_y"
+          style="max-height: 20rem"
+          tabindex="0"
+          aria-label={labels.preview}
+          data-id="preview"
+        >
+          <lightning-formatted-rich-text value={previewBody}></lightning-formatted-rich-text>
+        </section>
+      </template>
+    </template>
+
+    <div class="slds-m-top_medium slds-text-align_right">
+      <lightning-button
+        data-id="cancel"
+        label={labels.cancel}
+        onclick={handleCancel}
+        class="slds-m-right_x-small"
+      ></lightning-button>
+      <lightning-button
+        data-id="preview-button"
+        label={labels.preview}
+        disabled={buttonsDisabled}
+        onclick={handlePreview}
+        class="slds-m-right_x-small"
+      ></lightning-button>
+      <lightning-button
+        data-id="generate"
+        variant="brand"
+        label={labels.generate}
+        disabled={buttonsDisabled}
+        onclick={handleGenerate}
+      ></lightning-button>
+    </div>
+  </div>
+</template>

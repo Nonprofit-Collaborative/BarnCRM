@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Expires__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The day a completed step lapses, for example a background check valid for two years. Leave empty if it does not lapse. Cannot be before the completed date.</inlineHelpText>
+  <label>Expires</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

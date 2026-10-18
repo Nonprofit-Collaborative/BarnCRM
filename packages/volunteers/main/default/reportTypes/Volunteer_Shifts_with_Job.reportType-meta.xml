@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Volunteer_Shift__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Volunteer shifts with their start, volunteers needed, slots filled and remaining, and the job
+    they belong to.
+  </description>
+  <label>Volunteer Shifts with Job</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Volunteer_Job__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Start_Time__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>End_Time__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Volunteers_Needed__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Slots_Filled__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Slots_Remaining__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Location__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Total_Hours__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>CreatedDate</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <masterLabel>Volunteer Shift</masterLabel>
+  </sections>
+</ReportType>

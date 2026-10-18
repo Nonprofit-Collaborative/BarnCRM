@@ -7124,19 +7124,32 @@ Every attribute here, the person attributes included, is shipped by Volunteers, 
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
 BarnCRM role by `VolunteersAccessSync`, which never takes one away. Approved By, Approved Date,
-Household and every rollup total are read only in each. Staff and Read Only delete nothing; the
-Coordinator deletes only hours, since the platform gives Modify All only with Delete.
+Household, a schedule's Created Through and Shifts Kept, and every rollup total are read only in
+each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
+gives Modify All only with Delete.
 
-| Permission set | Given to | Job, Shift, Sign-up | Hours | Person attributes |
+| Permission set | Given to | Job, Shift, Sign-up, Shift Schedule | Hours | Person attributes |
 |---|---|---|---|---|
 | `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
 | `Volunteers_Coordinator` | the Coordinator role (`Volunteer_Coordinator`) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
 | `Volunteers_Staff` | the Team Member role (`Program_Staff`) | create, edit | create, edit their own entries (sharing Private) | edit |
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
-Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab. The custom permission `Manage_Volunteers`
+Each set shows the BarnCRM Volunteers app and the Jobs, Shifts, Hours and Skills tabs; only the
+Admin and Coordinator sets show the Volunteer Requirements tab (R-VQ4) and the Approve Hours tab
+(R-VG5's screen; every set may run its controller, which answers read only to a user without
+`Manage_Volunteers`), and only the Admin set shows the Volunteer Settings tab. The custom
+permission `Manage_Volunteers`
 (created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
+
+**Skills (V-04).** Skill, Volunteer Skill and Job Skill have no rule that refuses a user, so
+the sets follow the list's purpose. Skill (the admin's own list): Admin and Coordinator create,
+edit and delete (Modify All, since Skill sharing is Read and the platform lets a user edit
+another's record only with it; deleting a skill in use is refused anyway, R-SK1); Staff and
+Read Only read. Volunteer Skill: Admin and Coordinator the same; Staff create, edit and delete
+the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coordinator and
+Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
+the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
 ## 29I. Volunteer profile
 
@@ -7190,6 +7203,17 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 | Emergency Contact Phone | `Emergency_Contact_Phone__c` | Phone |
 | Availability Days | `Availability_Days__c` | Multi-Select Picklist, 7 values |
 | Availability Times | `Availability_Times__c` | Multi-Select Picklist, 3 values |
+
+- **Shown on the person:** a **Volunteer Profile** field section (Dynamic Forms) on
+  `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page` (ADR-0064 pattern, see
+  29S), holding these six attributes, editable, and the five totals of 29O, read only. It shows
+  when Volunteer Status is Prospective, Active or Inactive (a visibility rule cannot test a
+  picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
+  above zero, or the user holds
+  `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
+  attributes carry a field visibility rule (record type neither Household nor Organization), and
+  the Manage Volunteers clause applies only to that record type, so a household or
+  organization shows only its totals, once it has hours.
 
 ---
 
@@ -7314,7 +7338,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Volunteers Needed | `Volunteers_Needed__c` | Number(4, 0), default 1 |
 | Location | `Location__c` | Text(255) |
 | Status | `Status__c` | Picklist: Open, Cancelled, Completed |
-| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07), not in the first build of this section |
+| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07) |
 | Slots Filled | `Slots_Filled__c` | Number(4, 0) |
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
@@ -7606,8 +7630,9 @@ and a differently named twin would answer the same question twice. Jobs and shif
 module's own stamp.
 
 **R-VR2 Turned off, then on.** While Volunteers is turned off (ADR-0073) its registry rows do
-not run, so its saves queue no recalculation. After Turn on the totals catch up at the next
-nightly run (mode Both), or at once with Recalculate all.
+not run, so its saves queue no recalculation. The nightly run still recalculates the totals
+while the module is off; only turning Rollup Builder off stops it. After Turn on the totals
+catch up at the next nightly run (mode Both), or at once with Recalculate all.
 
 ### Salesforce implementation
 
@@ -7660,7 +7685,9 @@ package ships no skills.
 
 **R-SK1 Archive, do not delete.** A skill that a person or a job holds cannot be deleted; the
 admin clears Active instead. An inactive skill stays on the people and jobs that hold it and is
-not offered for new ones.
+refused for new ones: a Volunteer Skill or Job Skill that is created, or moved to another
+skill, may not name an inactive skill. A row that already holds a skill keeps it when the skill
+is retired, and a merge that moves a person's rows to the person kept is not refused.
 
 ### Salesforce implementation
 
@@ -7711,18 +7738,24 @@ the part of the day the shift starts in (before 12:00, 12:00 to 17:00, from 17:0
 with no availability recorded is listed last rather than left out. Interests matching the job's
 skills are shown beside each name; they never filter.
 
+**R-VK4 Deleted with the person.** Deleting a person deletes their volunteer skills, as it
+deletes their requirements (R-VQ5 says how).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Skill__c`, auto-number Name `VK-{000000}`, sharing Read.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
-| Type | `Type__c` | Picklist: Skill, Interest |
+| Contact | `Contact__c` | Lookup to Contact (the platform empties it when the person is deleted, and the row is then deleted, R-VK4) |
+| Person Account | `Account__c` | Lookup to Account (the same, R-VK4) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Type | `Type__c` | Required picklist: Skill, Interest (default Skill) |
 
-- **Validation rule:** `Volunteer_Skill_One_Person` (R-VK1).
+- **Validation rules:** `Volunteer_Skill_One_Person` (R-VK1), `Volunteer_Skill_Active_Skill`
+  (R-SK1: a new row, or a row moved to another skill, names an active skill).
+- **Related lists:** Volunteer Skills on the Skill page layout. On the person, the admin adds
+  the list to the organization's person layout (the module cannot edit Core's layout).
 
 ---
 
@@ -7752,7 +7785,11 @@ A skill a job needs (feature V-04), used to find volunteers for its shifts (R-VK
 | Attribute | API name | Type |
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+
+- **Validation rule:** `Job_Skill_Active_Skill` (R-SK1: a new row, or a row moved to another
+  skill, names an active skill).
+- **Related lists:** Job Skills on the Volunteer Job page layout.
 
 ---
 
@@ -7794,8 +7831,10 @@ it is seen only by those who may see requirements and it leaves with them (R-VQ4
 future; Expires may not be earlier than Completed Date.
 
 **R-VQ3 Readiness is shown, not enforced.** The volunteer profile shows each Type's most recent
-row and whether it is current. Nothing in v0.8 refuses a sign-up or hours for a person whose
-steps are not current; the coordinator decides.
+row (the one added last) and whether it is current; a Type with no row shows as not started.
+It shows only what the viewer may read: nothing to a user without access to requirements, and
+nothing on a household or organization. Nothing in v0.8 refuses a sign-up or hours for a person
+whose steps are not current; the coordinator decides.
 
 **R-VQ4 Kept to coordinators, erased with the person.** Requirements are private records: the
 Volunteers Admin and Volunteers Coordinator permission sets read and edit all of them, and the
@@ -7803,16 +7842,25 @@ Volunteers Staff and Volunteers Read Only sets grant no access. Erasing a person
 deletes their requirement rows and empties them from the Recycle Bin, through the Volunteers
 `PersonErasureExtension`, and the Erasure record lists them by Id only.
 
+**R-VQ5 Deleted with the person.** Deleting a Contact or an Account deletes the requirement rows
+and volunteer skills (R-VK4) that name it, in the same transaction, whoever deletes it. They are
+deleted in system mode: a background check must not outlive its person, and the user deleting
+the person may be a Team Member, who cannot see requirements at all. A record merged into
+another is not a deletion here: the merge moves its rows to the record kept, background checks
+included. Restoring a person from the Recycle Bin does not restore these rows; they stay in the
+Recycle Bin, without a person, until it empties. The rule always runs: no switch, pause or
+bypass stops it (R-A4).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Requirement__c`, auto-number Name `VR-{000000}`, sharing Private.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Type | `Type__c` | Picklist: Application, Background check, Orientation |
-| Status | `Status__c` | Picklist: Not started, In progress, Completed, Not approved |
+| Contact | `Contact__c` | Lookup to Contact (the platform empties it when the person is deleted, and the row is then deleted, R-VQ5) |
+| Person Account | `Account__c` | Lookup to Account (the same, R-VQ5) |
+| Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation |
+| Status | `Status__c` | Required restricted picklist: Not started (default), In progress, Completed, Not approved |
 | Completed Date | `Completed_Date__c` | Date |
 | Expires | `Expires__c` | Date |
 | Notes | `Notes__c` | Text (255) |
@@ -7820,7 +7868,29 @@ deletes their requirement rows and empties them from the Recycle Bin, through th
 
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
-- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8).
+- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8). It reads
+  the person's requirements in system mode, deletes them as the user (a user without access to
+  requirements is refused, R-ER5) and keeps no person field. Core adds the Ids of any records
+  an extension reports as Deleted to those it empties from the Recycle Bin after the commit.
+- **Person delete:** `VolunteerPersonDeleteHandler`, registered on Contact and on Account
+  (`Automation_Registry.Volunteers_Person_Delete_Contact` and `..._Account`, order 20, Always
+  Runs, `Module__c` Volunteers) and run by Core's own triggers. Before delete it notes the Ids
+  of the requirement rows and volunteer skills that name each deleted record (on Account, also
+  those naming any of its contacts, which the platform deletes with it, a person account's own
+  contact among them, with no person account field read); after delete it deletes the
+  ones noted for every record whose MasterRecordId is empty, so a merge loser's rows, which the
+  merge has moved to the record kept, stay.
+- **Readiness (R-VQ3):** the `volunteerReadiness` component, read from
+  `VolunteerReadinessController` (cacheable, user mode), on `Volunteers_Contact_Record_Page` and
+  `Volunteers_Account_Record_Page`: Core's person pages unchanged plus the component, as Giving
+  ships its own (ADR-0064), assigned in the Volunteers app (Large and Small). Elsewhere the admin
+  activates them or adds the component to a page of their own.
+- **Access:** `Volunteers_Admin` and `Volunteers_Coordinator` create, read, edit and delete, with
+  View All and Modify All (a Private object is edited by others only with Modify All, which the
+  platform gives only with delete); Is Current is read only. `Volunteers_Staff` and
+  `Volunteers_Read_Only` hold no object or field permission. The Volunteer Requirements tab, in
+  the Volunteers app, is visible in the Admin and Coordinator sets only; its All and Not Current
+  list views are shared with all users, who see rows only through the object permission.
 
 ---
 
@@ -7849,6 +7919,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 | Location | text | no | Where the shifts happen, copied to each shift; empty means the job's location. |
 | Active | boolean | yes (defaults true) | Whether the schedule still creates shifts. |
 | Created Through | date | computed | The last day the schedule has created shifts for. Kept by the generator; never edited. |
+| Shifts Kept | integer | computed | How many future shifts the last edit that removed shifts (R-SSC4, R-SSC5) kept as they were, because they have sign-ups or hours or are Cancelled. Kept by the automation; never edited. |
 
 ### Relationships
 
@@ -7866,9 +7937,10 @@ sides of a daylight saving change, whoever's job created it.
 **R-SSC2 A rolling horizon.** An active schedule keeps shifts created from today to
 `Shift_Horizon_Weeks__c` weeks ahead (Volunteer Settings, default 8). Each run creates the
 shift days after Created Through (or from today, if later), up to the horizon and End Date, then
-moves Created Through forward. A day that already has a shift from this schedule is skipped. Each
-created shift is Open, linked to the schedule, and takes the schedule's job, times, Volunteers
-Needed and Location.
+moves Created Through forward. A day that already has a shift from this schedule is skipped, and
+so is a shift today whose start has already passed. Each created shift is Open, linked to the
+schedule, and takes the schedule's job, times, Volunteers Needed and Location; it is named as
+R-VS2 names a shift, from its job and start, with the start written in the org's time zone.
 
 **R-SSC3 When it runs.** Saving a schedule queues a run for it, so its shifts appear without
 waiting for the night (the `Shift_Schedule_Rules` automation). Every night the Volunteers
@@ -7877,15 +7949,19 @@ queued run and the nightly run never create the same day twice. Nothing runs whi
 is turned off; turning it back on catches up at the next nightly run.
 
 **R-SSC4 Editing changes only future shifts with no sign-ups.** When Weekdays, Every N Weeks,
-Start Time, End Time, Start Date, End Date, Volunteers Needed or Location changes, the
-schedule's shifts that start after now, are not Cancelled and have no sign-up record of any
-status are deleted, Created Through is cleared, and a run recreates them from the new pattern.
-Past shifts, shifts with sign-ups and Cancelled shifts are never changed, and a day holding one
-of them is not given a second shift. The save tells the coordinator how many future shifts were
-kept as they were. Changing only Name changes no shift.
+Start Time, End Time, Start Date, Volunteers Needed or Location changes, the schedule's shifts
+that start after now, are not Cancelled and have no sign-up record of any status and no hours
+record are deleted, Created Through is cleared, and a run recreates them from the new pattern.
+Past shifts, shifts with sign-ups or hours and Cancelled shifts are never changed, and a day holding one of them is not given
+a second shift. The save records on the schedule, in Shifts Kept, how many future shifts were
+kept as they were. Changing only Name changes no shift. A change to End Date with none of the
+others is ending (R-SSC5): a later or empty End Date only lets the next run go further.
 
 **R-SSC5 Ending a schedule.** Clearing Active, or setting End Date earlier, deletes the future
-shifts it no longer covers that have no sign-ups and are not Cancelled; the rest are kept.
+shifts it no longer covers that have no sign-ups or hours and are not Cancelled; the rest are
+kept, and Shifts Kept counts those it no longer covers. Clearing Active also clears Created
+Through, so setting it again fills the horizon from today; an earlier End Date moves Created
+Through back to it, so a later End Date creates those days again.
 Deleting a schedule does the same for all its future shifts, and the shifts kept lose their
 link to it. A coordinator who wants one day off cancels that shift: a deleted shift is created
 again by the next edit of its schedule, a Cancelled one is not.
@@ -7910,12 +7986,18 @@ creates at most ten schedules' worth of shifts at the longest horizon the settin
 | Location | `Location__c` | Text (255) |
 | Active | `Active__c` | Checkbox, default true |
 | Created Through | `Created_Through__c` | Date, read only in every permission set |
+| Shifts Kept | `Shifts_Kept__c` | Number (5, 0), read only in every permission set |
 
 - **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Every N Weeks 1 to 52, End
   Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
 - **Automation:** registry row `Shift_Schedule_Rules` (`ShiftScheduleTriggerHandler`), which
-  applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`
-  supplied by `VolunteersNightlyJobProvider` (`NightlyJobProvider`).
+  applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
+  started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`), which
+  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
+  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  Through and Shifts Kept run in system mode: they are the schedule's own bookkeeping, which a
+  Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
+  access. Shifts are created in user mode.
 - **Health Check:** an active schedule whose Created Through is more than two days short of the
   horizon (or End Date) is reported as "schedule horizon not filled".
 
@@ -7945,7 +8027,8 @@ service renders, as for receipts (Section 25E).
 
 **R-VL1 One active template per type.** Activating a template deactivates the others of its
 type. Generating with no active template of the type asked for is refused with a readable
-message.
+message, and so is generating with a template that is not active (an inactive template is never
+merged, however it was chosen).
 
 **R-VL2 Tokens are a closed set.** `{OrganizationName}` and `{OrganizationAddress}` (Core's
 `Organization_Legal_Name__c` and `Organization_Address__c`), `{PersonName}`, `{FirstName}` (the
@@ -7964,13 +8047,33 @@ nothing else; the file is the record that it was sent. Generating needs the cust
 **R-VL5 The shipped templates arrive at install.** `Volunteer_Letter_Template_Default__mdt` is
 materialized by `VolunteersPostInstall` at install and at every upgrade, creating only the
 templates whose Template Key the org does not have and never changing an existing one
-(Section 13). A materialized template is Active when its type has no active template. The
-template list has a Restore the shipped templates action that does the same.
+(Section 13). A materialized template is Active when its type has no active template. A Restore
+the shipped templates action on the template list that does the same is a later item (an upgrade
+already brings back a deleted shipped template).
+
+**R-VL6 A list is started with a type and checked first.** The flow action Generate volunteer
+letters takes a letter Type (a picklist value, not a template Id) and uses that type's one active
+template. Before any job starts it checks the permission, the type, the template (it must be
+active) and the period, and refuses with a readable message that reaches the flow's fault path.
+All requests in one transaction run as one job, so a record-triggered flow on 200 records starts
+one job, not 200.
+
+**R-VL7 The person who started a list is told how it went.** A job counts the letters made, the
+people skipped (grouped by reason, for example no approved hours in the period) and the people
+whose chunk failed, across all chunks. When it ends it sends the person who started it one custom
+notification (Core's job notification, `BarnCRM_Job_Finished`, which the BarnCRM Settings option
+Job notifications turns off) giving the three counts and, when any failed, pointing to the Error
+Log. A job started by a schedule sends none. The record action shows the same outcome on screen.
 
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Letter_Template__c`, Text Name (80), sharing Read; edited only through
   the Volunteers Admin permission set.
+- **Access:** `Volunteers_Admin` creates, edits and deletes templates, every field editable;
+  `Volunteers_Coordinator` reads them, every field, to generate letters; `Volunteers_Staff` and
+  `Volunteers_Read_Only` have no access.
+- **Automation:** R-VL1 runs in `VolunteerLetterTemplateTriggerHandler`, registry row
+  `Volunteer_Letter_Template_Rules`, which always runs (it keeps a rule, not a convenience).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -7983,7 +8086,11 @@ template list has a Restore the shipped templates action that does the same.
   (`Hours_Letter`, `Certificate`), with `Template_Name__c` (Text 80), `Letter_Type__c` (Text 40)
   and `Body__c` (Long Text Area 32768); DeveloperName is the Template Key.
 - **Service:** `VolunteerLetterService`, `VolunteerLetterBatch`, `VolunteerLetterRenderer`
-  (`Blob.toPdf`).
+  (`Blob.toPdf`). On a person account the hours counted are those whose `Account__c` is the
+  account; an account that is not a person gets no letter.
+- **Where it is started:** the record action Volunteer letter (`volunteerLetter`) on Contact and
+  on Account, for one person with a preview, and the flow action Generate volunteer letters
+  (`VolunteerLetterBatch`, taking a letter Type) for a list of people (R-VL6, R-VL7).
 
 ---
 
@@ -8092,6 +8199,7 @@ is closed deliberately rather than discovered.
 | Rule | Gap | Why it is open |
 |---|---|---|
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
+| 29T Health Check | No "schedule horizon not filled" finding yet: an active schedule whose nightly run stopped shows only as shifts missing ahead. Health Check does list the nightly schedule run when it is not scheduled. | The finding needs a Volunteers Health Check extension, which the module does not have yet; it follows V-07 as its own change. |
 
 Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
 mirrors the primary member).
@@ -8256,6 +8364,13 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
 | v0.8 | 2026-10-18 | Rollup targets writable by the engine, not the saving user. No object or field added. R-R10: at run time the planner checks that the engine can write a target attribute (it exists, is not a formula, roll-up summary, auto number or system attribute), never the running user's field-level security; the Rollup Builder's save still checks the administrator's own. Before this, a staff member's save, on whom every module keeps the totals read only, had every definition refused and the totals waited for the nightly run. |
+| v0.8 | 2026-10-18 | Volunteer letters built (V-08, ADR-0129). No object or field added beyond 29U. Section 29U states the template access per Volunteers set, the registry row `Volunteer_Letter_Template_Rules` for R-VL1, that a person account's letter counts hours by `Account__c`, and where a letter is started (record action and flow action). |
+| v0.8 | 2026-10-18 | Volunteers screens (V-02). No object or field added. The access paragraph of Part G names the Approve Hours tab, shown by the Coordinator and Admin sets. |
+| v0.8 | 2026-10-18 | Recurring shifts built (V-07, ADR-0128). New field `Shifts_Kept__c` on `Shift_Schedule__c` (29T): how many future shifts the last edit kept, which is how the save tells the coordinator (R-SSC4). R-SSC2 skips a shift today that has already started and names shifts as R-VS2 does; R-SSC4 leaves an End Date only change to R-SSC5; clearing Active clears Created Through; R-SSC4 and R-SSC5 keep a shift with hours as well as one with a sign-up; an earlier End Date moves Created Through back to it. The access table gains Shift Schedule beside Job, Shift and Sign-up. The schedule Health Check finding is listed as a known gap. |
+| v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
+| v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
+| v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
+| v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 
 ---
 ## 32. Entity ownership by package
@@ -8358,7 +8473,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
-| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127) |
+| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Is_Current__c</fullName>
+  <externalId>false</externalId>
+  <formula>
+AND(
+  ISPICKVAL(Status__c, 'Completed'),
+  OR(ISBLANK(Expires__c), Expires__c &gt;= TODAY())
+)
+  </formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked when the step is completed and has not lapsed. BarnCRM works this out.</inlineHelpText>
+  <label>Is Current</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

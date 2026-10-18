@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Volunteer hours waiting for a coordinator to approve or reject them.</description>
+  <flexiPage>Volunteer_Approve_Hours</flexiPage>
+  <label>Approve Hours</label>
+  <motif>Custom20: Clock</motif>
+</CustomTab>

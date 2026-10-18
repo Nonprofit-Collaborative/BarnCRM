@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Active__c</fullName>
+  <defaultValue>true</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Whether this skill is offered when you add a skill to a person or a job. Untick it instead of deleting the skill: people and jobs that hold it keep it.</inlineHelpText>
+  <label>Active</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

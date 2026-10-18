@@ -1,0 +1,219 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom20">
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={showReadOnly}>
+        <p data-id="read-only" class="slds-text-body_regular slds-var-m-bottom_small">
+          {labels.readOnly}
+        </p>
+      </template>
+
+      <template lwc:if={hasError}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+          <lightning-combobox
+            data-id="status-filter"
+            label={labels.show}
+            value={status}
+            options={statusOptions}
+            onchange={handleStatusChange}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+          <lightning-record-picker
+            data-id="job-filter"
+            label={labels.job}
+            object-api-name="Volunteer_Job__c"
+            onchange={handleJobChange}
+          ></lightning-record-picker>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+          <lightning-input
+            data-id="from-filter"
+            type="date"
+            label={labels.fromDate}
+            value={fromDate}
+            onchange={handleFromChange}
+          ></lightning-input>
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+          <lightning-input
+            data-id="to-filter"
+            type="date"
+            label={labels.toDate}
+            value={toDate}
+            onchange={handleToChange}
+          ></lightning-input>
+        </div>
+      </div>
+
+      <template lwc:if={canManage}>
+        <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_small">
+          <template lwc:if={showApprove}>
+            <lightning-button
+              data-id="approve"
+              class="slds-var-m-right_x-small slds-var-m-bottom_x-small"
+              variant="brand"
+              label={labels.approve}
+              disabled={noneSelected}
+              onclick={handleApprove}
+            ></lightning-button>
+          </template>
+          <template lwc:if={showRejectButton}>
+            <lightning-button
+              data-id="reject"
+              class="slds-var-m-right_x-small slds-var-m-bottom_x-small"
+              label={labels.reject}
+              disabled={noneSelected}
+              onclick={handleShowReject}
+            ></lightning-button>
+          </template>
+          <template lwc:if={showReopen}>
+            <lightning-button
+              data-id="reopen"
+              class="slds-var-m-right_x-small slds-var-m-bottom_x-small"
+              label={labels.reopen}
+              disabled={noneSelected}
+              onclick={handleReopen}
+            ></lightning-button>
+          </template>
+          <span data-id="selected-count" aria-live="polite" class="slds-text-body_small slds-var-m-bottom_x-small">
+            {selectedText}
+          </span>
+        </div>
+
+        <template lwc:if={showReject}>
+          <div data-id="reject-form" class="slds-box slds-var-m-bottom_small">
+            <lightning-textarea
+              data-id="reason"
+              label={labels.reason}
+              value={reason}
+              max-length="255"
+              required
+              message-when-value-missing={labels.reasonRequired}
+              onchange={handleReasonChange}
+            ></lightning-textarea>
+            <div class="slds-var-m-top_x-small">
+              <lightning-button
+                data-id="confirm-reject"
+                variant="destructive"
+                label={labels.confirmReject}
+                disabled={busy}
+                onclick={handleConfirmReject}
+              ></lightning-button>
+              <lightning-button
+                data-id="cancel-reject"
+                class="slds-var-m-left_x-small"
+                label={labels.cancel}
+                onclick={handleCancelReject}
+              ></lightning-button>
+            </div>
+          </div>
+        </template>
+      </template>
+
+      <div data-id="result" tabindex="-1" role="status" class="slds-var-m-bottom_small">
+        <template lwc:if={resultMessage}>
+          <p class="slds-text-body_regular">{resultMessage}</p>
+          <template lwc:if={hasRefused}>
+            <ul data-id="refused-list" class="slds-list_dotted slds-text-color_error">
+              <template for:each={refusedLines} for:item="line">
+                <li key={line.key}>{line.text}</li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </div>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+      </template>
+
+      <template lwc:if={hasRows}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+          <caption data-id="caption" class="slds-text-title_bold slds-text-align_left slds-var-p-vertical_x-small">
+            {caption}
+          </caption>
+          <thead>
+            <tr class="slds-line-height_reset">
+              <template lwc:if={canManage}>
+                <th scope="col">
+                  <lightning-input
+                    data-id="select-all"
+                    type="checkbox"
+                    variant="label-hidden"
+                    label={labels.selectAll}
+                    checked={allSelected}
+                    disabled={busy}
+                    onchange={handleSelectAll}
+                  ></lightning-input>
+                </th>
+              </template>
+              <th scope="col">{labels.person}</th>
+              <th scope="col">{labels.job}</th>
+              <th scope="col">{labels.shift}</th>
+              <th scope="col">{labels.dateWorked}</th>
+              <th scope="col">{labels.hours}</th>
+              <template lwc:if={showReasonColumn}>
+                <th scope="col">{labels.reasonColumn}</th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.recordId} data-id="row">
+                <template lwc:if={canManage}>
+                  <td data-label={labels.select}>
+                    <lightning-input
+                      class="row-select"
+                      data-record-id={row.recordId}
+                      type="checkbox"
+                      variant="label-hidden"
+                      label={row.selectLabel}
+                      checked={row.selected}
+                      disabled={busy}
+                      onchange={handleSelectRow}
+                    ></lightning-input>
+                  </td>
+                </template>
+                <th scope="row" data-label={labels.person}>{row.personName}</th>
+                <td data-label={labels.job}>{row.jobName}</td>
+                <td data-label={labels.shift}>{row.shiftName}</td>
+                <td data-label={labels.dateWorked}>
+                  <lightning-formatted-date-time
+                    value={row.dateWorked}
+                    time-zone="UTC"
+                  ></lightning-formatted-date-time>
+                </td>
+                <td data-label={labels.hours}>{row.hours}</td>
+                <template lwc:if={showReasonColumn}>
+                  <td data-label={labels.reasonColumn}>{row.rejectionReason}</td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+
+      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-vertical_small">
+        <lightning-button
+          data-id="previous"
+          label={labels.previous}
+          disabled={previousDisabled}
+          onclick={handlePrevious}
+        ></lightning-button>
+        <span data-id="page-text" tabindex="-1" class="slds-text-body_small">{pageText}</span>
+        <lightning-button
+          data-id="next"
+          label={labels.next}
+          disabled={nextDisabled}
+          onclick={handleNext}
+        ></lightning-button>
+      </div>
+    </div>
+  </lightning-card>
+</template>
