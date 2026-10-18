@@ -33,21 +33,25 @@ private class VolunteerPersonDeleteHandlerTest {
 
     /** One background check and one skill for each person, as a Contact or an Account. */
     private static void giveRows(List<SObject> people, Id skillId) {
-        List<SObject> rows = new List<SObject>();
+        List<Volunteer_Requirement__c> checks = new List<Volunteer_Requirement__c>();
+        List<Volunteer_Skill__c> skills = new List<Volunteer_Skill__c>();
         for (SObject person : people) {
-            Boolean isContact = person.getSObjectType() == Contact.SObjectType;
+            String field = person.getSObjectType() == Contact.SObjectType
+                ? 'Contact__c'
+                : 'Account__c';
             Volunteer_Requirement__c check = new Volunteer_Requirement__c(
                 Type__c = 'Background check',
                 Status__c = 'Completed',
                 Completed_Date__c = System.today().addDays(-3)
             );
             Volunteer_Skill__c held = new Volunteer_Skill__c(Skill__c = skillId);
-            check.put(isContact ? 'Contact__c' : 'Account__c', person.Id);
-            held.put(isContact ? 'Contact__c' : 'Account__c', person.Id);
-            rows.add(check);
-            rows.add(held);
+            check.put(field, person.Id);
+            held.put(field, person.Id);
+            checks.add(check);
+            skills.add(held);
         }
-        insert rows;
+        insert checks;
+        insert skills;
     }
 
     private static Integer rowsLeft() {
