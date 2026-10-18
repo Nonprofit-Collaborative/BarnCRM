@@ -14,6 +14,10 @@ public with sharing class ShiftScheduleRemovalJob implements Queueable {
 
     private static final String LOG_CONTEXT = 'ShiftScheduleRemovalJob';
 
+    /** Set by a test to split a few shifts across jobs. */
+    @TestVisible
+    private static Integer shiftsPerJobOverride;
+
     private final List<Id> shiftIds;
 
     public ShiftScheduleRemovalJob(List<Id> shiftIds) {
@@ -30,10 +34,11 @@ public with sharing class ShiftScheduleRemovalJob implements Queueable {
 
     public void execute(QueueableContext context) {
         try {
+            Integer perJob = shiftsPerJobOverride == null ? SHIFTS_PER_JOB : shiftsPerJobOverride;
             Set<Id> now = new Set<Id>();
             List<Id> later = new List<Id>();
             for (Id shiftId : shiftIds) {
-                if (now.size() < SHIFTS_PER_JOB) {
+                if (now.size() < perJob) {
                     now.add(shiftId);
                 } else {
                     later.add(shiftId);

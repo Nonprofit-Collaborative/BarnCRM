@@ -128,10 +128,11 @@ private class ShiftScheduleRebuildTest {
         Test.stopTest();
 
         System.runAs(admin()) {
+            // The platform runs the trigger for 200 records, then 51, each with its own budget.
             Assert.areEqual(
-                SCHEDULE_COUNT - BUDGET,
+                200 - BUDGET,
                 marked,
-                'The save marks the schedules beyond its budget Rebuild Pending.'
+                'Each trigger chunk marks the schedules beyond its budget Rebuild Pending.'
             );
             Assert.areEqual(
                 1,
@@ -295,6 +296,53 @@ private class ShiftScheduleRebuildTest {
                 2,
                 shiftsOf(scheduleId).size(),
                 'The shift booked and the shift cancelled after the Ids were taken stay.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aJobRemovesItsShareAndPassesTheRestOn() {
+        System.runAs(admin()) {
+            Id scheduleId = allSchedules()[0].Id;
+            Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(
+                new Set<Id>{ scheduleId }
+            );
+            ShiftScheduleRemovalJob.shiftsPerJobOverride = 10;
+
+            Test.startTest();
+            System.runAs(user(SCHEDULE_ADMIN)) {
+                ShiftScheduleRemovalJob.queue(removable);
+            }
+            Test.stopTest();
+
+            // A test cannot run a chained job, so the next job's four shifts are still there.
+            // The failed chain is logged, not thrown.
+            Assert.areEqual(
+                SHIFTS_EACH - 10,
+                shiftsOf(scheduleId).size(),
+                'The first job removes ten shifts and leaves the rest to the next.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aRemovalWithNoQueueableJobLeftIsLoggedNotThrown() {
+        System.runAs(admin()) {
+            Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(
+                new Set<Id>{ allSchedules()[0].Id }
+            );
+
+            Test.startTest();
+            for (Integer i = 0; i < Limits.getLimitQueueableJobs(); i++) {
+                System.enqueueJob(new ShiftScheduleRemovalJob(new List<Id>()));
+            }
+            ShiftScheduleRemovalJob.queue(removable);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'ShiftScheduleRemovalJob'],
+                'A removal that cannot be queued is logged.'
             );
         }
     }
