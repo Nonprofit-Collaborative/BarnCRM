@@ -251,7 +251,7 @@ public with sharing class AccessController {
                 AccessService.removeRole(assigneeId, roleDeveloperName);
             }
             // The switchable tabs follow the role (ADR-0124), and so do the modules' own sets
-            // (ADR-NEXT `NEXT-module-access-sync-by-role.md`).
+            // (ADR-0131 `0131-module-access-sync-by-role.md`).
             TabAccessService.requestSync();
             ModuleAccessSyncs.requestAll();
         } catch (AccessService.AccessException e) {

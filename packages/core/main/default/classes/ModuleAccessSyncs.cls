@@ -1,6 +1,6 @@
 /**
- * Finds each installed module's access sync (`ModuleAccessSync`) and asks it to run (ADR-NEXT
- * `NEXT-module-access-sync-by-role.md`): the Module Manager asks the one module it turns on, and
+ * Finds each installed module's access sync (`ModuleAccessSync`) and asks it to run (ADR-0131
+ * `0131-module-access-sync-by-role.md`): the Module Manager asks the one module it turns on, and
  * the Access page and the nightly access check (`TabAccessScheduler`) ask every one.
  *
  * Found by convention, so Core names no module class: a module's sync is the class named after

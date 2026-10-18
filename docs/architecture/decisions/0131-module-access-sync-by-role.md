@@ -1,6 +1,6 @@
-# ADR-NEXT: A module gives its sets to holders of a BarnCRM role, and Core asks it at Turn on and nightly
+# ADR-0131: A module gives its sets to holders of a BarnCRM role, and Core asks it at Turn on and nightly
 
-**Status:** Accepted (settles the open point in ADR-0127, decision 3 and its Consequences)
+**Status:** Accepted (owner direction 2026-10-18 to proceed on the integrator's recommendation; settles the open point in ADR-0127, decision 3 and its Consequences)
 **Date:** 2026-10-17
 **Source:** v0.8 Volunteers build plan, PR7; builds on ADR-0059, ADR-0124, ADR-0125 and ADR-0127.
 

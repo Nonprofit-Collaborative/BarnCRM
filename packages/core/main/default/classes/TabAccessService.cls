@@ -20,7 +20,7 @@
  * A module that keeps its own permission sets with BarnCRM's roles uses the same audience
  * logic through `giveToHolders`, naming its sets and Core's (ADR-0125
  * `0125-rollup-builder-module.md`, D2), or through `giveToGroupHolders`, naming the roles
- * themselves (ADR-NEXT `NEXT-module-access-sync-by-role.md`); Core names no module set.
+ * themselves (ADR-0131 `0131-module-access-sync-by-role.md`); Core names no module set.
  */
 @NamespaceAccessible
 public with sharing class TabAccessService {
@@ -188,7 +188,7 @@ public with sharing class TabAccessService {
      * Gives the named permission set to every active person assigned one of the named permission
      * set groups, such as a BarnCRM role, up to `budget` assignments, with the rules of
      * `giveToHolders`. For a module whose sets follow roles that hold the same Core sets, such as
-     * the Coordinator and Team Member roles (ADR-NEXT `NEXT-module-access-sync-by-role.md`).
+     * the Coordinator and Team Member roles (ADR-0131 `0131-module-access-sync-by-role.md`).
      * Only the groups this product ships count. Returns true when more is left.
      */
     @NamespaceAccessible

@@ -1,7 +1,7 @@
 /**
  * Core asks each installed module's access sync to give its sets to BarnCRM's roles: every one
- * with the nightly access check, and a single one when the Module Manager turns it on (ADR-NEXT
- * `NEXT-module-access-sync-by-role.md`). No module is needed: the syncs are injected by key.
+ * with the nightly access check, and a single one when the Module Manager turns it on (ADR-0131
+ * `0131-module-access-sync-by-role.md`). No module is needed: the syncs are injected by key.
  */
 @IsTest(testFor='ApexClass:ModuleAccessSyncs')
 private class ModuleAccessSyncsTest {

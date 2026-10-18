@@ -1,6 +1,6 @@
 /**
- * A module's sync that gives its own permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-module-access-sync-by-role.md`). Core asks it through `ModuleAccessSyncs` when the
+ * A module's sync that gives its own permission sets to BarnCRM's roles (ADR-0131
+ * `0131-module-access-sync-by-role.md`). Core asks it through `ModuleAccessSyncs` when the
  * Module Manager turns the module on and with the nightly access check, so people given a role
  * since get the module's sets. The module's class needs a public no-argument constructor, since
  * Core builds it by name.
