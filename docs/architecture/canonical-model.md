@@ -7972,7 +7972,7 @@ again by the next edit of its schedule, a Cancelled one is not.
 creates at most ten schedules' worth of shifts at the longest horizon the setting allows. A save
 that changes the pattern of, or ends, many schedules removes shifts in the save only for as many
 schedules as the transaction's DML rows allow (the rows still free, less a reserve of 2,000,
-over seven shifts a week to the horizon: about 49 at 26 weeks). The rest are rebuilt by the same
+over seven shifts a week to the horizon: 43 at 26 weeks). The rest are rebuilt by the same
 batch, ten per transaction, which removes their future shifts as R-SSC4 and R-SSC5 say, records
 Shifts Kept, clears Created Through and creates the new shifts; until it has run, those
 schedules show no Shifts Kept and still hold their old shifts.

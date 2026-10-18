@@ -45,6 +45,9 @@ public with sharing class ShiftScheduleService {
     private static Datetime nowOverride;
     @TestVisible
     private static String timeZoneOverride;
+    /** Set by tests that cannot build the 10,000 shifts it takes to reach the real budget. */
+    @TestVisible
+    private static Integer inlineBudgetOverride;
 
     private static String orgTimeZone;
 
@@ -199,6 +202,9 @@ public with sharing class ShiftScheduleService {
      * (every day to the horizon). The rest are rebuilt by `ShiftScheduleBatch`.
      */
     public static Integer inlineScheduleBudget() {
+        if (inlineBudgetOverride != null) {
+            return inlineBudgetOverride;
+        }
         Integer free = Limits.getLimitDmlRows() - Limits.getDmlRows() - ROW_RESERVE;
         return Math.max(0, free / (7 * VolunteerSettings.shiftHorizonWeeks()));
     }
