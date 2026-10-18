@@ -272,6 +272,35 @@ private class VolunteerHoursImportTest {
     }
 
     @IsTest
+    static void aTemplateNamingApprovedCannotSkipApproval() {
+        Import_Template__c shipped;
+        List<String> emails;
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            VolunteersTestData.volunteerSettings(true, false);
+            shipped = template();
+            emails = people(shipped, 2);
+            // An administrator edits the shipped template to name Approved instead of Submitted.
+            shipped.Default_Values_JSON__c = '{"version": 1, "defaults": [{"target": "Record.Status__c", "value": "Approved"}]}';
+            update shipped;
+        }
+
+        System.runAs(importer()) {
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = load(shipped, rowsFor(emails));
+            Test.stopTest();
+
+            Assert.areEqual(0, outcome.created, 'Nothing loads Approved: ' + rejections());
+            Assert.areEqual(2, outcome.rejected, 'Each row is refused.');
+            Assert.isTrue(
+                rejections().contains(Label.Volunteers_Hours_StatusThroughApproval),
+                'Says approval goes through a coordinator: ' + rejections()
+            );
+        }
+        Assert.areEqual(0, hours().size(), 'No hours skipped approval.');
+    }
+
+    @IsTest
     static void approvedHoursStayLockedAndAnImportNeverChangesThem() {
         Import_Template__c shipped;
         List<String> emails;

@@ -127,11 +127,12 @@ Use these headings in the first row of a CSV or Excel file. Order does not matte
 | Hours | Yes | **Hours**, greater than zero, to two decimal places. |
 | Notes | No | What the person did. |
 
-There is no Status column. Every row starts **Submitted** and waits in the **Hours awaiting
-approval** list view for a coordinator; with **Hours require approval** off in Volunteer
-Settings, rows are **Approved** at once, by the person who runs the import, as for hours entered
-by hand. There is no Shift column, because shift names repeat; the hours still count toward the
-job.
+There is no Status column, and a file cannot approve its own hours. While **Hours require
+approval** is on in Volunteer Settings (the default), every row starts **Submitted** and waits in
+the **Hours awaiting approval** list view for a coordinator; a template changed to name any other
+status has those rows rejected. When it is off, rows are **Approved** at once, by the person who
+runs the import, as for hours entered by hand. There is no Shift column, because shift names
+repeat; the hours still count toward the job.
 
 ### Walkthrough
 
@@ -148,9 +149,16 @@ job.
 
 Approved hours are locked: the import only adds new entries and never changes an existing one,
 so it cannot alter hours a coordinator has approved. Importing a file twice adds the hours
-twice; to take back a wrong import, use **Undo** on its results (see
-[Importing](importing.md), section 5). The person must hold access to Volunteer Hours and its
-fields, since the load runs with that person's own permissions.
+twice. To take back a wrong import, use **Undo** on its results (see [Importing](importing.md),
+section 5). Undo removes only entries that are still **Submitted**, and only when the person
+undoing holds the Volunteers Coordinator or Admin role; approved hours are never deleted, so
+they are kept and listed in the import's journal. With **Hours require approval** off every
+imported entry is Approved at once, so check the file before you import: taking one back means
+a coordinator reopens it (back to Submitted) and then deletes it.
+
+To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volunteers role
+that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
+own permissions.
 
 ## Common mistakes
 
