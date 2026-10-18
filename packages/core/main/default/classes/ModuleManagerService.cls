@@ -198,7 +198,9 @@ public with sharing class ModuleManagerService {
      * Lets an installed module's automation run again, with each switch as it was, and creates
      * any switch row that is missing, which is Core's part of a module's post-install work.
      * The rollup engine, when installed, then catches up on what it skipped while its module was
-     * off (ADR-0125 decision 9), through its seam; Core names no module class.
+     * off (ADR-0125 decision 9), through its seam, and the module's access sync, when it has
+     * one, gives its sets to people given a role meanwhile (ADR-0131
+     * `0131-module-access-sync-by-role.md`); Core names no module class.
      */
     @NamespaceAccessible
     public static void turnOn(String moduleName) {
@@ -206,6 +208,7 @@ public with sharing class ModuleManagerService {
         setTurnedOff(row.name, false);
         AutomationControl.ensureDefaults();
         afterTurnedOn(row.name);
+        ModuleAccessSyncs.requestFor(row.name);
     }
 
     /** Tells the rollup engine a module is on again; a failure is logged, never in the way. */

@@ -137,6 +137,124 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void givesAModuleSetToOneRoleNotAnotherHoldingTheSameSets() {
+        System.runAs(TestUsers.admin()) {
+            User coordinator = TestUsers.standardUser('Coordinator');
+            User member = TestUsers.standardUser('Member');
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(
+                    AssigneeId = coordinator.Id,
+                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator')
+                        .Id
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = member.Id,
+                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Program_Staff').Id
+                )
+            };
+            List<String> roles = new List<String>{ 'Volunteer_Coordinator' };
+            // Core's tests can name no module set, so a tab set stands in for one.
+            TabAccessService.coreSetPrefix = 'Not_Core_';
+
+            Test.startTest();
+            Boolean noRoom = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                0,
+                'Test'
+            );
+            Boolean more = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                100,
+                'Test'
+            );
+            Boolean again = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                roles,
+                100,
+                'Test'
+            );
+            Boolean missing = TabAccessService.giveToGroupHolders('No_Such_Set', roles, 100, 'T');
+            Boolean noRoles = TabAccessService.giveToGroupHolders('Module_Set', null, 100, 'T');
+            Test.stopTest();
+
+            Assert.isTrue(noRoom, 'A budget of nothing leaves the role holder for later');
+            Assert.isFalse(more, 'Then everyone is done in one pass');
+            Assert.isFalse(again, 'And a second pass finds nobody left');
+            Assert.isFalse(missing, 'A set this org lacks is skipped');
+            Assert.isFalse(noRoles, 'No roles gives nothing');
+            Assert.isTrue(
+                tabSetsOf(coordinator.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Coordinator role holder gets the set'
+            );
+            Assert.isFalse(
+                tabSetsOf(member.Id).contains(TabAccessService.IMPORT_TAB),
+                'The Team Member, holding the same Core set, does not'
+            );
+        }
+    }
+
+    @IsTest
+    static void byRoleSkipsInactivePeopleAndThoseHoldingTheSetThroughAGroup() {
+        System.runAs(TestUsers.admin()) {
+            Id coordinatorRole = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator').Id;
+            User gone = TestUsers.standardUser('Gone');
+            User grouped = TestUsers.standardUser('Grouped');
+            // A role of the org's own that already includes the stand-in module set.
+            PermissionSetGroup ownRole = new PermissionSetGroup(
+                DeveloperName = 'Test_Module_Role',
+                MasterLabel = 'Test Module Role'
+            );
+            insert ownRole;
+            insert new PermissionSetGroupComponent(
+                PermissionSetGroupId = ownRole.Id,
+                PermissionSetId = [
+                    SELECT Id
+                    FROM PermissionSet
+                    WHERE Name = :TabAccessService.IMPORT_TAB
+                    LIMIT 1
+                ]
+                .Id
+            );
+            Test.calculatePermissionSetGroup(ownRole.Id);
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(
+                    AssigneeId = gone.Id,
+                    PermissionSetGroupId = coordinatorRole
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = grouped.Id,
+                    PermissionSetGroupId = coordinatorRole
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = grouped.Id,
+                    PermissionSetGroupId = ownRole.Id
+                )
+            };
+            gone.IsActive = false;
+            update gone;
+            TabAccessService.coreSetPrefix = 'Not_Core_';
+
+            Test.startTest();
+            Boolean more = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                new List<String>{ 'Volunteer_Coordinator' },
+                100,
+                'Test'
+            );
+            Test.stopTest();
+
+            Assert.isFalse(more, 'Nothing is left');
+            Assert.isTrue(tabSetsOf(gone.Id).isEmpty(), 'An inactive role holder is given nothing');
+            Assert.isTrue(
+                tabSetsOf(grouped.Id).isEmpty(),
+                'Someone holding it through a group is not given it again directly'
+            );
+        }
+    }
+
+    @IsTest
     static void givesNoneOfCoresOwnSetsAndNothingWithoutAnAudience() {
         System.runAs(TestUsers.admin()) {
             List<String> refused = new List<String>();
@@ -161,10 +279,20 @@ private class TabAccessServiceTest {
                     refused.add(coreSet);
                 }
             }
+            try {
+                TabAccessService.giveToGroupHolders(
+                    'BarnCRM_Staff',
+                    new List<String>{ 'Read_Only' },
+                    100,
+                    'Test'
+                );
+            } catch (IllegalArgumentException expected) {
+                refused.add('BarnCRM_Staff by role');
+            }
             Boolean noAudience = TabAccessService.giveToHolders('Module_Set', null, 100, 'Test');
             Test.stopTest();
 
-            Assert.areEqual(4, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
+            Assert.areEqual(5, refused.size(), 'Each of Core\'s sets is refused: ' + refused);
             Assert.isFalse(noAudience, 'No audience gives nothing and leaves nothing for later');
         }
     }
