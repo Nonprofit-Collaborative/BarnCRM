@@ -627,14 +627,17 @@ private class PersonErasureTest {
         System.runAs(eraser()) {
             PersonErasureExtensions.noneForTest = false;
             PersonErasureExtensions.overrides.add(new KeepsDepartment());
-            Boolean givingThere = Type.forName('GivingPersonErasureExtension') != null;
+            Integer installedModules = 0;
+            for (String className : PersonErasureExtensions.EXTENSION_CLASSES) {
+                installedModules += Type.forName(className) != null ? 1 : 0;
+            }
 
             List<PersonErasureExtension> found = PersonErasureExtensions.installed();
 
             Assert.areEqual(
-                givingThere ? 2 : 1,
+                1 + installedModules,
                 found.size(),
-                'The Giving module is asked for by name'
+                'Each installed module is asked for by name'
             );
             Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
         }

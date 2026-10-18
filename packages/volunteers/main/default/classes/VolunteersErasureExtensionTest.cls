@@ -68,10 +68,16 @@ private class VolunteersErasureExtensionTest {
                 [SELECT COUNT() FROM Volunteer_Requirement__c WHERE Contact__c = :jordan.Id],
                 'Their requirements are deleted'
             );
+            // A test still reads purged rows with ALL ROWS, so it cannot see the Recycle Bin
+            // empty: it proves the purge ran without failing.
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Volunteer_Requirement__c WHERE Id IN :theirs ALL ROWS],
-                'And emptied from the Recycle Bin'
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'PersonErasure.emptyRecycleBin'
+                ],
+                'Emptying the Recycle Bin did not fail'
             );
             Assert.areEqual(
                 1,
@@ -170,9 +176,15 @@ private class VolunteersErasureExtensionTest {
             jordan = person('Lee');
             insert check(jordan.Id, 'Ref A');
         }
-        User noVolunteers = TestUsers.withPermissionSets(
-            new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
-        );
+        // A staff member allowed to erase: the access sync gives them Volunteers Staff, which
+        // holds no right to requirements (a BarnCRM Admin would be given Volunteers Admin).
+        User noVolunteers;
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            noVolunteers = TestUsers.standardUserWith(
+                'ErasesNoVolunteers',
+                new List<String>{ VolunteersTestData.CORE_STAFF, 'BarnCRM_Erase_People' }
+            );
+        }
 
         System.runAs(noVolunteers) {
             try {

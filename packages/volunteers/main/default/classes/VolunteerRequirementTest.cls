@@ -44,6 +44,8 @@ private class VolunteerRequirementTest {
             return refused.getDmlMessage(0);
         } catch (TypeException noCreate) {
             return noCreate.getMessage(); // A user with no create right on the object.
+        } catch (SecurityException noAccess) {
+            return noAccess.getMessage(); // A user with no access to the object at all.
         }
         return '';
     }

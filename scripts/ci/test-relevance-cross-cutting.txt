@@ -6,4 +6,5 @@ FundraisingStaffGroupTest  # reads the packaged Fundraising_Staff permission set
 InKindGiftRulesTest  # validation rules on Gift__c only, asserted through DML: no Apex under test
 InteractionNoteTest  # the packaged Log_Interaction action and Task values: no Apex under test
 TestUsersTest  # tests the TestUsers test utility, which is not production code
+VolunteerRequirementTest  # validation rules, the Is Current formula and permission sets on the requirement object: no Apex under test (its erasure extension is tested by VolunteersErasureExtensionTest)
 VolunteerSkillTest  # validation rules, delete constraints and permission sets on the skill objects: no Apex under test
