@@ -36,8 +36,6 @@ ALLOWED_LITERALS = {
     "TestUsers.cls": "the module admin sets a test admin holds when the module is installed",
     "ModuleDetectionService.cls": "the detection-only probe objects for Giving (ADR-0009)",
     "ModuleDetectionServiceTest.cls": "asserts the detection probes",
-    "ModuleManagerServiceTest.cls": "stubs a Volunteers Setting Definition row naming its settings object",
-    "ModuleManagerControllerTest.cls": "stubs a Volunteers Setting Definition row naming its settings object",
     "NamespaceUtilTest.cls": "resolves a module object name without the module",
 }
 

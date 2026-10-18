@@ -3,7 +3,7 @@
   <fullName>Approved_By__c</fullName>
   <deleteConstraint>SetNull</deleteConstraint>
   <externalId>false</externalId>
-  <inlineHelpText>The coordinator who approved these hours. BarnCRM fills this in when the hours are approved.</inlineHelpText>
+  <inlineHelpText>The coordinator who approved or rejected these hours. BarnCRM fills this in when the hours are approved or rejected.</inlineHelpText>
   <label>Approved By</label>
   <referenceTo>User</referenceTo>
   <relationshipLabel>Approved Volunteer Hours</relationshipLabel>

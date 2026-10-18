@@ -42,7 +42,7 @@
         <field>Hours__c</field>
       </layoutItems>
       <layoutItems>
-        <behavior>Required</behavior>
+        <behavior>Readonly</behavior>
         <field>Status__c</field>
       </layoutItems>
       <layoutItems>
