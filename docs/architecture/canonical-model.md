@@ -1571,8 +1571,9 @@ problem in plain language. The checks sit in two places:
   Source Attribute. It leaves an entity or attribute the org does not have to the planner, so
   a definition for a module that is not installed can still be saved.
 - **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
-  target entity or attribute the org does not have, or cannot write; a source entity the org
-  does not have, or a path whose first segment on any alternative is not a reference
+  target entity or attribute the org does not have, or that the administrator saving it
+  cannot edit (their own field-level security, since an administrator is acting); a source
+  entity the org does not have, or a path whose first segment on any alternative is not a reference
   attribute of the source; a Source Attribute the source does not have; SUM and AVG of
   anything but a number, currency or percent, and MIN and MAX of anything but those or a
   date; FIRST and LAST with no Order By Attribute; a fiscal window whose offset is not 0, -1 or
@@ -1581,6 +1582,17 @@ problem in plain language. The checks sit in two places:
 
 A definition written another way (an import, the API) that fails a Builder check is left out of
 the run by the planner, which records why in the Error Log.
+
+**Writable at run time** means the engine can write the attribute, never that the person whose
+save set the run off may edit it. The planner (`RollupPlanner`) refuses a target attribute the
+org does not have, a formula, roll-up summary or auto number attribute, and a system attribute
+no permission can make editable (not permissionable, such as Created Date); it does not read the
+running user's field-level security. Totals are read only in every module's non-admin permission
+sets, and `RollupWriter` writes them in system mode on the administrator's definition's behalf
+(ADR-0021), limited to the target attributes the definitions name and the freshness stamp. So a
+staff member's save, instant or queued, keeps the totals over it current, as an
+administrator's does. The source records are read in system mode as before: a total counts every
+record, whoever saved the one that changed it.
 
 **R-R11 Recompute, and what marks a target.** Every calculation, instant, queued, nightly
 or on demand, recomputes each affected target record from all its source records; nothing
@@ -8243,6 +8255,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
+| v0.8 | 2026-10-18 | Rollup targets writable by the engine, not the saving user. No object or field added. R-R10: at run time the planner checks that the engine can write a target attribute (it exists, is not a formula, roll-up summary, auto number or system attribute), never the running user's field-level security; the Rollup Builder's save still checks the administrator's own. Before this, a staff member's save, on whom every module keeps the totals read only, had every definition refused and the totals waited for the nightly run. |
 
 ---
 ## 32. Entity ownership by package
