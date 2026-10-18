@@ -10,6 +10,10 @@
     <application>BarnCRM_Volunteers</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Manage_Volunteers</name>
+  </customPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Availability_Days__c</field>

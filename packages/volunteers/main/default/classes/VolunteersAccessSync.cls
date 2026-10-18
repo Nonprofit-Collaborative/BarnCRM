@@ -3,7 +3,7 @@
  * decision 3): Volunteers Admin to everyone holding BarnCRM Admin, directly or through a role,
  * and each other set to the people assigned its role (a permission set group). The Coordinator
  * and Team Member roles hold the same Core set, so those follow the role itself
- * (`TabAccessService.giveToGroupHolders`, ADR-NEXT `NEXT-module-access-sync-by-role.md`).
+ * (`TabAccessService.giveToGroupHolders`, ADR-0131 `0131-module-access-sync-by-role.md`).
  *
  * It only gives, never takes away: a set may also be given by hand. It runs at install
  * (`VolunteersPostInstall`), and Core asks it when a role is given on the Access page, at each

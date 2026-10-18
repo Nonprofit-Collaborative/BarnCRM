@@ -10,7 +10,10 @@ volunteer since, emergency contact, availability) and links their sign-ups and h
 
 Hours are entered by staff. When **Hours require approval** is on, a new entry waits as
 **Submitted** until a coordinator approves or rejects it, and only approved hours count in any
-total. There is no volunteer portal: volunteers do not log in.
+total. Marking a sign-up **Attended** creates its hours for you (the **Attendance creates hours**
+setting, on by default), so nobody types them twice. While automation is paused, attendance
+creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
+portal: volunteers do not log in.
 
 This page covers installing the module, who gets which access, and its settings. Approving hours
 on screen, the hour totals on people, the coordinator dashboard and recurring shifts each come
@@ -72,13 +75,13 @@ whoever entered it, and everyone who can see the person sees them.
 
 As an admin, open the **Volunteer Settings** tab in the BarnCRM Volunteers app, or the
 **Volunteers** section of **BarnCRM Settings**: both show the same three settings, and each
-saves as you change it. Each setting takes effect with the part of the module that uses it, as
-the table says; until then, changing it changes nothing.
+saves as you change it. The first two settings are already in effect; the third takes effect
+with recurring shifts, and until then changing it changes nothing.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|
-| Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | With the hours change (approval) |
-| Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | With the sign-up change |
+| Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
+| Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | With recurring shifts |
 
 ## Turning it off
@@ -98,8 +101,10 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.
 5. On the shift, add a sign-up for any person in your sample data.
-6. On **Volunteer Hours**, enter 3 hours for that person on that shift. The entry is
-   **Submitted** and appears in the **Hours awaiting approval** list view.
+6. Change the sign-up's status to **Attended**. On **Volunteer Hours**, a 3-hour entry for that
+   person on that shift now exists. It is **Submitted** and appears in the **Hours awaiting
+   approval** list view (or **Approved** if Hours require approval is off). You can also enter
+   hours by hand there.
 7. Open **Volunteer Settings** and read the three settings. Leave them as they are.
 
 ## Common mistakes
