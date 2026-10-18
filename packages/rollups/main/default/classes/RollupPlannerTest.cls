@@ -128,4 +128,86 @@ private class RollupPlannerTest {
             );
         }
     }
+
+    /**
+     * A run plans for whoever saved the record that set it off, and the totals are read only for
+     * everyone but an administrator. The planner asks whether the engine can write the target,
+     * not whether this person may edit it (R-R10, "Writable at run time"): before, every
+     * definition was refused on a staff member's save and the totals waited for the nightly run.
+     */
+    @IsTest
+    static void aTargetTheSavingUserMayNotEditIsStillPlanned() {
+        User staff;
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            staff = TestDataFactory.createUser('Plannerstaff', new List<String>{ 'BarnCRM_Staff' });
+        }
+
+        System.runAs(staff) {
+            Assert.isFalse(
+                Schema.SObjectType.Account.fields.Emptied_By_Deletion__c.isUpdateable(),
+                'Precondition: BarnCRM Staff may read this date and not edit it'
+            );
+
+            RollupPlanner.Plan plan = RollupPlanner.plan(
+                Account.SObjectType,
+                new List<Rollup_Definition__c>{
+                    fromChildren('MAX', 'Anniversary__c', 'Emptied_By_Deletion__c')
+                }
+            );
+
+            Assert.isTrue(plan.refused.isEmpty(), 'Not refused for the saving user\'s access');
+            Assert.areEqual(1, plan.definitions.size(), 'The definition is planned');
+        }
+    }
+
+    /** What no permission can make editable is still refused, an administrator's run included. */
+    @IsTest
+    static void formulaAutoNumberAndSystemTargetsAreStillRefused() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Assert.isFalse(
+                RollupPlanner.engineCanWrite(
+                    Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe()
+                ),
+                'A formula is calculated by the platform'
+            );
+            Assert.isFalse(
+                RollupPlanner.engineCanWrite(Rollup_Queue__c.Name.getDescribe()),
+                'An auto number is set by the platform'
+            );
+            Assert.isFalse(
+                RollupPlanner.engineCanWrite(Account.LastModifiedDate.getDescribe()),
+                'A system attribute is set by the platform'
+            );
+            Assert.isTrue(
+                RollupPlanner.engineCanWrite(Account.Member_Count__c.getDescribe()),
+                'An ordinary number attribute is written'
+            );
+
+            Rollup_Definition__c formula = new Rollup_Definition__c(
+                Name = 'Fill rate',
+                Source_Object__c = 'Field_Utilization_Snapshot__c',
+                Relationship_Path__c = 'Id',
+                Aggregate__c = 'MAX',
+                Source_Field__c = 'Fill_Rate__c',
+                Target_Object__c = 'Field_Utilization_Snapshot__c',
+                Target_Field__c = 'Fill_Rate__c',
+                Active__c = true
+            );
+            RollupPlanner.Plan formulaPlan = RollupPlanner.plan(
+                Field_Utilization_Snapshot__c.SObjectType,
+                new List<Rollup_Definition__c>{ formula }
+            );
+            RollupPlanner.Plan systemPlan = RollupPlanner.plan(
+                Account.SObjectType,
+                new List<Rollup_Definition__c>{
+                    fromChildren('MAX', 'Anniversary__c', 'LastModifiedDate')
+                }
+            );
+
+            Assert.areEqual(1, formulaPlan.refused.size(), 'A formula target is refused');
+            Assert.isTrue(formulaPlan.definitions.isEmpty(), 'And not planned');
+            Assert.areEqual(1, systemPlan.refused.size(), 'A system target is refused');
+            Assert.isTrue(systemPlan.definitions.isEmpty(), 'And not planned');
+        }
+    }
 }

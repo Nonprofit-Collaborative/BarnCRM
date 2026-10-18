@@ -243,7 +243,10 @@ public with sharing class RollupPlanner {
         return result;
     }
 
-    /** The target attribute, refused unless it exists, can be written, and has a type we fill. */
+    /**
+     * The target attribute, refused unless it exists, the engine can write it, and it has a type
+     * we fill.
+     */
     private static Schema.SObjectField writableTarget(
         Rollup_Definition__c definition,
         Map<String, Schema.SObjectField> targetFieldMap
@@ -251,7 +254,7 @@ public with sharing class RollupPlanner {
         Schema.SObjectField field = String.isBlank(definition.Target_Field__c)
             ? null
             : targetFieldMap.get(definition.Target_Field__c.toLowerCase());
-        if (field == null || !field.getDescribe().isUpdateable()) {
+        if (field == null || !engineCanWrite(field.getDescribe())) {
             throw new RollupPlanException(System.Label.Core_Rollups_ErrorTargetNotWritable);
         }
         String problem = targetTypeProblem(definition.Aggregate__c, field.getDescribe().getType());
@@ -259,6 +262,28 @@ public with sharing class RollupPlanner {
             throw new RollupPlanException(problem);
         }
         return field;
+    }
+
+    /**
+     * Whether the engine can write this attribute at all (R-R10), not whether the running user
+     * may edit it. A run plans for whoever saved the record that set it off, and `RollupWriter`
+     * writes the totals in system mode on the administrator's definition's behalf (ADR-0021).
+     * Every module's non-admin permission sets keep the totals read only, so the running user's
+     * field-level security would refuse every definition on a staff member's save and leave the
+     * totals to the nightly run. The administrator's own access is checked where an administrator
+     * acts: the Rollup Builder's save and its list of target attributes.
+     *
+     * A formula, roll-up summary or auto number attribute is never written. Otherwise the
+     * attribute is writable for this user, or kept from them only by field-level security: a
+     * permissionable attribute is one an administrator can grant edit on, which a system
+     * attribute (Id, CreatedDate, LastModifiedDate and the like) is not.
+     */
+    @TestVisible
+    private static Boolean engineCanWrite(Schema.DescribeFieldResult field) {
+        if (field.isCalculated() || field.isAutoNumber()) {
+            return false;
+        }
+        return field.isUpdateable() || field.isPermissionable();
     }
 
     /** One query per path alternative, each carrying this definition's one measure. */
