@@ -7187,7 +7187,13 @@ occurrence of it.
 ### Rules
 
 **R-VJ1 A used job is deactivated, not deleted.** A job with shifts or hours is not deleted;
-the message says to clear Active instead (as R-F2 for a fund).
+the message says to clear Active instead (as R-F2 for a fund). Hours of any status count,
+Approved ones included: deleting the job would take its shifts and sign-ups with it and leave
+hours that count in totals naming no job and no shift. The rule is enforced in Apex, before
+the delete, by an automation that always runs (registry row `Volunteer_Job_Rules`, ADR-0024),
+and it asks whether any shift or entry exists in the org (an existence check, never a count,
+so a bulk delete of busy jobs stays inside the query row limit), including those the deleting
+user cannot see.
 
 **R-VJ2 An inactive job keeps its history.** Clearing Active stops it being offered on a new
 shift and changes nothing already recorded, including its totals.
@@ -7206,7 +7212,8 @@ shift and changes nothing already recorded, including its totals.
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
 
-- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`.
+- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
+  `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
 
 ---
 
@@ -7309,15 +7316,31 @@ of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope
 ### Rules
 
 **R-VU1 Exactly one person.** Contact or Account, never both, never neither (validation rule).
+In a Person Account org a person is named by the Account side (Section 4). A sign-up or an
+hours entry that names a person account's person contact on the Contact side is not rewritten
+to the Account side: Gift does not rewrite its donor pair either, and the entry points that create them (the sign-up and hours screens,
+the hours import) are where the side is chosen. Such a record still saves, but its household
+(R-VG2) and the one sign-up per person check (R-VU2) see the person contact as a different
+person from the account. If the pairs are ever normalized, it is done for every pair at once,
+in Core.
 
 **R-VU2 One sign-up per person per shift.** A second one for the same person on the same
 shift is refused, naming the shift: it is always a mistake and would double the filled count.
+Every sign-up in the org counts, a cancelled one and one the user cannot see included. The
+check runs on insert, when the shift or person changes, and on undelete: restoring a sign-up
+for a person since booked onto the shift again is refused.
 
 **R-VU3 Marking attendance can write the hours.** When Attendance Creates Hours is on (29N),
 moving a sign-up to Attended creates one Volunteer Hours entry for that person, dated the
 shift's start, for the shift's length, against the shift and its job, naming the sign-up.
 Marking attendance again creates no second entry, and moving the sign-up away from Attended
-deletes nothing: removing hours a coordinator may have approved is left to a person.
+deletes nothing: removing hours a coordinator may have approved is left to a person. Undeleting
+an old entry for a sign-up another entry already records is refused, so one attendance stays
+one entry. A sign-up whose shift has no end time, ends before it starts, or cannot be read gets
+no entry; its attendance is still saved and a Warning in the Error Log names the sign-up, so
+the hours are typed by hand. While automation is paused or the sign-up automation is switched
+off, marking attendance writes no hours and nothing writes them later: the coordinator enters
+them by hand (admin guide, volunteers page).
 
 **R-VU4 A cancelled sign-up stops counting.** Slots Filled counts sign-ups whose Status is not
 Cancelled, so someone who drops out frees the place without the booking being deleted.
@@ -7339,7 +7362,8 @@ Cancelled, so someone who drops out frees the place without the booking being de
   its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
   SetNull) can still be edited.
 - **Service:** `VolunteerSignupService`, `VolunteerSignupTriggerHandler`,
-  `VolunteerSignupSelector`.
+  `VolunteerIntegritySelector` (the R-VU2 and R-VU3 checks read every sign-up and entry in the
+  org, without sharing, so a booking or an entry the user cannot see still counts).
 
 ---
 

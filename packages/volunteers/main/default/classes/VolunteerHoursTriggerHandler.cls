@@ -52,4 +52,9 @@ public with sharing class VolunteerHoursTriggerHandler extends TriggerHandler {
             VolunteerHoursService.deriveHouseholds(personChanged);
         }
     }
+
+    /** R-VU3: one attendance, one entry, also when an old entry is restored. */
+    public override void afterUndelete() {
+        VolunteerSignupService.refuseRestoringASecondEntry((List<Volunteer_Hours__c>) Trigger.new);
+    }
 }
