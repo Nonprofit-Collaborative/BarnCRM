@@ -108,6 +108,7 @@ export default class VolunteerHoursApproval extends LightningElement {
   refusedLines = [];
   focusResult = false;
   focusReason = false;
+  focusRejectButton = false;
 
   connectedCallback() {
     this.load();
@@ -119,6 +120,13 @@ export default class VolunteerHoursApproval extends LightningElement {
       if (reasonInput) {
         this.focusReason = false;
         reasonInput.focus();
+      }
+    }
+    if (this.focusRejectButton) {
+      const rejectButton = this.template.querySelector('[data-id="reject"]');
+      if (rejectButton) {
+        this.focusRejectButton = false;
+        rejectButton.focus();
       }
     }
     if (this.focusResult) {
@@ -311,9 +319,11 @@ export default class VolunteerHoursApproval extends LightningElement {
     this.reason = event.detail.value;
   }
 
+  /** Closes the form and puts focus back on Reject, where the user opened it. */
   handleCancelReject() {
     this.showReject = false;
     this.reason = '';
+    this.focusRejectButton = true;
   }
 
   handleConfirmReject() {
@@ -332,13 +342,19 @@ export default class VolunteerHoursApproval extends LightningElement {
     return this.act(
       rejectHours({ hoursIds: this.selectedIds, reason: this.reason }),
       DONE_REJECT
-    ).then(() => {
-      this.showReject = false;
-      this.reason = '';
+    ).then((outcome) => {
+      // A refused call keeps the form open with the reason typed, so it can be sent again.
+      if (outcome !== false) {
+        this.showReject = false;
+        this.reason = '';
+      }
     });
   }
 
-  /** Runs one verb, reports what moved and what did not, and reloads the page. */
+  /**
+   * Runs one verb, reports what moved and what did not, and reloads the page. Resolves false
+   * when the call was refused.
+   */
   act(call, doneTemplate) {
     const namesById = {};
     this.rows.forEach((row) => {
@@ -369,6 +385,7 @@ export default class VolunteerHoursApproval extends LightningElement {
         this.errorMessage = this.messageFrom(error);
         this.busy = false;
         Toast.show({ label: this.errorMessage, variant: 'error' }, this);
+        return false;
       });
   }
 

@@ -175,6 +175,34 @@ describe('c-volunteer-hours-approval', () => {
     expect(byId(element, 'reject-form')).toBeNull();
   });
 
+  it('keeps the reason when a rejection is refused, and returns focus to Reject on cancel', async () => {
+    getHours.mockResolvedValue(pageOf([ANA]));
+    rejectHours.mockRejectedValue({ body: { message: 'Not allowed.' } });
+    const element = build();
+    await flush();
+
+    tick(element, ANA.recordId);
+    await flush();
+    byId(element, 'reject').click();
+    await flush();
+    byId(element, 'reason').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Wrong date' } })
+    );
+    byId(element, 'confirm-reject').click();
+    await flush();
+
+    expect(byId(element, 'error-message').textContent.trim()).toBe('Not allowed.');
+    expect(byId(element, 'reject-form')).not.toBeNull();
+    expect(byId(element, 'reason').value).toBe('Wrong date');
+
+    const rejectButton = byId(element, 'reject');
+    rejectButton.focus = jest.fn();
+    byId(element, 'cancel-reject').click();
+    await flush();
+    expect(byId(element, 'reject-form')).toBeNull();
+    expect(rejectButton.focus).toHaveBeenCalled();
+  });
+
   it('offers Reopen on the approved list, from the first page again', async () => {
     getHours.mockResolvedValue(pageOf([{ ...ANA, status: 'Approved' }]));
     reopenHours.mockResolvedValue({ moved: 1, refused: [] });
