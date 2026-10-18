@@ -33,6 +33,10 @@
         <behavior>Edit</behavior>
         <field>Location__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Shift_Schedule__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>
