@@ -13,10 +13,16 @@
  *    reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Volunteers Admin at the same moment; with no installer it is queued alone.
  *
+ * 4. Add the module's shipped import templates (the volunteer hours template, V-06) beside the
+ *    templates the org already has, through Core's `materializeDefaultsDuringInstall`, because
+ *    Core installs first and cannot see a module's templates. Only the row for the org's
+ *    people is added, and none unless Volunteer Hours is in the org.
+ *
  * The shipped rollups and letter templates are created here by the changes that ship them.
  */
 public with sharing class VolunteersPostInstall implements InstallHandler {
     private static final String SWITCH_CONTEXT = 'VolunteersPostInstall.ensureAutomationSwitches';
+    private static final String IMPORT_CONTEXT = 'VolunteersPostInstall.ensureImportTemplates';
     @TestVisible
     private static final String ACCESS_CONTEXT = 'VolunteersPostInstall.grantInstallerAccess';
 
@@ -31,6 +37,7 @@ public with sharing class VolunteersPostInstall implements InstallHandler {
         }
         // The entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         Id installerId = context.installerId();
         if (installerId == null) {
             new VolunteersAccessSync().requestSync();

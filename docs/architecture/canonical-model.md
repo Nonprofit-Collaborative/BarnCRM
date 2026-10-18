@@ -8000,8 +8000,14 @@ is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Inser
 | Hours | Hours | |
 | Notes | Notes | |
 
-Status is not a column; the template's default value sets it to Submitted, so imported hours
-wait for approval like hours entered by hand. A row whose email or job finds nobody is rejected
+Status is not a column; the template's default value sets it to Submitted, and the hours rules
+then apply the starting status as for hours entered by hand (R-VG5, R-VG6): the entry stays
+Submitted and waits for a coordinator while Hours Require Approval is on, and is Approved by the
+importing user at once when it is off. There is no Shift column: shift names repeat across
+recurring shifts (ADR-0128), so a name cannot identify one, and the job is what hours need
+(R-VG3). The template reaches an org through the module's post-install step, which calls Core's
+`materializeDefaultsDuringInstall` (D-41), so it appears in the import wizard only where
+Volunteers is installed. A row whose email or job finds nobody is rejected
 (Lookup Not Found, Reject the row), and an email held by several people follows Several Matches
 (R-IT9). The household on each hours record is set by the hours automation, as for hours
 entered by hand.

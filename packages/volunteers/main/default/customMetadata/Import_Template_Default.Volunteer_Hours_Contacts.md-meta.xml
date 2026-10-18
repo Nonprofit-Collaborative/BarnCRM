@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Volunteer hours</label>
+    <protected>true</protected>
+    <values>
+        <field>Template_Key__c</field>
+        <value xsi:type="xsd:string">volunteer_hours</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">A spreadsheet of volunteer hours, one row per entry: the volunteer's email, the job's name, the date worked, the hours, and optional notes. Each row becomes one Volunteer Hours record, and a row whose email or job finds nobody is reported, not loaded.</value>
+    </values>
+    <values>
+        <field>Column_Mapping_JSON__c</field>
+        <value xsi:type="xsd:string">{"version": 1, "columns": [{"source": "Email", "target": "Record.Contact__c", "lookupField": "Email"}, {"source": "Job", "target": "Record.Volunteer_Job__c", "lookupField": "Name"}, {"source": "Date", "target": "Record.Date_Worked__c"}, {"source": "Hours", "target": "Record.Hours__c"}, {"source": "Notes", "target": "Record.Notes__c"}]}</value>
+    </values>
+    <values>
+        <field>Default_Values_JSON__c</field>
+        <value xsi:type="xsd:string">{"version": 1, "defaults": [{"target": "Record.Status__c", "value": "Submitted"}]}</value>
+    </values>
+    <values>
+        <field>Matching_Rule__c</field>
+        <value xsi:type="xsd:string">Email exact</value>
+    </values>
+    <values>
+        <field>Person_Mode__c</field>
+        <value xsi:type="xsd:string">Contacts</value>
+    </values>
+    <values>
+        <field>Target_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Hours__c</value>
+    </values>
+    <values>
+        <field>Load_Operation__c</field>
+        <value xsi:type="xsd:string">Insert</value>
+    </values>
+    <values>
+        <field>Default_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+</CustomMetadata>
