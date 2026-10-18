@@ -7396,7 +7396,15 @@ attendance record, and attendance is a sign-up.
 **R-VG5 Approval is a status moved by a service.** Status, Approved By and Approved Date are
 moved only by `VolunteerHoursService`, which refuses a user without the custom permission
 `Manage_Volunteers`; a Status change made any other way is refused. It is not a Salesforce
-approval process (ADR-0127, decision 4).
+approval process (ADR-0127, decision 4). The service has four verbs: submit (create entries,
+which start Submitted, or Approved under R-VG6), approve (any entry not yet Approved: Approved
+By and Approved Date are the coordinator and now, any Rejection Reason is cleared), reject
+(R-VG8: Approved By and Approved Date record who rejected and when) and reopen (an Approved or
+Rejected entry back to Submitted, those three fields cleared). Outside the service a new entry
+is saved Submitted, or Approved when Hours Require Approval is off, and naming any other status
+is refused; on a saved entry a change to Status, Approved By or Approved Date is refused. The
+check is part of the switchable hours automation (`Volunteer_Hours_Rules`), so pausing
+automation for an import of past hours lets them be loaded already Approved.
 
 **R-VG6 Only approved hours count.** Every rollup in 29O filters on Status equals Approved.
 With Hours Require Approval off (29N), entries are created Approved, by the saving user at the
@@ -7404,7 +7412,9 @@ save time, and count at once.
 
 **R-VG7 An approved entry is locked.** While Status is Approved, its person, Date Worked and
 Hours cannot change: the coordinator moves it back to Submitted, edits it and approves it
-again. A validation rule, so it holds with automation off.
+again. A validation rule, so it holds with automation off. Merging two people is not such a
+change: the platform's merge moves the duplicate's entries, approved ones included, to the
+surviving person without running the rule (`VolunteerHoursTriggerHandlerTest`).
 
 **R-VG8 Rejecting says why.** A rejection without a Rejection Reason is refused by the
 service.
@@ -7434,7 +7444,8 @@ service.
 - **Custom permission:** `Manage_Volunteers`, in `Volunteers_Coordinator` and
   `Volunteers_Admin` (R-VG5).
 - **Service:** `VolunteerHoursService`, `VolunteerHoursTriggerHandler`,
-  `VolunteerHoursSelector`.
+  `VolunteerHoursSelector`, `VolunteerHoursWriter` (the status save, in system mode because
+  Approved By and Approved Date are read only in every permission set; ADR-0021).
 
 ---
 
@@ -7445,7 +7456,7 @@ service.
 The Volunteers module's own org-wide settings (ADR-0017: each module owns a protected
 hierarchy custom setting), edited in the BarnCRM Settings console's Volunteers section and on
 the module's own Volunteer Settings page, never in Setup. Defaults are applied in Apex
-(ADR-0035): a blank or out of range value reads as the shipped one.
+(ADR-0035, `VolunteerSettings`): a blank or out of range value reads as the shipped one.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
