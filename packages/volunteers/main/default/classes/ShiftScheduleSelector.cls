@@ -71,11 +71,15 @@ public with sharing class ShiftScheduleSelector {
         ];
     }
 
-    /** Of these shifts, the Ids of those with a sign-up record of any status. */
-    public static Set<Id> shiftsWithSignups(Set<Id> shiftIds) {
-        Set<Id> booked = new Set<Id>();
+    /**
+     * Of these shifts, the Ids of those with a sign-up record of any status or an hours record.
+     * Hours may name a shift with no sign-up, and deleting that shift would clear the hours' only
+     * link to the work.
+     */
+    public static Set<Id> shiftsInUse(Set<Id> shiftIds) {
+        Set<Id> inUse = new Set<Id>();
         if (shiftIds == null || shiftIds.isEmpty()) {
-            return booked;
+            return inUse;
         }
         for (AggregateResult row : [
             SELECT Volunteer_Shift__c shiftId
@@ -84,9 +88,18 @@ public with sharing class ShiftScheduleSelector {
             WITH SYSTEM_MODE
             GROUP BY Volunteer_Shift__c
         ]) {
-            booked.add((Id) row.get('shiftId'));
+            inUse.add((Id) row.get('shiftId'));
         }
-        return booked;
+        for (AggregateResult row : [
+            SELECT Volunteer_Shift__c shiftId
+            FROM Volunteer_Hours__c
+            WHERE Volunteer_Shift__c IN :shiftIds
+            WITH SYSTEM_MODE
+            GROUP BY Volunteer_Shift__c
+        ]) {
+            inUse.add((Id) row.get('shiftId'));
+        }
+        return inUse;
     }
 
     /** The org's default time zone, which schedule times are read in (R-SSC1). */

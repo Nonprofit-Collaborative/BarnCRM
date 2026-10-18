@@ -137,8 +137,8 @@ public with sharing class ShiftScheduleService {
     }
 
     /**
-     * Removes the schedules' future shifts that have no sign-up record and are not Cancelled
-     * (R-SSC4, R-SSC5). A schedule mapped to a date keeps the shifts on or before that day (an
+     * Removes the schedules' future shifts that have no sign-up or hours record and are not
+     * Cancelled (R-SSC4, R-SSC5). A schedule mapped to a date keeps the shifts on or before that day (an
      * earlier End Date); one mapped to null loses every future shift. Returns, per schedule, how
      * many shifts it would have removed but kept.
      */
@@ -164,7 +164,7 @@ public with sharing class ShiftScheduleService {
                 future.add(shift);
             }
         }
-        Set<Id> booked = ShiftScheduleSelector.shiftsWithSignups(
+        Set<Id> booked = ShiftScheduleSelector.shiftsInUse(
             new Map<Id, Volunteer_Shift__c>(future).keySet()
         );
         List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
