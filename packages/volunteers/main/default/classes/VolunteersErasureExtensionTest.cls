@@ -20,7 +20,10 @@ private class VolunteersErasureExtensionTest {
     /** How many Deleted changes name the requirements, through the getters Core exposes. */
     private static Integer deletedLists(PersonErasure.Result result) {
         Integer found = 0;
-        String label = Volunteer_Requirement__c.SObjectType.getDescribe().getLabelPlural();
+        String label = Volunteer_Requirement__c.SObjectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .getLabelPlural();
         for (PersonErasure.Change change : result.getChanges()) {
             if (change.getAction() == PersonErasure.DELETED && change.getObjectLabel() == label) {
                 found++;
