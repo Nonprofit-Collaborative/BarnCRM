@@ -1948,7 +1948,7 @@ public with sharing class HouseholdService {
     /**
      * With Contacts to Multiple Accounts on, changing a contact's account can leave the old
      * direct relation behind as an indirect one, which keeps the emptied household from being
-     * tidied and blocks a later merge (ADR-NEXT). A content test, not an org-shape test: only
+     * tidied and blocks a later merge (ADR-0130). A content test, not an org-shape test: only
      * the relation between each moved contact and the household this move took them out of
      * is removed, only once it is indirect (this move turned it so, since that household was
      * the contact's own account until now), and only when nobody recorded roles or dates on

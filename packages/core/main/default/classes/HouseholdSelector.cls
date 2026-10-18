@@ -303,7 +303,7 @@ public with sharing class HouseholdSelector {
      * prevent would happen anyway.
      *
      * Native membership rows are left out only when the native household group is described
-     * and the probe counted none of it (ADR-NEXT). With Contacts to Multiple Accounts on, the
+     * and the probe counted none of it (ADR-0130). With Contacts to Multiple Accounts on, the
      * platform gives every contact a membership row on its account and keeps an indirect one
      * on the account a contact leaves, so where native households are ruled out those rows
      * say nothing about Nonprofit Cloud. An object merely absent from the describe does not
@@ -349,7 +349,7 @@ public with sharing class HouseholdSelector {
      * Native membership rows on these accounts (for these contacts, when contactIds is not
      * null), empty where the org does not have the object (Contacts to Multiple Accounts off).
      * The household merge asks, because the platform refuses to merge two accounts that share
-     * a related contact, and a household move asks for the relation it left behind (ADR-NEXT).
+     * a related contact, and a household move asks for the relation it left behind (ADR-0130).
      *
      * An upkeep read (ADR-0021) in system mode: its only callers are the household move and
      * merge, after their edit access checks; its only input is identifiers they computed for

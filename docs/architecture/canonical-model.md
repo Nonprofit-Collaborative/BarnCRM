@@ -294,7 +294,7 @@ household: it is a correct outcome, not a failure. With Contacts to Multiple Acc
 every contact has a membership row and a person who moves leaves an indirect one behind.
 For this delete the rows are ignored only when the group object is described and holds no
 household; an object merely absent from the describe may be hidden by the user's licences,
-so the rows still keep the household (ADR-NEXT). A BarnCRM move therefore removes the
+so the rows still keep the household (ADR-0130). A BarnCRM move therefore removes the
 relation it left behind on the household it took a contact out of, when that row is now
 indirect and carries no Roles, StartDate or EndDate, so the tidy-up works again.
 
@@ -345,7 +345,7 @@ Two households only: an organization is never a merge target, and the two record
 be different. A merge moves membership first, in whichever membership mode is active,
 then applies the field values a person chose, then (with Contacts to Multiple Accounts on)
 refuses, changing nothing, if anyone is still related to both households after the move's
-own tidy-up (R-H12), which the platform would refuse to merge (ADR-NEXT), then uses the
+own tidy-up (R-H12), which the platform would refuse to merge (ADR-0130), then uses the
 platform's own account merge
 so that activities, files, notes, and every lookup from another entity follow the record
 that goes away. A merge is not reversible and is audited by the platform's own record

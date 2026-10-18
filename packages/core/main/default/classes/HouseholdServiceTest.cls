@@ -1963,7 +1963,7 @@ private class HouseholdServiceTest {
         }
     }
 
-    // ------------------------------------- Contacts to Multiple Accounts (ADR-NEXT)
+    // ------------------------------------- Contacts to Multiple Accounts (ADR-0130)
 
     /**
      * The content test a move applies to what it leaves behind: only the indirect relation

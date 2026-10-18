@@ -316,7 +316,7 @@ public with sharing class HouseholdMergeService {
 
     /**
      * The people related to both households, which the platform refuses to merge over where
-     * Contacts to Multiple Accounts is on (ADR-NEXT). The move before the merge has already
+     * Contacts to Multiple Accounts is on (ADR-0130). The move before the merge has already
      * removed the unannotated relation each moved person left behind on the household going
      * away (HouseholdService.removeRelationsLeftBehind), so anyone still here is a relation
      * somebody made or annotated. BarnCRM deletes none of those: the merge is refused and

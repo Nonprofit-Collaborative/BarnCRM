@@ -124,7 +124,7 @@ private class OrgShapeDetectorTest {
             System.assertEquals(
                 0,
                 shape.nativeHouseholdGroupCount,
-                'An org without the object has no native household (ADR-NEXT).'
+                'An org without the object has no native household (ADR-0130).'
             );
             System.assertEquals(
                 false,

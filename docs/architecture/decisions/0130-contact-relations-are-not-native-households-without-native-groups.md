@@ -1,4 +1,4 @@
-# ADR-NEXT: Contact relations are not native households in an org without native household groups
+# ADR-0130: Contact relations are not native households in an org without native household groups
 
 **Status:** Proposed
 **Date:** 2026-10-17

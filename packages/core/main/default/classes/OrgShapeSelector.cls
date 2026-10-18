@@ -77,7 +77,7 @@ public with sharing class OrgShapeSelector {
      * How many native Nonprofit Cloud households this org has, or null when the question
      * could not be answered.
      *
-     * Zero when the object is not in the global describe at all (ADR-NEXT, narrowing
+     * Zero when the object is not in the global describe at all (ADR-0130, narrowing
      * ADR-0036). Treating that absence as unknown made every org without Nonprofit Cloud look
      * as though it had native households, and in an org with Contacts to Multiple Accounts on,
      * where every contact has a native membership row, every BarnCRM household then read as a
@@ -89,7 +89,7 @@ public with sharing class OrgShapeSelector {
      * for a path that deletes: the global describe is filtered by the running user's
      * permission set licences, so a user without the licence in a Nonprofit Cloud org can see
      * no object at all, and no signal Apex offers was confirmed to see past that filter. The
-     * deleting paths therefore also ask nativeHouseholdGroupObjectDescribed (ADR-NEXT).
+     * deleting paths therefore also ask nativeHouseholdGroupObjectDescribed (ADR-0130).
      *
      * The caller treats unknown as "assume they exist" (OrgShapeDetector.detect). The two
      * mistakes do not cost the same, which is the reasoning ADR-0036 uses for the delete
@@ -119,7 +119,7 @@ public with sharing class OrgShapeSelector {
     /**
      * Whether the native household group is in this transaction's global describe, so that a
      * zero count is one the probe actually made. False is not proof the org lacks the object:
-     * the describe is filtered by the running user's licences (ADR-NEXT). A test that injects a
+     * the describe is filtered by the running user's licences (ADR-0130). A test that injects a
      * count is treated as describing the object, since the count stands for a probe that ran.
      */
     public static Boolean nativeHouseholdGroupObjectDescribed() {
@@ -141,7 +141,7 @@ public with sharing class OrgShapeSelector {
                 ? nativeHouseholdGroupTypeOverride
                 : Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
             if (groupType == null) {
-                // Not in this org: a known none, not an unknown (ADR-NEXT).
+                // Not in this org: a known none, not an unknown (ADR-0130).
                 return 0;
             }
             if (!groupType.getDescribe().isAccessible()) {

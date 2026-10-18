@@ -49,7 +49,7 @@ public with sharing class OrgShapeDetector {
          * carrying a native household group. True unless the probe came back with a definite
          * zero, because unknown is treated as "assume they exist": see
          * OrgShapeSelector.nativeHouseholdGroupCount and ADR-0036. An org without the object
-         * at all is a definite zero, not an unknown (ADR-NEXT).
+         * at all is a definite zero, not an unknown (ADR-0130).
          */
         @AuraEnabled
         public Boolean hasNativeHouseholdGroups;
@@ -114,7 +114,7 @@ public with sharing class OrgShapeDetector {
         // not gate, so an org can have it without having any of them. A null count is the
         // probe saying it could not tell, and an org that might have native households is
         // treated as one that has them (ADR-0036). An org without the object counts zero
-        // (ADR-NEXT).
+        // (ADR-0130).
         shape.nativeHouseholdGroupCount = OrgShapeSelector.nativeHouseholdGroupCount();
         shape.hasNativeHouseholdGroups =
             shape.nativeHouseholdGroupCount == null ||

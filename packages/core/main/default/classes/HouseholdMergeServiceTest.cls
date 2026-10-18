@@ -76,7 +76,7 @@ private class HouseholdMergeServiceTest {
 
     /**
      * With Contacts to Multiple Accounts on, the platform refuses to merge two accounts that
-     * share a related contact (ADR-NEXT). The rows are built in memory, since the object does
+     * share a related contact (ADR-0130). The rows are built in memory, since the object does
      * not exist in every org these tests run in.
      */
     @IsTest
@@ -112,7 +112,7 @@ private class HouseholdMergeServiceTest {
 
     /**
      * A shared relation somebody annotated (roles, dates) is not BarnCRM's to delete, so the
-     * merge is refused and nothing changes (ADR-NEXT).
+     * merge is refused and nothing changes (ADR-0130).
      */
     @IsTest
     static void aSharedRelationWithRolesStopsTheMergeAndChangesNothing() {
