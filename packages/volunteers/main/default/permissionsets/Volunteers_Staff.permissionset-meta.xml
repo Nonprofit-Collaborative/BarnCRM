@@ -11,7 +11,15 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>VolunteerHoursApprovalController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>VolunteerLetterController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerShiftSignupsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>

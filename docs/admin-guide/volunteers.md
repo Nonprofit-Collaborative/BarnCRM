@@ -15,9 +15,10 @@ setting, on by default), so nobody types them twice. While automation is paused,
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
 
-This page covers installing the module, who gets which access, and its settings. Approving hours
-on screen, the hour totals on people, the coordinator dashboard and recurring shifts each come
-with a later part of the module, and this page will say so as each arrives.
+This page covers installing the module, who gets which access, its settings, the **Sign-ups**
+panel on a shift and the **Approve Hours** screen. The hour totals on people, the coordinator
+dashboard and recurring shifts each come with a later part of the module, and this page will say
+so as each arrives.
 
 ## Before you install
 
@@ -40,8 +41,9 @@ finishes, BarnCRM does three things on its own:
    shipped template you do not have, and never changes one you edited.
 
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
-**Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, and
-**Volunteer Letter Templates** and **Volunteer Settings** for admins only.
+**Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, **Approve
+Hours** for coordinators and admins, and **Volunteer Letter Templates** and **Volunteer
+Settings** for admins only.
 
 ## Roles and permission sets
 
@@ -150,6 +152,61 @@ approved hours in the period), and how many failed; for failures it points to th
 [Error Log](error-log.md). It is the BarnCRM job notification, so the **Job notifications**
 option in BarnCRM Settings turns it off.
 
+## Signing people up for a shift
+
+Open a shift (from **Volunteer Shifts**, or from its job). The **Sign-ups** panel at the top
+of the page shows how many **volunteers are needed**, how many **slots are filled** and how many
+**remain**, and lists who is signed up. A cancelled sign-up frees its slot; slots remaining goes
+below zero when more people are booked than were asked for, which is allowed.
+
+- **Add sign-up** opens a short form: choose the **Person** (in an org where people are person
+  accounts, only person accounts are offered), pick a **Status** if it is not **Signed up**, and
+  click **Save**. Signing the same person up twice for one shift is refused, with a message
+  naming the shift: change the sign-up that is there instead.
+- Change a sign-up's **Status** in its row: Signed up, Confirmed, Attended, No show or
+  Cancelled. The change saves at once.
+- **Attended** and **No show** in each row mark attendance in one click. When **Attendance
+  creates hours** is on, marking someone Attended records their hours for the length of the
+  shift, waiting for approval like any other entry, and the panel says so. Marking attendance a
+  second time records nothing more, and changing it back deletes nothing.
+- Click a person's name to open their sign-up record. The shift page also has a **Sign-ups**
+  related list below the details: use it to edit a sign-up's **Notes** (row menu, **Edit**) or to
+  remove one (row menu, **Delete**, which asks you to confirm). To keep the record but free the
+  slot, set its **Status** to Cancelled instead of deleting it.
+
+A message under the figures, also shown as a toast, says what changed. Read Only users see the
+panel without the button, pickers or attendance buttons.
+
+## Approving hours
+
+Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
+Hours** tab of the BarnCRM Volunteers app. It lists hours entries oldest first, 50 to a page,
+with the person, job, shift, date worked and hours of each.
+
+- **Show** picks which entries are listed: **Submitted** (the default, the ones waiting for
+  you), **Approved** or **Rejected**. **Job**, **From** and **To** narrow the list to one job and
+  a range of dates worked. The list changes as you change a filter. A **From** date later than
+  the **To** date is refused with a message on the field, and the list stays as it was.
+- Tick the entries to act on, or tick the box in the heading row to select the whole page.
+- **Approve** approves the selected entries: they count in totals from now on, and record you
+  and the time as who approved them.
+- **Reject** asks for a reason, which is required, then rejects the selected entries with it. The
+  person who entered them sees the reason on the entry.
+- **Reopen**, on the Approved and Rejected lists, moves the selected entries back to Submitted, so
+  they can be corrected, deleted or decided again. An approved entry cannot be edited or deleted
+  until it is reopened.
+
+A message under the buttons, also shown as a toast, says how many entries moved. An entry that
+could not be moved (one you can see but not edit, for example) is named there with the reason,
+and the others still move. **Previous** and **Next** move between pages; when one of them has
+nowhere left to go, keyboard focus moves to the other, or to the page number.
+
+Someone without Manage Volunteers who opens the screen sees a note saying approving needs that
+permission, and the list without the buttons. Read Only users see no hours at all.
+
+Approving here is the only way an entry's status changes: editing the Status field on the record
+is refused, for everyone.
+
 ## Turning it off
 
 Turning Volunteers off in Module Manager stops its automations; the records stay. Hours saved
@@ -166,12 +223,17 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 3. Open the **BarnCRM Volunteers** app. On **Volunteer Jobs**, create a job called "Food
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.
-5. On the shift, add a sign-up for any person in your sample data.
-6. Change the sign-up's status to **Attended**. On **Volunteer Hours**, a 3-hour entry for that
-   person on that shift now exists. It is **Submitted** and appears in the **Hours awaiting
-   approval** list view (or **Approved** if Hours require approval is off). You can also enter
-   hours by hand there.
-7. Open **Volunteer Settings** and read the three settings. Leave them as they are.
+5. Open the shift. In the **Sign-ups** panel click **Add sign-up**, choose any person in your
+   sample data and click **Save**. **Slots filled** is 1 and **Slots remaining** is 2.
+6. Click **Attended** on that sign-up's row. The panel says an hours entry was recorded. On
+   **Volunteer Hours**, a 3-hour entry for that person on that shift now exists. It is
+   **Submitted** and appears in the **Hours awaiting approval** list view (or **Approved** if
+   Hours require approval is off). You can also enter hours by hand there.
+7. Open **Approve Hours**. The entry is listed under **Submitted**. Tick it and click
+   **Approve**: the message says one entry was approved, and the list is empty.
+8. Change **Show** to **Approved**, tick the entry and click **Reopen**. It is back under
+   **Submitted**. Tick it, click **Reject**, type "Wrong date" as the reason and confirm.
+9. Open **Volunteer Settings** and read the three settings. Leave them as they are.
 
 ## Importing volunteer hours
 

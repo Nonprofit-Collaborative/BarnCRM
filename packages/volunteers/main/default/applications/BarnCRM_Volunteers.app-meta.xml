@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Volunteer shift</comment>
+    <content>Volunteer_Shift_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Shift__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Volunteer shift</comment>
+    <content>Volunteer_Shift_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Shift__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
@@ -18,10 +34,14 @@
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Hours__c</tabs>
+  <tabs>Volunteer_Approve_Hours</tabs>
   <tabs>Volunteer_Letter_Template__c</tabs>
   <tabs>Volunteer_Settings</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Volunteer_Approve_Hours</tab>
+    </mappings>
     <mappings>
       <tab>Volunteer_Hours__c</tab>
     </mappings>

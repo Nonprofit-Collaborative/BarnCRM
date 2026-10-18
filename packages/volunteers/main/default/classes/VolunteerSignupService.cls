@@ -5,6 +5,7 @@
  */
 public with sharing class VolunteerSignupService {
     public static final String STATUS_ATTENDED = 'Attended';
+    public static final String STATUS_CANCELLED = 'Cancelled';
     private static final Decimal MILLISECONDS_PER_HOUR = 3600000;
     private static final String LOG_CONTEXT = 'VolunteerSignupService.createHoursForAttendance';
 

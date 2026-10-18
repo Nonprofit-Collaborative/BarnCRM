@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The volunteer shift record page: the Sign-ups panel, where a coordinator books people and
+    marks attendance, above the shift's details and its Sign-ups related list.
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>force:highlightsPanel</componentName>
+        <identifier>shiftHighlightsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>header</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>shiftSignups</componentName>
+        <identifier>shiftSignupsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:detailPanel</componentName>
+        <identifier>shiftDetailPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:relatedListContainer</componentName>
+        <identifier>shiftRelatedLists</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Volunteer Shift Record Page</masterLabel>
+  <sobjectType>Volunteer_Shift__c</sobjectType>
+  <template>
+    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+  </template>
+  <type>RecordPage</type>
+</FlexiPage>

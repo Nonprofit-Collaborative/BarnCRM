@@ -256,4 +256,476 @@
         <shortDescription>Volunteer letter action: the letter was saved</shortDescription>
         <value>The letter is saved as a PDF in this person's Files.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Approve_NothingSelected</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A verb was asked with nothing selected</shortDescription>
+        <value>Select at least one hours entry first.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_TooMany</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Too many entries in one call; {0} is the limit</shortDescription>
+        <value>Select at most {0} hours entries at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_ActionFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected failure on the Approve Hours screen</shortDescription>
+        <value>Something went wrong with these hours. The details are in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approve Hours screen title</shortDescription>
+        <value>Approve volunteer hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Show</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approve Hours status filter label</shortDescription>
+        <value>Show</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_StatusSubmitted</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status filter choice: waiting for a coordinator</shortDescription>
+        <value>Submitted</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_StatusApproved</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status filter choice: approved</shortDescription>
+        <value>Approved</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_StatusRejected</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status filter choice: rejected</shortDescription>
+        <value>Rejected</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Job</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Job filter label and column heading</shortDescription>
+        <value>Job</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_From</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Earliest date worked filter label</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_To</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Latest date worked filter label</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Person</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person column heading</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Shift</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift column heading</shortDescription>
+        <value>Shift</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_DateWorked</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Date worked column heading</shortDescription>
+        <value>Date worked</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Hours</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hours column heading</shortDescription>
+        <value>Hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_ReasonColumn</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Rejection reason column heading</shortDescription>
+        <value>Rejection reason</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Select</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Selection column heading on a phone</shortDescription>
+        <value>Select</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_SelectAll</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label of the select all checkbox</shortDescription>
+        <value>Select every entry on this page</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_SelectRow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Row checkbox label; {0} person, {1} date worked, {2} hours</shortDescription>
+        <value>Select {0}, {1}, {2} hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Caption</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Table caption; {0} is the status shown, {1} the page number</shortDescription>
+        <value>{0} hours, page {1}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_SelectedCount</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>How many are selected; {0} is the count</shortDescription>
+        <value>{0} selected</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Approve</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approve button</shortDescription>
+        <value>Approve</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Reject</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reject button</shortDescription>
+        <value>Reject</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Reopen</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reopen button</shortDescription>
+        <value>Reopen</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Reason</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Rejection reason box label</shortDescription>
+        <value>Reason for rejecting</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_ConfirmReject</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that rejects with the reason typed</shortDescription>
+        <value>Reject selected</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Cancel</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Previous</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Previous page button</shortDescription>
+        <value>Previous</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Next</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Next page button</shortDescription>
+        <value>Next</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_DateRange</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Message when the From date is after the To date</shortDescription>
+        <value>From must be on or before To.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Page</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page indicator; {0} is the page number</shortDescription>
+        <value>Page {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Empty</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No hours match the filters</shortDescription>
+        <value>No hours match these filters.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_DoneApprove</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After approving; {0} is how many moved</shortDescription>
+        <value>Entries approved: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_DoneReject</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After rejecting; {0} is how many moved</shortDescription>
+        <value>Entries rejected: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_DoneReopen</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After reopening; {0} is how many moved</shortDescription>
+        <value>Entries reopened: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Approve_Refused</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Some entries did not move; {0} is how many</shortDescription>
+        <value>Not moved: {0}. The reasons are listed on the screen.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sign-ups panel title</shortDescription>
+        <value>Sign-ups</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Needed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteers needed figure label</shortDescription>
+        <value>Volunteers needed</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Filled</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slots filled figure label</shortDescription>
+        <value>Slots filled</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Remaining</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slots remaining figure label</shortDescription>
+        <value>Slots remaining</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Add</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that opens the add sign-up form</shortDescription>
+        <value>Add sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Person</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person picker label and column heading</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Status</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status picker label and column heading</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Actions</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendance buttons column heading</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Save</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Cancel</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Caption</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Table caption; {0} is the shift name</shortDescription>
+        <value>Sign-ups for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_StatusFor</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Row status picker label; {0} is the person</shortDescription>
+        <value>Status for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Attended</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Mark attended button</shortDescription>
+        <value>Attended</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MarkAttended</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attended button name for screen readers; {0} is the person</shortDescription>
+        <value>Mark {0} attended</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_NoShow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Mark no show button</shortDescription>
+        <value>No show</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MarkNoShow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No show button name for screen readers; {0} is the person</shortDescription>
+        <value>Mark {0} as a no show</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Empty</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nobody is signed up</shortDescription>
+        <value>Nobody is signed up for this shift yet.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Added</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After adding a sign-up</shortDescription>
+        <value>Sign-up added.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_Changed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>After a status change; {0} is the person, {1} the new status</shortDescription>
+        <value>{0}: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_HoursWritten</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendance wrote an hours entry</shortDescription>
+        <value>An hours entry was recorded for this attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_MoreThanShown</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>More sign-ups than listed; {0} is how many are shown</shortDescription>
+        <value>Showing the first {0} sign-ups.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_PersonRequired</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Adding a sign-up with no person</shortDescription>
+        <value>Choose the person to sign up first.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_ActionFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
+        <value>Something went wrong with sign-ups. The details are in the Error Log.</value>
+    </labels>
 </CustomLabels>

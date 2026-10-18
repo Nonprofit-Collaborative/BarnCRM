@@ -7135,7 +7135,9 @@ Coordinator deletes only hours, since the platform gives Modify All only with De
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
 Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab. The custom permission `Manage_Volunteers`
+set shows the Volunteer Settings tab, and only the Coordinator and Admin sets show the Approve
+Hours tab (R-VG5's screen; every set may run its controller, which answers read only to a user
+without `Manage_Volunteers`). The custom permission `Manage_Volunteers`
 (created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
 
 ## 29I. Volunteer profile
@@ -8282,6 +8284,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
 | v0.8 | 2026-10-18 | Rollup targets writable by the engine, not the saving user. No object or field added. R-R10: at run time the planner checks that the engine can write a target attribute (it exists, is not a formula, roll-up summary, auto number or system attribute), never the running user's field-level security; the Rollup Builder's save still checks the administrator's own. Before this, a staff member's save, on whom every module keeps the totals read only, had every definition refused and the totals waited for the nightly run. |
 | v0.8 | 2026-10-18 | Volunteer letters built (V-08, ADR-0129). No object or field added beyond 29U. Section 29U states the template access per Volunteers set, the registry row `Volunteer_Letter_Template_Rules` for R-VL1, that a person account's letter counts hours by `Account__c`, and where a letter is started (record action and flow action). |
+| v0.8 | 2026-10-18 | Volunteers screens (V-02). No object or field added. The access paragraph of Part G names the Approve Hours tab, shown by the Coordinator and Admin sets. |
 
 ---
 ## 32. Entity ownership by package

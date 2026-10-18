@@ -1,0 +1,153 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom15">
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        data-id="add-button"
+        label={labels.add}
+        disabled={addDisabled}
+        onclick={handleShowForm}
+      ></lightning-button>
+    </template>
+
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={hasError}>
+        <p role="alert" tabindex="-1" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={loaded}>
+        <dl class="slds-grid slds-wrap slds-var-m-bottom_small">
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{labels.needed}</dt>
+            <dd data-id="needed" class="slds-text-heading_small">{panel.volunteersNeeded}</dd>
+          </div>
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{labels.filled}</dt>
+            <dd data-id="filled" class="slds-text-heading_small">{panel.slotsFilled}</dd>
+          </div>
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{labels.remaining}</dt>
+            <dd data-id="remaining" class="slds-text-heading_small">{panel.slotsRemaining}</dd>
+          </div>
+        </dl>
+      </template>
+
+      <template lwc:if={showForm}>
+        <div data-id="add-form" class="slds-box slds-var-m-bottom_small">
+          <lightning-record-picker
+            data-id="person-picker"
+            label={labels.person}
+            object-api-name={personObjectApiName}
+            filter={personFilter}
+            required
+            onchange={handlePersonChange}
+          ></lightning-record-picker>
+          <lightning-combobox
+            data-id="draft-status"
+            label={labels.status}
+            value={draftStatus}
+            options={statusOptions}
+            onchange={handleDraftStatusChange}
+          ></lightning-combobox>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              data-id="save-button"
+              variant="brand"
+              label={labels.save}
+              disabled={saveDisabled}
+              onclick={handleSave}
+            ></lightning-button>
+            <lightning-button
+              data-id="cancel-button"
+              class="slds-var-m-left_x-small"
+              label={labels.cancel}
+              onclick={handleCancel}
+            ></lightning-button>
+          </div>
+        </div>
+      </template>
+
+      <div data-id="result" tabindex="-1" role="status" class="slds-var-m-bottom_small">
+        <template lwc:if={resultMessage}>
+          <p class="slds-text-body_regular">{resultMessage}</p>
+        </template>
+      </div>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+      </template>
+
+      <template lwc:if={hasSignups}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+          <caption data-id="caption" class="slds-text-title_bold slds-text-align_left slds-var-p-vertical_x-small">
+            {caption}
+          </caption>
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{labels.person}</th>
+              <th scope="col">{labels.status}</th>
+              <template lwc:if={canEdit}>
+                <th scope="col">{labels.actions}</th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={signups} for:item="signup">
+              <tr key={signup.recordId} data-id="signup">
+                <th scope="row" data-label={labels.person}>
+                  <a data-id="signup-link" href={signup.href} data-record-id={signup.recordId} onclick={handleOpenSignup}>{signup.displayName}</a>
+                </th>
+                <td data-label={labels.status}>
+                  <template lwc:if={canEdit}>
+                    <lightning-combobox
+                      class="status-picker"
+                      data-record-id={signup.recordId}
+                      label={signup.statusFor}
+                      variant="label-hidden"
+                      value={signup.status}
+                      options={statusOptions}
+                      disabled={busy}
+                      onchange={handleStatusChange}
+                    ></lightning-combobox>
+                  </template>
+                  <template lwc:else>{signup.statusLabel}</template>
+                </td>
+                <template lwc:if={canEdit}>
+                  <td data-label={labels.actions}>
+                    <template lwc:if={signup.showAttended}>
+                      <lightning-button
+                        class="mark-attended slds-var-m-right_x-small"
+                        data-record-id={signup.recordId}
+                        label={labels.attended}
+                        aria-label={signup.markAttended}
+                        disabled={busy}
+                        onclick={handleMarkAttended}
+                      ></lightning-button>
+                    </template>
+                    <template lwc:if={signup.showNoShow}>
+                      <lightning-button
+                        class="mark-no-show"
+                        data-record-id={signup.recordId}
+                        label={labels.noShow}
+                        aria-label={signup.markNoShow}
+                        disabled={busy}
+                        onclick={handleMarkNoShow}
+                      ></lightning-button>
+                    </template>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <template lwc:if={panel.moreThanShown}>
+          <p data-id="more-than-shown" class="slds-text-body_small slds-var-m-top_x-small">
+            {moreThanShownText}
+          </p>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>
