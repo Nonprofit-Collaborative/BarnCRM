@@ -15,9 +15,9 @@ setting, on by default), so nobody types them twice. While automation is paused,
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
 
-This page covers installing the module, who gets which access, its settings and the volunteer
-totals. Approving hours on screen, the coordinator dashboard and recurring shifts each come with
-a later part of the module, and this page will say so as each arrives.
+This page covers installing the module, who gets which access, its settings, the volunteer
+totals and the coordinator dashboard. Approving hours on screen and recurring shifts each come
+with a later part of the module, and this page will say so as each arrives.
 
 ## Before you install
 
@@ -118,6 +118,43 @@ does not move any total at once. The nightly run still brings every volunteer to
 on or off, so they catch up by the next morning. To bring them up to date at once, open the
 **Rollups** page and click **Recalculate all**.
 
+## The Volunteers dashboard and reports
+
+The module ships one dashboard, **Volunteers**, and four reports it reads, in folders named
+**BarnCRM Volunteers**. Nothing has to be built: open the **BarnCRM Volunteers** app, choose
+**Dashboards**, open the **BarnCRM Volunteers** folder and open **Volunteers**.
+
+| Chart | What it shows |
+|---|---|
+| Approved hours this year, by job | One bar per job: the approved hours with a Date Worked this calendar year. Submitted and Rejected hours are not counted. |
+| Hours awaiting approval | Every entry still **Submitted**, oldest first, with the date it was entered and the **Days Waiting** since. Ten rows show; click the title for the whole list. |
+| Unfilled shifts, next 14 days | **Open** shifts starting in the next 14 days with **Slots Remaining** above zero, soonest first. Cancelled and completed shifts are left out. |
+| Lapsing volunteers | People whose **Last Volunteer Date** (last approved hours) was between six and twelve months ago, longest gap first. It reads the Last Volunteer Date total on the person, so it follows approved hours only. |
+
+The reports are ordinary Salesforce reports in the same folder, built on four report types the
+module ships (**Volunteer Hours with Job and Shift**, **Volunteer Shifts with Job**, **Volunteer
+Sign-ups** and **Volunteers**). Anyone can open one, change a filter and save a copy of their own
+without changing what everyone else sees. The Volunteers report type reads people on Contact; an
+org whose people are person accounts builds the lapsing report on its own account-based type.
+
+**Who sees what.** The dashboard reads as **The dashboard viewer**, so each person sees only
+the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all
+and a Team Member sees the hours they can open. The folders ship public read only, and all four
+Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
+can also create and edit them.
+
+**How to change the running user.** If your edition does not offer the dashboard viewer, or your
+org has used up its allowance of dashboards that read that way, open the dashboard, choose
+**Edit**, and in **View dashboard as** choose a person who can see all volunteer hours, for
+example a coordinator. Everyone then sees that person's view, so choose carefully. Save.
+
+**How to add it to the home page.** Open the Home page, choose the gear and **Edit Page**, drag a
+**Dashboard** component on, choose **Volunteers** in the BarnCRM Volunteers folder, and save and
+activate the page for the BarnCRM Volunteers app.
+
+**Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
+schedule you pick.
+
 ## Turning it off
 
 Turning Volunteers off in Module Manager stops its automations; the records stay. Hours and
@@ -140,6 +177,9 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    approval** list view (or **Approved** if Hours require approval is off). You can also enter
    hours by hand there.
 7. Open **Volunteer Settings** and read the three settings. Leave them as they are.
+8. Choose **Dashboards**, open the **BarnCRM Volunteers** folder and open **Volunteers**. The
+   hours from step 6 show under **Hours awaiting approval** with their days waiting, and the
+   shift from step 4 shows under **Unfilled shifts, next 14 days** until it has three sign-ups.
 
 ## Common mistakes
 

@@ -19,6 +19,8 @@
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Hours__c</tabs>
   <tabs>Volunteer_Settings</tabs>
+  <tabs>standard-Dashboard</tabs>
+  <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
