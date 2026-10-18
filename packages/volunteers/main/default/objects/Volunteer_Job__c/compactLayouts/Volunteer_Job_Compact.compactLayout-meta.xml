@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Job_Compact</fullName>
+  <fields>NAME</fields>
+  <fields>Active__c</fields>
+  <fields>Total_Hours__c</fields>
+  <fields>Last_Volunteer_Date__c</fields>
+  <label>Volunteer Job Compact Layout</label>
+</CompactLayout>

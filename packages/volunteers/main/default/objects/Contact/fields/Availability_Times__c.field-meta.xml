@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Availability_Times__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The parts of the day this person is usually free: morning (before 12:00), afternoon (12:00 to 17:00) or evening (from 17:00).</inlineHelpText>
+  <label>Availability Times</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>MultiselectPicklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Morning</fullName>
+        <default>false</default>
+        <label>Morning</label>
+      </value>
+      <value>
+        <fullName>Afternoon</fullName>
+        <default>false</default>
+        <label>Afternoon</label>
+      </value>
+      <value>
+        <fullName>Evening</fullName>
+        <default>false</default>
+        <label>Evening</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+  <visibleLines>3</visibleLines>
+</CustomField>

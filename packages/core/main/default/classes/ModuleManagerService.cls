@@ -70,7 +70,12 @@ public with sharing class ModuleManagerService {
             'Tribute__c'
         },
         'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
-        'Mirror' => new List<String>()
+        'Mirror' => new List<String>(),
+        'Volunteers' => new List<String>{
+            'Volunteer_Job__c',
+            'Volunteer_Shift__c',
+            'Volunteer_Signup__c'
+        }
     };
 
     /** The permission set Turn on gives the person who turned the module on. */

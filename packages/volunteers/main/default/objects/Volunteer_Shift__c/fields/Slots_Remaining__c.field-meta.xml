@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Slots_Remaining__c</fullName>
+  <externalId>false</externalId>
+  <formula>Volunteers_Needed__c - Slots_Filled__c</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>How many people you are still short. Below zero means more came than you asked for.</inlineHelpText>
+  <label>Slots Remaining</label>
+  <precision>5</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+</CustomField>
