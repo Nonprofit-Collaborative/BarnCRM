@@ -64,4 +64,68 @@
         <shortDescription>Restoring would make a second entry for one sign-up</shortDescription>
         <value>These hours cannot be restored: another hours entry already records this sign-up's attendance.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the readiness card on a person</shortDescription>
+        <value>Volunteer readiness</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_NotStarted</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A requirement type the person has no row for</shortDescription>
+        <value>Not started</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Current</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Badge: the step is completed and not expired</shortDescription>
+        <value>Current</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_NotCurrent</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Badge: the step is not completed, or has expired</shortDescription>
+        <value>Not current</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Completed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Before the date a step was completed</shortDescription>
+        <value>Completed</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Expires</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Before the date a completed step lapses</shortDescription>
+        <value>Expires</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_LoadFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The readiness card could not be loaded</shortDescription>
+        <value>Readiness could not be loaded. Click Refresh, or reload the page.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Refresh</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh button on the readiness card</shortDescription>
+        <value>Refresh</value>
+    </labels>
 </CustomLabels>

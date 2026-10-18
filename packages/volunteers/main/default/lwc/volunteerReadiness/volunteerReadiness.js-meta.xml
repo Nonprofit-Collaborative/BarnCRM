@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Volunteer Readiness</masterLabel>
+  <description>Each onboarding requirement type with the person's latest step and whether it is current. Read only. Shows nothing to users who cannot see requirements, or on a household.</description>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Contact</object>
+        <object>Account</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>
