@@ -174,6 +174,38 @@ private class VolunteerShiftSignupsControllerTest {
     }
 
     @IsTest
+    static void aPersonAccountIsSignedUpOnTheAccountSide() {
+        Account person;
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            person = VolunteersTestData.personAccount('Okafor');
+            if (person == null) {
+                return; // An org without person accounts has no such person.
+            }
+            person.OwnerId = user(COORDINATOR).Id;
+            update person;
+        }
+        if (person == null) {
+            return;
+        }
+        VolunteerShiftSignupsController.Panel panel;
+
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            panel = VolunteerShiftSignupsController.addSignup(shiftId(), person.Id, null);
+        }
+        Test.stopTest();
+
+        Assert.isTrue(panel.hasPersonAccounts, 'The panel knows people are accounts here.');
+        Assert.areEqual(1, panel.signups.size(), 'The person is signed up.');
+        Assert.areEqual('Okafor', panel.signups[0].personName, 'Named from the account.');
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Signup__c saved = [SELECT Contact__c, Account__c FROM Volunteer_Signup__c];
+            Assert.areEqual(person.Id, saved.Account__c, 'On the Account side.');
+            Assert.isNull(saved.Contact__c, 'And no contact.');
+        }
+    }
+
+    @IsTest
     static void aRequestWithoutAPersonOrWithAnUnknownStatusIsRefused() {
         String noPerson = '';
         String badStatus = '';
