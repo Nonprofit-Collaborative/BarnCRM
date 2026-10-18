@@ -70,6 +70,11 @@
     <fields>Active__c</fields>
     <relatedList>Shift_Schedule__c.Job__c</relatedList>
   </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Skill__c</fields>
+    <relatedList>Job_Skill__c.Job__c</relatedList>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

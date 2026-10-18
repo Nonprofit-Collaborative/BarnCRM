@@ -7135,11 +7135,21 @@ gives Modify All only with Delete.
 | `Volunteers_Staff` | the Team Member role (`Program_Staff`) | create, edit | create, edit their own entries (sharing Private) | edit |
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
-Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab, and only the Coordinator and Admin sets show the Approve
-Hours tab (R-VG5's screen; every set may run its controller, which answers read only to a user
-without `Manage_Volunteers`). The custom permission `Manage_Volunteers`
+Each set shows the BarnCRM Volunteers app and the Jobs, Shifts, Hours and Skills tabs; only the
+Admin and Coordinator sets show the Volunteer Requirements tab (R-VQ4) and the Approve Hours tab
+(R-VG5's screen; every set may run its controller, which answers read only to a user without
+`Manage_Volunteers`), and only the Admin set shows the Volunteer Settings tab. The custom
+permission `Manage_Volunteers`
 (created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
+
+**Skills (V-04).** Skill, Volunteer Skill and Job Skill have no rule that refuses a user, so
+the sets follow the list's purpose. Skill (the admin's own list): Admin and Coordinator create,
+edit and delete (Modify All, since Skill sharing is Read and the platform lets a user edit
+another's record only with it; deleting a skill in use is refused anyway, R-SK1); Staff and
+Read Only read. Volunteer Skill: Admin and Coordinator the same; Staff create, edit and delete
+the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coordinator and
+Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
+the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
 ## 29I. Volunteer profile
 
@@ -7193,6 +7203,17 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 | Emergency Contact Phone | `Emergency_Contact_Phone__c` | Phone |
 | Availability Days | `Availability_Days__c` | Multi-Select Picklist, 7 values |
 | Availability Times | `Availability_Times__c` | Multi-Select Picklist, 3 values |
+
+- **Shown on the person:** a **Volunteer Profile** field section (Dynamic Forms) on
+  `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page` (ADR-0064 pattern, see
+  29S), holding these six attributes, editable, and the five totals of 29O, read only. It shows
+  when Volunteer Status is Prospective, Active or Inactive (a visibility rule cannot test a
+  picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
+  above zero, or the user holds
+  `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
+  attributes carry a field visibility rule (record type neither Household nor Organization), and
+  the Manage Volunteers clause applies only to that record type, so a household or
+  organization shows only its totals, once it has hours.
 
 ---
 
@@ -7663,7 +7684,9 @@ package ships no skills.
 
 **R-SK1 Archive, do not delete.** A skill that a person or a job holds cannot be deleted; the
 admin clears Active instead. An inactive skill stays on the people and jobs that hold it and is
-not offered for new ones.
+refused for new ones: a Volunteer Skill or Job Skill that is created, or moved to another
+skill, may not name an inactive skill. A row that already holds a skill keeps it when the skill
+is retired, and a merge that moves a person's rows to the person kept is not refused.
 
 ### Salesforce implementation
 
@@ -7714,18 +7737,24 @@ the part of the day the shift starts in (before 12:00, 12:00 to 17:00, from 17:0
 with no availability recorded is listed last rather than left out. Interests matching the job's
 skills are shown beside each name; they never filter.
 
+**R-VK4 Deleted with the person.** Deleting a person deletes their volunteer skills, as it
+deletes their requirements (R-VQ5 says how).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Skill__c`, auto-number Name `VK-{000000}`, sharing Read.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
-| Type | `Type__c` | Picklist: Skill, Interest |
+| Contact | `Contact__c` | Lookup to Contact (the platform empties it when the person is deleted, and the row is then deleted, R-VK4) |
+| Person Account | `Account__c` | Lookup to Account (the same, R-VK4) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Type | `Type__c` | Required picklist: Skill, Interest (default Skill) |
 
-- **Validation rule:** `Volunteer_Skill_One_Person` (R-VK1).
+- **Validation rules:** `Volunteer_Skill_One_Person` (R-VK1), `Volunteer_Skill_Active_Skill`
+  (R-SK1: a new row, or a row moved to another skill, names an active skill).
+- **Related lists:** Volunteer Skills on the Skill page layout. On the person, the admin adds
+  the list to the organization's person layout (the module cannot edit Core's layout).
 
 ---
 
@@ -7755,7 +7784,11 @@ A skill a job needs (feature V-04), used to find volunteers for its shifts (R-VK
 | Attribute | API name | Type |
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
-| Skill | `Skill__c` | Lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+| Skill | `Skill__c` | Required lookup to `Skill__c` (refuses deleting a skill in use, R-SK1) |
+
+- **Validation rule:** `Job_Skill_Active_Skill` (R-SK1: a new row, or a row moved to another
+  skill, names an active skill).
+- **Related lists:** Job Skills on the Volunteer Job page layout.
 
 ---
 
@@ -7797,8 +7830,10 @@ it is seen only by those who may see requirements and it leaves with them (R-VQ4
 future; Expires may not be earlier than Completed Date.
 
 **R-VQ3 Readiness is shown, not enforced.** The volunteer profile shows each Type's most recent
-row and whether it is current. Nothing in v0.8 refuses a sign-up or hours for a person whose
-steps are not current; the coordinator decides.
+row (the one added last) and whether it is current; a Type with no row shows as not started.
+It shows only what the viewer may read: nothing to a user without access to requirements, and
+nothing on a household or organization. Nothing in v0.8 refuses a sign-up or hours for a person
+whose steps are not current; the coordinator decides.
 
 **R-VQ4 Kept to coordinators, erased with the person.** Requirements are private records: the
 Volunteers Admin and Volunteers Coordinator permission sets read and edit all of them, and the
@@ -7806,16 +7841,25 @@ Volunteers Staff and Volunteers Read Only sets grant no access. Erasing a person
 deletes their requirement rows and empties them from the Recycle Bin, through the Volunteers
 `PersonErasureExtension`, and the Erasure record lists them by Id only.
 
+**R-VQ5 Deleted with the person.** Deleting a Contact or an Account deletes the requirement rows
+and volunteer skills (R-VK4) that name it, in the same transaction, whoever deletes it. They are
+deleted in system mode: a background check must not outlive its person, and the user deleting
+the person may be a Team Member, who cannot see requirements at all. A record merged into
+another is not a deletion here: the merge moves its rows to the record kept, background checks
+included. Restoring a person from the Recycle Bin does not restore these rows; they stay in the
+Recycle Bin, without a person, until it empties. The rule always runs: no switch, pause or
+bypass stops it (R-A4).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Requirement__c`, auto-number Name `VR-{000000}`, sharing Private.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Type | `Type__c` | Picklist: Application, Background check, Orientation |
-| Status | `Status__c` | Picklist: Not started, In progress, Completed, Not approved |
+| Contact | `Contact__c` | Lookup to Contact (the platform empties it when the person is deleted, and the row is then deleted, R-VQ5) |
+| Person Account | `Account__c` | Lookup to Account (the same, R-VQ5) |
+| Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation |
+| Status | `Status__c` | Required restricted picklist: Not started (default), In progress, Completed, Not approved |
 | Completed Date | `Completed_Date__c` | Date |
 | Expires | `Expires__c` | Date |
 | Notes | `Notes__c` | Text (255) |
@@ -7823,7 +7867,29 @@ deletes their requirement rows and empties them from the Recycle Bin, through th
 
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
-- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8).
+- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8). It reads
+  the person's requirements in system mode, deletes them as the user (a user without access to
+  requirements is refused, R-ER5) and keeps no person field. Core adds the Ids of any records
+  an extension reports as Deleted to those it empties from the Recycle Bin after the commit.
+- **Person delete:** `VolunteerPersonDeleteHandler`, registered on Contact and on Account
+  (`Automation_Registry.Volunteers_Person_Delete_Contact` and `..._Account`, order 20, Always
+  Runs, `Module__c` Volunteers) and run by Core's own triggers. Before delete it notes the Ids
+  of the requirement rows and volunteer skills that name each deleted record (on Account, also
+  those naming any of its contacts, which the platform deletes with it, a person account's own
+  contact among them, with no person account field read); after delete it deletes the
+  ones noted for every record whose MasterRecordId is empty, so a merge loser's rows, which the
+  merge has moved to the record kept, stay.
+- **Readiness (R-VQ3):** the `volunteerReadiness` component, read from
+  `VolunteerReadinessController` (cacheable, user mode), on `Volunteers_Contact_Record_Page` and
+  `Volunteers_Account_Record_Page`: Core's person pages unchanged plus the component, as Giving
+  ships its own (ADR-0064), assigned in the Volunteers app (Large and Small). Elsewhere the admin
+  activates them or adds the component to a page of their own.
+- **Access:** `Volunteers_Admin` and `Volunteers_Coordinator` create, read, edit and delete, with
+  View All and Modify All (a Private object is edited by others only with Modify All, which the
+  platform gives only with delete); Is Current is read only. `Volunteers_Staff` and
+  `Volunteers_Read_Only` hold no object or field permission. The Volunteer Requirements tab, in
+  the Volunteers app, is visible in the Admin and Coordinator sets only; its All and Not Current
+  list views are shared with all users, who see rows only through the object permission.
 
 ---
 
@@ -8300,6 +8366,10 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteer letters built (V-08, ADR-0129). No object or field added beyond 29U. Section 29U states the template access per Volunteers set, the registry row `Volunteer_Letter_Template_Rules` for R-VL1, that a person account's letter counts hours by `Account__c`, and where a letter is started (record action and flow action). |
 | v0.8 | 2026-10-18 | Volunteers screens (V-02). No object or field added. The access paragraph of Part G names the Approve Hours tab, shown by the Coordinator and Admin sets. |
 | v0.8 | 2026-10-18 | Recurring shifts built (V-07, ADR-0128). New field `Shifts_Kept__c` on `Shift_Schedule__c` (29T): how many future shifts the last edit kept, which is how the save tells the coordinator (R-SSC4). R-SSC2 skips a shift today that has already started and names shifts as R-VS2 does; R-SSC4 leaves an End Date only change to R-SSC5; clearing Active clears Created Through; R-SSC4 and R-SSC5 keep a shift with hours as well as one with a sign-up; an earlier End Date moves Created Through back to it. The access table gains Shift Schedule beside Job, Shift and Sign-up. The schedule Health Check finding is listed as a known gap. |
+| v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
+| v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
+| v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
+| v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 
 ---
 ## 32. Entity ownership by package

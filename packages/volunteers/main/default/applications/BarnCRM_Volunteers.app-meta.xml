@@ -16,6 +16,38 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Volunteer_Shift__c</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households, organizations and person accounts, with volunteer readiness</comment>
+    <content>Volunteers_Account_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households, organizations and person accounts, with volunteer readiness</comment>
+    <content>Volunteers_Account_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with volunteer readiness</comment>
+    <content>Volunteers_Contact_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with volunteer readiness</comment>
+    <content>Volunteers_Contact_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
@@ -36,6 +68,8 @@
   <tabs>Volunteer_Hours__c</tabs>
   <tabs>Volunteer_Approve_Hours</tabs>
   <tabs>Volunteer_Letter_Template__c</tabs>
+  <tabs>Skill__c</tabs>
+  <tabs>Volunteer_Requirement__c</tabs>
   <tabs>Volunteer_Settings</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -50,6 +84,12 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Letter_Template__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Skill__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Volunteer_Requirement__c</tab>
     </mappings>
     <mappings>
       <tab>Volunteer_Settings</tab>

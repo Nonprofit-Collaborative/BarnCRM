@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Type__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Which onboarding step this is. You can add more steps to this list in Setup.</inlineHelpText>
+  <label>Type</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>false</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Application</fullName>
+        <default>false</default>
+        <label>Application</label>
+      </value>
+      <value>
+        <fullName>Background check</fullName>
+        <default>false</default>
+        <label>Background check</label>
+      </value>
+      <value>
+        <fullName>Orientation</fullName>
+        <default>false</default>
+        <label>Orientation</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

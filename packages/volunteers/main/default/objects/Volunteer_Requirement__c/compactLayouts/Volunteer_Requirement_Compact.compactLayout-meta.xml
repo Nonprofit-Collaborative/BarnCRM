@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Requirement_Compact</fullName>
+  <fields>NAME</fields>
+  <fields>Type__c</fields>
+  <fields>Status__c</fields>
+  <fields>Contact__c</fields>
+  <fields>Expires__c</fields>
+  <label>Volunteer Requirement Compact Layout</label>
+</CompactLayout>
