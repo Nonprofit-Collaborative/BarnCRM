@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status_Needs_Manage_Volunteers</fullName>
+  <active>true</active>
+  <description>
+    R-VG5: on a saved entry, the status fields change only for a user with Manage Volunteers,
+    also while automation is paused. New entries are not checked, so a paused import may load
+    past hours already Approved.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISNEW()),
+  OR(
+    ISCHANGED(Status__c),
+    ISCHANGED(Approved_By__c),
+    ISCHANGED(Approved_Date__c),
+    ISCHANGED(Rejection_Reason__c)
+  ),
+  NOT($Permission.Manage_Volunteers)
+)
+  </errorConditionFormula>
+  <errorMessage>
+    Only a volunteer coordinator with the Manage Volunteers permission can approve, reject or reopen volunteer hours.
+  </errorMessage>
+</ValidationRule>
