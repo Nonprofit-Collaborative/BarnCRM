@@ -35,6 +35,31 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.First_Volunteer_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Last_Volunteer_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Volunteer_Hours_Last_Year__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Volunteer_Hours_This_Year__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Volunteer_Hours_Total__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Account.Volunteer_Since__c</field>
     <readable>true</readable>
@@ -62,6 +87,31 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Contact.Emergency_Contact_Phone__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.First_Volunteer_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Last_Volunteer_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Volunteer_Hours_Last_Year__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Volunteer_Hours_This_Year__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Volunteer_Hours_Total__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

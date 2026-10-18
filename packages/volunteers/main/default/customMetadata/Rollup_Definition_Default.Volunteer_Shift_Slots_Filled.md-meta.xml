@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Volunteer shift slots filled</label>
+    <protected>true</protected>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">How many people are signed up for this shift and have not cancelled. Slots Remaining is Volunteers Needed less this.</value>
+    </values>
+    <values>
+        <field>Definition_Key__c</field>
+        <value xsi:type="xsd:string">Volunteer_Shift_Slots_Filled</value>
+    </values>
+    <values>
+        <field>Source_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Signup__c</value>
+    </values>
+    <values>
+        <field>Target_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Shift__c</value>
+    </values>
+    <values>
+        <field>Relationship_Path__c</field>
+        <value xsi:type="xsd:string">Volunteer_Shift__c</value>
+    </values>
+    <values>
+        <field>Aggregate__c</field>
+        <value xsi:type="xsd:string">COUNT</value>
+    </values>
+    <values>
+        <field>Source_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Order_By_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Target_Field__c</field>
+        <value xsi:type="xsd:string">Slots_Filled__c</value>
+    </values>
+    <values>
+        <field>Filter_JSON__c</field>
+        <value xsi:type="xsd:string">{"version": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "not equals", "value": "Cancelled"}]}</value>
+    </values>
+    <values>
+        <field>Target_Filter_JSON__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Fiscal_Year_Aware__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Fiscal_Year_Offset__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Fiscal_Date_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Mode__c</field>
+        <value xsi:type="xsd:string">Both</value>
+    </values>
+    <values>
+        <field>Default_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Package__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+</CustomMetadata>

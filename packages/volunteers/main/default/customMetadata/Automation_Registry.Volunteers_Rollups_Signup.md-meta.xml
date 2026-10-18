@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Update rollups when a sign-up changes</label>
+    <protected>true</protected>
+    <values>
+        <field>Object_Name__c</field>
+        <value xsi:type="xsd:string">Volunteer_Signup__c</value>
+    </values>
+    <values>
+        <field>Handler_Class__c</field>
+        <value xsi:type="xsd:string">RollupTriggerHandler</value>
+    </values>
+    <values>
+        <field>Execution_Order__c</field>
+        <value xsi:type="xsd:double">90</value>
+    </values>
+    <values>
+        <field>Enabled_By_Default__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Keeps Slots Filled on the shift current when a sign-up is added, cancelled, changed, deleted or restored. Switched off, the count waits for the nightly run.</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+</CustomMetadata>
