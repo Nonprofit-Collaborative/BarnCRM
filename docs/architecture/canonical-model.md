@@ -7110,6 +7110,21 @@ the totals. There is no Volunteer entity: a volunteer is a person the organizati
 knows, so the profile is a set of person attributes the module ships on Contact and Account.
 Every attribute here, the person attributes included, is shipped by Volunteers, never by Core.
 
+**Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
+BarnCRM role by `VolunteersAccessSync`, which never takes one away. Approved By, Approved Date,
+Household and every rollup total are read only in each. Staff and Read Only delete nothing; the
+Coordinator deletes only hours, since the platform gives Modify All only with Delete.
+
+| Permission set | Given to | Job, Shift, Sign-up | Hours | Person attributes |
+|---|---|---|---|---|
+| `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
+| `Volunteers_Coordinator` | the Coordinator role (`Volunteer_Coordinator`) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` | edit |
+| `Volunteers_Staff` | the Team Member role (`Program_Staff`) | create, edit | create, edit their own entries (sharing Private) | edit |
+| `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read their own entries (sharing Private) | read |
+
+Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
+set shows the Volunteer Settings tab.
+
 ## 29I. Volunteer profile
 
 ### Definition
@@ -8220,6 +8235,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-15 | BarnCRM Rollup Builder in the module catalog (ADR-0125, D3 and decision 11). New field `Requires__c` on `BarnCRM_Module__mdt`: the modules a module's package needs installed first. Record `Rollups` gets `Package_Folder__c` `rollups` and `App_Name__c` `BarnCRM_Rollup_Builder`; Giving requires `Rollups`, Funders and Mirror `Rollups;Giving`. |
 | v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
+| v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
 
 ---
 ## 32. Entity ownership by package

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Volunteers module's own settings, the same ones the Volunteers section of BarnCRM Settings
+    shows.
+  </description>
+  <flexiPage>Volunteer_Settings</flexiPage>
+  <label>Volunteer Settings</label>
+  <motif>Custom67: Gears</motif>
+</CustomTab>
