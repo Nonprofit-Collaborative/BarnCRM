@@ -15,9 +15,9 @@ setting, on by default), so nobody types them twice. While automation is paused,
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
 
-This page covers installing the module, who gets which access, and its settings. Approving hours
-on screen, the hour totals on people, the coordinator dashboard and recurring shifts each come
-with a later part of the module, and this page will say so as each arrives.
+This page covers installing the module, who gets which access, its settings and recurring
+shifts. Approving hours on screen, the hour totals on people and the coordinator dashboard each
+come with a later part of the module, and this page will say so as each arrives.
 
 ## Before you install
 
@@ -75,14 +75,58 @@ whoever entered it, and everyone who can see the person sees them.
 
 As an admin, open the **Volunteer Settings** tab in the BarnCRM Volunteers app, or the
 **Volunteers** section of **BarnCRM Settings**: both show the same three settings, and each
-saves as you change it. The first two settings are already in effect; the third takes effect
-with recurring shifts, and until then changing it changes nothing.
+saves as you change it.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|
 | Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
-| Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | With recurring shifts |
+| Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
+
+## Recurring shifts
+
+Most volunteer work repeats. Instead of adding each Saturday's shift by hand, add a **shift
+schedule** to the job: on the job, in the **Shift Schedules** list, click **New** and fill in:
+
+| Field | What to enter |
+|---|---|
+| Schedule Name | What you call it, for example "Saturday sorting". |
+| Weekdays | The days a shift falls on. Pick several for "Tuesdays and Thursdays". |
+| Every N Weeks | 1 for every week, 2 for every other week, counted from the week of the start date. |
+| Start Time, End Time | The times of each shift, in your organization's time zone (Setup, **Company Information**). A 9:00 shift stays at 9:00 when the clocks change. |
+| Start Date, End Date | The first and last days a shift may fall on. Leave End Date empty to keep it running. |
+| Volunteers Needed | The places on each shift. |
+| Location | Copied to each shift. Leave it empty to use the job's location. |
+| Active | Untick to end the schedule. |
+
+When you save, BarnCRM creates the schedule's shifts from today up to the **Shift horizon
+weeks** ahead (8 by default), usually within a minute. Each is an ordinary shift: people sign up,
+attend and log hours on it as on any other, and it shows the schedule it came from. Every night
+at 3:00 AM BarnCRM adds the next days, so the schedule always reaches the horizon. **Created
+Through** on the schedule shows the last day it has created shifts for.
+
+**Changing a schedule changes only future shifts nobody signed up for.** When you change the
+days, times, dates, places or location, BarnCRM removes the schedule's future shifts that have
+no sign-ups and are not cancelled, and creates them again from the new pattern. Past shifts,
+shifts with a sign-up and cancelled shifts are kept as they are, and no day gets a second shift.
+**Shifts Kept** on the schedule then says how many future shifts were kept: check those by hand,
+because they still have the old times. Changing only the name changes no shift.
+
+**Ending a schedule.** Untick **Active**, or set an earlier **End Date**: the future shifts it no
+longer covers that nobody signed up for are removed, and the rest stay. Tick **Active** again and
+its shifts are created from today. An admin can delete a schedule: its future shifts nobody
+signed up for go with it, and the shifts that stay lose their link to it.
+
+**Taking one day off.** Open that day's shift and set its **Status** to Cancelled. Do not delete
+it: a deleted shift comes back the next time you change the schedule, a cancelled one does not.
+
+**Coordinators and Team Members** create and change schedules; only an admin deletes one. The
+shifts a change removes are removed for them, although they cannot delete shifts themselves.
+Read Only users see schedules and change nothing.
+
+**The nightly run** is one of BarnCRM's nightly jobs. If **Health Check** says "Volunteer shift
+schedules" is not scheduled, use its **Schedule all nightly jobs** fix. While Volunteers is turned
+off, no shifts are created; the first night after you turn it back on catches up.
 
 ## Turning it off
 
