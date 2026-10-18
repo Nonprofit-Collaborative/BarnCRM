@@ -135,6 +135,26 @@ layout your people use, choose **Related Lists**, and drag **Volunteer Skills** 
 Requirements** onto the layout. Save. Team Members and Read Only users never see the
 requirements list's rows, whatever the layout shows.
 
+**Readiness at a glance.** In the BarnCRM Volunteers app, a person opens on the **Volunteers
+Contact Record Page** (or the **Volunteers Account Record Page** for a person account): BarnCRM
+Core's person page plus a **Volunteer readiness** card. The card lists every requirement type
+(Application, Background check, Orientation and any you added) with the person's most recently
+added row for it: its status, completed date and expiry, and **Current** or **Not current**. A
+type the person has no row for says **Not started**. Click a type to open its row. The card
+only reads: it never stops a sign-up or hours. Admins and Coordinators see it; for Team
+Members and Read Only users, and on a household or organization, the card shows nothing. After
+adding a row, click the card's **Refresh** button to see it.
+
+- **In the BarnCRM app, people open on Core's page, which has no readiness card.** To show it
+  there too, open Setup, then **Lightning App Builder**, edit **Volunteers Contact Record
+  Page**, choose **Activation**, then **App, Record Type, and Profile**, and assign it to the
+  BarnCRM app on desktop and phone. Do the same for **Volunteers Account Record Page** where
+  your people are person accounts.
+- **On a record page of your own**, open it in the Lightning App Builder, drag the **Volunteer
+  Readiness** component onto it, and save. To have both giving and readiness on one page, clone
+  **Giving Contact Record Page** (a packaged page is replaced on upgrade), add the component to
+  the copy, and assign the copy.
+
 **Nothing is blocked.** A person whose steps are not current can still be signed up and log
 hours. The coordinator decides.
 

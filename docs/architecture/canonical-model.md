@@ -7804,8 +7804,10 @@ it is seen only by those who may see requirements and it leaves with them (R-VQ4
 future; Expires may not be earlier than Completed Date.
 
 **R-VQ3 Readiness is shown, not enforced.** The volunteer profile shows each Type's most recent
-row and whether it is current. Nothing in v0.8 refuses a sign-up or hours for a person whose
-steps are not current; the coordinator decides.
+row (the one added last) and whether it is current; a Type with no row shows as not started.
+It shows only what the viewer may read: nothing to a user without access to requirements, and
+nothing on a household or organization. Nothing in v0.8 refuses a sign-up or hours for a person
+whose steps are not current; the coordinator decides.
 
 **R-VQ4 Kept to coordinators, erased with the person.** Requirements are private records: the
 Volunteers Admin and Volunteers Coordinator permission sets read and edit all of them, and the
@@ -7851,6 +7853,11 @@ bypass stops it (R-A4).
   contact among them, with no person account field read); after delete it deletes the
   ones noted for every record whose MasterRecordId is empty, so a merge loser's rows, which the
   merge has moved to the record kept, stay.
+- **Readiness (R-VQ3):** the `volunteerReadiness` component, read from
+  `VolunteerReadinessController` (cacheable, user mode), on `Volunteers_Contact_Record_Page` and
+  `Volunteers_Account_Record_Page`: Core's person pages unchanged plus the component, as Giving
+  ships its own (ADR-0064), assigned in the Volunteers app (Large and Small). Elsewhere the admin
+  activates them or adds the component to a page of their own.
 - **Access:** `Volunteers_Admin` and `Volunteers_Coordinator` create, read, edit and delete, with
   View All and Modify All (a Private object is edited by others only with Modify All, which the
   platform gives only with delete); Is Current is read only. `Volunteers_Staff` and
@@ -8288,6 +8295,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
+| v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component, assigned in the Volunteers app. |
 
 ---
 ## 32. Entity ownership by package
