@@ -7118,12 +7118,14 @@ Coordinator deletes only hours, since the platform gives Modify All only with De
 | Permission set | Given to | Job, Shift, Sign-up | Hours | Person attributes |
 |---|---|---|---|---|
 | `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
-| `Volunteers_Coordinator` | the Coordinator role (`Volunteer_Coordinator`) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` | edit |
+| `Volunteers_Coordinator` | the Coordinator role (`Volunteer_Coordinator`) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
 | `Volunteers_Staff` | the Team Member role (`Program_Staff`) | create, edit | create, edit their own entries (sharing Private) | edit |
-| `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read their own entries (sharing Private) | read |
+| `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
 Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab.
+set shows the Volunteer Settings tab. `Manage_Volunteers` on the Coordinator and Admin sets
+arrives with the hours change (#469), which creates the custom permission; it is added to both
+sets in a follow-up after that change merges.
 
 ## 29I. Volunteer profile
 
