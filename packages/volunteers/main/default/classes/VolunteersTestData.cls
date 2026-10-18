@@ -6,6 +6,97 @@
 public class VolunteersTestData {
     public static final String ADMIN = 'Volunteers_Admin';
     public static final Datetime SHIFT_START = Datetime.newInstance(2026, 3, 14, 9, 0, 0);
+    /** The Core set a staff member holds, for contacts and accounts. */
+    public static final String CORE_STAFF = 'BarnCRM_Staff';
+
+    /**
+     * A staff member who enters hours and nothing more: Standard User, BarnCRM Staff, and a
+     * test-only permission set to read jobs and create and edit their own hours. No Manage
+     * Volunteers, so the permission is really absent (the module's Staff set ships with the
+     * permission sets, PR7).
+     */
+    public static User hoursStaffer(String lastName) {
+        User person = TestUsers.standardUserWith(lastName, new List<String>{ CORE_STAFF });
+        grant(person.Id, false, false);
+        return person;
+    }
+
+    /**
+     * A coordinator who holds Manage Volunteers and may see every entry but edit none: the
+     * case where an approval has to report an entry rather than fail the whole call.
+     */
+    public static User readOnlyCoordinator(String lastName) {
+        User person = TestUsers.standardUserWith(lastName, new List<String>{ CORE_STAFF });
+        grant(person.Id, true, true);
+        return person;
+    }
+
+    private static void grant(Id userId, Boolean readOnlyWithManage, Boolean viewAll) {
+        String hoursObject = Schema.SObjectType.Volunteer_Hours__c.getName();
+        String jobObject = Schema.SObjectType.Volunteer_Job__c.getName();
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            String name = 'Barn_Volunteers_Test_' + Math.abs(Crypto.getRandomInteger());
+            PermissionSet access = new PermissionSet(Name = name, Label = name);
+            insert as system access;
+            insert as system new List<ObjectPermissions>{
+                new ObjectPermissions(
+                    ParentId = access.Id,
+                    SobjectType = jobObject,
+                    PermissionsRead = true
+                ),
+                new ObjectPermissions(
+                    ParentId = access.Id,
+                    SobjectType = hoursObject,
+                    PermissionsRead = true,
+                    PermissionsCreate = !readOnlyWithManage,
+                    PermissionsEdit = !readOnlyWithManage,
+                    PermissionsViewAllRecords = viewAll
+                )
+            };
+            List<FieldPermissions> fields = new List<FieldPermissions>();
+            for (
+                Schema.SObjectField field : new List<Schema.SObjectField>{
+                    Volunteer_Hours__c.Contact__c,
+                    Volunteer_Hours__c.Volunteer_Job__c,
+                    Volunteer_Hours__c.Rejection_Reason__c,
+                    Volunteer_Hours__c.Approved_By__c,
+                    Volunteer_Hours__c.Approved_Date__c,
+                    Volunteer_Hours__c.Household__c
+                }
+            ) {
+                fields.add(
+                    new FieldPermissions(
+                        ParentId = access.Id,
+                        SobjectType = hoursObject,
+                        Field = hoursObject + '.' + field.getDescribe().getName(),
+                        PermissionsRead = true,
+                        PermissionsEdit = !readOnlyWithManage &&
+                            field != Volunteer_Hours__c.Approved_By__c &&
+                            field != Volunteer_Hours__c.Approved_Date__c &&
+                            field != Volunteer_Hours__c.Household__c
+                    )
+                );
+            }
+            insert as system fields;
+            if (readOnlyWithManage) {
+                insert as system new SetupEntityAccess(
+                    ParentId = access.Id,
+                    SetupEntityId = [
+                        SELECT Id
+                        FROM CustomPermission
+                        WHERE DeveloperName = :VolunteerHoursService.MANAGE_PERMISSION
+                        WITH SYSTEM_MODE
+                        LIMIT 1
+                    ]
+                    .Id
+                );
+            }
+            insert as system new PermissionSetAssignment(
+                AssigneeId = userId,
+                PermissionSetId = access.Id
+            );
+        }
+    }
 
     /** Contact membership mode with automatic households off: people are made as each test says. */
     public static void contactModeWithoutAutomaticHouseholds() {

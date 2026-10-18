@@ -163,20 +163,30 @@ private class VolunteerHoursServiceTest {
             Set<Id> ids = new Set<Id>{ hours.Id };
 
             Test.startTest();
-            Assert.areEqual(1, VolunteerHoursService.approve(ids), 'One entry approved.');
+            Assert.areEqual(1, VolunteerHoursService.approve(ids).moved, 'One entry approved.');
             Volunteer_Hours__c approved = reread(hours.Id);
             Assert.areEqual(
                 0,
-                VolunteerHoursService.approve(ids),
+                VolunteerHoursService.approve(ids).moved,
                 'Approving twice moves nothing.'
             );
 
             String locked = saveError(new Volunteer_Hours__c(Id = hours.Id, Hours__c = 5), false);
+            String deleted = '';
+            try {
+                delete new Volunteer_Hours__c(Id = hours.Id);
+            } catch (DmlException refused) {
+                deleted = refused.getDmlMessage(0);
+            }
 
-            Assert.areEqual(1, VolunteerHoursService.reject(ids, '  Wrong day  '), 'Rejected.');
+            Assert.areEqual(
+                1,
+                VolunteerHoursService.reject(ids, '  Wrong day  ').moved,
+                'Rejected.'
+            );
             Volunteer_Hours__c rejected = reread(hours.Id);
 
-            Assert.areEqual(1, VolunteerHoursService.reopen(ids), 'Reopened.');
+            Assert.areEqual(1, VolunteerHoursService.reopen(ids).moved, 'Reopened.');
             Volunteer_Hours__c reopened = reread(hours.Id);
             update new Volunteer_Hours__c(Id = hours.Id, Hours__c = 5);
             Test.stopTest();
@@ -187,6 +197,11 @@ private class VolunteerHoursServiceTest {
             Assert.isTrue(
                 locked.contains('Approved hours are locked'),
                 'An approved entry is locked (R-VG7): ' + locked
+            );
+            Assert.areEqual(
+                Label.Volunteers_Hours_ApprovedNotDeletable,
+                deleted,
+                'An approved entry is not deleted, even by an administrator (R-VG9).'
             );
             Assert.areEqual('Rejected', rejected.Status__c, 'Rejected.');
             Assert.areEqual('Wrong day', rejected.Rejection_Reason__c, 'The reason is kept.');
@@ -265,12 +280,13 @@ private class VolunteerHoursServiceTest {
             insert entries;
 
             Test.startTest();
-            Integer moved = VolunteerHoursService.approve(
+            VolunteerHoursService.StatusChange result = VolunteerHoursService.approve(
                 new Map<Id, Volunteer_Hours__c>(entries).keySet()
             );
             Test.stopTest();
 
-            Assert.areEqual(251, moved, 'Every entry approved.');
+            Assert.areEqual(251, result.moved, 'Every entry approved.');
+            Assert.isTrue(result.refused.isEmpty(), 'None refused: ' + result.refused);
             Assert.areEqual(
                 251,
                 [

@@ -22,7 +22,7 @@
         <field>Description__c</field>
         <value
       xsi:type="xsd:string"
-    >Starts new hours as Submitted, or as Approved when Hours Require Approval is off, and refuses a status change made any way other than approving, rejecting or reopening. Fills in the job from the shift and the household from the person, so household totals add up. Switching it off, or pausing automation, lets hours be loaded with any status (for an import of past hours) and leaves the household empty until the person on the entry changes. Approved hours stay locked either way: that is a validation rule.</value>
+    >Starts new hours as Submitted, or as Approved when Hours Require Approval is off, and refuses a status change made any way other than approving, rejecting or reopening. Fills in the job from the shift and the household from the person, so household totals add up. Switching it off, or pausing automation, lets new hours be loaded with any status (for an import of past hours) and leaves the household empty until the person on the entry changes. Either way, changing the status of saved hours still needs the Manage Volunteers permission, and approved hours stay locked: those are validation rules.</value>
     </values>
     <values>
         <field>Module__c</field>

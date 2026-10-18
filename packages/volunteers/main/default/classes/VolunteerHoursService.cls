@@ -25,6 +25,15 @@ public with sharing class VolunteerHoursService {
     }
 
     /**
+     * What a verb did: how many entries it moved, and each entry it could not move with the
+     * reason (one the user may see but not edit, say). One refused entry never stops the rest.
+     */
+    public class StatusChange {
+        public Integer moved = 0;
+        public Map<Id, String> refused = new Map<Id, String>();
+    }
+
+    /**
      * Whether the running user may approve, reject and reopen hours. Asked each time, not
      * cached: the check costs no query, and a cached answer would outlive a `System.runAs`.
      */
@@ -49,9 +58,9 @@ public with sharing class VolunteerHoursService {
     /**
      * Approves these entries: Approved By and Approved Date are the running user and now, and a
      * rejection reason left from an earlier rejection is cleared. An entry already Approved is
-     * left as it is. Returns how many it moved.
+     * left as it is.
      */
-    public static Integer approve(Set<Id> hoursIds) {
+    public static StatusChange approve(Set<Id> hoursIds) {
         requirePermission();
         Datetime now = Datetime.now();
         List<Volunteer_Hours__c> moves = new List<Volunteer_Hours__c>();
@@ -60,16 +69,15 @@ public with sharing class VolunteerHoursService {
                 moves.add(move(entry.Id, STATUS_APPROVED, UserInfo.getUserId(), now, null));
             }
         }
-        save(moves);
-        return moves.size();
+        return save(moves);
     }
 
     /**
      * Rejects these entries for the reason given, which is required (R-VG8). Approved By and
      * Approved Date record who rejected them and when. An entry already Rejected keeps its
-     * first reason. Returns how many it moved.
+     * first reason.
      */
-    public static Integer reject(Set<Id> hoursIds, String reason) {
+    public static StatusChange reject(Set<Id> hoursIds, String reason) {
         requirePermission();
         if (String.isBlank(reason)) {
             throw new VolunteerHoursException(Label.Volunteers_Hours_RejectionReasonRequired);
@@ -82,16 +90,14 @@ public with sharing class VolunteerHoursService {
                 moves.add(move(entry.Id, STATUS_REJECTED, UserInfo.getUserId(), now, trimmed));
             }
         }
-        save(moves);
-        return moves.size();
+        return save(moves);
     }
 
     /**
      * Moves these Approved or Rejected entries back to Submitted and clears who decided, when,
-     * and why, so the entry can be corrected and decided again (R-VG7). Returns how many it
-     * moved.
+     * and why, so the entry can be corrected, deleted, or decided again (R-VG7, R-VG9).
      */
-    public static Integer reopen(Set<Id> hoursIds) {
+    public static StatusChange reopen(Set<Id> hoursIds) {
         requirePermission();
         List<Volunteer_Hours__c> moves = new List<Volunteer_Hours__c>();
         for (Volunteer_Hours__c entry : VolunteerHoursSelector.selectForStatusChange(hoursIds)) {
@@ -99,8 +105,7 @@ public with sharing class VolunteerHoursService {
                 moves.add(move(entry.Id, STATUS_SUBMITTED, null, null, null));
             }
         }
-        save(moves);
-        return moves.size();
+        return save(moves);
     }
 
     // ---------------------------------------------------------------- the rules on every save
@@ -134,8 +139,10 @@ public with sharing class VolunteerHoursService {
     }
 
     /**
-     * R-VG5 for saved entries: Status, Approved By and Approved Date change only while a verb
-     * is moving the entry. A change made any other way is refused, naming the way to make it.
+     * R-VG5 for saved entries: Status, Approved By, Approved Date and Rejection Reason change
+     * only while a verb is moving the entry. A change made any other way is refused, naming the
+     * way to make it. The validation rule `Status_Needs_Manage_Volunteers` holds the same line
+     * for a user without Manage Volunteers while this automation is off or paused.
      */
     public static void refuseStatusChangesOutsideTheService(
         List<Volunteer_Hours__c> entries,
@@ -149,9 +156,22 @@ public with sharing class VolunteerHoursService {
             if (
                 entry.Status__c != previous.Status__c ||
                 entry.Approved_By__c != previous.Approved_By__c ||
-                entry.Approved_Date__c != previous.Approved_Date__c
+                entry.Approved_Date__c != previous.Approved_Date__c ||
+                entry.Rejection_Reason__c != previous.Rejection_Reason__c
             ) {
                 entry.addError(Label.Volunteers_Hours_StatusThroughApproval);
+            }
+        }
+    }
+
+    /**
+     * R-VG9: an Approved entry is not deleted, by anyone. It counts in totals, so deleting it
+     * would change them with nothing on record; a coordinator reopens it first.
+     */
+    public static void refuseDeletingApproved(List<Volunteer_Hours__c> entries) {
+        for (Volunteer_Hours__c entry : entries) {
+            if (entry.Status__c == STATUS_APPROVED) {
+                entry.addError(Label.Volunteers_Hours_ApprovedNotDeletable);
             }
         }
     }
@@ -233,20 +253,31 @@ public with sharing class VolunteerHoursService {
 
     /**
      * Saves the moves with these entries open to a status change, and closes them again
-     * whatever happens. The earlier open set is restored rather than emptied.
+     * whatever happens. The earlier open set is restored rather than emptied. Each entry is
+     * saved on its own terms: one the user cannot edit is reported, and the others move.
      */
-    private static void save(List<Volunteer_Hours__c> moves) {
+    private static StatusChange save(List<Volunteer_Hours__c> moves) {
+        StatusChange result = new StatusChange();
         if (moves.isEmpty()) {
-            return;
+            return result;
         }
         Set<Id> wasOpen = beingMoved;
+        List<Database.SaveResult> saves;
         try {
             Set<Id> open = new Set<Id>(wasOpen);
             open.addAll(new Map<Id, Volunteer_Hours__c>(moves).keySet());
             beingMoved = open;
-            VolunteerHoursWriter.save(moves);
+            saves = VolunteerHoursWriter.save(moves);
         } finally {
             beingMoved = wasOpen;
         }
+        for (Integer i = 0; i < saves.size(); i++) {
+            if (saves[i].isSuccess()) {
+                result.moved++;
+            } else {
+                result.refused.put(moves[i].Id, saves[i].getErrors()[0].getMessage());
+            }
+        }
+        return result;
     }
 }

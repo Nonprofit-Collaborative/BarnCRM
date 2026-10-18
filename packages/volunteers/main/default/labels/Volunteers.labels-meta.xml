@@ -24,4 +24,12 @@
         <shortDescription>Rejecting hours needs a reason</shortDescription>
         <value>Say why these hours are rejected, so the person who entered them knows what to fix.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Hours_ApprovedNotDeletable</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approved hours cannot be deleted</shortDescription>
+        <value>Approved hours count in totals, so they cannot be deleted. Reopen them first (move them back to Submitted, which needs the Manage Volunteers permission), then delete them.</value>
+    </labels>
 </CustomLabels>
