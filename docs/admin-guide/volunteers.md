@@ -26,10 +26,9 @@ setting, on by default), so nobody types them twice. While automation is paused,
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
 
-This page covers installing the module, who gets which access, its settings, the **Sign-ups**
-panel on a shift, the **Approve Hours** screen and recurring shifts. The hour totals on people
-and the coordinator dashboard each come with a later part of the module, and this page will say
-so as each arrives.
+This page covers installing the module, who gets which access, its settings, the volunteer
+totals, the coordinator dashboard, the **Sign-ups** panel on a shift, the **Approve Hours**
+screen and recurring shifts.
 
 ## Before you install
 
@@ -41,13 +40,14 @@ so as each arrives.
 ## Installing
 
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
-finishes, BarnCRM does three things on its own:
+finishes, BarnCRM does five things on its own:
 
 1. Creates the switch rows for the module's automations on the **Automation** page.
-2. Gives you, the person who installed it, the **Volunteers Admin** permission set.
-3. Gives everyone who already has a BarnCRM role the Volunteers permission set for that role
+2. Creates the volunteer totals on the **Rollups** page (see [Volunteer totals](#volunteer-totals)).
+3. Gives you, the person who installed it, the **Volunteers Admin** permission set.
+4. Gives everyone who already has a BarnCRM role the Volunteers permission set for that role
    (next section). This runs in the background and takes a minute or two in a large org.
-4. Adds the two shipped letter templates, an hours letter and a certificate (see
+5. Adds the two shipped letter templates, an hours letter and a certificate (see
    [Hour letters and certificates](#hour-letters-and-certificates)). An upgrade adds only a
    shipped template you do not have, and never changes one you edited.
 
@@ -84,8 +84,8 @@ their Volunteers set too, in Setup under **Users**, **Permission Set Assignments
 
 **Volunteer Hours are private by default.** A Team Member sees the hours they entered
 themselves; a Coordinator or Admin sees everyone's. A Read Only user enters none, so sees no
-hours entries at all. The totals on a person (when they arrive) count every approved entry
-whoever entered it, and everyone who can see the person sees them.
+hours entries at all. The totals on a person count every approved entry whoever entered it, and
+everyone who can see the person sees them.
 
 ## Skills and interests
 
@@ -371,11 +371,81 @@ permission, and the list without the buttons. Read Only users see no hours at al
 Approving here is the only way an entry's status changes: editing the Status field on the record
 is refused, for everyone.
 
+## Volunteer totals
+
+The module adds totals of approved hours to people, households, jobs and shifts. They are
+ordinary rollups on the **Rollups** page (see [Rollups](rollups.md)), created at install, each
+of which you can edit or switch off there. Only **Approved** hours count: a Submitted or Rejected
+entry adds nothing, and reopening an approved entry takes it back out of every total until it is
+approved again.
+
+| Where | Total | What it shows |
+|---|---|---|
+| Person and household | Volunteer Hours Total | Every approved hour this person or household has given. |
+| Person and household | Volunteer Hours This Year | Approved hours in the current fiscal year, by Date Worked. |
+| Person and household | Volunteer Hours Last Year | Approved hours in the previous fiscal year. |
+| Person and household | First Volunteer Date | The first day they gave time, which a service award counts from. |
+| Person and household | Last Volunteer Date | The most recent day they gave time, which a lapsed volunteer report counts from. |
+| Volunteer job | Total Hours, Last Volunteer Date | Approved hours on the job, and the most recent day anybody worked it. |
+| Volunteer shift | Total Hours | Approved hours on the shift. |
+| Volunteer shift | Slots Filled | Sign-ups that are not Cancelled. Slots Remaining is Volunteers Needed less this. |
+
+The fiscal year follows the fiscal year start month in **BarnCRM Settings**. A total moves when
+the hours or sign-up is saved, by anyone who saves it (a total is read only for every role, so
+nobody types one), and the nightly run checks every total again.
+
+**No "last calculated" line on people without Giving.** The line that says when a person's or a
+household's totals were last worked out comes from the Giving module. In an org without Giving,
+volunteer totals on people are still right, but no such line shows. Jobs and shifts always have
+their own **Rollups Last Calculated**.
+
+**While the module is off.** While Volunteers is off (next section), saving hours or sign-ups
+does not move any total at once. The nightly run still brings every volunteer total up to date,
+on or off, so they catch up by the next morning. To bring them up to date at once, open the
+**Rollups** page and click **Recalculate all**.
+
+## The Volunteers dashboard and reports
+
+The module ships one dashboard, **Volunteers**, and four reports it reads, in folders named
+**BarnCRM Volunteers**. Nothing has to be built: open the **BarnCRM Volunteers** app, choose
+**Dashboards**, open the **BarnCRM Volunteers** folder and open **Volunteers**.
+
+| Chart | What it shows |
+|---|---|
+| Approved hours this year, by job | One bar per job: the approved hours with a Date Worked this calendar year. Submitted and Rejected hours are not counted. |
+| Hours awaiting approval | Every entry still **Submitted**, oldest first, with the date it was entered and the **Days Waiting** since. Ten rows show; click the title for the whole list. |
+| Unfilled shifts, next 14 days | **Open** shifts starting in the next 14 days with **Slots Remaining** above zero, soonest first. Cancelled and completed shifts are left out. |
+| Lapsing volunteers | People whose **Last Volunteer Date** (last approved hours) was between six and twelve months ago, longest gap first. It reads the Last Volunteer Date total on the person, so it follows approved hours only. |
+
+The reports are ordinary Salesforce reports in the same folder, built on four report types the
+module ships (**Volunteer Hours with Job and Shift**, **Volunteer Shifts with Job**, **Volunteer
+Sign-ups** and **Volunteers**). Anyone can open one, change a filter and save a copy of their own
+without changing what everyone else sees. The Volunteers report type reads people on Contact; an
+org whose people are person accounts builds the lapsing report on its own account-based type.
+
+**Who sees what.** The dashboard reads as **The dashboard viewer**, so each person sees only
+the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all
+and a Team Member sees the hours they can open. The folders ship public read only, and all four
+Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
+can also create and edit them.
+
+**How to change the running user.** If your edition does not offer the dashboard viewer, or your
+org has used up its allowance of dashboards that read that way, open the dashboard, choose
+**Edit**, and in **View dashboard as** choose a person who can see all volunteer hours, for
+example a coordinator. Everyone then sees that person's view, so choose carefully. Save.
+
+**How to add it to the home page.** Open the Home page, choose the gear and **Edit Page**, drag a
+**Dashboard** component on, choose **Volunteers** in the BarnCRM Volunteers folder, and save and
+activate the page for the BarnCRM Volunteers app.
+
+**Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
+schedule you pick.
+
 ## Turning it off
 
-Turning Volunteers off in Module Manager stops its automations; the records stay. Hours saved
-while it is off are not totalled until it is back on and the next nightly run has finished. No
-Volunteers set is given while it is off.
+Turning Volunteers off in Module Manager stops its automations; the records stay. Hours and
+sign-ups saved while it is off are counted in the totals at the next nightly run, or when you
+click **Recalculate all** on the Rollups page. No Volunteers set is given while it is off.
 
 ## A five-minute walkthrough
 
@@ -393,11 +463,14 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    **Volunteer Hours**, a 3-hour entry for that person on that shift now exists. It is
    **Submitted** and appears in the **Hours awaiting approval** list view (or **Approved** if
    Hours require approval is off). You can also enter hours by hand there.
-7. Open **Approve Hours**. The entry is listed under **Submitted**. Tick it and click
+7. Choose **Dashboards**, open the **BarnCRM Volunteers** folder and open **Volunteers**. The
+   hours from step 6 show under **Hours awaiting approval** with their days waiting, and the
+   shift from step 4 shows under **Unfilled shifts, next 14 days** until it has three sign-ups.
+8. Open **Approve Hours**. The entry is listed under **Submitted**. Tick it and click
    **Approve**: the message says one entry was approved, and the list is empty.
-8. Change **Show** to **Approved**, tick the entry and click **Reopen**. It is back under
+9. Change **Show** to **Approved**, tick the entry and click **Reopen**. It is back under
    **Submitted**. Tick it, click **Reject**, type "Wrong date" as the reason and confirm.
-9. Open **Volunteer Settings** and read the three settings. Leave them as they are.
+10. Open **Volunteer Settings** and read the three settings. Leave them as they are.
 
 ## Importing volunteer hours
 

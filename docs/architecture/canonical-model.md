@@ -7630,8 +7630,9 @@ and a differently named twin would answer the same question twice. Jobs and shif
 module's own stamp.
 
 **R-VR2 Turned off, then on.** While Volunteers is turned off (ADR-0073) its registry rows do
-not run, so its saves queue no recalculation. After Turn on the totals catch up at the next
-nightly run (mode Both), or at once with Recalculate all.
+not run, so its saves queue no recalculation. The nightly run still recalculates the totals
+while the module is off; only turning Rollup Builder off stops it. After Turn on the totals
+catch up at the next nightly run (mode Both), or at once with Recalculate all.
 
 ### Salesforce implementation
 
@@ -8472,7 +8473,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
-| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127) |
+| Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

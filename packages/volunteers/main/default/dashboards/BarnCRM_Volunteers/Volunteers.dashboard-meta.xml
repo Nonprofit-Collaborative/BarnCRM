@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
+  <backgroundEndColor>#FFFFFF</backgroundEndColor>
+  <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+  <backgroundStartColor>#FFFFFF</backgroundStartColor>
+  <chartTheme>light</chartTheme>
+  <dashboardType>LoggedInUser</dashboardType>
+  <description>
+    Where the hours went this year, which hours still need approving, which shifts in the next two
+    weeks still need people, and which volunteers have gone quiet.
+  </description>
+  <leftSection>
+    <columnSize>Medium</columnSize>
+    <components>
+      <chartAxisRange>Auto</chartAxisRange>
+      <componentType>Bar</componentType>
+      <drillEnabled>true</drillEnabled>
+      <footer>Approved hours only, by Date Worked</footer>
+      <header>Approved hours this year, by job</header>
+      <legendPosition>Bottom</legendPosition>
+      <report>BarnCRM_Volunteers/Approved_Hours_This_Year_by_Job</report>
+      <sortBy>RowValueDescending</sortBy>
+    </components>
+    <components>
+      <componentType>Table</componentType>
+      <drillEnabled>true</drillEnabled>
+      <footer>Last approved hours six to twelve months ago, longest gap first</footer>
+      <header>Lapsing volunteers</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+      <maxValuesDisplayed>10</maxValuesDisplayed>
+      <report>BarnCRM_Volunteers/Lapsing_Volunteers</report>
+    </components>
+  </leftSection>
+  <rightSection>
+    <columnSize>Medium</columnSize>
+    <components>
+      <componentType>Table</componentType>
+      <drillEnabled>true</drillEnabled>
+      <footer>Submitted hours, oldest first</footer>
+      <header>Hours awaiting approval</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+      <maxValuesDisplayed>10</maxValuesDisplayed>
+      <report>BarnCRM_Volunteers/Hours_Awaiting_Approval</report>
+    </components>
+    <components>
+      <componentType>Table</componentType>
+      <drillEnabled>true</drillEnabled>
+      <footer>Open shifts that still have slots remaining, soonest first</footer>
+      <header>Unfilled shifts, next 14 days</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
+      <maxValuesDisplayed>10</maxValuesDisplayed>
+      <report>BarnCRM_Volunteers/Unfilled_Shifts_Next_14_Days</report>
+    </components>
+  </rightSection>
+  <textColor>#000000</textColor>
+  <title>Volunteers</title>
+  <titleColor>#000000</titleColor>
+  <titleSize>12</titleSize>
+</Dashboard>

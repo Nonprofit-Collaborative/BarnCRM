@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Volunteer_Hours__c$Name</field>
+  </columns>
+  <columns>
+    <field>Volunteer_Hours__c$Contact__c</field>
+  </columns>
+  <columns>
+    <field>Volunteer_Hours__c$Volunteer_Job__c</field>
+  </columns>
+  <columns>
+    <field>Volunteer_Hours__c$Date_Worked__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Volunteer_Hours__c$Hours__c</field>
+  </columns>
+  <columns>
+    <field>Volunteer_Hours__c$CreatedDate</field>
+  </columns>
+  <columns>
+    <field>CDF1</field>
+  </columns>
+  <customDetailFormulas>
+    <calculatedFormula>TODAY() - DATEVALUE(Volunteer_Hours__c.CreatedDate)</calculatedFormula>
+    <dataType>Double</dataType>
+    <description>Days since the hours were entered</description>
+    <developerName>CDF1</developerName>
+    <label>Days Waiting</label>
+    <scale>0</scale>
+  </customDetailFormulas>
+  <description>
+    Hours entered and not yet approved or rejected, oldest first, with the days each has waited.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Volunteer_Hours__c$Status__c</column>
+      <operator>equals</operator>
+      <value>Submitted</value>
+    </criteriaItems>
+  </filter>
+  <format>Tabular</format>
+  <name>Hours Awaiting Approval</name>
+  <reportType>Volunteer_Hours_with_Job_and_Shift__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+  <sortColumn>Volunteer_Hours__c$CreatedDate</sortColumn>
+  <sortOrder>Asc</sortOrder>
+</Report>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Volunteer_Hours__c$Hours__c</field>
+  </columns>
+  <description>
+    Approved volunteer hours this year, by job. Hours with no job are grouped as blank.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Volunteer_Hours__c$Status__c</column>
+      <operator>equals</operator>
+      <value>Approved</value>
+    </criteriaItems>
+    <criteriaItems>
+      <column>Volunteer_Hours__c$Date_Worked__c</column>
+      <operator>equals</operator>
+      <value>THIS_YEAR</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <field>Volunteer_Hours__c$Volunteer_Job__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Approved Hours This Year by Job</name>
+  <reportType>Volunteer_Hours_with_Job_and_Shift__c</reportType>
+  <scope>organization</scope>
+  <showDetails>false</showDetails>
+</Report>

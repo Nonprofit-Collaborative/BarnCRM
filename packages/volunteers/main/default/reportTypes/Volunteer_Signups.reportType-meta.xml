@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Volunteer_Signup__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Volunteer sign-ups with the person, status and notes, and the shift they signed up for.
+  </description>
+  <label>Volunteer Sign-ups</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Contact__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Account__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Volunteer_Shift__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Notes__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>CreatedDate</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <masterLabel>Volunteer Sign-up</masterLabel>
+  </sections>
+</ReportType>

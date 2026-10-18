@@ -71,6 +71,8 @@
   <tabs>Skill__c</tabs>
   <tabs>Volunteer_Requirement__c</tabs>
   <tabs>Volunteer_Settings</tabs>
+  <tabs>standard-Dashboard</tabs>
+  <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
@@ -96,6 +98,12 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Shift__c</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Dashboard</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-report</tab>
     </mappings>
   </workspaceConfig>
 </CustomApplication>
