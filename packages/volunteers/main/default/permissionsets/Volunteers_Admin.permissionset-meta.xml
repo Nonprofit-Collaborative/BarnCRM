@@ -6,6 +6,10 @@
     Runs volunteering: jobs, shifts, sign-ups and hours, including deleting a record entered by
     accident and approving or rejecting hours.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Volunteers</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <customPermissions>
     <enabled>true</enabled>
     <name>Manage_Volunteers</name>
@@ -231,4 +235,20 @@
     <object>Volunteer_Signup__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Volunteer_Hours__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Volunteer_Job__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Volunteer_Settings</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Volunteer_Shift__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>
