@@ -1,6 +1,6 @@
 /**
- * The nightly run of every active schedule (R-SSC3), and the run a large save hands its
- * schedules to. Ten schedules per transaction (R-SSC6): a schedule on every weekday at the
+ * The nightly run of every active schedule (R-SSC3) and of every schedule marked Rebuild Pending
+ * (R-SSC6), and the run a large save hands its schedules to. Ten schedules per transaction (R-SSC6): a schedule on every weekday at the
  * longest horizon (26 weeks) creates 182 shifts, so a chunk stays far inside the 10,000 rows one
  * transaction may write, and every schedule gets its turn however many the org has.
  *
@@ -23,25 +23,14 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
     /** Null for the nightly run of every runnable schedule. */
     private final Set<Id> onlyIds;
 
-    /**
-     * Null for a plain run. Otherwise the schedules a save left to remove the future shifts of
-     * (see `ShiftScheduleService.rebuild`), each with the day it keeps shifts through.
-     */
-    private final Map<Id, Date> rebuild;
-
-    /** The nightly run of every active schedule. */
+    /** The nightly run of every active schedule and every one marked Rebuild Pending. */
     public ShiftScheduleBatch() {
-        this((Set<Id>) null);
+        this(null);
     }
 
     /** A run of these schedules only. */
     public ShiftScheduleBatch(Set<Id> onlyIds) {
         this.onlyIds = onlyIds;
-    }
-
-    /** The removal and recreation of shifts a save was too large to do itself (R-SSC6). */
-    public ShiftScheduleBatch(Map<Id, Date> rebuild) {
-        this.rebuild = rebuild;
     }
 
     public static Integer chunkSize() {
@@ -57,24 +46,12 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
-        if (rebuild != null) {
-            return ShiftScheduleSelector.byIdLocator(rebuild.keySet());
-        }
         return ShiftScheduleSelector.runnableLocator(onlyIds, ShiftScheduleService.today());
     }
 
     public void execute(Database.BatchableContext context, List<Shift_Schedule__c> scope) {
         try {
-            Set<Id> ids = new Map<Id, Shift_Schedule__c>(scope).keySet();
-            if (rebuild == null) {
-                ShiftScheduleService.run(ids);
-                return;
-            }
-            Map<Id, Date> chunk = new Map<Id, Date>();
-            for (Id scheduleId : ids) {
-                chunk.put(scheduleId, rebuild.get(scheduleId));
-            }
-            ShiftScheduleService.rebuild(chunk);
+            ShiftScheduleService.run(new Map<Id, Shift_Schedule__c>(scope).keySet());
         } catch (Exception chunkFailure) {
             ErrorLogger.log(chunkFailure, LOG_CONTEXT);
         }

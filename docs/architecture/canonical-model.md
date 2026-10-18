@@ -7124,7 +7124,7 @@ Every attribute here, the person attributes included, is shipped by Volunteers, 
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
 BarnCRM role by `VolunteersAccessSync`, which never takes one away. Approved By, Approved Date,
-Household, a schedule's Created Through and Shifts Kept, and every rollup total are read only in
+Household, a schedule's Created Through, Shifts Kept and Rebuild Pending, and every rollup total are read only in
 each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
 gives Modify All only with Delete.
 
@@ -7920,6 +7920,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 | Active | boolean | yes (defaults true) | Whether the schedule still creates shifts. |
 | Created Through | date | computed | The last day the schedule has created shifts for. Kept by the generator; never edited. |
 | Shifts Kept | integer | computed | How many future shifts the last edit that removed shifts (R-SSC4, R-SSC5) kept as they were, because they have sign-ups or hours; Cancelled shifts are kept too but not counted. Cleared by a later save that changes neither the pattern nor the end. Kept by the automation; never edited. |
+| Rebuild Pending | boolean | computed (defaults false) | Set when a save changed or ended more schedules than it could remove shifts for itself (R-SSC6): the next run removes this schedule's future shifts after Created Through, records Shifts Kept and clears it. Bookkeeping, not on the layout; never edited. |
 
 ### Relationships
 
@@ -7972,10 +7973,17 @@ again by the next edit of its schedule, a Cancelled one is not.
 creates at most ten schedules' worth of shifts at the longest horizon the setting allows. A save
 that changes the pattern of, or ends, many schedules removes shifts in the save only for as many
 schedules as the transaction's DML rows allow (the rows still free, less a reserve of 2,000,
-over seven shifts a week to the horizon: 43 at 26 weeks). The rest are rebuilt by the same
-batch, ten per transaction, which removes their future shifts as R-SSC4 and R-SSC5 say, records
-Shifts Kept, clears Created Through and creates the new shifts; until it has run, those
-schedules show no Shifts Kept and still hold their old shifts.
+over seven shifts a week to the horizon: 43 at 26 weeks). The save marks the rest Rebuild
+Pending, with Created Through cleared or moved back as R-SSC4 and R-SSC5 say, and queues a run
+for them. Every run, queued or nightly, first removes the future shifts after Created Through of
+each marked schedule it takes, active or not, as R-SSC4 and R-SSC5 say, records Shifts Kept and
+clears the mark, then creates the new shifts; the nightly batch takes every marked schedule, so
+a run that could not be queued is made up that night. Until then those schedules show no Shifts
+Kept and still hold their old shifts. A delete of many schedules removes shifts in the save
+within the same budget; for the rest it takes the Ids of the future shifts R-SSC5 removes before
+the delete empties their link, and a queued job (`ShiftScheduleRemovalJob`, 5,000 a
+transaction) deletes those that still have no sign-up or hours, have not started and are not
+Cancelled.
 
 ### Salesforce implementation
 
@@ -7995,6 +8003,7 @@ schedules show no Shifts Kept and still hold their old shifts.
 | Active | `Active__c` | Checkbox, default true |
 | Created Through | `Created_Through__c` | Date, read only in every permission set |
 | Shifts Kept | `Shifts_Kept__c` | Number (5, 0), read only in every permission set |
+| Rebuild Pending | `Rebuild_Pending__c` | Checkbox, default false, read only in every permission set, not on the layout |
 
 - **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Every N Weeks 1 to 52, End
   Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
@@ -8003,7 +8012,7 @@ schedules show no Shifts Kept and still hold their old shifts.
   started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`), which
   `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
   nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
-  Through and Shifts Kept run in system mode: they are the schedule's own bookkeeping, which a
+  Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
 - **Health Check:** an active schedule whose Created Through is more than two days short of the
@@ -8378,7 +8387,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
-| v0.8 | 2026-10-18 | Volunteers hardening. No object or field added. R-SSC6: a save that changes or ends many schedules removes shifts inline only within the transaction's DML rows and hands the rest to the batch. R-SSC4 and R-SSC5: Shifts Kept counts only kept shifts with a sign-up or hours (Cancelled are not counted) and is cleared by a later save that changes neither pattern nor end. |
+| v0.8 | 2026-10-18 | Volunteers hardening. New field `Rebuild_Pending__c` on `Shift_Schedule__c` (29T), read only in every set, not on the layout. R-SSC6: a save that changes or ends many schedules removes shifts inline only within the transaction's DML rows and marks the rest Rebuild Pending, which every run (queued or nightly) finishes before creating shifts; a delete of many schedules queues the removal of the rest's shifts by Id (`ShiftScheduleRemovalJob`). R-SSC4 and R-SSC5: Shifts Kept counts only kept shifts with a sign-up or hours (Cancelled are not counted) and is cleared by a later save that changes neither pattern nor end. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 
 ---

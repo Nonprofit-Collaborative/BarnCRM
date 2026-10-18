@@ -158,6 +158,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Shift_Schedule__c.Rebuild_Pending__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Shift_Schedule__c.Shifts_Kept__c</field>
     <readable>true</readable>
   </fieldPermissions>

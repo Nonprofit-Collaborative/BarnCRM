@@ -233,10 +233,12 @@ shifts that have no sign-ups, no hours and are not cancelled, and creates them a
 new pattern. Past shifts, shifts with a sign-up or hours, and cancelled shifts are kept as they
 are, and no day gets a second shift. **Shifts Kept** on the schedule then says how many future
 shifts with a sign-up or hours were kept (cancelled shifts are not counted): check those by hand,
-because they still have the old times. The next save that changes neither the days nor the end
-clears the number. Changing only the name changes no shift. When one save changes many
-schedules, the ones beyond what a single save can handle are updated by the nightly job's batch
-a few minutes later, and show no Shifts Kept until it has run.
+because they still have the old times. The next save that changes none of those fields and not
+the end clears the number. Changing only the name changes no shift. When one save changes many
+schedules (an import or a mass edit), the ones beyond what a single save can handle are updated
+in the background a few minutes later, or by the nightly job at the latest: until then they keep
+their old shifts and show no Shifts Kept. Deleting many schedules at once works the same way:
+some of their future shifts may stay for a few minutes before they go.
 
 **Ending a schedule.** Untick **Active**, or set an earlier **End Date**: the future shifts it no
 longer covers that have no sign-ups or hours and are not cancelled are removed, and the rest
