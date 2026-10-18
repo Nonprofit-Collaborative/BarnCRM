@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Skill_Active_Skill</fullName>
+  <active>true</active>
+  <description>
+    R-SK1: a new volunteer skill, or one moved to another skill, names an active skill. A row
+    that already holds a skill keeps it when the skill is retired, and a merge changes no skill.
+  </description>
+  <errorConditionFormula>
+AND(
+  OR(ISNEW(), ISCHANGED(Skill__c)),
+  NOT(Skill__r.Active__c)
+)
+  </errorConditionFormula>
+  <errorDisplayField>Skill__c</errorDisplayField>
+  <errorMessage>
+    This skill is retired (not Active). Choose an active skill, or make this one active again on the Skills tab.
+  </errorMessage>
+</ValidationRule>

@@ -532,6 +532,44 @@ private class PersonErasureTest {
     }
 
     @IsTest
+    static void whatAModuleDeletedIsEmptiedFromTheRecycleBinWithTheRest() {
+        System.runAs(eraser()) {
+            isolate();
+            Contact jordan = coupleInContactMode(true);
+            Contact sam = addSam(jordan.AccountId);
+            // A record of Sam's, which Core itself leaves alone, stands in for a module's own.
+            Address__c moduleRecord = new Address__c(
+                Contact__c = sam.Id,
+                Type__c = 'Home',
+                City__c = 'Springfield'
+            );
+            insert moduleRecord;
+            PersonErasureExtensions.overrides.add(new DeletesARecord(moduleRecord.Id));
+
+            PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+
+            Assert.isTrue(
+                [SELECT IsDeleted FROM Address__c WHERE Id = :moduleRecord.Id ALL ROWS].IsDeleted,
+                'The module deleted its record'
+            );
+            Assert.isTrue(
+                PersonErasure.deletedIds.contains(moduleRecord.Id),
+                'The record the module reported as Deleted is emptied from the Recycle Bin'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'PersonErasure.emptyRecycleBin'
+                    WITH SYSTEM_MODE
+                ],
+                'Emptying the Recycle Bin did not fail'
+            );
+        }
+    }
+
+    @IsTest
     static void aModuleThatFailsRefusesTheWholeErasure() {
         System.runAs(eraser()) {
             isolate();
@@ -726,6 +764,28 @@ private class PersonErasureTest {
         public List<PersonErasure.Change> erase(Id personId) {
             return new List<PersonErasure.Change>{
                 new PersonErasure.Change(PersonErasure.KEPT, 'Module record', 3, 'Kept as records')
+            };
+        }
+    }
+
+    /** A module that deletes one record of its own and reports it, as Volunteers does. */
+    private class DeletesARecord implements PersonErasureExtension {
+        private Id recordId;
+        DeletesARecord(Id recordId) {
+            this.recordId = recordId;
+        }
+        public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
+            return new Set<Schema.SObjectField>();
+        }
+        public List<PersonErasure.Change> erase(Id personId) {
+            Database.delete(new List<Id>{ recordId }, true, AccessLevel.USER_MODE);
+            return new List<PersonErasure.Change>{
+                new PersonErasure.Change(
+                    PersonErasure.DELETED,
+                    'Module record',
+                    new List<Id>{ recordId },
+                    null
+                )
             };
         }
     }

@@ -334,6 +334,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Volunteer_Requirement__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Volunteer_Shift__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

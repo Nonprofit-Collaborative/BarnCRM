@@ -107,4 +107,54 @@ public without sharing class VolunteerIntegritySelector {
         }
         return withHours;
     }
+
+    /**
+     * The requirement rows and volunteer skills that name these contacts or accounts, keyed by
+     * the record being deleted, for R-VQ5 and R-VK4. A row naming a contact of one of these
+     * accounts is keyed by the account: the platform deletes an account's contacts with it, and
+     * a person account's own contact is one of them. Read whoever deletes the person, since a
+     * Team Member cannot see requirements but must not leave a background check behind.
+     */
+    public static Map<Id, Set<Id>> selectRowsNamingPeople(Set<Id> contactIds, Set<Id> accountIds) {
+        Map<Id, Set<Id>> rowsByPerson = new Map<Id, Set<Id>>();
+        if (contactIds.isEmpty() && accountIds.isEmpty()) {
+            return rowsByPerson;
+        }
+        List<SObject> rows = new List<SObject>();
+        rows.addAll(
+            [
+                SELECT Id, Contact__c, Account__c, Contact__r.AccountId
+                FROM Volunteer_Requirement__c
+                WHERE
+                    Contact__c IN :contactIds
+                    OR Account__c IN :accountIds
+                    OR Contact__r.AccountId IN :accountIds
+                WITH SYSTEM_MODE
+            ]
+        );
+        rows.addAll(
+            [
+                SELECT Id, Contact__c, Account__c, Contact__r.AccountId
+                FROM Volunteer_Skill__c
+                WHERE
+                    Contact__c IN :contactIds
+                    OR Account__c IN :accountIds
+                    OR Contact__r.AccountId IN :accountIds
+                WITH SYSTEM_MODE
+            ]
+        );
+        for (SObject row : rows) {
+            Id person = (Id) row.get('Contact__c');
+            if (!contactIds.contains(person)) {
+                person = accountIds.contains((Id) row.get('Account__c'))
+                    ? (Id) row.get('Account__c')
+                    : (Id) row.getSObject('Contact__r').get('AccountId');
+            }
+            if (!rowsByPerson.containsKey(person)) {
+                rowsByPerson.put(person, new Set<Id>());
+            }
+            rowsByPerson.get(person).add(row.Id);
+        }
+        return rowsByPerson;
+    }
 }

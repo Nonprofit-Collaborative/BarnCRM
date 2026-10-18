@@ -187,6 +187,55 @@ private class VolunteerSkillTest {
     }
 
     @IsTest
+    static void aRetiredSkillIsRefusedForNewRowsAndKeptOnOldOnes() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            Skill__c retired = skill('Typing');
+            Skill__c active = skill('Spanish');
+            Contact person = VolunteersTestData.contact('Rivera', null);
+            Volunteer_Job__c job = VolunteersTestData.job('Office');
+            Volunteer_Skill__c held = new Volunteer_Skill__c(
+                Contact__c = person.Id,
+                Skill__c = active.Id
+            );
+            insert held;
+            insert new Job_Skill__c(Job__c = job.Id, Skill__c = retired.Id);
+            update new Skill__c(Id = retired.Id, Active__c = false);
+
+            String personRefusal = insertError(
+                new Volunteer_Skill__c(Contact__c = person.Id, Skill__c = retired.Id)
+            );
+            String jobRefusal = insertError(
+                new Job_Skill__c(Job__c = job.Id, Skill__c = retired.Id)
+            );
+            String moveRefusal = '';
+            try {
+                update new Volunteer_Skill__c(Id = held.Id, Skill__c = retired.Id);
+            } catch (DmlException refused) {
+                moveRefusal = refused.getDmlMessage(0);
+            }
+            update new Volunteer_Skill__c(Id = held.Id, Type__c = 'Interest');
+
+            Assert.isTrue(
+                personRefusal.contains('retired'),
+                'Not given to a person: ' + personRefusal
+            );
+            Assert.isTrue(jobRefusal.contains('retired'), 'Not added to a job: ' + jobRefusal);
+            Assert.isTrue(moveRefusal.contains('retired'), 'A row is not moved onto it');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Job_Skill__c WHERE Skill__c = :retired.Id],
+                'The job that needed it keeps it, and the job can still be saved'
+            );
+            Assert.areEqual(
+                'Interest',
+                [SELECT Type__c FROM Volunteer_Skill__c WHERE Id = :held.Id].Type__c,
+                'A row whose skill is unchanged saves as before'
+            );
+        }
+    }
+
+    @IsTest
     static void deletingAJobDeletesItsJobSkills() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
             Skill__c forklift = skill('Forklift licence');
