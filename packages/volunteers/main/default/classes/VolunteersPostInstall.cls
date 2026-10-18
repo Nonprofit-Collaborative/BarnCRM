@@ -6,17 +6,24 @@
  * to the Error Log instead:
  *
  * 1. Create the switch rows of the Automation page for the module's own automations (C-21).
- * 2. Queue the job that gives the installer the Volunteers Admin permission set. Queued because
+ * 2. Create the Rollup Definitions the module ships (canonical model Section 29O), as Giving does
+ *    (ADR-0029): the Rollup Builder module's `RollupService` materializes every shipped
+ *    `Rollup_Definition_Default__mdt` row whose objects exist, and leaves one already here as the
+ *    administrator left it. Core and Rollup Builder install first, before the Volunteers objects
+ *    exist, so this is the first moment the rows can be created.
+ * 3. Queue the job that gives the installer the Volunteers Admin permission set. Queued because
  *    a permission set assignment is a setup object write, and this transaction has already
  *    written ordinary records (mixed DML).
- * 3. Give the Volunteers sets to BarnCRM's roles (`VolunteersAccessSync`), queued for the same
+ * 4. Give the Volunteers sets to BarnCRM's roles (`VolunteersAccessSync`), queued for the same
  *    reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Volunteers Admin at the same moment; with no installer it is queued alone.
  *
- * The shipped rollups and letter templates are created here by the changes that ship them.
+ * The shipped letter templates are created here by the change that ships them.
  */
 public with sharing class VolunteersPostInstall implements InstallHandler {
     private static final String SWITCH_CONTEXT = 'VolunteersPostInstall.ensureAutomationSwitches';
+    @TestVisible
+    private static final String ROLLUP_CONTEXT = 'VolunteersPostInstall.ensureRollupDefaults';
     @TestVisible
     private static final String ACCESS_CONTEXT = 'VolunteersPostInstall.grantInstallerAccess';
 
@@ -29,8 +36,9 @@ public with sharing class VolunteersPostInstall implements InstallHandler {
         if (context == null) {
             return;
         }
-        // The entry point records its own failures and returns, so nothing here throws.
+        // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
         Id installerId = context.installerId();
         if (installerId == null) {
             new VolunteersAccessSync().requestSync();
