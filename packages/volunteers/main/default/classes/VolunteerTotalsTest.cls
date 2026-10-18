@@ -372,11 +372,11 @@ private class VolunteerTotalsTest {
                 'Volunteers_Read_Only'
             }
         };
-        List<Schema.DescribeFieldResult> totals = new List<Schema.DescribeFieldResult>();
+        Integer checked = 0;
         Test.startTest();
         for (String role : setsByRole.keySet()) {
             System.runAs(TestUsers.standardUserWith(role, setsByRole.get(role))) {
-                totals = new List<Schema.DescribeFieldResult>{
+                List<Schema.DescribeFieldResult> totals = new List<Schema.DescribeFieldResult>{
                     Schema.SObjectType.Contact.fields.Volunteer_Hours_Total__c,
                     Schema.SObjectType.Account.fields.Last_Volunteer_Date__c,
                     Schema.SObjectType.Volunteer_Job__c.fields.Total_Hours__c,
@@ -385,11 +385,12 @@ private class VolunteerTotalsTest {
                 for (Schema.DescribeFieldResult total : totals) {
                     Assert.isTrue(total.isAccessible(), role + ' reads ' + total.getName());
                     Assert.isFalse(total.isUpdateable(), role + ' cannot type ' + total.getName());
+                    checked++;
                 }
             }
         }
         Test.stopTest();
-        Assert.areEqual(4, totals.size(), 'Each role was checked');
+        Assert.areEqual(8, checked, 'Four totals checked for each of the two roles');
     }
 
     /**

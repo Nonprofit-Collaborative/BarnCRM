@@ -112,17 +112,16 @@ household's totals were last worked out comes from the Giving module. In an org 
 volunteer totals on people are still right, but no such line shows. Jobs and shifts always have
 their own **Rollups Last Calculated**.
 
-**After turning the module back on.** While Volunteers is off (next section), saving hours or
-sign-ups does not update any total. When you turn it back on, the totals catch up at the next
-nightly run. To bring them up to date at once, open the **Rollups** page and click
-**Recalculate all**.
+**While the module is off.** While Volunteers is off (next section), saving hours or sign-ups
+does not move any total at once. The nightly run still brings every volunteer total up to date,
+on or off, so they catch up by the next morning. To bring them up to date at once, open the
+**Rollups** page and click **Recalculate all**.
 
 ## Turning it off
 
-Turning Volunteers off in Module Manager stops its automations; the records stay. Hours saved
-while it is off are not totalled until it is back on and the next nightly run has finished, or
-until you click **Recalculate all** on the Rollups page. No Volunteers set is given while it is
-off.
+Turning Volunteers off in Module Manager stops its automations; the records stay. Hours and
+sign-ups saved while it is off are counted in the totals at the next nightly run, or when you
+click **Recalculate all** on the Rollups page. No Volunteers set is given while it is off.
 
 ## A five-minute walkthrough
 
