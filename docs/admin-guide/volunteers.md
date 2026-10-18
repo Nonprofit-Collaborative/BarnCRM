@@ -105,7 +105,8 @@ approved again.
 | Volunteer shift | Slots Filled | Sign-ups that are not Cancelled. Slots Remaining is Volunteers Needed less this. |
 
 The fiscal year follows the fiscal year start month in **BarnCRM Settings**. A total moves when
-the hours or sign-up is saved, and the nightly run checks every total again.
+the hours or sign-up is saved, by anyone who saves it (a total is read only for every role, so
+nobody types one), and the nightly run checks every total again.
 
 **No "last calculated" line on people without Giving.** The line that says when a person's or a
 household's totals were last worked out comes from the Giving module. In an org without Giving,

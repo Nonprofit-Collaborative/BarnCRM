@@ -7594,8 +7594,9 @@ and a differently named twin would answer the same question twice. Jobs and shif
 module's own stamp.
 
 **R-VR2 Turned off, then on.** While Volunteers is turned off (ADR-0073) its registry rows do
-not run, so its saves queue no recalculation. After Turn on the totals catch up at the next
-nightly run (mode Both), or at once with Recalculate all.
+not run, so its saves queue no recalculation. The nightly run still recalculates the totals
+while the module is off; only turning Rollup Builder off stops it. After Turn on the totals
+catch up at the next nightly run (mode Both), or at once with Recalculate all.
 
 ### Salesforce implementation
 

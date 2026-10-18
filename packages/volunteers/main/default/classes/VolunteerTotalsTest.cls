@@ -355,12 +355,89 @@ private class VolunteerTotalsTest {
     }
 
     /**
-     * Every role reads the totals and none can type one (Part G access table): Staff and Read
-     * Only, on the Standard User profile with the sets their BarnCRM role gives.
+     * A staff member (the Team Member role's sets) enters hours with approval off: the totals
+     * move although Staff can edit none of them, because the engine writes them, not the user.
+     */
+    @IsTest
+    static void staffSavesMoveTotalsTheyCannotEdit() {
+        User staffer = TestUsers.standardUserWith(
+            'Staffer',
+            new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User', 'Volunteers_Staff' }
+        );
+        Contact person = rivera();
+        Id jobId = job().Id;
+        System.runAs(admin()) {
+            VolunteersTestData.volunteerSettings(false, false);
+            update new Contact(Id = person.Id, OwnerId = staffer.Id);
+        }
+
+        Test.startTest();
+        System.runAs(staffer) {
+            Assert.isFalse(
+                Schema.SObjectType.Contact.fields.Volunteer_Hours_Total__c.isUpdateable(),
+                'Staff cannot type a total'
+            );
+            insert VolunteersTestData.newHours(person.Id, jobId, 2);
+        }
+        Test.stopTest();
+
+        System.runAs(admin()) {
+            Assert.areEqual(2, rivera().Volunteer_Hours_Total__c, 'The staffer\'s hours count');
+            Assert.areEqual(2, job().Total_Hours__c, 'On the job too');
+        }
+    }
+
+    /**
+     * A coordinator (Standard User profile, Volunteers Coordinator) approves Submitted hours:
+     * the person's totals move although Coordinator can edit none of them.
+     */
+    @IsTest
+    static void coordinatorApprovalsMoveTotalsTheyCannotEdit() {
+        User coordinator = TestUsers.standardUserWith(
+            'Coordinator',
+            new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User', 'Volunteers_Coordinator' }
+        );
+        Contact person = rivera();
+        Volunteer_Hours__c hours = entry(person.Id, 3, Date.today());
+        System.runAs(admin()) {
+            update new Contact(Id = person.Id, OwnerId = coordinator.Id);
+            insert hours;
+        }
+        nextSave();
+
+        Test.startTest();
+        VolunteerHoursService.StatusChange approved;
+        System.runAs(coordinator) {
+            Assert.isFalse(
+                Schema.SObjectType.Contact.fields.Volunteer_Hours_Total__c.isUpdateable(),
+                'Coordinator cannot type a total'
+            );
+            approved = VolunteerHoursService.approve(new Set<Id>{ hours.Id });
+        }
+        Test.stopTest();
+
+        Assert.areEqual(1, approved.moved, 'The coordinator approved the entry');
+        System.runAs(admin()) {
+            Contact after = rivera();
+            Assert.areEqual(3, after.Volunteer_Hours_Total__c, 'The person\'s total moved');
+            Assert.areEqual(Date.today(), after.Last_Volunteer_Date__c, 'And the latest day');
+            Assert.areEqual(3, account(after.AccountId).Volunteer_Hours_Total__c, 'Household');
+            Assert.areEqual(3, job().Total_Hours__c, 'And the job');
+        }
+    }
+
+    /**
+     * Every role reads the totals and none can type one (Part G access table): Coordinator,
+     * Staff and Read Only, on the Standard User profile with the sets their BarnCRM role gives.
      */
     @IsTest
     static void everyRoleReadsTheTotalsAndNoneTypesThem() {
         Map<String, List<String>> setsByRole = new Map<String, List<String>>{
+            'Coordinator' => new List<String>{
+                'BarnCRM_Staff',
+                'Rollup_Builder_User',
+                'Volunteers_Coordinator'
+            },
             'Staffer' => new List<String>{
                 'BarnCRM_Staff',
                 'Rollup_Builder_User',
@@ -390,7 +467,7 @@ private class VolunteerTotalsTest {
             }
         }
         Test.stopTest();
-        Assert.areEqual(8, checked, 'Four totals checked for each of the two roles');
+        Assert.areEqual(12, checked, 'Four totals checked for each of the three roles');
     }
 
     /**
