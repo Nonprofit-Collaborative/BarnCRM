@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Job__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The job these hours were given to. Filled in from the shift when you pick one.</inlineHelpText>
+  <label>Volunteer Job</label>
+  <referenceTo>Volunteer_Job__c</referenceTo>
+  <relationshipLabel>Volunteer Hours</relationshipLabel>
+  <relationshipName>Volunteer_Hours</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

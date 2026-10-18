@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <compactLayoutAssignment>Volunteer_Hours_Compact</compactLayoutAssignment>
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    Time a person actually gave, entered as Submitted and then Approved or Rejected by a
+    coordinator. Only approved hours count in any rollup.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Volunteer Hours</label>
+  <nameField>
+    <displayFormat>VH-{000000}</displayFormat>
+    <label>Hours Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Volunteer Hours</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>
