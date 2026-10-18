@@ -107,7 +107,55 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    hours by hand there.
 7. Open **Volunteer Settings** and read the three settings. Leave them as they are.
 
+## Importing volunteer hours
+
+To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
+It is added when Volunteers is installed and appears only where Volunteers is. It loads one
+Volunteer Hours record per row, using the Core import's **Load one object** (see
+[Importing](importing.md), section 9), so the preview, results, exceptions download and undo
+all work as they do for any import.
+
+### The columns
+
+Use these headings in the first row of a CSV or Excel file. Order does not matter.
+
+| Column | Required | What it does |
+|---|---|---|
+| Email | Yes | Finds the volunteer by email address (the Contact's **Email**, or **Email** on a person account). |
+| Job | Yes | Finds the Volunteer Job by its exact name (capitals and surrounding spaces are ignored). |
+| Date | Yes | The **Date Worked**, for example `2026-03-14`. |
+| Hours | Yes | **Hours**, greater than zero, to two decimal places. |
+| Notes | No | What the person did. |
+
+There is no Status column. Every row starts **Submitted** and waits in the **Hours awaiting
+approval** list view for a coordinator; with **Hours require approval** off in Volunteer
+Settings, rows are **Approved** at once, by the person who runs the import, as for hours entered
+by hand. There is no Shift column, because shift names repeat; the hours still count toward the
+job.
+
+### Walkthrough
+
+1. Make a file with the columns above, for example `volunteer@example.org, Food pantry,
+   2026-03-14, 3, Sorted donations`. Every job named must already exist under **Volunteer
+   Jobs**, and every email must belong to someone already in BarnCRM.
+2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
+3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
+4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
+   **rejected** and named in the table with the reason; select **Download exceptions**, correct
+   those rows in your spreadsheet and import them again. An email shared by several people is
+   handled by the **Several matches** choice (**Reject the row** unless you change it).
+5. Select **Import**. Open **Volunteer Hours** to see the new entries.
+
+Approved hours are locked: the import only adds new entries and never changes an existing one,
+so it cannot alter hours a coordinator has approved. Importing a file twice adds the hours
+twice; to take back a wrong import, use **Undo** on its results (see
+[Importing](importing.md), section 5). The person must hold access to Volunteer Hours and its
+fields, since the load runs with that person's own permissions.
+
 ## Common mistakes
+
+**Importing hours twice.** Each row becomes a new entry whether or not an identical one exists.
+Check **Volunteer Hours** before re-running a file, or undo the first import.
 
 **Assigning the Volunteers sets by hand instead of a role.** It works, but the person keeps the
 set when their role changes. Give the role and let the module give the set.
