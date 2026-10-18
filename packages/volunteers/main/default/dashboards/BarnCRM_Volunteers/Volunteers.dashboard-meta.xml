@@ -26,6 +26,9 @@
       <drillEnabled>true</drillEnabled>
       <footer>Last approved hours six to twelve months ago, longest gap first</footer>
       <header>Lapsing volunteers</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
       <maxValuesDisplayed>10</maxValuesDisplayed>
       <report>BarnCRM_Volunteers/Lapsing_Volunteers</report>
     </components>
@@ -37,6 +40,9 @@
       <drillEnabled>true</drillEnabled>
       <footer>Submitted hours, oldest first</footer>
       <header>Hours awaiting approval</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
       <maxValuesDisplayed>10</maxValuesDisplayed>
       <report>BarnCRM_Volunteers/Hours_Awaiting_Approval</report>
     </components>
@@ -45,6 +51,9 @@
       <drillEnabled>true</drillEnabled>
       <footer>Open shifts that still have slots remaining, soonest first</footer>
       <header>Unfilled shifts, next 14 days</header>
+      <indicatorHighColor>#54C254</indicatorHighColor>
+      <indicatorLowColor>#C25454</indicatorLowColor>
+      <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
       <maxValuesDisplayed>10</maxValuesDisplayed>
       <report>BarnCRM_Volunteers/Unfilled_Shifts_Next_14_Days</report>
     </components>

@@ -66,22 +66,4 @@
     </columns>
     <masterLabel>Volunteer Shift</masterLabel>
   </sections>
-  <sections>
-    <columns>
-      <checkedByDefault>true</checkedByDefault>
-      <field>Coordinator__c</field>
-      <table>Volunteer_Shift__c.Volunteer_Job__r</table>
-    </columns>
-    <columns>
-      <checkedByDefault>false</checkedByDefault>
-      <field>Active__c</field>
-      <table>Volunteer_Shift__c.Volunteer_Job__r</table>
-    </columns>
-    <columns>
-      <checkedByDefault>false</checkedByDefault>
-      <field>Location__c</field>
-      <table>Volunteer_Shift__c.Volunteer_Job__r</table>
-    </columns>
-    <masterLabel>Volunteer Job</masterLabel>
-  </sections>
 </ReportType>

@@ -45,27 +45,4 @@
     </columns>
     <masterLabel>Volunteer Sign-up</masterLabel>
   </sections>
-  <sections>
-    <columns>
-      <checkedByDefault>true</checkedByDefault>
-      <field>Start_Time__c</field>
-      <table>Volunteer_Signup__c.Volunteer_Shift__r</table>
-    </columns>
-    <columns>
-      <checkedByDefault>false</checkedByDefault>
-      <field>Volunteers_Needed__c</field>
-      <table>Volunteer_Signup__c.Volunteer_Shift__r</table>
-    </columns>
-    <columns>
-      <checkedByDefault>false</checkedByDefault>
-      <field>Slots_Remaining__c</field>
-      <table>Volunteer_Signup__c.Volunteer_Shift__r</table>
-    </columns>
-    <columns>
-      <checkedByDefault>false</checkedByDefault>
-      <field>Status__c</field>
-      <table>Volunteer_Signup__c.Volunteer_Shift__r</table>
-    </columns>
-    <masterLabel>Volunteer Shift</masterLabel>
-  </sections>
 </ReportType>
