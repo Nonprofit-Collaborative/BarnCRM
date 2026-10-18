@@ -7187,7 +7187,12 @@ occurrence of it.
 ### Rules
 
 **R-VJ1 A used job is deactivated, not deleted.** A job with shifts or hours is not deleted;
-the message says to clear Active instead (as R-F2 for a fund).
+the message says to clear Active instead (as R-F2 for a fund). Hours of any status count,
+Approved ones included: deleting the job would take its shifts and sign-ups with it and leave
+hours that count in totals naming no job and no shift. The rule is enforced in Apex, before
+the delete, by an automation that always runs (registry row `Volunteer_Job_Rules`, ADR-0024),
+and it counts every shift and entry in the org, including those the deleting user cannot
+see.
 
 **R-VJ2 An inactive job keeps its history.** Clearing Active stops it being offered on a new
 shift and changes nothing already recorded, including its totals.
@@ -7206,7 +7211,8 @@ shift and changes nothing already recorded, including its totals.
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
 
-- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`.
+- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
+  `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
 
 ---
 
@@ -7339,7 +7345,8 @@ Cancelled, so someone who drops out frees the place without the booking being de
   its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
   SetNull) can still be edited.
 - **Service:** `VolunteerSignupService`, `VolunteerSignupTriggerHandler`,
-  `VolunteerSignupSelector`.
+  `VolunteerIntegritySelector` (the R-VU2 and R-VU3 checks read every sign-up and entry in the
+  org, without sharing, so a booking or an entry the user cannot see still counts).
 
 ---
 
