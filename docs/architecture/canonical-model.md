@@ -7192,7 +7192,9 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 - **Shown on the person:** a **Volunteer Profile** field section (Dynamic Forms) on
   `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page` (ADR-0064 pattern, see
   29S), holding these six attributes, editable, and the five totals of 29O, read only. It shows
-  when Volunteer Status is not blank, or Volunteer Hours Total is above zero, or the user holds
+  when Volunteer Status is Prospective, Active or Inactive (a visibility rule cannot test a
+  picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
+  above zero, or the user holds
   `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
   attributes carry a field visibility rule (record type neither Household nor Organization), and
   the Manage Volunteers clause applies only to that record type, so a household or

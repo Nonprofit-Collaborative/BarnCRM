@@ -12,8 +12,9 @@ volunteer since, emergency contact, availability) and links their sign-ups and h
 **Volunteers Contact Record Page** (or **Volunteers Account Record Page**), which has a
 **Volunteer Profile** section: status, volunteer since, availability and emergency contact,
 which you edit there, and the approved hour totals and first and last volunteer dates, which
-BarnCRM calculates and you only read. The section shows once a person has a Volunteer Status or
-approved hours. Admins and Coordinators (who hold Manage Volunteers) always see it, so they can
+BarnCRM calculates and you only read. The section shows once a person has a Volunteer Status
+(Prospective, Active or Inactive; a status value you add yourself also needs adding to the
+section's visibility rule in the Lightning App Builder) or approved hours. Admins and Coordinators (who hold Manage Volunteers) always see it, so they can
 set the status of someone new. On an account, the person details show only on a person
 account; a household or organization shows its hour totals once it has some. Other apps keep
 their own person page (see Readiness at a glance, under Onboarding requirements).
