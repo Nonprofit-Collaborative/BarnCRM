@@ -7196,7 +7196,13 @@ occurrence of it.
 ### Rules
 
 **R-VJ1 A used job is deactivated, not deleted.** A job with shifts or hours is not deleted;
-the message says to clear Active instead (as R-F2 for a fund).
+the message says to clear Active instead (as R-F2 for a fund). Hours of any status count,
+Approved ones included: deleting the job would take its shifts and sign-ups with it and leave
+hours that count in totals naming no job and no shift. The rule is enforced in Apex, before
+the delete, by an automation that always runs (registry row `Volunteer_Job_Rules`, ADR-0024),
+and it asks whether any shift or entry exists in the org (an existence check, never a count,
+so a bulk delete of busy jobs stays inside the query row limit), including those the deleting
+user cannot see.
 
 **R-VJ2 An inactive job keeps its history.** Clearing Active stops it being offered on a new
 shift and changes nothing already recorded, including its totals.
@@ -7215,7 +7221,8 @@ shift and changes nothing already recorded, including its totals.
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
 
-- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`.
+- **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
+  `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
 
 ---
 
@@ -7318,15 +7325,31 @@ of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope
 ### Rules
 
 **R-VU1 Exactly one person.** Contact or Account, never both, never neither (validation rule).
+In a Person Account org a person is named by the Account side (Section 4). A sign-up or an
+hours entry that names a person account's person contact on the Contact side is not rewritten
+to the Account side: Gift does not rewrite its donor pair either, and the entry points that create them (the sign-up and hours screens,
+the hours import) are where the side is chosen. Such a record still saves, but its household
+(R-VG2) and the one sign-up per person check (R-VU2) see the person contact as a different
+person from the account. If the pairs are ever normalized, it is done for every pair at once,
+in Core.
 
 **R-VU2 One sign-up per person per shift.** A second one for the same person on the same
 shift is refused, naming the shift: it is always a mistake and would double the filled count.
+Every sign-up in the org counts, a cancelled one and one the user cannot see included. The
+check runs on insert, when the shift or person changes, and on undelete: restoring a sign-up
+for a person since booked onto the shift again is refused.
 
 **R-VU3 Marking attendance can write the hours.** When Attendance Creates Hours is on (29N),
 moving a sign-up to Attended creates one Volunteer Hours entry for that person, dated the
 shift's start, for the shift's length, against the shift and its job, naming the sign-up.
 Marking attendance again creates no second entry, and moving the sign-up away from Attended
-deletes nothing: removing hours a coordinator may have approved is left to a person.
+deletes nothing: removing hours a coordinator may have approved is left to a person. Undeleting
+an old entry for a sign-up another entry already records is refused, so one attendance stays
+one entry. A sign-up whose shift has no end time, ends before it starts, or cannot be read gets
+no entry; its attendance is still saved and a Warning in the Error Log names the sign-up, so
+the hours are typed by hand. While automation is paused or the sign-up automation is switched
+off, marking attendance writes no hours and nothing writes them later: the coordinator enters
+them by hand (admin guide, volunteers page).
 
 **R-VU4 A cancelled sign-up stops counting.** Slots Filled counts sign-ups whose Status is not
 Cancelled, so someone who drops out frees the place without the booking being deleted.
@@ -7348,7 +7371,8 @@ Cancelled, so someone who drops out frees the place without the booking being de
   its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
   SetNull) can still be edited.
 - **Service:** `VolunteerSignupService`, `VolunteerSignupTriggerHandler`,
-  `VolunteerSignupSelector`.
+  `VolunteerIntegritySelector` (the R-VU2 and R-VU3 checks read every sign-up and entry in the
+  org, without sharing, so a booking or an entry the user cannot see still counts).
 
 ---
 
@@ -7405,7 +7429,20 @@ attendance record, and attendance is a sign-up.
 **R-VG5 Approval is a status moved by a service.** Status, Approved By and Approved Date are
 moved only by `VolunteerHoursService`, which refuses a user without the custom permission
 `Manage_Volunteers`; a Status change made any other way is refused. It is not a Salesforce
-approval process (ADR-0127, decision 4).
+approval process (ADR-0127, decision 4). The service has four verbs: submit (create entries,
+which start Submitted, or Approved under R-VG6), approve (any entry not yet Approved: Approved
+By and Approved Date are the coordinator and now, any Rejection Reason is cleared), reject
+(R-VG8: Approved By and Approved Date record who rejected and when) and reopen (an Approved or
+Rejected entry back to Submitted, those three fields cleared). Each verb saves entry by entry
+and reports any it could not move (one the user may see but not edit) without stopping the
+rest. Outside the service a new entry is saved Submitted, or Approved when Hours Require
+Approval is off, and naming any other status is refused; on a saved entry a change to Status,
+Approved By, Approved Date or Rejection Reason is refused. Two layers hold this. The hours
+automation (`Volunteer_Hours_Rules`) refuses the change for everyone outside the service. The
+validation rule `Status_Needs_Manage_Volunteers` refuses it for any user without
+`Manage_Volunteers`, so it holds while automation is paused or switched off. New entries are
+not covered by the validation rule: with automation paused, an import of past hours may load
+them already Approved.
 
 **R-VG6 Only approved hours count.** Every rollup in 29O filters on Status equals Approved.
 With Hours Require Approval off (29N), entries are created Approved, by the saving user at the
@@ -7413,10 +7450,21 @@ save time, and count at once.
 
 **R-VG7 An approved entry is locked.** While Status is Approved, its person, Date Worked and
 Hours cannot change: the coordinator moves it back to Submitted, edits it and approves it
-again. A validation rule, so it holds with automation off.
+again. A validation rule, so it holds with automation off. Merging two people is not such a
+change: the platform's merge moves the duplicate's entries, approved ones included, to the
+surviving person without running the rule or the hours automation, so the entry keeps the
+household it was given in (R-VG2) (`VolunteerHoursTriggerHandlerTest`,
+`VolunteerHoursPermissionTest`).
 
 **R-VG8 Rejecting says why.** A rejection without a Rejection Reason is refused by the
 service.
+
+**R-VG9 Approved hours are not deleted.** Deleting an Approved entry is refused for everyone,
+a coordinator with Modify All included: it counts in totals, and deleting it would change them
+with nothing on record. The message says to reopen it (back to Submitted, which needs
+`Manage_Volunteers`) and then delete it. A validation rule cannot block a delete, so the rule
+is Apex before the delete, in an automation that always runs (registry row
+`Volunteer_Hours_Delete_Guard`, ADR-0024): no switch or pause suspends it.
 
 ### Salesforce implementation
 
@@ -7439,11 +7487,14 @@ service.
 | Notes | `Notes__c` | Text Area(255) |
 
 - **Validation rules:** `Exactly_One_Person` (R-VG1), `Job_Or_Shift_Required` (R-VG3),
-  `Hours_Must_Be_Positive` (R-VG4), `Approved_Hours_Are_Locked` (R-VG7).
+  `Hours_Must_Be_Positive` (R-VG4), `Approved_Hours_Are_Locked` (R-VG7),
+  `Status_Needs_Manage_Volunteers` (R-VG5).
 - **Custom permission:** `Manage_Volunteers`, in `Volunteers_Coordinator` and
   `Volunteers_Admin` (R-VG5).
 - **Service:** `VolunteerHoursService`, `VolunteerHoursTriggerHandler`,
-  `VolunteerHoursSelector`.
+  `VolunteerHoursDeleteGuardHandler` (R-VG9),
+  `VolunteerHoursSelector`, `VolunteerHoursWriter` (the status save, in system mode because
+  Approved By and Approved Date are read only in every permission set; ADR-0021).
 
 ---
 
@@ -7454,7 +7505,7 @@ service.
 The Volunteers module's own org-wide settings (ADR-0017: each module owns a protected
 hierarchy custom setting), edited in the BarnCRM Settings console's Volunteers section and on
 the module's own Volunteer Settings page, never in Setup. Defaults are applied in Apex
-(ADR-0035): a blank or out of range value reads as the shipped one.
+(ADR-0035, `VolunteerSettings`): a blank or out of range value reads as the shipped one.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|

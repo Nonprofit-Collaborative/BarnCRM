@@ -6,6 +6,10 @@
     Runs volunteering: jobs, shifts, sign-ups and hours, including deleting a record entered by
     accident and approving or rejecting hours.
   </description>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Manage_Volunteers</name>
+  </customPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Availability_Days__c</field>

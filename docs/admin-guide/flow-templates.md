@@ -56,6 +56,9 @@ offer it anywhere else.
 | Update rollups when a person changes | None yet | Totals are worked out by the rollup engine. A flow that runs the engine for records you choose arrives with the next rollup update: see "Rollups on your own objects" below. |
 | Update rollups when membership changes | None yet | The same as above. |
 | Check rollups before saving | None | It checks a rollup definition against the field it fills, which only BarnCRM's rollup engine knows how to read. A flow copy could let a rollup save that the engine then skips on every run. Leave it on, or switch it off and read the Error Log. It also pauses while BarnCRM Rollup Builder is turned off on **Modules**; a rollup saved then that the engine cannot calculate is skipped and logged, never written wrong. |
+| Volunteer hours: status and household | None | It decides whether new hours wait for a coordinator, refuses a status change made any way other than approving, rejecting or reopening, and fills in the household the way your organization holds household membership. A flow cannot read membership the way BarnCRM does, and a copy that let a status through would count hours nobody approved. Switch it off only to load past hours with an import. |
+| Volunteer shift: name from job and start | None | It only names a shift saved without a name. Switch it off to leave unnamed shifts named by their record ID, or type the names yourself. |
+| Volunteer sign-up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.
