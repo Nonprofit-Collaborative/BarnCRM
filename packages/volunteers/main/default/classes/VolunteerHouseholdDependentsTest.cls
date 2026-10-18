@@ -30,8 +30,9 @@ private class VolunteerHouseholdDependentsTest {
 
     private static List<Volunteer_Hours__c> hoursFor(Id contactId, Integer howMany) {
         List<Volunteer_Hours__c> entries = new List<Volunteer_Hours__c>();
+        Id job = jobId();
         for (Integer i = 0; i < howMany; i++) {
-            entries.add(VolunteersTestData.newHours(contactId, jobId(), 1.5));
+            entries.add(VolunteersTestData.newHours(contactId, job, 1.5));
         }
         return entries;
     }
