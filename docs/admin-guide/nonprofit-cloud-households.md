@@ -36,7 +36,26 @@ If BarnCRM cannot count native households, it says that instead of showing you a
 That happens when your own permissions do not let you read them, which is common and is not a
 problem with your org. When the answer is not certain, BarnCRM assumes the households are
 there and stays out of their way. It would rather leave your data alone than tidy up something
-that was never its to tidy.
+that was never its to tidy. An org without Nonprofit Cloud has no native households to count,
+and BarnCRM treats it that way.
+
+**Contacts to Multiple Accounts.** With this Salesforce setting on, every contact gets an
+account relationship record, and moving a person to another household leaves an indirect one
+behind. In an org without Nonprofit Cloud households, BarnCRM does not read those records as
+a Nonprofit Cloud household: naming, greetings, addresses and memberships work as usual.
+
+- **Moving people.** When BarnCRM moves a person to another household, it removes the
+  indirect relationship that move left on the old household, but only if nobody added roles
+  or start or end dates to it. Empty households are then tidied away as usual.
+- **Merging.** Merging moves everyone first, with the same tidy-up. If someone is still
+  related to both households afterwards (a relationship somebody added, or one with roles or
+  dates), BarnCRM does not delete it: the merge stops, nothing changes, and you are told the
+  households could not be combined. Remove or edit that relationship and merge again.
+- **Kept households.** A household emptied some other way (for example by changing a
+  contact's account on the contact record), or one that still has a relationship somebody
+  added, is kept and noted in the Error Log at Info severity. Import undo also keeps an
+  imported household that still has such relationships. Check these and delete any you no
+  longer need.
 
 ## A five-minute walkthrough
 
@@ -78,7 +97,8 @@ double up and letters can still go out twice while both models stand. Pick one m
 household and stay with it.
 
 **Expecting the guard to catch every native household.** It only recognizes an Account that
-already carries a native household group or native membership rows. A person who belongs to a
+already carries a native household group, or, in an org that has Nonprofit Cloud households,
+native membership rows. A person who belongs to a
 Nonprofit Cloud household only through membership data BarnCRM cannot see, and whose own
 record carries no link to that Account yet, can still be given a BarnCRM household. This
 is deliberate: the alternative would be a query against `AccountContactRelation`, which Core

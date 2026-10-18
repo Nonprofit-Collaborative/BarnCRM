@@ -224,6 +224,9 @@ public with sharing class HouseholdMergeService {
             throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNoEditAccess);
         }
 
+        // Everything below is undone together if the merge cannot finish, so a refusal leaves
+        // both households as they were rather than emptying one and keeping it.
+        Savepoint beforeMerge = Database.setSavepoint();
         Set<Id> movedPeople = HouseholdService.getMemberPersonIds(new Set<Id>{ victimId })
             .get(victimId);
         if (movedPeople != null && !movedPeople.isEmpty()) {
@@ -242,6 +245,17 @@ public with sharing class HouseholdMergeService {
         Boolean keepsCustomName = applyChoices(survivor, victim, choices);
         Map<String, Object> chosenWording = chosenOtherWording(victim, choices);
 
+        List<String> reasons = new List<String>();
+        Set<Id> shared = sharedRelatedPeople(
+            survivorId,
+            HouseholdSelector.nativeMembershipRows(new Set<Id>{ survivorId, victimId }, null)
+        );
+        if (!shared.isEmpty()) {
+            // The people the platform would refuse over, for the administrator to look at.
+            reasons.add(String.join(new List<Id>(shared), ', '));
+            failMerge(beforeMerge, reasons, survivorId);
+        }
+
         // The platform's own merge, so that activities, files, notes, and every lookup
         // another package points at this household follow the record that goes away.
         Database.MergeResult merged = Database.merge(
@@ -251,22 +265,10 @@ public with sharing class HouseholdMergeService {
             AccessLevel.USER_MODE
         );
         if (!merged.isSuccess()) {
-            // The people have already moved. Throwing here rolls the whole transaction
-            // back, so a merge that cannot finish leaves both households as they were
-            // rather than emptying one and keeping it.
-            // The platform's own wording is for the administrator reading the Error Log,
-            // which survives the rollback; the person at the screen gets the plain message.
-            List<String> reasons = new List<String>();
             for (Database.Error problem : merged.getErrors()) {
                 reasons.add(problem.getMessage());
             }
-            ErrorLogger.logMessage(
-                Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
-                Label.Core_HouseholdMerge_ErrorContext,
-                ErrorLogger.SEVERITY_ERROR,
-                survivorId
-            );
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+            failMerge(beforeMerge, reasons, survivorId);
         }
 
         Set<Id> survivorOnly = new Set<Id>{ survivorId };
@@ -292,6 +294,50 @@ public with sharing class HouseholdMergeService {
         // wondering why the household never renames itself.
         result.customNameKept = customNameKept;
         return result;
+    }
+
+    /**
+     * Undoes the move and anything else the merge did, logs the reasons for the administrator,
+     * and gives the person at the screen the plain message. The rollback matters to a caller
+     * that catches the exception. HouseholdMergeController rethrows, so in the app the whole
+     * transaction rolls back and this Error Log entry goes with it; only a caller that catches
+     * keeps it.
+     */
+    private static void failMerge(Savepoint beforeMerge, List<String> reasons, Id survivorId) {
+        Database.rollback(beforeMerge);
+        ErrorLogger.logMessage(
+            Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
+            Label.Core_HouseholdMerge_ErrorContext,
+            ErrorLogger.SEVERITY_ERROR,
+            survivorId
+        );
+        throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+    }
+
+    /**
+     * The people related to both households, which the platform refuses to merge over where
+     * Contacts to Multiple Accounts is on (ADR-0130). The move before the merge has already
+     * removed the unannotated relation each moved person left behind on the household going
+     * away (HouseholdService.removeRelationsLeftBehind), so anyone still here is a relation
+     * somebody made or annotated. BarnCRM deletes none of those: the merge is refused and
+     * nothing changes.
+     */
+    @TestVisible
+    private static Set<Id> sharedRelatedPeople(
+        Id survivorId,
+        List<HouseholdSelector.NativeMembership> rows
+    ) {
+        Set<Id> onSurvivor = new Set<Id>();
+        Set<Id> onOther = new Set<Id>();
+        for (HouseholdSelector.NativeMembership row : rows) {
+            if (row.accountId == survivorId) {
+                onSurvivor.add(row.contactId);
+            } else {
+                onOther.add(row.contactId);
+            }
+        }
+        onOther.retainAll(onSurvivor);
+        return onOther;
     }
 
     /** The wording fields naming computes, which a merge also offers as choices. */

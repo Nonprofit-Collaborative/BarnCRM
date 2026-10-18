@@ -72,6 +72,14 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     };
 
     /**
+     * The contact-to-account relation the platform creates by itself for every contact where
+     * Contacts to Multiple Accounts is on. Not counted as gained where the org has no native
+     * households, since there it is nobody's later work; counted where it may be Nonprofit
+     * Cloud membership (ADR-0130). Lower case, compared with the child's local name.
+     */
+    private static final String PLATFORM_RELATION = 'accountcontactrelation';
+
+    /**
      * The most records one delete chunk takes. Smaller than a save's usual 200, because the
      * checks and the delete's own automation share one transaction's limits.
      */
@@ -1240,6 +1248,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             Map<String, Schema.SObjectField> childFields = child.fields.getMap();
             if (
                 NOT_GAINED.contains(localName.toLowerCase()) ||
+                (PLATFORM_RELATION.equals(localName.toLowerCase()) &&
+                OrgShapeDetector.hasNativeHouseholdGroups() == false) ||
                 !childFields.containsKey('createddate') ||
                 !childFields.containsKey('createdbyid') ||
                 (!child.isCustom() && !child.isCreateable())

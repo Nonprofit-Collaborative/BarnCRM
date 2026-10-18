@@ -110,7 +110,7 @@ private class OrgShapeDetectorTest {
      * Platform-only org. The fourth is the real probe on an org without the object.
      */
     @IsTest
-    static void anAbsentObjectIsUnknownRatherThanNone() {
+    static void anAbsentObjectIsNoneRatherThanUnknown() {
         System.runAs(TestUsers.admin()) {
             if (Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP)) {
                 // This org has the object, so there is no absent path to exercise here. The
@@ -122,15 +122,51 @@ private class OrgShapeDetectorTest {
             OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
 
             System.assertEquals(
-                null,
+                0,
                 shape.nativeHouseholdGroupCount,
-                'An object this org does not describe leaves the count unknown, not zero.'
+                'An org without the object has no native household (ADR-0130).'
             );
             System.assertEquals(
-                true,
+                false,
                 shape.hasNativeHouseholdGroups,
-                'Unknown is assumed to be yes, so a later guard stays cautious (ADR-0036).'
+                'So nothing here is treated as a Nonprofit Cloud household.'
             );
+            OrgShapeDetector.reset();
+            Assert.isFalse(OrgShapeDetector.hasNativeHouseholdGroups(), 'The facet agrees');
+            Assert.isFalse(OrgShapeSelector.anyNativeHouseholdGroup(), 'The one-row probe too');
+        }
+    }
+
+    /**
+     * The present-object path, run on any org: a stand-in type makes the object look described,
+     * and where the object is really absent the query fails and the answer is unknown.
+     */
+    @IsTest
+    static void aDescribedObjectIsProbedAndAFailedQueryIsUnknown() {
+        System.runAs(TestUsers.admin()) {
+            Boolean reallyThere = Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
+            Assert.areEqual(
+                reallyThere,
+                OrgShapeSelector.nativeHouseholdGroupObjectDescribed(),
+                'Described exactly when the describe has it'
+            );
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+            Assert.isTrue(
+                OrgShapeSelector.nativeHouseholdGroupObjectDescribed(),
+                'An injected count stands for a probe that ran'
+            );
+            OrgShapeSelector.nativeHouseholdGroupCountOverride = null;
+
+            OrgShapeSelector.nativeHouseholdGroupTypeOverride = Account.SObjectType;
+            Integer counted = OrgShapeSelector.nativeHouseholdGroupCount();
+            Boolean anyFound = OrgShapeSelector.anyNativeHouseholdGroup();
+
+            // Where the object exists, the answer depends on this user's access to it, so only
+            // the absent case has one answer to assert.
+            if (!reallyThere) {
+                Assert.isNull(counted, 'A query on an object the org lacks cannot answer');
+                Assert.isNull(anyFound, 'Nor can the one-row probe');
+            }
         }
     }
 

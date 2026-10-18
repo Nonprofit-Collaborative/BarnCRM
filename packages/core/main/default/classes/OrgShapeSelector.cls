@@ -46,6 +46,14 @@ public with sharing class OrgShapeSelector {
     private static Boolean failNativeHouseholdGroupProbe = false;
 
     /**
+     * Set only by tests: stands in for the native household group in the describe, so the
+     * present-object path runs on an org without the object. The query still names the real
+     * object, so there it fails and the answer is unknown. Production code never sets it.
+     */
+    @TestVisible
+    private static Schema.SObjectType nativeHouseholdGroupTypeOverride;
+
+    /**
      * The Account record types that describe themselves as person types.
      *
      * Empty, without querying, when the org has no Person Accounts. RecordType.IsPersonType
@@ -69,12 +77,19 @@ public with sharing class OrgShapeSelector {
      * How many native Nonprofit Cloud households this org has, or null when the question
      * could not be answered.
      *
-     * Null means unknown, and unknown is not zero. The object may be missing from the global
-     * describe, the running user may not be able to read it, or the query may fail; none of
-     * those three is evidence that the org has no native households. Schema.getGlobalDescribe
-     * is itself filtered by the running user's permission set licences, and the household
-     * group is documented as gated by the Group Membership permission set, so an org that has
-     * the object can still describe as though it does not.
+     * Zero when the object is not in the global describe at all (ADR-0130, narrowing
+     * ADR-0036). Treating that absence as unknown made every org without Nonprofit Cloud look
+     * as though it had native households, and in an org with Contacts to Multiple Accounts on,
+     * where every contact has a native membership row, every BarnCRM household then read as a
+     * native one: naming, addresses, memberships, tidy-up, merges and import undo all stood
+     * aside. Null still means unknown, and unknown is not zero, when the object is described
+     * but the running user cannot read it (the Group Membership permission set gates it) or
+     * when the query fails. Zero for an absent object is an answer for the paths that only
+     * leave a household alone (naming, greetings, addresses, memberships). It is not enough
+     * for a path that deletes: the global describe is filtered by the running user's
+     * permission set licences, so a user without the licence in a Nonprofit Cloud org can see
+     * no object at all, and no signal Apex offers was confirmed to see past that filter. The
+     * deleting paths therefore also ask nativeHouseholdGroupObjectDescribed (ADR-0130).
      *
      * The caller treats unknown as "assume they exist" (OrgShapeDetector.detect). The two
      * mistakes do not cost the same, which is the reasoning ADR-0036 uses for the delete
@@ -101,6 +116,19 @@ public with sharing class OrgShapeSelector {
         return found == null ? null : found > 0;
     }
 
+    /**
+     * Whether the native household group is in this transaction's global describe, so that a
+     * zero count is one the probe actually made. False is not proof the org lacks the object:
+     * the describe is filtered by the running user's licences (ADR-0130). A test that injects a
+     * count is treated as describing the object, since the count stands for a probe that ran.
+     */
+    public static Boolean nativeHouseholdGroupObjectDescribed() {
+        if (nativeHouseholdGroupCountOverride != null) {
+            return true;
+        }
+        return Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
+    }
+
     private static Integer probeNativeHouseholdGroups(Boolean anyIsEnough) {
         try {
             if (failNativeHouseholdGroupProbe == true) {
@@ -109,8 +137,14 @@ public with sharing class OrgShapeSelector {
             if (nativeHouseholdGroupCountOverride != null) {
                 return nativeHouseholdGroupCountOverride;
             }
-            Schema.SObjectType groupType = Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
-            if (groupType == null || !groupType.getDescribe().isAccessible()) {
+            Schema.SObjectType groupType = nativeHouseholdGroupTypeOverride != null
+                ? nativeHouseholdGroupTypeOverride
+                : Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
+            if (groupType == null) {
+                // Not in this org: a known none, not an unknown (ADR-0130).
+                return 0;
+            }
+            if (!groupType.getDescribe().isAccessible()) {
                 return null;
             }
             if (anyIsEnough) {

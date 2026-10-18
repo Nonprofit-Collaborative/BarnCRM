@@ -4,6 +4,9 @@
  */
 @IsTest(testFor='ApexClass:HouseholdMergeService')
 private class HouseholdMergeServiceTest {
+    private static final String CONTACT_RELATION = 'AccountContactRelation'; // detection-only: describe key, so the real shared-relation merge runs only where Contacts to Multiple Accounts is on
+    private static final String RELATION_COUNT_QUERY = 'SELECT COUNT() FROM AccountContactRelation WHERE Id = :relationId'; // detection-only: whether a refused merge left a relation in place, asked only where the object exists
+
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
@@ -70,6 +73,196 @@ private class HouseholdMergeServiceTest {
     }
 
     // ------------------------------------------------------------------ merge, contact mode
+
+    /**
+     * With Contacts to Multiple Accounts on, the platform refuses to merge two accounts that
+     * share a related contact (ADR-0130). The rows are built in memory, since the object does
+     * not exist in every org these tests run in.
+     */
+    @IsTest
+    static void thePeopleRelatedToBothHouseholdsAreFound() {
+        System.runAs(TestUsers.admin()) {
+            Id survivorId = FakeIds.of(Account.SObjectType, 1);
+            Id victimId = FakeIds.of(Account.SObjectType, 2);
+            Id both = FakeIds.of(Contact.SObjectType, 1);
+            Id onlyVictim = FakeIds.of(Contact.SObjectType, 2);
+            Id onlySurvivor = FakeIds.of(Contact.SObjectType, 3);
+            List<HouseholdSelector.NativeMembership> rows = new List<HouseholdSelector.NativeMembership>{
+                new HouseholdSelector.NativeMembership(relation(1), survivorId, both, true),
+                new HouseholdSelector.NativeMembership(relation(2), victimId, both, false),
+                new HouseholdSelector.NativeMembership(relation(3), victimId, onlyVictim, true),
+                new HouseholdSelector.NativeMembership(relation(4), survivorId, onlySurvivor, true)
+            };
+
+            Assert.areEqual(
+                new Set<Id>{ both },
+                HouseholdMergeService.sharedRelatedPeople(survivorId, rows),
+                'Only a person related to both households blocks the platform merge'
+            );
+            Assert.isTrue(
+                HouseholdMergeService.sharedRelatedPeople(
+                        survivorId,
+                        new List<HouseholdSelector.NativeMembership>()
+                    )
+                    .isEmpty(),
+                'Without Contacts to Multiple Accounts nobody is shared'
+            );
+        }
+    }
+
+    /**
+     * A shared relation somebody annotated (roles, dates) is not BarnCRM's to delete, so the
+     * merge is refused and nothing changes (ADR-0130).
+     */
+    @IsTest
+    static void aSharedRelationWithRolesStopsTheMergeAndChangesNothing() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+            // After the move Wei is direct on the survivor, and the relation on the other
+            // household carries roles, so the move leaves it and the merge has to refuse.
+            HouseholdSelector.nativeMembershipRowsOverride = new List<HouseholdSelector.NativeMembership>{
+                new HouseholdSelector.NativeMembership(relation(1), survivorId, wei.Id, true),
+                new HouseholdSelector.NativeMembership(relation(2), victimId, wei.Id, false, true)
+            };
+
+            String message;
+            Test.startTest();
+            try {
+                HouseholdMergeService.mergeHouseholds(
+                    survivorId,
+                    victimId,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            } catch (HouseholdException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_HouseholdMerge_ErrorMergeFailed,
+                message,
+                'The person is told the merge did not happen'
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = :Label.Core_HouseholdMerge_ErrorContext
+                ],
+                'The reason is in the Error Log for a caller that catches the refusal'
+            );
+            Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :victimId],
+                'Both households are still there'
+            );
+        }
+    }
+
+    /**
+     * Runs only where Contacts to Multiple Accounts is on: the relation the move leaves on the
+     * household going away is removed, so the platform merge goes through.
+     */
+    @IsTest
+    static void withRealContactRelationsTheMergeGoesThrough() {
+        System.runAs(TestUsers.admin()) {
+            if (!contactRelationsOn('withRealContactRelationsTheMergeGoesThrough')) {
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+
+            Test.startTest();
+            HouseholdMergeService.mergeHouseholds(
+                survivorId,
+                victimId,
+                new HouseholdMergeService.MergeChoices(null)
+            );
+            Test.stopTest();
+
+            Assert.areEqual(survivorId, householdOf(wei.Id), 'Wei moved to the survivor');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :victimId],
+                'The other household is merged away'
+            );
+        }
+    }
+
+    /**
+     * Runs only where Contacts to Multiple Accounts is on: a relation somebody made between a
+     * person and the other household is not removed, so the merge is refused unchanged.
+     */
+    @IsTest
+    static void withARealRelationSomebodyMadeTheMergeIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            if (!contactRelationsOn('withARealRelationSomebodyMadeTheMergeIsRefused')) {
+                return;
+            }
+            Schema.SObjectType relationType = Schema.getGlobalDescribe().get(CONTACT_RELATION);
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+            SObject indirect = relationType.newSObject();
+            indirect.put('AccountId', victimId);
+            indirect.put('ContactId', maria.Id);
+            insert indirect;
+
+            String message;
+            Test.startTest();
+            try {
+                HouseholdMergeService.mergeHouseholds(
+                    survivorId,
+                    victimId,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            } catch (HouseholdException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_HouseholdMerge_ErrorMergeFailed, message, 'Refused');
+            Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
+            Assert.areEqual(
+                1,
+                Database.countQueryWithBinds(
+                    RELATION_COUNT_QUERY,
+                    new Map<String, Object>{ 'relationId' => indirect.Id },
+                    AccessLevel.SYSTEM_MODE
+                ),
+                'The relation somebody made is still there'
+            );
+        }
+    }
+
+    /** Whether this org relates contacts to several accounts, with a debug line either way. */
+    private static Boolean contactRelationsOn(String testName) {
+        Boolean isOn = Schema.getGlobalDescribe().containsKey(CONTACT_RELATION);
+        System.debug(
+            LoggingLevel.INFO,
+            testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off')
+        );
+        return isOn;
+    }
+
+    private static Id relation(Integer n) {
+        // Only compared, never queried; an Account prefix keeps it valid in every org.
+        return FakeIds.of(Account.SObjectType, 100 + n);
+    }
 
     @IsTest
     static void mergeMovesEveryoneAndRemovesTheOtherHousehold() {
