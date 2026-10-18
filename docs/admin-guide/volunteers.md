@@ -101,24 +101,28 @@ schedule** to the job: on the job, in the **Shift Schedules** list, click **New*
 
 When you save, BarnCRM creates the schedule's shifts from today up to the **Shift horizon
 weeks** ahead (8 by default), usually within a minute. Each is an ordinary shift: people sign up,
-attend and log hours on it as on any other, and it shows the schedule it came from. Every night
+attend and log hours on it as on any other. It appears in the job's **Shifts** list and shows the
+schedule it came from. Every night
 at 3:00 AM BarnCRM adds the next days, so the schedule always reaches the horizon. **Created
 Through** on the schedule shows the last day it has created shifts for.
 
-**Changing a schedule changes only future shifts nobody signed up for.** When you change the
-days, times, dates, places or location, BarnCRM removes the schedule's future shifts that have
-no sign-ups and are not cancelled, and creates them again from the new pattern. Past shifts,
-shifts with a sign-up and cancelled shifts are kept as they are, and no day gets a second shift.
-**Shifts Kept** on the schedule then says how many future shifts were kept: check those by hand,
-because they still have the old times. Changing only the name changes no shift.
+**Changing a schedule changes only future shifts nobody is using.** When you change the days,
+Every N Weeks, times, start date, places or location, BarnCRM removes the schedule's future
+shifts that have no sign-ups, no hours and are not cancelled, and creates them again from the
+new pattern. Past shifts, shifts with a sign-up or hours, and cancelled shifts are kept as they
+are, and no day gets a second shift. **Shifts Kept** on the schedule then says how many future
+shifts were kept: check those by hand, because they still have the old times. Changing only the
+name changes no shift.
 
 **Ending a schedule.** Untick **Active**, or set an earlier **End Date**: the future shifts it no
-longer covers that nobody signed up for are removed, and the rest stay. Tick **Active** again and
-its shifts are created from today. An admin can delete a schedule: its future shifts nobody
-signed up for go with it, and the shifts that stay lose their link to it.
+longer covers that have no sign-ups or hours and are not cancelled are removed, and the rest
+stay. Tick **Active** again, or set a later **End Date**, and the missing days are created again.
+An admin can delete a schedule: its future shifts with no sign-ups or hours go with it, and the
+shifts that stay lose their link to it.
 
 **Taking one day off.** Open that day's shift and set its **Status** to Cancelled. Do not delete
-it: a deleted shift comes back the next time you change the schedule, a cancelled one does not.
+it: a deleted shift comes back the next time you change or restart the schedule, a cancelled one
+does not.
 
 **Coordinators and Team Members** create and change schedules; only an admin deletes one. The
 shifts a change removes are removed for them, although they cannot delete shifts themselves.

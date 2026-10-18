@@ -4,10 +4,11 @@
  *
  * - R-SSC3: saving a schedule queues a run for it (`ShiftScheduleGenerator`), so its shifts
  *   appear without waiting for the night.
- * - R-SSC4: a change to the pattern removes the future shifts nobody signed up for that are not
- *   Cancelled, clears Created Through and queues a run that recreates them from the new pattern.
+ * - R-SSC4: a change to the pattern removes the future shifts with no sign-ups or hours that are
+ *   not Cancelled, clears Created Through and queues a run that recreates them from the new
+ *   pattern.
  * - R-SSC5: clearing Active removes the same shifts and clears Created Through; an earlier End
- *   Date removes those after it; deleting the schedule removes every one of them, and the shifts
+ *   Date removes those after it and moves Created Through back to it; deleting the schedule removes every one of them, and the shifts
  *   kept lose their link through the lookup's SetNull.
  *
  * Shifts Kept records how many future shifts such a save kept, which is how the save tells the
@@ -69,6 +70,12 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
             }
             if (restart.contains(schedule.Id)) {
                 schedule.Created_Through__c = null;
+            } else if (
+                keepThrough.get(schedule.Id) != null &&
+                schedule.Created_Through__c > schedule.End_Date__c
+            ) {
+                // The days after the new end are gone, so a later End Date creates them again.
+                schedule.Created_Through__c = schedule.End_Date__c;
             }
         }
     }

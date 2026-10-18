@@ -358,4 +358,159 @@ private class ShiftScheduleTriggerHandlerTest {
             );
         }
     }
+
+    @IsTest
+    static void aShiftWithHoursButNoSignupIsKept() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+            List<Volunteer_Shift__c> original = shiftsOf(before.Id);
+            Volunteer_Hours__c hours = VolunteersTestData.newHours(contactId(), before.Job__c, 3);
+            hours.Volunteer_Shift__c = original[4].Id;
+            insert hours;
+
+            Test.startTest();
+            System.runAs(user(COORDINATOR)) {
+                update new Shift_Schedule__c(
+                    Id = before.Id,
+                    Start_Time__c = Time.newInstance(10, 0, 0, 0)
+                );
+            }
+            Test.stopTest();
+
+            List<Volunteer_Shift__c> shifts = shiftsOf(before.Id);
+            Assert.areEqual(
+                3,
+                schedule().Shifts_Kept__c,
+                'The booked, the cancelled and the shift with hours were kept.'
+            );
+            Assert.areEqual(original[4].Id, shifts[4].Id, '21 March, which has hours, stays.');
+            Assert.areEqual(
+                Datetime.newInstanceGmt(2026, 3, 21, 13, 0, 0),
+                shifts[4].Start_Time__c,
+                'It keeps its 9:00 start.'
+            );
+            Assert.areEqual(
+                original[4].Id,
+                [SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :hours.Id]
+                .Volunteer_Shift__c,
+                'The hours still name their shift.'
+            );
+            Assert.areEqual(8, shifts.size(), 'Four kept or past, and four recreated.');
+            assertOneShiftADay(shifts);
+        }
+    }
+
+    @IsTest
+    static void aLaterEndDateCreatesTheRemovedDaysAgain() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+            Set<Id> original = idsOf(shiftsOf(before.Id));
+
+            Test.startTest();
+            System.runAs(user(COORDINATOR)) {
+                update new Shift_Schedule__c(
+                    Id = before.Id,
+                    End_Date__c = Date.newInstance(2026, 3, 20)
+                );
+            }
+            Shift_Schedule__c ended = schedule();
+            Integer afterEnding = shiftsOf(before.Id).size();
+            System.runAs(user(COORDINATOR)) {
+                update new Shift_Schedule__c(Id = before.Id, End_Date__c = null);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Date.newInstance(2026, 3, 20),
+                ended.Created_Through__c,
+                'Created Through moves back to the new End Date.'
+            );
+            Assert.areEqual(4, afterEnding, '21 and 28 March went.');
+            List<Volunteer_Shift__c> shifts = shiftsOf(before.Id);
+            Assert.areEqual(
+                8,
+                shifts.size(),
+                '21 and 28 March come back, and 4 and 11 April reach the horizon.'
+            );
+            assertOneShiftADay(shifts);
+            Assert.isFalse(original.contains(shifts[4].Id), '21 March is a new record.');
+            Assert.areEqual(
+                Date.newInstance(2026, 4, 13),
+                schedule().Created_Through__c,
+                'Created Through reaches the horizon again.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSaveWithNoQueuedJobLeftStillSaves() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c fresh = VolunteersTestData.newSchedule(
+                schedule().Job__c,
+                'Wednesday',
+                Date.newInstance(2026, 3, 4)
+            );
+
+            Test.startTest();
+            while (Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()) {
+                System.enqueueJob(new ShiftScheduleGenerator(new Set<Id>()));
+            }
+            System.runAs(user(STAFF)) {
+                insert fresh;
+            }
+            Test.stopTest();
+
+            Assert.isNotNull(fresh.Id, 'The save is not refused.');
+            Assert.areEqual(
+                0,
+                shiftsOf(fresh.Id).size(),
+                'No run could be queued, so the nightly run creates the shifts.'
+            );
+            Assert.isNull(
+                [SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :fresh.Id]
+                .Created_Through__c,
+                'Nothing is recorded as created.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aQueuedRunThatFailsIsLoggedAndCreatesNothing() {
+        System.runAs(admin()) {
+            useMondayClock();
+            Shift_Schedule__c before = schedule();
+            Integer shiftsBefore = shiftsOf(before.Id).size();
+
+            Test.startTest();
+            System.runAs(user(READ_ONLY)) {
+                // Read Only creates no shift, so the run's insert fails inside the queued job.
+                new ShiftScheduleGenerator(new Set<Id>{ before.Id }).execute(null);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                shiftsBefore,
+                shiftsOf(before.Id).size(),
+                'The failed run creates no shift.'
+            );
+            Assert.areEqual(
+                before.Created_Through__c,
+                schedule().Created_Through__c,
+                'Created Through stays, so the nightly run tries these days again.'
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'ShiftScheduleGenerator'
+                    WITH SYSTEM_MODE
+                ],
+                'The failure is logged for the admin.'
+            );
+        }
+    }
 }
