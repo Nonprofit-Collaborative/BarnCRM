@@ -30,4 +30,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Whether marking a sign-up Attended writes the volunteer hours for that shift.</value>
     </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">volunteers.md</value>
+    </values>
 </CustomMetadata>

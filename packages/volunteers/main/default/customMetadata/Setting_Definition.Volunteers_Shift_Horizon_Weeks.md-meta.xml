@@ -38,4 +38,8 @@
         <field>Max_Value__c</field>
         <value xsi:type="xsd:double">26</value>
     </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">volunteers.md</value>
+    </values>
 </CustomMetadata>

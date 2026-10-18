@@ -30,4 +30,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Whether volunteer hours wait for a coordinator to approve them. Off means an entry counts as soon as it is saved.</value>
     </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">volunteers.md</value>
+    </values>
 </CustomMetadata>
