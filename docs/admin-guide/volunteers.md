@@ -35,10 +35,13 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Volunteers Admin** permission set.
 3. Gives everyone who already has a BarnCRM role the Volunteers permission set for that role
    (next section). This runs in the background and takes a minute or two in a large org.
+4. Adds the two shipped letter templates, an hours letter and a certificate (see
+   [Hour letters and certificates](#hour-letters-and-certificates)). An upgrade adds only a
+   shipped template you do not have, and never changes one you edited.
 
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
 **Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, and
-**Volunteer Settings** for admins only.
+**Volunteer Letter Templates** and **Volunteer Settings** for admins only.
 
 ## Roles and permission sets
 
@@ -83,6 +86,69 @@ with recurring shifts, and until then changing it changes nothing.
 | Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | With recurring shifts |
+
+## Hour letters and certificates
+
+A coordinator can give a volunteer a PDF letter stating their hours (for a school service
+requirement, court ordered service or an employer's matching program) or a certificate of
+service. Each one counts only **Approved** hours with a **Date Worked** in the period chosen, and
+only the hours the coordinator can see. It is saved as a file on the person's record (the
+**Files** list), and that file is the record that it was given. Giving is not needed.
+
+**Who can.** Making a letter needs the **Manage Volunteers** permission, which the Volunteers
+Coordinator and Volunteers Admin sets give. Only Volunteers Admin edits templates.
+
+**Templates.** On the **Volunteer Letter Templates** tab, each template has a **Type** (Hours
+letter or Certificate), a **Body** of HTML and an **Active** box. One template per type is
+active: ticking **Active** on one clears it on the others of its type. Edit the shipped
+templates or write your own. The body can use these tokens, each filled in when the letter is
+made:
+
+| Token | Filled with |
+|---|---|
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings |
+| `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
+| `{Hours}` | Their approved hours in the period |
+| `{JobList}` | A list of each job with its hours in the period |
+| `{FromDate}`, `{ToDate}`, `{Today}` | The period and the day the letter was made |
+
+A token spelled wrong is printed as typed, so a test letter shows the mistake. Names and job
+titles are printed as plain text, so a person or job name can never change the layout. Keep the
+HTML simple (paragraphs, headings, lists, inline styles): the PDF service does not run scripts.
+Fill in your legal name and address in the Organization section of BarnCRM Settings first;
+until you do, those tokens print nothing.
+
+The shipped templates come back at every upgrade if you delete them (inactive when their type
+already has an active template). To stop using one, clear its **Active** box rather than
+deleting it.
+
+**One person.** The **Volunteer letter** action is on no page until you add it. In Setup, go to
+**Object Manager**, **Contact**, **Page Layouts**, open each layout your people use, choose
+**Mobile & Lightning Actions** in the palette, and drag **Volunteer letter** into the
+**Salesforce Mobile and Lightning Experience Actions** section. If that section says its actions
+are predefined, click **override the predefined actions** first. If your people are held as
+person accounts, do the same under **Object Manager**, **Person Account**, **Page Layouts**.
+
+On a person, click **Volunteer letter**, choose the template and the period, click **Preview**
+to read it, then **Generate**. The action offers the active template of each type, so make a
+new template active to try it. A person with no approved hours in the period gets no letter,
+and the action says so. On a household or organization account the action says that letters
+are for people.
+
+**A list of people.** In Flow Builder, the **Generate volunteer letters** action takes a list of
+person Ids, a letter **Type** and the period, and makes the letters in the background, ten people
+at a time; each appears in that person's **Files** within a few minutes. The Type is the picklist
+value as written on the template, **Hours letter** or **Certificate**, and the action uses that
+type's active template. If the type has no active template, or the period is missing or
+reversed, the action stops before anything starts and its fault path carries a message saying
+why. Several requests in one transaction (for example a record-triggered flow on 200 records)
+run as one job.
+
+**When it ends.** The person who started the job gets one notification (the bell, and the mobile
+app) with how many letters were made, how many people were skipped and why (for example no
+approved hours in the period), and how many failed; for failures it points to the
+[Error Log](error-log.md). It is the BarnCRM job notification, so the **Job notifications**
+option in BarnCRM Settings turns it off.
 
 ## Turning it off
 
@@ -170,3 +236,6 @@ set when their role changes. Give the role and let the module give the set.
 
 **Looking for someone else's hours as a Team Member.** Hours are private; a Coordinator sees them
 all.
+
+**A letter shows fewer hours than expected.** A letter counts only Approved hours in the period.
+Approve the Submitted entries first, and check the From and To dates.

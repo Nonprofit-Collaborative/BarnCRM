@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Hours letter</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Name__c</field>
+    <value xsi:type="xsd:string">Hours letter</value>
+  </values>
+  <values>
+    <field>Letter_Type__c</field>
+    <value xsi:type="xsd:string">Hours letter</value>
+  </values>
+  <values>
+    <field>Body__c</field>
+    <value xsi:type="xsd:string">&lt;p&gt;{OrganizationName}&lt;br/&gt;{OrganizationAddress}&lt;/p&gt;
+&lt;p&gt;{Today}&lt;/p&gt;
+&lt;p&gt;To whom it may concern,&lt;/p&gt;
+&lt;p&gt;This letter confirms that {PersonName} gave {Hours} hours of volunteer service to {OrganizationName} from {FromDate} to {ToDate}:&lt;/p&gt;
+{JobList}
+&lt;p&gt;Thank you, {FirstName}, for your time and care.&lt;/p&gt;
+&lt;p&gt;{OrganizationName}&lt;/p&gt;
+</value>
+  </values>
+</CustomMetadata>

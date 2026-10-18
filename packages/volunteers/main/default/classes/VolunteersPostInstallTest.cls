@@ -61,6 +61,16 @@ private class VolunteersPostInstallTest {
                 'The Team Member role holds Volunteers Staff after the install'
             );
             Assert.areEqual(0, accessFailures(), 'Nothing failed');
+            Assert.areEqual(
+                2,
+                [
+                    SELECT COUNT()
+                    FROM Volunteer_Letter_Template__c
+                    WHERE Active__c = TRUE AND Template_Key__c != NULL
+                    WITH SYSTEM_MODE
+                ],
+                'The shipped letter templates arrive, one active per type'
+            );
         }
     }
 

@@ -64,4 +64,196 @@
         <shortDescription>Restoring would make a second entry for one sign-up</shortDescription>
         <value>These hours cannot be restored: another hours entry already records this sign-up's attendance.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NeedManagePermission</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Letters need the Manage Volunteers permission</shortDescription>
+        <value>Volunteer letters need the Manage Volunteers permission, which the Volunteers Coordinator and Volunteers Admin sets give.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_TemplateInactive</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The chosen letter template is not active: {0} is its name</shortDescription>
+        <value>The template {0} is not active. Make it active on the Volunteer Letter Templates tab, or choose the active template.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_TypeRequired</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A flow gave no letter type</shortDescription>
+        <value>Choose a letter type, Hours letter or Certificate.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoActiveTemplateForType</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No active template for the letter type: {0} is the type</shortDescription>
+        <value>No volunteer letter template of type {0} is active. Check the type is spelled as on the template (Hours letter or Certificate), and make one template of that type active on the Volunteer Letter Templates tab.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_JobNotice_Letters</fullName>
+        <categories>Volunteers, Job Notifications</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Job notification: name of a volunteer letter run</shortDescription>
+        <value>Volunteer letters</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_JobNotice_LettersBody</fullName>
+        <categories>Volunteers, Job Notifications</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Job notification body: letters made {0}, people skipped {1}, people failed {2}</shortDescription>
+        <value>{0} letters made, {1} skipped, {2} failed.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_JobNotice_LettersSkipped</fullName>
+        <categories>Volunteers, Job Notifications</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Job notification: one skip reason, {0} count, {1} reason</shortDescription>
+        <value>Skipped ({0}): {1}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_JobNotice_LettersFailed</fullName>
+        <categories>Volunteers, Job Notifications</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Job notification: where to read why letters failed</shortDescription>
+        <value>Open the Error Log to see why the failures happened.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_TemplateNotFound</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No usable letter template was chosen</shortDescription>
+        <value>Choose a volunteer letter template. If none is offered, ask your admin to activate one on the Volunteer Letter Templates tab.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_BadPeriod</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The letter period is missing or reversed</shortDescription>
+        <value>Choose a From date and a To date, with the From date on or before the To date.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoHours</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: no approved hours in the period</shortDescription>
+        <value>No letter: this person has no approved volunteer hours in the period.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NotAPerson</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: the account is not a person</shortDescription>
+        <value>No letter: this account is a household or organization, not a person. Open the person instead.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_PersonNotVisible</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Skipped: the person cannot be read</shortDescription>
+        <value>No letter: you cannot see this person.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_JobLine</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>One job in a letter: {0} is the job, {1} the hours</shortDescription>
+        <value>{0}: {1} hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoJob</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The job line for hours that name no job</shortDescription>
+        <value>Other volunteer work</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_FileTitle</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>File title: {0} template, {1} person, {2} from, {3} to</shortDescription>
+        <value>{0} for {1}, {2} to {3}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Heading</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action heading</shortDescription>
+        <value>Volunteer letter</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Template</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: template field</shortDescription>
+        <value>Template</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_From</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: start of the period</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_To</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: end of the period</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Preview</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: preview button and region</shortDescription>
+        <value>Preview</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Generate</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: generate button</shortDescription>
+        <value>Generate</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Cancel</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Saved</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: the letter was saved</shortDescription>
+        <value>The letter is saved as a PDF in this person's Files.</value>
+    </labels>
 </CustomLabels>

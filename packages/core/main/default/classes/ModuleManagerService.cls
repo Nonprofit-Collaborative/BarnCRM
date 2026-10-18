@@ -74,6 +74,7 @@ public with sharing class ModuleManagerService {
         'Volunteers' => new List<String>{
             'Volunteer_Hours__c',
             'Volunteer_Job__c',
+            'Volunteer_Letter_Template__c',
             'Volunteer_Shift__c',
             'Volunteer_Signup__c'
         }

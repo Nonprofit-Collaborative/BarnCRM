@@ -7945,7 +7945,8 @@ service renders, as for receipts (Section 25E).
 
 **R-VL1 One active template per type.** Activating a template deactivates the others of its
 type. Generating with no active template of the type asked for is refused with a readable
-message.
+message, and so is generating with a template that is not active (an inactive template is never
+merged, however it was chosen).
 
 **R-VL2 Tokens are a closed set.** `{OrganizationName}` and `{OrganizationAddress}` (Core's
 `Organization_Legal_Name__c` and `Organization_Address__c`), `{PersonName}`, `{FirstName}` (the
@@ -7964,13 +7965,33 @@ nothing else; the file is the record that it was sent. Generating needs the cust
 **R-VL5 The shipped templates arrive at install.** `Volunteer_Letter_Template_Default__mdt` is
 materialized by `VolunteersPostInstall` at install and at every upgrade, creating only the
 templates whose Template Key the org does not have and never changing an existing one
-(Section 13). A materialized template is Active when its type has no active template. The
-template list has a Restore the shipped templates action that does the same.
+(Section 13). A materialized template is Active when its type has no active template. A Restore
+the shipped templates action on the template list that does the same is a later item (an upgrade
+already brings back a deleted shipped template).
+
+**R-VL6 A list is started with a type and checked first.** The flow action Generate volunteer
+letters takes a letter Type (a picklist value, not a template Id) and uses that type's one active
+template. Before any job starts it checks the permission, the type, the template (it must be
+active) and the period, and refuses with a readable message that reaches the flow's fault path.
+All requests in one transaction run as one job, so a record-triggered flow on 200 records starts
+one job, not 200.
+
+**R-VL7 The person who started a list is told how it went.** A job counts the letters made, the
+people skipped (grouped by reason, for example no approved hours in the period) and the people
+whose chunk failed, across all chunks. When it ends it sends the person who started it one custom
+notification (Core's job notification, `BarnCRM_Job_Finished`, which the BarnCRM Settings option
+Job notifications turns off) giving the three counts and, when any failed, pointing to the Error
+Log. A job started by a schedule sends none. The record action shows the same outcome on screen.
 
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Letter_Template__c`, Text Name (80), sharing Read; edited only through
   the Volunteers Admin permission set.
+- **Access:** `Volunteers_Admin` creates, edits and deletes templates, every field editable;
+  `Volunteers_Coordinator` reads them, every field, to generate letters; `Volunteers_Staff` and
+  `Volunteers_Read_Only` have no access.
+- **Automation:** R-VL1 runs in `VolunteerLetterTemplateTriggerHandler`, registry row
+  `Volunteer_Letter_Template_Rules`, which always runs (it keeps a rule, not a convenience).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -7983,7 +8004,11 @@ template list has a Restore the shipped templates action that does the same.
   (`Hours_Letter`, `Certificate`), with `Template_Name__c` (Text 80), `Letter_Type__c` (Text 40)
   and `Body__c` (Long Text Area 32768); DeveloperName is the Template Key.
 - **Service:** `VolunteerLetterService`, `VolunteerLetterBatch`, `VolunteerLetterRenderer`
-  (`Blob.toPdf`).
+  (`Blob.toPdf`). On a person account the hours counted are those whose `Account__c` is the
+  account; an account that is not a person gets no letter.
+- **Where it is started:** the record action Volunteer letter (`volunteerLetter`) on Contact and
+  on Account, for one person with a preview, and the flow action Generate volunteer letters
+  (`VolunteerLetterBatch`, taking a letter Type) for a list of people (R-VL6, R-VL7).
 
 ---
 
@@ -8256,6 +8281,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
 | v0.8 | 2026-10-18 | Rollup targets writable by the engine, not the saving user. No object or field added. R-R10: at run time the planner checks that the engine can write a target attribute (it exists, is not a formula, roll-up summary, auto number or system attribute), never the running user's field-level security; the Rollup Builder's save still checks the administrator's own. Before this, a staff member's save, on whom every module keeps the totals read only, had every definition refused and the totals waited for the nightly run. |
+| v0.8 | 2026-10-18 | Volunteer letters built (V-08, ADR-0129). No object or field added beyond 29U. Section 29U states the template access per Volunteers set, the registry row `Volunteer_Letter_Template_Rules` for R-VL1, that a person account's letter counts hours by `Account__c`, and where a letter is started (record action and flow action). |
 
 ---
 ## 32. Entity ownership by package

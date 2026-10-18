@@ -17,8 +17,10 @@
  *    templates the org already has, through Core's `materializeDefaultsDuringInstall`, because
  *    Core installs first and cannot see a module's templates. Only the row for the org's
  *    people is added, and none unless Volunteer Hours is in the org.
+ * 5. Copy the shipped letter templates the org does not have (R-VL5,
+ *    `VolunteerLetterTemplates.installDefaultsDuringInstall`), never changing one it has.
  *
- * The shipped rollups and letter templates are created here by the changes that ship them.
+ * The shipped rollups are created here by the change that ships them.
  */
 public with sharing class VolunteersPostInstall implements InstallHandler {
     private static final String SWITCH_CONTEXT = 'VolunteersPostInstall.ensureAutomationSwitches';
@@ -38,6 +40,8 @@ public with sharing class VolunteersPostInstall implements InstallHandler {
         // The entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
+        // Copies only, and records its own failures: it comes before anything is queued.
+        VolunteerLetterTemplates.installDefaultsDuringInstall();
         Id installerId = context.installerId();
         if (installerId == null) {
             new VolunteersAccessSync().requestSync();
