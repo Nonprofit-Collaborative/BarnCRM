@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Volunteer Letter</masterLabel>
+  <description>
+    Save a volunteer hours letter or certificate as a PDF on a person, with a preview. Needs Manage Volunteers.
+  </description>
+  <targets>
+    <target>lightning__RecordAction</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordAction">
+      <actionType>ScreenAction</actionType>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

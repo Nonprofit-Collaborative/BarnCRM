@@ -136,4 +136,68 @@
         <shortDescription>File title: {0} template, {1} person, {2} from, {3} to</shortDescription>
         <value>{0} for {1}, {2} to {3}</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Heading</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action heading</shortDescription>
+        <value>Volunteer letter</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Template</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: template field</shortDescription>
+        <value>Template</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_From</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: start of the period</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_To</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: end of the period</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Preview</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: preview button and region</shortDescription>
+        <value>Preview</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Generate</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: generate button</shortDescription>
+        <value>Generate</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Cancel</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_Saved</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer letter action: the letter was saved</shortDescription>
+        <value>The letter is saved as a PDF in this person's Files.</value>
+    </labels>
 </CustomLabels>
