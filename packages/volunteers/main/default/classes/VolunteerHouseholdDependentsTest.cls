@@ -6,7 +6,7 @@
  * the person who moves and merges households.
  */
 @IsTest(testFor='ApexClass:VolunteersHouseholdDependentsExtension')
-private class VolunteersHouseholdDependentsExtensionTest {
+private class VolunteerHouseholdDependentsTest {
     @TestSetup
     static void makeData() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
