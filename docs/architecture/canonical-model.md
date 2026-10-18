@@ -282,7 +282,9 @@ still credits records to it (ADR-0070,
 credited records through the Core extension point `HouseholdDependentsExtension`, found by
 class name the way Health Check finds its extensions; Giving reports every household that
 a Gift or a Commitment names in its Household field, because those lookups clear on delete
-and a gift keeps the household it was given to (R-G2). Such a household is kept without an
+and a gift keeps the household it was given to (R-G2); Volunteers reports every household
+that a Volunteer Hours entry names in its Household field, for the same reason (R-VG2). Such
+a household is kept without an
 Error Log entry: keeping a donor's past household is the ordinary outcome of a move, not
 something an administrator has to act on. "Empty" is
 measured in BarnCRM's own membership, which is the only membership BarnCRM can
@@ -7406,6 +7408,11 @@ them by hand (admin guide, volunteers page).
 **R-VU4 A cancelled sign-up stops counting.** Slots Filled counts sign-ups whose Status is not
 Cancelled, so someone who drops out frees the place without the booking being deleted.
 
+**R-VU5 Erasing the person keeps their sign-ups.** Erasing a person (Section 29H) keeps every
+sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Signed up or
+Confirmed on a shift that has not started is set to Cancelled, so the place is freed and nobody
+expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Signup__c`, name field AutoNumber `VS-{000000}`, sharing Controlled
@@ -7470,7 +7477,10 @@ record.
 **R-VG2 The household is derived.** From the person's household through `HouseholdService`,
 in both membership modes, as R-G2 does for a gift: set when the entry is saved, recomputed
 only when its person changes, empty when the person has no household. Hours stay with the
-household they were given in when the person later moves (ADR-0071).
+household they were given in when the person later moves (ADR-0071), and that household is
+kept by the empty household tidy-ups and an import undo while any entry names it, through
+`VolunteersHouseholdDependentsExtension` (R-H12, R-H12a). A household merge moves the entries
+to the household kept, by the platform's merge.
 
 **R-VG3 An entry names a job.** A validation rule requires the job or the shift; the module
 fills the job from the shift, so a shift deleted later leaves the hours with their job.
@@ -7517,6 +7527,17 @@ with nothing on record. The message says to reopen it (back to Submitted, which 
 `Manage_Volunteers`) and then delete it. A validation rule cannot block a delete, so the rule
 is Apex before the delete, in an automation that always runs (registry row
 `Volunteer_Hours_Delete_Guard`, ADR-0024): no switch or pause suspends it.
+
+**R-VG10 Erasing the person keeps their hours.** Erasing a person (Section 29H) keeps every
+entry naming them, with its status, date and hours, still credited to the anonymized person, so
+every total stands, as Giving keeps gifts (ADR-0110). Notes is emptied, as the user (R-ER5).
+Nothing else changes, so an Approved entry, locked by R-VG7 against a change of person, date or
+hours, is erased like any other. The five volunteer totals on the person (29O) are fields the
+module keeps (`fieldsToKeep`, R-ER1), as Core already keeps the target of every rollup the
+engine reports: naming them also covers a total whose definition the administrator deleted,
+which is read only to every user and would otherwise refuse the erasure. They are anonymous
+aggregates like a donor level, and emptying them would leave totals that disagree with the
+hours kept.
 
 ### Salesforce implementation
 
@@ -7741,6 +7762,11 @@ skills are shown beside each name; they never filter.
 **R-VK4 Deleted with the person.** Deleting a person deletes their volunteer skills, as it
 deletes their requirements (R-VQ5 says how).
 
+**R-VK5 Erased with the person.** Erasing a person (Section 29H) deletes their volunteer skills
+and empties them from the Recycle Bin, as it does their requirements (R-VQ4): a skill or an
+interest is a fact about the person, like the availability the erasure empties on the person
+itself.
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Skill__c`, auto-number Name `VK-{000000}`, sharing Read.
@@ -7869,9 +7895,13 @@ bypass stops it (R-A4).
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
 - **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8). It reads
-  the person's requirements in system mode, deletes them as the user (a user without access to
-  requirements is refused, R-ER5) and keeps no person field. Core adds the Ids of any records
-  an extension reports as Deleted to those it empties from the Recycle Bin after the commit.
+  the person's requirements, volunteer skills, hours and sign-ups in system mode
+  (`VolunteerErasureSelector`) and changes them as the user (a user without access to them is
+  refused, R-ER5): requirements and volunteer skills deleted (R-VQ4, R-VK5), hours and sign-ups
+  kept with their notes emptied (R-VG10, R-VU5), bookings on shifts still to come cancelled
+  (R-VU5). It keeps the five volunteer totals on the person (R-VG10). Core adds the Ids of any
+  records an extension reports as Deleted to those it empties from the Recycle Bin after the
+  commit.
 - **Person delete:** `VolunteerPersonDeleteHandler`, registered on Contact and on Account
   (`Automation_Registry.Volunteers_Person_Delete_Contact` and `..._Account`, order 20, Always
   Runs, `Module__c` Volunteers) and run by Core's own triggers. Before delete it notes the Ids
@@ -8371,6 +8401,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
+| v0.8 | 2026-10-18 | Volunteers lifecycle: erasure and household dependents. No object or field added. New rules R-VG10, R-VU5 and R-VK5: erasing a person keeps their hours and sign-ups with notes emptied, cancels their bookings on shifts still to come, deletes their volunteer skills, and keeps the five volunteer totals on the person even where no rollup definition reports them (`VolunteersErasureExtension`). R-H12 and R-VG2: `VolunteersHouseholdDependentsExtension`, registered in `HouseholdDependentsExtensions.EXTENSION_CLASSES`, keeps a household a Volunteer Hours entry names. |
 
 ---
 ## 32. Entity ownership by package

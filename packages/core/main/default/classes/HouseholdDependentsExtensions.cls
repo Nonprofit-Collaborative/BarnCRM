@@ -15,7 +15,8 @@ public with sharing class HouseholdDependentsExtensions {
     /** The class names dependent packages register, in the order they are asked. */
     @NamespaceAccessible
     public static final List<String> EXTENSION_CLASSES = new List<String>{
-        'GivingHouseholdDependentsExtension'
+        'GivingHouseholdDependentsExtension',
+        'VolunteersHouseholdDependentsExtension'
     };
 
     /** Injected by Core's tests by class name, since no other package is there to resolve. */

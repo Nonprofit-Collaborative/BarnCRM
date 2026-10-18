@@ -182,7 +182,8 @@ else.
 **Erasing a person.** [Erasing a person](erase-a-person.md) deletes their requirements and
 empties them from the Recycle Bin. The Erasure record lists them by Id only. The person erasing
 must also hold Volunteers Admin or Volunteers Coordinator: otherwise the erasure is refused, so a
-background check is never left behind.
+background check is never left behind. What else erasing does to volunteer records is in
+[Erasing a volunteer](#erasing-a-volunteer).
 
 **Deleting a person.** Deleting a person (or a household or organization, with the people in
 it) deletes their requirements and volunteer skills too, whoever deletes them, even someone who
@@ -440,6 +441,38 @@ activate the page for the BarnCRM Volunteers app.
 
 **Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
 schedule you pick.
+
+## Erasing a volunteer
+
+When someone asks to be forgotten, [Erasing a person](erase-a-person.md) anonymizes their record.
+With Volunteers installed it also does this, all in the same step and all undone together if
+anything is refused:
+
+| Record | What happens | Why |
+|---|---|---|
+| Volunteer hours | Kept, with their date, hours and status, still credited to the anonymous record. The **Notes** on each are emptied. | The hours your organization received stay in every total, job and shift. Approved hours are erased like any other: nothing that approval locks is changed. |
+| Shift sign-ups | Kept, with their **Notes** emptied. A booking that is Signed up or Confirmed on a shift that has not started is set to **Cancelled**. | Shift counts stay right, the place is freed, and nobody expects the person. |
+| Volunteer skills and interests | Deleted, and emptied from the Recycle Bin. | A skill or interest is a fact about the person. |
+| Onboarding requirements | Deleted, and emptied from the Recycle Bin. | A background check result lives nowhere else. |
+| Volunteer totals on the person | Kept. | They say nothing about who the person was, and they still match the hours kept. |
+
+The preview lists each of these before you confirm. The person erasing must hold **Volunteers
+Admin** or **Volunteers Coordinator**: someone who cannot see or change these records is refused
+rather than leaving them behind. A **Rejection Reason** a coordinator wrote is kept: it says why
+an entry was refused, and only the approval screen changes it.
+
+## Households and volunteer hours
+
+Hours are credited to the household the person was in when the hours were saved, and stay there
+when the person moves (as gifts do). So a household that hours point at is never deleted by the
+empty household tidy-up: if the last person moves out of a household with volunteer hours, the
+household is kept, quietly, with no Error Log entry, so its history still adds up. The same holds
+for the nightly tidy-up of households emptied by deleting people and for undoing an import.
+A household with no hours (and nothing else pointing at it) is tidied away as usual.
+
+Merging two households moves every hours entry of the household merged away to the household you
+keep, approved ones included. That household's volunteer totals catch up at the next nightly
+run, or at once with **Recalculate all** on the Rollups page.
 
 ## Turning it off
 

@@ -808,4 +808,20 @@
         <shortDescription>Refresh button on the readiness card</shortDescription>
         <value>Refresh</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Erase_HoursKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: why volunteer hours are kept</shortDescription>
+        <value>Kept with their dates and hours, credited to the anonymous record, so totals stay right. Notes on them are emptied.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Erase_SignupsKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: why shift sign-ups are kept</shortDescription>
+        <value>Kept, so shift counts stay right. Bookings on shifts still to come are cancelled and notes are emptied.</value>
+    </labels>
 </CustomLabels>
