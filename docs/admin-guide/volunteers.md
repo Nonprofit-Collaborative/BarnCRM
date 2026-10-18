@@ -35,10 +35,13 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Volunteers Admin** permission set.
 3. Gives everyone who already has a BarnCRM role the Volunteers permission set for that role
    (next section). This runs in the background and takes a minute or two in a large org.
+4. Adds the two shipped letter templates, an hours letter and a certificate (see
+   [Hour letters and certificates](#hour-letters-and-certificates)). An upgrade adds only a
+   shipped template you do not have, and never changes one you edited.
 
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
 **Volunteer Shifts** and **Volunteer Hours** for everyone with a Volunteers set, and
-**Volunteer Settings** for admins only.
+**Volunteer Letter Templates** and **Volunteer Settings** for admins only.
 
 ## Roles and permission sets
 
@@ -84,6 +87,47 @@ with recurring shifts, and until then changing it changes nothing.
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | With recurring shifts |
 
+## Hour letters and certificates
+
+A coordinator can give a volunteer a PDF letter stating their hours (for a school service
+requirement, court ordered service or an employer's matching program) or a certificate of
+service. Each one counts only **Approved** hours with a **Date Worked** in the period chosen, and
+only the hours the coordinator can see. It is saved as a file on the person's record (the
+**Files** list), and that file is the record that it was given. Giving is not needed.
+
+**Who can.** Making a letter needs the **Manage Volunteers** permission, which the Volunteers
+Coordinator and Volunteers Admin sets give. Only Volunteers Admin edits templates.
+
+**Templates.** On the **Volunteer Letter Templates** tab, each template has a **Type** (Hours
+letter or Certificate), a **Body** of HTML and an **Active** box. One template per type is
+active: ticking **Active** on one clears it on the others of its type. Edit the shipped
+templates or write your own. The body can use these tokens, each filled in when the letter is
+made:
+
+| Token | Filled with |
+|---|---|
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings |
+| `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
+| `{Hours}` | Their approved hours in the period |
+| `{JobList}` | A list of each job with its hours in the period |
+| `{FromDate}`, `{ToDate}`, `{Today}` | The period and the day the letter was made |
+
+A token spelled wrong is printed as typed, so a test letter shows the mistake. Names and job
+titles are printed as plain text, so a person or job name can never change the layout. Keep the
+HTML simple (paragraphs, headings, lists, inline styles): the PDF service does not run scripts.
+
+**One person.** Add the **Volunteer letter** action to your contact page (and, if your people
+are held as person accounts, your account page): in Setup, **Object Manager**, **Contact**,
+**Page Layouts** (or the Lightning page), add the action. On a person, click **Volunteer
+letter**, choose the template and the period, click **Preview** to read it, then **Generate**.
+A person with no approved hours in the period gets no letter, and the action says so. On a
+household or organization account the action says that letters are for people.
+
+**A list of people.** In Flow Builder, the **Generate volunteer letters** action takes a list of
+person Ids, a template Id and the period, and makes the letters in the background, ten people
+at a time; each appears in that person's **Files** within a few minutes. People with no approved
+hours in the period are skipped.
+
 ## Turning it off
 
 Turning Volunteers off in Module Manager stops its automations; the records stay. Hours saved
@@ -114,3 +158,6 @@ set when their role changes. Give the role and let the module give the set.
 
 **Looking for someone else's hours as a Team Member.** Hours are private; a Coordinator sees them
 all.
+
+**A letter shows fewer hours than expected.** A letter counts only Approved hours in the period.
+Approve the Submitted entries first, and check the From and To dates.

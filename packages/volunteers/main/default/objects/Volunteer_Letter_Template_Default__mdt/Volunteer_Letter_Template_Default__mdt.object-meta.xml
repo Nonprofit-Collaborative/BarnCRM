@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The volunteer letter templates the package ships, copied into Volunteer_Letter_Template__c at install and upgrade when the org has no template with that key (R-VL5). An upgrade never changes a copied template.
+  </description>
+  <label>Volunteer Letter Template Default</label>
+  <pluralLabel>Volunteer Letter Template Defaults</pluralLabel>
+  <visibility>Protected</visibility>
+</CustomObject>

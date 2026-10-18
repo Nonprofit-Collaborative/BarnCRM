@@ -13,7 +13,10 @@
  *    reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Volunteers Admin at the same moment; with no installer it is queued alone.
  *
- * The shipped rollups and letter templates are created here by the changes that ship them.
+ * 4. Copy the shipped letter templates the org does not have (R-VL5,
+ *    `VolunteerLetterTemplates.installDefaultsDuringInstall`), never changing one it has.
+ *
+ * The shipped rollups are created here by the change that ships them.
  */
 public with sharing class VolunteersPostInstall implements InstallHandler {
     private static final String SWITCH_CONTEXT = 'VolunteersPostInstall.ensureAutomationSwitches';
@@ -31,6 +34,8 @@ public with sharing class VolunteersPostInstall implements InstallHandler {
         }
         // The entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        // Copies only, and records its own failures: it comes before anything is queued.
+        VolunteerLetterTemplates.installDefaultsDuringInstall();
         Id installerId = context.installerId();
         if (installerId == null) {
             new VolunteersAccessSync().requestSync();
