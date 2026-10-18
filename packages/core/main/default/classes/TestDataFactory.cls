@@ -116,7 +116,9 @@ public class TestDataFactory {
      */
     @NamespaceAccessible
     public static User createUser(String lastName, List<String> permissionSetNames) {
-        return TestUsers.standardUserWith(lastName, permissionSetNames);
+        return TestUsers.grantStandardFieldAccess(
+            TestUsers.standardUserWith(lastName, permissionSetNames)
+        );
     }
 
     /**

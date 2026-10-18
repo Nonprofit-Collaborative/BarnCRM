@@ -270,8 +270,12 @@ public with sharing class FieldUtilizationService {
     ) {
         Boolean grouped = groupsByRecordType(described);
         Boolean ordered = described.fields.getMap().containsKey(MODIFIED_FIELD);
+        // The sampled field can itself be RecordTypeId, and a select list may not name a field
+        // twice (in any case), so the record type is added only when it is not already there.
+        Boolean sampledIsRecordType = 'RecordTypeId'.equalsIgnoreCase(fieldName);
         String query = soql(
-            (grouped ? 'RecordTypeId, ' : '') + String.escapeSingleQuotes(fieldName),
+            (grouped && !sampledIsRecordType ? 'RecordTypeId, ' : '') +
+            String.escapeSingleQuotes(fieldName),
             described,
             (ordered ? ' ORDER BY LastModifiedDate DESC' : '') + ' LIMIT ' + SAMPLE_SIZE
         );

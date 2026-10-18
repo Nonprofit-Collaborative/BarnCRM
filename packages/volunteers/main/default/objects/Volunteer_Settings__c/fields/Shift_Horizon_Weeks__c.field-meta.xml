@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Shift_Horizon_Weeks__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    How many weeks ahead recurring schedules keep their shifts created. From 1 to 26; blank means 8.
+  </inlineHelpText>
+  <label>Shift Horizon Weeks</label>
+  <precision>2</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

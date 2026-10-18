@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <compactLayoutAssignment>Volunteer_Signup_Compact</compactLayoutAssignment>
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    A person booked onto a shift. It records the intention; volunteer hours record what
+    actually happened.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Volunteer Sign-up</label>
+  <nameField>
+    <displayFormat>VS-{000000}</displayFormat>
+    <label>Sign-up Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Volunteer Sign-ups</pluralLabel>
+  <sharingModel>ControlledByParent</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

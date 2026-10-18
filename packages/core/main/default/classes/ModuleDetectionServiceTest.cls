@@ -53,7 +53,7 @@ private class ModuleDetectionServiceTest {
             for (ModuleDetectionService.ModuleInfo module : modules) {
                 names.add(module.name);
             }
-            Assert.areEqual(
+            assertListed(
                 new List<String>{ 'Core', 'Rollups' },
                 names,
                 'No nonprofit module is shown until the Nonprofit Edition is chosen'
@@ -83,9 +83,19 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(3, modules.size(), 'Core, Rollup Builder and the installed module');
-            Assert.areEqual('Programs', modules[2].name, 'An installed module is never hidden');
-            Assert.isTrue(modules[2].present, 'And it is shown as here');
+            Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
+            for (ModuleDetectionService.ModuleInfo module : modules) {
+                byName.put(module.name, module);
+            }
+            Set<String> expected = installedModules();
+            expected.add('Programs');
+            Assert.areEqual(
+                3 + expected.size() - 1,
+                modules.size(),
+                'Core, Rollup Builder, the announcing module and any module whose objects are here'
+            );
+            Assert.isTrue(byName.containsKey('Programs'), 'An installed module is never hidden');
+            Assert.isTrue(byName.get('Programs').present, 'And it is shown as here');
         }
     }
 
@@ -158,7 +168,11 @@ private class ModuleDetectionServiceTest {
                 chosen,
                 'The saved choice is read'
             );
-            Assert.areEqual(2, modules.size(), 'Core and Rollup Builder, and no nonprofit module');
+            Assert.areEqual(
+                2 + installedModules().size(),
+                modules.size(),
+                'Core and Rollup Builder, any module whose objects are here, and no other nonprofit module'
+            );
         }
     }
 
@@ -176,7 +190,7 @@ private class ModuleDetectionServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(
+            assertListed(
                 new List<String>{ 'Core', 'Rollups', 'Giving' },
                 names,
                 'An installed module stays listed; the others stay hidden in the Standard Edition'
@@ -264,6 +278,10 @@ private class ModuleDetectionServiceTest {
             );
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            String appId = FakeIds.ofPrefix('06m', 1);
+            ModuleDetectionService.appIdsOverride = new Map<String, String>{
+                'Fundraising' => appId
+            };
 
             Test.startTest();
             ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -272,13 +290,101 @@ private class ModuleDetectionServiceTest {
             Assert.isTrue(giving.present, 'Giving is here');
             Assert.isNull(giving.installUrl, 'So the step offers no installer');
             Assert.areEqual(
-                '/lightning/app/' + NamespaceUtil.prefix() + 'Fundraising',
+                '/lightning/app/' + appId,
                 giving.appUrl,
-                'An installed module links to its own app, where its Settings tab lives'
+                'An installed module links to its own app by Id, where its Settings tab lives'
             );
             Assert.isTrue(
                 giving.docsUrl.endsWith('/giving/README.md'),
                 'Its description is linked'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkFallsBackToTheCustomAppFormWithNoNamespace() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
+            NamespaceUtil.cachedPrefix = '';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/c__Fundraising',
+                giving.appUrl,
+                'An app not found is addressed as an unmanaged custom app'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkFallsBackToTheNamespaceWhenThereIsOne() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            ModuleDetectionService.appIdsOverride = new Map<String, String>();
+            NamespaceUtil.cachedPrefix = 'barn__';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/barn__Fundraising',
+                giving.appUrl,
+                'An app not found is addressed by its namespace'
+            );
+        }
+    }
+
+    @IsTest
+    static void appLinkUsesTheOrgsOwnAppMenuWhenNothingIsStubbed() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'NoSuchBarnCrmApp';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            NamespaceUtil.cachedPrefix = '';
+
+            Test.startTest();
+            ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                '/lightning/app/c__NoSuchBarnCrmApp',
+                giving.appUrl,
+                'The real query finds nothing for an unknown app, so the name form is used'
+            );
+        }
+    }
+
+    @IsTest
+    static void anAppThatIsNotInTheOrgYetFallsBackToTheNameFormWithoutError() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.App_Name__c = 'BarnCRM_Volunteers';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+            NamespaceUtil.cachedPrefix = '';
+
+            ModuleDetectionService.ModuleInfo info = ModuleDetectionService.givingModule();
+
+            Assert.areEqual(
+                '/lightning/app/c__BarnCRM_Volunteers',
+                info.appUrl,
+                'Volunteers ships no app yet, so its link uses the name form'
             );
         }
     }
@@ -351,6 +457,10 @@ private class ModuleDetectionServiceTest {
             Assert.areEqual('BarnCRM_Rollup_Builder', rollups.App_Name__c, 'Its own app');
             Assert.areEqual(5, rollups.Sort_Order__c.intValue(), 'Listed before Giving');
             Assert.areEqual('Rollups', shipped.get('Giving').Requires__c, 'Giving needs it');
+            BarnCRM_Module__mdt volunteers = shipped.get('Volunteers');
+            Assert.areEqual('Rollups', volunteers.Requires__c, 'Volunteers needs it too');
+            Assert.areEqual('BarnCRM_Volunteers', volunteers.App_Name__c, 'Its own app');
+            Assert.areEqual('Volunteer_Hours__c', volunteers.Probe_Object__c, 'Its probe object');
         }
     }
 
@@ -428,6 +538,37 @@ private class ModuleDetectionServiceTest {
             Install_Version_Id__c = versionId,
             Sort_Order__c = sortOrder
         );
+    }
+
+    /**
+     * The modules other than Core, Rollup Builder and Giving whose probe object is in this org.
+     * Detection lists an installed module in any edition, so a test that expects a short list
+     * adds these to it and holds whether or not such a package is installed beside Core.
+     */
+    private static Set<String> installedModules() {
+        Set<String> names = new Set<String>();
+        for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+            if (
+                row.DeveloperName != 'Rollups' &&
+                row.DeveloperName != 'Giving' &&
+                String.isNotBlank(row.Probe_Object__c) &&
+                ModuleDetectionService.resolveObject(row.Probe_Object__c.trim()) != null
+            ) {
+                names.add(row.DeveloperName);
+            }
+        }
+        return names;
+    }
+
+    /** The expected modules first, then exactly the installed ones this org also has. */
+    private static void assertListed(List<String> expected, List<String> actual, String message) {
+        Assert.areEqual(expected.size() + installedModules().size(), actual.size(), message);
+        for (Integer i = 0; i < expected.size(); i++) {
+            Assert.areEqual(expected[i], actual[i], message);
+        }
+        Set<String> rest = new Set<String>(actual);
+        rest.removeAll(new Set<String>(expected));
+        Assert.areEqual(installedModules(), rest, message);
     }
 
     private static void chooseSuite(String suite) {

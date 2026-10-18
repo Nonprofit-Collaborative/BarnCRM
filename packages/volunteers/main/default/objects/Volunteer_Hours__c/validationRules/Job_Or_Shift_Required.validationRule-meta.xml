@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Job_Or_Shift_Required</fullName>
+  <active>true</active>
+  <description>
+    R-VG3: an hours entry names a job or a shift. A row the platform emptied when its job was
+    deleted is left alone until somebody changes the job or the shift.
+  </description>
+  <errorConditionFormula>
+AND(
+  ISBLANK(Volunteer_Job__c),
+  ISBLANK(Volunteer_Shift__c),
+  OR(ISNEW(), ISCHANGED(Volunteer_Job__c), ISCHANGED(Volunteer_Shift__c))
+)
+  </errorConditionFormula>
+  <errorMessage>
+    Choose the volunteer job or the shift these hours were given to.
+  </errorMessage>
+</ValidationRule>

@@ -126,7 +126,8 @@ public with sharing class ModuleDetectionService {
                 Package_Folder__c = 'giving'
             );
         }
-        return module(row, isGivingPresent());
+        Boolean present = isGivingPresent();
+        return module(row, present, present ? appIds(new List<BarnCRM_Module__mdt>{ row }) : null);
     }
 
     /** Salesforce's installer for a published version, or null when none is published. */
@@ -148,7 +149,8 @@ public with sharing class ModuleDetectionService {
         List<ModuleInfo> offered = new List<ModuleInfo>{
             module(
                 new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'),
-                true
+                true,
+                null
             )
         };
         List<BarnCRM_Module__mdt> rows = catalog();
@@ -158,10 +160,17 @@ public with sharing class ModuleDetectionService {
             presentByName.put(row.DeveloperName, isPresent(row, announced));
             labelByName.put(row.DeveloperName, labelOf(row));
         }
+        List<BarnCRM_Module__mdt> hereRows = new List<BarnCRM_Module__mdt>();
+        for (BarnCRM_Module__mdt row : rows) {
+            if (presentByName.get(row.DeveloperName)) {
+                hereRows.add(row);
+            }
+        }
+        Map<String, String> appIds = appIds(hereRows);
         for (BarnCRM_Module__mdt row : rows) {
             Boolean present = presentByName.get(row.DeveloperName);
             if (present || offeredIn(row, edition)) {
-                ModuleInfo info = module(row, present);
+                ModuleInfo info = module(row, present, appIds);
                 info.installFirst = present ? null : missing(row, presentByName, labelByName);
                 offered.add(info);
             }
@@ -278,7 +287,11 @@ public with sharing class ModuleDetectionService {
         return names;
     }
 
-    private static ModuleInfo module(BarnCRM_Module__mdt row, Boolean present) {
+    private static ModuleInfo module(
+        BarnCRM_Module__mdt row,
+        Boolean present,
+        Map<String, String> appIds
+    ) {
         ModuleInfo info = new ModuleInfo();
         info.name = row.DeveloperName;
         info.label = labelOf(row);
@@ -286,9 +299,67 @@ public with sharing class ModuleDetectionService {
         info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
         info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
         info.appUrl = present && String.isNotBlank(row.App_Name__c)
-            ? APP_PATH + NamespaceUtil.prefix() + row.App_Name__c.trim()
+            ? appUrl(row.App_Name__c.trim(), appIds)
             : null;
         return info;
+    }
+
+    /**
+     * The app's address by Id, which opens it however it is packaged; by name only when the
+     * app is not found (not installed, or not visible to the user). Lightning addresses an
+     * unmanaged app as `c__Name`, a managed one as `namespace__Name`.
+     */
+    private static String appUrl(String appName, Map<String, String> appIds) {
+        String appId = appIds == null ? null : appIds.get(appName);
+        if (String.isNotBlank(appId)) {
+            return APP_PATH + appId;
+        }
+        String prefix = NamespaceUtil.prefix();
+        return APP_PATH + (String.isBlank(prefix) ? 'c__' : prefix) + appName;
+    }
+
+    /**
+     * Stands in for the app list in tests, by app developer name: the DurableId `AppDefinition`
+     * gives it. An empty map means no app is found.
+     */
+    @TestVisible
+    private static Map<String, String> appIdsOverride;
+
+    /**
+     * The DurableIds (06m) Lightning addresses the apps these catalog rows name by, by
+     * developer name, from one `AppDefinition` query. Only an app in this package's namespace counts (none today), so another package's
+     * app with the same developer name is not picked up.
+     */
+    private static Map<String, String> appIds(List<BarnCRM_Module__mdt> rows) {
+        Map<String, String> found = new Map<String, String>();
+        Set<String> names = new Set<String>();
+        for (BarnCRM_Module__mdt row : rows) {
+            if (String.isNotBlank(row.App_Name__c)) {
+                names.add(row.App_Name__c.trim());
+            }
+        }
+        if (names.isEmpty()) {
+            return found;
+        }
+        if (appIdsOverride != null) {
+            return appIdsOverride;
+        }
+        String namespace = NamespaceUtil.prefix().removeEnd('__');
+        try {
+            for (AppDefinition item : [
+                SELECT DurableId, DeveloperName, NamespacePrefix
+                FROM AppDefinition
+                WHERE DeveloperName IN :names
+                WITH USER_MODE
+            ]) {
+                if ((item.NamespacePrefix == null ? '' : item.NamespacePrefix) == namespace) {
+                    found.put(item.DeveloperName, item.DurableId);
+                }
+            }
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'BarnCRM module app links');
+        }
+        return found;
     }
 
     private static Boolean objectExists(String objectName) {

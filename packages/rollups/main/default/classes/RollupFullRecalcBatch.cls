@@ -11,11 +11,21 @@
  * time before the totals are on the records (R-R13, bug 5).
  *
  * Chunk size follows the data. Each record's expected source rows are estimated from the counts
- * the last run stored on it (its COUNT totals) times the source queries the pass runs. A chunk
+ * the last run stored on it (the largest total of every active COUNT on its entity, as
+ * `RollupLargeParentBatch.estimate` does) times the source queries the pass runs. A chunk
  * takes records until the estimate reaches `rowBudget`, and holds the rest back for a follow-up
- * pass over just those records with a quarter of the chunk size. A record whose own estimate
- * reaches the budget is calculated alone, in a transaction of its own, after the others (skew
- * step 1). A record that has no COUNT total to go by is estimated at one row.
+ * pass over just those records with a quarter of the chunk size. A record that has no COUNT
+ * total to go by is estimated at one row.
+ *
+ * Large parents (R-RQ6): an aggregate query counts every row it aggregates towards the 50,000 a
+ * transaction may read, so a record with tens of thousands of source rows cannot be calculated
+ * in any chunk, even alone (the tier 1 scale test's fund of 30,000 allocations stopped its chunk
+ * on "Too many query rows: 50001" every run). A record estimated at
+ * `RollupLargeParentBatch.largeParentRows` or more goes to the Rollup Queue, which hands it to the
+ * large parent batch. A stale count can still make a record look small, so each chunk's
+ * recalculation runs under the queue's row ceiling: before a further query would pass it, the
+ * recalculation stops with nothing written, and the chunk's records are held back for a pass
+ * with smaller chunks, or, one record alone, go the large parent way too.
  *
  * Locks and failures: no `FOR UPDATE`; writes in Id order with partial success (`RollupWriter`);
  * a record the platform refused goes to the Rollup Queue to be tried again, Failed after five
@@ -114,22 +124,15 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
     /** Records that did not fit a chunk's budget, for a follow-up pass. */
     @TestVisible
     private Set<Id> later = new Set<Id>();
-    /** Records too heavy to share a transaction, calculated alone once the others are done. */
+    /** Records this pass sent to the large parent route, for tests to read. */
     @TestVisible
-    private Set<Id> alone;
+    private Set<Id> large = new Set<Id>();
 
-    private RollupFullRecalcBatch(
-        Run run,
-        Integer targetIndex,
-        Set<Id> onlyIds,
-        Integer scope,
-        Set<Id> alone
-    ) {
+    private RollupFullRecalcBatch(Run run, Integer targetIndex, Set<Id> onlyIds, Integer scope) {
         this.run = run;
         this.targetIndex = targetIndex;
         this.onlyIds = onlyIds;
         this.scope = Math.max(1, scope);
-        this.alone = alone == null ? new Set<Id>() : alone;
     }
 
     // --------------------------------------------------------------------------------- starting
@@ -234,22 +237,19 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
                 run.targets.add(target);
             }
         }
-        return run.targets.isEmpty()
-            ? null
-            : new RollupFullRecalcBatch(run, 0, null, firstScope(), null);
+        return run.targets.isEmpty() ? null : new RollupFullRecalcBatch(run, 0, null, firstScope());
     }
 
     private static Target targetFor(String name, List<Rollup_Definition__c> definitions) {
-        RollupPlanner.Plan plan = RollupPlanner.plan(SettingsService.typeByName(name), definitions);
+        Schema.SObjectType targetType = SettingsService.typeByName(name);
+        RollupPlanner.Plan plan = RollupPlanner.plan(targetType, definitions);
         Target target = new Target();
         target.name = name;
         target.definitions.addAll(plan.definitions);
         target.queries = Math.max(1, plan.queries.size());
-        for (Integer i = 0; i < plan.definitions.size(); i++) {
-            if ('COUNT'.equalsIgnoreCase(plan.definitions[i].Aggregate__c)) {
-                target.countFields.add(String.valueOf(plan.targetFields[i]));
-            }
-        }
+        // Every active COUNT on the entity, not only those planned: Recalculate on a fund's SUM
+        // alone must still see the fund's 30,000 allocations (R-RQ6).
+        target.countFields.addAll(RollupLargeParentBatch.storedCountFields(targetType));
         return target;
     }
 
@@ -294,17 +294,14 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
         Target target = currentTarget();
         Set<Id> taken = new Set<Id>();
         Set<Id> overflow = new Set<Id>();
+        Set<Id> large = new Set<Id>();
         Integer expected = 0;
         for (SObject record : records) {
             Integer weight = weightOf(record, target);
-            if (this.onlyIds == null && weight >= rowBudget) {
-                this.alone.add(record.Id);
+            if (weight >= RollupLargeParentBatch.largeParentRows()) {
+                large.add(record.Id);
             } else if (!taken.isEmpty() && expected + weight > rowBudget) {
-                if (this.later.size() < holdBackLimit) {
-                    this.later.add(record.Id);
-                } else {
-                    overflow.add(record.Id);
-                }
+                holdBack(record.Id, overflow);
             } else {
                 taken.add(record.Id);
                 expected += weight;
@@ -313,7 +310,41 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
         if (!overflow.isEmpty()) {
             RollupQueue.add(new Map<String, Set<Id>>{ target.name => overflow });
         }
+        toLargeParentRoute(target, large);
         recalculate(target, taken);
+    }
+
+    /** Holds a record back for a follow-up pass, or, past the hold back limit, queues it. */
+    private void holdBack(Id recordId, Set<Id> overflow) {
+        if (this.later.size() < holdBackLimit) {
+            this.later.add(recordId);
+        } else {
+            overflow.add(recordId);
+        }
+    }
+
+    /**
+     * R-RQ6: queues records too large for any chunk, naming the pass's definitions. The queue
+     * estimates them as this pass did and hands them to `RollupLargeParentBatch`, which reads
+     * their source rows in chunks; a stale count is caught by the queue's own row ceiling.
+     */
+    private void toLargeParentRoute(Target target, Set<Id> ids) {
+        if (ids.isEmpty()) {
+            return;
+        }
+        this.large.addAll(ids);
+        Set<Id> definitionIds = new Set<Id>();
+        for (Rollup_Definition__c definition : target.definitions) {
+            if (definition.Id != null) {
+                definitionIds.add(definition.Id);
+            }
+        }
+        RollupQueue.add(
+            new Map<String, Set<Id>>{ target.name => ids },
+            definitionIds.isEmpty()
+                ? null
+                : new Map<String, Set<Id>>{ target.name => definitionIds }
+        );
     }
 
     /** The source rows a record is expected to read: its largest stored count, per query. */
@@ -326,7 +357,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
             }
         }
         Decimal weight = largest * target.queries;
-        return weight >= rowBudget ? rowBudget : weight.intValue();
+        return weight > 2000000000 ? 2000000000 : weight.intValue();
     }
 
     private void recalculate(Target target, Set<Id> ids) {
@@ -334,6 +365,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
             return;
         }
         Map<Id, String> refused;
+        RollupAggregator.limitQueryRows(RollupLargeParentBatch.queueRowCeiling());
         try {
             RollupEngine.Result result = RollupEngine.recalculate(ids, target.definitions);
             this.run.written += result.written.size();
@@ -341,6 +373,21 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
                 this.run.refused.add(definition.Id);
             }
             refused = result.failed;
+        } catch (RollupAggregator.RowCeilingException tooLarge) {
+            // R-RQ6: a stale count took a record as small, and the next query would have stopped
+            // the chunk. Nothing was written: smaller chunks, or the large parent route alone.
+            if (ids.size() == 1) {
+                toLargeParentRoute(target, ids);
+            } else {
+                Set<Id> overflow = new Set<Id>();
+                for (Id recordId : ids) {
+                    holdBack(recordId, overflow);
+                }
+                if (!overflow.isEmpty()) {
+                    RollupQueue.add(new Map<String, Set<Id>>{ target.name => overflow });
+                }
+            }
+            return;
         } catch (Exception stopped) {
             // Nothing was written: the write is the engine's last step. The records wait in the
             // queue rather than until tomorrow night.
@@ -349,6 +396,8 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
             for (Id recordId : ids) {
                 refused.put(recordId, stopped.getMessage());
             }
+        } finally {
+            RollupAggregator.limitQueryRows(null);
         }
         if (refused.isEmpty()) {
             return;
@@ -363,7 +412,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
     }
 
     /**
-     * Follows up the held back records, then the heavy ones, then the next entity, then ends.
+     * Follows up the held back records, then the next entity, then ends.
      * Chains nothing once the module is turned off (ADR-0125 decision 9): the run stops there,
      * unstamped, and Turn on recalculates every rollup.
      */
@@ -396,22 +445,12 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
                 this.run,
                 this.targetIndex,
                 this.later,
-                this.scope / SHRINK_BY,
-                this.alone
+                this.scope / SHRINK_BY
             );
-        }
-        if (!this.alone.isEmpty()) {
-            return new RollupFullRecalcBatch(this.run, this.targetIndex, this.alone, 1, null);
         }
         clearResolvedEntries(currentTarget());
         if (this.targetIndex + 1 < this.run.targets.size()) {
-            return new RollupFullRecalcBatch(
-                this.run,
-                this.targetIndex + 1,
-                null,
-                firstScope(),
-                null
-            );
+            return new RollupFullRecalcBatch(this.run, this.targetIndex + 1, null, firstScope());
         }
         return null;
     }

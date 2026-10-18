@@ -1310,7 +1310,7 @@ names the modules a module's package needs installed first (ADR-0125
 | Install Version Id | `Install_Version_Id__c` | text (18) | The published package version Id (`04t`) Salesforce's installer opens, or empty until the module is first published. |
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
-| App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it; empty means no link yet. |
+| App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Rules
@@ -1735,7 +1735,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
   `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
   nightly recalculation: one batch pass per target entity in turn, records with many source rows
-  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13, one
+  in smaller chunks, large parents to the batch route (R-RQ6), Last Calculated stamped when the last pass finishes, R-R13, one
   run at a time, R-R14) with `RollupRecalcErrorHandler` queueing a stopped chunk's records from
   `BatchApexErrorEvent` (R-R14).
 - **Flow action and template (R-R12):** `RollupRecalcAction`, the invocable action "Recalculate
@@ -1865,7 +1865,13 @@ stored 3,200 of its 26,102 allocations), so the run also measures what each quer
 recalculation read: before a further query would take the transaction past four fifths of the
 limit, taken to read as much as the largest query before it, the recalculation stops with
 nothing written and that entity's records in the run go to the batch as an estimated one does. A
-single record that stopped its run on the query row limit (R-RQ3) goes to the batch too. No other failure goes there. The batch reads each
+single record that stopped its run on the query row limit (R-RQ3) goes to the batch too. No other failure goes there.
+The full run (R-R14) applies the same protection: it estimates each record as above, queues a
+record at the threshold or more, naming the run's definitions, instead of calculating it in a
+chunk (the tier 1 scale test's fund of 30,000 allocations, calculated alone, stopped its chunk on
+the query row limit every run), and recalculates each chunk under the same ceiling; a chunk the
+ceiling stops is held back for smaller chunks, and a lone record it stops is queued the same way.
+The queue then hands such records to the batch. The batch reads each
 planned query's source rows in chunks, runs the query over each chunk's rows only and folds the
 partial answers together, which merge exactly as path alternatives do (R-R1; a distinct count or
 distinct list keeps one entry per value), then writes each record once, with partial success,
@@ -7121,7 +7127,7 @@ references").
 | Emergency Contact Name | text | no | Who to call if something happens to this person on site. |
 | Emergency Contact Phone | text | no | The number to call for that person. |
 | Availability Days | multi-select picklist(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | no | The days this person is usually free to volunteer (V-04). |
-| Availability Times | multi-select picklist(Morning, Afternoon, Evening) | no | The parts of the day this person is usually free (V-04). |
+| Availability Times | multi-select picklist(Morning, Afternoon, Evening) | no | The parts of the day this person is usually free (V-04): Morning is before 12:00, Afternoon is 12:00 to 17:00, Evening is from 17:00. |
 
 The rollup targets that carry a person's hours are on the same two objects and are listed in
 Section 29O.
@@ -7273,7 +7279,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Volunteers Needed | `Volunteers_Needed__c` | Number(4, 0), default 1 |
 | Location | `Location__c` | Text(255) |
 | Status | `Status__c` | Picklist: Open, Cancelled, Completed |
-| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c` (clears on delete) |
+| Shift Schedule | `Shift_Schedule__c` | Lookup to `Shift_Schedule__c`, delete constraint SetNull (kept shifts survive a deleted schedule); ships with the Shift Schedule object (V-07), not in the first build of this section |
 | Slots Filled | `Slots_Filled__c` | Number(4, 0) |
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
@@ -7333,12 +7339,14 @@ Cancelled, so someone who drops out frees the place without the booking being de
 | Attribute | API name | Type |
 |---|---|---|
 | Volunteer Shift | `Volunteer_Shift__c` | Master-Detail to `Volunteer_Shift__c`, relationship name Signups |
-| Contact | `Contact__c` | Lookup to Contact |
-| Account | `Account__c` | Lookup to Account |
-| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull |
+| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled; required, default Signed up |
 | Notes | `Notes__c` | Text Area(255) |
 
-- **Validation rules:** `Exactly_One_Person` (R-VU1).
+- **Validation rules:** `Exactly_One_Person` (R-VU1), checked only when the sign-up is new or
+  its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
+  SetNull) can still be edited.
 - **Service:** `VolunteerSignupService`, `VolunteerSignupTriggerHandler`,
   `VolunteerSignupSelector`.
 
@@ -7452,7 +7460,7 @@ the module's own Volunteer Settings page, never in Setup. Defaults are applied i
 |---|---|---|---|
 | `Hours_Require_Approval__c` | boolean | true | Whether hours are entered as Submitted and wait for a coordinator. Off means an entry is Approved as it is saved and counts at once (R-VG6). |
 | `Attendance_Creates_Hours__c` | boolean | true | Whether marking a sign-up Attended writes the hours for that shift (R-VU3). |
-| `Shift_Horizon_Weeks__c` | integer, 1 to 52 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
+| `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
 
 ### Salesforce implementation
 

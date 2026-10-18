@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Hours_Require_Approval__c</fullName>
+  <defaultValue>true</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Whether volunteer hours wait for a coordinator to approve them. Off means an entry counts as soon as it is saved.
+  </inlineHelpText>
+  <label>Hours Require Approval</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

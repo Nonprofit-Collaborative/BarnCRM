@@ -6,6 +6,13 @@
  */
 @NamespaceAccessible
 public with sharing class ImportTemplateSelector {
+    /**
+     * Custom metadata cannot be inserted by a test, so tests put in-memory rows here and every
+     * read of the shipped defaults sees them instead of the packaged rows.
+     */
+    @TestVisible
+    private static List<Import_Template_Default__mdt> shippedOverride;
+
     /** Active templates, in the order the wizard lists them. */
     @NamespaceAccessible
     public static List<Import_Template__c> selectActive() {
@@ -115,6 +122,9 @@ public with sharing class ImportTemplateSelector {
     /** The templates the package ships (canonical model Section 13). */
     @NamespaceAccessible
     public static List<Import_Template_Default__mdt> selectShippedDefaults() {
+        if (shippedOverride != null) {
+            return shippedOverride;
+        }
         return [
             SELECT
                 DeveloperName,
@@ -125,7 +135,10 @@ public with sharing class ImportTemplateSelector {
                 Default_Values_JSON__c,
                 Matching_Rule__c,
                 Person_Mode__c,
-                Default_Active__c
+                Default_Active__c,
+                Target_Object__c,
+                Load_Operation__c,
+                Load_Match_Field__c
             FROM Import_Template_Default__mdt
             WITH SYSTEM_MODE
             ORDER BY MasterLabel ASC

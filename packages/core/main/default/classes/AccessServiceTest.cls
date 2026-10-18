@@ -229,8 +229,18 @@ private class AccessServiceTest {
     @IsTest
     static void removeRoleRefusesToRemoveTheLastBarnCrmAdmin() {
         System.runAs(TestUsers.admin()) {
-            TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
+            PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(
+                AccessService.ADMIN_ROLE
+            );
             User maria = insertUser('Maria', 'Alvarez');
+            // A real org already has other holders of the role (assignments are visible to
+            // tests), so Maria is the last one only once the others are cleared. The delete
+            // rolls back with the test.
+            delete as system [
+                SELECT Id
+                FROM PermissionSetAssignment
+                WHERE PermissionSetGroupId = :adminGroup.Id
+            ];
             AccessService.assignRole(maria.Id, AccessService.ADMIN_ROLE);
             String message;
 

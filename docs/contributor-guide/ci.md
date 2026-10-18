@@ -201,7 +201,7 @@ Salesforce org is needed for this job. Steps:
    relied on the old system-mode default fails for a user without access, and only an org
    run as that user shows it.
    `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
-   in Core, Giving or Mirror (the vendored engine excepted) never calls `System.runAs` and
+   in Core, Giving, Volunteers or Mirror (the vendored engine excepted) never calls `System.runAs` and
    carries no `// runs-as: deploying user (reason)` comment (a `@TestSetup` that only calls
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
@@ -559,6 +559,16 @@ So every test is self-contained:
   create people) and loses only the dependence on permission set assignments. A test that has
   something to prove about least privilege still builds its own user with
   `TestDataFactory.createUser` on the Standard User profile, inside the outer `runAs`.
+- A real org's System Administrator profile may hide optional standard fields (a sandbox of
+  a production org had no field access to `Account.AnnualRevenue`, `Contact.Description` or
+  `Contact.AssistantName`), and 55 tests that insert or query them failed with "fields being
+  inaccessible" or "No such column". So `TestUsers` also builds a permission set in the test,
+  once per transaction, granting Read and Edit on the optional standard fields the suite
+  uses (`OPTIONAL_STANDARD_FIELDS`), and assigns it to the users on the running user's
+  profile (`admin()`, `adminWith`, `withPermissionSets`, `onRunningProfileWith`) and to
+  `TestDataFactory.createUser` users. The `standardUser*` helpers and `peopleReaderWith` never
+  get it, because their tests prove least privilege. A test that uses a new optional standard
+  field adds it to the list rather than relying on the org's profile.
 - Users and permission set assignments are setup objects. `TestUsers` writes them in a
   context of their own; a test that creates more people does the same with a nested
   `System.runAs(new User(Id = UserInfo.getUserId()))`, as before.
@@ -631,7 +641,8 @@ about one shape and no other.
 The deploy goes in stages through `scripts/org/deploy-packages.sh`: Core (one stage per object under `packages/core/main/default/objects`, then
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
 flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
-applications, tabs, quick actions, Lightning components), then Giving. A failed stage asks the
+applications, tabs, quick actions, Lightning components), then Giving, then Volunteers (a no-op while `packages/volunteers` holds
+no metadata, and left out by `--core-only`), then Mirror. A failed stage asks the
 org for the component level report, by job id, in human form and then as JSON. After the last
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no

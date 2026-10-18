@@ -19,11 +19,12 @@ def read(path):
 
 
 def run_tier1(out, households=400, contacts=1000, gifts=3000, no_default_fund=False,
-              skip_fund_code=None):
+              skip_fund_code=None, acknowledge_every=10):
     gen.generate_tier1(
         Namespace(
             out_dir=str(out), households=households, contacts=contacts, gifts=gifts,
             no_default_fund=no_default_fund, skip_fund_code=skip_fund_code or [],
+            acknowledge_every=acknowledge_every,
         )
     )
 
@@ -104,6 +105,15 @@ class Tier1Tests(unittest.TestCase):
             run_tier1(Path(other), no_default_fund=True)
             funds = read(Path(other) / "funds.csv")
             self.assertTrue(all(f["Is_Default__c"] == "false" for f in funds))
+
+    def test_every_tenth_gift_needs_acknowledgment(self):
+        statuses = [r["Acknowledgment_Status__c"] for r in read(self.out / "gifts.csv")]
+        self.assertEqual(statuses.count("To acknowledge"), 300)
+        self.assertEqual(set(statuses), {"To acknowledge", "Not required"})
+        with tempfile.TemporaryDirectory() as other:
+            run_tier1(Path(other), acknowledge_every=0)
+            off = {r["Acknowledgment_Status__c"] for r in read(Path(other) / "gifts.csv")}
+            self.assertEqual(off, {"Not required"})
 
     def test_no_allocations_file(self):
         self.assertFalse((self.out / "allocations.csv").exists())

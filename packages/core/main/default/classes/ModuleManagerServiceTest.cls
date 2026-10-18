@@ -18,7 +18,7 @@ private class ModuleManagerServiceTest {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
             new Setting_Definition__mdt(
                 Setting_Key__c = 'Shift_Reminder_Days__c',
-                Settings_Object__c = 'Volunteer_Settings__c',
+                Settings_Object__c = 'Example_Settings__c',
                 Section__c = 'Volunteers',
                 Module__c = MODULE,
                 Data_Type__c = 'Number'
@@ -302,6 +302,17 @@ private class ModuleManagerServiceTest {
                         AND PermissionSet.Name = 'BarnCRM_Read_Only'
                 ],
                 'Held once'
+            );
+        }
+    }
+
+    @IsTest
+    static void namesTheShippedAdminSetOfEachModuleThatHasOne() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'Volunteers_Admin',
+                ModuleManagerService.adminPermissionSets.get('Volunteers'),
+                'Turning Volunteers on gives its admin set'
             );
         }
     }
