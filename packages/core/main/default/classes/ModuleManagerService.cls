@@ -76,6 +76,7 @@ public with sharing class ModuleManagerService {
             'Skill__c',
             'Volunteer_Hours__c',
             'Volunteer_Job__c',
+            'Volunteer_Requirement__c',
             'Volunteer_Shift__c',
             'Volunteer_Signup__c',
             'Volunteer_Skill__c'

@@ -376,6 +376,12 @@ public with sharing class PersonErasure {
                 List<Change> changes = extension.erase(personId);
                 if (changes != null) {
                     result.changes.addAll(changes);
+                    // Records a module deleted leave the Recycle Bin with the rest (R-ER8).
+                    for (Change change : changes) {
+                        if (change.action == DELETED) {
+                            deletedIds.addAll(change.recordIds);
+                        }
+                    }
                 }
             }
         } catch (ErasureException refusal) {

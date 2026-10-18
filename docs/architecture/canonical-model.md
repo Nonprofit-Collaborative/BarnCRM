@@ -7807,9 +7807,9 @@ deletes their requirement rows and empties them from the Recycle Bin, through th
 | Attribute | API name | Type |
 |---|---|---|
 | Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
-| Person Account | `Account__c` | Lookup to Account (deletes this record when the person is deleted) |
-| Type | `Type__c` | Picklist: Application, Background check, Orientation |
-| Status | `Status__c` | Picklist: Not started, In progress, Completed, Not approved |
+| Person Account | `Account__c` | Lookup to Account (emptied when the person is deleted) |
+| Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation |
+| Status | `Status__c` | Required restricted picklist: Not started (default), In progress, Completed, Not approved |
 | Completed Date | `Completed_Date__c` | Date |
 | Expires | `Expires__c` | Date |
 | Notes | `Notes__c` | Text (255) |
@@ -7817,7 +7817,14 @@ deletes their requirement rows and empties them from the Recycle Bin, through th
 
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
-- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8).
+- **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8). It reads
+  the person's requirements in system mode, deletes them as the user (a user without access to
+  requirements is refused, R-ER5) and keeps no person field. Core adds the Ids of any records
+  an extension reports as Deleted to those it empties from the Recycle Bin after the commit.
+- **Access:** `Volunteers_Admin` and `Volunteers_Coordinator` create, read, edit and delete, with
+  View All and Modify All (a Private object is edited by others only with Modify All, which the
+  platform gives only with delete); Is Current is read only. `Volunteers_Staff` and
+  `Volunteers_Read_Only` hold no object or field permission and the object has no tab.
 
 ---
 
@@ -8246,6 +8253,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-17 | Volunteers V-01 to V-03 (ADR-0127). New Part G, Sections 29I to 29O: the volunteer person attributes on Contact and Account (shipped by Volunteers, not Core), `Volunteer_Job__c`, `Volunteer_Shift__c`, `Volunteer_Signup__c`, `Volunteer_Hours__c`, the module's `Volunteer_Settings__c` and 19 shipped volunteer rollups (Status Approved, mode Both) through BarnCRM Rollup Builder. Rules R-VP, R-VJ, R-VS, R-VU, R-VG and R-VR. Section 4 gains the volunteer person pairs. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers V-04 to V-08 (ADR-0128 `0128-volunteer-recurring-shifts.md`, ADR-0129 `0129-volunteer-letters.md`). New in Part G, all in Volunteers: Skill (`Skill__c`, 29P), Volunteer Skill (`Volunteer_Skill__c`, 29Q), Job Skill (`Job_Skill__c`, 29R), Volunteer Requirement (`Volunteer_Requirement__c`, 29S), Shift Schedule (`Shift_Schedule__c`, 29T), Volunteer Letter Template (`Volunteer_Letter_Template__c` and the shipped `Volunteer_Letter_Template_Default__mdt`, 29U) and the volunteer hours import template (29V). Rules R-SK, R-VK, R-VQ, R-SSC, R-VL and R-VH. Core: `Import_Template_Default__mdt` gains `Target_Object__c`, `Load_Operation__c` and `Load_Match_Field__c`, and new rule R-D3 says how a one-object template is materialized. Section 13 now says `Rollup_Definition_Default__mdt` belongs to the Rollup Builder module (ADR-0125); Sections 30 and 32 move Programs to v0.9. Specified ahead of the build; no metadata yet. |
 | v0.8 | 2026-10-17 | Volunteers access (ADR-0127, decision 3). No object or field added. Part G gains the access table: `Volunteers_Coordinator`, `Volunteers_Staff` and `Volunteers_Read_Only` beside `Volunteers_Admin`, the role each is given to, and the BarnCRM Volunteers app with its Jobs, Shifts, Hours and Volunteer Settings tabs. |
+| v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 
 ---

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Volunteer_Requirement_Dates</fullName>
+  <active>true</active>
+  <description>
+    R-VQ2: Completed Date is required when Status is Completed and may not be in the future;
+    Expires may not be earlier than Completed Date.
+  </description>
+  <errorConditionFormula>
+OR(
+  AND(ISPICKVAL(Status__c, &apos;Completed&apos;), ISBLANK(Completed_Date__c)),
+  AND(NOT(ISBLANK(Completed_Date__c)), Completed_Date__c &gt; TODAY()),
+  AND(
+    NOT(ISBLANK(Completed_Date__c)),
+    NOT(ISBLANK(Expires__c)),
+    Expires__c &lt; Completed_Date__c
+  )
+)
+  </errorConditionFormula>
+  <errorMessage>
+    A completed step needs a completed date that is not in the future, and it cannot expire before it was completed.
+  </errorMessage>
+</ValidationRule>

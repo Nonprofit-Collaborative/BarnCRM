@@ -102,6 +102,40 @@ Admins, Coordinators and Team Members all add and remove a job's skills.
 Finding volunteers for a shift by skill and availability arrives with a later part of the
 module; until then the records are the data it will use.
 
+## Onboarding requirements
+
+Each onboarding step a volunteer goes through is one **Volunteer Requirement** on the person (a
+Contact, or an Account where your people are person accounts): an **Application**, a
+**Background check** or an **Orientation**. You can add more types in Setup (the **Type** field's
+picklist values). Fill in the contact or the account, never both.
+
+**One row per step started.** Add a row when a person starts a step. When a step lapses and is
+done again, add a new row rather than overwriting the old one, so the history stays.
+
+| Field | What it means |
+|---|---|
+| Status | Not started, In progress, Completed or Not approved. |
+| Completed Date | The day the step was done. Required when the status is Completed, and not in the future. |
+| Expires | The day a completed step lapses, for example two years after a background check. Empty means it does not lapse. It cannot be before the completed date. |
+| Notes | A short note for the coordinator, such as the reference of a check. Never write what a check found. |
+| Is Current | Worked out for you: ticked when the status is Completed and the step has not expired. |
+
+Open **Volunteer Requirements** from a person's related list, or use the **Not Current** list
+view to see every step that is not completed or has lapsed.
+
+**Nothing is blocked.** A person whose steps are not current can still be signed up and log
+hours. The coordinator decides.
+
+**Who sees them.** Requirements are private. Only Volunteers Admin and Volunteers Coordinator
+read and edit them, all of them, whoever created the row. Team Members and Read Only users
+cannot see them at all. The result of a background check is kept on the requirement and nowhere
+else.
+
+**Erasing a person.** [Erasing a person](erase-a-person.md) deletes their requirements and
+empties them from the Recycle Bin. The Erasure record lists them by Id only. The person erasing
+must also hold Volunteers Admin or Volunteers Coordinator: otherwise the erasure is refused, so a
+background check is never left behind.
+
 ## Settings
 
 As an admin, open the **Volunteer Settings** tab in the BarnCRM Volunteers app, or the
