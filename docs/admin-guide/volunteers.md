@@ -8,6 +8,16 @@ and the **hours** each person gave. A volunteer is a person you already have in 
 there is no separate volunteer record: the module adds a few volunteer details to people (status,
 volunteer since, emergency contact, availability) and links their sign-ups and hours to them.
 
+**Where the volunteer details show.** In the BarnCRM Volunteers app a person opens on the
+**Volunteers Contact Record Page** (or **Volunteers Account Record Page**), which has a
+**Volunteer Profile** section: status, volunteer since, availability and emergency contact,
+which you edit there, and the approved hour totals and first and last volunteer dates, which
+BarnCRM calculates and you only read. The section shows once a person has a Volunteer Status or
+approved hours. Admins and Coordinators (who hold Manage Volunteers) always see it, so they can
+set the status of someone new. On an account, the person details show only on a person
+account; a household or organization shows its hour totals once it has some. Other apps keep
+their own person page (see Readiness at a glance, under Onboarding requirements).
+
 Hours are entered by staff. When **Hours require approval** is on, a new entry waits as
 **Submitted** until a coordinator approves or rejects it, and only approved hours count in any
 total. Marking a sign-up **Attended** creates its hours for you (the **Attendance creates hours**
@@ -145,13 +155,14 @@ only reads: it never stops a sign-up or hours. Admins and Coordinators see it; f
 Members and Read Only users, and on a household or organization, the card shows nothing. After
 adding a row, click the card's **Refresh** button to see it.
 
-- **In the BarnCRM app, people open on Core's page, which has no readiness card.** To show it
-  there too, open Setup, then **Lightning App Builder**, edit **Volunteers Contact Record
+- **In the BarnCRM app, people open on Core's page, which has neither the readiness card nor
+  the Volunteer Profile section (see What it does).** To show them there too, open Setup, then **Lightning App Builder**, edit **Volunteers Contact Record
   Page**, choose **Activation**, then **App, Record Type, and Profile**, and assign it to the
   BarnCRM app on desktop and phone. Do the same for **Volunteers Account Record Page** where
   your people are person accounts.
 - **On a record page of your own**, open it in the Lightning App Builder, drag the **Volunteer
-  Readiness** component onto it, and save. To have both giving and readiness on one page, clone
+  Readiness** component onto it, add a field section with the volunteer fields, and save. To
+  have both giving and volunteering on one page, clone
   **Giving Contact Record Page** (a packaged page is replaced on upgrade), add the component to
   the copy, and assign the copy.
 

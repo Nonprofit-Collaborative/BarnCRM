@@ -7189,6 +7189,15 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 | Availability Days | `Availability_Days__c` | Multi-Select Picklist, 7 values |
 | Availability Times | `Availability_Times__c` | Multi-Select Picklist, 3 values |
 
+- **Shown on the person:** a **Volunteer Profile** field section (Dynamic Forms) on
+  `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page` (ADR-0064 pattern, see
+  29S), holding these six attributes, editable, and the five totals of 29O, read only. It shows
+  when Volunteer Status is not blank, or Volunteer Hours Total is above zero, or the user holds
+  `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
+  attributes carry a field visibility rule (record type neither Household nor Organization), and
+  the Manage Volunteers clause applies only to that record type, so a household or
+  organization shows only its totals, once it has hours.
+
 ---
 
 ## 29J. Volunteer Job
@@ -8295,7 +8304,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers V-05 built (Section 29S). Person lookups emptied, not cascaded, on person delete. Core: `PersonErasure` empties from the Recycle Bin the records an extension reports as Deleted, and `PersonErasureExtensions.EXTENSION_CLASSES` names `VolunteersErasureExtension`. |
 | v0.8 | 2026-10-18 | Volunteers V-04 built (Sections 29P to 29R). The person lookups on Volunteer Skill are emptied, not cascaded, when the person is deleted. Access gains the Skills paragraph and the Skills tab in every set. |
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
-| v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component, assigned in the Volunteers app. |
+| v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 
 ---
 ## 32. Entity ownership by package
