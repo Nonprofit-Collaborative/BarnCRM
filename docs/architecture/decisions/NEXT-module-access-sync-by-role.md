@@ -26,13 +26,18 @@ would be one more scheduled job for Health Check to count.
    holding the set already, refuses Core's own sets, writes in system mode and works a slice at
    a time. The module passes Core's role names; Core names no module set (ADR-0059).
 2. **A module access sync seam.** Core's interface `ModuleAccessSync` (`requestSync()`, queues
-   the module's sync and never throws) and resolver `ModuleAccessSyncs`, which finds a module's
-   class by name (`CLASSES`, module key to class name, added in the PR that adds the class).
-   Core asks the module's sync when the Module Manager turns that module on
-   (`ModuleManagerService.turnOn`) and asks every installed sync from Core's nightly access check
-   (`TabAccessScheduler`), so a module needs no scheduled job of its own to keep its sets with
-   the roles. A module that is missing or cannot be built is skipped; a failure is logged.
-3. The Rollup Builder module keeps its own wiring: nothing changes for it.
+   the module's sync and never throws) and resolver `ModuleAccessSyncs`. A module's sync is
+   found by convention, so Core names no module class: the class named after the module's key
+   in the module catalog (`BarnCRM_Module__mdt`) followed by `AccessSync`, such as
+   `VolunteersAccessSync`. A future module needs no Core change. Core asks the module's sync
+   when the Module Manager turns that module on (`ModuleManagerService.turnOn`), and asks every
+   catalog module's sync when a role or add-on is given on the Access page (`AccessController`)
+   and from Core's nightly access check (`TabAccessScheduler`), so a module needs no scheduled
+   job of its own to keep its sets with the roles. A module without such a class is skipped;
+   one that cannot be built, or throws, is logged and skipped.
+3. The Rollup Builder module keeps its own wiring: nothing changes for it. Its sync is named
+   `RollupAccessSync`, not `RollupsAccessSync`, so the convention does not find it. Moving it
+   onto the seam (renaming it and dropping its own Turn on and nightly calls) is a follow-up.
 
 ## Alternatives considered
 
@@ -44,7 +49,10 @@ would be one more scheduled job for Health Check to count.
 
 ## Consequences
 
-- A person given the Coordinator role outside BarnCRM's Access page gets the Volunteers set at
-  the next nightly check (one o'clock), or at once when the module is turned on again.
-- The nightly check queues one job per installed module sync beside its own, well inside the
-  platform's limit on queued jobs.
+- A person given the Coordinator role on BarnCRM's Access page gets the Volunteers set within a
+  minute; given it in Setup instead, at the next nightly check (one o'clock), or at once when the
+  module is turned on again.
+- The Access page and the nightly check queue one job per installed module sync beside their
+  own, well inside the platform's limit on queued jobs.
+- A class named `<ModuleKey>AccessSync` that is not an access sync is logged as an error each
+  time it is looked for: the name is reserved for this seam.

@@ -196,6 +196,65 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void byRoleSkipsInactivePeopleAndThoseHoldingTheSetThroughAGroup() {
+        System.runAs(TestUsers.admin()) {
+            Id coordinatorRole = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator').Id;
+            User gone = TestUsers.standardUser('Gone');
+            User grouped = TestUsers.standardUser('Grouped');
+            // A role of the org's own that already includes the stand-in module set.
+            PermissionSetGroup ownRole = new PermissionSetGroup(
+                DeveloperName = 'Test_Module_Role',
+                MasterLabel = 'Test Module Role'
+            );
+            insert ownRole;
+            insert new PermissionSetGroupComponent(
+                PermissionSetGroupId = ownRole.Id,
+                PermissionSetId = [
+                    SELECT Id
+                    FROM PermissionSet
+                    WHERE Name = :TabAccessService.IMPORT_TAB
+                    LIMIT 1
+                ]
+                .Id
+            );
+            Test.calculatePermissionSetGroup(ownRole.Id);
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(
+                    AssigneeId = gone.Id,
+                    PermissionSetGroupId = coordinatorRole
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = grouped.Id,
+                    PermissionSetGroupId = coordinatorRole
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = grouped.Id,
+                    PermissionSetGroupId = ownRole.Id
+                )
+            };
+            gone.IsActive = false;
+            update gone;
+            TabAccessService.coreSetPrefix = 'Not_Core_';
+
+            Test.startTest();
+            Boolean more = TabAccessService.giveToGroupHolders(
+                TabAccessService.IMPORT_TAB,
+                new List<String>{ 'Volunteer_Coordinator' },
+                100,
+                'Test'
+            );
+            Test.stopTest();
+
+            Assert.isFalse(more, 'Nothing is left');
+            Assert.isTrue(tabSetsOf(gone.Id).isEmpty(), 'An inactive role holder is given nothing');
+            Assert.isTrue(
+                tabSetsOf(grouped.Id).isEmpty(),
+                'Someone holding it through a group is not given it again directly'
+            );
+        }
+    }
+
+    @IsTest
     static void givesNoneOfCoresOwnSetsAndNothingWithoutAnAudience() {
         System.runAs(TestUsers.admin()) {
             List<String> refused = new List<String>();

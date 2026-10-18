@@ -150,6 +150,7 @@ public with sharing class AccessController {
                 throw new AccessService.AccessException(String.join(refusals, ' '));
             }
             TabAccessService.requestSync();
+            ModuleAccessSyncs.requestAll();
         } catch (AccessService.AccessException e) {
             result.success = false;
             result.errorCode = ERROR_FAILED;
@@ -249,8 +250,10 @@ public with sharing class AccessController {
             } else {
                 AccessService.removeRole(assigneeId, roleDeveloperName);
             }
-            // The switchable tabs follow the role (ADR-0124).
+            // The switchable tabs follow the role (ADR-0124), and so do the modules' own sets
+            // (ADR-NEXT `NEXT-module-access-sync-by-role.md`).
             TabAccessService.requestSync();
+            ModuleAccessSyncs.requestAll();
         } catch (AccessService.AccessException e) {
             result.success = false;
             result.errorCode = ERROR_FAILED;

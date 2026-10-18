@@ -1,17 +1,19 @@
 /**
  * Finds each installed module's access sync (`ModuleAccessSync`) and asks it to run (ADR-NEXT
- * `NEXT-module-access-sync-by-role.md`): the Module Manager asks the one module it turns on,
- * and the nightly access check (`TabAccessScheduler`) asks every one.
+ * `NEXT-module-access-sync-by-role.md`): the Module Manager asks the one module it turns on, and
+ * the Access page and the nightly access check (`TabAccessScheduler`) ask every one.
  *
- * Found by namespace and class name, as `HealthCheckExtensions` finds its extensions. A module
- * that is not installed is skipped; one that cannot be built, or throws, is logged and skipped,
- * since turning a module on or the nightly check must not fail over a sync.
+ * Found by convention, so Core names no module class: a module's sync is the class named after
+ * its key in the module catalog (`BarnCRM_Module__mdt`) followed by `AccessSync`, resolved by
+ * namespace and name as `HealthCheckExtensions` resolves its extensions. A module without such a
+ * class is skipped; one that cannot be built, or throws, is logged and skipped, since turning a
+ * module on, assigning a role or the nightly check must not fail over a sync.
  */
 @NamespaceAccessible
 public with sharing class ModuleAccessSyncs {
-    /** Each module's sync class, by module key, added in the PR that adds the class. */
+    /** The suffix after the module key that names a module's sync class. */
     @NamespaceAccessible
-    public static final Map<String, String> CLASSES = new Map<String, String>();
+    public static final String CLASS_SUFFIX = 'AccessSync';
 
     /** Injected by Core's tests by module key, since no module is there to resolve. */
     @TestVisible
@@ -22,32 +24,30 @@ public with sharing class ModuleAccessSyncs {
     /** Asks the named module's sync to run, when the module has one. Never throws. */
     @NamespaceAccessible
     public static void requestFor(String moduleName) {
-        for (String key : moduleKeys()) {
-            if (key.equalsIgnoreCase(moduleName)) {
-                request(key);
-            }
+        if (String.isNotBlank(moduleName)) {
+            request(moduleName);
         }
     }
 
-    /** Asks every installed module's sync to run. Never throws. */
+    /** Asks every catalog module's sync to run, where it has one. Never throws. */
     @NamespaceAccessible
     public static void requestAll() {
-        for (String key : moduleKeys()) {
+        Set<String> keys = new Set<String>(overrides.keySet());
+        try {
+            keys.addAll(BarnCRM_Module__mdt.getAll().keySet());
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, CONTEXT);
+        }
+        for (String key : keys) {
             request(key);
         }
-    }
-
-    private static Set<String> moduleKeys() {
-        Set<String> keys = new Set<String>(CLASSES.keySet());
-        keys.addAll(overrides.keySet());
-        return keys;
     }
 
     private static void request(String moduleKey) {
         try {
             ModuleAccessSync sync = overrides.containsKey(moduleKey)
                 ? overrides.get(moduleKey)
-                : resolve(CLASSES.get(moduleKey));
+                : resolve(moduleKey + CLASS_SUFFIX);
             if (sync != null) {
                 sync.requestSync();
             }

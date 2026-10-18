@@ -56,11 +56,11 @@ private class ModuleAccessSyncsTest {
             ModuleAccessSyncs.overrides.put('Example_Other', other);
 
             Test.startTest();
-            ModuleAccessSyncs.requestFor('example_volunteers');
+            ModuleAccessSyncs.requestFor('Example_Volunteers');
             ModuleAccessSyncs.requestFor('Example_Absent');
             Test.stopTest();
 
-            Assert.areEqual(1, volunteers.asked, 'The module is found whatever the case');
+            Assert.areEqual(1, volunteers.asked, 'The module turned on is asked');
             Assert.areEqual(0, other.asked, 'No other module is asked');
         }
     }
@@ -68,14 +68,14 @@ private class ModuleAccessSyncsTest {
     @IsTest
     static void aMissingOrWrongClassIsSkipped() {
         System.runAs(TestUsers.admin()) {
-            ModuleAccessSyncs.CLASSES.put('Example_Missing', 'No_Such_Access_Sync');
-            ModuleAccessSyncs.CLASSES.put('Example_Wrong', 'ModuleAccessSyncs');
             Exception thrown;
 
             Test.startTest();
             try {
+                // No class Example_MissingAccessSync exists.
                 ModuleAccessSyncs.requestFor('Example_Missing');
-                ModuleAccessSyncs.requestFor('Example_Wrong');
+                // ModuleAccessSync is the interface itself, which cannot be built.
+                ModuleAccessSyncs.requestFor('Module');
             } catch (Exception e) {
                 thrown = e;
             }
