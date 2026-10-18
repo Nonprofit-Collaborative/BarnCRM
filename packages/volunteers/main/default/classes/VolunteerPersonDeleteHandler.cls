@@ -77,8 +77,19 @@ public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
      * permission on them at all, yet must not leave a background check behind.
      */
     private without sharing class Purge {
+        /** One delete per object: a list that alternates objects splits into too many chunks. */
         void run(List<Id> rowIds) {
-            Database.delete(rowIds, true, AccessLevel.SYSTEM_MODE);
+            Map<Schema.SObjectType, List<Id>> byObject = new Map<Schema.SObjectType, List<Id>>();
+            for (Id rowId : rowIds) {
+                Schema.SObjectType rowType = rowId.getSObjectType();
+                if (!byObject.containsKey(rowType)) {
+                    byObject.put(rowType, new List<Id>());
+                }
+                byObject.get(rowType).add(rowId);
+            }
+            for (List<Id> sameObject : byObject.values()) {
+                Database.delete(sameObject, true, AccessLevel.SYSTEM_MODE);
+            }
         }
     }
 }
