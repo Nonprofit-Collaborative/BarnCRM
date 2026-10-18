@@ -7806,7 +7806,7 @@ deletes their requirement rows and empties them from the Recycle Bin, through th
 
 | Attribute | API name | Type |
 |---|---|---|
-| Contact | `Contact__c` | Lookup to Contact (deletes this record when the person is deleted) |
+| Contact | `Contact__c` | Lookup to Contact (emptied when the person is deleted: a lookup cannot delete its row; erasure deletes the row, R-VQ4) |
 | Person Account | `Account__c` | Lookup to Account (emptied when the person is deleted) |
 | Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation |
 | Status | `Status__c` | Required restricted picklist: Not started (default), In progress, Completed, Not approved |
