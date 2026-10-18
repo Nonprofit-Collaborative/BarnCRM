@@ -7123,9 +7123,8 @@ Coordinator deletes only hours, since the platform gives Modify All only with De
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
 Each set shows the BarnCRM Volunteers app and the Jobs, Shifts and Hours tabs; only the Admin
-set shows the Volunteer Settings tab. `Manage_Volunteers` on the Coordinator and Admin sets
-arrives with the hours change (#469), which creates the custom permission; it is added to both
-sets in a follow-up after that change merges.
+set shows the Volunteer Settings tab. The custom permission `Manage_Volunteers`
+(created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
 
 ## 29I. Volunteer profile
 

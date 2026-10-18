@@ -522,6 +522,17 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "The Rollup Builder access sync was not queued. Nothing else is affected: the nightly run"
     echo "syncs the access."
   fi
+
+  # The same gap for the Volunteers permission sets (ADR-0127 decision 3): VolunteersPostInstall
+  # gives each to its BarnCRM role, and a deployment runs no post-install.
+  if volunteers_has_metadata; then
+    echo ""
+    echo "== Queueing the Volunteers access sync =="
+    if ! printf '%s\n' 'new VolunteersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+      echo "The Volunteers access sync was not queued. Nothing else is affected: the nightly access"
+      echo "check syncs the access."
+    fi
+  fi
 fi
 
 echo ""
