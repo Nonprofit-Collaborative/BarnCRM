@@ -59,6 +59,8 @@ offer it anywhere else.
 | Volunteer hours: status and household | None | It decides whether new hours wait for a coordinator, refuses a status change made any way other than approving, rejecting or reopening, and fills in the household the way your organization holds household membership. A flow cannot read membership the way BarnCRM does, and a copy that let a status through would count hours nobody approved. Switch it off only to load past hours with an import. |
 | Volunteer shift: name from job and start | None | It only names a shift saved without a name. Switch it off to leave unnamed shifts named by their record ID, or type the names yourself. |
 | Volunteer sign-up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
+| Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate all** on the Rollups page. |
+| Update rollups when a sign-up changes | None | The same, for Slots Filled on a shift. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.
