@@ -1,6 +1,6 @@
 # ADR-0130: Contact relations are not native households in an org without native household groups
 
-**Status:** Proposed
+**Status:** Accepted (owner direction 2026-10-18 to proceed on the integrator's recommendation)
 **Date:** 2026-10-17
 **Source:** test run in an org with Contacts to Multiple Accounts on and no Nonprofit Cloud
 (33 household test failures, one root cause); narrows ADR-0036

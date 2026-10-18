@@ -138,7 +138,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0127](0127-volunteers-module.md) | The BarnCRM Volunteers module: totals through Rollup Builder, person fields in the module, approval as a status | Accepted (owner decision) |
 | [0128](0128-volunteer-recurring-shifts.md) | Recurring volunteer shifts are a schedule that creates ordinary shifts to a rolling horizon | Accepted (owner decision) |
 | [0129](0129-volunteer-letters.md) | Volunteer hour letters and certificates have their own small generator, not Giving's receipts engine | Accepted (owner decision) |
-| [0130](0130-contact-relations-are-not-native-households-without-native-groups.md) | Contact relations are not native households in an org without native household groups (narrows ADR-0036) | Proposed |
+| [0130](0130-contact-relations-are-not-native-households-without-native-groups.md) | Contact relations are not native households in an org without native household groups (narrows ADR-0036) | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
