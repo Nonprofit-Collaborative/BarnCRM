@@ -7154,7 +7154,7 @@ Staff create, edit and delete; Read Only read. Removing a skill from a person or
 the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
 **Health Check.** `VolunteersHealthCheckExtension`, registered in
-`HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds three findings to Core's one report,
+`HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds five findings to Core's one report,
 read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
 settings) and asked only of a viewer who may manage settings, and not at all while the module is
 turned off. Counts stop at 1,000 and the first five records are linked.
@@ -7164,6 +7164,8 @@ turned off. Counts stop at 1,000 and the first five records are linked.
 | `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
 | `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list. |
 | `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
+| `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold `Volunteers_Coordinator` neither directly nor through a group. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
+| `volunteer_rollups_off` | Info | Shipped volunteer totals (29O) whose definition is inactive. A missing one is Rollup Builder's `shipped_rollups_missing` finding, not reported twice. | Opens Rollup Builder. |
 
 ## 29I. Volunteer profile
 
@@ -8414,7 +8416,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 | v0.8 | 2026-10-18 | Volunteers lifecycle: erasure and household dependents. No object or field added. New rules R-VG10, R-VU5 and R-VK5: erasing a person keeps their hours and sign-ups with notes emptied, cancels their bookings on shifts still to come, deletes their volunteer skills, and keeps the five volunteer totals on the person even where no rollup definition reports them (`VolunteersErasureExtension`). R-H12 and R-VG2: `VolunteersHouseholdDependentsExtension`, registered in `HouseholdDependentsExtensions.EXTENSION_CLASSES`, keeps a household a Volunteer Hours entry names. |
-| v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: three findings from `VolunteersHealthCheckExtension` (hours waiting, past shifts Open, schedule horizon), registered in `HealthCheckExtensions.EXTENSION_CLASSES`. The 29T known gap ("schedule horizon not filled") is closed. |
+| v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: five findings from `VolunteersHealthCheckExtension`, registered in `HealthCheckExtensions.EXTENSION_CLASSES`, with one fix that queues the access sync. The 29T known gap ("schedule horizon not filled") is closed. |
 
 ---
 ## 32. Entity ownership by package

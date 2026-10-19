@@ -1,20 +1,26 @@
 /**
- * The Volunteers module's Health Check findings (canonical model Part G, "Health Check"; ADR-0057's
- * extension seam). Core finds this class by name (`HealthCheckExtensions.EXTENSION_CLASSES`) and
- * folds the findings into its one report, under the key `volunteers_extension`.
+ * The Volunteers module's Health Check findings and its one fix (canonical model Part G, "Health
+ * Check"; ADR-0057's extension seam). Core finds this class by name
+ * (`HealthCheckExtensions.EXTENSION_CLASSES`) and folds the findings into its one report, under
+ * the key `volunteers_extension`.
  *
- * Three questions about the records: hours waiting too long for approval, past shifts nobody
- * closed, and recurring schedules that have not created shifts as far ahead as Volunteer Settings
- * asks. Each reads organization-wide state, so they are asked only of a viewer who may manage
- * settings, as Giving's and Rollup Builder's are, and not at all while the module is turned off
- * (its automations and schedules stop then, on purpose). Each check is isolated: one that throws
- * becomes a single "check failed" finding and the rest still stand.
+ * Five questions: hours waiting too long for approval, past shifts nobody closed, recurring
+ * schedules that have not created shifts as far ahead as Volunteer Settings asks, coordinators
+ * missing their permission set, and shipped volunteer totals turned off. Each reads
+ * organization-wide state, and the fix gives a permission set, so they are asked only of a viewer
+ * who may manage settings, as Giving's and Rollup Builder's are, and not at all while the module
+ * is turned off (its automations, schedules and access sync all stop then, on purpose). Each check
+ * is isolated: one that throws becomes a single "check failed" finding and the rest still stand.
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
  */
 @NamespaceAccessible
-public with sharing class VolunteersHealthCheckExtension implements HealthCheckExtension {
+public with sharing class VolunteersHealthCheckExtension implements HealthCheckExtension, HealthCheckFixExtension {
+    /** The fix that gives the coordinator set to coordinators who lack it (VolunteersAccessSync). */
+    @NamespaceAccessible
+    public static final String FIX_KEY_COORDINATOR_ACCESS = 'giveVolunteersCoordinatorAccess';
+
     /** Hours entered longer ago than this, still Submitted, are waiting too long. */
     @TestVisible
     private static Integer hoursWaitingDays = 14;
@@ -33,6 +39,9 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     /** How many example records a finding links to. */
     private static final Integer LINKS_SHOWN = 5;
 
+    private static final String COORDINATOR_GROUP = 'Volunteer_Coordinator';
+    private static final String COORDINATOR_SET = 'Volunteers_Coordinator';
+
     @NamespaceAccessible
     public VolunteersHealthCheckExtension() {
         // Built by name from Core (HealthCheckExtensions), so it needs a public constructor.
@@ -47,7 +56,9 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
             String check : new List<String>{
                 'volunteer_hours_waiting',
                 'volunteer_past_shifts_open',
-                'volunteer_schedule_horizon'
+                'volunteer_schedule_horizon',
+                'volunteer_coordinator_access',
+                'volunteer_rollups_off'
             }
         ) {
             try {
@@ -70,8 +81,14 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
             when 'volunteer_past_shifts_open' {
                 return pastShiftsOpen();
             }
-            when else {
+            when 'volunteer_schedule_horizon' {
                 return scheduleHorizon();
+            }
+            when 'volunteer_coordinator_access' {
+                return coordinatorAccess();
+            }
+            when else {
+                return rollupsOff();
             }
         }
     }
@@ -193,7 +210,123 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
             .withLinks(links(behind));
     }
 
+    /**
+     * People holding the Coordinator role without the Volunteers Coordinator set (ADR-0127,
+     * decision 3; ADR-0131). The access sync gives it nightly; until it does they cannot approve
+     * hours. The fix asks the sync to run now.
+     */
+    private static HealthCheckService.Finding coordinatorAccess() {
+        List<String> names = coordinatorsMissingTheirSet();
+        if (names.isEmpty()) {
+            return null;
+        }
+        List<Object> values = new List<Object>{
+            String.valueOf(names.size()),
+            String.join(names, ', ')
+        };
+        return new HealthCheckService.Finding(
+                'volunteer_coordinator_access',
+                String.format(Label.Volunteers_HealthCheck_CoordinatorAccessTitle, values),
+                String.format(Label.Volunteers_HealthCheck_CoordinatorAccessDetail, values),
+                HealthCheckService.SEVERITY_WARNING,
+                HealthCheckService.CATEGORY_ACCESS
+            )
+            .withScope(names)
+            .withFix(
+                Label.Volunteers_HealthCheck_CoordinatorAccessFix,
+                HealthCheckService.FIX_ACTION_PREFIX + FIX_KEY_COORDINATOR_ACCESS
+            );
+    }
+
+    /**
+     * Shipped volunteer totals (29O) whose definition is inactive. Information: an administrator
+     * may turn one off on purpose. A shipped total that is missing altogether is Rollup Builder's
+     * own finding, with its restore fix, so it is not reported twice here.
+     */
+    private static HealthCheckService.Finding rollupsOff() {
+        Set<String> keys = VolunteerHealthCheckSelector.shippedRollupKeys(
+            ShiftScheduleService.MODULE_NAME
+        );
+        if (keys.isEmpty()) {
+            return null;
+        }
+        List<Rollup_Definition__c> off = VolunteerHealthCheckSelector.inactiveRollups(keys);
+        if (off.isEmpty()) {
+            return null;
+        }
+        List<String> names = new List<String>();
+        for (Rollup_Definition__c definition : off) {
+            names.add(definition.Name);
+        }
+        List<Object> values = new List<Object>{
+            String.valueOf(off.size()),
+            String.join(names, ', ')
+        };
+        return new HealthCheckService.Finding(
+                'volunteer_rollups_off',
+                String.format(Label.Volunteers_HealthCheck_RollupsOffTitle, values),
+                String.format(Label.Volunteers_HealthCheck_RollupsOffDetail, values),
+                HealthCheckService.SEVERITY_INFO,
+                HealthCheckService.CATEGORY_SETTINGS
+            )
+            .withFix(
+                Label.Volunteers_HealthCheck_RollupsOffFix,
+                '/lightning/n/' + NamespaceUtil.qualify('Rollup_Builder')
+            );
+    }
+
+    // ----------------------------------------------------------------------------------- fix
+
+    public List<String> fixScope(String fixKey) {
+        return FIX_KEY_COORDINATOR_ACCESS.equals(fixKey) ? coordinatorsMissingTheirSet() : null;
+    }
+
+    public String fixLabel(String fixKey) {
+        return FIX_KEY_COORDINATOR_ACCESS.equals(fixKey)
+            ? Label.Volunteers_HealthCheck_CoordinatorAccessFix
+            : null;
+    }
+
+    /**
+     * Queues the module's access sync, which gives every Volunteers set to the people whose role
+     * calls for it. Queued, because a permission set assignment is a setup object write and the
+     * fix also logs the change to a record (mixed DML).
+     */
+    public String runFix(String fixKey, List<String> scope) {
+        if (!FIX_KEY_COORDINATOR_ACCESS.equals(fixKey)) {
+            return null;
+        }
+        new VolunteersAccessSync().requestSync();
+        return String.format(
+            Label.Volunteers_HealthCheck_CoordinatorAccessDone,
+            new List<Object>{ String.join(scope, ', ') }
+        );
+    }
+
     // ------------------------------------------------------------------------------- helpers
+
+    /** The names, sorted, of active coordinators without the coordinator set. */
+    private static List<String> coordinatorsMissingTheirSet() {
+        String prefix = NamespaceUtil.prefix();
+        String namespace = String.isBlank(prefix) ? null : prefix.removeEnd('__');
+        Map<Id, String> coordinators = VolunteerHealthCheckSelector.groupHolders(
+            COORDINATOR_GROUP,
+            namespace
+        );
+        if (coordinators.isEmpty()) {
+            return new List<String>();
+        }
+        Set<Id> missing = new Set<Id>(coordinators.keySet());
+        missing.removeAll(
+            VolunteerHealthCheckSelector.setHoldersAmong(missing, COORDINATOR_SET, namespace)
+        );
+        List<String> names = new List<String>();
+        for (Id userId : missing) {
+            names.add(coordinators.get(userId));
+        }
+        names.sort();
+        return names;
+    }
 
     private static String counted(Integer howMany) {
         return howMany > countCap

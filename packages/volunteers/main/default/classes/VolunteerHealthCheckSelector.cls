@@ -75,4 +75,79 @@ public without sharing class VolunteerHealthCheckSelector {
             LIMIT :cap
         ];
     }
+
+    /** The active people assigned this permission set group, by user Id and name. */
+    public static Map<Id, String> groupHolders(String groupName, String namespace) {
+        requireManageSettings();
+        Map<Id, String> holders = new Map<Id, String>();
+        for (PermissionSetAssignment row : [
+            SELECT AssigneeId, Assignee.Name
+            FROM PermissionSetAssignment
+            WHERE
+                PermissionSetGroup.DeveloperName = :groupName
+                AND PermissionSetGroup.NamespacePrefix = :namespace
+                AND Assignee.IsActive = TRUE
+            WITH SYSTEM_MODE
+            LIMIT 2000
+        ]) {
+            holders.put(row.AssigneeId, row.Assignee.Name);
+        }
+        return holders;
+    }
+
+    /** Of these people, those who hold the permission set, directly or through a group. */
+    public static Set<Id> setHoldersAmong(Set<Id> userIds, String setName, String namespace) {
+        requireManageSettings();
+        Set<Id> groupIds = new Set<Id>();
+        for (PermissionSetGroupComponent component : [
+            SELECT PermissionSetGroupId
+            FROM PermissionSetGroupComponent
+            WHERE PermissionSet.Name = :setName AND PermissionSet.NamespacePrefix = :namespace
+            WITH SYSTEM_MODE
+        ]) {
+            groupIds.add(component.PermissionSetGroupId);
+        }
+        Set<Id> holders = new Set<Id>();
+        for (PermissionSetAssignment row : [
+            SELECT AssigneeId
+            FROM PermissionSetAssignment
+            WHERE
+                AssigneeId IN :userIds
+                AND ((PermissionSet.Name = :setName
+                AND PermissionSet.NamespacePrefix = :namespace)
+                OR PermissionSetGroupId IN :groupIds)
+            WITH SYSTEM_MODE
+        ]) {
+            holders.add(row.AssigneeId);
+        }
+        return holders;
+    }
+
+    /** The keys of the rollup definitions this package ships (29O). */
+    public static Set<String> shippedRollupKeys(String packageName) {
+        requireManageSettings();
+        Set<String> keys = new Set<String>();
+        for (Rollup_Definition_Default__mdt row : [
+            SELECT Definition_Key__c
+            FROM Rollup_Definition_Default__mdt
+            WHERE Package__c = :packageName
+            WITH SYSTEM_MODE
+        ]) {
+            keys.add(row.Definition_Key__c);
+        }
+        return keys;
+    }
+
+    /** The inactive definitions carrying these keys, by name. */
+    public static List<Rollup_Definition__c> inactiveRollups(Set<String> keys) {
+        requireManageSettings();
+        return [
+            SELECT Id, Name
+            FROM Rollup_Definition__c
+            WHERE Definition_Key__c IN :keys AND Active__c = FALSE
+            WITH SYSTEM_MODE
+            ORDER BY Name
+            LIMIT 200
+        ];
+    }
 }

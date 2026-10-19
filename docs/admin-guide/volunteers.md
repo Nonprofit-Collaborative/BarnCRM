@@ -444,7 +444,7 @@ schedule you pick.
 
 ## Health Check findings
 
-With Volunteers installed, [Health Check](health-check.md) also asks three questions about it.
+With Volunteers installed, [Health Check](health-check.md) also asks five questions about it.
 They are asked only of someone who may manage BarnCRM Settings, and not at all while Volunteers
 is turned off. Counts stop at 1,000, and each finding about records links the first five.
 
@@ -453,6 +453,8 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list**, open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
 | **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Shift Horizon Weeks** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
+| **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
 ## Erasing a volunteer
 

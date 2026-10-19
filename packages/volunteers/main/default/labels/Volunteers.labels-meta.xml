@@ -904,4 +904,60 @@
         <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
         <value>These active schedules should have shifts {0} weeks ahead (Volunteer Settings) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Coordinators missing their set title; {0} is the count</shortDescription>
+        <value>{0} volunteer coordinators do not have the Volunteers Coordinator permission set</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Coordinators missing their set, why and how to fix; {1} is their names</shortDescription>
+        <value>These people hold the Coordinator role but not Volunteers Coordinator, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessFix</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: button that gives coordinators their set</shortDescription>
+        <value>Give Volunteers Coordinator now</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessDone</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the coordinator access fix did; {0} is the names</shortDescription>
+        <value>Volunteers Coordinator is being given to {0}. It takes about a minute; run Health Check again to confirm.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_RollupsOffTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Volunteer totals turned off title; {0} is the count</shortDescription>
+        <value>{0} shipped volunteer totals are turned off</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_RollupsOffDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Volunteer totals turned off, why and how to fix; {1} is their names</shortDescription>
+        <value>These volunteer totals are inactive, so the fields they fill stop updating and the reports, list views and dashboard that use them go stale: {1}. If you turned them off on purpose, nothing is wrong. Otherwise open Rollup Builder, set each one Active, then choose Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_RollupsOffFix</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: button that opens Rollup Builder</shortDescription>
+        <value>Open Rollup Builder</value>
+    </labels>
 </CustomLabels>
