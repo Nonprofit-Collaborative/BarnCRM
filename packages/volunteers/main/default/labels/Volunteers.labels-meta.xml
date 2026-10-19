@@ -134,7 +134,55 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>No usable letter template was chosen</shortDescription>
-        <value>Choose a volunteer letter template. If none is offered, ask your admin to activate one on the Volunteer Letter Templates tab.</value>
+        <value>Choose a volunteer letter template.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_NoActiveTemplate</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The letter action found no active template to offer</shortDescription>
+        <value>No volunteer letter template is active. Ask your administrator to activate one on the Volunteer Letter Templates tab.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letter_ActionFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected failure in the Volunteer letter action</shortDescription>
+        <value>Something went wrong with the letter. Try again, and if it happens again ask your administrator to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LetterAction_NoLegalName</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Letter action: the organization legal name is blank in settings</shortDescription>
+        <value>Your organization's legal name is blank in BarnCRM Settings, so the letter will print without it. Ask your administrator to fill it in under Organization.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Loading</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>What a screen reader hears while a Volunteers screen loads</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_NoHoursWarning</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Marked Attended but no hours entry appeared; {0} is the person</shortDescription>
+        <value>{0} is marked Attended, but no hours entry was created. A shift needs a start and an end time for its hours to be created automatically; otherwise enter the hours by hand.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Readiness_Empty</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The readiness card when no requirement types exist</shortDescription>
+        <value>No requirement types are set up yet, so there is nothing to track. Ask your administrator to add types to Volunteer Requirement.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Letter_BadPeriod</fullName>
@@ -278,7 +326,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected failure on the Approve Hours screen</shortDescription>
-        <value>Something went wrong with these hours. The details are in the Error Log.</value>
+        <value>Something went wrong with these hours. Try again, and if it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Title</fullName>
@@ -726,7 +774,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
-        <value>Something went wrong with sign-ups. The details are in the Error Log.</value>
+        <value>Something went wrong with sign-ups. Try again, and if it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_NightlyJobs_SchedulesName</fullName>

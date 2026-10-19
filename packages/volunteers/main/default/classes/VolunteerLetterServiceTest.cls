@@ -267,6 +267,57 @@ private class VolunteerLetterServiceTest {
     }
 
     @IsTest
+    static void generateAndMergeRefuseAReversedOrMissingPeriodBeforeAnyFileIsMade() {
+        Id hoursLetter = templateId('Hours_Letter');
+        List<String> refusals = new List<String>();
+
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            for (
+                Date[] period : new List<Date[]>{
+                    new List<Date>{ TO_DATE, FROM_DATE },
+                    new List<Date>{ null, TO_DATE },
+                    new List<Date>{ FROM_DATE, null }
+                }
+            ) {
+                try {
+                    VolunteerLetterService.generate(
+                        new List<Id>(),
+                        hoursLetter,
+                        period[0],
+                        period[1]
+                    );
+                } catch (VolunteerLetterService.VolunteerLetterException refused) {
+                    refusals.add(refused.getMessage());
+                }
+                try {
+                    VolunteerLetterService.mergeLetters(
+                        new List<Id>(),
+                        hoursLetter,
+                        period[0],
+                        period[1]
+                    );
+                } catch (VolunteerLetterService.VolunteerLetterException refused) {
+                    refusals.add(refused.getMessage());
+                }
+            }
+        }
+        Test.stopTest();
+
+        Assert.areEqual(6, refusals.size(), 'Every bad period is refused by both entry points.');
+        Assert.areEqual(
+            new Set<String>{ Label.Volunteers_Letter_BadPeriod },
+            new Set<String>(refusals),
+            'With the plain period message.'
+        );
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM ContentVersion WITH SYSTEM_MODE],
+            'No file was made.'
+        );
+    }
+
+    @IsTest
     static void twoHundredFiftyOnePeopleAreGeneratedInOneTransaction() {
         List<Contact> people;
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {

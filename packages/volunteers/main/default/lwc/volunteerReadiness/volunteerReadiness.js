@@ -13,6 +13,8 @@ import COMPLETED from '@salesforce/label/c.Volunteers_Readiness_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
 import LOAD_FAILED from '@salesforce/label/c.Volunteers_Readiness_LoadFailed';
 import REFRESH from '@salesforce/label/c.Volunteers_Readiness_Refresh';
+import EMPTY from '@salesforce/label/c.Volunteers_Readiness_Empty';
+import LOADING from '@salesforce/label/c.Volunteers_Loading';
 
 /**
  * Volunteer readiness on a person (canonical model R-VQ3): each requirement type's most recently
@@ -26,7 +28,9 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
     title: TITLE,
     completed: COMPLETED,
     expires: EXPIRES,
-    refresh: REFRESH
+    refresh: REFRESH,
+    empty: EMPTY,
+    loading: LOADING
   };
 
   canSee = false;
@@ -87,6 +91,18 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
       return this.requirementInfo?.data?.queryable === true;
     }
     return this.canSee;
+  }
+
+  /**
+   * A spinner while the answer is on its way, but only for a user who can read requirements, so
+   * a user the card is not for never sees a card flash and vanish.
+   */
+  get showLoading() {
+    return !this.loaded && this.requirementInfo?.data?.queryable === true;
+  }
+
+  get showEmpty() {
+    return this.showCard && !this.failed && this.steps.length === 0;
   }
 
   handleRefresh() {

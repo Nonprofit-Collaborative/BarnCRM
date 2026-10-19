@@ -126,6 +126,8 @@ private class VolunteerShiftSignupsControllerTest {
 
         Assert.isTrue(attended.hoursWritten, 'Attendance wrote the hours.');
         Assert.isFalse(noShow.hoursWritten, 'A no show writes none.');
+        Assert.isTrue(attended.hoursExist, 'The attended sign-up now has hours.');
+        Assert.isFalse(noShow.hoursExist, 'The no show has none.');
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
             Volunteer_Hours__c written = [
                 SELECT Hours__c, Status__c, Contact__c

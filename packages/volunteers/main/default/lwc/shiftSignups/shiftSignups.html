@@ -10,7 +10,11 @@
       ></lightning-button>
     </template>
 
-    <div class="slds-var-p-horizontal_medium">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
       <template lwc:if={hasError}>
         <p role="alert" tabindex="-1" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
@@ -71,7 +75,18 @@
 
       <div data-id="result" tabindex="-1" role="status" class="slds-var-m-bottom_small">
         <template lwc:if={resultMessage}>
-          <p class="slds-text-body_regular">{resultMessage}</p>
+          <p class="slds-text-body_regular" data-id="result-text">
+            <template lwc:if={resultIsWarning}>
+              <lightning-icon
+                data-id="result-warning"
+                icon-name="utility:warning"
+                size="x-small"
+                alternative-text=""
+                class="slds-var-m-right_x-small"
+              ></lightning-icon>
+            </template>
+            {resultMessage}
+          </p>
         </template>
       </div>
 

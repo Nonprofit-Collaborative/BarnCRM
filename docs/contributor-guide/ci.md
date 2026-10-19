@@ -214,6 +214,12 @@ Salesforce org is needed for this job. Steps:
    with an object literal whose keys are not that method's parameter names. The platform
    drops an unknown key without an error and the parameter arrives as null, and a Jest mock
    accepts any shape, so nothing else sees it (ADMIN-1, ADMIN-13).
+   `scripts/ci/check-aura-class-access.py` fails the build if an Apex class with an
+   `@AuraEnabled` method that a component imports is granted (`classAccesses`) in no permission
+   set of the package that holds the class or the component. The platform refuses the call for
+   a user without that grant, and a Jest mock cannot see it (the Volunteers readiness card
+   shipped broken this way). A deliberate exception goes in
+   `scripts/ci/aura-class-access-allowlist.txt` as `Class  reason`.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

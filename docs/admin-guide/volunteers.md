@@ -293,12 +293,16 @@ The shipped templates come back at every upgrade if you delete them (inactive wh
 already has an active template). To stop using one, clear its **Active** box rather than
 deleting it.
 
-**One person.** The **Volunteer letter** action is on no page until you add it. In Setup, go to
-**Object Manager**, **Contact**, **Page Layouts**, open each layout your people use, choose
-**Mobile & Lightning Actions** in the palette, and drag **Volunteer letter** into the
-**Salesforce Mobile and Lightning Experience Actions** section. If that section says its actions
-are predefined, click **override the predefined actions** first. If your people are held as
-person accounts, do the same under **Object Manager**, **Person Account**, **Page Layouts**.
+**One person.** The **Volunteer letter** action is already on the **Volunteers Contact Record
+Page** and the **Volunteers Account Record Page** (the pages the BarnCRM Volunteers app uses), in
+the actions at the top of the record. On a record page of your own, or in another app, add it
+yourself. If the page lists its own actions, open it in the Lightning App Builder, select the
+highlights panel and add **Volunteer letter** to its actions. Otherwise, in Setup go to **Object
+Manager**, **Contact**, **Page Layouts**, open each layout your people use, choose **Mobile &
+Lightning Actions** in the palette, and drag **Volunteer letter** into the **Salesforce Mobile
+and Lightning Experience Actions** section (click **override the predefined actions** first if
+that section says its actions are predefined). If your people are held as person accounts, do
+the same under **Object Manager**, **Person Account**, **Page Layouts**.
 
 On a person, click **Volunteer letter**, choose the template and the period, click **Preview**
 to read it, then **Generate**. The action offers the active template of each type, so make a

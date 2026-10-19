@@ -1,5 +1,4 @@
 import { LightningElement } from 'lwc';
-import Toast from 'lightning/toast';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
 import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.reject';
@@ -41,6 +40,7 @@ import REFUSED from '@salesforce/label/c.Volunteers_Approve_Refused';
 import REASON_REQUIRED from '@salesforce/label/c.Volunteers_Hours_RejectionReasonRequired';
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Approve_ActionFailed';
 import DATE_RANGE from '@salesforce/label/c.Volunteers_Approve_DateRange';
+import LOADING from '@salesforce/label/c.Volunteers_Loading';
 
 const STATUS_SUBMITTED = 'Submitted';
 const STATUS_APPROVED = 'Approved';
@@ -53,6 +53,15 @@ const STATUS_LABELS = {
 
 function format(template, ...values) {
   return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
+}
+
+/** A yyyy-mm-dd date as people read dates, for a screen reader; the raw value if it is not one. */
+function readableDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (!value || Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' }).format(date);
 }
 
 /**
@@ -84,7 +93,8 @@ export default class VolunteerHoursApproval extends LightningElement {
     previous: PREVIOUS,
     next: NEXT,
     empty: EMPTY,
-    reasonRequired: REASON_REQUIRED
+    reasonRequired: REASON_REQUIRED,
+    loading: LOADING
   };
 
   statusOptions = [STATUS_SUBMITTED, STATUS_APPROVED, STATUS_REJECTED].map((value) => ({
@@ -195,7 +205,12 @@ export default class VolunteerHoursApproval extends LightningElement {
     return rows.map((row) => ({
       ...row,
       selected: this.selectedIds.includes(row.recordId),
-      selectLabel: format(SELECT_ROW, row.personName || row.name, row.dateWorked, row.hours)
+      selectLabel: format(
+        SELECT_ROW,
+        row.personName || row.name,
+        readableDate(row.dateWorked),
+        row.hours
+      )
     }));
   }
 
@@ -414,22 +429,16 @@ export default class VolunteerHoursApproval extends LightningElement {
           key: refusal.recordId,
           text: `${namesById[refusal.recordId] || refusal.recordId}: ${refusal.message}`
         }));
-        const refusedCount = this.refusedLines.length;
-        Toast.show(
-          {
-            label: this.resultMessage,
-            message: refusedCount ? format(REFUSED, refusedCount) : undefined,
-            variant: refusedCount ? 'warning' : 'success'
-          },
-          this
-        );
+        // Announced once, by the status region; a toast as well would be read out twice.
+        if (this.refusedLines.length) {
+          this.resultMessage = `${this.resultMessage} ${format(REFUSED, this.refusedLines.length)}`;
+        }
         this.focusResult = true;
         return this.load();
       })
       .catch((error) => {
         this.errorMessage = this.messageFrom(error);
         this.busy = false;
-        Toast.show({ label: this.errorMessage, variant: 'error' }, this);
         return false;
       });
   }

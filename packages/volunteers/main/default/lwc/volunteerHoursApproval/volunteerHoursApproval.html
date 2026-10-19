@@ -1,6 +1,10 @@
 <template>
   <lightning-card title={labels.title} icon-name="custom:custom20">
-    <div class="slds-var-p-horizontal_medium">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={busy}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
       <template lwc:if={showReadOnly}>
         <p data-id="read-only" class="slds-text-body_regular slds-var-m-bottom_small">
           {labels.readOnly}

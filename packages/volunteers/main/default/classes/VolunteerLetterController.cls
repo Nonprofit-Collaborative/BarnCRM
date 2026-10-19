@@ -4,6 +4,8 @@
  * answers for the screen.
  */
 public with sharing class VolunteerLetterController {
+    private static final String CONTEXT = 'Volunteer letter action';
+
     /** What the action shows when it opens. */
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getActionContext(Id recordId) {
@@ -18,20 +20,23 @@ public with sharing class VolunteerLetterController {
             for (
                 Volunteer_Letter_Template__c template : VolunteerLetterSelector.activeTemplates()
             ) {
-                String label =
-                    template.Name +
-                    ' (' +
-                    (typeLabels.containsKey(template.Type__c)
-                        ? typeLabels.get(template.Type__c)
-                        : template.Type__c) +
-                    ')';
+                String typeLabel = typeLabels.containsKey(template.Type__c)
+                    ? typeLabels.get(template.Type__c)
+                    : template.Type__c;
+                // A template named for its type is not shown as "Certificate (Certificate)".
+                String label = template.Name == typeLabel
+                    ? template.Name
+                    : template.Name + ' (' + typeLabel + ')';
                 templates.add(new Map<String, String>{ 'label' => label, 'value' => template.Id });
             }
         }
         return new Map<String, Object>{
             'canManage' => canManage,
             'isPerson' => isPerson,
-            'templates' => templates
+            'templates' => templates,
+            'organizationNameBlank' => String.isBlank(
+                BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
+            )
         };
     }
 
@@ -54,8 +59,8 @@ public with sharing class VolunteerLetterController {
                 'body' => letter.body,
                 'skipReason' => letter.skipReason
             };
-        } catch (VolunteerLetterService.VolunteerLetterException refused) {
-            throw handled(refused);
+        } catch (Exception failure) {
+            throw report(failure, recordId);
         }
     }
 
@@ -78,8 +83,8 @@ public with sharing class VolunteerLetterController {
                 'versionId' => outcome.versionIds.isEmpty() ? null : outcome.versionIds[0],
                 'skipReason' => outcome.skipped.get(recordId)
             };
-        } catch (VolunteerLetterService.VolunteerLetterException refused) {
-            throw handled(refused);
+        } catch (Exception failure) {
+            throw report(failure, recordId);
         }
     }
 
@@ -95,9 +100,17 @@ public with sharing class VolunteerLetterController {
         return labels;
     }
 
-    private static AuraHandledException handled(Exception refused) {
-        AuraHandledException handled = new AuraHandledException(refused.getMessage());
-        handled.setMessage(refused.getMessage());
+    /** A refusal the service names is passed on as it is; anything else is logged first. */
+    private static AuraHandledException report(Exception failure, Id recordId) {
+        String message;
+        if (failure instanceof VolunteerLetterService.VolunteerLetterException) {
+            message = failure.getMessage();
+        } else {
+            ErrorLogger.log(failure, CONTEXT, recordId);
+            message = Label.Volunteers_Letter_ActionFailed;
+        }
+        AuraHandledException handled = new AuraHandledException(message);
+        handled.setMessage(message);
         return handled;
     }
 }

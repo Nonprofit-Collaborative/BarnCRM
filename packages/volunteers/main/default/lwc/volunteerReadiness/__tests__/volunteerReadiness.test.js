@@ -86,6 +86,30 @@ describe('c-volunteer-readiness', () => {
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
+  it('shows a spinner while loading, but only to a user who can read requirements', async () => {
+    const element = render();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+
+    getObjectInfo.emit({ queryable: true });
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).not.toBeNull();
+
+    getReadiness.emit(READY);
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+  });
+
+  it('says there is nothing to track when no requirement types exist', async () => {
+    const element = render();
+    getReadiness.emit({ canSee: true, steps: [] });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.empty').textContent).toBe(
+      'c.Volunteers_Readiness_Empty'
+    );
+    expect(element.shadowRoot.querySelectorAll('li.step')).toHaveLength(0);
+  });
+
   it('lists each type with its latest step or Not started, and whether it is current', async () => {
     const element = render();
     getReadiness.emit(READY);
