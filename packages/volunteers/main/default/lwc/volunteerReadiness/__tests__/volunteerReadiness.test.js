@@ -1,3 +1,4 @@
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages -- the test drives the getObjectInfo wire mock directly */
 import { createElement } from 'lwc';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import VolunteerReadiness from 'c/volunteerReadiness';
