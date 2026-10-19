@@ -3,6 +3,7 @@
   <fullName>Template_Name__c</fullName>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>
+  <inlineHelpText>The name the shipped template is installed with.</inlineHelpText>
   <label>Template Name</label>
   <length>80</length>
   <required>true</required>

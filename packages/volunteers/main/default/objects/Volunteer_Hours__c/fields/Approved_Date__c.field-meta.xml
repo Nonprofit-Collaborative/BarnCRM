@@ -3,7 +3,7 @@
   <fullName>Approved_Date__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>When these hours were approved or rejected. BarnCRM fills this in when the hours are approved or rejected.</inlineHelpText>
-  <label>Approved Date</label>
+  <label>Reviewed Date</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>DateTime</type>

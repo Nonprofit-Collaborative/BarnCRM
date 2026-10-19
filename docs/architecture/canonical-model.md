@@ -7123,7 +7123,7 @@ knows, so the profile is a set of person attributes the module ships on Contact 
 Every attribute here, the person attributes included, is shipped by Volunteers, never by Core.
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
-BarnCRM role by `VolunteersAccessSync`, which never takes one away. Approved By, Approved Date,
+BarnCRM role by `VolunteersAccessSync`, which never takes one away. Reviewed By, Reviewed Date,
 Household, a schedule's Created Through, Shifts Kept and Rebuild Pending, and every rollup total are read only in
 each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
 gives Modify All only with Delete.
@@ -7236,7 +7236,7 @@ occurrence of it.
 | Active | boolean | yes (defaults true) | Whether this job is offered when a new shift is scheduled. |
 | Total Hours | decimal | computed | Approved hours ever recorded against this job. |
 | Last Volunteer Date | date | computed | The most recent day anybody worked this job. |
-| Rollups Last Calculated | datetime | computed | When BarnCRM last worked out this job's totals. |
+| Totals Last Updated | datetime | computed | When BarnCRM last worked out this job's totals. |
 
 ### Relationships
 
@@ -7271,7 +7271,7 @@ shift and changes nothing already recorded, including its totals.
 | Active | `Active__c` | Checkbox, default true |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
   `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
@@ -7291,7 +7291,7 @@ heads on.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | What this shift is called. BarnCRM writes it from the job and the start when it is left empty. |
-| Volunteer Job | reference(Volunteer Job) | yes | The work being done. A shift is a detail of its job. |
+| Job | reference(Volunteer Job) | yes | The work being done. A shift is a detail of its job. |
 | Start Time | datetime | yes | When the shift starts. |
 | End Time | datetime | yes | When the shift ends. |
 | Volunteers Needed | integer | yes (defaults 1) | How many people the coordinator wants on this shift. |
@@ -7301,7 +7301,7 @@ heads on.
 | Slots Filled | integer | computed | How many people are signed up and have not cancelled. |
 | Slots Remaining | integer | computed | Volunteers Needed less Slots Filled. Negative when more came than were asked for, which is information, not an error. |
 | Total Hours | decimal | computed | Approved hours recorded against this shift. |
-| Rollups Last Calculated | datetime | computed | When BarnCRM last worked out this shift's totals. |
+| Totals Last Updated | datetime | computed | When BarnCRM last worked out this shift's totals. |
 
 ### Relationships
 
@@ -7332,7 +7332,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 
 | Attribute | API name | Type |
 |---|---|---|
-| Volunteer Job | `Volunteer_Job__c` | Master-Detail to `Volunteer_Job__c`, relationship name Shifts |
+| Job | `Volunteer_Job__c` | Master-Detail to `Volunteer_Job__c`, relationship name Shifts |
 | Start Time | `Start_Time__c` | DateTime, required |
 | End Time | `End_Time__c` | DateTime, required |
 | Volunteers Needed | `Volunteers_Needed__c` | Number(4, 0), default 1 |
@@ -7342,7 +7342,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Slots Filled | `Slots_Filled__c` | Number(4, 0) |
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Validation rules:** `End_After_Start` (R-VS3).
 - **Service:** `VolunteerShiftTriggerHandler`, `VolunteerShiftSelector`.
@@ -7444,14 +7444,14 @@ record.
 | Contact | reference(Contact) | conditional | The person who gave the time, where people are Contacts. |
 | Account | reference(Account) | conditional | The person who gave the time, where people are person Accounts. |
 | Household | reference(Household) | computed | The household credited with this time. BarnCRM fills it in from the person. |
-| Volunteer Job | reference(Volunteer Job) | conditional | The work that was done. Filled from the shift when a shift is named. |
+| Job | reference(Volunteer Job) | conditional | The work that was done. Filled from the shift when a shift is named. |
 | Volunteer Shift | reference(Volunteer Shift) | no | The shift the time was given on, when it was a scheduled shift. |
 | Volunteer Sign-up | reference(Volunteer Sign-up) | no | The booking these hours were created from, when attendance created them. |
 | Date Worked | date | yes | The day the time was given. |
 | Hours | decimal | yes | How many hours, to two decimal places. |
 | Status | picklist(Submitted, Approved, Rejected) | yes (defaults Submitted) | Where this entry stands with the coordinator. |
-| Approved By | reference(User) | computed | Who approved or rejected the entry. |
-| Approved Date | datetime | computed | When they did it. |
+| Reviewed By | reference(User) | computed | Who approved or rejected the entry. |
+| Reviewed Date | datetime | computed | When they did it. |
 | Rejection Reason | text | conditional | Why the entry was rejected; required when rejecting. |
 | Notes | text | no | What the person did, when it is worth recording. |
 
@@ -7478,18 +7478,18 @@ fills the job from the shift, so a shift deleted later leaves the hours with the
 **R-VG4 Hours are greater than zero** (validation rule): zero hours is a mistake or an
 attendance record, and attendance is a sign-up.
 
-**R-VG5 Approval is a status moved by a service.** Status, Approved By and Approved Date are
-moved only by `VolunteerHoursService`, which refuses a user without the custom permission
+**R-VG5 Approval is a status moved by a service.** Status, Reviewed By and Reviewed Date (API
+names `Approved_By__c` and `Approved_Date__c`, unchanged) are moved only by `VolunteerHoursService`, which refuses a user without the custom permission
 `Manage_Volunteers`; a Status change made any other way is refused. It is not a Salesforce
 approval process (ADR-0127, decision 4). The service has four verbs: submit (create entries,
-which start Submitted, or Approved under R-VG6), approve (any entry not yet Approved: Approved
-By and Approved Date are the coordinator and now, any Rejection Reason is cleared), reject
-(R-VG8: Approved By and Approved Date record who rejected and when) and reopen (an Approved or
+which start Submitted, or Approved under R-VG6), approve (any entry not yet Approved: Reviewed
+By and Reviewed Date are the coordinator and now, any Rejection Reason is cleared), reject
+(R-VG8: Reviewed By and Reviewed Date record who rejected and when) and reopen (an Approved or
 Rejected entry back to Submitted, those three fields cleared). Each verb saves entry by entry
 and reports any it could not move (one the user may see but not edit) without stopping the
 rest. Outside the service a new entry is saved Submitted, or Approved when Hours Require
 Approval is off, and naming any other status is refused; on a saved entry a change to Status,
-Approved By, Approved Date or Rejection Reason is refused. Two layers hold this. The hours
+Reviewed By, Reviewed Date or Rejection Reason is refused. Two layers hold this. The hours
 automation (`Volunteer_Hours_Rules`) refuses the change for everyone outside the service. The
 validation rule `Status_Needs_Manage_Volunteers` refuses it for any user without
 `Manage_Volunteers`, so it holds while automation is paused or switched off. New entries are
@@ -7527,14 +7527,14 @@ is Apex before the delete, in an automation that always runs (registry row
 | Contact | `Contact__c` | Lookup to Contact |
 | Account | `Account__c` | Lookup to Account |
 | Household | `Household__c` | Lookup to Account |
-| Volunteer Job | `Volunteer_Job__c` | Lookup to `Volunteer_Job__c` |
+| Job | `Volunteer_Job__c` | Lookup to `Volunteer_Job__c` |
 | Volunteer Shift | `Volunteer_Shift__c` | Lookup to `Volunteer_Shift__c` (clears on delete) |
 | Volunteer Sign-up | `Volunteer_Signup__c` | Lookup to `Volunteer_Signup__c` (clears on delete) |
 | Date Worked | `Date_Worked__c` | Date, required |
 | Hours | `Hours__c` | Number(6, 2), required |
 | Status | `Status__c` | Picklist: Submitted, Approved, Rejected |
-| Approved By | `Approved_By__c` | Lookup to User |
-| Approved Date | `Approved_Date__c` | DateTime |
+| Reviewed By | `Approved_By__c` | Lookup to User |
+| Reviewed Date | `Approved_Date__c` | DateTime |
 | Rejection Reason | `Rejection_Reason__c` | Text(255) |
 | Notes | `Notes__c` | Text Area(255) |
 
@@ -7546,7 +7546,7 @@ is Apex before the delete, in an automation that always runs (registry row
 - **Service:** `VolunteerHoursService`, `VolunteerHoursTriggerHandler`,
   `VolunteerHoursDeleteGuardHandler` (R-VG9),
   `VolunteerHoursSelector`, `VolunteerHoursWriter` (the status save, in system mode because
-  Approved By and Approved Date are read only in every permission set; ADR-0021).
+  Reviewed By and Reviewed Date are read only in every permission set; ADR-0021).
 
 ---
 
@@ -7573,7 +7573,7 @@ the module's own Volunteer Settings page, never in Setup. Defaults are applied i
 |---|---|---|
 | Hours Require Approval | `Hours_Require_Approval__c` | Checkbox, default true |
 | Attendance Creates Hours | `Attendance_Creates_Hours__c` | Checkbox, default true |
-| Shift Horizon Weeks | `Shift_Horizon_Weeks__c` | Number(2, 0) |
+| Weeks Ahead to Create Shifts | `Shift_Horizon_Weeks__c` | Number(2, 0) |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.
@@ -7910,7 +7910,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 | Name | text | yes | What the coordinator calls the schedule, for example "Saturday sorting". |
 | Job | reference(Job) | yes | The job whose shifts the schedule creates. |
 | Weekdays | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on. |
-| Every N Weeks | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
+| Repeat Every (Weeks) | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
 | Start Time | time | yes | When each shift starts. |
 | End Time | time | yes | When each shift ends, later the same day. |
 | Start Date | date | yes | The first day a shift may fall on. |
@@ -7931,7 +7931,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 
 **R-SSC1 Which days.** A day is a shift day when its weekday is in Weekdays, it is on or after
 Start Date and on or before End Date (if any), and the number of whole weeks between the Monday
-of Start Date's week and the Monday of its own week divides by Every N Weeks. Start Time and End
+of Start Date's week and the Monday of its own week divides by Repeat Every (Weeks). Start Time and End
 Time are read in the org's default time zone, so a 9:00 shift starts at 9:00 local time on both
 sides of a daylight saving change, whoever's job created it.
 
@@ -7949,7 +7949,7 @@ nightly job runs every active schedule in a batch (ADR-0128). A run takes a lock
 queued run and the nightly run never create the same day twice. Nothing runs while the module
 is turned off; turning it back on catches up at the next nightly run.
 
-**R-SSC4 Editing changes only future shifts with no sign-ups.** When Weekdays, Every N Weeks,
+**R-SSC4 Editing changes only future shifts with no sign-ups.** When Weekdays, Repeat Every (Weeks),
 Start Time, End Time, Start Date, Volunteers Needed or Location changes, the schedule's shifts
 that start after now, are not Cancelled and have no sign-up record of any status and no hours
 record are deleted, Created Through is cleared, and a run recreates them from the new pattern.
@@ -7993,7 +7993,7 @@ Cancelled.
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
 | Weekdays | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
-| Every N Weeks | `Every_N_Weeks__c` | Number (2, 0), default 1 |
+| Repeat Every (Weeks) | `Every_N_Weeks__c` | Number (2, 0), default 1 |
 | Start Time | `Start_Time__c` | Time |
 | End Time | `End_Time__c` | Time |
 | Start Date | `Start_Date__c` | Date |
@@ -8005,7 +8005,7 @@ Cancelled.
 | Shifts Kept | `Shifts_Kept__c` | Number (5, 0), read only in every permission set |
 | Rebuild Pending | `Rebuild_Pending__c` | Checkbox, default false, read only in every permission set, not on the layout |
 
-- **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Every N Weeks 1 to 52, End
+- **Validation rule:** `Shift_Schedule_Valid`: Weekdays not empty, Repeat Every (Weeks) 1 to 52, End
   Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
 - **Automation:** registry row `Shift_Schedule_Rules` (`ShiftScheduleTriggerHandler`), which
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
@@ -8389,6 +8389,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | V-04 and V-05 follow-ups. No object or field added. New rules R-VQ5 and R-VK4: deleting a person deletes their requirement rows and volunteer skills in system mode, a merge keeps them (`VolunteerPersonDeleteHandler`, Always Runs). R-SK1 enforced: validation rules `Volunteer_Skill_Active_Skill` and `Job_Skill_Active_Skill` refuse a new or moved row on an inactive skill. The Volunteer Requirements tab, for the Admin and Coordinator sets. Related lists on the Skill and Volunteer Job layouts. |
 | v0.8 | 2026-10-18 | Volunteers hardening. New field `Rebuild_Pending__c` on `Shift_Schedule__c` (29T), read only in every set, not on the layout. R-SSC6: a save that changes or ends many schedules removes shifts inline only within the transaction's DML rows and marks the rest Rebuild Pending, which every run (queued or nightly) finishes before creating shifts; a delete of many schedules queues the removal of the rest's shifts by Id (`ShiftScheduleRemovalJob`). R-SSC4 and R-SSC5: Shifts Kept counts only kept shifts with a sign-up or hours (Cancelled are not counted) and is cleared by a later save that changes neither pattern nor end. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
+| v0.8 | 2026-10-18 | Volunteers QA and UX audit fixes. No object, field or API name added or changed; labels only: Approved By and Approved Date read Reviewed By and Reviewed Date, the job lookups on Volunteer Shift and Volunteer Hours read Job, `Shift_Horizon_Weeks__c` reads Weeks Ahead to Create Shifts, `Every_N_Weeks__c` reads Repeat Every (Weeks), and the job and shift `Rollups_Last_Calculated__c` read Totals Last Updated. Volunteers ships a page layout for `Volunteer_Letter_Template__c` (Name, Type, Active, Template Key, Body). `VolunteerReadinessController` is granted in all four sets; `VolunteerLetterController` only in Admin and Coordinator, since Staff and Read Only hold no template access (29U). |
 
 ---
 ## 32. Entity ownership by package
