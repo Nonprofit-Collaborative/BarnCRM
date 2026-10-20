@@ -8,8 +8,8 @@
  *
  * Loading is one module at a time on purpose. Core's stage batch finishes by starting the
  * first module, and each module's own load finishes by calling `startAfter` with its name,
- * which starts the module after it. With one module shipped that call is a no-op, and it is
- * what keeps a second module from needing a change in Core. A module runs its stages through
+ * which starts the module after it (Giving, then Volunteers), so a module never needs to know
+ * which modules come after it. A module runs its stages through
  * SampleDataStageBatch (see SampleDataStages), because a queueable chain stops after five
  * jobs in Developer Edition, trial and scratch orgs.
  */
@@ -19,7 +19,10 @@ public with sharing class SampleDataModules {
      * Module sample data classes in load order. Each must be public, `@NamespaceAccessible`,
      * have a no-argument constructor, and implement SampleDataModule.
      */
-    private static final List<String> MODULE_CLASS_NAMES = new List<String>{ 'GivingSampleData' };
+    private static final List<String> MODULE_CLASS_NAMES = new List<String>{
+        'GivingSampleData',
+        'VolunteersSampleData'
+    };
 
     /** Injected by the tests, which have no other package to resolve a real module from. */
     @TestVisible

@@ -30,6 +30,10 @@ The person's record is kept but made anonymous, so every total stays right:
 With the Giving module installed, gifts, soft credits, pledges and receipts are kept with their
 amounts and dates, still credited to the anonymous record. See section 4.
 
+With the Volunteers module installed, volunteer hours and shift sign-ups are kept the same way,
+with their notes emptied; bookings on shifts still to come are cancelled; onboarding
+requirements and skills are deleted. See [Volunteers](volunteers.md#erasing-a-volunteer).
+
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.
 

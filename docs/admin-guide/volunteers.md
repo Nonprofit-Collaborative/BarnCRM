@@ -190,7 +190,8 @@ else.
 **Erasing a person.** [Erasing a person](erase-a-person.md) deletes their requirements and
 empties them from the Recycle Bin. The Erasure record lists them by Id only. The person erasing
 must also hold Volunteers Admin or Volunteers Coordinator: otherwise the erasure is refused, so a
-background check is never left behind.
+background check is never left behind. What else erasing does to volunteer records is in
+[Erasing a volunteer](#erasing-a-volunteer).
 
 **Deleting a person.** Deleting a person (or a household or organization, with the people in
 it) deletes their requirements and volunteer skills too, whoever deletes them, even someone who
@@ -457,6 +458,53 @@ activate the page for the BarnCRM Volunteers app.
 
 **Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
 schedule you pick.
+
+## Health Check findings
+
+With Volunteers installed, [Health Check](health-check.md) also asks five questions about it.
+They are asked only of someone who may manage BarnCRM Settings, and not at all while Volunteers
+is turned off. Counts stop at 1,000, and each finding about records links the first five.
+
+| Finding | Why it matters | How to fix it |
+|---|---|---|
+| **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
+| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list**, open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Shift Horizon Weeks** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
+| **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
+
+## Erasing a volunteer
+
+When someone asks to be forgotten, [Erasing a person](erase-a-person.md) anonymizes their record.
+With Volunteers installed it also does this, all in the same step and all undone together if
+anything is refused:
+
+| Record | What happens | Why |
+|---|---|---|
+| Volunteer hours | Kept, with their date, hours and status, still credited to the anonymous record. The **Notes** on each are emptied. | The hours your organization received stay in every total, job and shift. Approved hours are erased like any other: nothing that approval locks is changed. |
+| Shift sign-ups | Kept, with their **Notes** emptied. A booking that is Signed up or Confirmed on a shift that has not started is set to **Cancelled**. | Shift counts stay right, the place is freed, and nobody expects the person. |
+| Volunteer skills and interests | Deleted, and emptied from the Recycle Bin. | A skill or interest is a fact about the person. |
+| Onboarding requirements | Deleted, and emptied from the Recycle Bin. | A background check result lives nowhere else. |
+| Volunteer totals on the person | Kept. | They say nothing about who the person was, and they still match the hours kept. |
+| Hour letters and certificates | Kept as files on the person's record. The preview counts them with the person's other files, as **Kept**. Delete them by hand, preferably before you erase. | A letter prints the person's name and hours, but a file can hold anything, so BarnCRM lists files rather than erasing them ([Erasing a person](erase-a-person.md)). |
+
+The preview lists each of these before you confirm. The person erasing must hold **Volunteers
+Admin** or **Volunteers Coordinator**: someone who cannot see or change these records is refused
+rather than leaving them behind. A **Rejection Reason** a coordinator wrote is kept: it says why
+an entry was refused, and only the approval screen changes it.
+
+## Households and volunteer hours
+
+Hours are credited to the household the person was in when the hours were saved, and stay there
+when the person moves (as gifts do). So a household that hours point at is never deleted by the
+empty household tidy-up: if the last person moves out of a household with volunteer hours, the
+household is kept, quietly, with no Error Log entry, so its history still adds up. The same holds
+for the nightly tidy-up of households emptied by deleting people and for undoing an import.
+A household with no hours (and nothing else pointing at it) is tidied away as usual.
+
+Merging two households moves every hours entry of the household merged away to the household you
+keep, approved ones included. That household's volunteer totals catch up at the next nightly
+run, or at once with **Recalculate all** on the Rollups page.
 
 ## Turning it off
 
