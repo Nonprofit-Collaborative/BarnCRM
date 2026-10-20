@@ -221,9 +221,10 @@ private class HealthCheckServiceTest {
                 finding.severity,
                 'People vanishing from their households is broken, not untidy.'
             );
-            System.assert(
-                finding.detail.contains('1 people'),
-                'The finding says how many people are affected: ' + finding.detail
+            System.assertEquals(
+                System.Label.Core_HealthCheck_MembershipHiddenByContactDetailOne,
+                finding.detail,
+                'The finding says how many people are affected, in the singular for one.'
             );
             System.assertEquals(
                 HealthCheckService.SECTION_HOUSEHOLDS,
@@ -253,9 +254,10 @@ private class HealthCheckServiceTest {
             );
 
             System.assertNotEquals(null, finding, 'A person the mode cannot see is reported.');
-            System.assert(
-                finding.detail.contains('1 people'),
-                'The finding says how many people are affected: ' + finding.detail
+            System.assertEquals(
+                System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetailOne,
+                finding.detail,
+                'The finding says how many people are affected, in the singular for one.'
             );
         }
     }

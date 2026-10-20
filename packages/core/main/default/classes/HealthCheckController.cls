@@ -189,14 +189,16 @@ public with sharing class HealthCheckController {
                 ? ''
                 : String.format(
                       System.Label.Core_HealthCheck_FixScheduled,
-                      new List<Object>{ String.join(again, ', ') }
+                      new List<Object>{ String.join(again, HealthCheckService.JOB_SEPARATOR) }
                   );
             if (!stoppedOnly.isEmpty()) {
                 outcome +=
                     (outcome == '' ? '' : ' ') +
                     String.format(
                         System.Label.Core_HealthCheck_FixStoppedOnly,
-                        new List<Object>{ String.join(stoppedOnly, ', ') }
+                        new List<Object>{
+                            String.join(stoppedOnly, HealthCheckService.JOB_SEPARATOR)
+                        }
                     );
             }
             return outcome;
@@ -204,7 +206,9 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
             return String.format(
                 System.Label.Core_HealthCheck_FixScheduled,
-                new List<Object>{ String.join(NightlyJobs.scheduleAll(), ', ') }
+                new List<Object>{
+                    String.join(NightlyJobs.scheduleAll(), HealthCheckService.JOB_SEPARATOR)
+                }
             );
         }
         String outcome = String.format(

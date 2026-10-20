@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: households with no current member.</shortDescription>
-        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. Open each one to add a member, merge it into another household, or delete it. Health Check finds these and does not change them.</value>
+        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. A household kept because records are credited to it is kept on purpose: deleting it unlinks those records. Open each to add a member, merge it into another household, or delete it. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsTitle</fullName>
@@ -911,5 +911,101 @@
         <protected>false</protected>
         <shortDescription>Detail: affiliations left with no person after a delete.</shortDescription>
         <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check finds these and does not change them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: one affiliation left with no person after a delete.</shortDescription>
+        <value>1 affiliation has no person</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: one relationship left with no person on one side.</shortDescription>
+        <value>1 relationship has no person on one side</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_EmptyHouseholdsTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one household with no current member.</shortDescription>
+        <value>1 household has nobody in it</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one person in no household.</shortDescription>
+        <value>1 person is not in a household</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_OrphansLinkedOnly</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: the one record a finding counts is linked below.</shortDescription>
+        <value>It is linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_OrphansFirstListedOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: only the first of several records is linked below.</shortDescription>
+        <value>The first is linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_ErrorLogTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one new Error Log entry.</shortDescription>
+        <value>1 error nobody has looked at</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_ErrorLogDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: one new Error Log entry.</shortDescription>
+        <value>The Error Log has 1 new entry. It says what went wrong and what to do about it. Work through it, then mark it resolved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_SwitchesMissingTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one automation switch is missing.</shortDescription>
+        <value>1 automation switch is missing</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_TemplatesMissingTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one shipped import template is missing.</shortDescription>
+        <value>1 shipped import template is missing</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_UsersWithoutAccessTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: one licensed user has no BarnCRM role.</shortDescription>
+        <value>1 user cannot see the app</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_UsersWithoutAccessDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: one licensed user has no BarnCRM role.</shortDescription>
+        <value>1 active user has a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if that person is not meant to use BarnCRM.</value>
     </labels>
 </CustomLabels>

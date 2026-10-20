@@ -15,6 +15,7 @@ import COLUMN_OBJECT from '@salesforce/label/c.Core_EraseAction_ColumnObject';
 import COLUMN_COUNT from '@salesforce/label/c.Core_EraseAction_ColumnCount';
 import COLUMN_FIELDS from '@salesforce/label/c.Core_EraseAction_ColumnFields';
 import COLUMN_NOTE from '@salesforce/label/c.Core_EraseAction_ColumnNote';
+import CHANGES_TABLE from '@salesforce/label/c.Core_EraseAction_ChangesTable';
 import ACTION_CLEARED from '@salesforce/label/c.Core_EraseAction_Cleared';
 import ACTION_ENDED from '@salesforce/label/c.Core_EraseAction_Ended';
 import ACTION_DELETED from '@salesforce/label/c.Core_EraseAction_Deleted';
@@ -50,6 +51,7 @@ export default class PersonErasure extends NavigationMixin(LightningElement) {
     warning: WARNING,
     preview: PREVIEW,
     working: WORKING,
+    changesTable: CHANGES_TABLE,
     reference: REFERENCE,
     referenceHelp: REFERENCE_HELP,
     erase: ERASE,
@@ -85,6 +87,11 @@ export default class PersonErasure extends NavigationMixin(LightningElement) {
 
   get erased() {
     return Boolean(this.erasureId);
+  }
+
+  /** The reference and confirmation fields: after a preview, until the person is erased. */
+  get confirming() {
+    return this.hasRows && !this.erased;
   }
 
   get confirmLabel() {

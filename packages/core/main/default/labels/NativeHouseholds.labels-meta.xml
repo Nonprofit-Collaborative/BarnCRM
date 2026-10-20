@@ -41,6 +41,30 @@
         <value>{0} Accounts are a BarnCRM household and a Salesforce Nonprofit Cloud household at the same time. BarnCRM leaves each one's name, greetings, and address alone rather than guess which model should win. Review these Accounts and settle each on one household model.</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_NativeHouseholdsDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: native households finding, one household</shortDescription>
+        <value>1 household here is managed by Salesforce Nonprofit Cloud (an Account carrying a native household group). BarnCRM leaves it alone: it never writes its name, greetings, or address.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NativeHouseholdCollisionTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check title: one household in both models</shortDescription>
+        <value>1 household carries both household models</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NativeHouseholdCollisionDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one household in both models</shortDescription>
+        <value>1 Account is a BarnCRM household and a Salesforce Nonprofit Cloud household at the same time. BarnCRM leaves its name, greetings, and address alone rather than guess which model should win. Review this Account and settle it on one household model.</value>
+    </labels>
+    <labels>
         <fullName>Core_HouseholdMerge_ErrorNativeHousehold</fullName>
         <categories>Households</categories>
         <language>en_US</language>

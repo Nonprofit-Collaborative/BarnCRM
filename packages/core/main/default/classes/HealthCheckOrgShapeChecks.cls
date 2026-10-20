@@ -236,8 +236,18 @@ public with sharing class HealthCheckOrgShapeChecks {
         List<Object> count = new List<Object>{ cappedCount(asAccounts) };
         return new HealthCheckService.Finding(
                 'membership_mode_people_as_accounts',
-                String.format(System.Label.Core_HealthCheck_PeopleAsAccountsTitle, count),
-                String.format(System.Label.Core_HealthCheck_PeopleAsAccountsDetail, count),
+                HealthCheckService.forCount(
+                    asAccounts,
+                    System.Label.Core_HealthCheck_PeopleAsAccountsTitleOne,
+                    System.Label.Core_HealthCheck_PeopleAsAccountsTitle,
+                    count
+                ),
+                HealthCheckService.forCount(
+                    asAccounts,
+                    System.Label.Core_HealthCheck_PeopleAsAccountsDetailOne,
+                    System.Label.Core_HealthCheck_PeopleAsAccountsDetail,
+                    count
+                ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_ORG_SHAPE
             )
@@ -267,12 +277,19 @@ public with sharing class HealthCheckOrgShapeChecks {
         }
 
         List<Object> count = new List<Object>{ String.valueOf(unseen) };
-        String detail = String.format(
-            junction
-                ? System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetail
-                : System.Label.Core_HealthCheck_MembershipHiddenByContactDetail,
-            count
-        );
+        String detail = junction
+            ? HealthCheckService.forCount(
+                  unseen,
+                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetailOne,
+                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetail,
+                  count
+              )
+            : HealthCheckService.forCount(
+                  unseen,
+                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetailOne,
+                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetail,
+                  count
+              );
         return new HealthCheckService.Finding(
                 'membership_data_hidden',
                 System.Label.Core_HealthCheck_MembershipHiddenTitle,
@@ -334,7 +351,9 @@ public with sharing class HealthCheckOrgShapeChecks {
             return null;
         }
         String detail = shape.nativeHouseholdGroupCount != null
-            ? String.format(
+            ? HealthCheckService.forCount(
+                  shape.nativeHouseholdGroupCount,
+                  System.Label.Core_HealthCheck_NativeHouseholdsDetailOne,
                   System.Label.Core_HealthCheck_NativeHouseholdsDetail,
                   new List<Object>{ cappedCount(shape.nativeHouseholdGroupCount) }
               )
@@ -363,8 +382,18 @@ public with sharing class HealthCheckOrgShapeChecks {
         List<Object> count = new List<Object>{ String.valueOf(collisions) };
         return new HealthCheckService.Finding(
             'native_household_collision',
-            String.format(System.Label.Core_HealthCheck_NativeHouseholdCollisionTitle, count),
-            String.format(System.Label.Core_HealthCheck_NativeHouseholdCollisionDetail, count),
+            HealthCheckService.forCount(
+                collisions,
+                System.Label.Core_HealthCheck_NativeHouseholdCollisionTitleOne,
+                System.Label.Core_HealthCheck_NativeHouseholdCollisionTitle,
+                count
+            ),
+            HealthCheckService.forCount(
+                collisions,
+                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetailOne,
+                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetail,
+                count
+            ),
             HealthCheckService.SEVERITY_WARNING,
             HealthCheckService.CATEGORY_ORG_SHAPE
         );

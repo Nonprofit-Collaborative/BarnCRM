@@ -16,13 +16,16 @@
           data={rows}
           columns={columns}
           hide-checkbox-column
+          aria-label={label.changesTable}
           data-id="changes"
         ></lightning-datatable>
       </template>
-      <template lwc:if={erased}>
-        <p class="slds-m-top_small" data-id="done">{label.done}</p>
-      </template>
-      <template lwc:elseif={hasRows}>
+      <div role="status" data-id="status">
+        <template lwc:if={erased}>
+          <p class="slds-m-top_small" data-id="done">{label.done}</p>
+        </template>
+      </div>
+      <template lwc:if={confirming}>
         <lightning-input
           class="slds-m-top_small"
           label={label.reference}

@@ -84,8 +84,18 @@ public with sharing class HealthCheckAccessChecks {
         List<Object> count = new List<Object>{ String.valueOf(without) };
         return new HealthCheckService.Finding(
                 'users_without_access',
-                String.format(System.Label.Core_HealthCheck_UsersWithoutAccessTitle, count),
-                String.format(System.Label.Core_HealthCheck_UsersWithoutAccessDetail, count),
+                HealthCheckService.forCount(
+                    without,
+                    System.Label.Core_HealthCheck_UsersWithoutAccessTitleOne,
+                    System.Label.Core_HealthCheck_UsersWithoutAccessTitle,
+                    count
+                ),
+                HealthCheckService.forCount(
+                    without,
+                    System.Label.Core_HealthCheck_UsersWithoutAccessDetailOne,
+                    System.Label.Core_HealthCheck_UsersWithoutAccessDetail,
+                    count
+                ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_ACCESS
             )

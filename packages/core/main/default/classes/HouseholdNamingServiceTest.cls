@@ -344,6 +344,64 @@ private class HouseholdNamingServiceTest {
     }
 
     @IsTest
+    static void aHouseholdLeftEmptyKeepsItsLastNameAndGreetings() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
+            Account elsewhere = HouseholdTestDataFactory.newHousehold('Elsewhere');
+            insert new List<Account>{ household, elsewhere };
+            Contact john = new Contact(
+                Salutation = 'Mr.',
+                FirstName = 'John',
+                LastName = 'Smith',
+                AccountId = household.Id
+            );
+            insert john;
+            Account named = [
+                SELECT Name, Household_Formal_Greeting__c, Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :household.Id
+            ];
+            Assert.areEqual('The Smith Family', named.Name, 'Named from its member first');
+
+            Test.startTest();
+            update new Contact(Id = john.Id, AccountId = elsewhere.Id);
+            HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+            Test.stopTest();
+
+            Account kept = [
+                SELECT
+                    Name,
+                    Member_Count__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :household.Id
+            ];
+            Assert.areEqual(0, kept.Member_Count__c, 'Nobody is left in it');
+            Assert.areEqual(
+                named.Name,
+                kept.Name,
+                'Still says which family it was, not the placeholder name'
+            );
+            Assert.areEqual(
+                named.Household_Formal_Greeting__c,
+                kept.Household_Formal_Greeting__c,
+                'Formal greeting kept'
+            );
+            Assert.areEqual(
+                named.Household_Informal_Greeting__c,
+                kept.Household_Informal_Greeting__c,
+                'Informal greeting kept'
+            );
+        }
+    }
+
+    @IsTest
     static void customNameStopsEveryRecomputation() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

@@ -13,8 +13,48 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: nightly run off. {0} waiting rollups, {1} nightly only.</shortDescription>
-        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled. {1} of them recalculate only then, so their values are not being kept up to date. Schedule all nightly jobs fixes this.</value>
+        <shortDescription>Health Check detail: nightly run off. {0} waiting rollups.</shortDescription>
+        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyOffDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly run off, one waiting rollup.</shortDescription>
+        <value>1 active total is set to recalculate in the nightly run, and it is not scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyOffOnlyThen</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly run off. {0} rollups run only then.</shortDescription>
+        <value>{0} of them recalculate only then, so their values are not being kept up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyOffOnlyThenOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly run off. One of several runs only then.</shortDescription>
+        <value>1 of them recalculates only then, so its value is not being kept up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyOffOnlyThenIt</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly run off. The one rollup runs only then.</shortDescription>
+        <value>It recalculates only then, so its value is not being kept up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyOffFixHint</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly run off. Which fix schedules it.</shortDescription>
+        <value>Schedule all nightly jobs fixes this.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyOffTitle</fullName>

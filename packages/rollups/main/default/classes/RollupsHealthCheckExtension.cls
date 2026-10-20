@@ -159,14 +159,31 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
                     nightlyOnly++;
                 }
             }
-            List<Object> values = new List<Object>{
-                String.valueOf(waiting.size()),
-                String.valueOf(nightlyOnly)
-            };
+            String detail = HealthCheckService.forCount(
+                waiting.size(),
+                System.Label.Core_HealthCheck_NightlyOffDetailOne,
+                System.Label.Core_HealthCheck_NightlyOffDetail,
+                new List<Object>{ String.valueOf(waiting.size()) }
+            );
+            // Said only when some rollup recalculates nowhere else; one set to Both still
+            // updates as records change.
+            if (waiting.size() == 1 && nightlyOnly == 1) {
+                detail += ' ' + System.Label.Core_HealthCheck_NightlyOffOnlyThenIt;
+            } else if (nightlyOnly > 0) {
+                detail +=
+                    ' ' +
+                    HealthCheckService.forCount(
+                        nightlyOnly,
+                        System.Label.Core_HealthCheck_NightlyOffOnlyThenOne,
+                        System.Label.Core_HealthCheck_NightlyOffOnlyThen,
+                        new List<Object>{ String.valueOf(nightlyOnly) }
+                    );
+            }
+            detail += ' ' + System.Label.Core_HealthCheck_NightlyOffFixHint;
             return new HealthCheckService.Finding(
                 'nightly_rollups_not_scheduled',
                 System.Label.Core_HealthCheck_NightlyOffTitle,
-                String.format(System.Label.Core_HealthCheck_NightlyOffDetail, values),
+                detail,
                 nightlyOnly > 0
                     ? HealthCheckService.SEVERITY_WARNING
                     : HealthCheckService.SEVERITY_INFO,

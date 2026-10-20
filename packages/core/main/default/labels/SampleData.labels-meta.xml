@@ -264,4 +264,12 @@
         <shortDescription>Remove already running error</shortDescription>
         <value>Sample data is still being removed. Wait for it to finish before loading or removing sample data.</value>
     </labels>
+    <labels>
+        <fullName>Core_SampleData_StoppedLogMessage</fullName>
+        <categories>Sample Data</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log message: a sample data load or removal stopped part way</shortDescription>
+        <value>The sample data load or removal stopped part way, at the step this entry names. The technical detail on this entry says what failed. The Sample data page of the admin guide, under Common mistakes, says what to check and how to finish.</value>
+    </labels>
 </CustomLabels>

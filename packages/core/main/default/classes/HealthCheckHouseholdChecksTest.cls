@@ -127,7 +127,15 @@ private class HealthCheckHouseholdChecksTest {
             HealthCheckService.Finding finding = runAsMaria(HOUSEHOLDS);
 
             Assert.isNotNull(finding, 'A household with nobody in it is reported.');
-            Assert.isTrue(finding.title.startsWith('1 '), 'Only the empty one. ' + finding.title);
+            Assert.areEqual(
+                System.Label.Core_HealthCheck_EmptyHouseholdsTitleOne,
+                finding.title,
+                'Only the empty one, said in the singular.'
+            );
+            Assert.isTrue(
+                finding.detail.contains(System.Label.Core_HealthCheck_OrphansLinkedOnly),
+                'Not "the first 1 are linked": ' + finding.detail
+            );
             Assert.areEqual(HealthCheckService.SEVERITY_INFO, finding.severity, 'Information.');
             Assert.isNull(finding.fixTarget, 'Detection only.');
             Assert.areEqual('The Empty Family', finding.links[0].label, 'It is linked by name.');
@@ -285,11 +293,15 @@ private class HealthCheckHouseholdChecksTest {
 
             Assert.isNotNull(finding, 'A household with only ended memberships is reported.');
             Assert.isTrue(finding.title.startsWith('1 '), 'Only that one. ' + finding.title);
-            // Upkeep renames a household nobody is in, so it is identified by its record.
             Assert.areEqual(
                 '/lightning/r/Account/' + ended.Id + '/view',
                 finding.links[0].url,
                 'It is the one linked.'
+            );
+            Assert.areEqual(
+                'The Ended Family',
+                finding.links[0].label,
+                'A household nobody is in keeps its name, so the list says which family (R-H4).'
             );
         }
     }

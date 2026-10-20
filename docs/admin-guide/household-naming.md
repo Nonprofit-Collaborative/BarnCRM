@@ -13,7 +13,9 @@ household name for lists and reports ("The Garcia Family"), a formal greeting fo
 
 They are recalculated whenever the people in the household change, so a mail merge is
 right without anyone checking it first. When staff want to word one household themselves,
-they check one box and the product stops touching it.
+they check one box and the product stops touching it. When the last person leaves a
+household that is kept, it keeps the name and greetings it had last, so reports still show
+which family it was.
 
 ## How to turn it on
 
