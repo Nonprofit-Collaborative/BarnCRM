@@ -94,8 +94,22 @@ describe('c-person-erasure', () => {
       requestReference: 'PR-2041'
     });
     expect(byId(element, 'done')).not.toBeNull();
+    expect(byId(element, 'done').parentElement.getAttribute('role')).toBe('status');
     expect(byId(element, 'open-audit')).not.toBeNull();
     expect(byId(element, 'erase')).toBeNull();
+    expect(byId(element, 'confirm')).toBeNull();
+  });
+
+  it('names the list of changes for assistive technology, and keeps a live region ready', async () => {
+    const element = build();
+    expect(byId(element, 'status').getAttribute('role')).toBe('status');
+    expect(byId(element, 'done')).toBeNull();
+
+    await previewed(element);
+
+    expect(byId(element, 'changes').getAttribute('aria-label')).toBe(
+      'c.Core_EraseAction_ChangesTable'
+    );
   });
 
   it('shows a refusal in its own words', async () => {

@@ -170,10 +170,20 @@ household records, names, greetings, member counts, and Members panel.
   load or a removal is still running, both **Load sample data** and **Remove sample data**
   are unavailable: removing halfway through would delete households the loader is still
   attaching people to.
+- **Installing a module after loading sample data.** A load brings in the sample data of the
+  modules installed at the time, so a module installed afterwards (Giving or Volunteers, for
+  example) has none, and **Load sample data** refuses with the message that sample data is
+  already loaded. Select **Remove sample data**, wait for **Not loaded**, then **Load sample
+  data** again: the new load includes every module installed now.
 - **Assuming removal is instant.** Removal deletes several thousand records with Giving
   installed and takes a minute or two; wait for the card to confirm **Not loaded** before
   assuming it is done. If it stops part way, a notification says so and the Error Log says
-  why; select **Remove sample data** again to finish it.
+  why; deal with what it names, then select **Remove sample data** again to finish it.
+- **Reading an Error Log entry from a load or removal that stopped.** The entry names the step
+  that stopped, and its technical detail says what failed (for example, a validation rule or
+  a required field your org added that refused a sample record). Fix or relax what it names,
+  then finish: after a stopped removal, select **Remove sample data** again; after a stopped
+  load, remove what loaded, then load again.
 - **Expecting the giving totals to appear straight away (with Giving).** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are
   worked out by the rollup run. Recalculate from **BarnCRM Settings > Rollups**, or wait

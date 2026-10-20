@@ -84,6 +84,21 @@ public with sharing class HealthCheckService {
     public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
 
     /**
+     * What a finding puts between the job names it lists. A job name can hold a comma
+     * ("Installment top up, 1:15 AM"), so a comma between them would run two jobs together.
+     */
+    public static final String JOB_SEPARATOR = '; ';
+
+    /**
+     * A finding's words for a count: `one` when the count is exactly 1, so it never reads
+     * "1 households have", and `many` otherwise, a count past a cap included.
+     */
+    @NamespaceAccessible
+    public static String forCount(Integer count, String one, String many, List<Object> values) {
+        return String.format(count == 1 ? one : many, values);
+    }
+
+    /**
      * What one of those fixes would change if it ran now: the names of the rows it would create,
      * or the names of the jobs it would schedule. Empty when it would change nothing, null for a
      * key that is not one of them.

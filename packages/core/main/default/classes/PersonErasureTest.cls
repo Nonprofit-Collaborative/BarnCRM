@@ -201,7 +201,92 @@ private class PersonErasureTest {
                 [SELECT COUNT() FROM Address__c WHERE Account__c = :jordan.AccountId],
                 'Its addresses deleted'
             );
-            Assert.isFalse(result.changes.isEmpty(), 'Reported');
+            PersonErasure.Change householdRow;
+            PersonErasure.Change personRow;
+            for (PersonErasure.Change change : result.changes) {
+                if (change.action == PersonErasure.CLEARED) {
+                    if (change.objectLabel == Label.Core_Erase_Household) {
+                        householdRow = change;
+                    } else if (change.recordIds.contains(jordan.Id)) {
+                        personRow = change;
+                    }
+                }
+            }
+            Assert.isNotNull(householdRow, 'Reported as a household, not as an account');
+            Assert.areEqual(Label.Core_Erase_NoteHouseholdKept, householdRow.note, 'Says why');
+            Assert.isTrue(
+                householdRow.fields.contains(Account.Name.getDescribe().getLabel()),
+                'Lists the name it replaced: ' + householdRow.fields
+            );
+            Assert.isTrue(
+                householdRow.fields.contains(
+                    Account.Household_Informal_Greeting__c.getDescribe().getLabel()
+                ),
+                'Lists the greetings it emptied: ' + householdRow.fields
+            );
+            Assert.isTrue(
+                personRow.fields.contains(Label.Core_Erase_Household),
+                'The contact account reads as its household: ' + personRow.fields
+            );
+            Assert.isFalse(
+                personRow.fields.contains(Contact.AccountId.getDescribe().getLabel()),
+                'Not as the account field: ' + personRow.fields
+            );
+            String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
+            .Details__c;
+            Assert.isTrue(
+                details.contains(
+                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Erase_Household + ' | 1'
+                ),
+                'The Erasure record uses the same words: ' + details
+            );
+        }
+    }
+
+    @IsTest
+    static void aContactsOrganizationAccountKeepsItsFieldLabelNotHousehold() {
+        System.runAs(eraser()) {
+            isolate();
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            HouseholdTestDataFactory.save(settings);
+            Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
+            Contact jordan = new Contact(
+                FirstName = 'Jordan',
+                LastName = 'Lee',
+                Phone = '555-0100',
+                AccountId = employer.Id
+            );
+            insert jordan;
+
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+
+            PersonErasure.Change personRow;
+            for (PersonErasure.Change change : result.changes) {
+                if (
+                    change.action == PersonErasure.CLEARED && change.recordIds.contains(jordan.Id)
+                ) {
+                    personRow = change;
+                }
+            }
+            Assert.isNotNull(personRow, 'The contact is reported');
+            Assert.isTrue(
+                personRow.fields.contains(Contact.AccountId.getDescribe().getLabel()),
+                'An employer reads as the account field: ' + personRow.fields
+            );
+            Assert.isFalse(
+                personRow.fields.contains(Label.Core_Erase_Household),
+                'Not as a household: ' + personRow.fields
+            );
+            String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
+            .Details__c;
+            Assert.isFalse(
+                details.contains(
+                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Erase_Household + ' | 1'
+                ),
+                'The Erasure record does not call it a household: ' + details
+            );
         }
     }
 
@@ -657,7 +742,10 @@ private class PersonErasureTest {
             new List<String>{ 'Email', 'Phone' }
         );
         String text = PersonErasure.details(new List<PersonErasure.Change>{ change });
-        Assert.isTrue(text.startsWith('Cleared | Contact | 1 | Email, Phone | '), text);
+        Assert.isTrue(
+            text.startsWith(Label.Core_EraseAction_Cleared + ' | Contact | 1 | Email, Phone | '),
+            'In the words the screen shows: ' + text
+        );
     }
 
     @IsTest

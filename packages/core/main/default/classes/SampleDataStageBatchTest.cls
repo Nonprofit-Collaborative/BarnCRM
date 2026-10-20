@@ -209,6 +209,20 @@ private class SampleDataStageBatchTest {
                 [SELECT COUNT() FROM Account WHERE Name LIKE 'Stage %'],
                 'the failed stage is rolled back and the stage before it is kept'
             );
+            Boolean pointed = false;
+            for (Error_Log__c entry : [
+                SELECT Message__c, Technical_Detail__c
+                FROM Error_Log__c
+                WITH SYSTEM_MODE
+            ]) {
+                if (entry.Message__c == Label.Core_SampleData_StoppedLogMessage) {
+                    pointed = entry.Technical_Detail__c != null;
+                }
+            }
+            System.assert(
+                pointed,
+                'the Error Log entry points to the admin guide and keeps the technical detail'
+            );
         }
     }
 

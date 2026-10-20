@@ -359,6 +359,13 @@ private class RollupsHealthCheckExtensionTest {
                     finding.getSeverity(),
                     'It still updates as records change; only the nightly correction is missed.'
                 );
+                Assert.areEqual(
+                    System.Label.Core_HealthCheck_NightlyOffDetailOne +
+                        ' ' +
+                        System.Label.Core_HealthCheck_NightlyOffFixHint,
+                    finding.getDetail(),
+                    'One total, in the singular, and no "0 of them recalculate only then".'
+                );
             }
         }
     }

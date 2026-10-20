@@ -303,8 +303,11 @@ public with sharing class HouseholdNamingService {
             if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
                 return false;
             }
-            if (members == null) {
-                members = new List<HouseholdService.Person>();
+            if (members == null || members.isEmpty()) {
+                // Nobody left to name it after: it keeps its last name and greetings, so a
+                // household kept for the records credited to it still says which family it
+                // was (R-H4). Erasure anonymizes one through its own path (R-ER3).
+                return false;
             }
             markPrimary(members, primaryId);
             String name = computeName(members, namePattern, includeDeceased);

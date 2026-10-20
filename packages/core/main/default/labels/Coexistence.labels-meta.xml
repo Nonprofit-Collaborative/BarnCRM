@@ -65,6 +65,38 @@
         <value>You chose the simple way of belonging, which is fine while everyone is stored as a contact. This org now stores {0} people as accounts, and the simple way cannot put a person stored as an account into a household. Switch to the flexible way, or keep storing people as contacts.</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_PeopleAsAccountsTitleOne</fullName>
+        <categories>Coexistence</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: simple mode, one person account appeared</shortDescription>
+        <value>1 person is stored as an account and cannot join a household</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_PeopleAsAccountsDetailOne</fullName>
+        <categories>Coexistence</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: simple mode cannot house the one person account</shortDescription>
+        <value>You chose the simple way of belonging, which is fine while everyone is stored as a contact. This org now stores 1 person as an account, and the simple way cannot put a person stored as an account into a household. Switch to the flexible way, or keep storing people as contacts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_MembershipHiddenByContactDetailOne</fullName>
+        <categories>Coexistence</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: simple mode hides one person&apos;s membership</shortDescription>
+        <value>1 person belongs to a household through a membership record, but the simple way of belonging is on and cannot see those records. Their household reads as empty, and an empty household can be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_MembershipHiddenByJunctionDetailOne</fullName>
+        <categories>Coexistence</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: flexible mode, one person lacks a membership</shortDescription>
+        <value>1 person is linked straight to their household but has no membership record, and the flexible way of belonging only sees membership records. They do not appear in any household. Switch back to the simple way, or plan a migration before changing the setting again.</value>
+    </labels>
+    <labels>
         <fullName>Core_HubHome_InstallCompleted</fullName>
         <categories>Coexistence</categories>
         <language>en_US</language>

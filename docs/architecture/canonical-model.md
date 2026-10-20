@@ -215,6 +215,14 @@ the org-language labels `Core_Households_ListAndOthers` and `Core_Households_Lis
 its last whole word. The household is saved either way; before this, a household of about 30
 was refused, leaving its name, greetings and member count stale.
 
+A household left with no current member keeps the name and greetings last computed for it:
+they are not recomputed into the placeholder name and empty greetings. A household kept because
+records are credited to it (R-H12) so still says in reports which family it was. A household
+emptied by erasing its last member is renamed and anonymized by the erasure itself (R-ER3).
+The placeholder name (`Core_Households_NamePlaceholder`) is still what a household saved with
+no name gets, and what a household whose members are all left out of the name (R-H7, R-H9)
+is called.
+
 **R-H5 Member ordering.** Members are ordered by Household Role (Head first, then Spouse
 or Partner, then Child, then Other, then no role). Within a role the primary member comes
 first, then the earliest created member, then first name, so that a household's name and
@@ -7040,7 +7048,7 @@ them, when, under which request, and what changed. It never holds an erased valu
 | Person Account | reference(Organization) | conditional | The anonymized person, where people are person Accounts. |
 | Erased Record Id | text | yes | The same person's record Id as text, kept if the record is deleted later. |
 | Request Reference | text | no | The organization's own reference for the request, for example a ticket number. Never a name or an address. |
-| Details | long text | yes | Each record the erasure changed, by object and Id, with what was done and the labels of the fields emptied. |
+| Details | long text | yes | Each record the erasure changed, by object and Id, with what was done (in the words the erase screen shows: Emptied, Ended, Deleted, Kept, Changed), the labels of the fields emptied, and the note the screen shows. |
 
 ### Relationships
 
@@ -7063,8 +7071,12 @@ their description; an affiliation also loses its role and primary flag.
 contact mode, and each current membership is ended in junction mode
 (`HouseholdService.endMembershipsFor`). Upkeep then recounts, renames and tidies away as on any
 move (R-H11, R-H12). A household left empty and kept is anonymized as in R-ER1, named "Erased
-household", with Custom Name on and its addresses deleted. Where the org stores people as
-accounts, the person account fields a household (a business account) cannot carry are left alone.
+household", with Custom Name on, its greetings emptied and its addresses deleted. Where the org
+stores people as accounts, the person account fields a household (a business account) cannot
+carry are left alone. The preview and the Erasure record list such a household under the label
+Household, with its name and greetings among the fields emptied and the note that it was kept
+because records are credited to it. The contact's account is listed among the person's fields as
+Household.
 
 **R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
 in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is
@@ -8485,6 +8497,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Volunteers QA fixes: Health Check and schedules. No object or field added. R-SSC3: an update of an active schedule whose Created Through is short of the horizon queues a run, so saving a schedule fills it. Health Check: the coordinator access finding leaves out Volunteers Admin holders; each finding reads in the singular for one; the past shifts finding opens the new `Volunteer_Shift__c` list view `Past_Shifts_Still_Open`; the nightly job reads "Volunteer Schedules, 3:00 AM". |
 | v0.8 | 2026-10-20 | Volunteers QA fixes: sample data removal. No object or field added. Removal leaves out the sample shifts, jobs and skills real records point at, deletes the rest with partial success, logs one Warning naming each kept record and why, and hands on, so Core's and Giving's sample data are still removed. |
 | v0.8 | 2026-10-20 | Volunteers QA fixes: erasure (amends D-108). No object or field added. Erasure deletes the hour letters BarnCRM generated for the person (system mode, exact match), lists the kept Rejection Reason, and refuses a user without Volunteers Admin or Coordinator access with a plain message before changing anything. |
+| v0.8 | 2026-10-20 | Core QA fixes. No object or field added. R-H4: a household left with no current member keeps its last computed name and greetings instead of the placeholder name and empty greetings, so a household kept for credited records still says which family it was. R-ER3: an anonymized kept household is reported under Household with its name and greetings among the fields and a note that it was kept because records are credited to it; the contact's account is reported as Household. Erasure Details uses the erase screen's words for what was done. |
 
 ---
 ## 32. Entity ownership by package

@@ -17,8 +17,10 @@ The person's record is kept but made anonymous, so every total stays right:
   person's history still says a relationship existed, but not with whom.
 - **Households**: the person leaves every household. The households are renamed and recounted.
   If the person was the only member, the household follows your **Delete empty households**
-  setting; a household that is kept (the setting is off, or gifts are credited to it) is made
-  anonymous too: it is renamed "Erased household" and its greetings and address are emptied.
+  setting; a household that is kept (the setting is off, or gifts or other records credited
+  to the household, such as volunteer hours, keep it) is made anonymous too: it is renamed
+  "Erased household" and its greetings and address are emptied. The preview lists it as
+  **Household**, with the note that it was kept because records are credited to it.
 - **Salesforce's privacy record**: where your org uses the Individual record (Setup, Data
   Protection and Privacy), it is emptied and marked **Forget this Individual**.
 - **Field history** of the record (old values of tracked fields) is deleted a moment after the
@@ -64,7 +66,8 @@ request as ticket PR-2041.
 4. Type the reference `PR-2041` into **Request reference** (never a name or an email address:
    the reference is kept).
 5. Type `Jordan Lee` into **Type the person's name to confirm**, then press **Erase**.
-6. The page shows what was done and links to the **Erasure** record.
+6. The page shows what was done and links to the **Erasure** record, whose Details keep the
+   same list in the same words.
 
 ## 4. What stays, and what you still have to do
 

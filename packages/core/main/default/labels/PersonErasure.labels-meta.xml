@@ -105,6 +105,14 @@
         <value>Renamed and recounted without this person.</value>
     </labels>
     <labels>
+        <fullName>Core_Erase_NoteHouseholdKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: a household left empty and kept</shortDescription>
+        <value>Kept because records are credited to it. Renamed, and its greetings and addresses emptied.</value>
+    </labels>
+    <labels>
         <fullName>Core_Erase_NoteHistoryKept</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -215,6 +223,14 @@
         <protected>false</protected>
         <shortDescription>Erase person action: column heading</shortDescription>
         <value>Note</value>
+    </labels>
+    <labels>
+        <fullName>Core_EraseAction_ChangesTable</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase person action: accessible name of the list of changes</shortDescription>
+        <value>What erasing this person changes</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_Cleared</fullName>
