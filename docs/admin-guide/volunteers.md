@@ -455,6 +455,7 @@ anything is refused:
 | Volunteer skills and interests | Deleted, and emptied from the Recycle Bin. | A skill or interest is a fact about the person. |
 | Onboarding requirements | Deleted, and emptied from the Recycle Bin. | A background check result lives nowhere else. |
 | Volunteer totals on the person | Kept. | They say nothing about who the person was, and they still match the hours kept. |
+| Hour letters and certificates | Kept as files on the person's record. The preview counts them with the person's other files, as **Kept**. Delete them by hand, preferably before you erase. | A letter prints the person's name and hours, but a file can hold anything, so BarnCRM lists files rather than erasing them ([Erasing a person](erase-a-person.md)). |
 
 The preview lists each of these before you confirm. The person erasing must hold **Volunteers
 Admin** or **Volunteers Coordinator**: someone who cannot see or change these records is refused
