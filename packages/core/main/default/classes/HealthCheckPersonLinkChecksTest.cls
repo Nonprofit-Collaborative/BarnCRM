@@ -68,7 +68,9 @@ private class HealthCheckPersonLinkChecksTest {
                 'To the relationship record page.'
             );
             Assert.isTrue(
-                finding.detail.contains(System.Label.Core_HealthCheck_RelationshipsNoPersonDetail),
+                finding.detail.contains(
+                    System.Label.Core_HealthCheck_RelationshipsNoPersonDetailOne
+                ),
                 'It says what to do next.'
             );
         }
@@ -140,7 +142,9 @@ private class HealthCheckPersonLinkChecksTest {
                 'To the affiliation record page.'
             );
             Assert.isTrue(
-                finding.detail.contains(System.Label.Core_HealthCheck_AffiliationsNoPersonDetail),
+                finding.detail.contains(
+                    System.Label.Core_HealthCheck_AffiliationsNoPersonDetailOne
+                ),
                 'It says what to do next.'
             );
         }

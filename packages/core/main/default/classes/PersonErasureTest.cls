@@ -244,6 +244,53 @@ private class PersonErasureTest {
     }
 
     @IsTest
+    static void aContactsOrganizationAccountKeepsItsFieldLabelNotHousehold() {
+        System.runAs(eraser()) {
+            isolate();
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            HouseholdTestDataFactory.save(settings);
+            Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
+            Contact jordan = new Contact(
+                FirstName = 'Jordan',
+                LastName = 'Lee',
+                Phone = '555-0100',
+                AccountId = employer.Id
+            );
+            insert jordan;
+
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+
+            PersonErasure.Change personRow;
+            for (PersonErasure.Change change : result.changes) {
+                if (
+                    change.action == PersonErasure.CLEARED && change.recordIds.contains(jordan.Id)
+                ) {
+                    personRow = change;
+                }
+            }
+            Assert.isNotNull(personRow, 'The contact is reported');
+            Assert.isTrue(
+                personRow.fields.contains(Contact.AccountId.getDescribe().getLabel()),
+                'An employer reads as the account field: ' + personRow.fields
+            );
+            Assert.isFalse(
+                personRow.fields.contains(Label.Core_Erase_Household),
+                'Not as a household: ' + personRow.fields
+            );
+            String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
+            .Details__c;
+            Assert.isFalse(
+                details.contains(
+                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Erase_Household + ' | 1'
+                ),
+                'The Erasure record does not call it a household: ' + details
+            );
+        }
+    }
+
+    @IsTest
     static void junctionModeEndsTheMembership() {
         System.runAs(eraser()) {
             isolate();

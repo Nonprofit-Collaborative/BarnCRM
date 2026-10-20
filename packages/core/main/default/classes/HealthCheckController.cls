@@ -136,7 +136,11 @@ public with sharing class HealthCheckController {
                 throw userError(System.Label.Core_HealthCheck_FixStale);
             }
             String outcome = runFix(fixKey, scope);
-            SettingsService.logChange(CHANGE_PREFIX + fixLabel, '', String.join(scope, ', '));
+            SettingsService.logChange(
+                CHANGE_PREFIX + fixLabel,
+                '',
+                String.join(scope, HealthCheckService.JOB_SEPARATOR)
+            );
             if (failAfterFixForTest) {
                 throw new HealthCheckFixException('A failure after the fix had written.');
             }

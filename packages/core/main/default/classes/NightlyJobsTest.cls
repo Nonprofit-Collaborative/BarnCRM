@@ -173,7 +173,10 @@ private class NightlyJobsTest {
             }
             Integer recorded = 0;
             for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
-                if (change.New_Value__c == 'Addresses, Donor levels') {
+                if (
+                    change.New_Value__c ==
+                    'Addresses' + HealthCheckService.JOB_SEPARATOR + 'Donor levels'
+                ) {
                     recorded++;
                 }
             }

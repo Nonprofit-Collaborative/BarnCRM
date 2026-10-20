@@ -724,6 +724,7 @@ public with sharing class PersonErasure {
             .fields.getMap();
         Clearing result = new Clearing();
         result.record = type.newSObject(record.Id);
+        Boolean accountIsHousehold = accountIsHousehold(type, values);
         Boolean named = false;
         // A household or other business account may not carry person account fields: the
         // standard Person ones and the __pc copies of contact fields. A custom Account field
@@ -757,17 +758,17 @@ public with sharing class PersonErasure {
             } else if (value == null || String.isBlank(String.valueOf(value))) {
                 continue;
             } else if (!field.isNillable()) {
-                result.required.add(shownAs(type, field));
+                result.required.add(shownAs(type, field, accountIsHousehold));
                 continue;
             }
             if (!field.isUpdateable()) {
                 if (field.isPermissionable()) {
-                    result.blocked.add(shownAs(type, field));
+                    result.blocked.add(shownAs(type, field, accountIsHousehold));
                 }
                 continue;
             }
             result.record.put(field.getName(), wanted);
-            result.cleared.add(shownAs(type, field));
+            result.cleared.add(shownAs(type, field, accountIsHousehold));
         }
         Schema.DescribeFieldResult nameField = fieldsOf(type).get('name');
         if (!named && nameField?.isUpdateable() == true) {
@@ -777,10 +778,33 @@ public with sharing class PersonErasure {
         return result;
     }
 
-    /** A field's label as the erase screen lists it: a contact's account is its household. */
-    private static String shownAs(Schema.SObjectType type, Schema.DescribeFieldResult field) {
-        return type == Contact.SObjectType &&
-            field.getName() == 'AccountId'
+    /**
+     * Whether this contact's account is its household: only in contact mode, and only when the
+     * account is a household record. In junction mode, or when the account is an organization,
+     * it is an employer and keeps its field label.
+     */
+    private static Boolean accountIsHousehold(Schema.SObjectType type, Map<String, Object> values) {
+        Id householdType = HouseholdService.householdRecordTypeId();
+        Id accountId = type == Contact.SObjectType ? (Id) values.get('AccountId') : null;
+        if (accountId == null || householdType == null || HouseholdService.isJunctionMode()) {
+            return false;
+        }
+        List<Account> accounts = [
+            SELECT RecordTypeId
+            FROM Account
+            WHERE Id = :accountId
+            WITH SYSTEM_MODE
+        ];
+        return !accounts.isEmpty() && accounts[0].RecordTypeId == householdType;
+    }
+
+    /** A field's label as the erase screen lists it: a household account reads as one. */
+    private static String shownAs(
+        Schema.SObjectType type,
+        Schema.DescribeFieldResult field,
+        Boolean accountIsHousehold
+    ) {
+        return accountIsHousehold && field.getName() == 'AccountId'
             ? Label.Core_Erase_Household
             : field.getLabel();
     }

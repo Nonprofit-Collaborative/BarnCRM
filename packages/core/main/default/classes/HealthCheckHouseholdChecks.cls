@@ -45,6 +45,7 @@ public with sharing class HealthCheckHouseholdChecks {
                 PersonLinkOrphanSelector.relationships(LINKS_SHOWN),
                 System.Label.Core_HealthCheck_RelationshipsNoPersonTitleOne,
                 System.Label.Core_HealthCheck_RelationshipsNoPersonTitle,
+                System.Label.Core_HealthCheck_RelationshipsNoPersonDetailOne,
                 System.Label.Core_HealthCheck_RelationshipsNoPersonDetail,
                 HealthCheckService.SEVERITY_WARNING,
                 false
@@ -61,6 +62,7 @@ public with sharing class HealthCheckHouseholdChecks {
                 PersonLinkOrphanSelector.affiliations(LINKS_SHOWN),
                 System.Label.Core_HealthCheck_AffiliationsNoPersonTitleOne,
                 System.Label.Core_HealthCheck_AffiliationsNoPersonTitle,
+                System.Label.Core_HealthCheck_AffiliationsNoPersonDetailOne,
                 System.Label.Core_HealthCheck_AffiliationsNoPersonDetail,
                 HealthCheckService.SEVERITY_WARNING,
                 false
@@ -78,6 +80,7 @@ public with sharing class HealthCheckHouseholdChecks {
         Integer count;
         List<SObject> first = new List<SObject>();
         String detail;
+        String detailOne;
         if (HouseholdService.isJunctionMode()) {
             Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
             Set<Id> excluded = new Set<Id>(personTypes);
@@ -99,10 +102,12 @@ public with sharing class HealthCheckHouseholdChecks {
                 }
             }
             detail = System.Label.Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail;
+            detailOne = System.Label.Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne;
         } else {
             count = HouseholdOrphanSelector.countContactsWithoutAccount(countCap + 1);
             first.addAll(HouseholdOrphanSelector.contactsWithoutAccount(LINKS_SHOWN));
             detail = System.Label.Core_HealthCheck_PeopleWithoutHouseholdContactDetail;
+            detailOne = System.Label.Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne;
         }
         return orphanFinding(
             'people_without_household',
@@ -110,6 +115,7 @@ public with sharing class HealthCheckHouseholdChecks {
             first,
             System.Label.Core_HealthCheck_PeopleWithoutHouseholdTitleOne,
             System.Label.Core_HealthCheck_PeopleWithoutHouseholdTitle,
+            detailOne,
             detail,
             HealthCheckService.SEVERITY_WARNING,
             true
@@ -134,6 +140,7 @@ public with sharing class HealthCheckHouseholdChecks {
             first,
             System.Label.Core_HealthCheck_EmptyHouseholdsTitleOne,
             System.Label.Core_HealthCheck_EmptyHouseholdsTitle,
+            System.Label.Core_HealthCheck_EmptyHouseholdsDetailOne,
             System.Label.Core_HealthCheck_EmptyHouseholdsDetail,
             HealthCheckService.SEVERITY_INFO,
             true
@@ -145,7 +152,8 @@ public with sharing class HealthCheckHouseholdChecks {
      * the records to open. In an org that also has Nonprofit Cloud households the detail says
      * that some may belong to one, because BarnCRM cannot see that membership (R-H12); that
      * note is left off the person-link findings, which are about BarnCRM's own records.
-     * `titleOne` is the title for exactly one, `title` the one that takes the count.
+     * `titleOne` is the title for exactly one, `title` the one that takes the count; `detailOne`
+     * and `detail` are the same pair for the detail.
      */
     private static HealthCheckService.Finding orphanFinding(
         String key,
@@ -153,6 +161,7 @@ public with sharing class HealthCheckHouseholdChecks {
         List<SObject> first,
         String titleOne,
         String title,
+        String detailOne,
         String detail,
         String severity,
         Boolean mayBeNativeHousehold
@@ -166,7 +175,7 @@ public with sharing class HealthCheckHouseholdChecks {
                   new List<Object>{ countCap.format() }
               )
             : count.format();
-        String text = detail;
+        String text = HealthCheckService.forCount(count, detailOne, detail, new List<Object>());
         if (count == 1 && first.size() == 1) {
             text += ' ' + System.Label.Core_HealthCheck_OrphansLinkedOnly;
         } else if (!first.isEmpty()) {

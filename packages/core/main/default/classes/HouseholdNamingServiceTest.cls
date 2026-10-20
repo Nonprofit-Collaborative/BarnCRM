@@ -401,6 +401,63 @@ private class HouseholdNamingServiceTest {
         }
     }
 
+    /** R-H4 in membership mode: the last current membership ends and the household keeps its words. */
+    @IsTest
+    static void aJunctionHouseholdWhoseLastMembershipEndsKeepsItsNameAndGreetings() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_JUNCTION
+            );
+            settings.Auto_Create_Households__c = false;
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
+            insert household;
+            Contact john = new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith');
+            insert john;
+            Household_Member__c member = new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = john.Id,
+                Is_Primary__c = true
+            );
+            insert member;
+            HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+            Account named = [
+                SELECT Name, Household_Formal_Greeting__c, Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :household.Id
+            ];
+            Assert.areEqual('The Smith Family', named.Name, 'Named from its member first');
+
+            Test.startTest();
+            update new Household_Member__c(Id = member.Id, End_Date__c = Date.today());
+            HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+            Test.stopTest();
+
+            Account kept = [
+                SELECT
+                    Name,
+                    Member_Count__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :household.Id
+            ];
+            Assert.areEqual(0, kept.Member_Count__c, 'Nobody is a current member');
+            Assert.areEqual(named.Name, kept.Name, 'Still says which family it was');
+            Assert.areEqual(
+                named.Household_Formal_Greeting__c,
+                kept.Household_Formal_Greeting__c,
+                'Formal greeting kept'
+            );
+            Assert.areEqual(
+                named.Household_Informal_Greeting__c,
+                kept.Household_Informal_Greeting__c,
+                'Informal greeting kept'
+            );
+        }
+    }
+
     @IsTest
     static void customNameStopsEveryRecomputation() {
         System.runAs(TestUsers.admin()) {

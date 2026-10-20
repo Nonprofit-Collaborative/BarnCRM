@@ -1008,4 +1008,44 @@
         <shortDescription>Health Check detail: one licensed user has no BarnCRM role.</shortDescription>
         <value>1 active user has a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if that person is not meant to use BarnCRM.</value>
     </labels>
+    <labels>
+        <fullName>Core_HealthCheck_EmptyHouseholdsDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: exactly one household with no current member.</shortDescription>
+        <value>Nobody is a current member of this household. It may be kept on purpose, for example when empty households are not deleted automatically. A household kept because records are credited to it is kept on purpose: deleting it unlinks those records. Open it to add a member, merge it into another household, or delete it. Health Check finds this and does not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: exactly one contact with no account, in contact mode.</shortDescription>
+        <value>This contact has no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open the contact and set its account to a household. Health Check finds this and does not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: one person with no current membership, junction mode.</shortDescription>
+        <value>No current household membership names this person, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open the person and add them to a household from its members panel. Health Check finds this and does not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: exactly one relationship left with no person after a delete.</shortDescription>
+        <value>The person on one side of this relationship was deleted, so the relationship no longer connects two people, and it cannot be edited until a person is chosen again. Open it and choose the missing person, or delete the relationship. Health Check finds this and does not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonDetailOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: exactly one affiliation left with no person after a delete.</shortDescription>
+        <value>The person in this affiliation was deleted, so it shows as an unnamed person. Open it and choose the person, or delete the affiliation. Health Check finds this and does not change it.</value>
+    </labels>
 </CustomLabels>
