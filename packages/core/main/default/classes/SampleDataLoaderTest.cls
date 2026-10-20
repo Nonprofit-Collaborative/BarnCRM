@@ -158,6 +158,8 @@ private class SampleDataLoaderTest {
     private class StubModule implements SampleDataModule {
         private Integer loaded;
         private Integer removeCalls = 0;
+        /** Sample records the module's removal kept, as Volunteers keeps ones real records use. */
+        private Boolean keptSome = false;
 
         private StubModule(Integer loaded) {
             this.loaded = loaded;
@@ -173,6 +175,10 @@ private class SampleDataLoaderTest {
 
         public Integer countLoaded() {
             return loaded;
+        }
+
+        public Boolean hasSampleRecords() {
+            return loaded > 0 || keptSome;
         }
 
         public void enqueueLoad() {
@@ -748,6 +754,38 @@ private class SampleDataLoaderTest {
             System.assertEquals(0, status.contactCount);
             System.assertEquals(false, status.loaded);
             System.assertEquals(false, status.loading);
+        }
+    }
+
+    @IsTest
+    static void testRemoveStaysOfferedWhileAModuleKeptSampleRecords() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            loadEverything(buildJson(1, 1, false));
+            StubModule module = new StubModule(12);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
+            SampleDataLoader.remove();
+            runCoreRemoval();
+            module.keptSome = true;
+
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            Assert.areEqual(0, status.householdCount, 'Core\'s own sample records are gone');
+            Assert.isTrue(
+                status.loaded,
+                'Still loaded while the module kept some, so Remove sample data stays offered'
+            );
+            SampleDataLoader.jsonOverride = buildJson(1, 1, false);
+            try {
+                SampleDataLoader.load();
+                Assert.fail('A load is refused while a module still has sample records');
+            } catch (SampleDataException refused) {
+                Assert.areEqual(Label.Core_SampleData_AlreadyLoaded, refused.getMessage());
+            }
+
+            module.keptSome = false;
+            Assert.isFalse(
+                SampleDataLoader.status().loaded,
+                'Not loaded once the admin has dealt with what the module kept'
+            );
         }
     }
 }

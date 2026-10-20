@@ -28,6 +28,10 @@ private class SampleDataStageBatchTest {
             return 0;
         }
 
+        public Boolean hasSampleRecords() {
+            return false;
+        }
+
         public void enqueueLoad() {
             loadStarted = true;
         }

@@ -7104,7 +7104,9 @@ changed and kept. A module that is installed but cannot answer refuses the erasu
 
 **R-ER10 Activities and files are listed, not erased.** Tasks and events naming the person (by
 WhoId, WhatId, TaskRelation or EventRelation) and files linked to the person
-(ContentDocumentLink) are counted and listed as kept, for the admin to delete by hand.
+(ContentDocumentLink) are counted and listed as kept, for the admin to delete by hand. They are
+counted after the modules' extensions (R-ER8) have run, leaving out what an extension reported
+as Deleted, so a file a module deletes is not also listed as kept.
 
 ### Salesforce implementation
 
@@ -7175,7 +7177,7 @@ reads in the singular: each finding has a one-item label beside its many-item la
 | Key | Severity | Reports | Fix |
 |---|---|---|---|
 | `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
-| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list view `Past_Shifts_Still_Open` (Status Open, End Time before today), shipped with the module. |
+| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list view `Past_Shifts_Still_Open` (Status Open, End Time before `N_DAYS_AGO:7`, so it shows what the finding counts), shipped with the module. |
 | `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
 | `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold neither `Volunteers_Coordinator` nor `Volunteers_Admin` (which grants all the coordinator set does), directly or through a group, read in the same one query plus one for the group holders it leaves out. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
 | `volunteer_rollups_off` | Info | Shipped volunteer totals (29O) whose definition is inactive. A missing one is Rollup Builder's `shipped_rollups_missing` finding, not reported twice. | Opens Rollup Builder. |
@@ -7199,8 +7201,12 @@ which R-VJ1 or the Restrict lookup would refuse, and leaves those out; every del
 partial success, and a record refused for any other reason is logged as a Warning and left, so
 one record never stops the removal. `finish()` logs one Warning (context
 `VolunteerSampleDataRemoveStages`) naming each kept shift, job and skill and why, then hands on,
-so Core's and Giving's sample data are still removed. Core's card then reads Not loaded, so the
-kept records are deleted by hand once their real rows are moved. No letter is generated.
+so Core's and Giving's sample data are still removed. Each read of what real records point at
+takes up to 200 rows of a kind, so the Warning may not name every kept record when more do;
+nothing real is deleted either way. `hasSampleRecords()` answers true while a sample job or
+skill is left, so Core's card still reads Loaded and offers Remove sample data again once the
+real rows are moved (`SampleDataModule.hasSampleRecords`, asked by `SampleDataLoader.status`
+and `load`). No letter is generated.
 
 ## 29I. Volunteer profile
 
@@ -8498,6 +8504,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Volunteers QA fixes: sample data removal. No object or field added. Removal leaves out the sample shifts, jobs and skills real records point at, deletes the rest with partial success, logs one Warning naming each kept record and why, and hands on, so Core's and Giving's sample data are still removed. |
 | v0.8 | 2026-10-20 | Volunteers QA fixes: erasure (amends D-108). No object or field added. Erasure deletes the hour letters BarnCRM generated for the person (system mode, exact match), lists the kept Rejection Reason, and refuses a user without Volunteers Admin or Coordinator access with a plain message before changing anything. |
 | v0.8 | 2026-10-20 | Core QA fixes. No object or field added. R-H4: a household left with no current member keeps its last computed name and greetings instead of the placeholder name and empty greetings, so a household kept for credited records still says which family it was. R-ER3: an anonymized kept household is reported under Household with its name and greetings among the fields and a note that it was kept because records are credited to it; the contact's account is reported as Household. Erasure Details uses the erase screen's words for what was done. |
+| v0.8 | 2026-10-20 | QA follow-ups. No object or field added. R-ER10: activities and files are counted after the module extensions run, leaving out what one reported as Deleted, so a generated letter Volunteers deletes is not also listed as kept. C-10: `SampleDataModule` gains `hasSampleRecords()`, and Core's sample data reads Loaded (and refuses a new load) while any module still has sample records, so a removal that kept some can be run again; Volunteers answers from its sample jobs and skills. The `Past_Shifts_Still_Open` list view filters End Time before `N_DAYS_AGO:7`, matching the Health Check finding. |
 
 ---
 ## 32. Entity ownership by package

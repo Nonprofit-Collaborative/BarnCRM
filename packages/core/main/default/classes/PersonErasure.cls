@@ -374,7 +374,9 @@ public with sharing class PersonErasure {
             if (individual != null) {
                 noteHistory(individual.getSObjectType(), individual.Id, result);
             }
-            noteActivitiesAndFiles(personId, result);
+            // Listed here, but counted once the modules have run: a file a module deletes is
+            // not also kept.
+            Integer activitiesAt = result.changes.size();
             HouseholdService.afterMembershipChange(households, true);
             settleHouseholds(households, result);
             for (PersonErasureExtension extension : extensions) {
@@ -389,6 +391,7 @@ public with sharing class PersonErasure {
                     }
                 }
             }
+            noteActivitiesAndFiles(personId, result, activitiesAt);
         } catch (ErasureException refusal) {
             throw refusal;
         } catch (DmlException refusedChange) {
@@ -622,8 +625,10 @@ public with sharing class PersonErasure {
      * (R-ER10). A task or event counts once whether it names the person as its Name, its
      * Related To, or one of the people a shared activity names. Counted in system mode, like
      * field history, so the admin learns of ones they cannot open; only counts are shown.
+     * Counted after the modules have run, leaving out what a module reported as Deleted, so a
+     * record a module deleted is not listed as kept too. The rows go in at `insertAt`.
      */
-    private static void noteActivitiesAndFiles(Id personId, Result result) {
+    private static void noteActivitiesAndFiles(Id personId, Result result, Integer insertAt) {
         Set<Id> people = new Set<Id>{ personId };
         Set<Id> tasks = new Set<Id>();
         for (Task task : [
@@ -667,21 +672,37 @@ public with sharing class PersonErasure {
         ]) {
             events.add(relation.EventId);
         }
-        Integer files = [
-            SELECT COUNT()
+        Set<Id> files = new Set<Id>();
+        for (ContentDocumentLink link : [
+            SELECT ContentDocumentId
             FROM ContentDocumentLink
             WHERE LinkedEntityId IN :people
             WITH SYSTEM_MODE
             LIMIT :ACTIVITY_CAP
-        ];
-        noteByHand(result, labelOf(Task.SObjectType), tasks.size());
-        noteByHand(result, labelOf(Event.SObjectType), events.size());
-        noteByHand(result, Label.Core_Erase_Files, files);
+        ]) {
+            files.add(link.ContentDocumentId);
+        }
+        Set<Id> deleted = new Set<Id>(deletedIds);
+        tasks.removeAll(deleted);
+        events.removeAll(deleted);
+        files.removeAll(deleted);
+        List<Change> rows = new List<Change>();
+        noteByHand(rows, labelOf(Task.SObjectType), tasks.size());
+        noteByHand(rows, labelOf(Event.SObjectType), events.size());
+        noteByHand(rows, Label.Core_Erase_Files, files.size());
+        for (Change change : rows) {
+            if (insertAt >= result.changes.size()) {
+                result.changes.add(change);
+            } else {
+                result.changes.add(insertAt, change);
+            }
+            insertAt++;
+        }
     }
 
-    private static void noteByHand(Result result, String objectLabel, Integer howMany) {
+    private static void noteByHand(List<Change> rows, String objectLabel, Integer howMany) {
         if (howMany > 0) {
-            result.changes.add(new Change(KEPT, objectLabel, howMany, Label.Core_Erase_NoteByHand));
+            rows.add(new Change(KEPT, objectLabel, howMany, Label.Core_Erase_NoteByHand));
         }
     }
 

@@ -115,6 +115,19 @@ public with sharing class SampleDataModules {
         return counts;
     }
 
+    /**
+     * True while any installed module still has sample records, for example ones its removal
+     * kept because the organization's own records point at them.
+     */
+    public static Boolean anyHasSampleRecords() {
+        for (SampleDataModule module : installed()) {
+            if (module.hasSampleRecords() == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Starts the module at this place in the load order, or ends the load when none is left. */
     private static void start(Integer index) {
         List<SampleDataModule> modules = installed();

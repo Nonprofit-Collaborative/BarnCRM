@@ -66,6 +66,18 @@ public with sharing class VolunteerSampleDataSelector {
         ];
     }
 
+    /** True while any sample job or skill is in the org. */
+    public Boolean hasSampleJobsOrSkills() {
+        return [
+                SELECT COUNT()
+                FROM Volunteer_Job__c
+                WHERE Sample_Data__c = TRUE
+                WITH USER_MODE
+                LIMIT 1
+            ] > 0 ||
+            [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH USER_MODE LIMIT 1] > 0;
+    }
+
     // ---------------------------------------------------------------- removal, in its order
 
     /** Sample people's sign-ups on the sample jobs' shifts. */

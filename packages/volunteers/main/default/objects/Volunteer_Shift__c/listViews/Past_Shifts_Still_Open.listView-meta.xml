@@ -15,7 +15,7 @@
   <filters>
     <field>End_Time__c</field>
     <operation>lessThan</operation>
-    <value>TODAY</value>
+    <value>N_DAYS_AGO:7</value>
   </filters>
   <filterScope>Everything</filterScope>
   <label>Past Shifts Still Open</label>

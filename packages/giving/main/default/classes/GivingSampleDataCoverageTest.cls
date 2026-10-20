@@ -180,12 +180,14 @@ private class GivingSampleDataCoverageTest {
                 'The gift stage after the reference data stage loads all five gifts'
             );
             Assert.areEqual(5, new GivingSampleData().countLoaded(), 'And the card counts them');
+            Assert.isTrue(new GivingSampleData().hasSampleRecords(), 'Giving has sample records');
             GivingSampleDataRemoveStages removal = new GivingSampleDataRemoveStages();
             Integer removalStages = removal.stageCount();
             for (Integer stage = 0; stage < removalStages; stage++) {
                 removal.runStage(stage);
             }
             Assert.areEqual(0, new GivingSampleData().countLoaded(), 'Nothing is left');
+            Assert.isFalse(new GivingSampleData().hasSampleRecords(), 'And none is left');
         }
     }
 

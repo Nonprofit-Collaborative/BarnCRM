@@ -31,6 +31,15 @@ public with sharing class VolunteersSampleData implements SampleDataModule {
         return new VolunteerSampleDataSelector().countSampleHours();
     }
 
+    /**
+     * Whether a sample job or skill is still here, including those removal kept because real
+     * records point at them; every other sample record hangs off one or off a sample person.
+     * While one is, Core keeps Remove sample data offered so the admin can finish.
+     */
+    public Boolean hasSampleRecords() {
+        return new VolunteerSampleDataSelector().hasSampleJobsOrSkills();
+    }
+
     /** Starts the Volunteers load, after Core's people and households exist. */
     public void enqueueLoad() {
         SampleDataStageBatch.start(new VolunteerSampleDataStages());

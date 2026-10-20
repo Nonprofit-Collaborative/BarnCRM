@@ -328,6 +328,20 @@ private class VolunteerSampleDataTest {
                 'A shift only sample people were on goes'
             );
             Assert.areEqual(1, [SELECT COUNT() FROM Volunteer_Job__c WHERE Id = :job.Id]);
+            Assert.isTrue(
+                new VolunteersSampleData().hasSampleRecords(),
+                'The kept job still counts, so Core keeps Remove sample data offered'
+            );
+
+            // Once the real records are moved, selecting Remove sample data again finishes it.
+            delete [SELECT Id FROM Volunteer_Signup__c WHERE Id = :realSignup.Id];
+            delete [SELECT Id FROM Volunteer_Hours__c WHERE Id = :realHours.Id];
+            removeEverything();
+            Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Job__c WHERE Id = :job.Id]);
+            Assert.isFalse(
+                new VolunteersSampleData().hasSampleRecords(),
+                'Nothing is left once the retry has run'
+            );
         }
     }
 
@@ -490,6 +504,7 @@ private class VolunteerSampleDataTest {
             Assert.areEqual('VolunteerSampleDataStages', new VolunteerSampleDataStages().name());
             Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording');
             Assert.areEqual(0, module.countLoaded(), 'Nothing loaded yet');
+            Assert.isFalse(module.hasSampleRecords(), 'No sample job or skill yet');
 
             // With no sample people the jobs still load, and nothing is booked.
             Test.startTest();

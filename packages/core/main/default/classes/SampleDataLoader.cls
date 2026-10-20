@@ -119,7 +119,11 @@ public with sharing class SampleDataLoader {
             throw new SampleDataException(Label.Core_SampleData_RemoveInProgress);
         }
         SampleDataSelector selector = new SampleDataSelector();
-        if (selector.countSampleHouseholds() > 0 || selector.countSampleOrganizations() > 0) {
+        if (
+            selector.countSampleHouseholds() > 0 ||
+            selector.countSampleOrganizations() > 0 ||
+            SampleDataModules.anyHasSampleRecords()
+        ) {
             throw new SampleDataException(Label.Core_SampleData_AlreadyLoaded);
         }
         // Parsed here so a malformed payload fails in front of the admin, with a readable
@@ -241,11 +245,14 @@ public with sharing class SampleDataLoader {
         result.moduleCounts = SampleDataModules.counts();
         result.loading = hasRunningLoadJob();
         result.removing = hasRunningRemoveJob();
+        // A module's sample records count too: when its removal kept some that the org's own
+        // records point at, Remove sample data stays offered so the admin can finish (C-10).
         result.loaded =
             !result.loading &&
             !result.removing &&
             (result.householdCount > 0 ||
-            result.organizationCount > 0);
+            result.organizationCount > 0 ||
+            SampleDataModules.anyHasSampleRecords());
         result.junctionMembership = HouseholdService.isJunctionMode();
         return result;
     }

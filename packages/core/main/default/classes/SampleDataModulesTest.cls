@@ -36,6 +36,10 @@ private class SampleDataModulesTest {
             return loaded;
         }
 
+        public Boolean hasSampleRecords() {
+            return loaded > 0;
+        }
+
         public void enqueueLoad() {
             loadStarted = true;
         }
@@ -70,7 +74,28 @@ private class SampleDataModulesTest {
                     module.countLoaded(),
                     'a resolved module has to answer with a number the card can show'
                 );
+                System.assertNotEquals(
+                    null,
+                    module.hasSampleRecords(),
+                    'a resolved module has to say whether it still has sample records'
+                );
             }
+        }
+    }
+
+    @IsTest
+    static void testAnyHasSampleRecordsAsksEveryModule() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            StubModule first = new StubModule('First', 0);
+            StubModule second = new StubModule('Second', 0);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
+            Assert.isFalse(SampleDataModules.anyHasSampleRecords(), 'No module has any');
+
+            second.loaded = 2;
+            Assert.isTrue(
+                SampleDataModules.anyHasSampleRecords(),
+                'One module with sample records is enough'
+            );
         }
     }
 
