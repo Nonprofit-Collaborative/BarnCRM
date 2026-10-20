@@ -7157,14 +7157,15 @@ the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 `HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds five findings to Core's one report,
 read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
 settings) and asked only of a viewer who may manage settings, and not at all while the module is
-turned off. Counts stop at 1,000 and the first five records are linked.
+turned off. Counts stop at 1,000 and the first five records are linked. A count of exactly one
+reads in the singular: each finding has a one-item label beside its many-item label.
 
 | Key | Severity | Reports | Fix |
 |---|---|---|---|
 | `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
-| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list. |
+| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list view `Past_Shifts_Still_Open` (Status Open, End Time before today), shipped with the module. |
 | `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
-| `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold `Volunteers_Coordinator` neither directly nor through a group. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
+| `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold neither `Volunteers_Coordinator` nor `Volunteers_Admin` (which grants all the coordinator set does), directly or through a group, read in the same one query plus one for the group holders it leaves out. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
 | `volunteer_rollups_off` | Info | Shipped volunteer totals (29O) whose definition is inactive. A missing one is Rollup Builder's `shipped_rollups_missing` finding, not reported twice. | Opens Rollup Builder. |
 
 **Sample data.** `VolunteersSampleData` implements Core's `SampleDataModule` and is registered in
@@ -8008,7 +8009,11 @@ schedule, and takes the schedule's job, times, Volunteers Needed and Location; i
 R-VS2 names a shift, from its job and start, with the start written in the org's time zone.
 
 **R-SSC3 When it runs.** Saving a schedule queues a run for it, so its shifts appear without
-waiting for the night (the `Shift_Schedule_Rules` automation). Every night the Volunteers
+waiting for the night (the `Shift_Schedule_Rules` automation). An update queues one for a
+schedule marked Rebuild Pending, and for an active schedule whose pattern changed, that was
+turned back on, whose End Date moved, or whose Created Through is short of the horizon (or of
+End Date when sooner, while that day has not passed), so opening and saving a schedule fills
+it. The run's own bookkeeping save moves Created Through to that day, so it queues nothing. Every night the Volunteers
 nightly job runs every active schedule in a batch (ADR-0128). A run takes a lock on the schedule's row first, so the
 queued run and the nightly run never create the same day twice. Nothing runs while the module
 is turned off; turning it back on catches up at the next nightly run.
@@ -8073,7 +8078,8 @@ Cancelled.
   Time after Start Time, End Date not before Start Date, Volunteers Needed at least 1.
 - **Automation:** registry row `Shift_Schedule_Rules` (`ShiftScheduleTriggerHandler`), which
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
-  started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`), which
+  started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`; Health
+  Check and the Nightly Jobs list call it "Volunteer Schedules, 3:00 AM"), which
   `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
   nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
   Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
@@ -8457,6 +8463,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers lifecycle: erasure and household dependents. No object or field added. New rules R-VG10, R-VU5 and R-VK5: erasing a person keeps their hours and sign-ups with notes emptied, cancels their bookings on shifts still to come, deletes their volunteer skills, and keeps the five volunteer totals on the person even where no rollup definition reports them (`VolunteersErasureExtension`). R-H12 and R-VG2: `VolunteersHouseholdDependentsExtension`, registered in `HouseholdDependentsExtensions.EXTENSION_CLASSES`, keeps a household a Volunteer Hours entry names. |
 | v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: five findings from `VolunteersHealthCheckExtension`, registered in `HealthCheckExtensions.EXTENSION_CLASSES`, with one fix that queues the access sync. The 29T known gap ("schedule horizon not filled") is closed. |
 | v0.8 | 2026-10-18 | Volunteers sample data (C-10). `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Volunteer_Job__c` (29J) and `Skill__c` (29P), so the sample load's records can be found and removed in one action; shifts, schedules, sign-ups, job skills and hours are found through their job. Part G gains a Sample data paragraph: `VolunteersSampleData`, registered in `SampleDataModules.MODULE_CLASS_NAMES`. No object added. |
+| v0.8 | 2026-10-20 | Volunteers QA fixes: Health Check and schedules. No object or field added. R-SSC3: an update of an active schedule whose Created Through is short of the horizon queues a run, so saving a schedule fills it. Health Check: the coordinator access finding leaves out Volunteers Admin holders; each finding reads in the singular for one; the past shifts finding opens the new `Volunteer_Shift__c` list view `Past_Shifts_Still_Open`; the nightly job reads "Volunteer Schedules, 3:00 AM". |
 
 ---
 ## 32. Entity ownership by package

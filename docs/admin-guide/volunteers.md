@@ -59,8 +59,9 @@ coordinators and admins, and **Volunteer Letter Templates** and **Volunteer Sett
 admins only.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
-**All Jobs** and **Active Jobs**; **All Shifts** and **Shifts Needing Volunteers** (open shifts
-from today with places left); **All Hours** and **Awaiting Approval**; **All Requirements** and
+**All Jobs** and **Active Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
+from today with places left) and **Past Shifts Still Open** (shifts that ended before today and
+are still Open); **All Hours** and **Awaiting Approval**; **All Requirements** and
 **Not Current**; **All Skills** and **Active Skills**; and **All Sign-ups**. Pick one from the
 list view menu at the top left.
 
@@ -201,6 +202,13 @@ skills, background checks included. Restoring a person from the Recycle Bin does
 their requirements and skills back: re-enter them. This cannot be switched off, because a
 background check must never outlive its person.
 
+Their hours and sign-ups are **not** deleted. Each keeps its job and shift but no longer names a
+person, and an hours entry deleted with its household names no household either. Approved hours
+stay Approved and still count in the job's and the shift's totals, though in nobody's. To take
+a person out of your records while keeping their hours counted, erase them instead
+([Erasing a volunteer](#erasing-a-volunteer)); to take their hours out of the totals too, reopen
+and delete those entries (or reject them) before you delete the person.
+
 ## Settings
 
 As an admin, open the **Volunteer Settings** tab in the BarnCRM Volunteers app, or the
@@ -243,7 +251,9 @@ new pattern. Past shifts, shifts with a sign-up or hours, and cancelled shifts a
 are, and no day gets a second shift. **Shifts Kept** on the schedule then says how many future
 shifts with a sign-up or hours were kept (cancelled shifts are not counted): check those by hand,
 because they still have the old times. The next save that changes none of those fields and not
-the end clears the number. Changing only the name changes no shift. When one save changes many
+the end clears the number. Changing only the name changes no existing shift. Any save of an
+active schedule also creates the days up to the horizon it is still missing, so to fill a
+schedule now, open it and save it. When one save changes many
 schedules (an import or a mass edit), the ones beyond what a single save can handle are updated
 in the background a few minutes later, or by the nightly job at the latest: until then they keep
 their old shifts and show no Shifts Kept. Deleting many schedules at once works the same way:
@@ -263,8 +273,9 @@ does not.
 shifts a change removes are removed for them, although they cannot delete shifts themselves.
 Read Only users see schedules and change nothing.
 
-**The nightly run** is one of BarnCRM's nightly jobs. If **Health Check** says "Volunteer shift
-schedules" is not scheduled, use its **Schedule all nightly jobs** fix. While Volunteers is turned
+**The nightly run** is one of BarnCRM's nightly jobs, **Volunteer Schedules** (Setup's
+**Scheduled Jobs** page lists it as BarnCRM Volunteer Schedules). If **Health Check** says
+"Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule all nightly jobs** fix. While Volunteers is turned
 off, no shifts are created; the first night after you turn it back on catches up.
 
 ## Hour letters and certificates
@@ -468,9 +479,9 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | Finding | Why it matters | How to fix it |
 |---|---|---|
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
-| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list**, open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
-| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Shift Horizon Weeks** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
-| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
+| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view (shifts that ended before today, so it also shows those that ended in the last week). Open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks ahead to create shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
 ## Erasing a volunteer

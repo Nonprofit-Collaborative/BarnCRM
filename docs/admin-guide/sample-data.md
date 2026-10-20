@@ -60,7 +60,7 @@ there:
 |---|---|---|
 | Skills | 4 | First aid, Spanish, Forklift and Gardening, with the jobs that ask for them |
 | Jobs | 3 | Food pantry sort, Front desk and Community garden, each with a description and a location |
-| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as **Shift Horizon Weeks** says |
+| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Weeks ahead to create shifts** setting says |
 | Shifts | 16, plus the schedule's | A morning shift for each job in each of the last four weeks, marked Completed, and four upcoming shifts on the front desk and in the garden |
 | Sign-ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
 | Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
