@@ -76,21 +76,46 @@ public without sharing class VolunteerHealthCheckSelector {
         ];
     }
 
-    /** The active people assigned this permission set group, by user Id and name. */
-    public static Map<Id, String> groupHolders(String groupName, String namespace) {
+    /** The active holders of a permission set group, and which of them also hold a set directly. */
+    public class GroupHolders {
+        /** Each active holder of the group, by user Id and name. */
+        public Map<Id, String> names = new Map<Id, String>();
+        /** The active people assigned the set itself, not through any group. */
+        public Set<Id> holdingSetDirectly = new Set<Id>();
+    }
+
+    /**
+     * The active people assigned this permission set group, and the active people assigned this
+     * permission set directly, in one read. The module's access sync gives the set directly, so in
+     * a healthy org this alone answers who is missing it; `setHoldersAmong` is asked only about
+     * the group holders it leaves out, who may hold the set through another group. One query
+     * rather than three keeps a whole Health Check run cheap.
+     */
+    public static GroupHolders groupHoldersWithSet(
+        String groupName,
+        String setName,
+        String namespace
+    ) {
         requireManageSettings();
-        Map<Id, String> holders = new Map<Id, String>();
+        GroupHolders holders = new GroupHolders();
         for (PermissionSetAssignment row : [
-            SELECT AssigneeId, Assignee.Name
+            SELECT AssigneeId, Assignee.Name, PermissionSetGroupId
             FROM PermissionSetAssignment
             WHERE
-                PermissionSetGroup.DeveloperName = :groupName
-                AND PermissionSetGroup.NamespacePrefix = :namespace
-                AND Assignee.IsActive = TRUE
+                Assignee.IsActive = TRUE
+                AND ((PermissionSetGroup.DeveloperName = :groupName
+                AND PermissionSetGroup.NamespacePrefix = :namespace)
+                OR (PermissionSetGroupId = NULL
+                AND PermissionSet.Name = :setName
+                AND PermissionSet.NamespacePrefix = :namespace))
             WITH SYSTEM_MODE
-            LIMIT 2000
+            LIMIT 4000
         ]) {
-            holders.put(row.AssigneeId, row.Assignee.Name);
+            if (row.PermissionSetGroupId != null) {
+                holders.names.put(row.AssigneeId, row.Assignee.Name);
+            } else {
+                holders.holdingSetDirectly.add(row.AssigneeId);
+            }
         }
         return holders;
     }

@@ -309,20 +309,22 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     private static List<String> coordinatorsMissingTheirSet() {
         String prefix = NamespaceUtil.prefix();
         String namespace = String.isBlank(prefix) ? null : prefix.removeEnd('__');
-        Map<Id, String> coordinators = VolunteerHealthCheckSelector.groupHolders(
+        VolunteerHealthCheckSelector.GroupHolders coordinators = VolunteerHealthCheckSelector.groupHoldersWithSet(
             COORDINATOR_GROUP,
+            COORDINATOR_SET,
             namespace
         );
-        if (coordinators.isEmpty()) {
-            return new List<String>();
+        Set<Id> missing = new Set<Id>(coordinators.names.keySet());
+        missing.removeAll(coordinators.holdingSetDirectly);
+        if (!missing.isEmpty()) {
+            // Only those without a direct assignment may still hold it through another group.
+            missing.removeAll(
+                VolunteerHealthCheckSelector.setHoldersAmong(missing, COORDINATOR_SET, namespace)
+            );
         }
-        Set<Id> missing = new Set<Id>(coordinators.keySet());
-        missing.removeAll(
-            VolunteerHealthCheckSelector.setHoldersAmong(missing, COORDINATOR_SET, namespace)
-        );
         List<String> names = new List<String>();
         for (Id userId : missing) {
-            names.add(coordinators.get(userId));
+            names.add(coordinators.names.get(userId));
         }
         names.sort();
         return names;

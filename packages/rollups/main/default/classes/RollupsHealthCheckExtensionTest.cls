@@ -77,16 +77,22 @@ private class RollupsHealthCheckExtensionTest {
     }
 
     private static HealthCheckService.Finding find(String key) {
-        for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-            if (key.equals(finding.getKey())) {
-                return finding;
-            }
-        }
-        return null;
+        return find(HealthCheckService.run(), key);
     }
 
     private static HealthCheckService.Finding find(HealthCheckService.Report report, String key) {
-        for (HealthCheckService.Finding finding : report.getFindings()) {
+        return find(report.getFindings(), key);
+    }
+
+    /**
+     * A finding from a run already made. A test that reads several findings asks Health Check
+     * once, as the panel does: each full run costs a few dozen queries with every module there.
+     */
+    private static HealthCheckService.Finding find(
+        List<HealthCheckService.Finding> findings,
+        String key
+    ) {
+        for (HealthCheckService.Finding finding : findings) {
             if (key.equals(finding.getKey())) {
                 return finding;
             }
@@ -284,7 +290,8 @@ private class RollupsHealthCheckExtensionTest {
 
             System.runAs(maria) {
                 RollupService.ensureDefaults();
-                HealthCheckService.Finding finding = find('nightly_rollups_not_scheduled');
+                List<HealthCheckService.Finding> found = HealthCheckService.run();
+                HealthCheckService.Finding finding = find(found, 'nightly_rollups_not_scheduled');
                 Assert.isNotNull(
                     finding,
                     'A rollup waiting on a run nobody scheduled is reported.'
@@ -299,7 +306,7 @@ private class RollupsHealthCheckExtensionTest {
                     'One cause, one button: the nightly jobs fix.'
                 );
 
-                HealthCheckService.Finding jobs = find('nightly_jobs_not_scheduled');
+                HealthCheckService.Finding jobs = find(found, 'nightly_jobs_not_scheduled');
                 Assert.areEqual(
                     new List<String>{ System.Label.Core_HealthCheck_JobRollups },
                     jobs.getFixScope(),
