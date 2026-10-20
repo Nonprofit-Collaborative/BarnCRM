@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-17.
+Last verified 2026-10-20.
 
 ## Pointers
 
@@ -135,3 +135,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - `@AuraEnabled` methods, like fields, cannot be `@NamespaceAccessible` (the deploy fails); give cross-package callers a plain annotated wrapper or getter.
 - In a worktree whose `node_modules` symlinks into the Mead Drive path, `prettier-plugin-apex` fails on the path with spaces, so the prettier step of `run-offline-checks.sh` fails there; CI is the check.
 - The org-test user lacks Bulk API Hard Delete, so scale cleanup soft-deletes to the Recycle Bin.
+- `Date.today()` can differ between `System.runAs` users across UTC midnight (a Volunteers totals test failed once at the gate); capture the date once in a test and reuse it.
+- Code Analyzer high rule `EagerlyLoadedDescribeSObjectResult`: use `getDescribe(SObjectDescribeOptions.DEFERRED)` (hit in a Volunteers test, #493).
+- ESLint `@lwc/lwc/no-unexpected-wire-adapter-usages` fires in Jest tests that call `getObjectInfo.emit`: use a file-level disable with a reason.
+- One full Health Check request costs about 41 SOQL cold (Core 23, Rollups 3, Giving 3, Volunteers 5): a test must not run several full Health Checks in one transaction.
+- Gate worktrees live in `~/worktrees/BarnCRM/gate-pa` and `gate-test`, never under `/tmp` or the scratchpad: macOS deletes `/tmp` files unused for 3 days (it removed gate scripts and worktree `.git` files on 2026-10-20).
+- A single-branch deploy to a shared test org leaves stray classes and registry rows that break later gates (hit on #486: a stray handler and a missing selector method failed every Account and Contact trigger); gate with full deploys only.
+- `scripts/ci/check-aura-class-access.py` fails when an Apex class an LWC calls is granted in no permission set of its package (added in #500 after the Volunteers readiness controller shipped ungranted); deliberate exceptions go in `scripts/ci/aura-class-access-allowlist.txt`.
