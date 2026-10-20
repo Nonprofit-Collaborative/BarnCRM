@@ -388,7 +388,13 @@ private class ImportUndoTest {
                 new Contact(Id = edited.Id, Description = 'Saved by the undo'),
                 new Contact(Id = untouched.Id, Description = 'Saved by the undo')
             };
-            run.rest();
+            // The people's pass runs as a job with limits of its own, as the platform runs
+            // every pass. Run here, after the setup and the passes before it, its checks would
+            // share their query budget, and in an org with more relationships on Contact
+            // (Nonprofit Cloud) they keep what they can no longer afford to ask about.
+            Test.startTest();
+            run.queueRest();
+            Test.stopTest();
 
             Assert.isTrue(exists(edited.Id), 'Jo\'s edit before the undo keeps Ana.');
             Assert.isFalse(exists(untouched.Id), 'The undo\'s own save keeps nobody.');
