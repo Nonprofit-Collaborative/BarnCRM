@@ -62,6 +62,14 @@ public with sharing class HouseholdSelector {
     private static Set<Id> accountsWithNativeHouseholdGroupsOverride;
 
     /**
+     * Set only by tests: the object names this org is taken to have, in place of the describe.
+     * It lets a test show how each native probe behaves when the object is said to exist but
+     * cannot be queried, which is the org shape a licence or permission gap produces.
+     */
+    @TestVisible
+    private static Set<String> describedObjectNamesOverride;
+
+    /**
      * Set only by tests: the accounts the native membership probe would find, so that an org
      * with Contacts to Multiple Accounts on can be simulated where the object does not exist.
      */
@@ -370,7 +378,7 @@ public with sharing class HouseholdSelector {
             accountIds == null ||
             accountIds.isEmpty() ||
             (contactIds != null && contactIds.isEmpty()) ||
-            !Schema.getGlobalDescribe().containsKey(NATIVE_MEMBERSHIP)
+            !objectDescribed(NATIVE_MEMBERSHIP)
         ) {
             return rows;
         }
@@ -475,7 +483,7 @@ public with sharing class HouseholdSelector {
         if (nativeHouseholdCollisionCountOverride != null) {
             return nativeHouseholdCollisionCountOverride;
         }
-        if (!Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP_TYPE)) {
+        if (!objectDescribed(NATIVE_HOUSEHOLD_GROUP_TYPE)) {
             return 0;
         }
         Id recordTypeId = HouseholdService.householdRecordTypeId();
@@ -526,7 +534,7 @@ public with sharing class HouseholdSelector {
         String query,
         Set<Id> accountIds
     ) {
-        if (!Schema.getGlobalDescribe().containsKey(objectName)) {
+        if (!objectDescribed(objectName)) {
             return;
         }
         try {
@@ -550,6 +558,12 @@ public with sharing class HouseholdSelector {
      * the person cannot read, so somebody without access to, say, the anniversary still
      * gets the merge screen. Sharing still applies: the class is `with sharing`.
      */
+    private static Boolean objectDescribed(String objectName) {
+        return describedObjectNamesOverride != null
+            ? describedObjectNamesOverride.contains(objectName)
+            : Schema.getGlobalDescribe().containsKey(objectName);
+    }
+
     @NamespaceAccessible
     public static List<Account> getHouseholdsForMerge(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
