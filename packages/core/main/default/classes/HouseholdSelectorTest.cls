@@ -6,7 +6,9 @@
  * Cloud probes are shown on an org that is said to have the object but cannot query it, which
  * is the shape a licence or permission gap produces: a probe that cannot run must read as "the
  * accounts are dependent" for the delete guard and as "unknown" for Health Check, never as
- * "nothing there" (ADR-0036).
+ * "nothing there" (ADR-0036). Stating the describe also makes those probes fail, so the
+ * answers hold in an org that really has the objects (Nonprofit Cloud, Contacts to Multiple
+ * Accounts on), and the stated-rows check states an empty describe so no real probe runs.
  */
 @IsTest(testFor='ApexClass:HouseholdSelector')
 private class HouseholdSelectorTest {
@@ -207,6 +209,7 @@ private class HouseholdSelectorTest {
 
             HouseholdSelector.accountsWithNativeDependentsOverride = null;
             HouseholdSelector.nativeMembershipAccountsOverride = stated;
+            HouseholdSelector.describedObjectNamesOverride = new Set<String>();
             OrgShapeDetector.reset();
             OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
             Assert.areEqual(
