@@ -8,6 +8,9 @@
  * chunk costs the same whether it holds one person or ten.
  */
 public with sharing class VolunteerLetterService {
+    /** The file name every generated letter is saved with; erasure finds the letters by it. */
+    public static final String FILE_NAME = 'volunteer-letter.pdf';
+
     /** The renderer; a bulk test stands in one that skips the PDF service. */
     @TestVisible
     private static VolunteerLetterRenderer renderer = new VolunteerLetterRenderer();
@@ -180,7 +183,7 @@ public with sharing class VolunteerLetterService {
             files.add(
                 new ContentVersion(
                     Title = title,
-                    PathOnClient = 'volunteer-letter.pdf',
+                    PathOnClient = FILE_NAME,
                     VersionData = renderer.render(document(letter.body)),
                     FirstPublishLocationId = letter.personId
                 )
@@ -191,6 +194,19 @@ public with sharing class VolunteerLetterService {
             outcome.versionIds.add(file.Id);
         }
         return outcome;
+    }
+
+    /**
+     * The start of the title of every letter made from this template: the title up to the
+     * person's name (`Volunteers_Letter_FileTitle`), which erasure matches a generated letter by.
+     */
+    public static String titlePrefix(String templateName) {
+        String marker = '<<person>>';
+        return String.format(
+                Label.Volunteers_Letter_FileTitle,
+                new List<Object>{ templateName, marker, '', '' }
+            )
+            .substringBefore(marker);
     }
 
     /** The whole HTML document the PDF service renders around a merged body. */

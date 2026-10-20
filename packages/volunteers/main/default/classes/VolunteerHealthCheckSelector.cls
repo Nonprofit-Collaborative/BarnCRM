@@ -80,20 +80,20 @@ public without sharing class VolunteerHealthCheckSelector {
     public class GroupHolders {
         /** Each active holder of the group, by user Id and name. */
         public Map<Id, String> names = new Map<Id, String>();
-        /** The active people assigned the set itself, not through any group. */
+        /** The active people assigned one of the sets itself, not through any group. */
         public Set<Id> holdingSetDirectly = new Set<Id>();
     }
 
     /**
-     * The active people assigned this permission set group, and the active people assigned this
-     * permission set directly, in one read. The module's access sync gives the set directly, so in
-     * a healthy org this alone answers who is missing it; `setHoldersAmong` is asked only about
-     * the group holders it leaves out, who may hold the set through another group. One query
-     * rather than three keeps a whole Health Check run cheap.
+     * The active people assigned this permission set group, and the active people assigned any of
+     * these permission sets directly, in one read. The module's access sync gives the sets
+     * directly, so in a healthy org this alone answers who is missing them; `setHoldersAmong` is
+     * asked only about the group holders it leaves out, who may hold a set through another group.
+     * One query rather than three keeps a whole Health Check run cheap.
      */
     public static GroupHolders groupHoldersWithSet(
         String groupName,
-        String setName,
+        Set<String> setNames,
         String namespace
     ) {
         requireManageSettings();
@@ -106,7 +106,7 @@ public without sharing class VolunteerHealthCheckSelector {
                 AND ((PermissionSetGroup.DeveloperName = :groupName
                 AND PermissionSetGroup.NamespacePrefix = :namespace)
                 OR (PermissionSetGroupId = NULL
-                AND PermissionSet.Name = :setName
+                AND PermissionSet.Name IN :setNames
                 AND PermissionSet.NamespacePrefix = :namespace))
             WITH SYSTEM_MODE
             LIMIT 4000
@@ -120,14 +120,14 @@ public without sharing class VolunteerHealthCheckSelector {
         return holders;
     }
 
-    /** Of these people, those who hold the permission set, directly or through a group. */
-    public static Set<Id> setHoldersAmong(Set<Id> userIds, String setName, String namespace) {
+    /** Of these people, those who hold any of the permission sets, directly or through a group. */
+    public static Set<Id> setHoldersAmong(Set<Id> userIds, Set<String> setNames, String namespace) {
         requireManageSettings();
         Set<Id> groupIds = new Set<Id>();
         for (PermissionSetGroupComponent component : [
             SELECT PermissionSetGroupId
             FROM PermissionSetGroupComponent
-            WHERE PermissionSet.Name = :setName AND PermissionSet.NamespacePrefix = :namespace
+            WHERE PermissionSet.Name IN :setNames AND PermissionSet.NamespacePrefix = :namespace
             WITH SYSTEM_MODE
         ]) {
             groupIds.add(component.PermissionSetGroupId);
@@ -138,7 +138,7 @@ public without sharing class VolunteerHealthCheckSelector {
             FROM PermissionSetAssignment
             WHERE
                 AssigneeId IN :userIds
-                AND ((PermissionSet.Name = :setName
+                AND ((PermissionSet.Name IN :setNames
                 AND PermissionSet.NamespacePrefix = :namespace)
                 OR PermissionSetGroupId IN :groupIds)
             WITH SYSTEM_MODE

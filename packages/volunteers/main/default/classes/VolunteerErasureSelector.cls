@@ -5,15 +5,16 @@
  *
  * `without sharing` (ADR-0021): hours and requirements are Private, and a read limited by the
  * eraser's sharing would leave another user's entry, notes included, behind while reporting the
- * person erased. It returns only Ids, notes, statuses and shift start times, and every change is
- * then made as the user (`VolunteersErasureExtension`), which is what refuses a user who may not.
+ * person erased. It returns only Ids, notes, rejection reasons, statuses, shift start times, and
+ * what identifies a generated letter file, and every change but a letter's delete is then made as
+ * the user (`VolunteersErasureExtension`), which is what refuses a user who may not.
  */
 public without sharing class VolunteerErasureSelector {
     private static final Integer CAP = 10000;
 
     public static List<Volunteer_Hours__c> hoursOf(Set<Id> contacts, Set<Id> accounts) {
         return [
-            SELECT Id, Notes__c
+            SELECT Id, Notes__c, Rejection_Reason__c
             FROM Volunteer_Hours__c
             WHERE Contact__c IN :contacts OR Account__c IN :accounts
             WITH SYSTEM_MODE
@@ -52,5 +53,50 @@ public without sharing class VolunteerErasureSelector {
             WITH SYSTEM_MODE
             LIMIT :CAP
         ];
+    }
+
+    /**
+     * The person's files that may be letters BarnCRM generated (R-VL4): saved under the letter
+     * file name and first published on the person. The caller also matches each title against a
+     * letter template, so no other file is ever taken.
+     */
+    public static List<ContentDocumentLink> letterFilesOf(Id personId) {
+        List<ContentDocumentLink> found = new List<ContentDocumentLink>();
+        for (ContentDocumentLink link : [
+            SELECT
+                ContentDocumentId,
+                ContentDocument.Title,
+                ContentDocument.FileType,
+                ContentDocument.LatestPublishedVersion.PathOnClient,
+                ContentDocument.LatestPublishedVersion.FirstPublishLocationId
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId = :personId
+            WITH SYSTEM_MODE
+            LIMIT :CAP
+        ]) {
+            ContentVersion latest = link.ContentDocument?.LatestPublishedVersion;
+            if (
+                latest != null &&
+                latest.PathOnClient == VolunteerLetterService.FILE_NAME &&
+                latest.FirstPublishLocationId == personId
+            ) {
+                found.add(link);
+            }
+        }
+        return found;
+    }
+
+    /** The names of every letter template, which start the titles of the letters made from it. */
+    public static Set<String> letterTemplateNames() {
+        Set<String> names = new Set<String>();
+        for (Volunteer_Letter_Template__c template : [
+            SELECT Name
+            FROM Volunteer_Letter_Template__c
+            WITH SYSTEM_MODE
+            LIMIT :CAP
+        ]) {
+            names.add(template.Name);
+        }
+        return names;
     }
 }

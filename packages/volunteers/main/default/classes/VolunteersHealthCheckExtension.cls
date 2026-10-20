@@ -42,6 +42,16 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     private static final String COORDINATOR_GROUP = 'Volunteer_Coordinator';
     private static final String COORDINATOR_SET = 'Volunteers_Coordinator';
 
+    /** A coordinator holding either set can approve hours and work with shifts. */
+    private static final Set<String> COORDINATOR_SETS = new Set<String>{
+        COORDINATOR_SET,
+        VolunteersAccessSync.ADMIN_SET
+    };
+
+    /** The shift list view the past shifts finding opens. */
+    @TestVisible
+    private static final String PAST_SHIFTS_LIST_VIEW = 'Past_Shifts_Still_Open';
+
     @NamespaceAccessible
     public VolunteersHealthCheckExtension() {
         // Built by name from Core (HealthCheckExtensions), so it needs a public constructor.
@@ -108,13 +118,25 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
         if (waiting.isEmpty()) {
             return null;
         }
+        Integer howMany = waiting.size();
         return new HealthCheckService.Finding(
                 'volunteer_hours_waiting',
                 String.format(
-                    Label.Volunteers_HealthCheck_HoursWaitingTitle,
-                    new List<Object>{ counted(waiting.size()), hoursWaitingDays.format() }
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_HoursWaitingTitleOne,
+                        Label.Volunteers_HealthCheck_HoursWaitingTitle
+                    ),
+                    new List<Object>{ counted(howMany), hoursWaitingDays.format() }
                 ),
-                withFirstListed(Label.Volunteers_HealthCheck_HoursWaitingDetail, waiting.size()),
+                withFirstListed(
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_HoursWaitingDetailOne,
+                        Label.Volunteers_HealthCheck_HoursWaitingDetail
+                    ),
+                    howMany
+                ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
             )
@@ -138,27 +160,30 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
         if (open.isEmpty()) {
             return null;
         }
+        Integer howMany = open.size();
         String detail = String.format(
-            Label.Volunteers_HealthCheck_PastShiftsDetail,
+            oneOrMany(
+                howMany,
+                Label.Volunteers_HealthCheck_PastShiftsDetailOne,
+                Label.Volunteers_HealthCheck_PastShiftsDetail
+            ),
             new List<Object>{ PAST_SHIFT_DAYS.format() }
         );
         return new HealthCheckService.Finding(
                 'volunteer_past_shifts_open',
                 String.format(
-                    Label.Volunteers_HealthCheck_PastShiftsTitle,
-                    new List<Object>{ counted(open.size()) }
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_PastShiftsTitleOne,
+                        Label.Volunteers_HealthCheck_PastShiftsTitle
+                    ),
+                    new List<Object>{ counted(howMany) }
                 ),
-                withFirstListed(detail, open.size()),
+                withFirstListed(detail, howMany),
                 HealthCheckService.SEVERITY_INFO,
                 HealthCheckService.CATEGORY_SETTINGS
             )
-            .withFix(
-                Label.Volunteers_HealthCheck_PastShiftsFix,
-                '/lightning/o/' +
-                    Volunteer_Shift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getName() +
-                    '/list'
-            )
+            .withFix(Label.Volunteers_HealthCheck_PastShiftsFix, pastShiftsListUrl())
             .withLinks(links(open));
     }
 
@@ -193,17 +218,26 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
         if (behind.isEmpty()) {
             return null;
         }
+        Integer howMany = behind.size();
         String detail = String.format(
-            Label.Volunteers_HealthCheck_HorizonDetail,
+            oneOrMany(
+                howMany,
+                Label.Volunteers_HealthCheck_HorizonDetailOne,
+                Label.Volunteers_HealthCheck_HorizonDetail
+            ),
             new List<Object>{ weeks.format() }
         );
         return new HealthCheckService.Finding(
                 'volunteer_schedule_horizon',
                 String.format(
-                    Label.Volunteers_HealthCheck_HorizonTitle,
-                    new List<Object>{ counted(behind.size()) }
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_HorizonTitleOne,
+                        Label.Volunteers_HealthCheck_HorizonTitle
+                    ),
+                    new List<Object>{ counted(howMany) }
                 ),
-                withFirstListed(detail, behind.size()),
+                withFirstListed(detail, howMany),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
             )
@@ -211,23 +245,35 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     }
 
     /**
-     * People holding the Coordinator role without the Volunteers Coordinator set (ADR-0127,
-     * decision 3; ADR-0131). The access sync gives it nightly; until it does they cannot approve
-     * hours. The fix asks the sync to run now.
+     * People holding the Coordinator role with neither the Volunteers Coordinator set nor
+     * Volunteers Admin (ADR-0127, decision 3; ADR-0131). The access sync gives the coordinator
+     * set nightly; until it does they cannot approve hours. The fix asks the sync to run now.
      */
     private static HealthCheckService.Finding coordinatorAccess() {
         List<String> names = coordinatorsMissingTheirSet();
         if (names.isEmpty()) {
             return null;
         }
-        List<Object> values = new List<Object>{
-            String.valueOf(names.size()),
-            String.join(names, ', ')
-        };
+        Integer howMany = names.size();
+        List<Object> values = new List<Object>{ String.valueOf(howMany), String.join(names, ', ') };
         return new HealthCheckService.Finding(
                 'volunteer_coordinator_access',
-                String.format(Label.Volunteers_HealthCheck_CoordinatorAccessTitle, values),
-                String.format(Label.Volunteers_HealthCheck_CoordinatorAccessDetail, values),
+                String.format(
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_CoordinatorAccessTitleOne,
+                        Label.Volunteers_HealthCheck_CoordinatorAccessTitle
+                    ),
+                    values
+                ),
+                String.format(
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_CoordinatorAccessDetailOne,
+                        Label.Volunteers_HealthCheck_CoordinatorAccessDetail
+                    ),
+                    values
+                ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_ACCESS
             )
@@ -258,14 +304,26 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
         for (Rollup_Definition__c definition : off) {
             names.add(definition.Name);
         }
-        List<Object> values = new List<Object>{
-            String.valueOf(off.size()),
-            String.join(names, ', ')
-        };
+        Integer howMany = off.size();
+        List<Object> values = new List<Object>{ String.valueOf(howMany), String.join(names, ', ') };
         return new HealthCheckService.Finding(
                 'volunteer_rollups_off',
-                String.format(Label.Volunteers_HealthCheck_RollupsOffTitle, values),
-                String.format(Label.Volunteers_HealthCheck_RollupsOffDetail, values),
+                String.format(
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_RollupsOffTitleOne,
+                        Label.Volunteers_HealthCheck_RollupsOffTitle
+                    ),
+                    values
+                ),
+                String.format(
+                    oneOrMany(
+                        howMany,
+                        Label.Volunteers_HealthCheck_RollupsOffDetailOne,
+                        Label.Volunteers_HealthCheck_RollupsOffDetail
+                    ),
+                    values
+                ),
                 HealthCheckService.SEVERITY_INFO,
                 HealthCheckService.CATEGORY_SETTINGS
             )
@@ -305,21 +363,24 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 
     // ------------------------------------------------------------------------------- helpers
 
-    /** The names, sorted, of active coordinators without the coordinator set. */
+    /**
+     * The names, sorted, of active coordinators holding neither the coordinator set nor
+     * Volunteers Admin, which grants all that the coordinator set does.
+     */
     private static List<String> coordinatorsMissingTheirSet() {
         String prefix = NamespaceUtil.prefix();
         String namespace = String.isBlank(prefix) ? null : prefix.removeEnd('__');
         VolunteerHealthCheckSelector.GroupHolders coordinators = VolunteerHealthCheckSelector.groupHoldersWithSet(
             COORDINATOR_GROUP,
-            COORDINATOR_SET,
+            COORDINATOR_SETS,
             namespace
         );
         Set<Id> missing = new Set<Id>(coordinators.names.keySet());
         missing.removeAll(coordinators.holdingSetDirectly);
         if (!missing.isEmpty()) {
-            // Only those without a direct assignment may still hold it through another group.
+            // Only those without a direct assignment may still hold one through another group.
             missing.removeAll(
-                VolunteerHealthCheckSelector.setHoldersAmong(missing, COORDINATOR_SET, namespace)
+                VolunteerHealthCheckSelector.setHoldersAmong(missing, COORDINATOR_SETS, namespace)
             );
         }
         List<String> names = new List<String>();
@@ -340,12 +401,28 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     }
 
     private static String withFirstListed(String detail, Integer howMany) {
+        if (howMany == 1) {
+            return detail + ' ' + Label.Volunteers_HealthCheck_FirstListedOne;
+        }
         return detail +
             ' ' +
             String.format(
                 Label.Volunteers_HealthCheck_FirstListed,
                 new List<Object>{ String.valueOf(Math.min(howMany, LINKS_SHOWN)) }
             );
+    }
+
+    /** The one-item label for a count of exactly one, otherwise the many-item label. */
+    private static String oneOrMany(Integer howMany, String one, String many) {
+        return howMany == 1 ? one : many;
+    }
+
+    /** The shift list view of Open shifts dated before today. */
+    private static String pastShiftsListUrl() {
+        return '/lightning/o/' +
+            Volunteer_Shift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+            '/list?filterName=' +
+            NamespaceUtil.qualify(PAST_SHIFTS_LIST_VIEW);
     }
 
     private static List<HealthCheckService.Link> links(List<SObject> records) {

@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:VolunteersErasureExtension, ApexClass:VolunteerErasureSelector')
 private class VolunteersErasureExtensionTest {
+    @TestSetup
+    static void makeUsers() {
+        TestUsers.adminWith(VolunteersTestData.ADMIN);
+    }
+
     private static User eraser() {
         return TestUsers.withPermissionSets(
             new List<String>{
@@ -364,22 +369,176 @@ private class VolunteersErasureExtensionTest {
         }
     }
 
+    /** A change's fields, read through JSON: `note` and `recordIds` are `@AuraEnabled` only. */
+    private static Map<String, Object> fieldsOf(PersonErasure.Change change) {
+        return (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(change));
+    }
+
+    private static List<Map<String, Object>> changesLabelled(
+        PersonErasure.Result result,
+        String objectLabel,
+        String action
+    ) {
+        List<Map<String, Object>> found = new List<Map<String, Object>>();
+        for (PersonErasure.Change change : result.getChanges()) {
+            if (change.getAction() == action && change.getObjectLabel() == objectLabel) {
+                found.add(fieldsOf(change));
+            }
+        }
+        return found;
+    }
+
+    private static ContentVersion file(Id personId, String fileName, String title) {
+        return new ContentVersion(
+            Title = title,
+            PathOnClient = fileName,
+            VersionData = Blob.valueOf('%PDF-1.4'),
+            FirstPublishLocationId = personId
+        );
+    }
+
+    private static Id documentOf(Id versionId) {
+        return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :versionId]
+        .ContentDocumentId;
+    }
+
     @IsTest
-    static void aPersonErasingWithoutAccessToRequirementsIsRefusedAndNothingChanges() {
+    static void deletesTheLettersBarnCRMGeneratedAndKeepsEveryOtherFile() {
+        User coordinator = eraser();
         Contact jordan;
+        Id letter;
+        Id lookalike;
+        Id ownFile;
+        // A colleague generated the letter, so the person erasing does not own it.
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
             VolunteersTestData.contactModeWithoutAutomaticHouseholds();
             jordan = person('Lee');
-            insert check(jordan.Id, 'Ref A');
+            Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
+                Name = 'Thank you letter',
+                Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
+                Body__c = '{PersonName}',
+                Active__c = true
+            );
+            insert template;
+            String letterTitle = VolunteerLetterService.titlePrefix(template.Name) + 'Ana Lee';
+            List<ContentVersion> files = new List<ContentVersion>{
+                file(jordan.Id, VolunteerLetterService.FILE_NAME, letterTitle),
+                file(jordan.Id, VolunteerLetterService.FILE_NAME, 'Scanned thank you'),
+                file(jordan.Id, 'thank-you.pdf', letterTitle)
+            };
+            insert files;
+            letter = documentOf(files[0].Id);
+            lookalike = documentOf(files[1].Id);
+            ownFile = documentOf(files[2].Id);
         }
-        // A staff member allowed to erase: the access sync gives them Volunteers Staff, which
-        // holds no right to requirements (a BarnCRM Admin would be given Volunteers Admin).
+
+        System.runAs(coordinator) {
+            PersonErasure.Result preview = PersonErasure.preview(jordan.Id);
+            List<Map<String, Object>> listed = changesLabelled(
+                preview,
+                Label.Volunteers_Erase_LettersLabel,
+                PersonErasure.DELETED
+            );
+            Assert.areEqual(1, listed.size(), 'The preview lists the letters as Deleted');
+            List<Object> listedIds = (List<Object>) listed[0].get('recordIds');
+            Assert.areEqual(1, listedIds.size(), 'Only the generated letter');
+            Assert.areEqual(String.valueOf(letter), String.valueOf(listedIds[0]));
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM ContentDocument WHERE Id = :letter],
+                'The preview deleted nothing'
+            );
+
+            Test.startTest();
+            PersonErasure.erase(jordan.Id, 'Ana Lee', null);
+            Test.stopTest();
+        }
+
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM ContentDocument WHERE Id = :letter],
+                'The generated letter is deleted, though a colleague made it'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM ContentDocument WHERE Id IN (:lookalike, :ownFile)],
+                'A file BarnCRM did not generate is kept, whatever its name or title'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'PersonErasure.emptyRecycleBin'
+                ],
+                'The letter leaves the Recycle Bin with the rest'
+            );
+        }
+    }
+
+    @IsTest
+    static void listsTheRejectionReasonsItKeeps() {
+        System.runAs(eraser()) {
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            VolunteersTestData.volunteerSettings(true, true);
+            Contact jordan = person('Lee');
+            Volunteer_Job__c pantry = VolunteersTestData.job('Pantry');
+            List<Volunteer_Hours__c> entries = new List<Volunteer_Hours__c>{
+                VolunteersTestData.newHours(jordan.Id, pantry.Id, 2),
+                VolunteersTestData.newHours(jordan.Id, pantry.Id, 3)
+            };
+            insert entries;
+            VolunteerHoursService.reject(new Set<Id>{ entries[0].Id }, 'Entered twice');
+
+            PersonErasure.Result preview = PersonErasure.preview(jordan.Id);
+
+            Boolean listed = false;
+            for (
+                Map<String, Object> kept : changesLabelled(
+                    preview,
+                    Volunteer_Hours__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural(),
+                    PersonErasure.KEPT
+                )
+            ) {
+                if (kept.get('note') == Label.Volunteers_Erase_RejectionReasonKept) {
+                    Assert.areEqual(1, kept.get('count'), 'One entry has a reason');
+                    listed = true;
+                }
+            }
+            Assert.isTrue(listed, 'The preview lists the kept Rejection Reason');
+
+            Test.startTest();
+            PersonErasure.erase(jordan.Id, 'Ana Lee', null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                'Entered twice',
+                [SELECT Rejection_Reason__c FROM Volunteer_Hours__c WHERE Id = :entries[0].Id]
+                .Rejection_Reason__c,
+                'The reason is kept'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPersonErasingWithoutAccessToRequirementsIsRefusedAndNothingChanges() {
+        // A BarnCRM Admin allowed to erase whom the nightly access sync has not yet given
+        // Volunteers Admin: Core lets them erase, and only the Volunteers records refuse.
         User noVolunteers;
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-            noVolunteers = TestUsers.standardUserWith(
-                'ErasesNoVolunteers',
-                new List<String>{ VolunteersTestData.CORE_STAFF, 'BarnCRM_Erase_People' }
+            VolunteersTestData.contactModeWithoutAutomaticHouseholds();
+            noVolunteers = TestUsers.withPermissionSets(
+                new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
             );
+        }
+        Contact jordan;
+        System.runAs(noVolunteers) {
+            jordan = person('Lee');
+        }
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            insert check(jordan.Id, 'Ref A');
         }
 
         System.runAs(noVolunteers) {
@@ -387,7 +546,11 @@ private class VolunteersErasureExtensionTest {
                 PersonErasure.erase(jordan.Id, 'Ana Lee', null);
                 Assert.fail('The erasure must be refused');
             } catch (PersonErasure.ErasureException refused) {
-                Assert.isNotNull(refused.getMessage(), 'A reason is given');
+                Assert.areEqual(
+                    Label.Volunteers_Erase_NeedVolunteersAccess,
+                    refused.getMessage(),
+                    'The reason says which access is missing, not the platform\'s own words'
+                );
             }
         }
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {

@@ -209,8 +209,35 @@ private class ShiftScheduleTriggerHandlerTest {
     }
 
     @IsTest
-    static void aNameOnlyChangeTouchesNoShift() {
+    static void aNameOnlyChangeAtTheHorizonTouchesNoShift() {
         System.runAs(admin()) {
+            // On Friday the schedule's Created Through is the horizon, so there is nothing to fill.
+            ShiftScheduleService.timeZoneOverride = ZONE;
+            ShiftScheduleService.nowOverride = FRIDAY_NOON;
+            Shift_Schedule__c before = schedule();
+            Set<Id> original = idsOf(shiftsOf(before.Id));
+
+            Test.startTest();
+            System.runAs(user(COORDINATOR)) {
+                update new Shift_Schedule__c(Id = before.Id, Name = 'Saturday morning sort');
+            }
+            Assert.areEqual(0, Limits.getQueueableJobs(), 'No run is queued.');
+            Test.stopTest();
+
+            Assert.areEqual(original, idsOf(shiftsOf(before.Id)), 'The same shifts.');
+            Assert.isNull(schedule().Shifts_Kept__c, 'Nothing was removed, so nothing is counted.');
+            Assert.areEqual(
+                before.Created_Through__c,
+                schedule().Created_Through__c,
+                'Created Through is kept.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPlainSaveFillsAScheduleShortOfTheHorizon() {
+        System.runAs(admin()) {
+            // On Monday the horizon is 13 April, past Created Through (3 April).
             useMondayClock();
             Shift_Schedule__c before = schedule();
             Set<Id> original = idsOf(shiftsOf(before.Id));
@@ -221,13 +248,20 @@ private class ShiftScheduleTriggerHandlerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(original, idsOf(shiftsOf(before.Id)), 'The same shifts.');
-            Assert.isNull(schedule().Shifts_Kept__c, 'Nothing was removed, so nothing is counted.');
+            List<Volunteer_Shift__c> after = shiftsOf(before.Id);
+            Assert.isTrue(idsOf(after).containsAll(original), 'No shift is removed.');
             Assert.areEqual(
-                before.Created_Through__c,
-                schedule().Created_Through__c,
-                'Created Through is kept.'
+                original.size() + 2,
+                after.size(),
+                'The save fills 4 and 11 April at once.'
             );
+            assertOneShiftADay(after);
+            Assert.areEqual(
+                Date.newInstance(2026, 4, 13),
+                schedule().Created_Through__c,
+                'Created Through reaches the horizon.'
+            );
+            Assert.isNull(schedule().Shifts_Kept__c, 'Nothing was removed, so nothing is counted.');
         }
     }
 
