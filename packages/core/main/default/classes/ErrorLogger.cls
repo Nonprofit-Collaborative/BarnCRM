@@ -2,8 +2,9 @@
  * Records a caught failure where an administrator can read it (rule R-E1).
  *
  * Two texts are kept apart on purpose. `Message__c` is what Maria reads: what went wrong and
- * what to do about it. `Technical_Detail__c` is what she forwards to a support contact: the
- * exception type, its message, and the stack trace.
+ * what to do about it. `Technical_Detail__c` is what whoever looks into the failure reads: the
+ * exception type, its message, and the stack trace. BarnCRM is self-service, so no message
+ * points to a support contact.
  *
  * Every method takes a list or is called once per failure, and every path writes with a single
  * insert, so logging 200 failures in one transaction costs one statement.
@@ -54,6 +55,16 @@ public with sharing class ErrorLogger {
 
     @NamespaceAccessible
     public static void log(List<Exception> thrown, String context, Id recordId) {
+        logAll(thrown, context, recordId, null);
+    }
+
+    /** Each failure as one entry, read under `message`, or the generic message when blank. */
+    private static void logAll(
+        List<Exception> thrown,
+        String context,
+        Id recordId,
+        String message
+    ) {
         if (thrown == null || thrown.isEmpty()) {
             return;
         }
@@ -65,7 +76,7 @@ public with sharing class ErrorLogger {
                 }
                 entries.add(
                     buildEntry(
-                        friendlyMessage(context),
+                        String.isBlank(message) ? friendlyMessage(context) : message,
                         technicalDetail(failure),
                         context,
                         SEVERITY_ERROR,
@@ -84,6 +95,18 @@ public with sharing class ErrorLogger {
             );
         }
         ErrorLogWriter.write(entries);
+    }
+
+    /**
+     * A caught failure with a message of the caller's own in place of the generic one, for a
+     * failure the caller can say more about; the technical detail is kept as `log` keeps it.
+     */
+    @NamespaceAccessible
+    public static void logWithMessage(Exception thrown, String context, String message) {
+        if (thrown == null) {
+            return;
+        }
+        logAll(new List<Exception>{ thrown }, context, null, message);
     }
 
     @NamespaceAccessible

@@ -153,7 +153,10 @@ private class NightlyJobsTest {
             System.runAs(maria) {
                 HealthCheckService.Finding finding = findNightlyJobs(HealthCheckService.run());
                 Assert.isNotNull(finding, 'Unscheduled jobs are reported.');
-                Assert.isTrue(finding.detail.contains('Addresses, Donor levels'), 'Each is named.');
+                Assert.isTrue(
+                    finding.detail.contains('Addresses; Donor levels'),
+                    'Each is named, apart by a semicolon, since a job name can hold a comma.'
+                );
                 Assert.areEqual(
                     System.Label.Core_HealthCheck_NightlyJobsFix,
                     finding.fixLabel,
@@ -170,7 +173,10 @@ private class NightlyJobsTest {
             }
             Integer recorded = 0;
             for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
-                if (change.New_Value__c == 'Addresses, Donor levels') {
+                if (
+                    change.New_Value__c ==
+                    'Addresses' + HealthCheckService.JOB_SEPARATOR + 'Donor levels'
+                ) {
                     recorded++;
                 }
             }

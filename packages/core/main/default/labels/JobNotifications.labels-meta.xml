@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Job notification body: sample data removal stopped</shortDescription>
-        <value>The sample data removal stopped part way. The Error Log says why. Select Remove sample data again to finish it.</value>
+        <value>The sample data removal stopped part way. The Error Log says why. Select Remove sample data again to finish it, after you deal with what it names.</value>
     </labels>
     <labels>
         <fullName>Core_JobNotice_SampleDataStoppedBody</fullName>

@@ -535,8 +535,19 @@ public with sharing class PersonErasure {
                     Label.Core_Erase_HouseholdName
                 );
                 anonymous.record.put(Account.Custom_Name__c, true);
-                anonymous.record.put(Account.Household_Formal_Greeting__c, null);
-                anonymous.record.put(Account.Household_Informal_Greeting__c, null);
+                // The package keeps the greetings from plan(), so they are emptied, and
+                // listed, here: an emptied household keeps its last ones (R-H4).
+                for (
+                    Schema.SObjectField greeting : new List<Schema.SObjectField>{
+                        Account.Household_Formal_Greeting__c,
+                        Account.Household_Informal_Greeting__c
+                    }
+                ) {
+                    anonymous.record.put(greeting, null);
+                    if (household.get(greeting) != null) {
+                        anonymous.cleared.add(greeting.getDescribe().getLabel());
+                    }
+                }
                 refuseBlocked(anonymous);
                 remove(
                     rows(
@@ -546,7 +557,12 @@ public with sharing class PersonErasure {
                     Address__c.SObjectType,
                     result
                 );
-                save(anonymous, result);
+                save(
+                    anonymous,
+                    result,
+                    Label.Core_Erase_Household,
+                    Label.Core_Erase_NoteHouseholdKept
+                );
             }
         }
         deletedIds.addAll(gone);
@@ -708,6 +724,7 @@ public with sharing class PersonErasure {
             .fields.getMap();
         Clearing result = new Clearing();
         result.record = type.newSObject(record.Id);
+        Boolean accountIsHousehold = accountIsHousehold(type, values);
         Boolean named = false;
         // A household or other business account may not carry person account fields: the
         // standard Person ones and the __pc copies of contact fields. A custom Account field
@@ -741,22 +758,55 @@ public with sharing class PersonErasure {
             } else if (value == null || String.isBlank(String.valueOf(value))) {
                 continue;
             } else if (!field.isNillable()) {
-                result.required.add(field.getLabel());
+                result.required.add(shownAs(type, field, accountIsHousehold));
                 continue;
             }
             if (!field.isUpdateable()) {
                 if (field.isPermissionable()) {
-                    result.blocked.add(field.getLabel());
+                    result.blocked.add(shownAs(type, field, accountIsHousehold));
                 }
                 continue;
             }
             result.record.put(field.getName(), wanted);
-            result.cleared.add(field.getLabel());
+            result.cleared.add(shownAs(type, field, accountIsHousehold));
         }
-        if (!named && fieldsOf(type).get('name')?.isUpdateable() == true) {
+        Schema.DescribeFieldResult nameField = fieldsOf(type).get('name');
+        if (!named && nameField?.isUpdateable() == true) {
             result.record.put('Name', placeholder);
+            result.cleared.add(nameField.getLabel());
         }
         return result;
+    }
+
+    /**
+     * Whether this contact's account is its household: only in contact mode, and only when the
+     * account is a household record. In junction mode, or when the account is an organization,
+     * it is an employer and keeps its field label.
+     */
+    private static Boolean accountIsHousehold(Schema.SObjectType type, Map<String, Object> values) {
+        Id householdType = HouseholdService.householdRecordTypeId();
+        Id accountId = type == Contact.SObjectType ? (Id) values.get('AccountId') : null;
+        if (accountId == null || householdType == null || HouseholdService.isJunctionMode()) {
+            return false;
+        }
+        List<Account> accounts = [
+            SELECT RecordTypeId
+            FROM Account
+            WHERE Id = :accountId
+            WITH SYSTEM_MODE
+        ];
+        return !accounts.isEmpty() && accounts[0].RecordTypeId == householdType;
+    }
+
+    /** A field's label as the erase screen lists it: a household account reads as one. */
+    private static String shownAs(
+        Schema.SObjectType type,
+        Schema.DescribeFieldResult field,
+        Boolean accountIsHousehold
+    ) {
+        return accountIsHousehold && field.getName() == 'AccountId'
+            ? Label.Core_Erase_Household
+            : field.getLabel();
     }
 
     private static void refuseBlocked(Clearing clearing) {
@@ -776,12 +826,16 @@ public with sharing class PersonErasure {
     }
 
     private static void save(Clearing clearing, Result result) {
+        save(clearing, result, labelOf(clearing.record.getSObjectType()), null);
+    }
+
+    /** Saves the clearing and reports it under this label, with this note. */
+    private static void save(Clearing clearing, Result result, String objectLabel, String note) {
         Database.update(clearing.record, true, AccessLevel.USER_MODE);
-        Schema.SObjectType type = clearing.record.getSObjectType();
         List<Id> one = new List<Id>{ clearing.record.Id };
-        add(result, CLEARED, type, one, clearing.cleared);
+        add(result, CLEARED, objectLabel, one, clearing.cleared, note);
         if (!clearing.required.isEmpty()) {
-            Change kept = new Change(KEPT, labelOf(type), one, clearing.required);
+            Change kept = new Change(KEPT, objectLabel, one, clearing.required);
             kept.note = Label.Core_Erase_NoteRequired;
             result.changes.add(kept);
         }
@@ -962,12 +1016,25 @@ public with sharing class PersonErasure {
         return type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
     }
 
-    /** The audit text: one line per change, labels and Ids only (R-ER5). */
+    /**
+     * The audit text: one line per change, labels and Ids only (R-ER5), with what was done in
+     * the words the erase screen shows.
+     */
     @TestVisible
     private static String details(List<Change> changes) {
+        Map<String, String> shown = new Map<String, String>{
+            CLEARED => Label.Core_EraseAction_Cleared,
+            ENDED => Label.Core_EraseAction_Ended,
+            DELETED => Label.Core_EraseAction_Deleted,
+            KEPT => Label.Core_EraseAction_Kept,
+            UPDATED => Label.Core_EraseAction_Updated
+        };
         List<String> lines = new List<String>();
         for (Change change : changes) {
-            String line = change.action + ' | ' + change.objectLabel + ' | ' + change.count;
+            String action = shown.containsKey(change.action)
+                ? shown.get(change.action)
+                : change.action;
+            String line = action + ' | ' + change.objectLabel + ' | ' + change.count;
             if (!change.fields.isEmpty()) {
                 line += ' | ' + String.join(change.fields, ', ');
             }

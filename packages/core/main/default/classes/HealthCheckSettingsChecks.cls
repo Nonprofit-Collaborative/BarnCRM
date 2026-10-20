@@ -50,6 +50,7 @@ public with sharing class HealthCheckSettingsChecks {
             return missingDefaultsFinding(
                     'automation_switches_missing',
                     HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES,
+                    System.Label.Core_HealthCheck_SwitchesMissingTitleOne,
                     System.Label.Core_HealthCheck_SwitchesMissingTitle,
                     System.Label.Core_HealthCheck_SwitchesMissingDetail,
                     HealthCheckService.SEVERITY_INFO
@@ -68,6 +69,7 @@ public with sharing class HealthCheckSettingsChecks {
             return missingDefaultsFinding(
                     'import_templates_missing',
                     HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES,
+                    System.Label.Core_HealthCheck_TemplatesMissingTitleOne,
                     System.Label.Core_HealthCheck_TemplatesMissingTitle,
                     System.Label.Core_HealthCheck_TemplatesMissingDetail,
                     HealthCheckService.SEVERITY_INFO
@@ -103,7 +105,7 @@ public with sharing class HealthCheckSettingsChecks {
                     System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
                     String.format(
                         System.Label.Core_HealthCheck_InactiveOwnerJobsDetail,
-                        new List<Object>{ String.join(stopped, ', ') }
+                        new List<Object>{ String.join(stopped, HealthCheckService.JOB_SEPARATOR) }
                     ),
                     HealthCheckService.SEVERITY_WARNING,
                     HealthCheckService.CATEGORY_SETTINGS
@@ -135,7 +137,7 @@ public with sharing class HealthCheckSettingsChecks {
                 System.Label.Core_HealthCheck_NightlyJobsTitle,
                 String.format(
                     System.Label.Core_HealthCheck_NightlyJobsDetail,
-                    new List<Object>{ String.join(waiting, ', ') }
+                    new List<Object>{ String.join(waiting, HealthCheckService.JOB_SEPARATOR) }
                 ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
@@ -152,11 +154,13 @@ public with sharing class HealthCheckSettingsChecks {
      * One finding naming the package defaults that are missing, or null when none is. The
      * title and detail take the count as {0} and the names as {1}, so the finding says what
      * its fix will create, counted from this org, and it carries the same names as its fix
-     * scope, so the fix creates exactly those (ADR-0048 condition 5).
+     * scope, so the fix creates exactly those (ADR-0048 condition 5). `titleOne` is the title
+     * when exactly one is missing.
      */
     private static HealthCheckService.Finding missingDefaultsFinding(
         String key,
         String fixKey,
+        String titleOne,
         String title,
         String detail,
         String severity
@@ -171,7 +175,7 @@ public with sharing class HealthCheckSettingsChecks {
         };
         return new HealthCheckService.Finding(
                 key,
-                String.format(title, values),
+                HealthCheckService.forCount(missingNames.size(), titleOne, title, values),
                 String.format(detail, values),
                 severity,
                 HealthCheckService.CATEGORY_SETTINGS
@@ -274,8 +278,18 @@ public with sharing class HealthCheckSettingsChecks {
         List<Object> count = new List<Object>{ counted };
         return new HealthCheckService.Finding(
                 'error_log_new',
-                String.format(System.Label.Core_HealthCheck_ErrorLogTitle, count),
-                String.format(System.Label.Core_HealthCheck_ErrorLogDetail, count),
+                HealthCheckService.forCount(
+                    newErrors,
+                    System.Label.Core_HealthCheck_ErrorLogTitleOne,
+                    System.Label.Core_HealthCheck_ErrorLogTitle,
+                    count
+                ),
+                HealthCheckService.forCount(
+                    newErrors,
+                    System.Label.Core_HealthCheck_ErrorLogDetailOne,
+                    System.Label.Core_HealthCheck_ErrorLogDetail,
+                    count
+                ),
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
             )

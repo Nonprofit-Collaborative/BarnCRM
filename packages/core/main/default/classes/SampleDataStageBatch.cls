@@ -118,7 +118,11 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
         stopped = true;
         // Logged here because nothing else sees an asynchronous failure; the synchronous entry
         // points leave logging to SampleDataController.
-        ErrorLogger.log(failed, stages.name() + (stage == null ? '' : ', stage ' + stage));
+        ErrorLogger.logWithMessage(
+            failed,
+            stages.name() + (stage == null ? '' : ', stage ' + stage),
+            Label.Core_SampleData_StoppedLogMessage
+        );
         // The stage is already rolled back to its savepoint, so this notice stays (Q-04).
         notifyStopped();
     }
