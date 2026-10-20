@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Shifts_Kept__c</fullName>
   <externalId>false</externalId>
-  <inlineHelpText>How many future shifts your last change to the pattern or end left as they were, because people signed up for them, hours were logged on them, or they are cancelled. Check those shifts by hand.</inlineHelpText>
+  <inlineHelpText>How many future shifts your last change to the pattern or end left as they were, because people signed up for them or hours were logged on them. Cancelled shifts are not counted. Check those shifts by hand. The next save that changes neither clears this.</inlineHelpText>
   <label>Shifts Kept</label>
   <precision>5</precision>
   <required>false</required>

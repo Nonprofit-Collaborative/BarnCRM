@@ -1,6 +1,5 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import Toast from 'lightning/toast';
 import getPanel from '@salesforce/apex/VolunteerShiftSignupsController.getPanel';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
 import setStatus from '@salesforce/apex/VolunteerShiftSignupsController.setStatus';
@@ -27,6 +26,8 @@ import CHANGED from '@salesforce/label/c.Volunteers_Signups_Changed';
 import HOURS_WRITTEN from '@salesforce/label/c.Volunteers_Signups_HoursWritten';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Volunteers_Signups_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Signups_ActionFailed';
+import NO_HOURS_WARNING from '@salesforce/label/c.Volunteers_Signups_NoHoursWarning';
+import LOADING from '@salesforce/label/c.Volunteers_Loading';
 
 const STATUS_SIGNED_UP = 'Signed up';
 const STATUS_ATTENDED = 'Attended';
@@ -58,7 +59,8 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
     cancel: CANCEL,
     attended: ATTENDED,
     noShow: NO_SHOW,
-    empty: EMPTY
+    empty: EMPTY,
+    loading: LOADING
   };
 
   panel;
@@ -68,7 +70,10 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
   draftStatus = STATUS_SIGNED_UP;
   errorMessage;
   resultMessage;
+  resultIsWarning = false;
   focusTarget;
+  /** The first load is still running. */
+  loading = true;
 
   connectedCallback() {
     this.load();
@@ -91,11 +96,18 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
       })
       .catch((error) => {
         this.errorMessage = this.messageFrom(error);
+      })
+      .finally(() => {
+        this.loading = false;
       });
   }
 
   get loaded() {
     return !!this.panel;
+  }
+
+  get showSpinner() {
+    return this.loading || this.busy;
   }
 
   get canAdd() {
@@ -202,7 +214,7 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
       }),
       () => {
         this.resetForm();
-        return ADDED;
+        return { text: ADDED };
       }
     );
   }
@@ -246,24 +258,35 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
     return this.run(setStatus({ signupId, status }), (panel) => {
       const option = panel.statusOptions.find((candidate) => candidate.value === status);
       const changed = format(CHANGED, who, option ? option.label : status);
-      return panel.hoursWritten ? `${changed} ${HOURS_WRITTEN}` : changed;
+      if (panel.hoursWritten) {
+        return { text: `${changed} ${HOURS_WRITTEN}` };
+      }
+      // Attended with no hours entry at all (a shift with no end time, or the setting off):
+      // say so by name, because nothing else tells the coordinator the hours are missing.
+      if (status === STATUS_ATTENDED && !panel.hoursExist) {
+        return { text: `${changed} ${format(NO_HOURS_WARNING, who)}`, warning: true };
+      }
+      return { text: changed };
     });
   }
 
-  /** Runs one save, shows the panel it returns, and announces what happened. */
+  /**
+   * Runs one save, shows the panel it returns, and announces what happened once, in the status
+   * region (a failure in the alert region); a toast as well would be read out twice.
+   */
   run(call, describe) {
     this.busy = true;
     this.errorMessage = undefined;
     return call
       .then((panel) => {
         this.panel = panel;
-        this.resultMessage = describe(panel);
-        Toast.show({ label: this.resultMessage, variant: 'success' }, this);
+        const outcome = describe(panel);
+        this.resultMessage = outcome.text;
+        this.resultIsWarning = outcome.warning === true;
         this.focusTarget = 'result';
       })
       .catch((error) => {
         this.errorMessage = this.messageFrom(error);
-        Toast.show({ label: this.errorMessage, variant: 'error' }, this);
         this.focusTarget = 'error-message';
       })
       .finally(() => {

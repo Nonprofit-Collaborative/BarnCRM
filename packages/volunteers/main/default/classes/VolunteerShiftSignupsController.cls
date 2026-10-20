@@ -64,6 +64,9 @@ public with sharing class VolunteerShiftSignupsController {
         /** After a status change: whether an hours entry for the sign-up appeared. */
         @AuraEnabled
         public Boolean hoursWritten = false;
+        /** After a status change: whether the sign-up has any hours entry at all. */
+        @AuraEnabled
+        public Boolean hoursExist = false;
     }
 
     /** Not cacheable: the panel changes with every sign-up. */
@@ -129,7 +132,9 @@ public with sharing class VolunteerShiftSignupsController {
                 AccessLevel.USER_MODE
             );
             Panel panel = panelFor(signup.Volunteer_Shift__c);
-            panel.hoursWritten = VolunteerSignupSelector.countHoursFor(signupId) > hoursBefore;
+            Integer hoursAfter = VolunteerSignupSelector.countHoursFor(signupId);
+            panel.hoursWritten = hoursAfter > hoursBefore;
+            panel.hoursExist = hoursAfter > 0;
             return panel;
         } catch (AuraHandledException refused) {
             throw refused;

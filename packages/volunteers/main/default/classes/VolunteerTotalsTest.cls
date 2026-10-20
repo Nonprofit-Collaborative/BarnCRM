@@ -398,7 +398,9 @@ private class VolunteerTotalsTest {
             new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User', 'Volunteers_Coordinator' }
         );
         Contact person = rivera();
-        Volunteer_Hours__c hours = entry(person.Id, 3, Date.today());
+        // One day for the entry and the check: the admin user's time zone can be a day ahead.
+        Date worked = Date.today();
+        Volunteer_Hours__c hours = entry(person.Id, 3, worked);
         System.runAs(admin()) {
             update new Contact(Id = person.Id, OwnerId = coordinator.Id);
             insert hours;
@@ -420,7 +422,7 @@ private class VolunteerTotalsTest {
         System.runAs(admin()) {
             Contact after = rivera();
             Assert.areEqual(3, after.Volunteer_Hours_Total__c, 'The person\'s total moved');
-            Assert.areEqual(Date.today(), after.Last_Volunteer_Date__c, 'And the latest day');
+            Assert.areEqual(worked, after.Last_Volunteer_Date__c, 'And the latest day');
             Assert.areEqual(3, account(after.AccountId).Volunteer_Hours_Total__c, 'Household');
             Assert.areEqual(3, job().Total_Hours__c, 'And the job');
         }

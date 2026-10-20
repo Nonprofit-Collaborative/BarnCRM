@@ -17,8 +17,11 @@ public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
     /** The rows noted before delete, by the record being deleted, until after delete. */
     private static Map<Id, Set<Id>> notedByPerson = new Map<Id, Set<Id>>();
     /**
-     * Rows already deleted in this transaction: an account's contacts are deleted with it, and
-     * should their triggers run too, a row is not deleted twice.
+     * Rows already deleted in this pass of the delete: an account's contacts are deleted with it,
+     * and should their triggers run too, a row is not deleted twice. Cleared at the start of
+     * every before delete, because the platform retries a batch whose other rows failed (partial
+     * success): the first pass is rolled back, its rows are back, and a retained set would make
+     * the retry skip them.
      */
     private static Set<Id> deleted = new Set<Id>();
 
@@ -32,9 +35,10 @@ public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
     }
 
     public override void beforeDelete() {
+        deleted = new Set<Id>();
         Set<Id> contactIds = new Set<Id>();
         Set<Id> accountIds = new Set<Id>();
-        for (SObject person : Trigger.old) {
+        for (SObject person : oldRecordsById().values()) {
             if (person.getSObjectType() == Contact.SObjectType) {
                 contactIds.add(person.Id);
             } else {
@@ -48,7 +52,7 @@ public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
 
     public override void afterDelete() {
         Set<Id> toDelete = new Set<Id>();
-        for (SObject person : Trigger.old) {
+        for (SObject person : oldRecordsById().values()) {
             Set<Id> noted = notedByPerson.remove(person.Id);
             if (noted != null && person.get('MasterRecordId') == null) {
                 toDelete.addAll(noted);

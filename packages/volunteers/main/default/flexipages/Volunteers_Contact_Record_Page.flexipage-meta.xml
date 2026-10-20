@@ -325,6 +325,9 @@
               <value>Contact.Log_Interaction</value>
             </valueListItems>
             <valueListItems>
+              <value>Contact.Volunteer_Letter</value>
+            </valueListItems>
+            <valueListItems>
               <value>Contact.Erase_Person</value>
               <visibilityRule>
                 <criteria>

@@ -5,7 +5,8 @@
  * (R-SSC6).
  *
  * Queuing never fails a save: with no queueable job left in the transaction, or the module
- * turned off, nothing is queued and the nightly run creates the shifts instead.
+ * turned off, nothing is queued and the nightly run creates the shifts instead, and removes
+ * those of a schedule the save marked Rebuild Pending (R-SSC6).
  */
 public with sharing class ShiftScheduleGenerator implements Queueable {
     private static final String LOG_CONTEXT = 'ShiftScheduleGenerator';

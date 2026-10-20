@@ -3,6 +3,7 @@
   <fullName>Letter_Type__c</fullName>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>
+  <inlineHelpText>The type the shipped template is installed as, Hours letter or Certificate.</inlineHelpText>
   <label>Letter Type</label>
   <length>40</length>
   <required>true</required>

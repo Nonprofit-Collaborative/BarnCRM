@@ -2,11 +2,33 @@
   <div class="slds-p-around_medium">
     <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
 
+    <template lwc:if={isLoading}>
+      <div class="slds-is-relative slds-p-around_large" data-id="loading">
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </div>
+    </template>
+    <template lwc:if={working}>
+      <div class="slds-is-relative slds-p-around_medium" data-id="working">
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </div>
+    </template>
+
     <template lwc:if={blocker}>
       <p role="alert" class="slds-text-color_error" data-id="blocker">{blocker}</p>
     </template>
 
     <template lwc:if={showForm}>
+      <template lwc:if={showLegalNameWarning}>
+        <p class="slds-text-color_weak slds-m-bottom_small" data-id="legal-name-warning">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="x-small"
+            alternative-text=""
+            class="slds-m-right_x-small"
+          ></lightning-icon>
+          {labels.noLegalName}
+        </p>
+      </template>
       <lightning-combobox
         data-id="template"
         label={labels.template}

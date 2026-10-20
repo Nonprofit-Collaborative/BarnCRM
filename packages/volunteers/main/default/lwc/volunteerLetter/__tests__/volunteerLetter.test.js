@@ -4,6 +4,9 @@ import VolunteerLetter from 'c/volunteerLetter';
 import getActionContext from '@salesforce/apex/VolunteerLetterController.getActionContext';
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
+import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
+import ACTION_FAILED from '@salesforce/label/c.Volunteers_Letter_ActionFailed';
+import NO_ACTIVE_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
 
 jest.mock(
   '@salesforce/apex/VolunteerLetterController.getActionContext',
@@ -131,6 +134,71 @@ describe('c-volunteer-letter', () => {
 
     expect(generateLetter).toHaveBeenCalled();
     expect(toast.mock.calls[0][0].variant).toBe('success');
+  });
+
+  it('shows a spinner until the first answer arrives', async () => {
+    const element = build();
+    expect(find(element, 'loading')).not.toBeNull();
+    getActionContext.emit(READY);
+    await flush();
+    expect(find(element, 'loading')).toBeNull();
+  });
+
+  it('refuses a From date after the To date inline, with no server call', async () => {
+    const element = build();
+    getActionContext.emit(READY);
+    await flush();
+
+    find(element, 'from').dispatchEvent(
+      new CustomEvent('change', { detail: { value: '2026-04-01' } })
+    );
+    find(element, 'to').dispatchEvent(
+      new CustomEvent('change', { detail: { value: '2026-03-01' } })
+    );
+    find(element, 'preview-button').click();
+    await flush();
+    expect(find(element, 'notice').textContent).toBe(BAD_PERIOD);
+
+    find(element, 'generate').click();
+    await flush();
+    expect(find(element, 'notice').textContent).toBe(BAD_PERIOD);
+    expect(previewLetter).not.toHaveBeenCalled();
+    expect(generateLetter).not.toHaveBeenCalled();
+  });
+
+  it('says to ask an administrator when no template is active', async () => {
+    const element = build();
+    getActionContext.emit({ canManage: true, isPerson: true, templates: [] });
+    await flush();
+
+    expect(find(element, 'blocker').textContent).toBe(NO_ACTIVE_TEMPLATE);
+  });
+
+  it('warns before the letter when the organization legal name is blank', async () => {
+    const element = build();
+    getActionContext.emit({ ...READY, organizationNameBlank: true });
+    await flush();
+    expect(find(element, 'legal-name-warning')).not.toBeNull();
+  });
+
+  it('does not warn when the legal name is filled in', async () => {
+    const element = build();
+    getActionContext.emit({ ...READY, organizationNameBlank: false });
+    await flush();
+    expect(find(element, 'legal-name-warning')).toBeNull();
+  });
+
+  it('shows a plain sentence for an error with no readable message', async () => {
+    generateLetter.mockRejectedValue({ body: { message: { code: 500 } } });
+    const element = build();
+    getActionContext.emit(READY);
+    await flush();
+
+    find(element, 'generate').click();
+    await flush();
+
+    expect(find(element, 'notice').textContent).toBe(ACTION_FAILED);
+    expect(find(element, 'notice').textContent).not.toContain('[object Object]');
   });
 
   it('shows a refusal from the server', async () => {

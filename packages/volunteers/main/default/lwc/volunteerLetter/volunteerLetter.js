@@ -15,7 +15,11 @@ import CANCEL from '@salesforce/label/c.Volunteers_LetterAction_Cancel';
 import SAVED from '@salesforce/label/c.Volunteers_LetterAction_Saved';
 import NOT_A_PERSON from '@salesforce/label/c.Volunteers_Letter_NotAPerson';
 import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
-import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_TemplateNotFound';
+import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
+import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
+import ACTION_FAILED from '@salesforce/label/c.Volunteers_Letter_ActionFailed';
+import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalName';
+import LOADING from '@salesforce/label/c.Volunteers_Loading';
 
 /** A date as the lightning-input date value: yyyy-mm-dd, in the user's own day. */
 function isoDate(value) {
@@ -38,7 +42,9 @@ export default class VolunteerLetter extends LightningElement {
     toDate: TO_DATE,
     preview: PREVIEW,
     generate: GENERATE,
-    cancel: CANCEL
+    cancel: CANCEL,
+    loading: LOADING,
+    noLegalName: NO_LEGAL_NAME
   };
 
   context;
@@ -82,6 +88,16 @@ export default class VolunteerLetter extends LightningElement {
     return Boolean(this.context) && !this.blocker;
   }
 
+  /** The first answer has not arrived and nothing has failed yet. */
+  get isLoading() {
+    return !this.context && !this.notice;
+  }
+
+  /** Letters print the legal name; a blank one prints nothing, so say so before the letter. */
+  get showLegalNameWarning() {
+    return this.showForm && this.context.organizationNameBlank === true;
+  }
+
   get templateOptions() {
     return this.context ? this.context.templates : [];
   }
@@ -98,11 +114,13 @@ export default class VolunteerLetter extends LightningElement {
   handleFromChange(event) {
     this.fromDate = event.detail.value;
     this.previewBody = undefined;
+    this.notice = undefined;
   }
 
   handleToChange(event) {
     this.toDate = event.detail.value;
     this.previewBody = undefined;
+    this.notice = undefined;
   }
 
   handleCancel() {
@@ -130,9 +148,22 @@ export default class VolunteerLetter extends LightningElement {
     this.dispatchEvent(new CloseActionScreenEvent());
   }
 
+  /** True when the period can be sent; otherwise shows why, with no server call. */
+  periodIsValid() {
+    if (!this.fromDate || !this.toDate || this.fromDate > this.toDate) {
+      this.notice = BAD_PERIOD;
+      this.previewBody = undefined;
+      return false;
+    }
+    return true;
+  }
+
   async call(method) {
-    this.working = true;
     this.notice = undefined;
+    if (!this.periodIsValid()) {
+      return undefined;
+    }
+    this.working = true;
     try {
       return await method({
         recordId: this.recordId,
@@ -148,10 +179,15 @@ export default class VolunteerLetter extends LightningElement {
     }
   }
 
+  /** A readable sentence for any error shape, never "[object Object]". */
   messageOf(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
+    const body = error && error.body;
+    if (body && typeof body.message === 'string' && body.message) {
+      return body.message;
     }
-    return error && error.message ? error.message : String(error);
+    if (error && typeof error.message === 'string' && error.message) {
+      return error.message;
+    }
+    return ACTION_FAILED;
   }
 }

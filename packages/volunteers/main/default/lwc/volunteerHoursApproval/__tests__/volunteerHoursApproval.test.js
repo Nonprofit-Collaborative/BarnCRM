@@ -1,5 +1,4 @@
 import { createElement } from 'lwc';
-import Toast from 'lightning/toast';
 import VolunteerHoursApproval from 'c/volunteerHoursApproval';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
@@ -101,13 +100,23 @@ describe('c-volunteer-hours-approval', () => {
     expect(byId(element, 'caption')).not.toBeNull();
     const boxes = element.shadowRoot.querySelectorAll('.row-select');
     expect(boxes[0].label).toContain('Ana Rivera');
+    // The accessible name reads the date as a date, not as 2026-03-14.
+    expect(boxes[0].label).not.toContain('2026-03-14');
+    expect(boxes[0].label).toContain('Mar');
     expect(byId(element, 'approve').disabled).toBe(true);
+  });
+
+  it('shows a spinner while the list loads', async () => {
+    getHours.mockResolvedValue(pageOf([ANA]));
+    const element = build();
+    expect(byId(element, 'loading')).not.toBeNull();
+    await flush();
+    expect(byId(element, 'loading')).toBeNull();
   });
 
   it('approves the selected entries, announces the result and reloads', async () => {
     getHours.mockResolvedValue(pageOf([ANA, TOM]));
     approveHours.mockResolvedValue({ moved: 1, refused: [] });
-    const toasts = jest.spyOn(Toast, 'show');
     const element = build();
     await flush();
 
@@ -118,10 +127,6 @@ describe('c-volunteer-hours-approval', () => {
     await flush();
 
     expect(approveHours).toHaveBeenCalledWith({ hoursIds: [ANA.recordId] });
-    expect(toasts).toHaveBeenCalledWith(
-      expect.objectContaining({ label: 'Entries approved: 1.', variant: 'success' }),
-      expect.anything()
-    );
     expect(byId(element, 'result').textContent).toContain('Entries approved: 1.');
     expect(getHours).toHaveBeenCalledTimes(2);
   });
@@ -132,7 +137,6 @@ describe('c-volunteer-hours-approval', () => {
       moved: 0,
       refused: [{ recordId: ANA.recordId, message: 'Insufficient access.' }]
     });
-    const toasts = jest.spyOn(Toast, 'show');
     const element = build();
     await flush();
 
@@ -144,10 +148,6 @@ describe('c-volunteer-hours-approval', () => {
 
     expect(byId(element, 'refused-list').textContent).toContain('Ana Rivera');
     expect(byId(element, 'refused-list').textContent).toContain('Insufficient access.');
-    expect(toasts).toHaveBeenCalledWith(
-      expect.objectContaining({ variant: 'warning' }),
-      expect.anything()
-    );
   });
 
   it('asks for a reason before rejecting, and sends it', async () => {

@@ -1,6 +1,6 @@
 /**
- * The nightly run of every active schedule (R-SSC3), and the run a large save hands its
- * schedules to. Ten schedules per transaction (R-SSC6): a schedule on every weekday at the
+ * The nightly run of every active schedule (R-SSC3) and of every schedule marked Rebuild Pending
+ * (R-SSC6), and the run a large save hands its schedules to. Ten schedules per transaction (R-SSC6): a schedule on every weekday at the
  * longest horizon (26 weeks) creates 182 shifts, so a chunk stays far inside the 10,000 rows one
  * transaction may write, and every schedule gets its turn however many the org has.
  *
@@ -23,7 +23,7 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
     /** Null for the nightly run of every runnable schedule. */
     private final Set<Id> onlyIds;
 
-    /** The nightly run of every active schedule. */
+    /** The nightly run of every active schedule and every one marked Rebuild Pending. */
     public ShiftScheduleBatch() {
         this(null);
     }

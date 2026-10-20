@@ -3,6 +3,7 @@
   <fullName>Body__c</fullName>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>
+  <inlineHelpText>The HTML the shipped letter starts from, with the same tokens as a template's Body.</inlineHelpText>
   <label>Body</label>
   <length>32768</length>
   <type>LongTextArea</type>

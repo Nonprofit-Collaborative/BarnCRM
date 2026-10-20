@@ -10,14 +10,20 @@
  * change, whoever runs it.
  *
  * Shifts are created in user mode, as the person who saved the schedule or scheduled the nightly
- * run. Created Through, Shifts Kept and the removal of a schedule's own future shifts run in
- * system mode: they are the schedule's bookkeeping, read only in every permission set, and a
+ * run. Created Through, Shifts Kept, Rebuild Pending and the removal of a schedule's own future
+ * shifts run in system mode: they are the schedule's bookkeeping, read only in every permission set, and a
  * Coordinator or Staff user who may edit a schedule holds no delete on shifts.
  */
 public with sharing class ShiftScheduleService {
     public static final String MODULE_NAME = 'Volunteers';
     public static final String STATUS_OPEN = 'Open';
     public static final String STATUS_CANCELLED = 'Cancelled';
+
+    /**
+     * DML rows a save leaves unused for everything else in its transaction (the save's own rows,
+     * other triggers), before it removes shifts inline (R-SSC6).
+     */
+    private static final Integer ROW_RESERVE = 2000;
 
     private static final String NAME_FORMAT = 'd MMM yyyy, h:mm a';
     private static final Integer NAME_LENGTH = 80;
@@ -39,6 +45,9 @@ public with sharing class ShiftScheduleService {
     private static Datetime nowOverride;
     @TestVisible
     private static String timeZoneOverride;
+    /** Set by tests that cannot build the 10,000 shifts it takes to reach the real budget. */
+    @TestVisible
+    private static Integer inlineBudgetOverride;
 
     private static String orgTimeZone;
 
@@ -56,6 +65,7 @@ public with sharing class ShiftScheduleService {
             return 0;
         }
         List<Shift_Schedule__c> schedules = ShiftScheduleSelector.lockForRun(scheduleIds);
+        Map<Id, Shift_Schedule__c> bookkeeping = finishPendingRemovals(schedules);
         Date runDay = today();
         Date horizon = runDay.addDays(7 * VolunteerSettings.shiftHorizonWeeks());
         Datetime runStart = now();
@@ -65,7 +75,6 @@ public with sharing class ShiftScheduleService {
             toOrgDatetime(runDay, Time.newInstance(0, 0, 0, 0))
         );
         List<Volunteer_Shift__c> created = new List<Volunteer_Shift__c>();
-        List<Shift_Schedule__c> moved = new List<Shift_Schedule__c>();
         for (Shift_Schedule__c schedule : schedules) {
             if (schedule.Active__c != true) {
                 continue;
@@ -93,16 +102,54 @@ public with sharing class ShiftScheduleService {
                 }
                 created.add(shift);
             }
-            moved.add(new Shift_Schedule__c(Id = schedule.Id, Created_Through__c = untilDay));
+            if (!bookkeeping.containsKey(schedule.Id)) {
+                bookkeeping.put(schedule.Id, new Shift_Schedule__c(Id = schedule.Id));
+            }
+            bookkeeping.get(schedule.Id).Created_Through__c = untilDay;
         }
         if (!created.isEmpty()) {
             insert as user created;
         }
-        if (!moved.isEmpty()) {
-            // System mode: Created Through is read only in every permission set (29T).
-            update as system moved;
+        if (!bookkeeping.isEmpty()) {
+            // System mode: Created Through, Shifts Kept and Rebuild Pending are read only in
+            // every permission set (29T).
+            update as system bookkeeping.values();
         }
         return created.size();
+    }
+
+    /**
+     * R-SSC6: for the schedules a large save marked Rebuild Pending, removes the future shifts
+     * after Created Through as R-SSC4 and R-SSC5 say. The save cleared Created Through (a new
+     * pattern, or ended) or moved it back to the earlier End Date, and every run comes here
+     * before it moves it again, so Created Through is the day the save kept shifts through.
+     * Returns the schedules' bookkeeping: Shifts Kept recorded and the mark cleared.
+     */
+    private static Map<Id, Shift_Schedule__c> finishPendingRemovals(
+        List<Shift_Schedule__c> schedules
+    ) {
+        Map<Id, Date> keepThrough = new Map<Id, Date>();
+        for (Shift_Schedule__c schedule : schedules) {
+            if (schedule.Rebuild_Pending__c == true) {
+                keepThrough.put(schedule.Id, schedule.Created_Through__c);
+            }
+        }
+        Map<Id, Shift_Schedule__c> bookkeeping = new Map<Id, Shift_Schedule__c>();
+        if (keepThrough.isEmpty()) {
+            return bookkeeping;
+        }
+        Map<Id, Integer> kept = removeFutureShifts(keepThrough);
+        for (Id scheduleId : keepThrough.keySet()) {
+            bookkeeping.put(
+                scheduleId,
+                new Shift_Schedule__c(
+                    Id = scheduleId,
+                    Shifts_Kept__c = kept.get(scheduleId),
+                    Rebuild_Pending__c = false
+                )
+            );
+        }
+        return bookkeeping;
     }
 
     /**
@@ -140,12 +187,71 @@ public with sharing class ShiftScheduleService {
      * Removes the schedules' future shifts that have no sign-up or hours record and are not
      * Cancelled (R-SSC4, R-SSC5). A schedule mapped to a date keeps the shifts on or before that day (an
      * earlier End Date); one mapped to null loses every future shift. Returns, per schedule, how
-     * many shifts it would have removed but kept.
+     * many shifts it would have removed but kept because they have a sign-up or hours; a
+     * Cancelled shift is kept too but is not counted.
      */
     public static Map<Id, Integer> removeFutureShifts(Map<Id, Date> keepThrough) {
         Map<Id, Integer> kept = new Map<Id, Integer>();
+        deleteShifts(removableFutureShifts(keepThrough, kept));
+        return kept;
+    }
+
+    /**
+     * R-SSC5 and R-SSC6: the Ids of the shifts deleting these schedules removes, for a delete too
+     * large to remove them itself. Taken before the delete, which empties the shifts' link to
+     * their schedule (SetNull); `ShiftScheduleRemovalJob` removes them.
+     */
+    public static Set<Id> removableFutureShiftIds(Set<Id> scheduleIds) {
+        Map<Id, Date> keepThrough = new Map<Id, Date>();
+        for (Id scheduleId : scheduleIds) {
+            keepThrough.put(scheduleId, null);
+        }
+        return new Map<Id, Volunteer_Shift__c>(
+                removableFutureShifts(keepThrough, new Map<Id, Integer>())
+            )
+            .keySet();
+    }
+
+    /**
+     * Deletes those of these shifts that are still removable when the queued removal runs (R-SSC6):
+     * not yet started, not Cancelled, and with no sign-up or hours record, any of which may have
+     * changed since the save. Returns how many it deleted.
+     */
+    public static Integer removeShifts(Set<Id> shiftIds) {
+        if (shiftIds == null || shiftIds.isEmpty()) {
+            return 0;
+        }
+        Datetime cutoff = now();
+        List<Volunteer_Shift__c> future = new List<Volunteer_Shift__c>();
+        for (Volunteer_Shift__c shift : ShiftScheduleSelector.shiftsById(shiftIds)) {
+            if (shift.Start_Time__c > cutoff && shift.Status__c != STATUS_CANCELLED) {
+                future.add(shift);
+            }
+        }
+        Set<Id> booked = ShiftScheduleSelector.shiftsInUse(
+            new Map<Id, Volunteer_Shift__c>(future).keySet()
+        );
+        List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
+        for (Volunteer_Shift__c shift : future) {
+            if (!booked.contains(shift.Id)) {
+                removed.add(shift);
+            }
+        }
+        deleteShifts(removed);
+        return removed.size();
+    }
+
+    /**
+     * The schedules' future shifts R-SSC4 and R-SSC5 remove, as `removeFutureShifts` describes,
+     * counting into `kept`, per schedule, those kept for a sign-up or hours.
+     */
+    private static List<Volunteer_Shift__c> removableFutureShifts(
+        Map<Id, Date> keepThrough,
+        Map<Id, Integer> kept
+    ) {
+        List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
         if (keepThrough == null || keepThrough.isEmpty()) {
-            return kept;
+            return removed;
         }
         for (Id scheduleId : keepThrough.keySet()) {
             kept.put(scheduleId, 0);
@@ -167,20 +273,39 @@ public with sharing class ShiftScheduleService {
         Set<Id> booked = ShiftScheduleSelector.shiftsInUse(
             new Map<Id, Volunteer_Shift__c>(future).keySet()
         );
-        List<Volunteer_Shift__c> removed = new List<Volunteer_Shift__c>();
         for (Volunteer_Shift__c shift : future) {
-            if (booked.contains(shift.Id) || shift.Status__c == STATUS_CANCELLED) {
+            if (shift.Status__c == STATUS_CANCELLED) {
+                continue;
+            }
+            if (booked.contains(shift.Id)) {
                 kept.put(shift.Shift_Schedule__c, kept.get(shift.Shift_Schedule__c) + 1);
             } else {
                 removed.add(shift);
             }
         }
+        return removed;
+    }
+
+    private static void deleteShifts(List<Volunteer_Shift__c> removed) {
         if (!removed.isEmpty()) {
             // System mode: the schedule's own unbooked shifts, which a Coordinator or Staff user
             // who may edit the schedule cannot delete with their own access (29T).
             delete as system removed;
         }
-        return kept;
+    }
+
+    /**
+     * How many schedules a save may remove the future shifts of inline (R-SSC6): the DML rows
+     * still free in this transaction, less a reserve, over the most shifts one schedule can hold
+     * (every day to the horizon). An update marks the rest Rebuild Pending for the next run; a
+     * delete hands the rest to `ShiftScheduleRemovalJob`.
+     */
+    public static Integer inlineScheduleBudget() {
+        if (inlineBudgetOverride != null) {
+            return inlineBudgetOverride;
+        }
+        Integer free = Limits.getLimitDmlRows() - Limits.getDmlRows() - ROW_RESERVE;
+        return Math.max(0, free / (7 * VolunteerSettings.shiftHorizonWeeks()));
     }
 
     /** A Datetime for this local day and time in the org's time zone, across daylight saving. */

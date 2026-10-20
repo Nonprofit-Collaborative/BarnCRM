@@ -5,7 +5,7 @@
   <inlineHelpText>
     How many weeks ahead recurring schedules keep their shifts created. From 1 to 26; blank means 8.
   </inlineHelpText>
-  <label>Shift Horizon Weeks</label>
+  <label>Weeks Ahead to Create Shifts</label>
   <precision>2</precision>
   <required>false</required>
   <scale>0</scale>

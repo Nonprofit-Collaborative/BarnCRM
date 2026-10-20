@@ -4,7 +4,7 @@
   <defaultValue>1</defaultValue>
   <externalId>false</externalId>
   <inlineHelpText>1 for every week, 2 for every other week, and so on, counted from the week of the start date.</inlineHelpText>
-  <label>Every N Weeks</label>
+  <label>Repeat Every (Weeks)</label>
   <precision>2</precision>
   <required>true</required>
   <scale>0</scale>

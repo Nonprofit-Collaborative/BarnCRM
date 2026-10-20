@@ -29,7 +29,8 @@ public with sharing class ShiftScheduleSelector {
                 Volunteers_Needed__c,
                 Location__c,
                 Active__c,
-                Created_Through__c
+                Created_Through__c,
+                Rebuild_Pending__c
             FROM Shift_Schedule__c
             WHERE Id IN :scheduleIds
             WITH USER_MODE
@@ -37,14 +38,21 @@ public with sharing class ShiftScheduleSelector {
         ];
     }
 
-    /** Every schedule that may still create shifts, for the nightly batch. */
+    /**
+     * Every schedule that may still create shifts, and every one a large save left shifts to
+     * remove for (Rebuild Pending, R-SSC6), active or not, for the batch.
+     */
     public static Database.QueryLocator runnableLocator(Set<Id> onlyIds, Date today) {
         if (onlyIds == null) {
             return Database.getQueryLocator(
                 [
                     SELECT Id
                     FROM Shift_Schedule__c
-                    WHERE Active__c = TRUE AND (End_Date__c = NULL OR End_Date__c >= :today)
+                    WHERE
+                        (Active__c = TRUE
+                        AND (End_Date__c = NULL
+                        OR End_Date__c >= :today))
+                        OR Rebuild_Pending__c = TRUE
                     WITH USER_MODE
                     ORDER BY Id
                 ]
@@ -54,11 +62,21 @@ public with sharing class ShiftScheduleSelector {
             [
                 SELECT Id
                 FROM Shift_Schedule__c
-                WHERE Id IN :onlyIds AND Active__c = TRUE
+                WHERE Id IN :onlyIds AND (Active__c = TRUE OR Rebuild_Pending__c = TRUE)
                 WITH USER_MODE
                 ORDER BY Id
             ]
         );
+    }
+
+    /** These shifts as they are now: their start and status, for a queued removal (R-SSC6). */
+    public static List<Volunteer_Shift__c> shiftsById(Set<Id> shiftIds) {
+        return [
+            SELECT Id, Shift_Schedule__c, Start_Time__c, Status__c
+            FROM Volunteer_Shift__c
+            WHERE Id IN :shiftIds
+            WITH SYSTEM_MODE
+        ];
     }
 
     /** The schedules' shifts starting at or after `fromTime`: their schedule and start. */

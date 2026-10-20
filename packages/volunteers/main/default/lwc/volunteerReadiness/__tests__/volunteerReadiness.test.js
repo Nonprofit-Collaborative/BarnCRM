@@ -1,4 +1,6 @@
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages -- the test drives the getObjectInfo wire mock directly */
 import { createElement } from 'lwc';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import VolunteerReadiness from 'c/volunteerReadiness';
 import getReadiness from '@salesforce/apex/VolunteerReadinessController.getReadiness';
 import { refreshApex } from '@salesforce/apex';
@@ -84,6 +86,30 @@ describe('c-volunteer-readiness', () => {
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
+  it('shows a spinner while loading, but only to a user who can read requirements', async () => {
+    const element = render();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+
+    getObjectInfo.emit({ queryable: true });
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).not.toBeNull();
+
+    getReadiness.emit(READY);
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+  });
+
+  it('says there is nothing to track when no requirement types exist', async () => {
+    const element = render();
+    getReadiness.emit({ canSee: true, steps: [] });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.empty').textContent).toBe(
+      'c.Volunteers_Readiness_Empty'
+    );
+    expect(element.shadowRoot.querySelectorAll('li.step')).toHaveLength(0);
+  });
+
   it('lists each type with its latest step or Not started, and whether it is current', async () => {
     const element = render();
     getReadiness.emit(READY);
@@ -144,12 +170,45 @@ describe('c-volunteer-readiness', () => {
     expect(refreshApex).toHaveBeenCalled();
   });
 
-  it('says so when it cannot load', async () => {
+  it('says so, in a generic message, to a user who can see requirements when it cannot load', async () => {
     const element = render();
-    getReadiness.error();
+    getObjectInfo.emit({ queryable: true });
+    getReadiness.error({ body: { message: 'FIELD_CUSTOM_VALIDATION_EXCEPTION secret detail' } });
     await flush();
 
     const alert = element.shadowRoot.querySelector('[role="alert"]');
     expect(alert.textContent).toBe('c.Volunteers_Readiness_LoadFailed');
+    expect(element.shadowRoot.textContent).not.toContain('secret detail');
+  });
+
+  it('says so when the failure arrives before the permission answer', async () => {
+    const element = render();
+    getReadiness.error();
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+
+    getObjectInfo.emit({ queryable: true });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[role="alert"]')).not.toBeNull();
+  });
+
+  it('shows nothing when it cannot load for a user who cannot see requirements', async () => {
+    const element = render();
+    getObjectInfo.emit({ queryable: false });
+    getReadiness.error();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it('shows nothing when it cannot load and the object cannot be read at all', async () => {
+    const element = render();
+    getObjectInfo.error();
+    getReadiness.error();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 });

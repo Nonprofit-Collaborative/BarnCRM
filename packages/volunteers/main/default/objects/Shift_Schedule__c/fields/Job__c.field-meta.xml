@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Job__c</fullName>
   <externalId>false</externalId>
+  <inlineHelpText>The job whose shifts this schedule creates. A schedule stays with its job and cannot be moved to another.</inlineHelpText>
   <label>Job</label>
   <referenceTo>Volunteer_Job__c</referenceTo>
   <relationshipLabel>Shift Schedules</relationshipLabel>

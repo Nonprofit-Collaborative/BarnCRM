@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Volunteer_Shift__c</fullName>
   <externalId>false</externalId>
+  <inlineHelpText>The shift this person signed up for. A sign-up belongs to its shift.</inlineHelpText>
   <label>Volunteer Shift</label>
   <referenceTo>Volunteer_Shift__c</referenceTo>
   <relationshipLabel>Sign-ups</relationshipLabel>

@@ -3,7 +3,7 @@
   <fullName>Rollups_Last_Calculated__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>When BarnCRM last worked out the totals on this shift.</inlineHelpText>
-  <label>Rollups Last Calculated</label>
+  <label>Totals Last Updated</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>DateTime</type>

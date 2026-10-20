@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rebuild_Pending__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Set when a save changed or ended more schedules than it could remove shifts for itself; the next run removes this schedule's old future shifts and clears it (R-SSC6). Bookkeeping, not on the layout.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>BarnCRM is still replacing this schedule's future shifts after a large change. It clears itself; you never edit it.</inlineHelpText>
+  <label>Rebuild Pending</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

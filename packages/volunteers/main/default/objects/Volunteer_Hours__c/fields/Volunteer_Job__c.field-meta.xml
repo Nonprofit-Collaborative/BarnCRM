@@ -4,7 +4,7 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <externalId>false</externalId>
   <inlineHelpText>The job these hours were given to. Filled in from the shift when you pick one.</inlineHelpText>
-  <label>Volunteer Job</label>
+  <label>Job</label>
   <referenceTo>Volunteer_Job__c</referenceTo>
   <relationshipLabel>Volunteer Hours</relationshipLabel>
   <relationshipName>Volunteer_Hours</relationshipName>

@@ -1,5 +1,4 @@
 import { createElement } from 'lwc';
-import Toast from 'lightning/toast';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -40,6 +39,11 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Volunteers_Signups_MarkAttended',
   () => ({ default: 'Mark {0} attended' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Volunteers_Signups_NoHoursWarning',
+  () => ({ default: '{0} has no hours.' }),
   { virtual: true }
 );
 jest.mock(
@@ -125,7 +129,6 @@ describe('c-shift-signups', () => {
   it('adds a sign-up for the person chosen', async () => {
     getPanel.mockResolvedValue(panelOf([]));
     addSignup.mockResolvedValue(panelOf([ANA]));
-    const toasts = jest.spyOn(Toast, 'show');
     const element = build();
     await flush();
     expect(byId(element, 'empty-state')).not.toBeNull();
@@ -149,10 +152,46 @@ describe('c-shift-signups', () => {
     });
     expect(byId(element, 'add-form')).toBeNull();
     expect(byId(element, 'filled').textContent).toBe('1');
-    expect(toasts).toHaveBeenCalledWith(
-      expect.objectContaining({ variant: 'success' }),
-      expect.anything()
+    // Announced once, in the status region, not by a toast as well.
+    expect(byId(element, 'result-text').textContent).toContain('Volunteers_Signups_Added');
+    expect(byId(element, 'result-warning')).toBeNull();
+  });
+
+  it('shows a spinner while the panel loads', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA]));
+    const element = build();
+    expect(byId(element, 'loading')).not.toBeNull();
+    await flush();
+    expect(byId(element, 'loading')).toBeNull();
+  });
+
+  it('warns, naming the person, when Attended created no hours entry', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA]));
+    setStatus.mockResolvedValue(
+      panelOf([{ ...ANA, status: 'Attended' }], { hoursWritten: false, hoursExist: false })
     );
+    const element = build();
+    await flush();
+
+    element.shadowRoot.querySelector('.mark-attended').click();
+    await flush();
+
+    expect(byId(element, 'result-warning')).not.toBeNull();
+    expect(byId(element, 'result').textContent).toContain('Ana Rivera has no hours.');
+  });
+
+  it('does not warn when the sign-up already has an hours entry', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA]));
+    setStatus.mockResolvedValue(
+      panelOf([{ ...ANA, status: 'Attended' }], { hoursWritten: false, hoursExist: true })
+    );
+    const element = build();
+    await flush();
+
+    element.shadowRoot.querySelector('.mark-attended').click();
+    await flush();
+
+    expect(byId(element, 'result-warning')).toBeNull();
   });
 
   it('offers person accounts only where people are accounts', async () => {

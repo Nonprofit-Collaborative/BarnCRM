@@ -4,9 +4,9 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <externalId>false</externalId>
   <inlineHelpText>The coordinator who approved or rejected these hours. BarnCRM fills this in when the hours are approved or rejected.</inlineHelpText>
-  <label>Approved By</label>
+  <label>Reviewed By</label>
   <referenceTo>User</referenceTo>
-  <relationshipLabel>Approved Volunteer Hours</relationshipLabel>
+  <relationshipLabel>Reviewed Volunteer Hours</relationshipLabel>
   <relationshipName>Approved_Volunteer_Hours</relationshipName>
   <required>false</required>
   <trackTrending>false</trackTrending>

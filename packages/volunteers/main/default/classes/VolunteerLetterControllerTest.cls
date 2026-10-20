@@ -83,6 +83,67 @@ private class VolunteerLetterControllerTest {
     }
 
     @IsTest
+    static void anUnexpectedFailureIsLoggedAndShownAsAPlainSentence() {
+        String previewed;
+        Id template = hoursLetterId();
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            // No person at all is not something the screen can send; it must not leak a stack.
+            try {
+                VolunteerLetterController.preview(null, template, FROM_DATE, TO_DATE);
+            } catch (AuraHandledException shown) {
+                previewed = shown.getMessage();
+            }
+        }
+        Test.stopTest();
+
+        Assert.areEqual(Label.Volunteers_Letter_ActionFailed, previewed, 'Plain preview message.');
+        Assert.areEqual(
+            1,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c = 'Volunteer letter action'
+                WITH SYSTEM_MODE
+            ],
+            'The failure is logged.'
+        );
+    }
+
+    @IsTest
+    static void aTemplateNamedForItsTypeIsOfferedOnceAndTheLegalNameIsFlagged() {
+        Map<String, Object> blank;
+        Map<String, Object> filled;
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            update new Volunteer_Letter_Template__c(Id = hoursLetterId(), Name = 'Hours letter');
+        }
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            blank = VolunteerLetterController.getActionContext(personId());
+        }
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            settings.Auto_Create_Households__c = false;
+            settings.Organization_Legal_Name__c = 'Barn Org';
+            TestDataFactory.saveSettings(settings);
+        }
+        System.runAs(user(COORDINATOR)) {
+            filled = VolunteerLetterController.getActionContext(personId());
+        }
+        Test.stopTest();
+
+        Set<String> labels = new Set<String>();
+        for (Object offered : (List<Object>) blank.get('templates')) {
+            labels.add((String) ((Map<String, Object>) offered).get('label'));
+        }
+        Assert.isTrue(labels.contains('Hours letter'), 'The type is not repeated: ' + labels);
+        Assert.isTrue((Boolean) blank.get('organizationNameBlank'), 'No legal name is flagged.');
+        Assert.isFalse((Boolean) filled.get('organizationNameBlank'), 'A legal name is not.');
+    }
+
+    @IsTest
     static void staffAndHouseholdsAreToldWhyNot() {
         Map<String, Object> staff;
         Map<String, Object> household;
