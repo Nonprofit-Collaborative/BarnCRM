@@ -8,6 +8,9 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- Remote branches: deleted the #510 and #511 branches after their merges.
+- BMemory plan edited (commit d0b383ed): Section 11.3 item 10 marked done (#508 and #511). `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed.
+- `barn-npc` read-only checks for #510 ruled out other packages' triggers or flows on Contact and Account, and Contact field history, as the cause of the ImportUndoTest failure.
 - Remote branches: deleted the #503 to #508 branches after their merges.
 - BMemory plan edited (commits 8f78d7ec, f41ad2b2, 6d3ef6f1): D-108 amended (erasure deletes generated hour letters and certificates), Section 11.3 item 10 (Core-only coverage follow-up), Section 11.2 item 28 (Rejection Reason on erasure, open). `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed.
 - `barn-npc`: release validation of main ec8cf042 (0Afhk000001pzlyCAA) failed because 77 stale BarnCRM components deleted in #377 (AddressController, FieldUtilizationBatch and about 60 more classes) are still on the org and do not compile. A destructive cleanup is prepared (validation 0Afhk000001qEBNCA2, 3110 of 3114). Nothing deployed: waiting on owner approval and on the auto-mode permission check that blocks production deploys. The deploy should use main 342dfb0f or later.
@@ -22,6 +25,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main
 
+- #511 (squash 5ec9874e, gate `oi-test` 3,499 of 3,499): Core tests now cover HouseholdSelector 93%, CustomPermissionSelector 94%, HouseholdWriter 98%, DataManagerController 100% and PersonErasureController 100% from Core and Rollups tests alone (were 75 to 79%); `HouseholdSelector` gains a `@TestVisible` `describedObjectNamesOverride` test seam. Closes the Core-only coverage follow-up.
+- #510 (squash cc414cb0, gate `oi-pa` 3,469 of 3,469): `ImportUndoTest.anEditBeforeTheUndoIsNotHiddenByASaveTheUndoMakes` failed in the `barn-npc` release validation (probably earlier on `mwdbdevsb` too) because the test ran setup and every undo pass in one transaction; the undo's checks cap themselves at half of 100 SOQL, and `barn-npc`'s Contact has 124 child relationships against 76 on `oi-pa`, so its checks need more queries. The test now runs the remaining passes as their own job (`run.queueRest()` inside `Test.startTest`/`Test.stopTest`), as `GiftImportUndoTest` does. Product unchanged.
 - #508 (squash 342dfb0f, gate `oi-test` 3,469 of 3,469): Core tests cover AffiliationController 100%, ImportMatcher 96%, DataProtectionExtensions 100% and HouseholdDependentsExtensions 100% with Core and Rollups tests only; `ImportMatcher` ACCOUNT_*_FIELD are now `@TestVisible` non-final statics (test seam). Follow-up: HouseholdSelector 75%, CustomPermissionSelector 77%, HouseholdWriter 78%, DataManagerController 79%, PersonErasureController 79% Core-only.
 - #507 (squash ec8cf042, gate `oi-test` 3,455 of 3,455): QA follow-ups: erasure Files count, sample data retry, past shifts list.
 - #506 (squash 5ae2cc9a, gate `oi-pa` 3,451 of 3,451, coverage 92%): Volunteers QA fixes: Health Check, sample data removal, erasure. Erasure now deletes the hour letters and certificates BarnCRM generated for the person (system mode after the access check) and lists them as Deleted; other Files stay, listed as Kept (amends D-108); Rejection Reason is a Kept row. Sample data removal skips blockers and continues with a named Warning; horizon save and coordinator finding (excludes admins) fixed. Closed as landed: #504, #505.

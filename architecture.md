@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-20 (main at #508, 342dfb0f).
+Last verified 2026-10-20 (main at #511, 5ec9874e).
 
 ## Pointers
 
@@ -104,6 +104,8 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - In a class with a field named `label`, reference custom labels as `System.Label.X`.
 - `ALL ROWS` returns deleted records until they are physically removed.
 - Person-account orgs rename some child relationships; do not hard-code relationship names.
+- A test that runs many passes of a SOQL-capped job in one transaction can fail only in orgs with more child relationships on Contact (Nonprofit Cloud: 124 vs 76 on `oi-pa`; the undo checks cap at half of 100 SOQL). Run later passes as their own job between `Test.startTest` and `Test.stopTest` (#510).
+- Apex coverage on a scratch org accumulates across runs until the class is redeployed; redeploy a class before measuring its coverage.
 - `BarnCRM_Settings__c.Suite__c` accepts only `Community` or `Impact` (the API values of Standard and Nonprofit Edition); Setup edits are not audited. The edition is chosen once in first-run setup; first-run shows while `Suite__c` is blank (ADR-0124).
 - `Features_Turned_On__c`: blank means every feature on (upgraded org), `None` means a new install before setup, `NoneChosen` means setup finished with nothing turned on. Turning a feature on is one-way.
 - Turning Household Upkeep on queues `HouseholdCatchUpBatch` (contacts only; person accounts are not caught up, a roadmap follow-up). Tests that turn it on enqueue a batch (one `executeBatch` per test method).

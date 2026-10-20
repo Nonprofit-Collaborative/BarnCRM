@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-20 (through D-109; D-108 amended, open question 28 added).
+Last refreshed from BMemory 2026-10-20 (through D-109; D-108 amended, open question 28 added; Section 11.3 item 10 marked done).
 
 ## Decision log (plan Section 12)
 
