@@ -23,6 +23,40 @@ private class DataProtectionExtensionsTest {
         }
     }
 
+    /**
+     * Registers Core's own fake classes by name, as a module registers its class, so the lookup
+     * runs without any module installed. (A class nested in a test class cannot be found by
+     * name, so the fakes are top level: ExtensionFakeWorks and its siblings.)
+     */
+    @IsTest
+    static void aRegisteredClassIsFoundByNameAndAsked() {
+        DataProtectionExtensions.EXTENSION_CLASSES.clear();
+        DataProtectionExtensions.EXTENSION_CLASSES.add('ExtensionFakeWorks');
+
+        Assert.areEqual(
+            new Set<Schema.SObjectType>{ Relationship__c.SObjectType },
+            DataProtectionExtensions.protectedObjects(),
+            'The extension found by name answers'
+        );
+    }
+
+    @IsTest
+    static void aRegisteredClassThatIsNotAnExtensionOrCannotBeBuiltIsLoggedAndLeftOut() {
+        DataProtectionExtensions.EXTENSION_CLASSES.clear();
+        DataProtectionExtensions.EXTENSION_CLASSES.add('ExtensionFakeNotAnExtension');
+        DataProtectionExtensions.EXTENSION_CLASSES.add('ExtensionFakeUnbuildable');
+        DataProtectionExtensions.EXTENSION_CLASSES.add('ExtensionFakeWorks');
+        DataProtectionExtensions.EXTENSION_CLASSES.add('NoSuchClassAnywhere');
+
+        Set<Schema.SObjectType> objects = DataProtectionExtensions.protectedObjects();
+
+        Assert.areEqual(
+            new Set<Schema.SObjectType>{ Relationship__c.SObjectType },
+            objects,
+            'Only the working extension counts, and the broken ones do not stop it'
+        );
+    }
+
     @IsTest
     static void anObjectAnExtensionProtectsIsRefusedLikeCoresOwnBookkeeping() {
         DataProtectionExtensions.noneForTest = true;

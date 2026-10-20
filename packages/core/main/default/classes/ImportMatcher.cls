@@ -15,20 +15,29 @@ public with sharing class ImportMatcher {
     /** The separator between the parts of a composite key, chosen not to occur in a name. */
     private static final String KEY_SEPARATOR = '|~|';
 
-    private static final String ACCOUNT_EMAIL_FIELD = 'PersonEmail';
-    private static final String ACCOUNT_LAST_NAME_FIELD = 'LastName';
+    /**
+     * The account fields person matching reads. Not final only so a test can point them at
+     * standard Account fields and run the person account lookups in an org without person
+     * accounts (the Platform-only shape, ADR-0013). Production never changes them.
+     */
+    @TestVisible
+    private static String ACCOUNT_EMAIL_FIELD = 'PersonEmail';
+    @TestVisible
+    private static String ACCOUNT_LAST_NAME_FIELD = 'LastName';
     /**
      * A person account's own postal code: the one the importer writes a row's mailing postal
      * code to, and the one an address propagates to (R-AD3), so the key a person is created
      * with is the key they are found by (R-IB12).
      */
-    private static final String ACCOUNT_POSTAL_CODE_FIELD = 'PersonMailingPostalCode';
+    @TestVisible
+    private static String ACCOUNT_POSTAL_CODE_FIELD = 'PersonMailingPostalCode';
     /**
      * The billing postal code, also read: a person account loaded by another tool (NPSP, Data
      * Loader, by hand) often holds its postal code only there, and missing it would create
      * that person again.
      */
-    private static final String ACCOUNT_BILLING_POSTAL_CODE_FIELD = 'BillingPostalCode';
+    @TestVisible
+    private static String ACCOUNT_BILLING_POSTAL_CODE_FIELD = 'BillingPostalCode';
 
     /**
      * The labels of the fields the last lookup could not match on because the user may not

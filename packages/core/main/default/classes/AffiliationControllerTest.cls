@@ -50,4 +50,82 @@ private class AffiliationControllerTest {
             );
         }
     }
+
+    /**
+     * The org shape is stubbed, so the person account branch runs whether or not the org has
+     * Person Accounts: an account whose record type the shape calls a person type is the
+     * person end.
+     */
+    @IsTest
+    static void anAccountOfAPersonRecordTypeIsThePersonEnd() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Garcia Household');
+            Id recordTypeId = [SELECT RecordTypeId FROM Account WHERE Id = :orgs[0].Id]
+            .RecordTypeId;
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.personAccountRecordTypeIds = new Set<Id>{ recordTypeId };
+            OrgShapeDetector.overrideShape = shape;
+
+            Test.startTest();
+            AffiliationController.CardContext context = AffiliationController.getCardContext(
+                orgs[0].Id
+            );
+            Test.stopTest();
+
+            Assert.areEqual('Person_Account__c', context.ownerField, 'The person account is owner');
+            Assert.areEqual('Organization__c', context.otherEndField, 'An organization is added');
+        }
+    }
+
+    @IsTest
+    static void anOrganizationAccountInAPersonAccountOrgPicksPeopleThroughPersonAccounts() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            // A person type that is not this account's, so the account stays an organization.
+            shape.personAccountRecordTypeIds = new Set<Id>{ FakeIds.of(Account.SObjectType, 1) };
+            OrgShapeDetector.overrideShape = shape;
+            HouseholdService.personAccountOverride = true;
+
+            Test.startTest();
+            AffiliationController.CardContext context = AffiliationController.getCardContext(
+                orgs[0].Id
+            );
+            Test.stopTest();
+
+            Assert.areEqual('Organization__c', context.ownerField, 'The organization end');
+            Assert.areEqual('Person_Account__c', context.otherEndField, 'People are accounts here');
+        }
+    }
+
+    @IsTest
+    static void anOrganizationAccountInAContactOrgPicksPeopleThroughContacts() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            HouseholdService.personAccountOverride = false;
+
+            Test.startTest();
+            AffiliationController.CardContext context = AffiliationController.getCardContext(
+                orgs[0].Id
+            );
+            Test.stopTest();
+
+            Assert.areEqual('Organization__c', context.ownerField, 'The organization end');
+            Assert.areEqual('Contact__c', context.otherEndField, 'People are contacts here');
+        }
+    }
+
+    @IsTest
+    static void noRecordIsTreatedAsAContact() {
+        System.runAs(TestUsers.admin()) {
+            AffiliationController.CardContext context = AffiliationController.getCardContext(null);
+
+            Assert.areEqual('Contact__c', context.ownerField, 'The default is the person end');
+            Assert.areEqual('Organization__c', context.otherEndField, 'An organization is added');
+        }
+    }
 }

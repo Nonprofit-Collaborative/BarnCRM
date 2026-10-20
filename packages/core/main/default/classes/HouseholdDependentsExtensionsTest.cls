@@ -33,6 +33,65 @@ private class HouseholdDependentsExtensionsTest {
         }
     }
 
+    /**
+     * Registers Core's own fake classes (ExtensionFakeWorks and its siblings) by name, as
+     * modules register theirs, so the lookup by name runs without any module installed.
+     */
+    @IsTest
+    static void registeredClassesAreFoundByNameAndAnUnusableOneKeepsEveryHousehold() {
+        System.runAs(TestUsers.admin()) {
+            askRegisteredClasses();
+        }
+    }
+
+    private static void askRegisteredClasses() {
+        Set<Id> asked = new Set<Id>{
+            FakeIds.of(Account.SObjectType, 1),
+            FakeIds.of(Account.SObjectType, 2)
+        };
+        Test.startTest();
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.clear();
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.add('ExtensionFakeWorks');
+
+        Assert.isTrue(
+            HouseholdDependentsExtensions.householdsWithDependents(asked).isEmpty(),
+            'A working extension found by name that credits nothing keeps nothing'
+        );
+
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.clear();
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.add('NoSuchClassAnywhere');
+        Assert.isTrue(
+            HouseholdDependentsExtensions.householdsWithDependents(asked).isEmpty(),
+            'A class that is not installed is absent and asks nothing'
+        );
+
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.clear();
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.add('ExtensionFakeNotAnExtension');
+        Assert.areEqual(
+            asked,
+            HouseholdDependentsExtensions.householdsWithDependents(asked),
+            'A class that is not an extension keeps every household'
+        );
+
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.clear();
+        HouseholdDependentsExtensions.EXTENSION_CLASSES.add('ExtensionFakeUnbuildable');
+        Assert.areEqual(
+            asked,
+            HouseholdDependentsExtensions.householdsWithDependents(asked),
+            'A class that cannot be built keeps every household'
+        );
+        Test.stopTest();
+        Assert.areEqual(
+            2,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c LIKE 'HouseholdDependentsExtensions.resolve'
+            ],
+            'Each unusable class is logged'
+        );
+    }
+
     private static void onlyThisExtension(HouseholdDependentsExtension extension) {
         HouseholdDependentsExtensions.noneForTest = true;
         HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>();
