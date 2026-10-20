@@ -120,6 +120,8 @@ Nothing is broken today.
 | Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
+| Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
+| Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
 
 Five of those are new: the two fiscal years, and, with a module installed, the Override
 Receipt Lock permission, the failed receipts, the unposted gifts in a closed period (all
@@ -172,6 +174,7 @@ undone on their own page:
 | **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollup Builder, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Mirror. |
 | **Scheduled jobs belong to a deactivated person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
+| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (with Volunteers) | Gives each person the finding names the Volunteers set their role calls for, in the background, within about a minute. | Remove the permission set assignment in Setup. The nightly access check gives it back while the person holds the role, so take the role away on the Access page instead. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
 should be a BarnCRM Admin when nobody is, whether paused automation should resume, what

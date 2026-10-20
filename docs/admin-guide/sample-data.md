@@ -51,6 +51,31 @@ today or in two years and there are still gifts this year, last year and the yea
 No sample gift has a receipt number. Receipted gifts cannot be deleted, and everything here
 has to stay removable.
 
+### With Volunteers installed
+
+With the **Volunteers** package installed, the same action also loads, after Giving if it is
+there:
+
+| Records | How many | What is in them |
+|---|---|---|
+| Skills | 4 | First aid, Spanish, Forklift and Gardening, with the jobs that ask for them |
+| Jobs | 3 | Food pantry sort, Front desk and Community garden, each with a description and a location |
+| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as **Shift Horizon Weeks** says |
+| Shifts | 16, plus the schedule's | A morning shift for each job in each of the last four weeks, marked Completed, and four upcoming shifts on the front desk and in the garden |
+| Sign-ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
+| Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
+| Volunteer skills | 24 | One skill or interest on each of the 24 people |
+| Requirements | 8 | Six completed background checks and two orientations in progress |
+
+The hours get their statuses the way a coordinator gives them, so loading needs the **Manage
+Volunteers** permission (Volunteers Admin includes it). Without it the hours keep the status
+they were saved with: Submitted, or Approved when **Hours Require Approval** is off.
+
+The set does not generate a letter, because a letter is a file. To see one, open any sample
+volunteer with Approved hours and use the **Volunteer letter** action with the shipped Hours
+letter template ([Hour letters and certificates](volunteers.md#hour-letters-and-certificates)). Remove the file yourself afterwards: it is yours, not the
+loader's.
+
 ## 2. How to turn it on
 
 1. Open **BarnCRM Settings**.
@@ -125,7 +150,10 @@ household records, names, greetings, member counts, and Members panel.
    record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
    too, along with the household member records that joined people to households if your
-   org uses the flexible way. Anything you entered yourself is untouched.
+   org uses the flexible way. With Volunteers installed, its jobs, skills, schedule, shifts,
+  sign-ups, hours, volunteer skills and requirements go first: Approved sample hours are
+  reopened, then deleted, because an Approved entry cannot be deleted as it is. Anything you
+  entered yourself is untouched.
 
 ## 4. Common mistakes
 
@@ -155,6 +183,11 @@ household records, names, greetings, member counts, and Members panel.
   are contacts even where your own people are stored as accounts. That is a limit of the
   sample set, not of households: the households, memberships, names, greetings, and counts
   all work the same way they will with your own records.
+- **Recording your own hours against a sample job (with Volunteers).** Removal takes only
+  the hours of sample people. Hours you recorded for a real person on a sample job stay, so
+  that job cannot be deleted and removal stops there, with the reason in the Error Log. Move
+  those hours to a job of your own (or delete them), then select **Remove sample data**
+  again.
 - **Not having the permission.** If the **Load sample data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.
@@ -166,6 +199,7 @@ household records, names, greetings, member counts, and Members panel.
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
 | Sample Data checkbox on gifts, funds, appeals and commitments (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c` and `Commitment__c` |
+| Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
 | The join between a sample person and their household, flexible mode only | `Household_Member__c`, removed with the household it belongs to |
 | Allocations, soft credits and tributes on a sample gift | Details of the gift, removed with it; they carry no checkbox of their own |

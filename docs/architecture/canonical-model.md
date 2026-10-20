@@ -282,7 +282,9 @@ still credits records to it (ADR-0070,
 credited records through the Core extension point `HouseholdDependentsExtension`, found by
 class name the way Health Check finds its extensions; Giving reports every household that
 a Gift or a Commitment names in its Household field, because those lookups clear on delete
-and a gift keeps the household it was given to (R-G2). Such a household is kept without an
+and a gift keeps the household it was given to (R-G2); Volunteers reports every household
+that a Volunteer Hours entry names in its Household field, for the same reason (R-VG2). Such
+a household is kept without an
 Error Log entry: keeping a donor's past household is the ordinary outcome of a move, not
 something an administrator has to act on. "Empty" is
 measured in BarnCRM's own membership, which is the only membership BarnCRM can
@@ -7151,6 +7153,34 @@ the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coo
 Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
 the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
+**Health Check.** `VolunteersHealthCheckExtension`, registered in
+`HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds five findings to Core's one report,
+read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
+settings) and asked only of a viewer who may manage settings, and not at all while the module is
+turned off. Counts stop at 1,000 and the first five records are linked.
+
+| Key | Severity | Reports | Fix |
+|---|---|---|---|
+| `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
+| `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list. |
+| `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
+| `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold `Volunteers_Coordinator` neither directly nor through a group. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
+| `volunteer_rollups_off` | Info | Shipped volunteer totals (29O) whose definition is inactive. A missing one is Rollup Builder's `shipped_rollups_missing` finding, not reported twice. | Opens Rollup Builder. |
+
+**Sample data.** `VolunteersSampleData` implements Core's `SampleDataModule` and is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Giving (C-10). Its load, three stages of
+`SampleDataStageBatch`, builds three jobs and four skills flagged `Sample_Data__c` (29J, 29P),
+their job skills, one weekly schedule, sixteen one-off shifts (twelve past and Completed, four
+upcoming), sign-ups, hours, volunteer skills and requirements for up to 24 of Core's sample
+people (contacts, in either membership mode), and sets the hours' statuses with the approval
+verbs (R-VG5): the newest four Submitted, the next two Rejected, the rest Approved. Its removal,
+in `SampleDataRemoveBatch` before Giving's and Core's, deletes one chunk per stage: the hours of
+sample people on sample jobs (Approved ones reopened first, R-VG9), the sample jobs' shifts
+(sign-ups cascade) and schedules, the jobs (job skills cascade), the volunteer skills and
+requirements of sample people and skills, then the skills. An entry for a real person on a
+sample job is not sample data, so R-VJ1 refuses that job and the removal stops there. No letter
+is generated.
+
 ## 29I. Volunteer profile
 
 ### Definition
@@ -7237,6 +7267,7 @@ occurrence of it.
 | Total Hours | decimal | computed | Approved hours ever recorded against this job. |
 | Last Volunteer Date | date | computed | The most recent day anybody worked this job. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this job's totals. |
+| Sample Data | boolean | yes (defaults false) | Set by the sample data loader so Remove Sample Data finds the job and everything hanging off it. |
 
 ### Relationships
 
@@ -7272,6 +7303,7 @@ shift and changes nothing already recorded, including its totals.
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (v0.8) |
 
 - **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
   `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
@@ -7406,6 +7438,11 @@ them by hand (admin guide, volunteers page).
 **R-VU4 A cancelled sign-up stops counting.** Slots Filled counts sign-ups whose Status is not
 Cancelled, so someone who drops out frees the place without the booking being deleted.
 
+**R-VU5 Erasing the person keeps their sign-ups.** Erasing a person (Section 29H) keeps every
+sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Signed up or
+Confirmed on a shift that has not started is set to Cancelled, so the place is freed and nobody
+expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Signup__c`, name field AutoNumber `VS-{000000}`, sharing Controlled
@@ -7470,7 +7507,10 @@ record.
 **R-VG2 The household is derived.** From the person's household through `HouseholdService`,
 in both membership modes, as R-G2 does for a gift: set when the entry is saved, recomputed
 only when its person changes, empty when the person has no household. Hours stay with the
-household they were given in when the person later moves (ADR-0071).
+household they were given in when the person later moves (ADR-0071), and that household is
+kept by the empty household tidy-ups and an import undo while any entry names it, through
+`VolunteersHouseholdDependentsExtension` (R-H12, R-H12a). A household merge moves the entries
+to the household kept, by the platform's merge.
 
 **R-VG3 An entry names a job.** A validation rule requires the job or the shift; the module
 fills the job from the shift, so a shift deleted later leaves the hours with their job.
@@ -7517,6 +7557,17 @@ with nothing on record. The message says to reopen it (back to Submitted, which 
 `Manage_Volunteers`) and then delete it. A validation rule cannot block a delete, so the rule
 is Apex before the delete, in an automation that always runs (registry row
 `Volunteer_Hours_Delete_Guard`, ADR-0024): no switch or pause suspends it.
+
+**R-VG10 Erasing the person keeps their hours.** Erasing a person (Section 29H) keeps every
+entry naming them, with its status, date and hours, still credited to the anonymized person, so
+every total stands, as Giving keeps gifts (ADR-0110). Notes is emptied, as the user (R-ER5).
+Nothing else changes, so an Approved entry, locked by R-VG7 against a change of person, date or
+hours, is erased like any other. The five volunteer totals on the person (29O) are fields the
+module keeps (`fieldsToKeep`, R-ER1), as Core already keeps the target of every rollup the
+engine reports: naming them also covers a total whose definition the administrator deleted,
+which is read only to every user and would otherwise refuse the erasure. They are anonymous
+aggregates like a donor level, and emptying them would leave totals that disagree with the
+hours kept.
 
 ### Salesforce implementation
 
@@ -7676,6 +7727,7 @@ package ships no skills.
 | Name | text | yes | The skill as staff see it in pickers and filters. |
 | Description | long text | no | What the skill means here, for example which licence counts. |
 | Active | boolean | yes (defaults true) | Whether the skill is offered when a skill is added to a person or a job. |
+| Sample Data | boolean | yes (defaults false) | Set by the sample data loader so Remove Sample Data finds the skill. |
 
 ### Relationships
 
@@ -7697,6 +7749,7 @@ is retired, and a merge that moves a person's rows to the person kept is not ref
 |---|---|---|
 | Description | `Description__c` | Long Text Area (2000) |
 | Active | `Active__c` | Checkbox, default true |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (v0.8) |
 
 ---
 
@@ -7740,6 +7793,11 @@ skills are shown beside each name; they never filter.
 
 **R-VK4 Deleted with the person.** Deleting a person deletes their volunteer skills, as it
 deletes their requirements (R-VQ5 says how).
+
+**R-VK5 Erased with the person.** Erasing a person (Section 29H) deletes their volunteer skills
+and empties them from the Recycle Bin, as it does their requirements (R-VQ4): a skill or an
+interest is a fact about the person, like the availability the erasure empties on the person
+itself.
 
 ### Salesforce implementation
 
@@ -7869,9 +7927,13 @@ bypass stops it (R-A4).
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
 - **Erasure:** `VolunteersErasureExtension` implements `PersonErasureExtension` (R-ER8). It reads
-  the person's requirements in system mode, deletes them as the user (a user without access to
-  requirements is refused, R-ER5) and keeps no person field. Core adds the Ids of any records
-  an extension reports as Deleted to those it empties from the Recycle Bin after the commit.
+  the person's requirements, volunteer skills, hours and sign-ups in system mode
+  (`VolunteerErasureSelector`) and changes them as the user (a user without access to them is
+  refused, R-ER5): requirements and volunteer skills deleted (R-VQ4, R-VK5), hours and sign-ups
+  kept with their notes emptied (R-VG10, R-VU5), bookings on shifts still to come cancelled
+  (R-VU5). It keeps the five volunteer totals on the person (R-VG10). Core adds the Ids of any
+  records an extension reports as Deleted to those it empties from the Recycle Bin after the
+  commit.
 - **Person delete:** `VolunteerPersonDeleteHandler`, registered on Contact and on Account
   (`Automation_Registry.Volunteers_Person_Delete_Contact` and `..._Account`, order 20, Always
   Runs, `Module__c` Volunteers) and run by Core's own triggers. Before delete it notes the Ids
@@ -8016,7 +8078,8 @@ Cancelled.
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
 - **Health Check:** an active schedule whose Created Through is more than two days short of the
-  horizon (or End Date) is reported as "schedule horizon not filled".
+  horizon (or End Date) is reported as "schedule horizon not filled"
+  (`volunteer_schedule_horizon`, Part G "Health Check").
 
 ---
 
@@ -8216,7 +8279,6 @@ is closed deliberately rather than discovered.
 | Rule | Gap | Why it is open |
 |---|---|---|
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
-| 29T Health Check | No "schedule horizon not filled" finding yet: an active schedule whose nightly run stopped shows only as shifts missing ahead. Health Check does list the nightly schedule run when it is not scheduled. | The finding needs a Volunteers Health Check extension, which the module does not have yet; it follows V-07 as its own change. |
 
 Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
 mirrors the primary member).
@@ -8390,6 +8452,9 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers hardening. New field `Rebuild_Pending__c` on `Shift_Schedule__c` (29T), read only in every set, not on the layout. R-SSC6: a save that changes or ends many schedules removes shifts inline only within the transaction's DML rows and marks the rest Rebuild Pending, which every run (queued or nightly) finishes before creating shifts; a delete of many schedules queues the removal of the rest's shifts by Id (`ShiftScheduleRemovalJob`). R-SSC4 and R-SSC5: Shifts Kept counts only kept shifts with a sign-up or hours (Cancelled are not counted) and is cleared by a later save that changes neither pattern nor end. |
 | v0.8 | 2026-10-18 | V-05 readiness built (R-VQ3 restated as built). No object or field added. Volunteers ships `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page`, Core's person pages plus the readiness component and a Volunteer Profile field section (the 29I attributes and the 29O totals, 29I "Shown on the person"), assigned in the Volunteers app. |
 | v0.8 | 2026-10-18 | Volunteers QA and UX audit fixes. No object, field or API name added or changed; labels only: Approved By and Approved Date read Reviewed By and Reviewed Date, the job lookups on Volunteer Shift and Volunteer Hours read Job, `Shift_Horizon_Weeks__c` reads Weeks Ahead to Create Shifts, `Every_N_Weeks__c` reads Repeat Every (Weeks), and the job and shift `Rollups_Last_Calculated__c` read Totals Last Updated. Volunteers ships a page layout for `Volunteer_Letter_Template__c` (Name, Type, Active, Template Key, Body). `VolunteerReadinessController` is granted in all four sets; `VolunteerLetterController` only in Admin and Coordinator, since Staff and Read Only hold no template access (29U). |
+| v0.8 | 2026-10-18 | Volunteers lifecycle: erasure and household dependents. No object or field added. New rules R-VG10, R-VU5 and R-VK5: erasing a person keeps their hours and sign-ups with notes emptied, cancels their bookings on shifts still to come, deletes their volunteer skills, and keeps the five volunteer totals on the person even where no rollup definition reports them (`VolunteersErasureExtension`). R-H12 and R-VG2: `VolunteersHouseholdDependentsExtension`, registered in `HouseholdDependentsExtensions.EXTENSION_CLASSES`, keeps a household a Volunteer Hours entry names. |
+| v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: five findings from `VolunteersHealthCheckExtension`, registered in `HealthCheckExtensions.EXTENSION_CLASSES`, with one fix that queues the access sync. The 29T known gap ("schedule horizon not filled") is closed. |
+| v0.8 | 2026-10-18 | Volunteers sample data (C-10). `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Volunteer_Job__c` (29J) and `Skill__c` (29P), so the sample load's records can be found and removed in one action; shifts, schedules, sign-ups, job skills and hours are found through their job. Part G gains a Sample data paragraph: `VolunteersSampleData`, registered in `SampleDataModules.MODULE_CLASS_NAMES`. No object added. |
 
 ---
 ## 32. Entity ownership by package
