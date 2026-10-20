@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-20 (through D-109).
+Last refreshed from BMemory 2026-10-20 (through D-109; D-108 amended, open question 28 added).
 
 ## Decision log (plan Section 12)
 
@@ -115,7 +115,7 @@ Last refreshed from BMemory 2026-10-20 (through D-109).
 | D-105 | 2026-10-18 | Deleting a person removes that person's volunteer requirements and volunteer skills; merging two people keeps them (Volunteers V-05; taken as recommended by the integrator, owner may amend). |
 | D-106 | 2026-10-18 | Volunteers ships its own copies of the Core person pages (the ADR-0064 pattern), so the Volunteer Profile, readiness card and letter action appear on the Volunteers app's person pages; a copy can drift from Core's page (taken as recommended by the integrator, owner may amend). |
 | D-107 | 2026-10-18 | The Volunteers lapsing-volunteers report stays Contact-only, so it shows no rows in Person Account orgs; a report type has a single base object (taken as recommended by the integrator, owner may amend). |
-| D-108 | 2026-10-20 | Erasing a person leaves the hour letter and certificate PDFs (Files) for an admin to delete, as with Giving receipts; documented (taken as recommended by the integrator, owner may amend). |
+| D-108 | 2026-10-20 | Erasing a person deletes the hour letters and certificates BarnCRM generated for them (identified exactly, deleted in system mode after the access check) and lists them as Deleted; every other File stays, listed by Core as Kept (#506, amends the 2026-10-20 entry) (taken as recommended by the integrator, owner may amend). |
 | D-109 | 2026-10-20 | Removing sample data never deletes a real person's rows: sign-ups, hours and skills a real person holds on a sample shift or skill are kept, the sample job or skill stays, and removal stops with the reason in the Error Log (taken as recommended by the integrator, owner may amend). |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
@@ -133,6 +133,7 @@ D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the 
 - 23: A separate nonprofit app in Giving.
 - 24: Neutral labels for nonprofits: accepted 2026-10-14 (Brandon); the product-branded "BarnCRM ..." names stay (D-92).
 - 27: Plan corrections: resolved 2026-10-13, applied (D-80).
+- 28: Whether erasing a person also empties Rejection Reason on their volunteer hours (kept today, listed by Core as Kept, documented). Raised 2026-10-20.
 - Provisional (confirm when the owner tests): 8 primary person through the person contact, 9 guards only, 10 membership-mode switch guard only.
 
 ## Parking lot (plan Section 11.3)
