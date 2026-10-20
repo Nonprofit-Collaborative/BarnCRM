@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Past_Shifts_Still_Open</fullName>
+  <columns>NAME</columns>
+  <columns>Volunteer_Job__c</columns>
+  <columns>Start_Time__c</columns>
+  <columns>End_Time__c</columns>
+  <columns>Status__c</columns>
+  <columns>Slots_Filled__c</columns>
+  <filters>
+    <field>Status__c</field>
+    <operation>equals</operation>
+    <value>Open</value>
+  </filters>
+  <filters>
+    <field>End_Time__c</field>
+    <operation>lessThan</operation>
+    <value>TODAY</value>
+  </filters>
+  <filterScope>Everything</filterScope>
+  <label>Past Shifts Still Open</label>
+</ListView>

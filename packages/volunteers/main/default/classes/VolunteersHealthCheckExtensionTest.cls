@@ -86,11 +86,26 @@ private class VolunteersHealthCheckExtensionTest {
             Map<String, Object> open = finding('volunteer_past_shifts_open');
 
             Assert.isNotNull(open, 'The old Open shift is reported');
-            Assert.isTrue(((String) open.get('title')).startsWith('1 '), 'Only that one');
+            Assert.areEqual(
+                String.format(
+                    Label.Volunteers_HealthCheck_PastShiftsTitleOne,
+                    new List<Object>{ '1' }
+                ),
+                open.get('title'),
+                'Only that one, counted in the singular'
+            );
+            Assert.isTrue(
+                ((String) open.get('detail')).endsWith(Label.Volunteers_HealthCheck_FirstListedOne),
+                'One shift is linked, in the singular'
+            );
             Assert.areEqual(HealthCheckService.SEVERITY_INFO, open.get('severity'));
             Assert.isTrue(
-                ((String) open.get('fixTarget')).endsWith('/list'),
-                'The fix opens the shift list'
+                ((String) open.get('fixTarget'))
+                    .endsWith(
+                        '/list?filterName=' +
+                        NamespaceUtil.qualify(VolunteersHealthCheckExtension.PAST_SHIFTS_LIST_VIEW)
+                    ),
+                'The fix opens the past shifts still Open list view'
             );
         }
     }
@@ -204,6 +219,39 @@ private class VolunteersHealthCheckExtensionTest {
                 VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS
             );
             Assert.isFalse(after.contains(name), 'They hold the set now');
+        }
+    }
+
+    @IsTest
+    static void aCoordinatorHoldingVolunteersAdminIsNotReported() {
+        User coordinator;
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            List<PermissionSetGroup> groups = [
+                SELECT Id
+                FROM PermissionSetGroup
+                WHERE DeveloperName = 'Volunteer_Coordinator' AND Status = 'Updated'
+                LIMIT 1
+            ];
+            if (groups.isEmpty()) {
+                return; // The role is still being computed after a deploy.
+            }
+            coordinator = TestUsers.standardUserWith(
+                'Coordwithadmin',
+                new List<String>{ VolunteersTestData.ADMIN }
+            );
+            insert new PermissionSetAssignment(
+                AssigneeId = coordinator.Id,
+                PermissionSetGroupId = groups[0].Id
+            );
+        }
+        String name = [SELECT Name FROM User WHERE Id = :coordinator.Id].Name;
+        System.runAs(admin()) {
+            List<String> scope = new VolunteersHealthCheckExtension()
+                .fixScope(VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS);
+            Assert.isFalse(
+                scope.contains(name),
+                'Volunteers Admin can approve hours and work with shifts, so they are not missing it'
+            );
         }
     }
 

@@ -111,12 +111,15 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 
     /**
      * Queues a run for a schedule marked Rebuild Pending, active or not, and for an active
-     * schedule whose pattern changed, that was turned back on, or whose End Date moved. The run's
-     * own bookkeeping save clears the mark and queues nothing.
+     * schedule whose pattern changed, that was turned back on, whose End Date moved, or whose
+     * Created Through is short of the horizon (so opening and saving a schedule fills it now).
+     * The run's own bookkeeping save clears the mark and moves Created Through to the horizon or
+     * End Date, so it queues nothing.
      */
     public override void afterUpdate() {
         Map<Id, Shift_Schedule__c> oldById = (Map<Id, Shift_Schedule__c>) Trigger.oldMap;
         Set<Id> toRun = new Set<Id>();
+        Date horizon = null;
         for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
             Shift_Schedule__c old = oldById.get(schedule.Id);
             if (schedule.Rebuild_Pending__c == true) {
@@ -131,6 +134,14 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
                 patternChanged(schedule, old) ||
                 schedule.End_Date__c != old.End_Date__c
             ) {
+                toRun.add(schedule.Id);
+                continue;
+            }
+            if (horizon == null) {
+                horizon = ShiftScheduleService.today()
+                    .addDays(7 * VolunteerSettings.shiftHorizonWeeks());
+            }
+            if (isShortOfHorizon(schedule, horizon)) {
                 toRun.add(schedule.Id);
             }
         }
@@ -165,6 +176,25 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
             }
         }
         return false;
+    }
+
+    /**
+     * True when a run would still create days for this schedule: Created Through is before the
+     * last day a run fills (the horizon, or End Date when that is earlier) and that day has not
+     * passed. A schedule that starts after the horizon has nothing to fill yet.
+     */
+    private static Boolean isShortOfHorizon(Shift_Schedule__c schedule, Date horizon) {
+        Date untilDay = schedule.End_Date__c == null ||
+            schedule.End_Date__c > horizon
+            ? horizon
+            : schedule.End_Date__c;
+        if (untilDay < ShiftScheduleService.today()) {
+            return false;
+        }
+        if (schedule.Start_Date__c != null && schedule.Start_Date__c > untilDay) {
+            return false;
+        }
+        return schedule.Created_Through__c == null || schedule.Created_Through__c < untilDay;
     }
 
     private static Boolean endsEarlier(Shift_Schedule__c schedule, Shift_Schedule__c old) {

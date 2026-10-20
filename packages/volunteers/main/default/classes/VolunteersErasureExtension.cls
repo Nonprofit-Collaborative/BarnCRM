@@ -11,11 +11,13 @@
  * their hours and sign-ups. A booking on a shift still to come is cancelled, so nobody expects
  * the person and the place is freed. The person's onboarding requirements and their skills and
  * interests are deleted: a background check result lives nowhere else, and a skill or interest
- * is a fact about the person. Core empties deleted records from the Recycle Bin once the erasure
- * commits and the Erasure record lists them by Id only.
+ * is a fact about the person. The hour letters and certificates BarnCRM generated for the person
+ * are deleted too (amends D-108): they print the person's name. Core empties deleted records from
+ * the Recycle Bin once the erasure commits and the Erasure record lists them by Id only.
  *
  * Records are read in system mode, so one is found whoever may see it, and changed as the user
- * (R-ER5): a person erasing without access to them is refused rather than leaving them behind.
+ * (R-ER5): a person erasing without Volunteers Admin or Volunteers Coordinator is refused, with
+ * that reason, rather than leaving them behind.
  * Nothing here changes an entry's person, date or hours, so an Approved entry, which R-VG7 locks
  * against those changes, is erased like any other.
  *
@@ -52,22 +54,126 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
         };
     }
 
+    /**
+     * Reads everything the module holds about the person first, and refuses with a plain reason,
+     * before changing anything, a person erasing who lacks the Volunteers access the changes
+     * need. A person with no Volunteers records is erased by anyone Core allows.
+     */
     public List<PersonErasure.Change> erase(Id personId) {
         Boolean isContact = personId.getSObjectType() == Contact.SObjectType;
         Set<Id> contacts = isContact ? new Set<Id>{ personId } : new Set<Id>();
         Set<Id> accounts = isContact ? new Set<Id>() : new Set<Id>{ personId };
+        List<Volunteer_Hours__c> hours = VolunteerErasureSelector.hoursOf(contacts, accounts);
+        List<Volunteer_Signup__c> signups = VolunteerErasureSelector.signupsOf(contacts, accounts);
+        List<Volunteer_Skill__c> skills = VolunteerErasureSelector.skillsOf(contacts, accounts);
+        List<Volunteer_Requirement__c> requirements = VolunteerErasureSelector.requirementsOf(
+            contacts,
+            accounts
+        );
+        List<Id> letters = generatedLetters(personId);
+        if (
+            !(hours.isEmpty() &&
+            signups.isEmpty() &&
+            skills.isEmpty() &&
+            requirements.isEmpty() &&
+            letters.isEmpty())
+        ) {
+            requireVolunteersAccess();
+        }
         List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
-        changes.addAll(eraseHours(contacts, accounts));
-        changes.addAll(eraseSignups(contacts, accounts));
-        changes.addAll(deleteRows(VolunteerErasureSelector.skillsOf(contacts, accounts)));
-        changes.addAll(deleteRows(VolunteerErasureSelector.requirementsOf(contacts, accounts)));
+        changes.addAll(eraseHours(hours));
+        changes.addAll(eraseSignups(signups));
+        changes.addAll(deleteRows(skills));
+        changes.addAll(deleteRows(requirements));
+        changes.addAll(deleteLetters(letters));
         return changes;
     }
 
-    /** Hours are kept and counted; the notes typed on them are emptied as the user. */
-    private static List<PersonErasure.Change> eraseHours(Set<Id> contacts, Set<Id> accounts) {
+    /**
+     * The changes need Manage Volunteers (Volunteers Admin and Volunteers Coordinator hold it),
+     * edit on hours and sign-ups and delete on skills and requirements. Without them a user
+     * would be refused by the platform part way, with its own wording.
+     */
+    private static void requireVolunteersAccess() {
+        Boolean allowed =
+            VolunteerHoursService.canManage() &&
+            Schema.SObjectType.Volunteer_Hours__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Hours__c.fields.Notes__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Signup__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Signup__c.fields.Status__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Signup__c.fields.Notes__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Skill__c.isDeletable() &&
+            Schema.SObjectType.Volunteer_Requirement__c.isDeletable();
+        if (!allowed) {
+            throw new PersonErasure.ErasureException(Label.Volunteers_Erase_NeedVolunteersAccess);
+        }
+    }
+
+    /**
+     * The hour letters and certificates BarnCRM generated for the person (R-VL4): files saved
+     * under the letter file name, first published on the person, whose title starts as a letter
+     * template's letters do. Any other file is left to Core, which lists it as Kept.
+     */
+    private static List<Id> generatedLetters(Id personId) {
+        List<Id> letters = new List<Id>();
+        List<ContentDocumentLink> candidates = VolunteerErasureSelector.letterFilesOf(personId);
+        if (candidates.isEmpty()) {
+            return letters;
+        }
+        List<String> prefixes = new List<String>();
+        for (String templateName : VolunteerErasureSelector.letterTemplateNames()) {
+            prefixes.add(VolunteerLetterService.titlePrefix(templateName));
+        }
+        for (ContentDocumentLink candidate : candidates) {
+            String title = candidate.ContentDocument.Title;
+            for (String prefix : prefixes) {
+                if (title != null && title.startsWith(prefix)) {
+                    letters.add(candidate.ContentDocumentId);
+                    break;
+                }
+            }
+        }
+        return letters;
+    }
+
+    /**
+     * Deletes the generated letters (amends D-108): they print the person's name and hours. In
+     * system mode, because each file belongs to whoever generated it and a coordinator may not
+     * delete a colleague's file as themselves; only files identified exactly as generated
+     * letters are taken, and only after `requireVolunteersAccess`.
+     */
+    private static List<PersonErasure.Change> deleteLetters(List<Id> documentIds) {
+        if (documentIds.isEmpty()) {
+            return new List<PersonErasure.Change>();
+        }
+        new LetterRemover().remove(documentIds);
+        return new List<PersonErasure.Change>{
+            new PersonErasure.Change(
+                PersonErasure.DELETED,
+                Label.Volunteers_Erase_LettersLabel,
+                documentIds,
+                null
+            )
+        };
+    }
+
+    /** Deletes files whoever owns them; see `deleteLetters`. */
+    private without sharing class LetterRemover {
+        void remove(List<Id> documentIds) {
+            List<ContentDocument> documents = new List<ContentDocument>();
+            for (Id documentId : documentIds) {
+                documents.add(new ContentDocument(Id = documentId));
+            }
+            Database.delete(documents, true, AccessLevel.SYSTEM_MODE);
+        }
+    }
+
+    /**
+     * Hours are kept and counted; the notes typed on them are emptied as the user. A Rejection
+     * Reason is kept, and listed as kept.
+     */
+    private static List<PersonErasure.Change> eraseHours(List<Volunteer_Hours__c> entries) {
         List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
-        List<Volunteer_Hours__c> entries = VolunteerErasureSelector.hoursOf(contacts, accounts);
         if (entries.isEmpty()) {
             return changes;
         }
@@ -81,10 +187,24 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
             )
         );
         List<Volunteer_Hours__c> cleared = new List<Volunteer_Hours__c>();
+        Integer withReason = 0;
         for (Volunteer_Hours__c entry : entries) {
             if (String.isNotBlank(entry.Notes__c)) {
                 cleared.add(new Volunteer_Hours__c(Id = entry.Id, Notes__c = null));
             }
+            if (String.isNotBlank(entry.Rejection_Reason__c)) {
+                withReason++;
+            }
+        }
+        if (withReason > 0) {
+            changes.add(
+                new PersonErasure.Change(
+                    PersonErasure.KEPT,
+                    objectLabel,
+                    withReason,
+                    Label.Volunteers_Erase_RejectionReasonKept
+                )
+            );
         }
         if (!cleared.isEmpty()) {
             Database.update(cleared, true, AccessLevel.USER_MODE);
@@ -104,9 +224,8 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
      * Sign-ups are kept and counted; their notes are emptied, and a booking on a shift that has
      * not started is cancelled, in one save as the user.
      */
-    private static List<PersonErasure.Change> eraseSignups(Set<Id> contacts, Set<Id> accounts) {
+    private static List<PersonErasure.Change> eraseSignups(List<Volunteer_Signup__c> signups) {
         List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
-        List<Volunteer_Signup__c> signups = VolunteerErasureSelector.signupsOf(contacts, accounts);
         if (signups.isEmpty()) {
             return changes;
         }

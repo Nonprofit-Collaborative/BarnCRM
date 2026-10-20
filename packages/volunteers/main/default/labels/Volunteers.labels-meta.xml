@@ -782,7 +782,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Nightly jobs: the shift schedule run and when it runs</shortDescription>
-        <value>Volunteer shift schedules, 3:00 AM</value>
+        <value>Volunteer Schedules, 3:00 AM</value>
     </labels>
     <labels>
         <fullName>Volunteers_Schedules_SkippedTurnedOff</fullName>
@@ -889,6 +889,14 @@
         <value>The first {0} are linked below.</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_FirstListedOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check example record when there is only one</shortDescription>
+        <value>It is linked below.</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingTitle</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -897,12 +905,28 @@
         <value>{0} volunteer hours entries have waited more than {1} days for approval</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_HoursWaitingTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Hours waiting for approval title, one entry; {0} is 1, {1} the days</shortDescription>
+        <value>{0} volunteer hours entry has waited more than {1} days for approval</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingDetail</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: hours waiting for approval, why and how to fix</shortDescription>
         <value>Hours count in no total and no letter until a coordinator approves them, so these volunteers look as if they gave less time than they did. Open Approve Hours, choose Submitted, and approve each entry, or reject it with a reason when it is wrong.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_HoursWaitingDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: one hours entry waiting for approval, why and how to fix</shortDescription>
+        <value>Hours count in no total and no letter until a coordinator approves them, so this volunteer looks as if they gave less time than they did. Open Approve Hours, choose Submitted, and approve the entry, or reject it with a reason when it is wrong.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingFix</fullName>
@@ -921,6 +945,14 @@
         <value>{0} past shifts are still Open</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_PastShiftsTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Past shifts still Open title, one shift; {0} is 1</shortDescription>
+        <value>{0} past shift is still Open</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsDetail</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -929,11 +961,19 @@
         <value>These shifts ended more than {0} days ago and nobody closed them. That usually means attendance was never marked, so the people who came have no hours recorded. Open each shift, mark who came on its Sign-ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_PastShiftsDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One past shift still Open, why and how to fix; {0} is the days</shortDescription>
+        <value>This shift ended more than {0} days ago and nobody closed it. That usually means attendance was never marked, so the people who came have no hours recorded. Open the shift, mark who came on its Sign-ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsFix</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check: button that opens the shift list</shortDescription>
+        <shortDescription>Health Check: button that opens the past shifts still Open list view</shortDescription>
         <value>Open the shift list</value>
     </labels>
     <labels>
@@ -945,12 +985,28 @@
         <value>{0} shift schedules have not created shifts far enough ahead</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_HorizonTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Schedule horizon not filled title, one schedule; {0} is 1</shortDescription>
+        <value>{0} shift schedule has not created shifts far enough ahead</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_HorizonDetail</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>These active schedules should have shifts {0} weeks ahead (Volunteer Settings) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
+        <value>These active schedules should have shifts {0} weeks ahead (Weeks ahead to create shifts, Volunteer Settings) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_HorizonDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
+        <value>This active schedule should have shifts {0} weeks ahead (Weeks ahead to create shifts, Volunteer Settings) but stops more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill the schedule now, open it and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
@@ -961,12 +1017,28 @@
         <value>{0} volunteer coordinators do not have the Volunteers Coordinator permission set</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One coordinator missing their set title; {0} is 1</shortDescription>
+        <value>{0} volunteer coordinator does not have the Volunteers Coordinator permission set</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessDetail</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Coordinators missing their set, why and how to fix; {1} is their names</shortDescription>
-        <value>These people hold the Coordinator role but not Volunteers Coordinator, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
+        <value>These people hold the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_CoordinatorAccessDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One coordinator missing their set, why and how to fix; {1} is the name</shortDescription>
+        <value>This person holds the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessFix</fullName>
@@ -993,12 +1065,28 @@
         <value>{0} shipped volunteer totals are turned off</value>
     </labels>
     <labels>
+        <fullName>Volunteers_HealthCheck_RollupsOffTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One volunteer total turned off title; {0} is 1</shortDescription>
+        <value>{0} shipped volunteer total is turned off</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffDetail</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Volunteer totals turned off, why and how to fix; {1} is their names</shortDescription>
         <value>These volunteer totals are inactive, so the fields they fill stop updating and the reports, list views and dashboard that use them go stale: {1}. If you turned them off on purpose, nothing is wrong. Otherwise open Rollup Builder, set each one Active, then choose Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_RollupsOffDetailOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One volunteer total turned off, why and how to fix; {1} is its name</shortDescription>
+        <value>This volunteer total is inactive, so the field it fills stops updating and the reports, list views and dashboard that use it go stale: {1}. If you turned it off on purpose, nothing is wrong. Otherwise open Rollup Builder, set it Active, then choose Recalculate.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffFix</fullName>
@@ -1023,5 +1111,117 @@
         <protected>false</protected>
         <shortDescription>Rejection reason on the sample hours entries that are rejected</shortDescription>
         <value>Entered twice: the same day is already recorded.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptShift</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample shift; {0} shift, {1} person, {2} what they have</shortDescription>
+        <value>Sample data removal kept the sample shift {0} because {1} has {2} on it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptHoursAndSignup</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: hours and a sign-up</shortDescription>
+        <value>hours and a sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptHours</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: hours</shortDescription>
+        <value>hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSignup</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: a sign-up</shortDescription>
+        <value>a sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptJobHours</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample job for real hours; {0} job, {1} person</shortDescription>
+        <value>Sample data removal kept the sample job {0} because {1} has hours on it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptJobShifts</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample job because a shift on it was kept; {0} job</shortDescription>
+        <value>Sample data removal kept the sample job {0} because a shift on it was kept.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSkillPerson</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample skill a real person has; {0} skill, {1} person</shortDescription>
+        <value>Sample data removal kept the sample skill {0} because {1} has it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSkillJob</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample skill a real job asks for; {0} skill, {1} job</shortDescription>
+        <value>Sample data removal kept the sample skill {0} because the job {1} asks for it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptNext</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What to do about sample records removal kept</shortDescription>
+        <value>Move or delete those records, then delete the kept sample records by hand: once the rest of the sample data is gone, Remove sample data is not offered.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptUnnamed</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stands in for a real person with no name on a kept sample record</shortDescription>
+        <value>a person outside the sample set</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_NotRemoved</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal could not delete a sample record; {0} is the platform reason</shortDescription>
+        <value>Sample data removal could not remove this record: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Erase_NeedVolunteersAccess</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase refused: the person erasing lacks the Volunteers access it needs</shortDescription>
+        <value>To erase a volunteer you also need Volunteers Admin or Volunteers Coordinator. Nothing was erased.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Erase_LettersLabel</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase preview and result: the hour letter files BarnCRM generated</shortDescription>
+        <value>Hour letters and certificates</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Erase_RejectionReasonKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: why the Rejection Reason on hours is kept</shortDescription>
+        <value>Rejection Reason kept: a coordinator wrote why the entry was refused, and only the approval screen changes it.</value>
     </labels>
 </CustomLabels>
