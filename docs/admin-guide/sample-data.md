@@ -154,7 +154,8 @@ household records, names, greetings, member counts, and Members panel.
   sign-ups, hours, volunteer skills and requirements go first: Approved sample hours are
   reopened, then deleted, because an Approved entry cannot be deleted as it is. Anything you
   entered yourself is untouched; where it hangs off a sample job, shift or skill, that sample
-  record stays too (see Common mistakes below).
+  record stays too, the rest of the set is still removed, and one Warning in the
+  [Error Log](error-log.md) names each sample record kept and why (see Common mistakes below).
 
 ## 4. Common mistakes
 
@@ -187,11 +188,15 @@ household records, names, greetings, member counts, and Members panel.
 - **Recording your own people on sample jobs, shifts or skills (with Volunteers).** Removal
   takes only the hours, sign-ups and volunteer skills of sample people. Hours you recorded for
   a real person on a sample job stay, and so does a sample shift a real person is signed up
-  for or has hours on, with that sign-up; that job cannot be deleted, so removal stops there,
-  with the reason in the Error Log. A real person given a sample skill keeps it, so that skill
-  cannot be deleted and removal stops at the skills the same way. Move those hours, sign-ups
-  and skills to a job, shift or skill of your own (or delete them), then select **Remove
-  sample data** again.
+  for or has hours on, with that sign-up, and that job. A real person given a sample skill
+  keeps it, and so does a job of your own that asks for one, so that skill stays too. Removal
+  keeps only those sample records and removes everything else, Core's and Giving's sample data
+  included. The Error Log then holds one Warning naming each one kept and why, for example
+  "Sample data removal kept the sample shift Front desk: 13 Oct 2026 because Rita Real has
+  hours and a sign-up on it." Move those hours, sign-ups and skills to a job, shift or skill
+  of your own (or delete them), then delete the kept sample shift, job or skill by hand (a
+  shift before its job). Once the rest of the sample data is gone the card shows **Not
+  loaded**, so **Remove sample data** is not offered for them.
 - **Not having the permission.** If the **Load sample data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.

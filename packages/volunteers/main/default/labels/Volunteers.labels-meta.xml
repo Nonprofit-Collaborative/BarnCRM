@@ -1112,4 +1112,92 @@
         <shortDescription>Rejection reason on the sample hours entries that are rejected</shortDescription>
         <value>Entered twice: the same day is already recorded.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptShift</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample shift; {0} shift, {1} person, {2} what they have</shortDescription>
+        <value>Sample data removal kept the sample shift {0} because {1} has {2} on it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptHoursAndSignup</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: hours and a sign-up</shortDescription>
+        <value>hours and a sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptHours</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: hours</shortDescription>
+        <value>hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSignup</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What a real person has on a kept sample shift: a sign-up</shortDescription>
+        <value>a sign-up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptJobHours</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample job for real hours; {0} job, {1} person</shortDescription>
+        <value>Sample data removal kept the sample job {0} because {1} has hours on it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptJobShifts</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample job because a shift on it was kept; {0} job</shortDescription>
+        <value>Sample data removal kept the sample job {0} because a shift on it was kept.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSkillPerson</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample skill a real person has; {0} skill, {1} person</shortDescription>
+        <value>Sample data removal kept the sample skill {0} because {1} has it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptSkillJob</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal kept a sample skill a real job asks for; {0} skill, {1} job</shortDescription>
+        <value>Sample data removal kept the sample skill {0} because the job {1} asks for it.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptNext</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What to do about sample records removal kept</shortDescription>
+        <value>Move or delete those records, then delete the kept sample records by hand: once the rest of the sample data is gone, Remove sample data is not offered.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_KeptUnnamed</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stands in for a real person with no name on a kept sample record</shortDescription>
+        <value>a person outside the sample set</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_SampleData_NotRemoved</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal could not delete a sample record; {0} is the platform reason</shortDescription>
+        <value>Sample data removal could not remove this record: {0}</value>
+    </labels>
 </CustomLabels>

@@ -7180,9 +7180,15 @@ sample people on sample jobs (Approved ones reopened first, R-VG9), the sample p
 sign-ups on the sample jobs' shifts, those shifts and schedules, the jobs (job skills cascade),
 the volunteer skills and requirements of sample people, then the skills. Only sample people's
 rows are taken. An entry for a real person on a sample job is not sample data, and a shift a
-real person is signed up for or has hours on is not deleted, so R-VJ1 refuses that job and the
-removal stops there. A real person's volunteer skill on a sample skill is kept the same way:
-the skill's Restrict lookup refuses deleting the skill. No letter is generated.
+real person is signed up for or has hours on is not deleted. Before deleting jobs and skills the
+removal reads which ones real records point at (a kept shift's job, a sample job with a real
+person's hours, a sample skill a real person's volunteer skill or a real job's job skill names),
+which R-VJ1 or the Restrict lookup would refuse, and leaves those out; every delete runs with
+partial success, and a record refused for any other reason is logged as a Warning and left, so
+one record never stops the removal. `finish()` logs one Warning (context
+`VolunteerSampleDataRemoveStages`) naming each kept shift, job and skill and why, then hands on,
+so Core's and Giving's sample data are still removed. Core's card then reads Not loaded, so the
+kept records are deleted by hand once their real rows are moved. No letter is generated.
 
 ## 29I. Volunteer profile
 
@@ -8464,6 +8470,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-18 | Volunteers Health Check. No object or field added. Part G gains a Health Check paragraph: five findings from `VolunteersHealthCheckExtension`, registered in `HealthCheckExtensions.EXTENSION_CLASSES`, with one fix that queues the access sync. The 29T known gap ("schedule horizon not filled") is closed. |
 | v0.8 | 2026-10-18 | Volunteers sample data (C-10). `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Volunteer_Job__c` (29J) and `Skill__c` (29P), so the sample load's records can be found and removed in one action; shifts, schedules, sign-ups, job skills and hours are found through their job. Part G gains a Sample data paragraph: `VolunteersSampleData`, registered in `SampleDataModules.MODULE_CLASS_NAMES`. No object added. |
 | v0.8 | 2026-10-20 | Volunteers QA fixes: Health Check and schedules. No object or field added. R-SSC3: an update of an active schedule whose Created Through is short of the horizon queues a run, so saving a schedule fills it. Health Check: the coordinator access finding leaves out Volunteers Admin holders; each finding reads in the singular for one; the past shifts finding opens the new `Volunteer_Shift__c` list view `Past_Shifts_Still_Open`; the nightly job reads "Volunteer Schedules, 3:00 AM". |
+| v0.8 | 2026-10-20 | Volunteers QA fixes: sample data removal. No object or field added. Removal leaves out the sample shifts, jobs and skills real records point at, deletes the rest with partial success, logs one Warning naming each kept record and why, and hands on, so Core's and Giving's sample data are still removed. |
 
 ---
 ## 32. Entity ownership by package

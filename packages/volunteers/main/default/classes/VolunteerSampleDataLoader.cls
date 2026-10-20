@@ -15,9 +15,11 @@
  * sign-ups, the sample jobs' shifts, schedules and jobs (their job skills go with them), the
  * volunteer skills and requirements of sample people, then the skills. Only sample people's rows
  * are taken. Hours a real person recorded against a sample job are not sample hours, and a shift
- * a real person is signed up for or has hours on is not deleted, so R-VJ1 then refuses that job
- * and the removal stops with that message in the Error Log. A real person's volunteer skill on a
- * sample skill stays in the same way: the skill's Restrict lookup refuses deleting the skill.
+ * a real person is signed up for or has hours on is not deleted. Removal leaves out the sample
+ * records such real rows point at (that shift, its job, a job with a real person's hours, a skill
+ * a real person or a real job holds), which R-VJ1 or a Restrict lookup would refuse, deletes the
+ * rest with partial success, and carries on to Core's removal. `logWhatWasKept`, at the end,
+ * names each kept record and why in one Warning in the Error Log.
  */
 public with sharing class VolunteerSampleDataLoader {
     /** How many of Core's sample people volunteer. */
@@ -31,6 +33,12 @@ public with sharing class VolunteerSampleDataLoader {
     /** Records deleted per removeNext() call. Tests lower it. */
     @TestVisible
     private static Integer removeChunkSize = 200;
+
+    /** The Error Log context of what removal kept or could not remove. */
+    private static final String REMOVE_CONTEXT = 'VolunteerSampleDataRemoveStages';
+
+    /** How many real rows of each kind the reads of what removal keeps take. */
+    private static final Integer KEPT_CAP = 200;
 
     private static final String JOB_PANTRY = 'Food pantry sort';
     private static final String JOB_DESK = 'Front desk';
@@ -298,7 +306,7 @@ public with sharing class VolunteerSampleDataLoader {
             removed = deleteAll(selector.scheduleIds(removeChunkSize));
         }
         if (removed == 0) {
-            removed = deleteAll(selector.jobIds(removeChunkSize));
+            removed = deleteAll(selector.jobIds(removeChunkSize, findKept(false).jobIds()));
         }
         if (removed == 0) {
             removed = deleteAll(selector.volunteerSkillIds(removeChunkSize));
@@ -307,9 +315,201 @@ public with sharing class VolunteerSampleDataLoader {
             removed = deleteAll(selector.requirementIds(removeChunkSize));
         }
         if (removed == 0) {
-            removed = deleteAll(selector.skillIds(removeChunkSize));
+            removed = deleteAll(selector.skillIds(removeChunkSize, findKept(true).skillIds()));
         }
         return removed;
+    }
+
+    /**
+     * Logs one Warning naming each sample record real records kept from removal, and why, and
+     * returns its message; null when nothing was kept. Run once, after the last stage.
+     */
+    public static String logWhatWasKept() {
+        Kept kept = findKept(true);
+        List<String> sentences = kept.sentences();
+        if (sentences.isEmpty()) {
+            return null;
+        }
+        sentences.add(Label.Volunteers_SampleData_KeptNext);
+        String message = String.join(sentences, ' ');
+        ErrorLogger.logMessage(message, REMOVE_CONTEXT, ErrorLogger.SEVERITY_WARNING);
+        return message;
+    }
+
+    /**
+     * The sample records real records point at. The shifts and jobs are read always; the skills
+     * only when asked, as they cost two more reads.
+     */
+    private static Kept findKept(Boolean withSkills) {
+        Kept kept = new Kept();
+        for (Volunteer_Signup__c signup : selector.realSignupsOnSampleShifts(KEPT_CAP)) {
+            kept.addShift(
+                signup.Volunteer_Shift__c,
+                signup.Volunteer_Shift__r.Name,
+                signup.Volunteer_Shift__r.Volunteer_Job__c,
+                signup.Volunteer_Shift__r.Volunteer_Job__r.Name,
+                personName(signup.Contact__r, signup.Account__r),
+                false
+            );
+        }
+        for (Volunteer_Hours__c entry : selector.realHoursOnSampleJobs(KEPT_CAP)) {
+            String person = personName(entry.Contact__r, entry.Account__r);
+            if (entry.Volunteer_Shift__r?.Volunteer_Job__r?.Sample_Data__c == true) {
+                kept.addShift(
+                    entry.Volunteer_Shift__c,
+                    entry.Volunteer_Shift__r.Name,
+                    entry.Volunteer_Shift__r.Volunteer_Job__c,
+                    entry.Volunteer_Shift__r.Volunteer_Job__r.Name,
+                    person,
+                    true
+                );
+            } else if (entry.Volunteer_Job__r?.Sample_Data__c == true) {
+                kept.addJobHours(entry.Volunteer_Job__c, entry.Volunteer_Job__r.Name, person);
+            }
+        }
+        if (withSkills) {
+            for (Volunteer_Skill__c row : selector.realVolunteerSkillsOnSampleSkills(KEPT_CAP)) {
+                kept.addSkill(
+                    row.Skill__c,
+                    row.Skill__r.Name,
+                    String.format(
+                        Label.Volunteers_SampleData_KeptSkillPerson,
+                        new List<Object>{
+                            row.Skill__r.Name,
+                            personName(row.Contact__r, row.Account__r)
+                        }
+                    )
+                );
+            }
+            for (Job_Skill__c row : selector.realJobSkillsOnSampleSkills(KEPT_CAP)) {
+                kept.addSkill(
+                    row.Skill__c,
+                    row.Skill__r.Name,
+                    String.format(
+                        Label.Volunteers_SampleData_KeptSkillJob,
+                        new List<Object>{ row.Skill__r.Name, row.Job__r.Name }
+                    )
+                );
+            }
+        }
+        return kept;
+    }
+
+    private static String personName(Contact contact, Account account) {
+        if (contact != null && String.isNotBlank(contact.Name)) {
+            return contact.Name;
+        }
+        if (account != null && String.isNotBlank(account.Name)) {
+            return account.Name;
+        }
+        return Label.Volunteers_SampleData_KeptUnnamed;
+    }
+
+    /** The sample shifts, jobs and skills real records keep, and who or what keeps each. */
+    private class Kept {
+        private final Map<Id, String> shiftNames = new Map<Id, String>();
+        /** For each kept shift, each real person on it, and whether they have hours there. */
+        private final Map<Id, Map<String, Boolean>> shiftPeople = new Map<Id, Map<String, Boolean>>();
+        /** For each kept shift and person, whether they have a sign-up there. */
+        private final Map<Id, Set<String>> shiftSignups = new Map<Id, Set<String>>();
+        private final Map<Id, String> jobNames = new Map<Id, String>();
+        private final Set<Id> jobsOfShifts = new Set<Id>();
+        private final Map<Id, Set<String>> jobHoursPeople = new Map<Id, Set<String>>();
+        private final Map<Id, String> skillNames = new Map<Id, String>();
+        private final Map<Id, Set<String>> skillReasons = new Map<Id, Set<String>>();
+
+        void addShift(
+            Id shiftId,
+            String shiftName,
+            Id jobId,
+            String jobName,
+            String person,
+            Boolean hours
+        ) {
+            shiftNames.put(shiftId, shiftName);
+            if (!shiftPeople.containsKey(shiftId)) {
+                shiftPeople.put(shiftId, new Map<String, Boolean>());
+                shiftSignups.put(shiftId, new Set<String>());
+            }
+            Map<String, Boolean> people = shiftPeople.get(shiftId);
+            people.put(person, hours || people.get(person) == true);
+            if (!hours) {
+                shiftSignups.get(shiftId).add(person);
+            }
+            jobNames.put(jobId, jobName);
+            jobsOfShifts.add(jobId);
+        }
+
+        void addJobHours(Id jobId, String jobName, String person) {
+            jobNames.put(jobId, jobName);
+            if (!jobHoursPeople.containsKey(jobId)) {
+                jobHoursPeople.put(jobId, new Set<String>());
+            }
+            jobHoursPeople.get(jobId).add(person);
+        }
+
+        void addSkill(Id skillId, String skillName, String reason) {
+            skillNames.put(skillId, skillName);
+            if (!skillReasons.containsKey(skillId)) {
+                skillReasons.put(skillId, new Set<String>());
+            }
+            skillReasons.get(skillId).add(reason);
+        }
+
+        Set<Id> jobIds() {
+            return jobNames.keySet();
+        }
+
+        Set<Id> skillIds() {
+            return skillNames.keySet();
+        }
+
+        /** One plain sentence per kept record and reason. */
+        List<String> sentences() {
+            List<String> result = new List<String>();
+            for (Id shiftId : shiftNames.keySet()) {
+                Map<String, Boolean> people = shiftPeople.get(shiftId);
+                for (String person : people.keySet()) {
+                    Boolean hours = people.get(person);
+                    Boolean signup = shiftSignups.get(shiftId).contains(person);
+                    String what = hours && signup
+                        ? Label.Volunteers_SampleData_KeptHoursAndSignup
+                        : hours
+                              ? Label.Volunteers_SampleData_KeptHours
+                              : Label.Volunteers_SampleData_KeptSignup;
+                    result.add(
+                        String.format(
+                            Label.Volunteers_SampleData_KeptShift,
+                            new List<Object>{ shiftNames.get(shiftId), person, what }
+                        )
+                    );
+                }
+            }
+            for (Id jobId : jobNames.keySet()) {
+                if (jobsOfShifts.contains(jobId)) {
+                    result.add(
+                        String.format(
+                            Label.Volunteers_SampleData_KeptJobShifts,
+                            new List<Object>{ jobNames.get(jobId) }
+                        )
+                    );
+                }
+                if (jobHoursPeople.containsKey(jobId)) {
+                    for (String person : jobHoursPeople.get(jobId)) {
+                        result.add(
+                            String.format(
+                                Label.Volunteers_SampleData_KeptJobHours,
+                                new List<Object>{ jobNames.get(jobId), person }
+                            )
+                        );
+                    }
+                }
+            }
+            for (Id skillId : skillNames.keySet()) {
+                result.addAll(skillReasons.get(skillId));
+            }
+            return result;
+        }
     }
 
     /** Reopens the Approved entries in the next chunk (R-VG9), then deletes the chunk. */
@@ -327,11 +527,41 @@ public with sharing class VolunteerSampleDataLoader {
         return deleteAll(new List<Id>(new Map<Id, Volunteer_Hours__c>(chunk).keySet()));
     }
 
+    /**
+     * Deletes these records with partial success and returns how many went. A record refused for
+     * a reason removal did not foresee is logged as a Warning and left, so one record never stops
+     * the removal; when none of them went, the next kind is started.
+     */
     private static Integer deleteAll(List<Id> ids) {
-        if (!ids.isEmpty()) {
-            Database.delete(ids, AccessLevel.USER_MODE);
+        if (ids.isEmpty()) {
+            return 0;
         }
-        return ids.size();
+        Integer deleted = 0;
+        List<String> problems = new List<String>();
+        List<Id> problemIds = new List<Id>();
+        List<Database.DeleteResult> results = Database.delete(ids, false, AccessLevel.USER_MODE);
+        for (Integer i = 0; i < results.size(); i++) {
+            if (results[i].isSuccess()) {
+                deleted++;
+            } else {
+                problems.add(
+                    String.format(
+                        Label.Volunteers_SampleData_NotRemoved,
+                        new List<Object>{ results[i].getErrors()[0].getMessage() }
+                    )
+                );
+                problemIds.add(ids[i]);
+            }
+        }
+        if (!problems.isEmpty()) {
+            ErrorLogger.logMessages(
+                problems,
+                problemIds,
+                REMOVE_CONTEXT,
+                ErrorLogger.SEVERITY_WARNING
+            );
+        }
+        return deleted;
     }
 
     // ------------------------------------------------------------------------- builders

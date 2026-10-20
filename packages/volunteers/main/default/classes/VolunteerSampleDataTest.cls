@@ -174,19 +174,30 @@ private class VolunteerSampleDataTest {
         }
     }
 
-    /** Runs the removal and returns the message of the delete a protection refused, or null. */
-    private static String removeUntilRefused() {
-        try {
-            removeEverything();
-        } catch (DmlException refused) {
-            return refused.getMessage();
-        }
-        return null;
+    /** The removal's Error Log entries, oldest first. */
+    private static List<Error_Log__c> removalLog() {
+        return [
+            SELECT Message__c, Severity__c
+            FROM Error_Log__c
+            WHERE Context__c = 'VolunteerSampleDataRemoveStages'
+            ORDER BY CreatedDate, Id
+        ];
+    }
+
+    private static String nameOf(Id recordId) {
+        return (String) Database.query(
+                'SELECT Name FROM ' + recordId.getSObjectType() + ' WHERE Id = :recordId'
+            )[0]
+            .get('Name');
     }
 
     private static Volunteer_Job__c sampleJob() {
+        return sampleJob('Sample job');
+    }
+
+    private static Volunteer_Job__c sampleJob(String name) {
         Volunteer_Job__c job = new Volunteer_Job__c(
-            Name = 'Sample job',
+            Name = name,
             Active__c = true,
             Sample_Data__c = true
         );
@@ -225,14 +236,70 @@ private class VolunteerSampleDataTest {
             Volunteer_Hours__c realHours = VolunteersTestData.newHours(realPerson.Id, job.Id, 2);
             realHours.Volunteer_Shift__c = worked.Id;
             insert realHours;
+            // A second sample job nothing real points at, with a shift a sample person was on.
+            Volunteer_Job__c spare = sampleJob('Spare sample job');
+            Volunteer_Shift__c spareShift = VolunteersTestData.newShift(
+                spare.Id,
+                VolunteersTestData.SHIFT_START,
+                3
+            );
+            insert spareShift;
+            insert VolunteersTestData.newSignup(spareShift.Id, sampler.Id);
+            String person = nameOf(realPerson.Id);
 
             Test.startTest();
-            String refusal = removeUntilRefused();
+            removeEverything();
+            String warning = VolunteerSampleDataLoader.logWhatWasKept();
             Test.stopTest();
 
+            Assert.areEqual(0, VolunteerSampleDataLoader.removeNext(), 'Nothing is left to take');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Volunteer_Job__c WHERE Id = :spare.Id],
+                'The rest is removed: a sample job nothing real points at goes'
+            );
+            List<Error_Log__c> log = removalLog();
+            Assert.areEqual(1, log.size(), 'One entry, and no refused delete: ' + log);
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, log[0].Severity__c);
+            Assert.areEqual(warning, log[0].Message__c, 'The warning is what was logged');
             Assert.isTrue(
-                refusal != null && refusal.contains(Label.Volunteers_Job_InUseNotDeletable),
-                'R-VJ1 keeps the job and the removal stops with its message: ' + refusal
+                warning.contains(
+                    String.format(
+                        Label.Volunteers_SampleData_KeptShift,
+                        new List<Object>{
+                            nameOf(booked.Id),
+                            person,
+                            Label.Volunteers_SampleData_KeptSignup
+                        }
+                    )
+                ),
+                'It names the booked shift and who is on it: ' + warning
+            );
+            Assert.isTrue(
+                warning.contains(
+                    String.format(
+                        Label.Volunteers_SampleData_KeptShift,
+                        new List<Object>{
+                            nameOf(worked.Id),
+                            person,
+                            Label.Volunteers_SampleData_KeptHours
+                        }
+                    )
+                ),
+                'It names the worked shift and who has hours there: ' + warning
+            );
+            Assert.isTrue(
+                warning.contains(
+                    String.format(
+                        Label.Volunteers_SampleData_KeptJobShifts,
+                        new List<Object>{ job.Name }
+                    )
+                ),
+                'It names the job kept with them: ' + warning
+            );
+            Assert.isTrue(
+                warning.endsWith(Label.Volunteers_SampleData_KeptNext),
+                'It says what to do'
             );
             Assert.areEqual(
                 1,
@@ -286,11 +353,55 @@ private class VolunteerSampleDataTest {
                 )
             };
 
+            // A real job asking for a second sample skill keeps it too; a third goes.
+            Skill__c asked = new Skill__c(Name = 'Asked skill', Active__c = true);
+            asked.Sample_Data__c = true;
+            Skill__c unused = new Skill__c(Name = 'Unused skill', Active__c = true);
+            unused.Sample_Data__c = true;
+            insert new List<Skill__c>{ asked, unused };
+            Volunteer_Job__c realJob = VolunteersTestData.job('Real job');
+            insert new Job_Skill__c(Job__c = realJob.Id, Skill__c = asked.Id);
+            String person = nameOf(realPerson.Id);
+
             Test.startTest();
-            String refusal = removeUntilRefused();
+            removeEverything();
+            new VolunteerSampleDataRemoveStages().finish();
             Test.stopTest();
 
-            Assert.isNotNull(refusal, 'The skill\'s Restrict lookup refuses the delete');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'],
+                'The removal carries on to the next module or to Core'
+            );
+            List<Error_Log__c> log = removalLog();
+            Assert.areEqual(1, log.size(), 'One entry, and no refused delete: ' + log);
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, log[0].Severity__c);
+            Assert.isTrue(
+                log[0]
+                    .Message__c.contains(
+                        String.format(
+                            Label.Volunteers_SampleData_KeptSkillPerson,
+                            new List<Object>{ skill.Name, person }
+                        )
+                    ),
+                'It names the skill and who has it: ' + log[0].Message__c
+            );
+            Assert.isTrue(
+                log[0]
+                    .Message__c.contains(
+                        String.format(
+                            Label.Volunteers_SampleData_KeptSkillJob,
+                            new List<Object>{ asked.Name, realJob.Name }
+                        )
+                    ),
+                'It names the skill and the job that asks for it: ' + log[0].Message__c
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Skill__c WHERE Id = :unused.Id],
+                'The rest is removed: a sample skill nothing real holds goes'
+            );
+            Assert.areEqual(1, [SELECT COUNT() FROM Skill__c WHERE Id = :asked.Id], 'Kept');
             Assert.areEqual(
                 1,
                 [SELECT COUNT() FROM Volunteer_Skill__c WHERE Id = :realRow.Id],
