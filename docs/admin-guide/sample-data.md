@@ -153,7 +153,8 @@ household records, names, greetings, member counts, and Members panel.
    org uses the flexible way. With Volunteers installed, its jobs, skills, schedule, shifts,
   sign-ups, hours, volunteer skills and requirements go first: Approved sample hours are
   reopened, then deleted, because an Approved entry cannot be deleted as it is. Anything you
-  entered yourself is untouched.
+  entered yourself is untouched; where it hangs off a sample job, shift or skill, that sample
+  record stays too (see Common mistakes below).
 
 ## 4. Common mistakes
 
@@ -183,11 +184,14 @@ household records, names, greetings, member counts, and Members panel.
   are contacts even where your own people are stored as accounts. That is a limit of the
   sample set, not of households: the households, memberships, names, greetings, and counts
   all work the same way they will with your own records.
-- **Recording your own hours against a sample job (with Volunteers).** Removal takes only
-  the hours of sample people. Hours you recorded for a real person on a sample job stay, so
-  that job cannot be deleted and removal stops there, with the reason in the Error Log. Move
-  those hours to a job of your own (or delete them), then select **Remove sample data**
-  again.
+- **Recording your own people on sample jobs, shifts or skills (with Volunteers).** Removal
+  takes only the hours, sign-ups and volunteer skills of sample people. Hours you recorded for
+  a real person on a sample job stay, and so does a sample shift a real person is signed up
+  for or has hours on, with that sign-up; that job cannot be deleted, so removal stops there,
+  with the reason in the Error Log. A real person given a sample skill keeps it, so that skill
+  cannot be deleted and removal stops at the skills the same way. Move those hours, sign-ups
+  and skills to a job, shift or skill of your own (or delete them), then select **Remove
+  sample data** again.
 - **Not having the permission.** If the **Load sample data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.

@@ -5,9 +5,10 @@
  * The sample people are Core's: contacts flagged `Sample_Data__c`, in either membership mode,
  * because Core cannot create person accounts. The module's own records are found through the
  * two flagged kinds, jobs and skills: shifts, schedules, sign-ups and hours hang off a sample
- * job, and an hours entry counts as sample only when its person is a sample person too, so an
- * entry somebody recorded for a real person is never taken. Everything reads in the user's own
- * access, as Giving's does.
+ * job, and an hours entry, sign-up or volunteer skill counts as sample only when its person is a
+ * sample person too, so a row somebody recorded for a real person is never taken. A sample shift
+ * that also holds a real person's sign-up or hours is not taken either, so its job stays and
+ * R-VJ1 says why. Everything reads in the user's own access, as Giving's does.
  */
 public with sharing class VolunteerSampleDataSelector {
     /** Up to `cap` sample people, in the order of the key Core's generator gave them. */
@@ -66,12 +67,45 @@ public with sharing class VolunteerSampleDataSelector {
 
     // ---------------------------------------------------------------- removal, in its order
 
+    /** Sample people's sign-ups on the sample jobs' shifts. */
+    public List<Id> signupIds(Integer cap) {
+        return idsOf(
+            [
+                SELECT Id
+                FROM Volunteer_Signup__c
+                WHERE
+                    Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE
+                    AND Contact__r.Sample_Data__c = TRUE
+                WITH USER_MODE
+                LIMIT :cap
+            ]
+        );
+    }
+
+    /**
+     * The sample jobs' shifts that no real person is signed up for or has hours on. A shift with
+     * either is kept, with its sign-ups and hours, so its job is kept too (R-VJ1).
+     */
     public List<Id> shiftIds(Integer cap) {
         return idsOf(
             [
                 SELECT Id
                 FROM Volunteer_Shift__c
-                WHERE Volunteer_Job__r.Sample_Data__c = TRUE
+                WHERE
+                    Volunteer_Job__r.Sample_Data__c = TRUE
+                    AND Id NOT IN (
+                        SELECT Volunteer_Shift__c
+                        FROM Volunteer_Signup__c
+                        WHERE Contact__c = NULL OR Contact__r.Sample_Data__c = FALSE
+                    )
+                    AND Id NOT IN (
+                        SELECT Volunteer_Shift__c
+                        FROM Volunteer_Hours__c
+                        WHERE
+                            Volunteer_Shift__c != NULL
+                            AND (Contact__c = NULL
+                            OR Contact__r.Sample_Data__c = FALSE)
+                    )
                 WITH USER_MODE
                 LIMIT :cap
             ]
@@ -96,13 +130,16 @@ public with sharing class VolunteerSampleDataSelector {
         );
     }
 
-    /** Volunteer skills naming a sample skill or held by a sample person. */
+    /**
+     * Volunteer skills held by a sample person. A real person's row on a sample skill is kept, so
+     * the skill is kept too (its Restrict lookup).
+     */
     public List<Id> volunteerSkillIds(Integer cap) {
         return idsOf(
             [
                 SELECT Id
                 FROM Volunteer_Skill__c
-                WHERE Skill__r.Sample_Data__c = TRUE OR Contact__r.Sample_Data__c = TRUE
+                WHERE Contact__r.Sample_Data__c = TRUE
                 WITH USER_MODE
                 LIMIT :cap
             ]
@@ -127,10 +164,22 @@ public with sharing class VolunteerSampleDataSelector {
         );
     }
 
-    /** How many of each kind the removal deletes, in removal order. */
+    /**
+     * How many of each kind the removal deletes, in removal order. Shifts are counted before
+     * their sample sign-ups go, so a kept shift is counted too: at worst one stage too many,
+     * which deletes nothing.
+     */
     public List<Integer> removalCounts() {
         return new List<Integer>{
             countSampleHours(),
+            [
+                SELECT COUNT()
+                FROM Volunteer_Signup__c
+                WHERE
+                    Volunteer_Shift__r.Volunteer_Job__r.Sample_Data__c = TRUE
+                    AND Contact__r.Sample_Data__c = TRUE
+                WITH USER_MODE
+            ],
             [
                 SELECT COUNT()
                 FROM Volunteer_Shift__c
@@ -147,7 +196,7 @@ public with sharing class VolunteerSampleDataSelector {
             [
                 SELECT COUNT()
                 FROM Volunteer_Skill__c
-                WHERE Skill__r.Sample_Data__c = TRUE OR Contact__r.Sample_Data__c = TRUE
+                WHERE Contact__r.Sample_Data__c = TRUE
                 WITH USER_MODE
             ],
             [

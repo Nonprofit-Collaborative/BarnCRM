@@ -7175,11 +7175,13 @@ upcoming), sign-ups, hours, volunteer skills and requirements for up to 24 of Co
 people (contacts, in either membership mode), and sets the hours' statuses with the approval
 verbs (R-VG5): the newest four Submitted, the next two Rejected, the rest Approved. Its removal,
 in `SampleDataRemoveBatch` before Giving's and Core's, deletes one chunk per stage: the hours of
-sample people on sample jobs (Approved ones reopened first, R-VG9), the sample jobs' shifts
-(sign-ups cascade) and schedules, the jobs (job skills cascade), the volunteer skills and
-requirements of sample people and skills, then the skills. An entry for a real person on a
-sample job is not sample data, so R-VJ1 refuses that job and the removal stops there. No letter
-is generated.
+sample people on sample jobs (Approved ones reopened first, R-VG9), the sample people's
+sign-ups on the sample jobs' shifts, those shifts and schedules, the jobs (job skills cascade),
+the volunteer skills and requirements of sample people, then the skills. Only sample people's
+rows are taken. An entry for a real person on a sample job is not sample data, and a shift a
+real person is signed up for or has hours on is not deleted, so R-VJ1 refuses that job and the
+removal stops there. A real person's volunteer skill on a sample skill is kept the same way:
+the skill's Restrict lookup refuses deleting the skill. No letter is generated.
 
 ## 29I. Volunteer profile
 

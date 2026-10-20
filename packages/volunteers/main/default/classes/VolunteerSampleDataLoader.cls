@@ -11,11 +11,13 @@
  * without it leaves the hours as the save gave them.
  *
  * Removal deletes, one chunk per call: the sample hours (an Approved entry is reopened first,
- * because R-VG9 refuses deleting it and nothing stands that rule down), the sample jobs'
- * shifts (their sign-ups go with them), schedules and jobs (their job skills go with them), the
- * volunteer skills and requirements of sample people and skills, then the skills. Hours a real
- * person recorded against a sample job are not sample hours, so R-VJ1 then refuses that job and
- * the removal stops with that message in the Error Log.
+ * because R-VG9 refuses deleting it and nothing stands that rule down), the sample people's
+ * sign-ups, the sample jobs' shifts, schedules and jobs (their job skills go with them), the
+ * volunteer skills and requirements of sample people, then the skills. Only sample people's rows
+ * are taken. Hours a real person recorded against a sample job are not sample hours, and a shift
+ * a real person is signed up for or has hours on is not deleted, so R-VJ1 then refuses that job
+ * and the removal stops with that message in the Error Log. A real person's volunteer skill on a
+ * sample skill stays in the same way: the skill's Restrict lookup refuses deleting the skill.
  */
 public with sharing class VolunteerSampleDataLoader {
     /** How many of Core's sample people volunteer. */
@@ -286,6 +288,9 @@ public with sharing class VolunteerSampleDataLoader {
      */
     public static Integer removeNext() {
         Integer removed = removeHours();
+        if (removed == 0) {
+            removed = deleteAll(selector.signupIds(removeChunkSize));
+        }
         if (removed == 0) {
             removed = deleteAll(selector.shiftIds(removeChunkSize));
         }

@@ -174,6 +174,137 @@ private class VolunteerSampleDataTest {
         }
     }
 
+    /** Runs the removal and returns the message of the delete a protection refused, or null. */
+    private static String removeUntilRefused() {
+        try {
+            removeEverything();
+        } catch (DmlException refused) {
+            return refused.getMessage();
+        }
+        return null;
+    }
+
+    private static Volunteer_Job__c sampleJob() {
+        Volunteer_Job__c job = new Volunteer_Job__c(
+            Name = 'Sample job',
+            Active__c = true,
+            Sample_Data__c = true
+        );
+        insert job;
+        return job;
+    }
+
+    @IsTest
+    static void aRealPersonsSignupOrHoursOnASampleShiftKeepTheShiftAndItsJob() {
+        System.runAs(admin()) {
+            Contact sampler = samplePeople(1)[0];
+            Contact realPerson = VolunteersTestData.contact('Real', null);
+            Volunteer_Job__c job = sampleJob();
+            Volunteer_Shift__c booked = VolunteersTestData.newShift(
+                job.Id,
+                VolunteersTestData.SHIFT_START,
+                3
+            );
+            Volunteer_Shift__c worked = VolunteersTestData.newShift(
+                job.Id,
+                VolunteersTestData.SHIFT_START.addDays(1),
+                3
+            );
+            Volunteer_Shift__c sampleOnly = VolunteersTestData.newShift(
+                job.Id,
+                VolunteersTestData.SHIFT_START.addDays(2),
+                3
+            );
+            insert new List<Volunteer_Shift__c>{ booked, worked, sampleOnly };
+            Volunteer_Signup__c realSignup = VolunteersTestData.newSignup(booked.Id, realPerson.Id);
+            insert new List<Volunteer_Signup__c>{
+                realSignup,
+                VolunteersTestData.newSignup(booked.Id, sampler.Id),
+                VolunteersTestData.newSignup(sampleOnly.Id, sampler.Id)
+            };
+            Volunteer_Hours__c realHours = VolunteersTestData.newHours(realPerson.Id, job.Id, 2);
+            realHours.Volunteer_Shift__c = worked.Id;
+            insert realHours;
+
+            Test.startTest();
+            String refusal = removeUntilRefused();
+            Test.stopTest();
+
+            Assert.isTrue(
+                refusal != null && refusal.contains(Label.Volunteers_Job_InUseNotDeletable),
+                'R-VJ1 keeps the job and the removal stops with its message: ' + refusal
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Volunteer_Signup__c WHERE Id = :realSignup.Id],
+                'The real sign-up stays'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Volunteer_Shift__c WHERE Id IN (:booked.Id, :worked.Id)],
+                'The shifts a real person is on stay'
+            );
+            Assert.areEqual(
+                worked.Id,
+                [SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :realHours.Id]
+                .Volunteer_Shift__c,
+                'The real entry still names its shift'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Volunteer_Signup__c WHERE Contact__c = :sampler.Id],
+                'The sample person\'s sign-ups go, on a kept shift too'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Volunteer_Shift__c WHERE Id = :sampleOnly.Id],
+                'A shift only sample people were on goes'
+            );
+            Assert.areEqual(1, [SELECT COUNT() FROM Volunteer_Job__c WHERE Id = :job.Id]);
+        }
+    }
+
+    @IsTest
+    static void aRealPersonsVolunteerSkillOnASampleSkillKeepsTheSkill() {
+        System.runAs(admin()) {
+            Contact sampler = samplePeople(1)[0];
+            Contact realPerson = VolunteersTestData.contact('Real', null);
+            Skill__c skill = new Skill__c(Name = 'Sample skill', Active__c = true);
+            skill.Sample_Data__c = true;
+            insert skill;
+            Volunteer_Skill__c realRow = new Volunteer_Skill__c(
+                Contact__c = realPerson.Id,
+                Skill__c = skill.Id,
+                Type__c = 'Skill'
+            );
+            insert new List<Volunteer_Skill__c>{
+                realRow,
+                new Volunteer_Skill__c(
+                    Contact__c = sampler.Id,
+                    Skill__c = skill.Id,
+                    Type__c = 'Skill'
+                )
+            };
+
+            Test.startTest();
+            String refusal = removeUntilRefused();
+            Test.stopTest();
+
+            Assert.isNotNull(refusal, 'The skill\'s Restrict lookup refuses the delete');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Volunteer_Skill__c WHERE Id = :realRow.Id],
+                'The real person\'s skill stays'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Volunteer_Skill__c WHERE Contact__c = :sampler.Id],
+                'The sample person\'s skill goes'
+            );
+            Assert.areEqual(1, [SELECT COUNT() FROM Skill__c WHERE Id = :skill.Id], 'Kept');
+        }
+    }
+
     @IsTest
     static void twoHundredFiftyOneApprovedSampleEntriesAreReopenedAndRemoved() {
         System.runAs(admin()) {
