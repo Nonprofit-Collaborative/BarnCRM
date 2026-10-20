@@ -156,6 +156,8 @@ household records, names, greetings, member counts, and Members panel.
   entered yourself is untouched; where it hangs off a sample job, shift or skill, that sample
   record stays too, the rest of the set is still removed, and one Warning in the
   [Error Log](error-log.md) names each sample record kept and why (see Common mistakes below).
+  While a kept sample record is left, the card shows **Loaded** rather than **Not loaded**, so
+  **Remove sample data** stays offered for when you have dealt with them.
 
 ## 4. Common mistakes
 
@@ -204,9 +206,12 @@ household records, names, greetings, member counts, and Members panel.
   included. The Error Log then holds one Warning naming each one kept and why, for example
   "Sample data removal kept the sample shift Front desk: 13 Oct 2026 because Rita Real has
   hours and a sign-up on it." Move those hours, sign-ups and skills to a job, shift or skill
-  of your own (or delete them), then delete the kept sample shift, job or skill by hand (a
-  shift before its job). Once the rest of the sample data is gone the card shows **Not
-  loaded**, so **Remove sample data** is not offered for them.
+  of your own (or delete them), then select **Remove sample data** again: the card still shows
+  **Loaded** while a kept sample record is left, and the second removal takes what is no longer
+  in use. When more than 200 of your own records of one kind (sign-ups, hours, volunteer skills
+  or job skills) point at sample data, the Warning may not name every kept record; nothing of
+  yours is deleted either way, and running the removal again after you move them logs a new
+  Warning naming whatever is still kept.
 - **Not having the permission.** If the **Load sample data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.

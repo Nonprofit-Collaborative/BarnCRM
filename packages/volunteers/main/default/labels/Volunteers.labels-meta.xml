@@ -1182,7 +1182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What to do about sample records removal kept</shortDescription>
-        <value>Move or delete those records, then delete the kept sample records by hand: once the rest of the sample data is gone, Remove sample data is not offered.</value>
+        <value>Move or delete those records, then select Remove sample data again.</value>
     </labels>
     <labels>
         <fullName>Volunteers_SampleData_KeptUnnamed</fullName>

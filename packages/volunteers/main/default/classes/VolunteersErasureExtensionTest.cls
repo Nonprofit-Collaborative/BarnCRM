@@ -478,6 +478,61 @@ private class VolunteersErasureExtensionTest {
     }
 
     @IsTest
+    static void aPersonHeldAsAnAccountHasTheirGeneratedLetterDeleted() {
+        System.runAs(eraser()) {
+            Account person = VolunteersTestData.personAccount('Okafor');
+            if (person == null) {
+                return; // An org without person accounts has no such person.
+            }
+            Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
+                Name = 'Thank you letter',
+                Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
+                Body__c = '{PersonName}',
+                Active__c = true
+            );
+            insert template;
+            List<ContentVersion> files = new List<ContentVersion>{
+                file(
+                    person.Id,
+                    VolunteerLetterService.FILE_NAME,
+                    VolunteerLetterService.titlePrefix(template.Name) + 'Okafor'
+                ),
+                file(person.Id, 'photo.pdf', 'Photo')
+            };
+            insert files;
+            Id letter = documentOf(files[0].Id);
+            Id photo = documentOf(files[1].Id);
+
+            PersonErasure.Result preview = PersonErasure.preview(person.Id);
+            Assert.areEqual(
+                1,
+                changesLabelled(preview, Label.Volunteers_Erase_LettersLabel, PersonErasure.DELETED)
+                    .size(),
+                'The preview lists the letter on the person account as Deleted'
+            );
+
+            Test.startTest();
+            PersonErasure.erase(
+                person.Id,
+                [SELECT Name FROM Account WHERE Id = :person.Id].Name,
+                null
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM ContentDocument WHERE Id = :letter],
+                'The letter published on the person account is deleted'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM ContentDocument WHERE Id = :photo],
+                'Another file on the person account is kept'
+            );
+        }
+    }
+
+    @IsTest
     static void listsTheRejectionReasonsItKeeps() {
         System.runAs(eraser()) {
             VolunteersTestData.contactModeWithoutAutomaticHouseholds();

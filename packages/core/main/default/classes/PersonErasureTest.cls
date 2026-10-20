@@ -655,6 +655,57 @@ private class PersonErasureTest {
     }
 
     @IsTest
+    static void aFileAModuleDeletesIsNotAlsoListedAsKept() {
+        System.runAs(eraser()) {
+            isolate();
+            Contact jordan = coupleInContactMode(false);
+            insert new List<ContentVersion>{
+                new ContentVersion(
+                    Title = 'Generated letter',
+                    PathOnClient = 'letter.txt',
+                    VersionData = Blob.valueOf('Dear Jordan'),
+                    FirstPublishLocationId = jordan.Id
+                ),
+                new ContentVersion(
+                    Title = 'Photo',
+                    PathOnClient = 'photo.txt',
+                    VersionData = Blob.valueOf('A photo'),
+                    FirstPublishLocationId = jordan.Id
+                )
+            };
+            PersonErasureExtensions.overrides.add(new DeletesGeneratedFiles());
+
+            Assert.areEqual(
+                1,
+                filesKept(PersonErasure.preview(jordan.Id)),
+                'The preview keeps only the file the module leaves'
+            );
+            Test.startTest();
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+            Test.stopTest();
+            Assert.areEqual(1, filesKept(result), 'The erasure keeps only the file it left');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM ContentDocument WHERE Title = 'Photo'],
+                'The other file is still there'
+            );
+        }
+    }
+
+    private static Integer filesKept(PersonErasure.Result result) {
+        Integer count = 0;
+        for (PersonErasure.Change change : result.changes) {
+            if (
+                change.action == PersonErasure.KEPT &&
+                change.objectLabel == Label.Core_Erase_Files
+            ) {
+                count += change.count;
+            }
+        }
+        return count;
+    }
+
+    @IsTest
     static void aModuleThatFailsRefusesTheWholeErasure() {
         System.runAs(eraser()) {
             isolate();
@@ -884,6 +935,27 @@ private class PersonErasureTest {
         }
         public List<PersonErasure.Change> erase(Id personId) {
             throw new PersonErasure.ErasureException('The module failed');
+        }
+    }
+
+    /** A module that deletes the files it generated for the person, as Volunteers does. */
+    private class DeletesGeneratedFiles implements PersonErasureExtension {
+        public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
+            return new Set<Schema.SObjectField>();
+        }
+        public List<PersonErasure.Change> erase(Id personId) {
+            List<Id> generated = new List<Id>();
+            for (ContentDocumentLink link : [
+                SELECT ContentDocumentId
+                FROM ContentDocumentLink
+                WHERE LinkedEntityId = :personId AND ContentDocument.Title = 'Generated letter'
+            ]) {
+                generated.add(link.ContentDocumentId);
+            }
+            Database.delete(generated, true, AccessLevel.USER_MODE);
+            return new List<PersonErasure.Change>{
+                new PersonErasure.Change(PersonErasure.DELETED, 'Module file', generated, null)
+            };
         }
     }
 }

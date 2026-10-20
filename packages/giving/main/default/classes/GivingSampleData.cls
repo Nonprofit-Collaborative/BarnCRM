@@ -56,6 +56,11 @@ public with sharing class GivingSampleData implements SampleDataModule {
         return new GivingSampleDataSelector().countSampleGifts();
     }
 
+    /** Giving's removal keeps nothing, so its gifts answer whether any of its set is left. */
+    public Boolean hasSampleRecords() {
+        return countLoaded() > 0;
+    }
+
     /**
      * Starts the Giving load. Core calls this when its own load has finished, so the
      * households and people every gift points at already exist.
