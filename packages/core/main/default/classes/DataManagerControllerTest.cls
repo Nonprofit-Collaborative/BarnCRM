@@ -65,6 +65,48 @@ private class DataManagerControllerTest {
     }
 
     @IsTest
+    static void theRealPermissionDecidesWhenNothingIsStated() {
+        List<Import_Template__c> rows = templates(2);
+        System.runAs(TestUsers.admin()) {
+            insert rows;
+            Test.startTest();
+            List<DataManagerController.Mapping> forAdmin = DataManagerController.getMappings();
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                forAdmin.size(),
+                'A person holding Manage BarnCRM Settings through the Admin permission set sees the mappings'
+            );
+        }
+        System.runAs(TestUsers.standardUser('Unpermitted')) {
+            Assert.isTrue(
+                DataManagerController.getMappings().isEmpty(),
+                'A person without the permission sees an empty card, not an error'
+            );
+        }
+    }
+
+    @IsTest
+    static void aReaderWhoCannotSeeMappingsGetsAUserMessageNotAStackTrace() {
+        System.runAs(TestUsers.admin()) {
+            insert templates(1);
+        }
+        System.runAs(TestUsers.standardUser('Blocked')) {
+            DataManagerController.permissionOverride = true;
+            try {
+                DataManagerController.getMappings();
+                Assert.fail('A user without access to the mapping object is refused');
+            } catch (AuraHandledException refused) {
+                Assert.isFalse(
+                    String.isBlank(refused.getMessage()),
+                    'The screen is given the reason to show'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void listsNothingForAPersonWhoCannotImport() {
         System.runAs(TestUsers.admin()) {
             insert templates(2);
