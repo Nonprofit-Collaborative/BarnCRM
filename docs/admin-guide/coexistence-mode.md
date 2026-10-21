@@ -26,7 +26,7 @@ BarnCRM offers only the modes that fit your org:
 - The mode you saved is always offered, even if what it was chosen for is gone, so your
   choice is never hidden.
 
-The Setup Assistant's first step and BarnCRM Settings offer the same list.
+The Setup Assistant's second step and BarnCRM Settings offer the same list.
 
 | Mode | Choose it when | What it changes |
 |---|---|---|
@@ -45,8 +45,9 @@ Coexistence mode is always on: every org has a mode. What you do is confirm or c
 1. Open the **BarnCRM** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **General** in the left navigation.
-4. Find **Coexistence mode**. It shows the current mode and, underneath, what BarnCRM
-   detected in your org.
+4. Find **Coexistence mode**. It shows the current mode and, underneath, a description of
+   it. What BarnCRM detected in your org is shown on the **Health** page and in the Setup
+   Assistant's second step.
 5. Pick a mode and click **Save**.
 
 You need the **Manage BarnCRM Settings** permission to change it. If you do not have it,

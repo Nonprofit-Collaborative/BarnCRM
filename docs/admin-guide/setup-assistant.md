@@ -254,7 +254,7 @@ the legal name goes here and your everyday name goes on the letter text later.
 ### Step 7: Choose which modules to turn on
 
 A list of the BarnCRM packages that fit your org. Each says **Present** or **Not
-installed**, with a **Learn more** link to that package's description (its README on
+installed**, with a **What this module does** link to that package's description (its README on
 GitHub). A module that is not installed and has a published version also has an
 **Install** link, which opens Salesforce's installer for it in a new tab.
 
@@ -270,11 +270,11 @@ opening its install link and following the Salesforce install screens yourself: 
 assistant never installs anything for you.
 
 To turn an installed module on or off, or to see what uninstalling one would delete, use the
-[Module Manager](module-manager.md): **Modules**, in the General section of BarnCRM Settings.
+[Module Manager](module-manager.md): the **Modules** section of BarnCRM Settings.
 
 Click **Next** when you have read it. The step marks itself done.
 
-**What Maria sees:** all six packages, Core and Giving present, the other four not
+**What Maria sees:** all seven packages, Core and Giving present, the other four not
 installed. She makes a note to read about Volunteers this afternoon.
 
 ### Step 8: Bring in your data
