@@ -26,15 +26,15 @@ public with sharing class AccessService {
     };
 
     /**
-     * The add-on permission sets the Access page may give and take away, in the order the
-     * page shows them. These are the packaged Core permission sets that no role includes (or,
-     * for Find and Export, that only BarnCRM Admin includes), and nothing else: the page never
-     * assigns an arbitrary permission set. Each is resolved by API name in the package's own
-     * namespace at runtime, never by Id.
+     * Core's add-on permission sets, in the order the page shows them: the packaged Core
+     * permission sets that no role includes (or, for Find and Export, that only BarnCRM Admin
+     * includes). Each is resolved by API name in the package's own namespace at runtime,
+     * never by Id.
      *
-     * Module permission sets (Giving Staff and the rest) are out of scope. Core has no
-     * extension point through which a module contributes roles or permission sets to this
-     * page today; when one is added, its sets join this list through it rather than by name.
+     * A module adds its own sets after these by shipping Access Add-On rows (ADR-0132,
+     * modules list their permission sets on the Access page), so Core names no module set.
+     * These and the registered rows are the whole allowlist: the page never assigns an
+     * arbitrary permission set.
      */
     public static final List<String> ADD_ON_PERMISSION_SETS = new List<String>{
         'BarnCRM_Find_And_Export',
@@ -62,6 +62,16 @@ public with sharing class AccessService {
      */
     @TestVisible
     private static Boolean assignPermissionSetsOverride;
+
+    /**
+     * Access Add-On rows used instead of the shipped ones. Custom metadata records cannot be
+     * created in a test, so tests set this to in-memory rows.
+     */
+    @TestVisible
+    private static List<Access_Add_On__mdt> stubbedModuleAddOns;
+
+    /** The module add-ons, read once per transaction: name to the sentence the page shows. */
+    private static Map<String, String> moduleAddOnText;
 
     private static final String READY_STATUS = 'Updated';
     private static final Integer USER_SEARCH_LIMIT = 20;
@@ -173,8 +183,11 @@ public with sharing class AccessService {
             this.developerName = permissionSetRecord.Name;
             this.label = permissionSetRecord.Label;
             AddOnText text = ADD_ON_TEXT.get(permissionSetRecord.Name);
-            this.description = text.description;
-            this.isDestructive = text.isDestructive;
+            // A module's add-on: its sentence comes from its own label, and none removes data.
+            this.description = text == null
+                ? moduleAddOns().get(permissionSetRecord.Name)
+                : text.description;
+            this.isDestructive = text != null && text.isDestructive;
             // System.Label: a bare Label here would resolve to this class's own label field.
             this.warning = this.isDestructive
                 ? System.Label.Core_Access_AddOnDestructiveWarning
@@ -209,7 +222,7 @@ public with sharing class AccessService {
     public static List<AddOn> getAddOns() {
         Map<String, PermissionSet> setsByName = loadAddOnSets();
         List<AddOn> addOns = new List<AddOn>();
-        for (String name : ADD_ON_PERMISSION_SETS) {
+        for (String name : addOnNames()) {
             PermissionSet permissionSetRecord = setsByName.get(name);
             if (permissionSetRecord != null) {
                 addOns.add(new AddOn(permissionSetRecord));
@@ -229,7 +242,7 @@ public with sharing class AccessService {
         Map<String, PermissionSet> setsByName = loadAddOnSets();
         Map<Id, AddOnAssignments> resultsById = new Map<Id, AddOnAssignments>();
         List<AddOnAssignments> results = new List<AddOnAssignments>();
-        for (String name : ADD_ON_PERMISSION_SETS) {
+        for (String name : addOnNames()) {
             PermissionSet permissionSetRecord = setsByName.get(name);
             if (permissionSetRecord != null) {
                 AddOnAssignments entry = new AddOnAssignments(name);
@@ -478,7 +491,7 @@ public with sharing class AccessService {
         try {
             for (
                 PermissionSet permissionSetRecord : permissionSetSelector.selectPackagedByNames(
-                    new Set<String>(ADD_ON_PERMISSION_SETS),
+                    new Set<String>(addOnNames()),
                     NamespaceUtil.prefix().removeEnd('__')
                 )
             ) {
@@ -488,6 +501,90 @@ public with sharing class AccessService {
             throw logAndWrap(e, 'AccessService.loadAddOnSets', Label.Core_Access_ErrorUnexpected);
         }
         return setsByName;
+    }
+
+    /**
+     * The whole add-on allowlist, in the page's order: Core's add-ons, then each module's.
+     *
+     * @return the API names, without a namespace prefix
+     */
+    private static List<String> addOnNames() {
+        List<String> names = new List<String>(ADD_ON_PERMISSION_SETS);
+        names.addAll(moduleAddOns().keySet());
+        return names;
+    }
+
+    /**
+     * The permission sets modules list on this page through their Access Add-On rows, in sort
+     * order, each with the sentence its label holds. A row counts only in the package's own
+     * namespace, so a row an org adds itself is never used, and a row naming a Core add-on
+     * again is ignored. A row whose label cannot be read is still listed, with no sentence.
+     *
+     * @return the sentence for each module add-on, by API name, in the page's order
+     */
+    private static Map<String, String> moduleAddOns() {
+        if (moduleAddOnText != null) {
+            return moduleAddOnText;
+        }
+        String namespace = NamespaceUtil.prefix().removeEnd('__');
+        Set<String> coreNames = new Set<String>(ADD_ON_PERMISSION_SETS);
+        Map<String, String> textByName = new Map<String, String>();
+        for (Access_Add_On__mdt row : loadModuleAddOnRows()) {
+            String rowNamespace = String.isBlank(row.NamespacePrefix) ? '' : row.NamespacePrefix;
+            String name = row.Permission_Set__c;
+            if (
+                rowNamespace != namespace ||
+                String.isBlank(name) ||
+                coreNames.contains(name) ||
+                textByName.containsKey(name)
+            ) {
+                continue;
+            }
+            textByName.put(name, moduleLabel(namespace, row.Description_Label__c));
+        }
+        moduleAddOnText = textByName;
+        return moduleAddOnText;
+    }
+
+    /**
+     * The shipped Access Add-On rows, in sort order.
+     *
+     * @return the rows
+     */
+    private static List<Access_Add_On__mdt> loadModuleAddOnRows() {
+        if (stubbedModuleAddOns != null) {
+            return stubbedModuleAddOns;
+        }
+        // Package-shipped custom metadata holding no organization data, read as shipped (as
+        // the Setting Definition and Automation Registry catalogs are), so an org that limits
+        // custom metadata to the users granted it does not hide a module's add-ons.
+        return [
+            SELECT DeveloperName, NamespacePrefix, Permission_Set__c, Description_Label__c
+            FROM Access_Add_On__mdt
+            WITH SYSTEM_MODE
+            ORDER BY Sort_Order__c, DeveloperName
+            LIMIT 200
+        ];
+    }
+
+    /**
+     * Reads a module's label by name, in the running user's language.
+     *
+     * @param namespace the package namespace, empty when there is none
+     * @param labelName the label's name
+     * @return the label's text, or null when it cannot be read
+     */
+    private static String moduleLabel(String namespace, String labelName) {
+        if (String.isBlank(labelName)) {
+            return null;
+        }
+        try {
+            return System.Label.get(namespace, labelName);
+        } catch (Exception unreadable) {
+            // Deliberate: a missing label leaves the add-on without its sentence rather than
+            // taking the whole Access page down.
+            return null;
+        }
     }
 
     /**
@@ -510,7 +607,7 @@ public with sharing class AccessService {
     private static PermissionSet requireAddOn(String permissionSetName) {
         if (
             String.isBlank(permissionSetName) ||
-            !new Set<String>(ADD_ON_PERMISSION_SETS).contains(permissionSetName)
+            !new Set<String>(addOnNames()).contains(permissionSetName)
         ) {
             throw new AccessException(Label.Core_Access_ErrorAddOnNotFound);
         }

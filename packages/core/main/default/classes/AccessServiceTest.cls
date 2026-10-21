@@ -501,8 +501,174 @@ private class AccessServiceTest {
         ];
     }
 
+    /**
+     * Builds an in-memory Access Add-On row. Custom metadata records cannot be created in a
+     * test, and NamespacePrefix cannot be set by a constructor, so the row is deserialized.
+     *
+     * @param namespace the row's namespace, or null for the package's own
+     * @param permissionSetName the permission set the row lists
+     * @param labelName the label holding the row's sentence
+     * @return the row
+     */
+    private static Access_Add_On__mdt addOnRow(
+        String namespace,
+        String permissionSetName,
+        String labelName
+    ) {
+        String own = NamespaceUtil.prefix().removeEnd('__');
+        Map<String, Object> fields = new Map<String, Object>{
+            'DeveloperName' => permissionSetName,
+            'NamespacePrefix' => namespace != null ? namespace : (String.isBlank(own) ? null : own),
+            'Permission_Set__c' => permissionSetName,
+            'Description_Label__c' => labelName
+        };
+        return (Access_Add_On__mdt) JSON.deserialize(
+            JSON.serialize(fields),
+            Access_Add_On__mdt.class
+        );
+    }
+
+    /** A Core set no role card or Core add-on lists, standing in for a module's set. */
+    private static final String MODULE_SET = 'BarnCRM_Read_Only';
+
+    @IsTest
+    static void aModuleAddOnIsListedAfterCoreAndCanBeGivenAndRemoved() {
+        AccessService.stubbedModuleAddOns = new List<Access_Add_On__mdt>{
+            addOnRow(null, MODULE_SET, 'Core_Access_AddOnBulkUpdate')
+        };
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+
+            Test.startTest();
+            List<AccessService.AddOn> addOns = AccessService.getAddOns();
+            List<String> failures = AccessService.assignAddOn(new Set<Id>{ david.Id }, MODULE_SET);
+            Boolean listed = false;
+            for (AccessService.AddOnAssignments entry : AccessService.getAddOnAssignments()) {
+                if (entry.permissionSetName == MODULE_SET) {
+                    for (AccessService.UserSummary person : entry.users) {
+                        listed = listed || person.userId == david.Id;
+                    }
+                }
+            }
+            Integer heldAfterAssign = countAddOn(david.Id, MODULE_SET);
+            List<String> removeFailures = AccessService.removeAddOn(
+                new Set<Id>{ david.Id },
+                MODULE_SET
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                AccessService.ADD_ON_PERMISSION_SETS.size() + 1,
+                addOns.size(),
+                'The module add-on should be listed beside the Core ones.'
+            );
+            AccessService.AddOn moduleAddOn = addOns[addOns.size() - 1];
+            Assert.areEqual(MODULE_SET, moduleAddOn.developerName, 'It should come after Core.');
+            Assert.areEqual(
+                Label.Core_Access_AddOnBulkUpdate,
+                moduleAddOn.description,
+                'Its sentence should be the label its row names.'
+            );
+            Assert.isFalse(
+                moduleAddOn.isDestructive,
+                'A module add-on is not marked as removing data.'
+            );
+            Assert.isNull(moduleAddOn.warning, 'So it carries no warning.');
+            Assert.isTrue(
+                failures.isEmpty(),
+                'Giving David the module add-on should not be refused.'
+            );
+            Assert.areEqual(1, heldAfterAssign, 'David should hold it once.');
+            Assert.isTrue(listed, 'David should be listed on its card.');
+            Assert.isTrue(removeFailures.isEmpty(), 'Removing it should not be refused.');
+            Assert.areEqual(0, countAddOn(david.Id, MODULE_SET), 'David should no longer hold it.');
+        }
+    }
+
+    @IsTest
+    static void aModuleRowFromAnotherNamespaceOrRepeatingCoreIsIgnored() {
+        AccessService.stubbedModuleAddOns = new List<Access_Add_On__mdt>{
+            addOnRow('someoneelse', 'BarnCRM_Staff', 'Core_Access_AddOnBulkUpdate'),
+            addOnRow(null, BULK_UPDATE, 'Core_Access_AddOnErasePeople'),
+            addOnRow(null, MODULE_SET, 'No_Such_Label_For_This_Test')
+        };
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            String refusal;
+
+            Test.startTest();
+            List<AccessService.AddOn> addOns = AccessService.getAddOns();
+            try {
+                AccessService.assignAddOn(new Set<Id>{ david.Id }, 'BarnCRM_Staff');
+            } catch (AccessService.AccessException e) {
+                refusal = e.getMessage();
+            }
+            Test.stopTest();
+
+            Map<String, AccessService.AddOn> byName = new Map<String, AccessService.AddOn>();
+            for (AccessService.AddOn addOn : addOns) {
+                byName.put(addOn.developerName, addOn);
+            }
+            Assert.areEqual(
+                AccessService.ADD_ON_PERMISSION_SETS.size() + 1,
+                addOns.size(),
+                'Only the row in the package namespace that names a new set should be added.'
+            );
+            Assert.isFalse(
+                byName.containsKey('BarnCRM_Staff'),
+                'A row from another namespace should never be listed.'
+            );
+            Assert.areEqual(
+                Label.Core_Access_AddOnBulkUpdate,
+                byName.get(BULK_UPDATE).description,
+                'A row repeating a Core add-on should not change it.'
+            );
+            Assert.isNull(
+                byName.get(MODULE_SET).description,
+                'A row whose label cannot be read is listed without a sentence.'
+            );
+            Assert.areEqual(
+                Label.Core_Access_ErrorAddOnNotFound,
+                refusal,
+                'A set named only by a row from another namespace should never be given.'
+            );
+            Assert.areEqual(0, countAddOn(david.Id, 'BarnCRM_Staff'), 'David should not hold it.');
+        }
+    }
+
+    @IsTest
+    static void everyShippedModuleAddOnIsListedWithItsSentence() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<AccessService.AddOn> addOns = AccessService.getAddOns();
+            Test.stopTest();
+
+            Map<String, AccessService.AddOn> byName = new Map<String, AccessService.AddOn>();
+            for (AccessService.AddOn addOn : addOns) {
+                byName.put(addOn.developerName, addOn);
+            }
+            // Whatever modules this org has: none in a Core-only org, Giving's and Mirror's here.
+            String own = NamespaceUtil.prefix().removeEnd('__');
+            for (Access_Add_On__mdt row : Access_Add_On__mdt.getAll().values()) {
+                if ((String.isBlank(row.NamespacePrefix) ? '' : row.NamespacePrefix) != own) {
+                    continue;
+                }
+                AccessService.AddOn addOn = byName.get(row.Permission_Set__c);
+                Assert.isNotNull(
+                    addOn,
+                    row.Permission_Set__c + ' should be listed: its row names a set this org has.'
+                );
+                Assert.isTrue(
+                    String.isNotBlank(addOn.description),
+                    row.Permission_Set__c + ' should say what it grants: its row names a label.'
+                );
+            }
+        }
+    }
+
     @IsTest
     static void getAddOnsListsTheSixCoreAddOnsAndWarnsOnTheDestructiveOnes() {
+        AccessService.stubbedModuleAddOns = new List<Access_Add_On__mdt>();
         System.runAs(TestUsers.admin()) {
             Test.startTest();
             List<AccessService.AddOn> addOns = AccessService.getAddOns();

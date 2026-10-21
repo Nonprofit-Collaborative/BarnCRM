@@ -10,16 +10,21 @@ change our settings?" in a few seconds.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
-One thing they do not do. A role carries what Core provides, and nothing a
-module adds: a module ships its own permission sets (Giving, for example, ships **Giving
-Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. The
-[Module Manager](module-manager.md) does not join them up either: turning a module on gives
-the module's admin set (for Giving, **Giving Admin**) only to you, the person who turned it
-on. Anyone else with a role sees households and people but nothing the module adds until a
-Salesforce administrator assigns the
-module's permission set in Setup alongside the role. That is the one place BarnCRM still sends
-you to Setup for access, and it is a gap rather than a design. Until then, a Salesforce user
-access policy can add the module's permission set for you: see
+A module ships its own permission sets, and a Core role cannot include them. They reach
+people in one of two ways:
+
+- **Volunteers and Rollup Builder follow the roles for you.** Their sets are given
+  automatically to everyone holding the matching role (for example the Coordinator role gets
+  **Volunteers Coordinator**), at the latest overnight.
+- **Giving and Mirror sets are chosen per person, on this page.** Turning a module on in the
+  [Module Manager](module-manager.md) gives its admin set (for Giving, **Giving Admin**) only to
+  you, the person who turned it on. Everyone else gets **Giving Admin**, **Giving Staff**,
+  **Giving Read Only**, **Campaign Sync**, **Opportunity Mirror**, **Accounting Export** and
+  the rest under "Extra permissions" below, beside their role. The Fundraising Staff role
+  already includes Giving Staff.
+
+You never need Setup for either. If you would rather have a module set given automatically to
+every new user, a Salesforce user access policy can do it: see
 [Automatic access](automatic-access.md).
 
 BarnCRM Core ships four roles. The Fundraising Staff role comes with the Giving module,
@@ -61,7 +66,7 @@ tax identification number, to everyone who can read a contact.
 
 So to find a donor's receipt, open the donor, then the **Receipts** related list, then the receipt,
 then the file on it. If somebody says they cannot see receipts on a donor's record, that is this,
-and the fix is the Giving permission set rather than anything on this page.
+and the fix is a Giving permission set, which you give them under "Extra permissions" below.
 
 Nobody can edit or delete a receipt PDF, whatever they hold. See
 [Receipts and year-end statements](receipts.md).
@@ -119,9 +124,10 @@ Here is how she gives him access, checks it, and takes it away again.
    on the Team Member card, and the number in brackets beside the role name goes up
    by one.
 7. David can now sign in and see households and contacts. He does not see BarnCRM
-   Settings, because that belongs to the BarnCRM Admin role. If your org has a module, he
-   does not see what it adds yet either: for that he also needs the module's own permission
-   set (for Giving, **Giving Staff**), which today is assigned in Salesforce Setup.
+   Settings, because that belongs to the BarnCRM Admin role. If your org has Giving, he
+   does not see gifts yet either: for that he also needs **Giving Staff**, which you give him
+   on this page under "Extra permissions" below (or give him the Fundraising Staff role,
+   which includes it).
 8. To take the role away, find David's name on the Team Member card and click
    **Remove**. Confirm, and a message says "David Okafor no longer has the Team Member
    role." His name disappears from the card.
@@ -132,9 +138,11 @@ role they already have changes nothing and reports no error.
 
 ## Extra permissions
 
-A few BarnCRM features are in no role on purpose, because most people should not have them.
-You give them to a person on this page too, alongside their role, under **Extra permissions**.
-You never need Setup for them.
+A few BarnCRM features are in no role on purpose, because most people should not have them,
+and a module's own permission sets cannot be in a Core role. You give them to a person on this
+page too, alongside their role, under **Extra permissions**. You never need Setup for them.
+
+Core's six are always listed:
 
 | Extra permission | What it lets the person do |
 |---|---|
@@ -145,8 +153,25 @@ You never need Setup for them.
 | BarnCRM Duplicate Review | Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
 
-These six are the only permissions this section gives. It never lists or assigns any other
-permission set in your org, including a module's (see "What still needs Setup" below).
+A module's sets are listed after them, only where that module is installed:
+
+| Extra permission | Module | What it lets the person do |
+|---|---|---|
+| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
+| Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. The Fundraising Staff role already includes it. |
+| Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. |
+| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
+| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access. |
+| Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts. |
+| Inbound Gift API | Mirror | For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM. |
+| Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |
+
+The Volunteers and Rollup Builder sets are not listed, because they follow the roles
+automatically (see the top of this page): removing one here would only be undone overnight.
+
+These are the only permissions this section gives. It never lists or assigns any other
+permission set in your org, including one you created yourself with the same name as one of
+these.
 
 To give one:
 

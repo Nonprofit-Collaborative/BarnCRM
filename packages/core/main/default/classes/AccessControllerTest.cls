@@ -379,6 +379,8 @@ private class AccessControllerTest {
 
     @IsTest
     static void getAccessOverviewListsTheAddOnsAndWhoMayGiveThem() {
+        // Core's add-ons only: a module's rows are counted in AccessServiceTest.
+        AccessService.stubbedModuleAddOns = new List<Access_Add_On__mdt>();
         System.runAs(TestUsers.admin()) {
             User maria = insertAdminUser();
             User david = insertUser('David', 'Okafor');

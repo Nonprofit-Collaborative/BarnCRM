@@ -140,6 +140,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0129](0129-volunteer-letters.md) | Volunteer hour letters and certificates have their own small generator, not Giving's receipts engine | Accepted (owner decision) |
 | [0130](0130-contact-relations-are-not-native-households-without-native-groups.md) | Contact relations are not native households in an org without native household groups (narrows ADR-0036) | Accepted |
 | [0131](0131-module-access-sync-by-role.md) | A module gives its sets to holders of a BarnCRM role, and Core asks it at Turn on and nightly | Accepted |
+| [0132](0132-modules-list-their-permission-sets-on-the-access-page.md) | A module lists its permission sets on the Access page by shipping Access Add-On rows | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
