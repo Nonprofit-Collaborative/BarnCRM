@@ -238,11 +238,13 @@ public with sharing class GiftPostingLock {
     /**
      * Before delete of a Contact or Account: notes which of them a locked gift names. Nothing is
      * refused yet, because a merge deletes the losing record too and only after delete says so.
+     * Each delete reads the books afresh: a record refused earlier in the transaction is not
+     * refused again once nothing locked names it.
      */
     public static void noteDonorsNamed(List<SObject> records) {
-        donorsNamed.addAll(
-            namedByLockedGifts(new Map<Id, SObject>(records).keySet(), closedThrough())
-        );
+        Set<Id> recordIds = new Map<Id, SObject>(records).keySet();
+        donorsNamed.removeAll(recordIds);
+        donorsNamed.addAll(namedByLockedGifts(recordIds, closedThrough()));
     }
 
     /**

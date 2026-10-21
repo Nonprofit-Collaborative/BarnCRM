@@ -1848,7 +1848,14 @@ the transaction publishes one `Rollup_Queue_Ready__e` (publish after commit, how
 entries it wrote), and its subscriber calls `RollupService.startQueuedRecalculation`, which
 starts the processor unless one is already waiting (ADR-0100). A job that rolls back publishes
 nothing. If the event cannot be published, the entries wait for the next processor a later save
-starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run. The
+starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run. A partial
+save (allOrNone false, as the Bulk API, Data Loader and `Database.delete(records, false)` save)
+whose records partly fail is rolled back, entries, queued processor and event with it, and its
+triggers run again for the records that passed with static variables kept. The retry is told
+apart by a DML count lower than the last insert left (the platform resets governor limits for
+it) and that insert's entry gone, and asks for a processor again; the trigger framework clears
+its per record claims the same way, so the retry's records are marked again. Before this the
+retry left its entries Pending with no processor until the nightly run. The
 processor's own chain respects the platform's chain depth limit: a run as deep as its chain may
 go (the chain's own maximum when one is set, otherwise five, the Developer Edition, trial and
 scratch org limit) publishes the same event instead of queuing the next run, so a fresh chain
@@ -8544,6 +8551,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | QA follow-ups. No object or field added. R-ER10: activities and files are counted after the module extensions run, leaving out what one reported as Deleted, so a generated letter Volunteers deletes is not also listed as kept. C-10: `SampleDataModule` gains `hasSampleRecords()`, and Core's sample data reads Loaded (and refuses a new load) while any module still has sample records, so a removal that kept some can be run again; Volunteers answers from its sample jobs and skills. The `Past_Shifts_Still_Open` list view filters End Time before `N_DAYS_AGO:7`, matching the Health Check finding. |
 | v0.8 | 2026-10-20 | Giving QA fixes: pledge balance. No object or field added. R-CM5: a pledge saved with Amount and Installments Planned and no Expected Total gets their product. R-CM4: a refund or write-off carries the original's commitment and installment, takes its amount off both and reopens a pledge it takes short; installments, completion and the Paid To Date and Paid Amount rollups count the same statuses (Received, Refunded, Written off). R-CM1: the donor of an Active or Paused commitment, or that person's account, is not deleted (`GiftDonorDeleteGuardHandler`); a merge and an erasure still work. |
 | v0.8 | 2026-10-20 | Erasure audit fixes B3 and S2. No object or field added. R-ER3: a household left with members whose name was typed by hand has Custom Name turned off and is named again from the remaining members; a household Nonprofit Cloud names is listed for staff to check; each is reported with the fields that really changed. Giving deletes the person's automatic Household Member soft credits in the erasure and lists them as Deleted (ADR-0110 amended). |
+| v0.8 | 2026-10-21 | Rollups after a partial save. No object or field added. R-RQ3: a partial save's retry (allOrNone false, some records refused) asks for a processor again and marks its records again, instead of leaving its entries Pending until the nightly run. R-CM1 and R-G15: the donor delete guards read the commitments and the books at each delete, so a donor refused earlier in the transaction is deleted once nothing holds them. |
 
 ---
 ## 32. Entity ownership by package

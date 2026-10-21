@@ -86,7 +86,10 @@ public with sharing class TriggerDispatcher {
         if (!Trigger.isExecuting) {
             return;
         }
+        // Before and after: a partial save's retry is told apart from the attempt it repeats.
+        TriggerHandler.noteTriggerProgress();
         run(objectApiName, currentContext());
+        TriggerHandler.noteTriggerProgress();
     }
 
     @NamespaceAccessible

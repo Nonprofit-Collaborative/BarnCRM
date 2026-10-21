@@ -61,7 +61,7 @@ public with sharing class CommitmentService {
 
     /**
      * People and organizations being deleted that are the donor of an open commitment, noted
-     * before delete and refused after it unless the delete was a merge (R-CM1).
+     * before each delete and refused after it unless the delete was a merge (R-CM1).
      */
     private static Set<Id> donorsWithOpenCommitments = new Set<Id>();
 
@@ -538,10 +538,13 @@ public with sharing class CommitmentService {
     /**
      * Before delete of a Contact or Account: notes which of them is the donor of an Active or
      * Paused commitment, or the account of a person who is. Nothing is refused yet, because a
-     * merge deletes the losing record too and says so only after delete.
+     * merge deletes the losing record too and says so only after delete. Each delete reads the
+     * commitments afresh: a donor refused earlier in the transaction is not refused again once
+     * their commitment is no longer open.
      */
     public static void noteDonorsWithOpenCommitments(List<SObject> records) {
         Set<Id> recordIds = new Map<Id, SObject>(records).keySet();
+        donorsWithOpenCommitments.removeAll(recordIds);
         for (Commitment__c commitment : new CommitmentSelector().selectOpenNaming(recordIds)) {
             for (
                 Id reference : new List<Id>{
