@@ -152,12 +152,13 @@ private class JobNotificationPathsTest {
             ImportUndoService.finish(updated.Id, 0, 2, false, 0);
             ImportUndoService.finish(imported.Id, 0, 2, false, 0);
 
-            String updateLog = [SELECT Run_Log__c FROM Import_Batch__c WHERE Id = :updated.Id]
-            .Run_Log__c;
-            String importLog = [SELECT Run_Log__c FROM Import_Batch__c WHERE Id = :imported.Id]
-            .Run_Log__c;
+            Map<Id, Import_Batch__c> logs = new Map<Id, Import_Batch__c>(
+                [SELECT Run_Log__c FROM Import_Batch__c]
+            );
+            String updateLog = logs.get(updated.Id).Run_Log__c;
+            String importLog = logs.get(imported.Id).Run_Log__c;
             Assert.isTrue(updateLog.contains('2 values put back'), 'Says what was put back');
-            Assert.isFalse(updateLog.contains('records deleted'), 'No import wording: ' + updateLog);
+            Assert.isFalse(updateLog.contains('records deleted'), 'No import wording');
             Assert.isTrue(importLog.contains('records deleted'), 'An import keeps its wording');
         }
     }

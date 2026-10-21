@@ -1,17 +1,14 @@
 @IsTest
 private class GivingErrorsTest {
+    private static final String FALLBACK = Label.Giving_Gift_UnexpectedError;
+
     @IsTest
     static void aBarnCrmExceptionIsShownAsWritten() {
-        AuraHandledException surfaced = GivingErrors.userError(
-            new GiftService.GiftServiceException('Choose a gift first.'),
-            Label.Giving_Gift_UnexpectedError
-        );
+        Exception known = new GiftService.GiftServiceException('Choose a gift first.');
 
-        Assert.areEqual(
-            'Choose a gift first.',
-            surfaced.getMessage(),
-            'Known message passes through'
-        );
+        AuraHandledException surfaced = GivingErrors.userError(known, FALLBACK);
+
+        Assert.areEqual('Choose a gift first.', surfaced.getMessage(), 'Known message');
     }
 
     @IsTest
@@ -20,10 +17,9 @@ private class GivingErrorsTest {
         try {
             insert new Gift__c();
         } catch (DmlException failed) {
-            message = GivingErrors.userError(failed, Label.Giving_Gift_UnexpectedError)
-                .getMessage();
-            Assert.areEqual(failed.getDmlMessage(0), message, 'The row message, not the whole text');
-            Assert.isFalse(message.contains('Insert failed'), 'No raw DML wrapper: ' + message);
+            message = GivingErrors.userError(failed, FALLBACK).getMessage();
+            Assert.areEqual(failed.getDmlMessage(0), message, 'The row message only');
+            Assert.isFalse(message.contains('Insert failed'), 'No DML wrapper');
         }
         Assert.isNotNull(message, 'The insert failed');
     }
@@ -38,26 +34,24 @@ private class GivingErrorsTest {
             raw = failed;
         }
 
-        AuraHandledException surfaced = GivingErrors.userError(
-            raw,
-            Label.Giving_Gift_UnexpectedError
-        );
+        AuraHandledException surfaced = GivingErrors.userError(raw, FALLBACK);
 
-        Assert.areEqual(Label.Giving_Gift_UnexpectedError, surfaced.getMessage(), 'Label shown');
+        Assert.areEqual(FALLBACK, surfaced.getMessage(), 'Label shown');
     }
 
     @IsTest
     static void aRefundOfAnUnknownGiftNeverShowsRawText() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Id notAGift = FakeIds.of(Account.SObjectType, 1);
             String message;
             try {
-                GiftController.refund(FakeIds.of(Account.SObjectType, 1), 5, 'Wrong object');
+                GiftController.refund(notAGift, 5, 'Wrong object');
             } catch (AuraHandledException refused) {
                 message = refused.getMessage();
             }
             Assert.isNotNull(message, 'Refused');
-            Assert.isFalse(message.contains('Exception'), 'No raw exception text: ' + message);
-            Assert.isFalse(message.contains('Insert failed'), 'No DML text: ' + message);
+            Assert.isFalse(message.contains('Exception'), 'No raw exception text');
+            Assert.isFalse(message.contains('Insert failed'), 'No DML text');
         }
     }
 }

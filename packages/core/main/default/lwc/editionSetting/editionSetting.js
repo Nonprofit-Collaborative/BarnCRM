@@ -100,5 +100,7 @@ export default class EditionSetting extends LightningElement {
 }
 
 function messageOf(error) {
-  return (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR;
+  return (
+    (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR
+  );
 }

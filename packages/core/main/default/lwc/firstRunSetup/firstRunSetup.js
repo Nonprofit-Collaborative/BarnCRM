@@ -185,5 +185,7 @@ export default class FirstRunSetup extends NavigationMixin(LightningElement) {
 }
 
 function messageOf(error) {
-  return (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR;
+  return (
+    (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR
+  );
 }
