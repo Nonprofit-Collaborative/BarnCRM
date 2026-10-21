@@ -301,7 +301,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Reaching This Person</value>
+          <value>{!$Label.Core_Section_ReachingThisPerson}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>reachingSection</identifier>
