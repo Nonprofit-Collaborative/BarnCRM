@@ -137,7 +137,10 @@ public with sharing class FeatureSwitchService {
                         'Delete_Empty_Households',
                         'Include_Deceased_In_Name',
                         'Keep_Households_Of_Deleted_People',
-                        'Household_Naming_Preview'
+                        'Household_Naming_Preview',
+                        'Household_Name_Pattern',
+                        'Formal_Greeting_Pattern',
+                        'Informal_Greeting_Pattern'
                     }
                 ),
             new Item(ADDRESSES, KIND_FEATURE)

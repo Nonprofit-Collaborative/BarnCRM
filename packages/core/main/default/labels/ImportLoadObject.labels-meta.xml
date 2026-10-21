@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: upsert has no external ID field chosen</shortDescription>
-        <value>Upsert by external ID needs the external ID field rows are matched on. Choose it in the matching step.</value>
+        <value>Updating or creating by external ID needs the external ID field rows are matched on. Choose it in the matching step.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorKeyFieldUnusable</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: no column for the upsert field; {0} is the field</shortDescription>
-        <value>Upsert by external ID needs a column mapped to {0}, the field rows are matched on.</value>
+        <value>Updating or creating by external ID needs a column mapped to {0}, the field rows are matched on.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorKeyForEveryRow</fullName>
@@ -270,7 +270,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the Insert load operation</shortDescription>
-        <value>Insert</value>
+        <value>Create new records</value>
     </labels>
     <labels>
         <fullName>Core_Import_OperationUpdate</fullName>
@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the Upsert by external ID load operation</shortDescription>
-        <value>Upsert by external ID</value>
+        <value>Update or create, matched by external ID</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadInsertHelp</fullName>

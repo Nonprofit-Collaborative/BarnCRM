@@ -10,7 +10,7 @@
                     <article class="slds-box slds-box_small">
                         <h3 class="slds-text-heading_small">{tool.title}</h3>
                         <p class="slds-var-m-vertical_x-small slds-text-body_small">{tool.text}</p>
-                        <lightning-button label={labels.open} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
+                        <lightning-button label={labels.open} aria-label={tool.openLabel} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
                     </article>
                 </div>
             </template>

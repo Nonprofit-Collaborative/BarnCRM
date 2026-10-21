@@ -2,6 +2,10 @@ import { createElement } from 'lwc';
 import DataManager from 'c/dataManager';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 
+jest.mock('@salesforce/label/c.Core_DataManager_OpenAria', () => ({ default: 'Open {0}' }), {
+  virtual: true
+});
+
 const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
@@ -69,6 +73,17 @@ describe('c-data-manager', () => {
     expect(one(element, 'update')).not.toBeNull();
     expect(one(element, 'delete')).toBeNull();
     expect(one(element, 'optimizer')).not.toBeNull();
+  });
+
+  it('names each Open button for its tool', async () => {
+    const element = await render();
+
+    const names = Array.from(element.shadowRoot.querySelectorAll('lightning-button[data-tab]')).map(
+      (button) => button.ariaLabel
+    );
+    expect(names.length).toBeGreaterThan(1);
+    names.forEach((name) => expect(name).toMatch(/^Open \S/));
+    expect(new Set(names).size).toBe(names.length);
   });
 
   it('opens the tool tab by its API name', async () => {

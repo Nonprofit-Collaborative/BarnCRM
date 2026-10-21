@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: related records chosen under Insert, which has no parent key</shortDescription>
-        <value>Related records need a parent key. Choose Upsert by external ID, Update by a field you choose or Update by record ID, or turn off related records.</value>
+        <value>Related records need a parent key. Choose update or create matched by external ID, update by a field you choose, or update by record ID, or turn off related records.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorRelatedObjectUnusable</fullName>
@@ -110,6 +110,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: why Insert offers no related records</shortDescription>
-        <value>To load related records, choose Upsert by external ID or one of the updates, so rows can name their parent by a key.</value>
+        <value>To load related records, choose update or create matched by external ID, or one of the updates, so rows can name their parent by a key.</value>
     </labels>
 </CustomLabels>

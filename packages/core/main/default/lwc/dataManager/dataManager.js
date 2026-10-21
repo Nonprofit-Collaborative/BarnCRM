@@ -21,6 +21,7 @@ import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_DataManager_OptimizerTitle';
 import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
 import OPEN from '@salesforce/label/c.Core_DataManager_Open';
+import OPEN_ARIA from '@salesforce/label/c.Core_DataManager_OpenAria';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
 import COLUMN_NAME from '@salesforce/label/c.Core_DataManager_ColumnName';
@@ -123,7 +124,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
         tab: TABS.optimizer
       });
     }
-    return tools;
+    return tools.map((tool) => ({ ...tool, openLabel: OPEN_ARIA.replace('{0}', tool.title) }));
   }
 
   get hasMappings() {

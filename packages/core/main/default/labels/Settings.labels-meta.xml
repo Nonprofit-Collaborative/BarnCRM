@@ -105,6 +105,14 @@
         <value>Learn more</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_LearnMoreAria</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: screen reader name of a Learn more link; {0} is the setting</shortDescription>
+        <value>Learn more about {0} (opens a new tab)</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_LoadErrorMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>
