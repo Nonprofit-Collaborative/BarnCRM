@@ -6,8 +6,11 @@
  *
  * Gifts, soft credits, commitments and receipts are kept as they are, still credited to the
  * anonymized person, so every total stands and the books and tax records are untouched (posted
- * and receipted gifts are locked anyway, ADR-0024, ADR-0053). What Giving holds as typed text
- * about the person is emptied: tribute names typed for them, the message on a tribute of their
+ * and receipted gifts are locked anyway, ADR-0024, ADR-0053). The one exception is the person's
+ * automatic Household Member credits: they exist only because the person belonged to a
+ * household (R-SC3), and the erasure has just taken them out of every household, so they are
+ * deleted here, as the user, and listed as Deleted rather than left to the queued recompute.
+ * What Giving holds as typed text about the person is emptied: tribute names typed for them, the message on a tribute of their
  * own gift, and the email address the acknowledgment ledger sent to. Running stewardship plans
  * for them are cancelled, so no more tasks are made about them. The donor level fields are kept,
  * like the totals.
@@ -56,6 +59,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
             ],
             Label.Giving_Erase_GiftsKept
         );
+        changes.addAll(deleteHouseholdCredits(contacts, accounts));
         kept(
             changes,
             Soft_Credit__c.SObjectType,
@@ -94,6 +98,41 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
         changes.addAll(eraseAcknowledgments(contacts, accounts));
         changes.addAll(cancelStewardship(contacts, accounts));
         return changes;
+    }
+
+    /**
+     * The person's automatic Household Member credits, deleted as the user (R-SC3: only current
+     * members are credited, and the person is now in no household). Deleted before the kept
+     * credits are counted, so the count is only of what stays: credits a person entered and
+     * other automatic roles such as Matched Donor.
+     */
+    private static List<PersonErasure.Change> deleteHouseholdCredits(
+        Set<Id> contacts,
+        Set<Id> accounts
+    ) {
+        List<Soft_Credit__c> credits = [
+            SELECT Id
+            FROM Soft_Credit__c
+            WHERE
+                (Contact__c IN :contacts
+                OR Account__c IN :accounts)
+                AND Is_Automatic__c = TRUE
+                AND Role__c = :SoftCreditService.ROLE_HOUSEHOLD_MEMBER
+            WITH SYSTEM_MODE
+            LIMIT 10000
+        ];
+        if (credits.isEmpty()) {
+            return new List<PersonErasure.Change>();
+        }
+        Database.delete(credits, true, AccessLevel.USER_MODE);
+        return new List<PersonErasure.Change>{
+            new PersonErasure.Change(
+                PersonErasure.DELETED,
+                Label.Giving_Erase_HouseholdCreditsLabel,
+                new List<Id>(new Map<Id, Soft_Credit__c>(credits).keySet()),
+                null
+            )
+        };
     }
 
     /** Names typed for the person, and the words of their own tributes, emptied as the user. */

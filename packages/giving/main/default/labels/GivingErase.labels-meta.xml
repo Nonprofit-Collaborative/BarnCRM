@@ -16,4 +16,12 @@
         <shortDescription>Erase a person: why receipts are kept</shortDescription>
         <value>Kept as tax records. Their PDF documents still print the donor&apos;s name and address: delete them by hand once your rules allow it.</value>
     </labels>
+    <labels>
+        <fullName>Giving_Erase_HouseholdCreditsLabel</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: the automatic household soft credits deleted</shortDescription>
+        <value>Automatic household soft credits</value>
+    </labels>
 </CustomLabels>

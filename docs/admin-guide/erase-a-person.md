@@ -15,7 +15,13 @@ The person's record is kept but made anonymous, so every total stays right:
 - **Addresses** the person owns are deleted.
 - **Relationships and affiliations** are ended today and lose their descriptions, so the other
   person's history still says a relationship existed, but not with whom.
-- **Households**: the person leaves every household. The households are renamed and recounted.
+- **Households**: the person leaves every household. A household with other members is
+  recounted, and its name and greetings are made again from the people still in it. If its
+  name was typed by hand (**Custom Name** on), BarnCRM cannot tell safely which words name the
+  person, so it turns Custom Name off and the name and greetings are made again from the
+  remaining members; type a new custom name afterwards if you want one. A household Nonprofit
+  Cloud names keeps its wording: the preview tells you to check it and change it by hand. The
+  preview lists each household with exactly the fields that changed.
   If the person was the only member, the household follows your **Delete empty households**
   setting; a household that is kept (the setting is off, or gifts or other records credited
   to the household, such as volunteer hours, keep it) is made anonymous too: it is renamed
@@ -30,7 +36,9 @@ The person's record is kept but made anonymous, so every total stays right:
   because they say nothing about who the person was.
 
 With the Giving module installed, gifts, soft credits, pledges and receipts are kept with their
-amounts and dates, still credited to the anonymous record. See section 4.
+amounts and dates, still credited to the anonymous record, except the automatic household soft
+credits the person had as a household member, which are deleted because they are no longer in
+a household. See section 4.
 
 With the Volunteers module installed, volunteer hours and shift sign-ups are kept the same way,
 with their notes emptied; bookings on shifts still to come are cancelled; onboarding
@@ -45,8 +53,9 @@ and each record that changed with the fields that were emptied. It never holds a
    Admin**. Assign the **BarnCRM Erase People** permission set to the one or two people who handle
    privacy requests (BarnCRM Settings, Access, Extra permissions).
 2. The person erasing also needs edit access to the person and to everything the erasure changes
-   (their addresses, relationships, affiliations and household memberships). BarnCRM Admin has
-   it.
+   (their addresses, relationships, affiliations and household memberships, a household whose
+   custom name it turns off, and with Giving their automatic household soft credits). BarnCRM
+   Admin, with Giving Admin or Giving Staff, has it.
 3. Optional, recommended: give them the Salesforce system permission **Delete From Field
    History** (in a permission set of your own), so field history is erased too.
 4. **Erase person** is on the person record pages BarnCRM ships. On a page of your own, add the
@@ -72,7 +81,10 @@ request as ticket PR-2041.
 ## 4. What stays, and what you still have to do
 
 - **Gifts and receipts (Giving).** Gifts, soft credits, pledges and their payments keep their
-  amounts, dates and funds, credited to the anonymous record. Receipt records and their PDF
+  amounts, dates and funds, credited to the anonymous record. The one exception: the person's
+  automatic household soft credits (the ones BarnCRM gives each household member on another
+  member's gift) are deleted, because the person is no longer in the household, and the
+  preview lists them as **Deleted**. Soft credits someone entered by hand are kept. Receipt records and their PDF
   documents are kept, because a tax authority can ask for them, and the PDFs print the donor's
   name and address. The preview counts them. If your rules let you, delete the documents by hand
   once you no longer have to keep them. Tribute names typed for the person, the message on a
