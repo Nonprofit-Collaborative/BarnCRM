@@ -1210,7 +1210,7 @@ handlers.
 
 `Access_Add_On__mdt`: the catalog through which a module lists its own permission sets on the
 Access page as extra permissions, beside Core's six, so an administrator gives them without
-Setup and Core names no module set (Decision ADR-NEXT, modules list their permission sets on
+Setup and Core names no module set (Decision ADR-0132, modules list their permission sets on
 the Access page). A module ships one protected row per set; the page uses a row only when it is
 in the package's own namespace and its set is a packaged set in that namespace.
 

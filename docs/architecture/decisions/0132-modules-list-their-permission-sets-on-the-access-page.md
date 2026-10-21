@@ -1,6 +1,6 @@
-# ADR-NEXT: A module lists its permission sets on the Access page by shipping Access Add-On rows
+# ADR-0132: A module lists its permission sets on the Access page by shipping Access Add-On rows
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-10-20
 **Source:** final audit finding S1 (module permission sets can be assigned only in Setup); plan
 Section 7.4 ("no Setup step required for normal use") and the non-negotiable that every admin

@@ -31,7 +31,7 @@ public with sharing class AccessService {
      * includes). Each is resolved by API name in the package's own namespace at runtime,
      * never by Id.
      *
-     * A module adds its own sets after these by shipping Access Add-On rows (ADR-NEXT,
+     * A module adds its own sets after these by shipping Access Add-On rows (ADR-0132,
      * modules list their permission sets on the Access page), so Core names no module set.
      * These and the registered rows are the whole allowlist: the page never assigns an
      * arbitrary permission set.
