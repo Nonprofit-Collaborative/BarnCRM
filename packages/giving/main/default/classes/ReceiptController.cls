@@ -295,8 +295,6 @@ public with sharing class ReceiptController {
         Id recordId
     ) {
         ErrorLogger.log(failure, context, recordId);
-        AuraHandledException surfaced = new AuraHandledException(failure.getMessage());
-        surfaced.setMessage(failure.getMessage());
-        return surfaced;
+        return GivingErrors.userError(failure, Label.Giving_Receipt_UnexpectedError);
     }
 }

@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import LIMITS_HEADING from '@salesforce/label/c.Core_OrgOptimizer_LimitsHeading';
 import LIMIT_USAGE from '@salesforce/label/c.Core_OrgOptimizer_LimitUsage';
@@ -63,7 +64,7 @@ export default class OptimizerStorage extends LightningElement {
     try {
       this.storage = await getStorage();
     } catch (error) {
-      this.errorMessage = (error && error.body && error.body.message) || String(error);
+      this.errorMessage = (error && error.body && error.body.message) || UNEXPECTED_ERROR;
     } finally {
       this.loading = false;
     }

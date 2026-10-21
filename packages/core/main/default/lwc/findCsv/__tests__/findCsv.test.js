@@ -86,6 +86,6 @@ describe('c/findCsv', () => {
     expect(format('{0} of {1}', 'one', 'two')).toBe('one of two');
     expect(messageFrom({ body: { message: 'From the server' } })).toBe('From the server');
     expect(messageFrom(new Error('Thrown'))).toBe('Thrown');
-    expect(messageFrom('plain')).toBe('plain');
+    expect(messageFrom('plain')).toBe('c.Core_UnexpectedError');
   });
 });

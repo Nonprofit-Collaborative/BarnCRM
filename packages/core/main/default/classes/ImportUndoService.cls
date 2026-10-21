@@ -191,7 +191,9 @@ public with sharing class ImportUndoService {
                 LIMIT 1
             ];
             String line = String.format(
-                Label.Core_Import_LogUndone,
+                BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
+                    ? Label.Core_Import_LogUndoneBulkUpdate
+                    : Label.Core_Import_LogUndone,
                 new List<String>{
                     UserInfo.getName(),
                     Datetime.now().format(),

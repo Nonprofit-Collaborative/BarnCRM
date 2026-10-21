@@ -6,6 +6,7 @@ import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_DataManager_Title';
 import INTRO from '@salesforce/label/c.Core_DataManager_Intro';
 import TOOLS_HEADING from '@salesforce/label/c.Core_DataManager_ToolsHeading';
@@ -96,7 +97,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       this.mappingsError = undefined;
     } else if (error) {
       this.mappings = [];
-      this.mappingsError = (error.body && error.body.message) || String(error);
+      this.mappingsError = (error && error.body && error.body.message) || UNEXPECTED_ERROR;
     }
   }
 

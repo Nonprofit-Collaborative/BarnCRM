@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFindings';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_INTRO from '@salesforce/label/c.Core_OrgOptimizer_SetupIntro';
 import CHECK_USERS from '@salesforce/label/c.Core_OrgOptimizer_CheckInactiveUsers';
@@ -48,7 +49,7 @@ export default class OptimizerSetup extends LightningElement {
     try {
       this.result = await getFindings();
     } catch (error) {
-      this.errorMessage = (error && error.body && error.body.message) || String(error);
+      this.errorMessage = (error && error.body && error.body.message) || UNEXPECTED_ERROR;
     } finally {
       this.loading = false;
     }

@@ -18,6 +18,7 @@ import RESULT from '@salesforce/label/c.Core_Find_Result';
 import BLANK from '@salesforce/label/c.Core_Find_Blank';
 import CAPPED from '@salesforce/label/c.Core_Find_SummaryCapped';
 import LOADING from '@salesforce/label/c.Core_Find_Loading';
+import NOTHING_TO_SUMMARIZE from '@salesforce/label/c.Core_Find_SummaryNothing';
 
 const NUMBER_TYPES = new Set(['double', 'currency', 'percent', 'integer', 'long']);
 const DATE_TYPES = new Set(['date', 'datetime']);
@@ -39,7 +40,8 @@ export default class FindSummaryPanel extends LightningElement {
     summaryFunction: SUMMARY_FUNCTION,
     summaryField: SUMMARY_FIELD,
     groupBy: GROUP_BY,
-    loading: LOADING
+    loading: LOADING,
+    nothingToSummarize: NOTHING_TO_SUMMARIZE
   };
 
   fn = 'count';
@@ -131,7 +133,12 @@ export default class FindSummaryPanel extends LightningElement {
   }
 
   get hasLines() {
-    return !!this.lines;
+    return !!this.lines && this.lines.length > 0;
+  }
+
+  /** A summary that ran and found no records, so there is nothing to put in a table. */
+  get hasNoLines() {
+    return !!this.lines && this.lines.length === 0;
   }
 
   get cappedNote() {

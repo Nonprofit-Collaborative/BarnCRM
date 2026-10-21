@@ -68,9 +68,6 @@ public with sharing class SampleDataController {
      * generic "Script-thrown exception".
      */
     private static AuraHandledException auraError(Exception e, String context) {
-        ErrorLogger.log(e, context);
-        AuraHandledException wrapped = new AuraHandledException(e.getMessage());
-        wrapped.setMessage(e.getMessage());
-        return wrapped;
+        return UserErrors.wrap(e, context, true);
     }
 }

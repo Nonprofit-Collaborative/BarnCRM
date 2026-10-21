@@ -1069,9 +1069,6 @@ public with sharing class ImportController {
      * on the exception, which AuraHandledException otherwise replaces with a generic message.
      */
     private static AuraHandledException auraError(Exception e, String context) {
-        ErrorLogger.log(e, context);
-        AuraHandledException wrapped = new AuraHandledException(e.getMessage());
-        wrapped.setMessage(e.getMessage());
-        return wrapped;
+        return UserErrors.wrap(e, context, true);
     }
 }

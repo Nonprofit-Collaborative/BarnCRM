@@ -14,6 +14,7 @@ import {
   valueProblem
 } from 'c/filterDocument';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import REMOVE_CONDITION from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import CONDITION_LEGEND from '@salesforce/label/c.Core_Filter_ConditionLegend';
@@ -701,6 +702,6 @@ export default class FilterBuilder extends LightningElement {
     if (error && error.body && error.body.message) {
       return error.body.message;
     }
-    return error && error.message ? error.message : String(error);
+    return error && error.message ? error.message : UNEXPECTED_ERROR;
   }
 }

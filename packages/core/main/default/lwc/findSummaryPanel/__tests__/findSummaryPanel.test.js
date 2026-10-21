@@ -154,6 +154,17 @@ describe('c-find-summary-panel', () => {
     ]);
   });
 
+  it('says there is nothing to summarize when no records match', async () => {
+    const element = await mount();
+    summarize.mockResolvedValue({ soql: 'SELECT ...', capped: false, lines: [] });
+    element.shadowRoot.querySelector('[data-id="summarize"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="summary"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="summary-empty"]').textContent).toBe(
+      'c.Core_Find_SummaryNothing'
+    );
+  });
+
   it('keeps a saved summary and shows a refusal', async () => {
     const element = await mount({ function: 'MIN', field: 'Gift_Date__c' });
     expect(element.shadowRoot.querySelector('[data-id="function"]').value).toBe('min');

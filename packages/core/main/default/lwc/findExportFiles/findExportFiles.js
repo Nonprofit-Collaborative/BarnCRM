@@ -2,6 +2,7 @@ import { LightningElement, api } from 'lwc';
 import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import STARTED from '@salesforce/label/c.Core_Find_ExportFilesStarted';
 import PROGRESS from '@salesforce/label/c.Core_Find_ExportFilesProgress';
 import DONE from '@salesforce/label/c.Core_Find_ExportFilesDone';
@@ -18,7 +19,7 @@ function messageFrom(error) {
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
-  return error && error.message ? error.message : String(error);
+  return error && error.message ? error.message : UNEXPECTED_ERROR;
 }
 
 /**

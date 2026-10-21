@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import heading from '@salesforce/label/c.Core_Import_ChangesHeading';
 import help from '@salesforce/label/c.Core_Import_ChangesHelp';
 import addLabel from '@salesforce/label/c.Core_Import_ChangesAdd';
@@ -365,7 +366,7 @@ export default class ImportColumnTransforms extends LightningElement {
     } catch (error) {
       this.samples = [];
       this.problems = [
-        error && error.body && error.body.message ? error.body.message : String(error)
+        error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR
       ];
     }
   }

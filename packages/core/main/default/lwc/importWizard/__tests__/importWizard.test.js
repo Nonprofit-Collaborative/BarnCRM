@@ -1252,7 +1252,9 @@ describe('the import wizard', () => {
       ]);
       const lines = written.split('\r\n').filter((line) => line.length > 0);
       expect(lines).toHaveLength(1251);
-      expect(lines[0]).toBe('﻿Row,Last Name,Email,Notes,Reason');
+      expect(lines[0]).toBe(
+        '﻿c.Core_Import_ResultsRow,Last Name,Email,Notes,c.Core_Import_ResultsReason'
+      );
       // The shared writer defuses a formula and leaves a negative amount alone.
       expect(lines[1]).toBe('2,"\'=HYPERLINK(""x"")",,n,Last name is missing.');
       expect(lines[2]).toBe('3,Person 1,,-25.00,Last name is missing.');

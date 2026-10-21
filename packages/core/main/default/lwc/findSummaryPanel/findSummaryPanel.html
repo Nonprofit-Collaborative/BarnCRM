@@ -49,6 +49,9 @@
                 {errorMessage}
             </div>
         </template>
+        <template lwc:if={hasNoLines}>
+            <p class="slds-var-m-top_small" role="status" data-id="summary-empty">{labels.nothingToSummarize}</p>
+        </template>
         <template lwc:if={hasLines}>
             <div class="slds-var-m-top_small" role="region" aria-live="polite" aria-label={labels.summarize}>
                 <lightning-datatable

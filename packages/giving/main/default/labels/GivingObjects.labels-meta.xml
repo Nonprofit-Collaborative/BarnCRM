@@ -33,6 +33,14 @@
         <value>Only one fund can be the default. Save one default fund at a time, and BarnCRM will clear the flag on the previous one.</value>
     </labels>
     <labels>
+        <fullName>Giving_Gift_UnexpectedError</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gift actions: an unexpected failure</shortDescription>
+        <value>That did not work, and nothing was changed. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
+    </labels>
+    <labels>
         <fullName>Giving_Gift_AllocationUpdateFailed</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

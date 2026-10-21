@@ -921,6 +921,14 @@
         <value>This import has already run, so it cannot be previewed again. Start a new import to preview the file.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_LogUndoneBulkUpdate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk update undo log: {0} person, {1} time, {4} put back</shortDescription>
+        <value>Undone by {0} on {1}: {4} values put back.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_LogUndone</fullName>
         <categories>Import</categories>
         <language>en_US</language>
