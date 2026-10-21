@@ -15,9 +15,12 @@ their own pages in this guide describe; Data Manager is how you reach them.
 
 ## 2. How to turn it on
 
-There is nothing to turn on. The **Data Manager** tab is in the BarnCRM app for anyone with
-the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
-or **BarnCRM Bulk Delete** permission sets.
+On a new install the **Data Manager** feature is off until you turn it on: choose **Turn
+on** in the **Data Manager** row in **BarnCRM Settings**, **General** (or leave it ticked in
+first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tabs are
+hidden for everyone. Once it is on, the **Data Manager** tab is in the BarnCRM app for anyone
+with the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk
+Update** or **BarnCRM Bulk Delete** permission sets.
 
 Each card and each kind of job is shown only to people who may use it:
 

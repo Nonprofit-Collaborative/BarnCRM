@@ -14,8 +14,10 @@ connection is current while the matching record says it ended two years ago.
 
 ## How to turn it on
 
-Relationships is part of Core and is on as soon as BarnCRM is installed. There is
-nothing to install and no Setup step.
+Relationships is part of Core, but on a new install it is off until you turn it on. In
+**BarnCRM Settings**, **General**, choose **Turn on** in the **Relationships** row (or leave
+it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
+to install and no Setup step.
 
 1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Relationships**.

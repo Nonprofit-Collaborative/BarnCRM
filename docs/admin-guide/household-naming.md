@@ -19,8 +19,11 @@ which family it was.
 
 ## How to turn it on
 
-Naming is on as soon as Core is installed, with patterns that work out of the box. To
-change them:
+Naming belongs to the **Household upkeep** feature, which on a new install is off until you
+turn it on: choose **Turn on** in the **Household upkeep** row in **BarnCRM Settings**,
+**General** (or leave it ticked in first-run setup); see
+[BarnCRM Settings](barncrm-settings.md). Once it is on, the patterns work out of the box.
+To change them:
 
 1. Open the **BarnCRM** app and click the **BarnCRM Settings** tab.
 2. Click **Households** in the left navigation. The naming panel is in that section, and
@@ -30,13 +33,14 @@ change them:
 3. Change any of the three patterns. A preview of five sample households updates as you
    type, so you can see the result before you save. The samples ship with the product; they
    are not your own households.
-4. Choose whether people who have died stay in the household name. They are always left
-   out of the informal greeting.
-5. Click **Save**.
+4. Click **Save** to save the three patterns.
+5. Whether people who have died stay in the household name is a separate row in the console,
+   saved by the console's own **Save**, not by the patterns' Save. They are always left out
+   of the informal greeting.
 6. Saving changes the pattern everywhere it is used next. Every household is renamed from
    the current patterns the next time anything touches it, so an org that does not recompute
    drifts into the new pattern one household at a time. To bring every household up to date
-   at once, click **Recompute all households** and confirm. The page tells you the recompute
+   at once, click **Update all household names** and confirm. The page tells you the recompute
    has started; it then runs in the background, and households are renamed a few hundred at
    a time. A large org takes a few minutes. The page does not report progress or tell you
    when the batch has finished.
@@ -91,7 +95,7 @@ Maria does steps 1 to 5. David does step 6.
    to keep people who have died in household names.
 4. Open **BarnCRM Settings**, click **Households**, and change the household name
    pattern to `{LastName} Household`. Watch the sample preview change as you type.
-   Click **Save**, then **Recompute all households**, and confirm.
+   Click **Save**, then **Update all household names**, and confirm.
 5. Go back to a household with one surname. It now reads **Garcia Household**.
 6. David opens the household for the Reverend and Mrs. Smith, checks **Custom name**, and
    types the name and greetings the way he wants them. From now on nothing recalculates
@@ -111,7 +115,7 @@ enter the person.
 **"I changed the pattern and nothing changed."**
 An existing household keeps its old name only until something touches it: naming reads the
 current patterns every time it runs, so the household is renamed the next time a member is
-added, changed, or moved. Click **Recompute all households** to rename them all now instead
+added, changed, or moved. Click **Update all household names** to rename them all now instead
 of household by household.
 
 **"One household refuses to update."**

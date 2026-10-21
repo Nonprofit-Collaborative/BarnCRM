@@ -13,9 +13,11 @@ are unchanged; you have simply written down where they work.
 
 ## How to turn it on
 
-Affiliations is part of Core and is on as soon as BarnCRM is installed. There is nothing
-to install, no Setup step, and no setting to choose: an affiliation means the same thing in
-every organization, so there is nothing to configure.
+Affiliations is part of Core, but on a new install it is off until you turn it on. In
+**BarnCRM Settings**, **General**, choose **Turn on** in the **Affiliations** row (or leave
+it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
+to install and no Setup step, and no setting to choose once it is on: an affiliation means
+the same thing in every organization, so there is nothing to configure.
 
 On the **Automation** page in BarnCRM Settings you will see two rows for affiliations,
 both switched on as they ship:
@@ -128,6 +130,8 @@ already overlap (loaded before the rule, or with automation off) are checked onl
 change the person, organization, role or dates on one of them: marking one primary or
 editing its description still saves, and changing its dates is how you fix the overlap.
 
-**Looking for a setting to turn on.** There is not one. Affiliations behaves the same way in
-every organization, so nothing is exposed in BarnCRM Settings, and there is nothing you can
-get wrong by leaving it alone.
+**Looking for a setting to turn on.** The only switch is the **Affiliations** feature in
+**BarnCRM Settings**, **General**, which is off on a new install until you turn it on (see
+[BarnCRM Settings](barncrm-settings.md)). Beyond that, Affiliations behaves the same way in
+every organization, so no other setting is exposed, and there is nothing you can get wrong
+by leaving it alone.

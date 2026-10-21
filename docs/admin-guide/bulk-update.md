@@ -132,7 +132,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 ## 6. Changing values with steps
 
 **Change with steps** changes each record's own value rather than giving every record the same
-one. Choose the field, choose **Change with steps**, then **Add a step** (up to ten). Steps run
+one. Choose the field, choose **Change with steps**, then **Add a change** (up to ten). Steps run
 in the order listed:
 
 | Step | What it does | Example |

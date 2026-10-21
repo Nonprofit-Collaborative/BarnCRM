@@ -24,7 +24,7 @@ once:
 1. Create at least one fund and mark it as the default (see the Funds page). A gift saved
    without a designation goes there.
 2. Open **BarnCRM Settings**, choose **Giving**, and check the settings on that page:
-   **Default Fund**, **Default Appeal** (optional), and **Automatic Household Soft Credits**.
+   **Default fund**, **Default appeal** (optional), and **Automatic household soft credits**.
 
 Then give your fundraising staff the **Fundraising Staff** role on the Access page: it
 includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only

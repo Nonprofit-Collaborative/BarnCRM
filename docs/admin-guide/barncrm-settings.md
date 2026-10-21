@@ -127,16 +127,16 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
 
 - A module that is not installed shows **Not installed** with **Install**, which opens
   Salesforce's installer, and **What this module does**.
-- An installed module shows **Installed** and a link to its own app. Each module has its own
-  app with its own Settings tab, and its settings live there, not in BarnCRM Settings. (Some
-  module sections still show in BarnCRM Settings for now; they move to the module's app in a
-  later release.)
+- An installed module shows **Installed** and a link to its own app, where it has one.
+  Rollup Builder and Volunteers have a Settings tab in their app, and their settings live
+  there; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  sections still show in BarnCRM Settings for now; they move to the module's app in a later
+  release.)
 
 The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
 Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror (Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
-Builder is still part of Core while it is being split into its own package; until then it
-shows as installed, and its tab and settings show as they always have. See the
+Builder ships as its own package, installed from this section like the others. See the
 [Module Manager](module-manager.md) for what else you can do with an installed module.
 
 ## A five-minute walkthrough
@@ -152,7 +152,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
-   **Edition**, shown read-only: it is chosen once in the Setup Assistant, and the
+   **Edition**, shown read-only: it is chosen once in first-run setup, and the
    **Change edition** link under it is the way to change it later (see
    [Editions](editions.md)).
 3. Click in the **Search settings** box and type `greeting`. Results appear as you type. If

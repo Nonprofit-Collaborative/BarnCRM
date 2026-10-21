@@ -30,7 +30,10 @@ section, and each section's own page in this guide says what that button does.
 
 ## 2. How to turn it on
 
-There is nothing to turn on.
+On a new install the **Org Optimizer and Health Check** feature is off until you turn it on:
+choose **Turn on** in that row in **BarnCRM Settings**, **General** (or leave it ticked in
+first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tab is
+hidden for everyone.
 
 1. Open the **BarnCRM** app and choose the **Org Optimizer** tab. (It is the tab that used to
    be called **Data Hygiene**; bookmarks to it still work.)

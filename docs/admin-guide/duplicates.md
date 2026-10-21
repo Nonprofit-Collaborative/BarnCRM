@@ -13,9 +13,12 @@ Nothing is ever merged or deleted for you. Every merge is a pair you looked at a
 
 ## How to turn it on
 
-There is nothing to install. Salesforce switches on its standard duplicate rules for people
-and accounts in every new org, and BarnCRM uses them. There is one Setup step, because of a
-Salesforce licensing rule:
+There is nothing to install, but on a new install the **Duplicate Review** feature is off
+until you turn it on: choose **Turn on** in the **Duplicate Review** row in **BarnCRM
+Settings**, **General** (or leave it ticked in first-run setup); see
+[BarnCRM Settings](barncrm-settings.md). Salesforce switches on its standard duplicate rules
+for people and accounts in every new org, and BarnCRM uses them. There is one permission
+step, because of a Salesforce licensing rule:
 
 **Who can review duplicates.** Salesforce keeps possible duplicates in records called duplicate
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
@@ -30,7 +33,7 @@ Platform user nothing usable.
 
 1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
 2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
-   **Open** button brings you here too.)
+   **Open this page** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -143,7 +146,8 @@ which the BarnCRM Duplicate Review permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
-Assign the permission set in Setup (see How to turn it on). A Salesforce Platform user cannot
+Give them the permission set in BarnCRM Settings, **Access**, under **Extra permissions** (see
+How to turn it on). A Salesforce Platform user cannot
 be given it at all; ask a colleague with a Sales Cloud or Service Cloud license to review.
 
 **The last-scan line is red.** Salesforce refused to check some batches of up to 50 records, for

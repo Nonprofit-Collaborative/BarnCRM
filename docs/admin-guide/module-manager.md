@@ -21,17 +21,18 @@ There is nothing to turn on.
 Everyone who can open BarnCRM Settings sees the list. You need the **Manage BarnCRM
 Settings** permission to install, turn on, turn off, or check what an uninstall would delete.
 
-Which modules are listed depends on the edition chosen in the first step of the
-[Setup Assistant](setup-assistant.md). The Standard Edition (or no edition chosen yet) lists
+Which modules are listed depends on the edition chosen in first-run setup (see
+[BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
 Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all seven: Core, BarnCRM Rollup
 Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM
 Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
 No module is installed with Core or by first-run setup: a module is installed only when you
-install it from this section. Each installed module has its own app with its own Settings
-tab, where its settings live; its row links there. (Some module settings still show in
-BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
+install it from this section. An installed module's row links to its own app. Rollup
+Builder and Volunteers have a Settings tab there, where their settings live; Giving's
+Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
+still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
 features are turned on in General instead (see
 [BarnCRM Settings, Features](barncrm-settings.md#features-general)).
 
@@ -41,18 +42,18 @@ Maria's org has Core and Giving installed. She wants to see the list, pause Givi
 cleans up her data, and check what removing a module would cost.
 
 1. Open **BarnCRM Settings**, **Modules**. Each row has the module's name, a status, a
-   **Learn more** link to what it does, and its actions:
-   - **Installed** (On): installed and working, with a link to the module's own app. Core is
+   **What this module does** link, and its actions:
+   - **Installed**: installed and working, with a link to the module's own app. Core is
      always On.
    - **Installed and off**: installed, and its automation is not running.
    - **Not installed**: not in your org.
 2. On a **Not installed** row, click **Install**. Salesforce's install screen opens in a new
    tab. Choose who to install for (**Install for Admins Only** is the safe choice), click
    **Install**, and wait for Salesforce's email. Come back and click **Check again**: the row
-   says **On**. If a row says "No install link is published for this module yet.", there is
-   no version to install yet; read about it with **Learn more**. If it says "Install these
+   says **Installed**. If a row says "No install link is published for this module yet.", there is
+   no version to install yet; read about it with **What this module does**. If it says "Install these
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
-   first: Salesforce refuses Giving, Funders and Mirror until BarnCRM Rollup Builder is
+   first: Salesforce refuses Giving, Volunteers, Funders and Mirror until BarnCRM Rollup Builder is
    installed, and Funders and Mirror until Giving is too.
 3. On the **Giving** row, click **Turn off**. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
