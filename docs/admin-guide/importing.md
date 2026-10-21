@@ -622,10 +622,10 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
 
 | Choice | What it does | What it risks |
 |---|---|---|
-| **Insert** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
+| **Create new records** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
 | **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
 | **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 4. |
-| **Upsert by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
+| **Update or create, matched by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
 | **Delete by record ID** | Deletes the record whose Salesforce record ID is in the row's ID column, as a bulk delete does. Listed only for people with **Bulk Delete Records**, and only for objects a bulk delete may delete. | Every record the file names goes, with the related records Salesforce deletes with it. See "Deleting the records a file lists" below. |
 
    Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
@@ -636,7 +636,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
 
-**Your duplicate rules.** Under **Insert** and **Upsert by external ID**, tick **Also match
+**Your duplicate rules.** Under **Create new records** and **Update or create, matched by external ID**, tick **Also match
 with my duplicate rules** (on the matching step) to stop a file from creating a second copy of
 a record you already have. Each row that would create a record is first looked for with the
 duplicate rules your org has switched on for that object (see [Duplicates](duplicates.md)),
@@ -646,7 +646,7 @@ by record ID**, **Update by a field you choose** or **Delete by record ID**, whi
 a record (so it never appears for contacts and accounts, which load by Update only).
 
 - **Which wins.** The record ID and the field rows are found by always come first: under
-  **Upsert by external ID**, a row whose external ID finds a record updates that record and the
+  **Update or create, matched by external ID**, a row whose external ID finds a record updates that record and the
   duplicate rules are never asked about it. Only a row that would otherwise create a record is
   asked.
 - **External IDs are never overwritten.** Under an upsert, a row the rules match to a record
@@ -742,9 +742,9 @@ attendees, or a legacy system's accounts and their notes. Each row names its par
 and the rows that share a key belong to one parent. **Related records** loads both in one
 import, with one dry run and one undo.
 
-1. On the step where you choose what each row does, choose **Upsert by external ID**, **Update
-   by a field you choose** or **Update by record ID**. The field rows are matched by is the
-   **parent key**: rows with the same value in it share one parent. **Insert** cannot load
+1. On the step where you choose what each row does, choose **Update or create, matched by
+   external ID**, **Update by a field you choose** or **Update by record ID**. The field rows are matched by is the
+   **parent key**: rows with the same value in it share one parent. **Create new records** cannot load
    related records, because a key that no field holds cannot find its parent again in a later
    part of the file or on a second run. To create new parents, give the object an External ID
    field (a program code, a legacy ID) and upsert by it.
@@ -761,7 +761,7 @@ How it loads:
   or update the parent. Later rows with the same key add related records to it, and their
   parent columns are not loaded, so put the parent's values on its first row.
 - **A row with only a key and related columns** adds a related record to the parent that key
-  finds, in the file or already in Salesforce. Under Upsert, a key no record holds creates a
+  finds, in the file or already in Salesforce. Under **Update or create, matched by external ID**, a key no record holds creates a
   parent with only that value.
 - **A parent that fails takes its related records with it.** When a parent row is rejected,
   each later row with the same key is rejected with "The parent record of this row was not
