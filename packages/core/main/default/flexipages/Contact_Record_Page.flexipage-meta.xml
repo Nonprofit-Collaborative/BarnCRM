@@ -273,7 +273,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>{!$Label.c.Core_Section_Person}</value>
+          <value>{!$Label.Core_Section_Person}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>personSection</identifier>
@@ -287,7 +287,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>{!$Label.c.Core_Section_Household}</value>
+          <value>{!$Label.Core_Section_Household}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>personHouseholdSection</identifier>
