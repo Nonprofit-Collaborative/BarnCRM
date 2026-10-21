@@ -243,6 +243,146 @@ private class PersonErasureTest {
         }
     }
 
+    /** The row reporting a household the person left that still has members. */
+    private static PersonErasure.Change sharedHouseholdRow(
+        PersonErasure.Result result,
+        Id householdId
+    ) {
+        for (PersonErasure.Change change : result.changes) {
+            if (
+                change.objectLabel == Label.Core_Erase_Household &&
+                change.action != PersonErasure.CLEARED &&
+                change.recordIds.contains(householdId)
+            ) {
+                return change;
+            }
+        }
+        return null;
+    }
+
+    @IsTest
+    static void aCustomNamedHouseholdNoLongerNamesTheErasedPerson() {
+        System.runAs(eraser()) {
+            isolate();
+            Contact jordan = coupleInContactMode(true);
+            addSam(jordan.AccountId);
+            update new Account(
+                Id = jordan.AccountId,
+                Name = 'Jordan and Sam Lee',
+                Household_Formal_Greeting__c = 'Mx. Jordan Lee and Mx. Sam Lee',
+                Household_Informal_Greeting__c = 'Jordan and Sam',
+                Custom_Name__c = true
+            );
+
+            PersonErasure.Result preview = PersonErasure.preview(jordan.Id);
+            Account untouched = [
+                SELECT Name, Custom_Name__c
+                FROM Account
+                WHERE Id = :jordan.AccountId
+            ];
+            Assert.areEqual('Jordan and Sam Lee', untouched.Name, 'The preview changes nothing');
+            Assert.isTrue(untouched.Custom_Name__c, 'Not even the box');
+
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, 'PR-7');
+
+            Account household = [
+                SELECT
+                    Name,
+                    Custom_Name__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c,
+                    Member_Count__c
+                FROM Account
+                WHERE Id = :jordan.AccountId
+            ];
+            Assert.isFalse(household.Custom_Name__c, 'Custom Name turned off');
+            for (
+                String wording : new List<String>{
+                    household.Name,
+                    household.Household_Formal_Greeting__c,
+                    household.Household_Informal_Greeting__c
+                }
+            ) {
+                Assert.isFalse(
+                    String.valueOf(wording).contains('Jordan'),
+                    'The erased person is not named: ' + wording
+                );
+            }
+            Assert.areEqual(
+                'Sam',
+                household.Household_Informal_Greeting__c,
+                'Named from who is left'
+            );
+            Assert.areEqual(1, household.Member_Count__c, 'Recounted without Jordan');
+
+            for (PersonErasure.Result run : new List<PersonErasure.Result>{ preview, result }) {
+                PersonErasure.Change row = sharedHouseholdRow(run, jordan.AccountId);
+                Assert.isNotNull(row, 'The household is reported');
+                Assert.areEqual(PersonErasure.UPDATED, row.action, 'As updated');
+                Assert.areEqual(
+                    Label.Core_Erase_NoteCustomNameReleased,
+                    row.note,
+                    'Saying the typed name was replaced'
+                );
+                Assert.isTrue(
+                    row.fields.contains(Account.Name.getDescribe().getLabel()),
+                    'Lists the name: ' + row.fields
+                );
+                Assert.isTrue(
+                    row.fields.contains(Account.Custom_Name__c.getDescribe().getLabel()),
+                    'And the box: ' + row.fields
+                );
+            }
+            String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
+            .Details__c;
+            Assert.isTrue(
+                details.contains(Label.Core_Erase_NoteCustomNameReleased),
+                'The Erasure record says the same: ' + details
+            );
+            Assert.isFalse(details.contains('Jordan'), 'And names nobody');
+        }
+    }
+
+    @IsTest
+    static void aNamedHouseholdListsOnlyTheFieldsThatChanged() {
+        System.runAs(eraser()) {
+            isolate();
+            Contact jordan = coupleInContactMode(true);
+            addSam(jordan.AccountId);
+            String nameBefore = [SELECT Name FROM Account WHERE Id = :jordan.AccountId].Name;
+
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, null);
+
+            Account household = [
+                SELECT Name, Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :jordan.AccountId
+            ];
+            Assert.isFalse(
+                household.Household_Informal_Greeting__c.contains('Jordan'),
+                'Renamed without Jordan: ' + household.Household_Informal_Greeting__c
+            );
+            PersonErasure.Change row = sharedHouseholdRow(result, jordan.AccountId);
+            Assert.areEqual(PersonErasure.UPDATED, row.action, 'Reported as updated');
+            Assert.areEqual(Label.Core_Erase_NoteRenamed, row.note, 'Named again by upkeep');
+            Assert.isTrue(
+                row.fields.contains(Account.Member_Count__c.getDescribe().getLabel()),
+                'Lists the count: ' + row.fields
+            );
+            Assert.isTrue(
+                row.fields.contains(
+                    Account.Household_Informal_Greeting__c.getDescribe().getLabel()
+                ),
+                'And the greeting: ' + row.fields
+            );
+            Assert.areEqual(
+                household.Name != nameBefore,
+                row.fields.contains(Account.Name.getDescribe().getLabel()),
+                'The name is listed only if it changed: ' + nameBefore + ', ' + row.fields
+            );
+        }
+    }
+
     @IsTest
     static void aContactsOrganizationAccountKeepsItsFieldLabelNotHousehold() {
         System.runAs(eraser()) {

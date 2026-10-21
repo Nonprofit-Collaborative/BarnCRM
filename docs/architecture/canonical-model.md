@@ -7090,7 +7090,14 @@ stores people as accounts, the person account fields a household (a business acc
 carry are left alone. The preview and the Erasure record list such a household under the label
 Household, with its name and greetings among the fields emptied and the note that it was kept
 because records are credited to it. The contact's account is listed among the person's fields as
-Household.
+Household. A household left with other members whose name was typed by hand (Custom Name on,
+R-H8) has Custom Name turned off, as the user, and its name and greetings made again from the
+remaining members, because a typed name can name the person in any words. A household Nonprofit
+Cloud names is left to it, and listed with a note to check its wording by hand. Each household
+left with members is listed under Household with the fields that really changed (Updated), or
+as Kept when none did, with a note saying which of the three happened. With Giving installed,
+the person's automatic Household Member soft credits (R-SC3) are deleted by the erasure and
+listed as Deleted; every other soft credit is kept.
 
 **R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
 in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is
@@ -8520,6 +8527,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Core QA fixes. No object or field added. R-H4: a household left with no current member keeps its last computed name and greetings instead of the placeholder name and empty greetings, so a household kept for credited records still says which family it was. R-ER3: an anonymized kept household is reported under Household with its name and greetings among the fields and a note that it was kept because records are credited to it; the contact's account is reported as Household. Erasure Details uses the erase screen's words for what was done. |
 | v0.8 | 2026-10-20 | QA follow-ups. No object or field added. R-ER10: activities and files are counted after the module extensions run, leaving out what one reported as Deleted, so a generated letter Volunteers deletes is not also listed as kept. C-10: `SampleDataModule` gains `hasSampleRecords()`, and Core's sample data reads Loaded (and refuses a new load) while any module still has sample records, so a removal that kept some can be run again; Volunteers answers from its sample jobs and skills. The `Past_Shifts_Still_Open` list view filters End Time before `N_DAYS_AGO:7`, matching the Health Check finding. |
 | v0.8 | 2026-10-20 | Giving QA fixes: pledge balance. No object or field added. R-CM5: a pledge saved with Amount and Installments Planned and no Expected Total gets their product. R-CM4: a refund or write-off carries the original's commitment and installment, takes its amount off both and reopens a pledge it takes short; installments, completion and the Paid To Date and Paid Amount rollups count the same statuses (Received, Refunded, Written off). R-CM1: the donor of an Active or Paused commitment, or that person's account, is not deleted (`GiftDonorDeleteGuardHandler`); a merge and an erasure still work. |
+| v0.8 | 2026-10-20 | Erasure audit fixes B3 and S2. No object or field added. R-ER3: a household left with members whose name was typed by hand has Custom Name turned off and is named again from the remaining members; a household Nonprofit Cloud names is listed for staff to check; each is reported with the fields that really changed. Giving deletes the person's automatic Household Member soft credits in the erasure and lists them as Deleted (ADR-0110 amended). |
 
 ---
 ## 32. Entity ownership by package

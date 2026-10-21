@@ -18,7 +18,7 @@ Appeals arrive with the Giving module. There is nothing to install separately.
 2. Create one appeal per effort you want to measure. Do not create one per mailing list or
    per segment: an appeal you cannot report on is an appeal nobody fills in.
 3. If you want a particular appeal proposed on new gifts, open **BarnCRM Settings**,
-   choose **Giving**, and set **Default Appeal**.
+   choose **Giving**, and set **Default appeal**.
 
 No Salesforce Setup step is needed.
 

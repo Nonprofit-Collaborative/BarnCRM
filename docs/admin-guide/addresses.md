@@ -29,8 +29,10 @@ job you cannot trust, which is why the last run is shown rather than assumed.
 
 ## How to turn it on
 
-Addresses is part of Core and is on as soon as BarnCRM is installed. There is nothing
-to install and no Setup step. Two things are worth setting once.
+Addresses is part of Core, but on a new install it is off until you turn it on. In
+**BarnCRM Settings**, **General**, choose **Turn on** in the **Addresses** row (or leave it
+ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing to
+install and no Setup step. Once it is on, two things are worth setting once.
 
 1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.

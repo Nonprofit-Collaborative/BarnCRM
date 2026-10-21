@@ -165,3 +165,14 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core | Core quality pass |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core | v0.9 |
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core | v0.6 |
+| C-08 Record pages | [record-pages.md](record-pages.md) | Core | v0.1 |
+| C-18 Seasonal addresses | [addresses.md](addresses.md) | Core | v0.3 |
+| C-19 Import undo and journal | [importing.md](importing.md) | Core | v0.5 |
+| C-21 Health Check fixes and defaults findings | [health-check.md](health-check.md) | Core | v0.5 |
+| C-22 People stored as person accounts | [household-members.md](household-members.md) | Core | v0.5 |
+| C-23 Error digest and automatic pause expiry | [error-log.md](error-log.md), [automation-control.md](automation-control.md) | Core | v0.5 |
+| C-32 Import matching rules | [importing.md](importing.md) | Core | v0.7 |
+| C-33 Load one object | [importing.md](importing.md) | Core | v0.7 |
+| C-36 Export to Files | [find.md](find.md) | Core | Shipped (#219) |
+| G-02 Giving totals on donors, funds and appeals | [donor-records.md](donor-records.md) | Giving | v0.2 |
+| X-06 API documentation and samples | [inbound-gift-api.md](inbound-gift-api.md) | Mirror | v0.6 |
