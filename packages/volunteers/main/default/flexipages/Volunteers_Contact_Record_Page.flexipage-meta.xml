@@ -398,7 +398,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Person</value>
+          <value>{!$Label.Core_Section_Person}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>personSection</identifier>
@@ -412,7 +412,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Household</value>
+          <value>{!$Label.Core_Section_Household}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>personHouseholdSection</identifier>
@@ -426,7 +426,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Reaching This Person</value>
+          <value>{!$Label.Core_Section_ReachingThisPerson}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>reachingSection</identifier>
@@ -440,7 +440,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Volunteer Profile</value>
+          <value>{!$Label.Volunteers_Section_VolunteerProfile}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>volunteerSection</identifier>

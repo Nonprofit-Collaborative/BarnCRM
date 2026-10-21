@@ -299,7 +299,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Commitment</value>
+          <value>{!$Label.Giving_Section_Commitment}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>commitmentSection</identifier>
@@ -313,7 +313,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Schedule</value>
+          <value>{!$Label.Giving_Section_Schedule}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>scheduleSection</identifier>
@@ -327,7 +327,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Totals</value>
+          <value>{!$Label.Giving_Section_Totals}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>totalsSection</identifier>
