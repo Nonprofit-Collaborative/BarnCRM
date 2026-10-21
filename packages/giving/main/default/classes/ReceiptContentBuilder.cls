@@ -124,7 +124,9 @@ public with sharing class ReceiptContentBuilder {
             String described = String.isBlank(gift.In_Kind_Description__c)
                 ? Label.Giving_Receipt_InKindDescribedDefault
                 : gift.In_Kind_Description__c.trim();
-            sentences.add(String.format(Label.Giving_Receipt_InKindSentence, new List<String>{ described }));
+            sentences.add(
+                String.format(Label.Giving_Receipt_InKindSentence, new List<String>{ described })
+            );
         }
 
         if (gift.Intangible_Religious_Benefits__c == true) {

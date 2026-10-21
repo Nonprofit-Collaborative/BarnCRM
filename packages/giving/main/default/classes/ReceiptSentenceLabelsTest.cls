@@ -16,7 +16,10 @@ private class ReceiptSentenceLabelsTest {
             'The only goods or services provided in exchange for this contribution were intangible religious benefits.',
             ReceiptContentBuilder.SENTENCE_INTANGIBLE_RELIGIOUS
         );
-        System.assertEquals('the goods or services described below', ReceiptContentBuilder.IN_KIND_AMOUNT_PHRASE);
+        System.assertEquals(
+            'the goods or services described below',
+            ReceiptContentBuilder.IN_KIND_AMOUNT_PHRASE
+        );
         System.assertEquals(
             'No value stated (gift of goods or services)',
             ReceiptContentBuilder.AMOUNT_NOT_STATED
@@ -51,7 +54,12 @@ private class ReceiptSentenceLabelsTest {
 
         String sentence = ReceiptContentBuilder.taxSentencesFor(gift)[0];
 
-        System.assert(sentence.startsWith('In exchange for this contribution you received goods or services. '), sentence);
+        System.assert(
+            sentence.startsWith(
+                'In exchange for this contribution you received goods or services. '
+            ),
+            sentence
+        );
         System.assert(sentence.endsWith('which is $0.00.'), sentence);
     }
 
@@ -76,7 +84,9 @@ private class ReceiptSentenceLabelsTest {
         String sentence = ReceiptContentBuilder.taxSentencesFor(gift)[0];
 
         System.assert(
-            sentence.startsWith('You gave the following goods or services: goods or services, described to us by the donor. '),
+            sentence.startsWith(
+                'You gave the following goods or services: goods or services, described to us by the donor. '
+            ),
             sentence
         );
     }
