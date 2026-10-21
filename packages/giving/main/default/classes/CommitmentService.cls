@@ -21,8 +21,20 @@ public with sharing class CommitmentService {
     private static final String STATUS_COMPLETED = 'Completed';
     @TestVisible
     private static final String STATUS_CANCELLED = 'Cancelled';
-    private static final String GIFT_STATUS_RECEIVED = 'Received';
     private static final String GIFT_STATUS_CANCELLED = 'Cancelled';
+
+    /**
+     * The gift statuses whose amounts count as paid, for an installment, for a pledge's
+     * completion and for the Paid To Date rollup alike: the statuses every packaged giving
+     * total counts (R-G16, Section 26). A refunded or written off gift still counts, and the
+     * negative gift that reverses it (Received, linked to the same commitment and installment)
+     * takes the amount back off, so what is paid is the net of the two (R-G3).
+     */
+    public static final Set<String> PAID_GIFT_STATUSES = new Set<String>{
+        'Received',
+        'Refunded',
+        'Written off'
+    };
     @TestVisible
     private static final String INSTALLMENT_SCHEDULED = 'Scheduled';
     @TestVisible
@@ -47,7 +59,35 @@ public with sharing class CommitmentService {
     @TestVisible
     private static Set<Id> giftsLinkedThisTransaction = new Set<Id>();
 
+    /**
+     * People and organizations being deleted that are the donor of an open commitment, noted
+     * before delete and refused after it unless the delete was a merge (R-CM1).
+     */
+    private static Set<Id> donorsWithOpenCommitments = new Set<Id>();
+
     // ------------------------------------------------------------------ schedule shape
+
+    /**
+     * Fills in the expected total of a pledge entered with an amount and a number of
+     * installments but no total: the amount times the installments (R-CM5). Without it the
+     * balance reads zero before anything is paid and negative after, and the pledge never
+     * completes. Nothing is queried, so the same call serves the record save and the preview.
+     */
+    public static void fillExpectedTotals(List<Commitment__c> commitments) {
+        for (Commitment__c commitment : commitments) {
+            if (
+                TYPE_PLEDGE.equals(commitment.Type__c) &&
+                commitment.Expected_Total__c == null &&
+                commitment.Amount__c != null &&
+                commitment.Installments_Planned__c != null &&
+                commitment.Installments_Planned__c > 0
+            ) {
+                commitment.Expected_Total__c = (commitment.Amount__c *
+                    commitment.Installments_Planned__c)
+                    .setScale(2);
+            }
+        }
+    }
 
     /**
      * The schedule a commitment implies, as unsaved installments in sequence order.
@@ -320,10 +360,13 @@ public with sharing class CommitmentService {
                 gift.Commitment__c != null &&
                 !giftsLinkedThisTransaction.contains(gift.Id) &&
                 !notAutoLinked.contains(gift.Id) &&
-                gift.Status__c != GIFT_STATUS_CANCELLED
+                gift.Status__c != GIFT_STATUS_CANCELLED &&
+                gift.Original_Gift__c == null
             ) {
                 // A Cancelled gift keeps its pledge as history but pays nothing, so it is not
                 // linked to the next open installment, nor when it goes back to Pending (R-G16).
+                // A refund or write-off takes money back from the payment its original paid,
+                // never from the next open one, so it is not linked either (R-G3).
                 awaitingInstallment.add(gift);
             }
         }
@@ -379,15 +422,15 @@ public with sharing class CommitmentService {
     }
 
     /**
-     * Sets each installment's status from the received gifts linked to it. Skipped is left
-     * alone, because it is the one status only a person sets.
+     * Sets each installment's status from the paid gifts linked to it, net of refunds and
+     * write-offs. Skipped is left alone, because it is the one status only a person sets.
      */
     public static void refreshInstallmentStatuses(Set<Id> installmentIds) {
         if (installmentIds == null || installmentIds.isEmpty()) {
             return;
         }
         InstallmentSelector selector = new InstallmentSelector();
-        Map<Id, Decimal> paidByInstallment = selector.sumReceivedGifts(installmentIds);
+        Map<Id, Decimal> paidByInstallment = selector.sumPaidGifts(installmentIds);
         Date cutoff = Date.today().addDays(-graceDays());
         List<Installment__c> changed = new List<Installment__c>();
         for (Installment__c installment : selector.selectByIds(installmentIds)) {
@@ -423,7 +466,7 @@ public with sharing class CommitmentService {
     }
 
     /**
-     * A pledge whose received gifts reach its expected total is Completed (R-CM4). A
+     * A pledge whose paid gifts reach its expected total is Completed (R-CM4). A
      * recurring commitment is never completed automatically.
      */
     private static void completeFullyPaidPledges(Set<Id> commitmentIds) {
@@ -431,7 +474,7 @@ public with sharing class CommitmentService {
             return;
         }
         CommitmentSelector selector = new CommitmentSelector();
-        Map<Id, Decimal> paidByCommitment = selector.sumReceivedGifts(commitmentIds);
+        Map<Id, Decimal> paidByCommitment = selector.sumPaidGifts(commitmentIds);
         List<Commitment__c> changed = new List<Commitment__c>();
         for (Commitment__c commitment : selector.selectByIds(commitmentIds)) {
             if (
@@ -454,16 +497,16 @@ public with sharing class CommitmentService {
     }
 
     /**
-     * Reopens a pledge that deleted gifts had completed (R-CM4): Completed, fully paid with
-     * the removed received amounts, and short without them. A pledge staff completed short of
-     * its total was not completed by these gifts and stays Completed.
+     * Reopens a pledge that deleted gifts, or a refund or write-off, had taken below its total
+     * (R-CM4): Completed, fully paid with the removed amounts, and short without them. A pledge
+     * staff completed short of its total was not completed by these gifts and stays Completed.
      */
     public static void reopenPledgesNoLongerPaid(Map<Id, Decimal> removedByCommitment) {
         if (removedByCommitment == null || removedByCommitment.isEmpty()) {
             return;
         }
         CommitmentSelector selector = new CommitmentSelector();
-        Map<Id, Decimal> paidByCommitment = selector.sumReceivedGifts(removedByCommitment.keySet());
+        Map<Id, Decimal> paidByCommitment = selector.sumPaidGifts(removedByCommitment.keySet());
         List<Commitment__c> changed = new List<Commitment__c>();
         for (Commitment__c commitment : selector.selectByIds(removedByCommitment.keySet())) {
             if (
@@ -485,9 +528,49 @@ public with sharing class CommitmentService {
         }
     }
 
-    /** Whether a gift counts toward what a commitment has been paid. */
-    public static Boolean isReceived(Gift__c gift) {
-        return GIFT_STATUS_RECEIVED.equals(gift.Status__c);
+    /** Whether a gift's amount counts toward what a commitment has been paid. */
+    public static Boolean countsAsPaid(Gift__c gift) {
+        return PAID_GIFT_STATUSES.contains(gift.Status__c);
+    }
+
+    // ------------------------------------------------------------- donor delete guard
+
+    /**
+     * Before delete of a Contact or Account: notes which of them is the donor of an Active or
+     * Paused commitment, or the account of a person who is. Nothing is refused yet, because a
+     * merge deletes the losing record too and says so only after delete.
+     */
+    public static void noteDonorsWithOpenCommitments(List<SObject> records) {
+        Set<Id> recordIds = new Map<Id, SObject>(records).keySet();
+        for (Commitment__c commitment : new CommitmentSelector().selectOpenNaming(recordIds)) {
+            for (
+                Id reference : new List<Id>{
+                    commitment.Donor_Contact__c,
+                    commitment.Donor_Contact__r?.AccountId,
+                    commitment.Donor_Account__c
+                }
+            ) {
+                if (reference != null && recordIds.contains(reference)) {
+                    donorsWithOpenCommitments.add(reference);
+                }
+            }
+        }
+    }
+
+    /**
+     * After delete: refuses deleting a noted record that was not merged (R-CM1). The platform
+     * would clear the commitment's donor, and a commitment with no donor can never be saved
+     * again, not even by its own totals. A merged record's commitments moved to the survivor.
+     */
+    public static void refuseDeletingOpenCommitmentDonors(List<SObject> records) {
+        for (SObject record : records) {
+            if (
+                donorsWithOpenCommitments.contains(record.Id) &&
+                record.get('MasterRecordId') == null
+            ) {
+                record.addError(System.Label.Giving_Commitment_DonorDeleteBlocked);
+            }
+        }
     }
 
     // ------------------------------------------------------------------- overdue job
@@ -504,8 +587,7 @@ public with sharing class CommitmentService {
             return 0;
         }
         Set<Id> installmentIds = new Map<Id, Installment__c>(candidates).keySet();
-        Map<Id, Decimal> paidByInstallment = new InstallmentSelector()
-            .sumReceivedGifts(installmentIds);
+        Map<Id, Decimal> paidByInstallment = new InstallmentSelector().sumPaidGifts(installmentIds);
         List<Installment__c> changed = new List<Installment__c>();
         for (Installment__c installment : candidates) {
             Decimal paid = paidByInstallment.get(installment.Id);
@@ -642,7 +724,7 @@ public with sharing class CommitmentService {
 
     /**
      * Drops from a delete list any installment a gift of any status points at. Paid Amount
-     * only counts received gifts, so a pending gift would otherwise have its installment
+     * counts only paid gifts, so a pending gift would otherwise have its installment
      * removed from under it and lose the link (R-CM2).
      */
     private static List<Installment__c> withoutLinkedGifts(List<Installment__c> installments) {

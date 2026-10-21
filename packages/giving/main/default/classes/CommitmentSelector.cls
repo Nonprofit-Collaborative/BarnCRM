@@ -5,9 +5,9 @@
  * InstallmentSelector (plan Section 9.3).
  */
 public with sharing class CommitmentSelector {
-    private static final String STATUS_RECEIVED = 'Received';
     private static final String TYPE_RECURRING = 'Recurring';
     private static final String STATUS_ACTIVE = 'Active';
+    private static final Set<String> OPEN_STATUSES = new Set<String>{ 'Active', 'Paused' };
 
     /**
      * The commitments named, with every attribute the schedule builder reads.
@@ -72,17 +72,20 @@ public with sharing class CommitmentSelector {
     }
 
     /**
-     * What has been received against each commitment named, by commitment.
+     * What has been paid against each commitment named, by commitment: the gifts in
+     * `CommitmentService.PAID_GIFT_STATUSES`, net of the negative gifts that refund or write
+     * them off.
      */
-    public Map<Id, Decimal> sumReceivedGifts(Set<Id> commitmentIds) {
+    public Map<Id, Decimal> sumPaidGifts(Set<Id> commitmentIds) {
         Map<Id, Decimal> totals = new Map<Id, Decimal>();
         if (commitmentIds == null || commitmentIds.isEmpty()) {
             return totals;
         }
+        Set<String> paid = CommitmentService.PAID_GIFT_STATUSES;
         for (AggregateResult row : [
             SELECT Commitment__c commitmentId, SUM(Amount__c) total
             FROM Gift__c
-            WHERE Commitment__c IN :commitmentIds AND Status__c = :STATUS_RECEIVED
+            WHERE Commitment__c IN :commitmentIds AND Status__c IN :paid
             WITH USER_MODE
             GROUP BY Commitment__c
         ]) {
@@ -90,5 +93,24 @@ public with sharing class CommitmentSelector {
             totals.put((Id) row.get('commitmentId'), total == null ? 0 : total);
         }
         return totals;
+    }
+
+    /**
+     * The Active and Paused commitments whose donor is one of these records, or whose person
+     * donor's account is (deleting that account deletes the person with it). Read in system
+     * mode, because the delete guard has to see every such commitment, not only those the
+     * person deleting can see.
+     */
+    public List<Commitment__c> selectOpenNaming(Set<Id> recordIds) {
+        return [
+            SELECT Id, Donor_Contact__c, Donor_Contact__r.AccountId, Donor_Account__c
+            FROM Commitment__c
+            WHERE
+                Status__c IN :OPEN_STATUSES
+                AND (Donor_Contact__c IN :recordIds
+                OR Donor_Contact__r.AccountId IN :recordIds
+                OR Donor_Account__c IN :recordIds)
+            WITH SYSTEM_MODE
+        ];
     }
 }

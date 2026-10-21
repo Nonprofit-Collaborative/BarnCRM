@@ -3452,7 +3452,8 @@ receipt.
 - **Named records (R-G15):** `GiftPostingLock.enforceOnDelete` refuses deleting an original;
   `GiftDonorDeleteGuardHandler` runs on Contact and Account from registry records
   `Automation_Registry.Gift_Donor_Delete_Guard_Contact` and `..._Account` (Always Runs), through
-  Core's own triggers.
+  Core's own triggers. The same handler refuses deleting the donor of an open commitment
+  (R-CM1, `CommitmentService.noteDonorsWithOpenCommitments`).
 
 ---
 
@@ -3834,11 +3835,11 @@ of data.
 | Start Date | date | yes | The date the first installment falls due. |
 | End Date | date | conditional | The date the schedule ends; required for a pledge, empty for an open-ended recurring gift. |
 | Status | picklist(Active, Paused, Completed, Cancelled) | yes (defaults Active) | Where the commitment stands. |
-| Expected Total | decimal | conditional | The total promised; required for a pledge, empty for an open-ended recurring gift. |
+| Expected Total | decimal | conditional | The total promised; required for a pledge, empty for an open-ended recurring gift. A pledge saved with Amount and Installments Planned and no Expected Total gets Amount times Installments Planned (R-CM5). |
 | Installments Planned | integer | conditional | How many installments the pledge is paid in; required for a pledge. |
 | Fund | reference(Fund) | no | The fund the gifts paying this commitment are allocated to by default. |
 | Appeal | reference(Appeal) | no | The fundraising effort this commitment came from. |
-| Paid To Date | decimal | computed | The total of gifts received against this commitment (Section 26). |
+| Paid To Date | decimal | computed | The total of gifts paid against this commitment (Received, Refunded and Written off), net of the negative gifts that refund or write them off (Section 26, R-G3). |
 | Balance | decimal | computed | Expected Total less Paid To Date, calculated live (R-CM5). |
 
 ### Relationships
@@ -3852,7 +3853,13 @@ of data.
 
 ### Rules
 
-**R-CM1 Exactly one donor.** As R-G1, and the household is derived the same way.
+**R-CM1 Exactly one donor.** As R-G1, and the household is derived the same way. The
+platform clears Donor Contact or Donor Account when the record it names is deleted, and a
+commitment with no donor can never be saved again, not even by its own totals. So a person or
+organization that is the donor of an Active or Paused commitment, or the account of a person
+who is, is not deleted: staff cancel the commitment or change its donor first. A merge is not a
+delete for this rule (the commitment moves to the surviving record), and erasing a person
+anonymizes them in place, so it is untouched (R-ER8).
 
 **R-CM2 Installment generation.** The package generates installments from Start Date,
 Frequency, Day of Month, and either Installments Planned (a pledge) or the org's
@@ -3870,11 +3877,18 @@ when End Date passes. Deleting a gift undoes what it did: the installment it pai
 status again from the gifts still linked (R-IN2), and a Completed pledge that was fully paid
 with the deleted gifts' received amounts and is not without them is Active again. A pledge
 staff completed short of its total stays Completed, because no deleted gift completed it.
-Restoring a gift from the recycle bin applies it again.
+Restoring a gift from the recycle bin applies it again. A refund or write-off of a payment
+(R-G3) carries the original's commitment and installment, so it takes its amount back off
+both: the installment takes its status again (R-IN2), and a Completed pledge it takes short of
+its total is Active again, as for a deleted gift. It is never linked to the next open
+installment. What counts as paid is the same everywhere: the amounts of the gifts in Received,
+Refunded and Written off, which the negative gifts net (Section 26).
 
 **R-CM5 Balance is calculated live.** Balance is Expected Total less Paid To Date for a
 pledge and empty for a recurring commitment, which has no expected total to subtract
-from. It is derived at read time rather than stored, because a difference of two numbers on the same record
+from. A pledge saved with Amount and Installments Planned and no Expected Total gets Amount
+times Installments Planned as its Expected Total, on insert and on update, so its balance is
+never measured from zero. It is derived at read time rather than stored, because a difference of two numbers on the same record
 cannot be stale and needs no recalculation pass. The household-level pledge balance
 aggregates this value (Section 26). If the aggregation engine chosen in ADR-0011 cannot
 aggregate a calculated attribute, Balance becomes a stored attribute written by the
@@ -3938,7 +3952,7 @@ this entity, which is why it exists rather than being computed on the fly.
 | Due Date | date | yes | The date this installment is expected. |
 | Expected Amount | decimal | yes | The amount expected on that date. |
 | Status | picklist(Scheduled, Paid, Partially paid, Overdue, Skipped) | yes (defaults Scheduled) | Where this installment stands. |
-| Paid Amount | decimal | computed | The total of gifts received against this installment (Section 26). |
+| Paid Amount | decimal | computed | The total of gifts paid against this installment (Received, Refunded and Written off), net of the negative gifts that refund or write them off (Section 26, R-CM4). |
 
 ### Relationships
 
@@ -8528,6 +8542,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Volunteers QA fixes: erasure (amends D-108). No object or field added. Erasure deletes the hour letters BarnCRM generated for the person (system mode, exact match), lists the kept Rejection Reason, and refuses a user without Volunteers Admin or Coordinator access with a plain message before changing anything. |
 | v0.8 | 2026-10-20 | Core QA fixes. No object or field added. R-H4: a household left with no current member keeps its last computed name and greetings instead of the placeholder name and empty greetings, so a household kept for credited records still says which family it was. R-ER3: an anonymized kept household is reported under Household with its name and greetings among the fields and a note that it was kept because records are credited to it; the contact's account is reported as Household. Erasure Details uses the erase screen's words for what was done. |
 | v0.8 | 2026-10-20 | QA follow-ups. No object or field added. R-ER10: activities and files are counted after the module extensions run, leaving out what one reported as Deleted, so a generated letter Volunteers deletes is not also listed as kept. C-10: `SampleDataModule` gains `hasSampleRecords()`, and Core's sample data reads Loaded (and refuses a new load) while any module still has sample records, so a removal that kept some can be run again; Volunteers answers from its sample jobs and skills. The `Past_Shifts_Still_Open` list view filters End Time before `N_DAYS_AGO:7`, matching the Health Check finding. |
+| v0.8 | 2026-10-20 | Giving QA fixes: pledge balance. No object or field added. R-CM5: a pledge saved with Amount and Installments Planned and no Expected Total gets their product. R-CM4: a refund or write-off carries the original's commitment and installment, takes its amount off both and reopens a pledge it takes short; installments, completion and the Paid To Date and Paid Amount rollups count the same statuses (Received, Refunded, Written off). R-CM1: the donor of an Active or Paused commitment, or that person's account, is not deleted (`GiftDonorDeleteGuardHandler`); a merge and an erasure still work. |
 | v0.8 | 2026-10-20 | Erasure audit fixes B3 and S2. No object or field added. R-ER3: a household left with members whose name was typed by hand has Custom Name turned off and is named again from the remaining members; a household Nonprofit Cloud names is listed for staff to check; each is reported with the fields that really changed. Giving deletes the person's automatic Household Member soft credits in the erasure and lists them as Deleted (ADR-0110 amended). |
 
 ---

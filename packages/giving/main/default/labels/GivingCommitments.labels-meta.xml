@@ -49,6 +49,14 @@
         <value>This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead.</value>
     </labels>
     <labels>
+        <fullName>Giving_Commitment_DonorDeleteBlocked</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown when deleting the donor of an open pledge or recurring gift.</shortDescription>
+        <value>This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment, or change its donor, first. Merging a duplicate still works.</value>
+    </labels>
+    <labels>
         <fullName>Giving_Commitment_InvalidSchedule</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

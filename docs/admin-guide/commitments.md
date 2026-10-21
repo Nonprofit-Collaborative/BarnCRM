@@ -124,6 +124,18 @@ Start from the sample data. The first part is David's work, the last step is Jen
 If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
 
+If David had left **Expected total** empty, BarnCRM would have filled it in on save as the
+amount times the installments planned, 1,200 here, so the balance is right from the start.
+It does the same whenever a pledge is saved with the total cleared. A total you type is
+always kept.
+
+If Ana later asks for that payment back, David records it with **Refund or Write Off** on
+the gift (see [Refunds and write-offs](refunds.md)). The negative gift names the same pledge
+and payment, so paid to date drops by what went back and the balance, Ana's pledge balance
+and her household's all rise by the same amount. A part refund leaves the payment
+**Partially paid**; a full one leaves it unpaid. A pledge the payment had completed is
+Active again.
+
 ### David pauses a recurring gift
 
 12. Open the **Commitments** tab and open one of the sample recurring gifts, or create one:
@@ -170,6 +182,15 @@ has no expected total. Choose Pledge if the donor promised a fixed amount."
 payment, the commitment and that payment are part of the giving history and cannot be
 deleted. Cancel the commitment instead: the unpaid future payments are marked Skipped and
 nothing already received is touched.
+
+**Deleting the donor of an open commitment.** A person or organization who is the donor of
+an Active or Paused pledge or recurring gift cannot be deleted, and neither can the
+household of a person who is, because the commitment would be left with no donor and could
+not be saved again. The delete stops with "This record is the donor of an active or paused
+pledge or recurring gift, so it cannot be deleted. Cancel the commitment, or change its
+donor, first." Merging duplicates still works: the commitment moves to the record you keep.
+Erasing a person is not a delete either, so it works with an open pledge: the pledge stays,
+credited to the anonymized record.
 
 **Editing the amount partway through.** Changing the amount, the frequency, the day of
 month, or the end date rebuilds the payments that are still unpaid and leaves every paid

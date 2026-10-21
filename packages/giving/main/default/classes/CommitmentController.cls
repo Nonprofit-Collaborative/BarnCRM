@@ -126,6 +126,8 @@ public with sharing class CommitmentController {
                 Expected_Total__c = input.expectedTotal,
                 Installments_Planned__c = input.installmentsPlanned
             );
+            // The preview shows the schedule the save will make, total filled in the same way.
+            CommitmentService.fillExpectedTotals(new List<Commitment__c>{ draft });
             List<InstallmentRow> rows = new List<InstallmentRow>();
             for (Installment__c installment : CommitmentService.buildSchedule(draft)) {
                 rows.add(toRow(installment));

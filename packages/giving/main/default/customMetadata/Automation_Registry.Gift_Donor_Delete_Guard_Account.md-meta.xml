@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <label>Posting lock: Account delete guard</label>
+    <label>Giving donor: Account delete guard</label>
     <protected>true</protected>
     <values>
         <field>Object_Name__c</field>
@@ -26,7 +26,7 @@
         <field>Description__c</field>
         <value
       xsi:type="xsd:string"
-    >Refuses to delete a organization or household that a gift posted to accounting, or dated in a closed period, names as its donor: deleting it would blank the donor on a gift the books already hold. Merging a duplicate still works. This automation enforces a rule, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Posting Lock permission, and every use is written to the Error Log.</value>
+    >Refuses to delete a organization or household that a gift posted to accounting, or dated in a closed period, names as its donor: deleting it would blank the donor on a gift the books already hold. Also refuses to delete the donor of an active or paused pledge or recurring gift, or the household of a person who is, because the commitment could not be saved again without a donor. Merging a duplicate still works. This automation enforces a rule, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Posting Lock permission, and every use is written to the Error Log.</value>
     </values>
     <values>
         <field>Module__c</field>

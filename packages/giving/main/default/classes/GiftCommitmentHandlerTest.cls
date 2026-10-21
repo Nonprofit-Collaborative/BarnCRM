@@ -78,6 +78,10 @@ private class GiftCommitmentHandlerTest {
         }
     }
 
+    /**
+     * A refund is a negative gift on the payment the original paid (R-G3): part of it back leaves
+     * the payment partly paid, and the rest back leaves it unpaid.
+     */
     @IsTest
     static void recalculatesWhenAGiftIsRefunded() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -92,20 +96,60 @@ private class GiftCommitmentHandlerTest {
             ];
             Gift__c gift = giftFor(person.Id, pledge.Id, first.Id, 100);
             insert gift;
-            CommitmentService.applyGift(new List<Gift__c>{ gift });
-
-            Map<Id, Gift__c> oldMap = new Map<Id, Gift__c>{ gift.Id => gift.clone(true, true) };
-            gift.Status__c = 'Refunded';
-            update gift;
 
             Test.startTest();
-            new GiftCommitmentHandler().onAfterUpdate(new List<Gift__c>{ gift }, oldMap);
+            Id partial = GiftService.refund(gift.Id, 40, 'Part of it back');
+            String afterPartial = [SELECT Status__c FROM Installment__c WHERE Id = :first.Id]
+            .Status__c;
+            GiftService.refund(gift.Id, 60, 'The rest back');
             Test.stopTest();
 
+            Gift__c reversal = [
+                SELECT Commitment__c, Installment__c
+                FROM Gift__c
+                WHERE Id = :partial
+            ];
+            Assert.areEqual(pledge.Id, reversal.Commitment__c, 'The refund names the pledge.');
+            Assert.areEqual(first.Id, reversal.Installment__c, 'And the payment it takes from.');
+            Assert.areEqual(
+                'Partially paid',
+                afterPartial,
+                'Forty of the hundred went back, so sixty still pays the payment.'
+            );
             Assert.areEqual(
                 'Scheduled',
                 [SELECT Status__c FROM Installment__c WHERE Id = :first.Id].Status__c,
-                'A gift that is no longer received stops counting toward the payment.'
+                'All of it went back, so nothing pays the payment any more.'
+            );
+        }
+    }
+
+    /**
+     * A negative gift never takes from the next open payment: it belongs to the payment its
+     * original paid, or to none.
+     */
+    @IsTest
+    static void aRefundIsNotLinkedToTheNextOpenPayment() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact person = donor();
+            Commitment__c pledge = pledgeWithSchedule(person.Id);
+            Gift__c gift = giftFor(person.Id, pledge.Id, null, 100);
+            insert gift;
+            Gift__c reversal = giftFor(person.Id, pledge.Id, null, -100);
+            reversal.Original_Gift__c = gift.Id;
+            reversal.Refund_Reason__c = 'Returned';
+
+            Test.startTest();
+            insert reversal;
+            Test.stopTest();
+
+            Assert.isNotNull(
+                [SELECT Installment__c FROM Gift__c WHERE Id = :gift.Id].Installment__c,
+                'The payment itself was linked to the first open payment.'
+            );
+            Assert.isNull(
+                [SELECT Installment__c FROM Gift__c WHERE Id = :reversal.Id].Installment__c,
+                'The refund was not linked to another one.'
             );
         }
     }

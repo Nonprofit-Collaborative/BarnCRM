@@ -942,7 +942,11 @@ public with sharing class GiftService {
             Status__c = STATUS_RECEIVED,
             Acknowledgment_Status__c = ACKNOWLEDGMENT_NOT_REQUIRED,
             Original_Gift__c = original.Id,
-            Refund_Reason__c = reason
+            Refund_Reason__c = reason,
+            // The pledge and the payment the original paid, so what came back is taken off
+            // the pledge's paid to date and that payment's paid amount (R-G3, R-CM4).
+            Commitment__c = original.Commitment__c,
+            Installment__c = original.Installment__c
         );
 
         List<Gift_Allocation__c> originalAllocations = original.Gift_Allocations__r;
