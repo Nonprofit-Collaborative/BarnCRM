@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_Receipt_NoGoods</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: no goods or services</shortDescription>
+    <value>No goods or services were provided in exchange for this contribution.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_IntangibleReligious</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: intangible religious benefits</shortDescription>
+    <value>The only goods or services provided in exchange for this contribution were intangible religious benefits.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_InKindAmountPhrase</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: in-kind amount phrase</shortDescription>
+    <value>the goods or services described below</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_AmountNotStated</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: no value stated note</shortDescription>
+    <value>No value stated (gift of goods or services)</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_InKindLineAmount</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Statement: in-kind line amount</shortDescription>
+    <value>Not valued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_InKindNotInTotal</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Statement: in-kind gifts not in total</shortDescription>
+    <value>Gifts of goods or services are listed above without a value and are not part of the total, because determining the value of donated property is the donor's responsibility.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_InKindDescribedDefault</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: in-kind default description</shortDescription>
+    <value>goods or services, described to us by the donor</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_InKindSentence</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: in-kind sentence ({0} description)</shortDescription>
+    <value>You gave the following goods or services: {0}. This organization has not placed a value on your gift; determining the value of donated property is the donor''s responsibility.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_BenefitDefault</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: default benefit description</shortDescription>
+    <value>goods or services</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_QuidProQuo</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Receipt: quid pro quo ({0} benefit, {1} value, {2} deductible)</shortDescription>
+    <value>In exchange for this contribution you received {0}. Our good faith estimate of the value of those goods or services is {1}. The amount of your contribution that is deductible for federal income tax purposes is limited to the excess of the amount contributed over that value, which is {2}.</value>
+  </labels>
+</CustomLabels>

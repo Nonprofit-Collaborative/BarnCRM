@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Section_Person</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page section: Person</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Core_Section_Household</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page section: Household</shortDescription>
+        <value>Household</value>
+    </labels>
+    <labels>
+        <fullName>Core_Section_ReachingThisPerson</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page section: Reaching This Person</shortDescription>
+        <value>Reaching This Person</value>
+    </labels>
+    <labels>
+        <fullName>Core_Section_Details</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page section: Details</shortDescription>
+        <value>Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_Section_NameAndGreetings</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page section: Name and Greetings</shortDescription>
+        <value>Name and Greetings</value>
+    </labels>
+</CustomLabels>
