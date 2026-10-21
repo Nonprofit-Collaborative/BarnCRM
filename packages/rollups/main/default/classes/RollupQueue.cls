@@ -87,6 +87,15 @@ public without sharing class RollupQueue implements Queueable {
     private static Id lastEntryId;
     private static Integer dmlStatementsAtLastInsert = 0;
 
+    /**
+     * Test seam: stands in for the DML statements counted; null reads the platform. A test
+     * cannot make the platform retry a partial save the way production does (it does not roll
+     * a test's queued job back), so it rolls back to a savepoint and sets this to the count the
+     * platform would have put back.
+     */
+    @TestVisible
+    private static Integer dmlStatementsForTest;
+
     /** Test seam: what a fresh transaction starts with, as the Ready event's subscriber has. */
     @TestVisible
     private static void newTransactionForTest() {
@@ -335,7 +344,7 @@ public without sharing class RollupQueue implements Queueable {
         forgetRolledBackAttempt();
         Database.insert(entries, AccessLevel.SYSTEM_MODE);
         lastEntryId = entries[0].Id;
-        dmlStatementsAtLastInsert = Limits.getDmlStatements();
+        dmlStatementsAtLastInsert = dmlStatements();
         insertedEntries = true;
         requestProcessor();
     }
@@ -354,7 +363,7 @@ public without sharing class RollupQueue implements Queueable {
      * asked for is forgotten, so the retry asks again. One query, only when the count went down.
      */
     private static void forgetRolledBackAttempt() {
-        if (lastEntryId == null || Limits.getDmlStatements() >= dmlStatementsAtLastInsert) {
+        if (lastEntryId == null || dmlStatements() >= dmlStatementsAtLastInsert) {
             return;
         }
         Boolean rolledBack = [
@@ -372,6 +381,10 @@ public without sharing class RollupQueue implements Queueable {
             insertedEntries = false;
             readyEventsPublished = 0;
         }
+    }
+
+    private static Integer dmlStatements() {
+        return dmlStatementsForTest == null ? Limits.getDmlStatements() : dmlStatementsForTest;
     }
 
     /**

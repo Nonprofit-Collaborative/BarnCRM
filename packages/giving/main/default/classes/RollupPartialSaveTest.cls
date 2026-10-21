@@ -4,8 +4,11 @@
  *
  * The platform then rolls the first attempt back, the Rollup Queue entries and the processor it
  * queued with it, and runs the triggers again for the records that passed, keeping static
- * variables. A retry that believed its processor was already queued, or its records already
- * handled, left entries Pending with no processor coming and totals that never caught up.
+ * variables. A retry that believed its records already handled (the trigger framework's per
+ * record claims) never queued a partial insert's donor or a partial delete's fund. In an org the
+ * retry also believed its processor already queued and left its entries Pending; a test's queued
+ * job is not rolled back, so `RollupQueueTest.aPartialSavesRetryAsksForAProcessorAgain` covers
+ * that half and these tests check the totals end to end.
  *
  * The refusals come from the posting lock: Ana's two gifts dated in the closed month cannot be
  * changed or deleted (G-20), the other five can.
