@@ -8,6 +8,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- `barn-npc` check-only validations (no change to the org) with the 77-component cleanup: at 878af52a (0Afhk000001qUXhCAM) ImportUndoTest passed after #510, but two HouseholdSelectorTest methods from #511 failed (fixed in #513); at 4f6933ec (0Afhk000001qYg9CAE, same tree as main e7d68c8b) 0 component errors, 3,151 tests, only the 3 expected Volunteers failures ("No such column" until the Volunteers objects are deployed there). Deploy checkout `~/worktrees/BarnCRM/npc-cleanup` at 4f6933ec. Still waiting on owner approval of the cleanup and on the permission check for production deploys.
+- Remote branches: deleted the #513 branch after its merge.
 - Remote branches: deleted the #510 and #511 branches after their merges.
 - BMemory plan edited (commit d0b383ed): Section 11.3 item 10 marked done (#508 and #511). `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed.
 - `barn-npc` read-only checks for #510 ruled out other packages' triggers or flows on Contact and Account, and Contact field history, as the cause of the ImportUndoTest failure.
@@ -25,6 +27,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main
 
+- #513 (squash e7d68c8b, gate `oi-pa` 3,499 of 3,499): `HouseholdSelector`'s test describe override now also fails the native household probes (delete guard, group probe, collision count, membership rows), so HouseholdSelectorTest holds in orgs with native households and Contacts to Multiple Accounts (`barn-npc`). Production behaviour unchanged (the override is test-only).
 - #511 (squash 5ec9874e, gate `oi-test` 3,499 of 3,499): Core tests now cover HouseholdSelector 93%, CustomPermissionSelector 94%, HouseholdWriter 98%, DataManagerController 100% and PersonErasureController 100% from Core and Rollups tests alone (were 75 to 79%); `HouseholdSelector` gains a `@TestVisible` `describedObjectNamesOverride` test seam. Closes the Core-only coverage follow-up.
 - #510 (squash cc414cb0, gate `oi-pa` 3,469 of 3,469): `ImportUndoTest.anEditBeforeTheUndoIsNotHiddenByASaveTheUndoMakes` failed in the `barn-npc` release validation (probably earlier on `mwdbdevsb` too) because the test ran setup and every undo pass in one transaction; the undo's checks cap themselves at half of 100 SOQL, and `barn-npc`'s Contact has 124 child relationships against 76 on `oi-pa`, so its checks need more queries. The test now runs the remaining passes as their own job (`run.queueRest()` inside `Test.startTest`/`Test.stopTest`), as `GiftImportUndoTest` does. Product unchanged.
 - #508 (squash 342dfb0f, gate `oi-test` 3,469 of 3,469): Core tests cover AffiliationController 100%, ImportMatcher 96%, DataProtectionExtensions 100% and HouseholdDependentsExtensions 100% with Core and Rollups tests only; `ImportMatcher` ACCOUNT_*_FIELD are now `@TestVisible` non-final statics (test seam). Follow-up: HouseholdSelector 75%, CustomPermissionSelector 77%, HouseholdWriter 78%, DataManagerController 79%, PersonErasureController 79% Core-only.
