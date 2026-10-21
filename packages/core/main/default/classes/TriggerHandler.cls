@@ -25,7 +25,10 @@
  * The recursion guard is per transaction, per handler, per phase, and per record: `claimRunFor`
  * takes the record ids in front of it and hands back the ones this handler has not already
  * processed, so a handler that causes its own object to be updated again does its work once per
- * record while a 400 record load still gets all 400 processed.
+ * record while a 400 record load still gets all 400 processed. Every claim of the transaction is
+ * cleared when a partial save is retried (`noteTriggerProgress`), so a claim never stops a
+ * workflow or flow re-fire across a partial save: a handler that must not run twice for a
+ * record needs work that is safe to repeat, or its own check of saved state.
  */
 @NamespaceAccessible
 public virtual with sharing class TriggerHandler {
@@ -171,6 +174,10 @@ public virtual with sharing class TriggerHandler {
      * whole phase would let a handler process the first 200 records and silently skip the rest
      * (plan Principle 2). Records already claimed come back out of the set, everything else is
      * claimed and returned.
+     *
+     * Claims reset when a partial save (allOrNone false) is retried: `noteTriggerProgress` clears
+     * every claim of the transaction, not only the rolled-back attempt's. Do not rely on a claim
+     * to stop a workflow or flow re-fire across a partial save.
      */
     @NamespaceAccessible
     public Set<Id> claimRunFor(String phase, Set<Id> recordIds) {
