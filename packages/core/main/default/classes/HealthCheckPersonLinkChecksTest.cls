@@ -14,17 +14,24 @@ private class HealthCheckPersonLinkChecksTest {
     private static final String RELATIONSHIP_KEY = 'relationships_without_person';
     private static final String AFFILIATION_KEY = 'affiliations_without_person';
 
-    private static HealthCheckService.Finding runAsMaria(String key) {
+    /**
+     * Runs Health Check once as Maria and returns its findings by key. The run is the measured
+     * part, so it gets its own governor limits: the setup (hundreds of people, their links and
+     * the deletes, with every trigger, flow and module guard an org runs on them) is spent
+     * before Test.startTest, and an org with more automation than ours does not push one run
+     * over the query limit.
+     */
+    private static Map<String, HealthCheckService.Finding> runAsMaria() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
-        HealthCheckService.Finding found;
+        Map<String, HealthCheckService.Finding> byKey = new Map<String, HealthCheckService.Finding>();
+        Test.startTest();
         System.runAs(maria) {
             for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-                if (key.equals(finding.key)) {
-                    found = finding;
-                }
+                byKey.put(finding.key, finding);
             }
         }
-        return found;
+        Test.stopTest();
+        return byKey;
     }
 
     private static List<Relationship__c> relationshipsBetween(
@@ -55,7 +62,7 @@ private class HealthCheckPersonLinkChecksTest {
 
             delete others[0];
 
-            HealthCheckService.Finding finding = runAsMaria(RELATIONSHIP_KEY);
+            HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
             Assert.isNotNull(finding, 'A relationship with nobody on one side is reported.');
             Assert.isTrue(finding.title.startsWith('1 '), 'One of the two: ' + finding.title);
@@ -86,7 +93,7 @@ private class HealthCheckPersonLinkChecksTest {
 
             delete people;
 
-            HealthCheckService.Finding finding = runAsMaria(RELATIONSHIP_KEY);
+            HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
             Assert.isNotNull(finding, 'A blank person on the owner side is reported too.');
             Assert.isTrue(finding.title.startsWith('1 '), finding.title);
@@ -101,8 +108,10 @@ private class HealthCheckPersonLinkChecksTest {
             List<Contact> others = RelationshipTestDataFactory.contacts(3, 'Lee');
             relationshipsBetween(people, others);
 
-            Assert.isNull(runAsMaria(RELATIONSHIP_KEY), 'Nothing is blank, so nothing is shown.');
-            Assert.isNull(runAsMaria(AFFILIATION_KEY), 'Nor for affiliations.');
+            Map<String, HealthCheckService.Finding> findings = runAsMaria();
+
+            Assert.isNull(findings.get(RELATIONSHIP_KEY), 'Nothing is blank, so nothing is shown.');
+            Assert.isNull(findings.get(AFFILIATION_KEY), 'Nor for affiliations.');
         }
     }
 
@@ -114,7 +123,7 @@ private class HealthCheckPersonLinkChecksTest {
             List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
             insert RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer');
 
-            Assert.isNull(runAsMaria(AFFILIATION_KEY), 'The person is still there.');
+            Assert.isNull(runAsMaria().get(AFFILIATION_KEY), 'The person is still there.');
         }
     }
 
@@ -132,7 +141,7 @@ private class HealthCheckPersonLinkChecksTest {
 
             delete people[0];
 
-            HealthCheckService.Finding finding = runAsMaria(AFFILIATION_KEY);
+            HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
             Assert.isNotNull(finding, 'An affiliation with no person is reported.');
             Assert.isTrue(finding.title.startsWith('1 '), finding.title);
@@ -169,8 +178,9 @@ private class HealthCheckPersonLinkChecksTest {
             delete others;
             delete people;
 
-            HealthCheckService.Finding relationships = runAsMaria(RELATIONSHIP_KEY);
-            HealthCheckService.Finding affiliationFinding = runAsMaria(AFFILIATION_KEY);
+            Map<String, HealthCheckService.Finding> findings = runAsMaria();
+            HealthCheckService.Finding relationships = findings.get(RELATIONSHIP_KEY);
+            HealthCheckService.Finding affiliationFinding = findings.get(AFFILIATION_KEY);
 
             Assert.isTrue(relationships.title.startsWith('200 '), relationships.title);
             Assert.areEqual(5, relationships.links.size(), 'Five are linked.');
@@ -195,7 +205,7 @@ private class HealthCheckPersonLinkChecksTest {
             delete people;
             HealthCheckHouseholdChecks.countCap = 2;
 
-            HealthCheckService.Finding finding = runAsMaria(AFFILIATION_KEY);
+            HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
             Assert.isTrue(
                 finding.title.startsWith(
@@ -219,12 +229,14 @@ private class HealthCheckPersonLinkChecksTest {
             delete people;
             User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
+            Test.startTest();
             System.runAs(priya) {
                 for (HealthCheckService.Finding finding : HealthCheckService.run()) {
                     Assert.areNotEqual(RELATIONSHIP_KEY, finding.key, 'Hidden from her.');
                     Assert.areNotEqual(AFFILIATION_KEY, finding.key, 'Hidden from her.');
                 }
             }
+            Test.stopTest();
         }
     }
 }
