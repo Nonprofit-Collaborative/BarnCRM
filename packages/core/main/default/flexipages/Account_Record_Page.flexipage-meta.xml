@@ -259,7 +259,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Details</value>
+          <value>{!$Label.Core_Section_Details}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>accountDetailsSection</identifier>
@@ -273,7 +273,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Name and Greetings</value>
+          <value>{!$Label.Core_Section_NameAndGreetings}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>householdNamingSection</identifier>

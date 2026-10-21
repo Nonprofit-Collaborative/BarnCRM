@@ -345,7 +345,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Gift</value>
+          <value>{!$Label.Giving_Section_Gift}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>giftSection</identifier>
@@ -359,7 +359,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Acknowledgment, Receipt and Recognition</value>
+          <value>{!$Label.Giving_Section_AckReceiptRecognition}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>giftFollowUpSection</identifier>
@@ -373,7 +373,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>In-kind Gift</value>
+          <value>{!$Label.Giving_Section_InKindGift}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>inKindSection</identifier>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_Section_Gift</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Gift</shortDescription>
+    <value>Gift</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_AckReceiptRecognition</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: acknowledgment, receipt, recognition</shortDescription>
+    <value>Acknowledgment, Receipt and Recognition</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_InKindGift</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: In-kind Gift</shortDescription>
+    <value>In-kind Gift</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_Commitment</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Commitment</shortDescription>
+    <value>Commitment</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_Schedule</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Schedule</shortDescription>
+    <value>Schedule</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_Totals</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Totals</shortDescription>
+    <value>Totals</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_Giving</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Giving</shortDescription>
+    <value>Giving</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_Batch</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Batch</shortDescription>
+    <value>Batch</value>
+  </labels>
+</CustomLabels>

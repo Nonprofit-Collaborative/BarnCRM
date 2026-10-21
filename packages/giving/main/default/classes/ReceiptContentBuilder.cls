@@ -31,15 +31,15 @@ public with sharing class ReceiptContentBuilder {
      */
     public static final Decimal QUID_PRO_QUO_THRESHOLD = 75;
 
-    public static final String SENTENCE_NO_GOODS = 'No goods or services were provided in exchange for this contribution.';
-    public static final String SENTENCE_INTANGIBLE_RELIGIOUS = 'The only goods or services provided in exchange for this contribution were intangible religious benefits.';
+    public static final String SENTENCE_NO_GOODS = Label.Giving_Receipt_NoGoods;
+    public static final String SENTENCE_INTANGIBLE_RELIGIOUS = Label.Giving_Receipt_IntangibleReligious;
 
     /**
      * What an in-kind gift puts where the template asked for an amount (R-RC12). A currency figure
      * there reads as a cash contribution of that amount, which is the one thing a document for
      * donated property must not say.
      */
-    public static final String IN_KIND_AMOUNT_PHRASE = 'the goods or services described below';
+    public static final String IN_KIND_AMOUNT_PHRASE = Label.Giving_Receipt_InKindAmountPhrase;
 
     /**
      * What every document states in place of a figure, for a gift of goods (G-18, ADR-0030,
@@ -47,13 +47,13 @@ public with sharing class ReceiptContentBuilder {
      * printing the fair market value the organization recorded is the one thing ADR-0016 forbids.
      * So the document says what is true: the organization has not stated a value.
      */
-    public static final String AMOUNT_NOT_STATED = 'No value stated (gift of goods or services)';
+    public static final String AMOUNT_NOT_STATED = Label.Giving_Receipt_AmountNotStated;
 
     /** What an in-kind gift puts in the amount column of a statement (R-RC12). */
-    public static final String IN_KIND_LINE_AMOUNT = 'Not valued';
+    public static final String IN_KIND_LINE_AMOUNT = Label.Giving_Receipt_InKindLineAmount;
 
     /** Why a statement's total is smaller than the sum of the lines above it (R-RC12). */
-    public static final String SENTENCE_IN_KIND_NOT_IN_TOTAL = 'Gifts of goods or services are listed above without a value and are not part of the total, because determining the value of donated property is the donor\'s responsibility.';
+    public static final String SENTENCE_IN_KIND_NOT_IN_TOTAL = Label.Giving_Receipt_InKindNotInTotal;
 
     private static final String IN_KIND = 'In-kind';
     private static final String TOKEN_OPEN = '{{';
@@ -122,12 +122,10 @@ public with sharing class ReceiptContentBuilder {
 
         if (isInKind(gift)) {
             String described = String.isBlank(gift.In_Kind_Description__c)
-                ? 'goods or services, described to us by the donor'
+                ? Label.Giving_Receipt_InKindDescribedDefault
                 : gift.In_Kind_Description__c.trim();
             sentences.add(
-                'You gave the following goods or services: ' +
-                    described +
-                    '. This organization has not placed a value on your gift; determining the value of donated property is the donor\'s responsibility.'
+                String.format(Label.Giving_Receipt_InKindSentence, new List<String>{ described })
             );
         }
 
@@ -160,15 +158,12 @@ public with sharing class ReceiptContentBuilder {
             deductible = 0;
         }
         String described = String.isBlank(gift.Benefit_Description__c)
-            ? 'goods or services'
+            ? Label.Giving_Receipt_BenefitDefault
             : gift.Benefit_Description__c.trim();
-        return 'In exchange for this contribution you received ' +
-            described +
-            '. Our good faith estimate of the value of those goods or services is ' +
-            money(benefit) +
-            '. The amount of your contribution that is deductible for federal income tax purposes is limited to the excess of the amount contributed over that value, which is ' +
-            money(deductible) +
-            '.';
+        return String.format(
+            Label.Giving_Receipt_QuidProQuo,
+            new List<String>{ described, money(benefit), money(deductible) }
+        );
     }
 
     /**

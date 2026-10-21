@@ -131,7 +131,7 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>label</name>
-          <value>Batch</value>
+          <value>{!$Label.Giving_Section_Batch}</value>
         </componentInstanceProperties>
         <componentName>flexipage:fieldSection</componentName>
         <identifier>batchSection</identifier>
