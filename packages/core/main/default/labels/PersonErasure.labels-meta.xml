@@ -102,7 +102,23 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase a person: a household with other members</shortDescription>
-        <value>Renamed and recounted without this person.</value>
+        <value>Recounted without this person. Its name and greetings were made again from the remaining members.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Erase_NoteCustomNameReleased</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: a custom-named household with other members</shortDescription>
+        <value>Its name was typed by hand and could name this person, so Custom Name was turned off and its name and greetings were made again from the remaining members. Type a new custom name afterwards if you want one.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Erase_NoteNativeHousehold</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: a household Nonprofit Cloud names</shortDescription>
+        <value>Nonprofit Cloud names this household, so its name and greetings were not changed. If they name this person, change them by hand.</value>
     </labels>
     <labels>
         <fullName>Core_Erase_NoteHouseholdKept</fullName>

@@ -157,6 +157,85 @@ private class GivingPersonErasureExtensionTest {
     }
 
     @IsTest
+    static void deletesTheAutomaticHouseholdCreditsAndSaysSo() {
+        System.runAs(eraser()) {
+            RecognitionTestData.setAutomaticHouseholdCredits(true);
+            Contact jordan = donor();
+            Contact sam = RecognitionTestData.person('Sam', 'Lee', jordan.AccountId);
+            Contact friend = GivingTestDataFactory.insertHouseholdContact(
+                'The Park Family',
+                'Ana',
+                'Park'
+            );
+            Gift__c samsGift = RecognitionTestData.gift(sam.Id, null, 100);
+            Gift__c friendsGift = RecognitionTestData.gift(friend.Id, null, 50);
+            Soft_Credit__c manual = RecognitionTestData.manualCredit(
+                friendsGift.Id,
+                jordan.Id,
+                'Solicitor',
+                50
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Soft_Credit__c
+                    WHERE
+                        Gift__c = :samsGift.Id
+                        AND Contact__c = :jordan.Id
+                        AND Is_Automatic__c = TRUE
+                ],
+                'Jordan is credited on Sam\'s gift as a household member'
+            );
+
+            Test.startTest();
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Soft_Credit__c
+                    WHERE Contact__c = :jordan.Id AND Is_Automatic__c = TRUE
+                ],
+                'The household credit is deleted'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Soft_Credit__c WHERE Id = :manual.Id],
+                'A credit a person entered stays'
+            );
+            Boolean deletedListed = false;
+            for (PersonErasure.Change change : result.getChanges()) {
+                deletedListed |=
+                    change.getAction() == PersonErasure.DELETED &&
+                    change.getObjectLabel() == Label.Giving_Erase_HouseholdCreditsLabel;
+            }
+            Assert.isTrue(deletedListed, 'The deleted credits are listed as Deleted');
+            String details = [SELECT Details__c FROM Erasure__c WHERE Contact__c = :jordan.Id]
+            .Details__c;
+            String softCredits = Soft_Credit__c.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .getLabelPlural();
+            Assert.isTrue(
+                details.contains(
+                    Label.Core_EraseAction_Deleted +
+                        ' | ' +
+                        Label.Giving_Erase_HouseholdCreditsLabel +
+                        ' | 1'
+                ),
+                'The Erasure record says the household credit was deleted: ' + details
+            );
+            Assert.isTrue(
+                details.contains(Label.Core_EraseAction_Kept + ' | ' + softCredits + ' | 1'),
+                'And counts only the credit that stays as kept: ' + details
+            );
+        }
+    }
+
+    @IsTest
     static void keepsTheDonorLevelFields() {
         // runs-as: deploying user (pure logic: returns field tokens, no DML or SOQL)
         GivingPersonErasureExtension extension = new GivingPersonErasureExtension();

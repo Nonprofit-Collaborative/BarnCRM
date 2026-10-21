@@ -6,7 +6,8 @@
  * at it. What to empty is worked out from describe: every field that can be empty, except what
  * `DataProtectedFields` protects, a few structural fields, and what a module keeps. Addresses
  * are deleted, relationships, affiliations and memberships are ended, households left empty and
- * kept are anonymized too, and the linked Individual is emptied and marked Forget.
+ * kept are anonymized too, a household with members left whose name was typed by hand is named
+ * again from them, and the linked Individual is emptied and marked Forget.
  *
  * Reads that decide what to change run in system mode, so a field the user cannot see is not
  * missed; every change runs in user mode, all or nothing. The preview is the same run, rolled
@@ -77,6 +78,16 @@ public with sharing class PersonErasure {
         'Contact_Address_Capture',
         'Account_Address_Capture',
         'Address_Default_Propagation'
+    };
+
+    /** What a household with members left is compared on, before and after (R-ER3). */
+    private static final List<Schema.SObjectField> HOUSEHOLD_WORDING = new List<Schema.SObjectField>{
+        Account.Name,
+        Account.Household_Formal_Greeting__c,
+        Account.Household_Informal_Greeting__c,
+        Account.Member_Count__c,
+        Account.Primary_Contact__c,
+        Account.Custom_Name__c
     };
 
     private static final Integer ACCESS_CHUNK = 200;
@@ -312,6 +323,7 @@ public with sharing class PersonErasure {
         if (account != null) {
             households.add(account);
         }
+        Map<Id, Account> householdsBefore = householdWording(households);
         SObject individual = individualOf(person);
 
         // The user must be able to make every change before any is made (R-ER5).
@@ -378,7 +390,7 @@ public with sharing class PersonErasure {
             // not also kept.
             Integer activitiesAt = result.changes.size();
             HouseholdService.afterMembershipChange(households, true);
-            settleHouseholds(households, result);
+            settleHouseholds(households, householdsBefore, result);
             for (PersonErasureExtension extension : extensions) {
                 List<Change> changes = extension.erase(personId);
                 if (changes != null) {
@@ -510,9 +522,14 @@ public with sharing class PersonErasure {
     /**
      * After upkeep: a household the person left is gone, still has members, or was left empty
      * and kept, in which case it would still carry the person's name and address and is
-     * anonymized too (R-ER3).
+     * anonymized too (R-ER3). `before` holds each household's wording as it was before the
+     * erasure began, so a household with members left is reported with what really changed.
      */
-    private static void settleHouseholds(Set<Id> householdIds, Result result) {
+    private static void settleHouseholds(
+        Set<Id> householdIds,
+        Map<Id, Account> before,
+        Result result
+    ) {
         if (householdIds.isEmpty()) {
             return;
         }
@@ -522,7 +539,7 @@ public with sharing class PersonErasure {
         Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(remaining.keySet());
         Id householdType = HouseholdService.householdRecordTypeId();
         List<Id> gone = new List<Id>();
-        List<Id> renamed = new List<Id>();
+        List<Id> shared = new List<Id>();
         for (Id householdId : householdIds) {
             SObject household = remaining.get(householdId);
             if (household == null) {
@@ -530,7 +547,7 @@ public with sharing class PersonErasure {
             } else if (householdType != null && household.get('RecordTypeId') != householdType) {
                 continue;
             } else if (members.containsKey(householdId) && !members.get(householdId).isEmpty()) {
-                renamed.add(householdId);
+                shared.add(householdId);
             } else {
                 Clearing anonymous = plan(
                     household,
@@ -572,16 +589,105 @@ public with sharing class PersonErasure {
         if (!gone.isEmpty()) {
             add(result, DELETED, Label.Core_Erase_Household, gone, null, null);
         }
-        if (!renamed.isEmpty()) {
-            add(
-                result,
-                UPDATED,
-                Label.Core_Erase_Household,
-                renamed,
-                null,
-                Label.Core_Erase_NoteRenamed
-            );
+        settleSharedHouseholds(shared, remaining, before, result);
+    }
+
+    /**
+     * Households the person left that still have members (R-ER3). Upkeep has recounted and
+     * renamed them, except where a person typed the name (Custom Name, R-H8). A typed name can
+     * name the person in any words ("The Reverend and Mrs. Smith", a nickname), so it cannot be
+     * edited safely: the erasure turns Custom Name off, as the user, and the name and greetings
+     * are made again from the remaining members. A household Nonprofit Cloud names is not
+     * BarnCRM's to rename, and is listed for staff to check by hand. Each is reported with the
+     * fields that really changed: Updated, or Kept when none did. One save and two reads for
+     * every household the person left together.
+     */
+    private static void settleSharedHouseholds(
+        List<Id> householdIds,
+        Map<Id, SObject> remaining,
+        Map<Id, Account> before,
+        Result result
+    ) {
+        if (householdIds.isEmpty()) {
+            return;
         }
+        Set<Id> shared = new Set<Id>(householdIds);
+        Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(shared);
+        List<Account> released = new List<Account>();
+        for (Id householdId : householdIds) {
+            if (
+                !natives.contains(householdId) &&
+                remaining.get(householdId).get('Custom_Name__c') == true
+            ) {
+                released.add(new Account(Id = householdId, Custom_Name__c = false));
+            }
+        }
+        Set<Id> releasedIds = new Map<Id, Account>(released).keySet();
+        if (!released.isEmpty()) {
+            Database.update(released, true, AccessLevel.USER_MODE);
+            // The Account trigger names a released household too; asked here as well so the
+            // erasure does not rest on that automation being on. Naming twice changes nothing.
+            HouseholdNamingService.applyNaming(releasedIds);
+        }
+        Map<Id, Account> after = householdWording(shared);
+        for (Id householdId : householdIds) {
+            List<String> changed = changedWording(before.get(householdId), after.get(householdId));
+            Change change = new Change(
+                changed.isEmpty() ? KEPT : UPDATED,
+                Label.Core_Erase_Household,
+                new List<Id>{ householdId },
+                changed
+            );
+            if (natives.contains(householdId)) {
+                change.note = Label.Core_Erase_NoteNativeHousehold;
+            } else if (releasedIds.contains(householdId)) {
+                change.note = Label.Core_Erase_NoteCustomNameReleased;
+            } else {
+                change.note = Label.Core_Erase_NoteRenamed;
+            }
+            result.changes.add(change);
+        }
+    }
+
+    /** What a household's wording and count are, read in system mode to compare (R-ER3). */
+    private static Map<Id, Account> householdWording(Set<Id> householdIds) {
+        return new Map<Id, Account>(
+            [
+                SELECT
+                    Id,
+                    Name,
+                    Custom_Name__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c,
+                    Member_Count__c,
+                    Primary_Contact__c
+                FROM Account
+                WHERE Id IN :householdIds
+                WITH SYSTEM_MODE
+            ]
+        );
+    }
+
+    /** The labels of the household fields whose value differs, compared case by case. */
+    private static List<String> changedWording(Account before, Account after) {
+        List<String> changed = new List<String>();
+        if (before == null || after == null) {
+            return changed;
+        }
+        for (Schema.SObjectField field : HOUSEHOLD_WORDING) {
+            Object was = before.get(field);
+            Object now = after.get(field);
+            Boolean same;
+            if (was == null || now == null) {
+                same = was == now;
+            } else {
+                same = String.valueOf(was).equals(String.valueOf(now));
+            }
+            if (!same) {
+                changed.add(field.getDescribe().getLabel());
+            }
+        }
+        return changed;
     }
 
     /** Field history of this record: deleted after commit where the user may, otherwise kept. */

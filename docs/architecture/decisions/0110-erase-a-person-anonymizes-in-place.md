@@ -62,7 +62,14 @@ what Giving keeps (ADR-0059).
    (ADR-0036, ADR-0070). A household left empty that is kept (the setting is off, or gifts are
    credited to it) would still carry the person's name, greetings and address, so it is
    anonymized the same way: name "Erased household", Custom Name on, greetings and address
-   fields emptied, its addresses deleted.
+   fields emptied, its addresses deleted. A household that keeps other members but whose name
+   was typed by hand (Custom Name on) is not renamed by upkeep (R-H8), and a typed name can
+   name the person in any words, so it cannot be edited safely: the erasure turns Custom Name
+   off, as the user, and the name and greetings are made again from the remaining members. A
+   household Nonprofit Cloud names is not BarnCRM's to rename and is listed for staff to check
+   by hand. Each such household is listed with the fields that really changed (amended
+   2026-10-20 after audit finding B3, which found a custom name still naming the person while
+   the preview said renamed).
 4. **Contact points and connections.** Addresses the person owns are deleted. Relationships on
    either side and affiliations are ended (End Date today, or the Start Date when that is
    later), lose their description, and an affiliation loses its role and primary flag. Ending
@@ -115,6 +122,14 @@ the person to notify) are emptied, and so is the message on a tribute of the per
 The acknowledgment ledger's recipient email and failure reason are emptied on rows sent to the
 person. Active stewardship plans for the person are ended. Donor level fields are kept: they are
 anonymous aggregates like the totals.
+
+One exception to "soft credits are kept" (amended 2026-10-20 after audit finding S2): the
+person's automatic Household Member credits exist only because they belonged to a household
+(R-SC3), and the erasure takes them out of every household, so the queued household recompute
+would delete them after the erasure while the preview called them kept. The extension deletes
+them itself, as the user, in the erasure's transaction, and lists them as Deleted, so the
+preview and the Erasure record say what happens and the rows leave the Recycle Bin with the
+rest. Credits a person entered, and other automatic roles such as Matched Donor, are kept.
 
 ## Alternatives considered
 
