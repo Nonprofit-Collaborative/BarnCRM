@@ -320,6 +320,23 @@ private class GiftPostingLockTest {
         }
     }
 
+    /** The guard reads the books as they are now, not as they were at an earlier delete. */
+    @IsTest
+    static void theDonorIsDeletedOnceTheBooksAreReopened() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+
+            Test.startTest();
+            String whileClosed = deleteRefusal(ana());
+            GivingTestDataFactory.closeBooksThrough(null);
+            String onceReopened = deleteRefusal(ana());
+            Test.stopTest();
+
+            Assert.areEqual(Label.Giving_Posting_DonorLocked, whileClosed);
+            Assert.isNull(onceReopened, 'Nothing of Ana\'s is in a closed period any more.');
+        }
+    }
+
     @IsTest
     static void aDonorWhoseGiftsAreAllOpenIsDeleted() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

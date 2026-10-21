@@ -75,6 +75,23 @@ private class CommitmentDonorDeleteGuardTest {
         }
     }
 
+    /** The guard reads the pledge as it is now, not as it was at an earlier delete. */
+    @IsTest
+    static void theDonorIsDeletedOnceTheirPledgeIsCancelled() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Commitment__c pledge = pledgeFrom(ana().Id, null, 'Active');
+
+            Test.startTest();
+            String whileActive = deleteRefusal(new Contact(Id = ana().Id));
+            update new Commitment__c(Id = pledge.Id, Status__c = 'Cancelled');
+            String onceCancelled = deleteRefusal(new Contact(Id = ana().Id));
+            Test.stopTest();
+
+            Assert.areEqual(Label.Giving_Commitment_DonorDeleteBlocked, whileActive);
+            Assert.isNull(onceCancelled, 'A cancelled pledge does not hold Ana.');
+        }
+    }
+
     @IsTest
     static void theHouseholdOfAPausedPledgesDonorIsNotDeleted() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
