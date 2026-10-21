@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice that one click module control arrives later</shortDescription>
-        <value>To turn an installed module off or on, or to see what uninstalling one would delete, open Modules in the General section of BarnCRM Settings.</value>
+        <value>To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>
