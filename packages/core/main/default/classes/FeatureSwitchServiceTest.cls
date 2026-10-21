@@ -38,13 +38,12 @@ private class FeatureSwitchServiceTest {
             Assert.isFalse(dataManagerOn, 'Data Manager is off');
             Assert.isTrue(FeatureSwitchService.tabSetsOn().isEmpty(), 'No feature tab is on');
             Assert.isTrue(hidden.contains('Duplicate_Review'), 'Feature rows are hidden');
-            for (String pattern : new List<String>{
-                'Household_Name_Pattern',
-                'Formal_Greeting_Pattern',
-                'Informal_Greeting_Pattern'
-            }) {
-                Assert.isTrue(hidden.contains(pattern), 'Household upkeep off hides ' + pattern);
-            }
+            Assert.isTrue(hidden.contains('Household_Name_Pattern'), 'Name pattern is hidden');
+            Assert.isTrue(hidden.contains('Formal_Greeting_Pattern'), 'Formal greeting is hidden');
+            Assert.isTrue(
+                hidden.contains('Informal_Greeting_Pattern'),
+                'Informal greeting is hidden'
+            );
             Assert.isFalse(relationshipsRun, 'A feature that is off runs no automation');
         }
     }
