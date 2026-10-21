@@ -11,6 +11,9 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
   virtual: true
 });
+jest.mock('@salesforce/label/c.Core_OrgOptimizer_OpenAria', () => ({ default: 'Open {0}' }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -58,6 +61,18 @@ describe('c-org-optimizer as an administrator', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('names each Overview Open button for its section', async () => {
+    const element = await render();
+
+    const buttons = Array.from(
+      element.shadowRoot.querySelectorAll('lightning-button[data-section]')
+    );
+    expect(buttons.length).toBeGreaterThan(1);
+    const names = buttons.map((button) => button.ariaLabel);
+    names.forEach((name) => expect(name).toMatch(/^Open \S/));
+    expect(new Set(names).size).toBe(names.length);
   });
 
   it('opens on the Overview and runs no section', async () => {

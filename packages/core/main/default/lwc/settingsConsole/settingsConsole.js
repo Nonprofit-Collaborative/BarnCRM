@@ -13,6 +13,7 @@ import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPa
 import LOAD_ERROR from '@salesforce/label/c.Core_Settings_LoadErrorMessage';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
 import LEARN_MORE from '@salesforce/label/c.Core_Settings_LearnMoreLink';
+import LEARN_MORE_ARIA from '@salesforce/label/c.Core_Settings_LearnMoreAria';
 import EMPTY_SECTION from '@salesforce/label/c.Core_Settings_EmptySectionMessage';
 import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeading';
 import RECENT_EMPTY from '@salesforce/label/c.Core_Settings_RecentChangesEmpty';
@@ -255,6 +256,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isRecordTypeList: setting.dataType === 'RecordTypeList',
       isComponent: setting.dataType === 'Component',
       hasHelp: Boolean(setting.helpUrl),
+      learnMoreLabel: LEARN_MORE_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,

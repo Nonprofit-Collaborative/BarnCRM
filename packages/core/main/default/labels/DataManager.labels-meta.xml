@@ -113,6 +113,14 @@
         <value>Open</value>
     </labels>
     <labels>
+        <fullName>Core_DataManager_OpenAria</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: screen reader name of a tool card button; {0} is the tool</shortDescription>
+        <value>Open {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_DataManager_MappingsHeading</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>

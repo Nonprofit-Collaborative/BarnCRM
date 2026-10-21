@@ -97,6 +97,14 @@
         <value>Open</value>
     </labels>
     <labels>
+        <fullName>Core_OrgOptimizer_OpenAria</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: screen reader name of an Overview button; {0} is the section</shortDescription>
+        <value>Open {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_RunHealthCheck</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>

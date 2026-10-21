@@ -10,6 +10,12 @@ jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {
   virtual: true
 });
 
+jest.mock(
+  '@salesforce/label/c.Core_Settings_LearnMoreAria',
+  () => ({ default: 'Learn more about {0} (opens a new tab)' }),
+  { virtual: true }
+);
+
 jest.mock('@salesforce/apex/SettingsController.getConsoleModel', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -285,6 +291,9 @@ describe('c-settings-console', () => {
     const help = element.shadowRoot.querySelector('a[target="_blank"]');
     expect(help).not.toBeNull();
     expect(help.href).toContain('household-naming.md');
+    expect(help.getAttribute('aria-label')).toBe(
+      'Learn more about Household name pattern (opens a new tab)'
+    );
   });
 
   it('sends only the settings Maria changed', async () => {

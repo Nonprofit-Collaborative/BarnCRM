@@ -358,7 +358,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what detection found when a household package is installed</shortDescription>
-        <value>NPSP is installed in this org. BarnCRM can adopt the household accounts you already have rather than building new ones.</value>
+        <value>NPSP is installed in this org. BarnCRM builds its own households and leaves NPSP's alone.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ShapePersonAccounts</fullName>

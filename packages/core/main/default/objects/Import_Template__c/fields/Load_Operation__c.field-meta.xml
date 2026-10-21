@@ -14,12 +14,12 @@
       <value>
         <fullName>Insert</fullName>
         <default>true</default>
-        <label>Insert</label>
+        <label>Create new records</label>
       </value>
       <value>
         <fullName>Update by record Id</fullName>
         <default>false</default>
-        <label>Update by record Id</label>
+        <label>Update by record ID</label>
       </value>
       <value>
         <fullName>Update by a matching field</fullName>
@@ -29,12 +29,12 @@
       <value>
         <fullName>Upsert by external ID</fullName>
         <default>false</default>
-        <label>Upsert by external ID</label>
+        <label>Update or create, matched by external ID</label>
       </value>
       <value>
         <fullName>Delete by record Id</fullName>
         <default>false</default>
-        <label>Delete by record Id</label>
+        <label>Delete by record ID</label>
       </value>
     </valueSetDefinition>
   </valueSet>

@@ -20,6 +20,7 @@ import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
 import OPEN from '@salesforce/label/c.Core_OrgOptimizer_Open';
+import OPEN_ARIA from '@salesforce/label/c.Core_OrgOptimizer_OpenAria';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
 
@@ -78,7 +79,10 @@ export default class OrgOptimizer extends LightningElement {
         { name: 'setup', title: SETUP, text: SETUP_TEXT }
       );
     }
-    return sections;
+    return sections.map((section) => ({
+      ...section,
+      openLabel: OPEN_ARIA.replace('{0}', section.title)
+    }));
   }
 
   get qualityOpened() {
