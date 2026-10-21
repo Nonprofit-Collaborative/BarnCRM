@@ -83,6 +83,19 @@ public without sharing class RollupQueue implements Queueable {
     /** Set once this transaction inserts entries, which no processor reads until it commits. */
     private static Boolean insertedEntries = false;
 
+    /** The first entry of this transaction's last insert, and the DML statements counted then. */
+    private static Id lastEntryId;
+    private static Integer dmlStatementsAtLastInsert = 0;
+
+    /**
+     * Test seam: stands in for the DML statements counted; null reads the platform. A test
+     * cannot make the platform retry a partial save the way production does (it does not roll
+     * a test's queued job back), so it rolls back to a savepoint and sets this to the count the
+     * platform would have put back.
+     */
+    @TestVisible
+    private static Integer dmlStatementsForTest;
+
     /** Test seam: what a fresh transaction starts with, as the Ready event's subscriber has. */
     @TestVisible
     private static void newTransactionForTest() {
@@ -90,6 +103,8 @@ public without sharing class RollupQueue implements Queueable {
         processorComing = false;
         insertedEntries = false;
         readyEventsPublished = 0;
+        lastEntryId = null;
+        dmlStatementsAtLastInsert = 0;
     }
 
     /** Test seam: stands in for the processors queued and not yet started; null reads them. */
@@ -326,9 +341,50 @@ public without sharing class RollupQueue implements Queueable {
         if (entries.isEmpty()) {
             return;
         }
+        forgetRolledBackAttempt();
         Database.insert(entries, AccessLevel.SYSTEM_MODE);
+        lastEntryId = entries[0].Id;
+        dmlStatementsAtLastInsert = dmlStatements();
         insertedEntries = true;
         requestProcessor();
+    }
+
+    /**
+     * A partial save (allOrNone false, as the Bulk API, Data Loader and `Database.delete(records,
+     * false)` save) whose records partly fail is rolled back and its triggers run again for the
+     * records that passed. The rollback takes this transaction's entries and the processor or
+     * Ready event it asked for, but static variables are kept: the retry would believe its
+     * processor already queued and leave its entries Pending with nothing coming for them.
+     *
+     * The platform puts governor limits back where they were before the attempt, so fewer DML
+     * statements than this transaction's last insert counted means a rollback, or a test's
+     * startTest or stopTest. The entry that insert wrote tells them apart: rolled back, it is
+     * gone, while one a processor finished is still in the Recycle Bin. After a rollback what was
+     * asked for is forgotten, so the retry asks again. One query, only when the count went down.
+     */
+    private static void forgetRolledBackAttempt() {
+        if (lastEntryId == null || dmlStatements() >= dmlStatementsAtLastInsert) {
+            return;
+        }
+        Boolean rolledBack = [
+                SELECT Id
+                FROM Rollup_Queue__c
+                WHERE Id = :lastEntryId
+                WITH SYSTEM_MODE
+                ALL ROWS
+            ]
+            .isEmpty();
+        lastEntryId = null;
+        if (rolledBack) {
+            processorRequested = false;
+            processorComing = false;
+            insertedEntries = false;
+            readyEventsPublished = 0;
+        }
+    }
+
+    private static Integer dmlStatements() {
+        return dmlStatementsForTest == null ? Limits.getDmlStatements() : dmlStatementsForTest;
     }
 
     /**

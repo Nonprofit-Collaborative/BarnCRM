@@ -560,6 +560,43 @@ private class RollupQueueTest {
         }
     }
 
+    /**
+     * A partial save (allOrNone false) whose records partly fail: the platform rolls the first
+     * attempt back, its entries and the processor it queued with it, puts governor limits back
+     * and runs the triggers again for the rest, with static variables kept. The retry asks for a
+     * processor again instead of believing one is queued. A test's queued job is not rolled
+     * back, so the savepoint and the seams stand in for the platform here.
+     */
+    @IsTest
+    static void aPartialSavesRetryAsksForAProcessorAgain() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.waitingForTest = 0;
+            Savepoint beforeTheAttempt = Database.setSavepoint();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(7) });
+            Database.rollback(beforeTheAttempt);
+            RollupQueue.dmlStatementsForTest = 0;
+            Integer queuedBeforeTheRetry = processorsQueued();
+
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+
+            Assert.areEqual(1, entries().size(), 'Only the retry\'s entry is left');
+            Assert.areEqual(
+                queuedBeforeTheRetry + 1,
+                processorsQueued(),
+                'The retry queued a processor for its entries'
+            );
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(3) });
+            Assert.areEqual(
+                queuedBeforeTheRetry + 1,
+                processorsQueued(),
+                'And only one: a later save in the same transaction asks nothing more'
+            );
+            Test.stopTest();
+        }
+    }
+
     @IsTest
     static void aSaveSeeingOnlyARunningProcessorQueuesItsOwn() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {

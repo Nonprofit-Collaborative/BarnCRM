@@ -197,6 +197,27 @@ public virtual with sharing class TriggerHandler {
         CLAIMED_RECORDS.clear();
     }
 
+    /** Queries plus DML statements spent when a trigger last started or ended. */
+    private static Integer workAtLastTrigger = 0;
+
+    /**
+     * Called by the dispatcher as each trigger starts and ends. A partial save (allOrNone false,
+     * as the Bulk API, Data Loader and `Database.delete(records, false)` save) whose records
+     * partly fail is rolled back and its triggers run again for the records that passed, with
+     * static variables kept, so the claims of the rolled-back attempt would make the retry skip
+     * every record: what a handler did for them went with the rollback. The platform puts
+     * governor limits back where they were before the attempt, so less work counted than when
+     * the last trigger ended means a rollback, and the claims are cleared. A test's startTest and
+     * stopTest move the count too, which only clears claims a test would clear itself.
+     */
+    public static void noteTriggerProgress() {
+        Integer work = Limits.getQueries() + Limits.getDmlStatements();
+        if (work < workAtLastTrigger) {
+            CLAIMED_RECORDS.clear();
+        }
+        workAtLastTrigger = work;
+    }
+
     private Set<Id> claimedFor(String phase) {
         String key = phaseKey(phase);
         if (!CLAIMED_RECORDS.containsKey(key)) {
