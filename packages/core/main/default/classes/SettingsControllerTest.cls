@@ -125,7 +125,11 @@ private class SettingsControllerTest {
                 keys.contains(CHECKBOX_KEY),
                 'Household upkeep is off on a new install, so its row is hidden'
             );
-            Assert.isTrue(keys.contains(TEXT_KEY), 'A row of no feature still shows');
+            Assert.isFalse(
+                keys.contains(TEXT_KEY),
+                'The naming pattern rows belong to Household upkeep, so they are hidden too'
+            );
+            Assert.isTrue(keys.contains('Coexistence_Mode__c'), 'A row of no feature still shows');
         }
     }
 
