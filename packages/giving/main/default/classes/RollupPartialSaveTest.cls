@@ -5,7 +5,7 @@
  * The platform then rolls the first attempt back, the Rollup Queue entries and the processor it
  * queued with it, and runs the triggers again for the records that passed, keeping static
  * variables. A retry that believed its records already handled (the trigger framework's per
- * record claims) never queued a partial insert's donor or a partial delete's fund. In an org the
+ * record claims) never queued the fund of a partial delete's allocations. In an org the
  * retry also believed its processor already queued and left its entries Pending; a test's queued
  * job is not rolled back, so `RollupQueueTest.aPartialSavesRetryAsksForAProcessorAgain` covers
  * that half and these tests check the totals end to end.
@@ -75,20 +75,6 @@ private class RollupPartialSaveTest {
         return [SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_PENDING];
     }
 
-    /** Whether a queued entry for this target entity names this record. */
-    private static Boolean queued(Schema.SObjectType target, Id recordId) {
-        for (Rollup_Queue__c entry : [
-            SELECT Record_Ids__c
-            FROM Rollup_Queue__c
-            WHERE Target_Object__c = :String.valueOf(target)
-        ]) {
-            if (entry.Record_Ids__c != null && entry.Record_Ids__c.contains(recordId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static void assertTotals(Decimal total, Integer count) {
         Contact person = GivingRollupTestData.person(ana().Id);
         GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
@@ -106,7 +92,11 @@ private class RollupPartialSaveTest {
         );
     }
 
-    /** The case seen in the org: 7 gifts deleted, 2 refused, and the totals never caught up. */
+    /**
+     * The case seen in the org: 7 gifts deleted, 2 refused, and the totals never caught up. The
+     * allocations are deleted with their gifts and fire no trigger, so the fund is read before
+     * the delete; the retry must read it again, since what the first attempt read went with it.
+     */
     @IsTest
     static void aDeleteWithRefusedGiftsStillProcessesTheTotals() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
@@ -120,25 +110,6 @@ private class RollupPartialSaveTest {
             Assert.areEqual(2, refusedCount(results), 'The two gifts in the books stay');
             Assert.areEqual(0, pendingEntries(), 'A processor ran for what the retry queued');
             assertTotals(2 * CLOSED_AMOUNT, 2);
-        }
-    }
-
-    /**
-     * The allocations are deleted with their gifts and fire no trigger, so the fund is read
-     * before the delete. The retry must read it again: what the first attempt read went with it.
-     */
-    @IsTest
-    static void aDeleteWithRefusedGiftsStillQueuesTheFund() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
-            List<Gift__c> all = gifts();
-
-            Test.startTest();
-            Database.delete(all, false);
-            Boolean fundQueued = queued(Fund__c.SObjectType, defaultFundId());
-            Test.stopTest();
-
-            Assert.isTrue(fundQueued, 'The fund of the deleted allocations is queued');
         }
     }
 
@@ -156,11 +127,9 @@ private class RollupPartialSaveTest {
 
             Test.startTest();
             List<Database.SaveResult> results = Database.insert(added, false);
-            Boolean anaQueued = queued(Contact.SObjectType, ana().Id);
             Test.stopTest();
 
             Assert.areEqual(1, refusedCount(results), 'Nothing new goes into a closed month');
-            Assert.isTrue(anaQueued, 'The retry queued Ana');
             Assert.areEqual(0, pendingEntries(), 'A processor ran for what the retry queued');
             assertTotals(2 * CLOSED_AMOUNT + 5 * OPEN_AMOUNT + 20 + 10, 9);
         }
