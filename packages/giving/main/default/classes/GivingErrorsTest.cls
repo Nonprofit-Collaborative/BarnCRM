@@ -1,42 +1,53 @@
-@IsTest
+@IsTest(testFor='ApexClass:GivingErrors, ApexClass:GiftController')
 private class GivingErrorsTest {
     private static final String FALLBACK = Label.Giving_Gift_UnexpectedError;
 
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void aBarnCrmExceptionIsShownAsWritten() {
-        Exception known = new GiftService.GiftServiceException('Choose a gift first.');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Exception known = new GiftService.GiftServiceException('Choose a gift first.');
 
-        AuraHandledException surfaced = GivingErrors.userError(known, FALLBACK);
+            AuraHandledException surfaced = GivingErrors.userError(known, FALLBACK);
 
-        Assert.areEqual('Choose a gift first.', surfaced.getMessage(), 'Known message');
+            Assert.areEqual('Choose a gift first.', surfaced.getMessage(), 'Known message');
+        }
     }
 
     @IsTest
     static void aFailedSaveShowsOnlyTheRowMessage() {
-        String message;
-        try {
-            insert new Gift__c();
-        } catch (DmlException failed) {
-            message = GivingErrors.userError(failed, FALLBACK).getMessage();
-            Assert.areEqual(failed.getDmlMessage(0), message, 'The row message only');
-            Assert.isFalse(message.contains('Insert failed'), 'No DML wrapper');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            String message;
+            try {
+                insert new Gift__c();
+            } catch (DmlException failed) {
+                message = GivingErrors.userError(failed, FALLBACK).getMessage();
+                Assert.areEqual(failed.getDmlMessage(0), message, 'The row message only');
+                Assert.isFalse(message.contains('Insert failed'), 'No DML wrapper');
+            }
+            Assert.isNotNull(message, 'The insert failed');
         }
-        Assert.isNotNull(message, 'The insert failed');
     }
 
     @IsTest
     static void anythingElseBecomesTheLabel() {
-        Exception raw;
-        try {
-            Object nothing = null;
-            nothing.toString();
-        } catch (NullPointerException failed) {
-            raw = failed;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Exception raw;
+            try {
+                Object nothing = null;
+                nothing.toString();
+            } catch (NullPointerException failed) {
+                raw = failed;
+            }
+
+            AuraHandledException surfaced = GivingErrors.userError(raw, FALLBACK);
+
+            Assert.areEqual(FALLBACK, surfaced.getMessage(), 'Label shown');
         }
-
-        AuraHandledException surfaced = GivingErrors.userError(raw, FALLBACK);
-
-        Assert.areEqual(FALLBACK, surfaced.getMessage(), 'Label shown');
     }
 
     @IsTest
