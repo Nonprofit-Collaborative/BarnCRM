@@ -8,12 +8,19 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- Full gates on main 44df8cb8: `oi-test` 3,542 of 3,542 and `oi-pa` 3,542 of 3,542 (earlier on 3a32c662: 3,533 and 3,535).
+- Re-test of the first-week scenario on `oi-test` at 3a32c662: audit B1, B2, B3, S2 and S3 fixed; rollups, Health Check, Find, bulk update and undo unchanged.
+- Real-org partial-save check on `oi-test` at 44df8cb8: a `Database.delete` of 7 gifts with 2 refused and a `Database.update` of 7 with 2 refused each queued a processor on their own, the queue emptied without a manual run, and fund, person and household totals matched; org counts restored.
+- `barn-npc` check-only validations with the 77-component cleanup (no change to the org): 0Afhk000001rCQfCAM at 3a32c662 found one more failure, `HealthCheckPersonLinkChecksTest` at 101 SOQL (fixed in #525); 0Afhk000001rIZJCA2 at 44df8cb8: 5,403 components, 0 errors, 3,192 tests, only the 3 expected Volunteers "No such column" failures. Deploy still waits on owner approval.
 - Final whole-product QA and UX audit on main 0a5bdb2f (Opus): "new admin, first week" scenario on `oi-test` (household, gift, pledge and payment, rollups, Health Check, Find, bulk update and undo, erasure); 3 blockers, 10 should-fix and 13 nice-to-have found; all fixed in #515 to #522.
 - Gate locks now record the owner's PID after two `oi-test` gates overlapped when a lock was removed by hand; both runs were stopped and rerun alone.
 - `oi-test` expires 2026-10-23; replacing it waits on owner approval.
 
 ### Merged to main (newest first)
 
+- #526 (squash 44df8cb8, gate `oi-pa` 3,542 of 3,542): Rollup Queue: a partial save's retry restores what was asked before its attempt instead of zeroing it, so a processor queued earlier in the transaction still counts; TriggerHandler documents that claims reset after a partial-save retry (review follow-ups to #524).
+- #525 (squash 7501b0b2, gate `oi-test` 3,533 of 3,533): `HealthCheckPersonLinkChecksTest` runs Health Check once per test inside `Test.startTest`/`Test.stopTest`, so it no longer hits 101 SOQL on `barn-npc`, where #520's donor delete guard (one query per Contact or Account delete) pushed it over; product unchanged.
+- #524 (squash 10101969, gate `oi-pa` 3,540 of 3,540, Opus review): rollups after a partial save (allOrNone false, some records refused): the platform's retry asks for a processor again (RollupQueue) and its records are marked again (TriggerHandler claims; a partial delete missed the fund totals); the commitment and posting lock donor delete guards read current state at each delete.
 - #520 (squash 3a32c662, gate `oi-pa` 3,515 of 3,515): Giving pledge balance fixes (audit B1, B2, S3): a blank pledge expected total is filled from amount x installments; refunds and write-offs carry the pledge and installment and net Paid To Date, with one definition of paid for installments, completion and rollups, and a refund that takes a pledge short reopens it; deleting the donor (or household) of an open pledge or open recurring gift is refused (merge and erasure still work).
 - #522 (squash d74d7b67): admin guide and catalog use the renamed import operation labels (#516 follow-up).
 - #516 (squash 3f04ce77, gate `oi-pa` 3,499 of 3,499): Settings console fixes (audit S6, S7, N3, N8, N9): naming-pattern rows hidden while Household upkeep is off, NPSP coexistence label promises only what is built, Giving setting labels in sentence case, plain import operation labels, accessible names on Open and Learn more controls, Modules section named in the module manager notice.
