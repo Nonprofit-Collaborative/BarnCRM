@@ -161,6 +161,11 @@ describe('c-access-manager extra permissions', () => {
     expect(element.shadowRoot.querySelector('[data-id="add-on-warning"]').textContent).toContain(
       WARNING
     );
+    // The icon is decorative: the warning text beside it says it all, so a screen reader skips it.
+    const warningIcon = element.shadowRoot.querySelector(
+      '[data-id="add-on-warning"] lightning-icon'
+    );
+    expect(warningIcon.alternativeText).toBe('');
     expect(button.disabled).toBe(false);
 
     button.click();

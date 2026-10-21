@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_Access_AddOnGivingAdmin</fullName>
+    <categories>Access</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Giving Admin grants</shortDescription>
+    <value>Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Access_AddOnGivingStaff</fullName>
+    <categories>Access</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Giving Staff grants</shortDescription>
+    <value>Enter gifts, record refunds, and set up funds and appeals, without deleting anything. The Fundraising Staff role already includes it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Access_AddOnGivingReadOnly</fullName>
+    <categories>Access</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Giving Read Only grants</shortDescription>
+    <value>See gifts, funds, appeals and receipts without changing them.</value>
+  </labels>
+</CustomLabels>

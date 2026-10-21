@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    A module's permission set that the Access page lists as an extra permission, beside Core's,
+    so an administrator gives it without Setup. Modules ship the rows; Core names no module set.
+  </description>
+  <label>Access Add-On</label>
+  <pluralLabel>Access Add-Ons</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>

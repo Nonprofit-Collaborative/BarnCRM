@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Record Inbound Gift Action</label>
+    <protected>true</protected>
+    <values>
+        <field>Permission_Set__c</field>
+        <value xsi:type="xsd:string">Record_Inbound_Gift_Action</value>
+    </values>
+    <values>
+        <field>Description_Label__c</field>
+        <value xsi:type="xsd:string">Mirror_Access_AddOnRecordInboundGiftAction</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">250</value>
+    </values>
+</CustomMetadata>

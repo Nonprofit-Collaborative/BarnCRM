@@ -1206,6 +1206,22 @@ draft ("Object" and "Order") are platform reserved words, and because the materi
 no records: the first records arrive with feature C-01, which ships the first two trigger
 handlers.
 
+### Access Add-On
+
+`Access_Add_On__mdt`: the catalog through which a module lists its own permission sets on the
+Access page as extra permissions, beside Core's six, so an administrator gives them without
+Setup and Core names no module set (Decision ADR-NEXT, modules list their permission sets on
+the Access page). A module ships one protected row per set; the page uses a row only when it is
+in the package's own namespace and its set is a packaged set in that namespace.
+
+| Field | Type | Definition |
+|---|---|---|
+| DeveloperName | text | The stable identifier of the row. |
+| Label | text | The row's name in Setup; the page shows the permission set's own label. |
+| `Permission_Set__c` | text (80) | The API name of the module's permission set, without a namespace prefix. |
+| `Description_Label__c` | text (80) | The name of a custom label, shipped by the same package, holding the one sentence the page shows under the picker. |
+| `Sort_Order__c` | number | The order of this row after Core's add-ons, lowest first. |
+
 ### Rollup Definition Default
 
 `Rollup_Definition_Default__mdt` (v0.2): the rollup definitions the package ships,

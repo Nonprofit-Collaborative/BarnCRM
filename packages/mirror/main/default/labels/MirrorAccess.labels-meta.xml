@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Mirror_Access_AddOnCampaignSync</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Campaign Sync grants</shortDescription>
+    <value>Edit an appeal's Campaign ID and open the Campaign sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_Access_AddOnOpportunityMirror</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Opportunity Mirror grants</shortDescription>
+    <value>Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_Access_AddOnAccountingExport</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Accounting Export grants</shortDescription>
+    <value>Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_Access_AddOnInboundGiftApi</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Inbound Gift API grants</shortDescription>
+    <value>For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_Access_AddOnRecordInboundGiftAction</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Record Inbound Gift Action grants</shortDescription>
+    <value>Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff.</value>
+  </labels>
+</CustomLabels>
