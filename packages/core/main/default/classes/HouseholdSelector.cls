@@ -64,7 +64,10 @@ public with sharing class HouseholdSelector {
     /**
      * Set only by tests: the object names this org is taken to have, in place of the describe.
      * It lets a test show how each native probe behaves when the object is said to exist but
-     * cannot be queried, which is the org shape a licence or permission gap produces.
+     * cannot be queried, which is the org shape a licence or permission gap produces. While it
+     * is set, every native probe of a described object fails as that gap would, so the answer
+     * is the same in an org that really has the object (Nonprofit Cloud, Contacts to Multiple
+     * Accounts on) as in one that does not. Production code never sets it.
      */
     @TestVisible
     private static Set<String> describedObjectNamesOverride;
@@ -382,6 +385,7 @@ public with sharing class HouseholdSelector {
         ) {
             return rows;
         }
+        failProbeWhereTestStatesDescribe();
         Map<String, Object> binds = new Map<String, Object>{ 'accountIds' => accountIds };
         if (contactIds != null) {
             binds.put('contactIds', contactIds);
@@ -491,6 +495,7 @@ public with sharing class HouseholdSelector {
             return 0;
         }
         try {
+            failProbeWhereTestStatesDescribe();
             return Database.countQueryWithBinds(
                 NATIVE_HOUSEHOLD_COLLISION_COUNT_QUERY,
                 new Map<String, Object>{ 'recordTypeId' => recordTypeId },
@@ -538,6 +543,7 @@ public with sharing class HouseholdSelector {
             return;
         }
         try {
+            failProbeWhereTestStatesDescribe();
             for (SObject row : Database.query(query, AccessLevel.SYSTEM_MODE)) {
                 dependent.add((Id) row.get(ACCOUNT_FIELD));
             }
@@ -562,6 +568,18 @@ public with sharing class HouseholdSelector {
         return describedObjectNamesOverride != null
             ? describedObjectNamesOverride.contains(objectName)
             : Schema.getGlobalDescribe().containsKey(objectName);
+    }
+
+    /**
+     * Called just before a native probe queries an object the describe said exists. Where a
+     * test has stated the describe, the probe fails as a licence or permission gap would make
+     * it fail, rather than reaching the real object in an org that has it and answering from
+     * there. Does nothing in production, where the override is never set.
+     */
+    private static void failProbeWhereTestStatesDescribe() {
+        if (describedObjectNamesOverride != null) {
+            throw new QueryException('Injected probe failure, tests only.');
+        }
     }
 
     @NamespaceAccessible
