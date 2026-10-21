@@ -11,6 +11,7 @@ import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 import { startPolling } from 'c/jobPoller';
 
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import HEADING from '@salesforce/label/c.Core_DataJobs_Heading';
 import EMPTY from '@salesforce/label/c.Core_DataJobs_Empty';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
@@ -61,7 +62,7 @@ function errorText(error) {
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
-  return (error && error.message) || String(error);
+  return (error && error.message) || UNEXPECTED_ERROR;
 }
 
 // ImportBatchService.STATUS_UNDOING

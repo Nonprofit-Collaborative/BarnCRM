@@ -105,6 +105,13 @@ describe('c-data-manager', () => {
     expect(table.data[1].loads).toBe('Session__c');
   });
 
+  it('shows the unexpected-error label, not raw text, when the error has no message', async () => {
+    const element = await render();
+    getMappings.error({});
+    await flush();
+    expect(one(element, 'mappings-error').textContent).toContain('c.Core_UnexpectedError');
+  });
+
   it('says when there are no mappings, and shows a mappings error', async () => {
     const element = await render();
     getMappings.emit([]);

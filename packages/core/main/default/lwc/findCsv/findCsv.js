@@ -7,6 +7,7 @@
  * and so is text that is only a negative number such as "-25.00" (an import's exceptions file
  * holds every value as text, and nothing in it can run).
  */
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 
 /** Text that is a plain negative decimal and nothing else. */
 const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
@@ -69,7 +70,7 @@ export function messageFrom(error) {
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
-  return error && error.message ? error.message : String(error);
+  return error && error.message ? error.message : UNEXPECTED_ERROR;
 }
 
 const zonedFormats = new Map();

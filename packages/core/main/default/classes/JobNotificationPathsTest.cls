@@ -144,6 +144,25 @@ private class JobNotificationPathsTest {
     }
 
     @IsTest
+    static void aBulkUpdateUndoLogSaysOnlyWhatAUpdateCanDo() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c updated = job(BulkUpdateService.OPERATION_UPDATE);
+            Import_Batch__c imported = job(null);
+
+            ImportUndoService.finish(updated.Id, 0, 2, false, 0);
+            ImportUndoService.finish(imported.Id, 0, 2, false, 0);
+
+            String updateLog = [SELECT Run_Log__c FROM Import_Batch__c WHERE Id = :updated.Id]
+            .Run_Log__c;
+            String importLog = [SELECT Run_Log__c FROM Import_Batch__c WHERE Id = :imported.Id]
+            .Run_Log__c;
+            Assert.isTrue(updateLog.contains('2 values put back'), 'Says what was put back');
+            Assert.isFalse(updateLog.contains('records deleted'), 'No import wording: ' + updateLog);
+            Assert.isTrue(importLog.contains('records deleted'), 'An import keeps its wording');
+        }
+    }
+
+    @IsTest
     static void bulkUpdateOpensTheJob() {
         System.runAs(TestUsers.admin()) {
             notifications(true);

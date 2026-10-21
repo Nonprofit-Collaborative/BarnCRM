@@ -64,6 +64,15 @@ describe('c-optimizer-storage', () => {
     expect(table.data[1].recordsText).toBe('12');
   });
 
+  it('shows the unexpected-error label when the failure has no message', async () => {
+    getStorage.mockRejectedValue('boom');
+    const element = await render();
+
+    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+      'c.Core_UnexpectedError'
+    );
+  });
+
   it('shows the refusal and reads again on Refresh', async () => {
     getStorage.mockRejectedValue({ body: { message: 'Needs the permission.' } });
     const element = await render();

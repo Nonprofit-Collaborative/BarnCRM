@@ -112,7 +112,7 @@ public with sharing class OrgOptimizerStorageController {
             }
             return result;
         } catch (Exception caught) {
-            throw asAuraError(caught.getMessage());
+            throw UserErrors.wrap(caught, 'OrgOptimizerStorageController.getStorage', true);
         }
     }
 

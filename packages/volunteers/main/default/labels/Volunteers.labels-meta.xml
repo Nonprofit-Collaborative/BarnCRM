@@ -1224,4 +1224,12 @@
         <shortDescription>Erase a person: why the Rejection Reason on hours is kept</shortDescription>
         <value>Rejection Reason kept: a coordinator wrote why the entry was refused, and only the approval screen changes it.</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_HealthCheck_NeedsManageSettings</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: refusal when the person cannot manage settings</shortDescription>
+        <value>Health Check findings need Manage BarnCRM Settings.</value>
+    </labels>
 </CustomLabels>

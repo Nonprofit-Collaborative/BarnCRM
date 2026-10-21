@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getFeatures from '@salesforce/apex/FeatureController.getFeatures';
 import turnOn from '@salesforce/apex/FeatureController.turnOn';
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import WARNING from '@salesforce/label/c.Core_Feature_OneWayWarning';
 import TURN_ON from '@salesforce/label/c.Core_Feature_TurnOn';
 import ON from '@salesforce/label/c.Core_Feature_On';
@@ -91,5 +92,5 @@ function format(template, value) {
 }
 
 function messageOf(error) {
-  return (error && error.body && error.body.message) || (error && error.message) || '';
+  return (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR;
 }

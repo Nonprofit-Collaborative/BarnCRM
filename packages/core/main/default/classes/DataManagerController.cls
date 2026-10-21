@@ -53,9 +53,8 @@ public with sharing class DataManagerController {
             }
             return result;
         } catch (Exception caught) {
-            AuraHandledException error = new AuraHandledException(caught.getMessage());
-            error.setMessage(caught.getMessage());
-            throw error;
+            // Cacheable call: the platform refuses the Error Log insert, so nothing is logged.
+            throw UserErrors.wrap(caught, 'DataManagerController.getMappings', false);
         }
     }
 

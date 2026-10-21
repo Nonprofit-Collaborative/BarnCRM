@@ -239,6 +239,14 @@
         <value>Search settings</value>
     </labels>
     <labels>
+        <fullName>Core_UnexpectedError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown when something unexpected went wrong; the details are in the Error Log.</shortDescription>
+        <value>Something went wrong. The details are in the Error Log; try again, or ask your administrator.</value>
+    </labels>
+    <labels>
         <fullName>Core_SettingsSearch_ResultsHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -185,6 +185,14 @@
         <value>(blank)</value>
     </labels>
     <labels>
+        <fullName>Core_Find_SummaryNothing</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown when a summary finds no records to summarize.</shortDescription>
+        <value>No records match, so there is nothing to summarize.</value>
+    </labels>
+    <labels>
         <fullName>Core_Find_SummaryCapped</fullName>
         <categories>Find</categories>
         <language>en_US</language>

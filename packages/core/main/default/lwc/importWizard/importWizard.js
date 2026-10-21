@@ -1704,9 +1704,9 @@ export default class ImportWizard extends LightningElement {
 
   /** Writes the rejected rows as CSV and saves the file. */
   saveExceptions(rows) {
-    const columns = [{ label: 'Row', path: 'row' }]
+    const columns = [{ label: resultsRow, path: 'row' }]
       .concat(this.fileColumns)
-      .concat([{ label: 'Reason', path: 'reason' }]);
+      .concat([{ label: resultsReason, path: 'reason' }]);
     const records = rows.map((row) => ({
       ...this.fileValuesOf(row),
       row: row.rowNumber,

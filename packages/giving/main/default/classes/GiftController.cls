@@ -56,9 +56,7 @@ public with sharing class GiftController {
     }
 
     private static AuraHandledException asUserError(Exception cause) {
-        AuraHandledException userError = new AuraHandledException(cause.getMessage());
-        userError.setMessage(cause.getMessage());
-        return userError;
+        return GivingErrors.userError(cause, Label.Giving_Gift_UnexpectedError);
     }
 
     /**

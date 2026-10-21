@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/FirstRunController.getState';
 import finish from '@salesforce/apex/FirstRunController.finish';
+import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_FirstRun_Title';
 import INTRO from '@salesforce/label/c.Core_FirstRun_Intro';
 import EDITION_QUESTION from '@salesforce/label/c.Core_FirstRun_EditionQuestion';
@@ -184,5 +185,5 @@ export default class FirstRunSetup extends NavigationMixin(LightningElement) {
 }
 
 function messageOf(error) {
-  return (error && error.body && error.body.message) || (error && error.message) || '';
+  return (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR;
 }
