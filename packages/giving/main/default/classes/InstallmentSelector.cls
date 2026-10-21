@@ -2,7 +2,6 @@
  * Queries for Installment__c and for the gifts paid against an installment.
  */
 public with sharing class InstallmentSelector {
-    private static final String STATUS_RECEIVED = 'Received';
     private static final String STATUS_SCHEDULED = 'Scheduled';
 
     /**
@@ -123,17 +122,20 @@ public with sharing class InstallmentSelector {
     }
 
     /**
-     * What has been received against each installment named, by installment.
+     * What has been paid against each installment named, by installment: the gifts in
+     * `CommitmentService.PAID_GIFT_STATUSES`, net of the negative gifts that refund or write
+     * them off.
      */
-    public Map<Id, Decimal> sumReceivedGifts(Set<Id> installmentIds) {
+    public Map<Id, Decimal> sumPaidGifts(Set<Id> installmentIds) {
         Map<Id, Decimal> totals = new Map<Id, Decimal>();
         if (installmentIds == null || installmentIds.isEmpty()) {
             return totals;
         }
+        Set<String> paid = CommitmentService.PAID_GIFT_STATUSES;
         for (AggregateResult row : [
             SELECT Installment__c installmentId, SUM(Amount__c) total
             FROM Gift__c
-            WHERE Installment__c IN :installmentIds AND Status__c = :STATUS_RECEIVED
+            WHERE Installment__c IN :installmentIds AND Status__c IN :paid
             WITH USER_MODE
             GROUP BY Installment__c
         ]) {

@@ -27,15 +27,34 @@ public with sharing class GiftCommitmentHandler extends TriggerHandler {
         onAfterInsert((List<Gift__c>) newRecords());
     }
 
+    /**
+     * A new gift pays what it names. A refund or write-off of a pledge payment (a negative gift
+     * carrying the original's commitment and installment, R-G3) takes its amount back off, so
+     * a pledge it had completed and that is now short of its total is reopened (R-CM4).
+     */
     @TestVisible
     private void onAfterInsert(List<Gift__c> gifts) {
         List<Gift__c> relevant = new List<Gift__c>();
+        Map<Id, Decimal> removedByCommitment = new Map<Id, Decimal>();
         for (Gift__c gift : gifts) {
             if (gift.Commitment__c != null || gift.Installment__c != null) {
                 relevant.add(gift);
             }
+            if (
+                gift.Commitment__c != null &&
+                gift.Amount__c != null &&
+                gift.Amount__c < 0 &&
+                CommitmentService.countsAsPaid(gift)
+            ) {
+                Decimal removed = removedByCommitment.get(gift.Commitment__c);
+                removedByCommitment.put(
+                    gift.Commitment__c,
+                    (removed == null ? 0 : removed) - gift.Amount__c
+                );
+            }
         }
         CommitmentService.applyGift(relevant);
+        CommitmentService.reopenPledgesNoLongerPaid(removedByCommitment);
     }
 
     /**
@@ -87,7 +106,7 @@ public with sharing class GiftCommitmentHandler extends TriggerHandler {
             if (gift.Installment__c != null) {
                 installmentIds.add(gift.Installment__c);
             }
-            if (gift.Commitment__c != null && CommitmentService.isReceived(gift)) {
+            if (gift.Commitment__c != null && CommitmentService.countsAsPaid(gift)) {
                 Decimal removed = removedByCommitment.get(gift.Commitment__c);
                 removedByCommitment.put(
                     gift.Commitment__c,

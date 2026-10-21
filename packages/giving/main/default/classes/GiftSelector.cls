@@ -52,6 +52,8 @@ public with sharing class GiftSelector {
                 Receipt_Number__c,
                 Original_Gift__c,
                 Refund_Reason__c,
+                Commitment__c,
+                Installment__c,
                 (
                     SELECT Id, Fund__c, Amount__c, Percent__c
                     FROM Gift_Allocations__r
