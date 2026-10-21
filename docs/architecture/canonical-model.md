@@ -1853,8 +1853,10 @@ save (allOrNone false, as the Bulk API, Data Loader and `Database.delete(records
 whose records partly fail is rolled back, entries, queued processor and event with it, and its
 triggers run again for the records that passed with static variables kept. The retry is told
 apart by a DML count lower than the last insert left (the platform resets governor limits for
-it) and that insert's entry gone, and asks for a processor again; the trigger framework clears
-its per record claims the same way, so the retry's records are marked again. Before this the
+it) and that insert's entry gone, and goes back to what it had asked for before the attempt's
+first insert, so it asks for a processor again unless one queued earlier in the transaction
+survived; the trigger framework clears all its per record claims the same way, so the retry's
+records are marked again (a claim never stops a re-fire across a partial save). Before this the
 retry left its entries Pending with no processor until the nightly run. The
 processor's own chain respects the platform's chain depth limit: a run as deep as its chain may
 go (the chain's own maximum when one is set, otherwise five, the Developer Edition, trial and

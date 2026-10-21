@@ -87,6 +87,33 @@ public without sharing class RollupQueue implements Queueable {
     private static Id lastEntryId;
     private static Integer dmlStatementsAtLastInsert = 0;
 
+    /** What was asked for before each insert of this transaction, oldest first. */
+    private static List<Asked> askedBeforeInserts = new List<Asked>();
+
+    /** The processor state just before one insert, and the DML statements counted then. */
+    private class Asked {
+        final Integer dmlStatementsBefore;
+        final Boolean requested;
+        final Boolean coming;
+        final Boolean inserted;
+        final Integer readyEvents;
+
+        Asked(Integer dmlStatementsBefore) {
+            this.dmlStatementsBefore = dmlStatementsBefore;
+            this.requested = processorRequested;
+            this.coming = processorComing;
+            this.inserted = insertedEntries;
+            this.readyEvents = readyEventsPublished;
+        }
+
+        void restore() {
+            processorRequested = requested;
+            processorComing = coming;
+            insertedEntries = inserted;
+            readyEventsPublished = readyEvents;
+        }
+    }
+
     /**
      * Test seam: stands in for the DML statements counted; null reads the platform. A test
      * cannot make the platform retry a partial save the way production does (it does not roll
@@ -105,6 +132,7 @@ public without sharing class RollupQueue implements Queueable {
         readyEventsPublished = 0;
         lastEntryId = null;
         dmlStatementsAtLastInsert = 0;
+        askedBeforeInserts.clear();
     }
 
     /** Test seam: stands in for the processors queued and not yet started; null reads them. */
@@ -342,6 +370,7 @@ public without sharing class RollupQueue implements Queueable {
             return;
         }
         forgetRolledBackAttempt();
+        askedBeforeInserts.add(new Asked(dmlStatements()));
         Database.insert(entries, AccessLevel.SYSTEM_MODE);
         lastEntryId = entries[0].Id;
         dmlStatementsAtLastInsert = dmlStatements();
@@ -359,11 +388,18 @@ public without sharing class RollupQueue implements Queueable {
      * The platform puts governor limits back where they were before the attempt, so fewer DML
      * statements than this transaction's last insert counted means a rollback, or a test's
      * startTest or stopTest. The entry that insert wrote tells them apart: rolled back, it is
-     * gone, while one a processor finished is still in the Recycle Bin. After a rollback what was
-     * asked for is forgotten, so the retry asks again. One query, only when the count went down.
+     * gone, while one a processor finished is still in the Recycle Bin. One query, only when the
+     * count went down.
+     *
+     * After a rollback the state goes back to what it was before the attempt's first insert, so
+     * the retry asks again for what the rollback took and no more: a processor queued earlier in
+     * the transaction, or the processor this job is, survives the rollback and still counts. The
+     * retry reaches its first insert with the count the attempt's first insert started from, so
+     * that insert is the first one noted at or above the count now.
      */
     private static void forgetRolledBackAttempt() {
-        if (lastEntryId == null || dmlStatements() >= dmlStatementsAtLastInsert) {
+        Integer counted = dmlStatements();
+        if (lastEntryId == null || counted >= dmlStatementsAtLastInsert) {
             return;
         }
         Boolean rolledBack = [
@@ -375,11 +411,20 @@ public without sharing class RollupQueue implements Queueable {
             ]
             .isEmpty();
         lastEntryId = null;
-        if (rolledBack) {
-            processorRequested = false;
-            processorComing = false;
-            insertedEntries = false;
-            readyEventsPublished = 0;
+        if (!rolledBack) {
+            // A test's startTest or stopTest: every insert so far stands.
+            askedBeforeInserts.clear();
+            return;
+        }
+        for (Integer i = 0; i < askedBeforeInserts.size(); i++) {
+            Asked before = askedBeforeInserts[i];
+            if (before.dmlStatementsBefore >= counted) {
+                before.restore();
+                while (askedBeforeInserts.size() > i) {
+                    askedBeforeInserts.remove(i);
+                }
+                return;
+            }
         }
     }
 

@@ -597,6 +597,59 @@ private class RollupQueueTest {
         }
     }
 
+    /**
+     * A processor queued by an earlier save of the same transaction survives a later partial
+     * save's rollback, so the retry finds it still asked for and asks for nothing more.
+     */
+    @IsTest
+    static void aPartialSavesRetryKeepsAProcessorQueuedBeforeIt() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.waitingForTest = 0;
+            // An all-or-none save first: it queues the processor, and the count moves on.
+            RollupQueue.dmlStatementsForTest = 1;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(3) });
+            Assert.areEqual(1, processorsQueued(), 'The first save queued the processor');
+
+            // Then a partial save: its attempt is rolled back, and the retry starts from the
+            // count the attempt started from.
+            RollupQueue.dmlStatementsForTest = 5;
+            Savepoint beforeTheAttempt = Database.setSavepoint();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(7) });
+            Database.rollback(beforeTheAttempt);
+            RollupQueue.dmlStatementsForTest = 4;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+
+            Assert.areEqual(2, entries().size(), 'The first save\'s entry and the retry\'s');
+            Assert.areEqual(1, processorsQueued(), 'The processor queued first still serves both');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'Nothing more is asked for');
+            Test.stopTest();
+        }
+    }
+
+    /**
+     * A count lower than the last insert left with that entry still there is a test's
+     * startTest or stopTest, not a rollback: what was asked for stands.
+     */
+    @IsTest
+    static void aLowerCountWithTheEntryStillThereChangesNothing() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.waitingForTest = 0;
+            RollupQueue.dmlStatementsForTest = 5;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(3) });
+            RollupQueue.dmlStatementsForTest = 0;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+
+            Assert.areEqual(2, entries().size(), 'Both entries stand');
+            Assert.areEqual(1, processorsQueued(), 'One processor for both');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'Nothing more is asked for');
+            Test.stopTest();
+        }
+    }
+
     @IsTest
     static void aSaveSeeingOnlyARunningProcessorQueuesItsOwn() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
