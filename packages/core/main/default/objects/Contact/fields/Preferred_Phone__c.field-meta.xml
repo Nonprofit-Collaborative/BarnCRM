@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Preferred_Phone__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Which of this person's phone numbers you call. Whatever you choose is copied into the
+    ordinary Phone box every time the record is saved. Leave it empty to keep typing into the
+    ordinary Phone box yourself.
+  </inlineHelpText>
+  <label>Preferred Phone</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Home</fullName>
+        <default>false</default>
+        <label>Home</label>
+      </value>
+      <value>
+        <fullName>Mobile</fullName>
+        <default>false</default>
+        <label>Mobile</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

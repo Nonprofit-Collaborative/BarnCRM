@@ -554,6 +554,7 @@ address fields are used as the platform provides them.
 | Work Email | email | no | The email address this person uses at work. |
 | Alternate Email | email | no | A third email address for a person who has one, for example a seasonal or a school address. |
 | Preferred Email | picklist(Personal, Work, Alternate) | no | Which of the three addresses the organization should write to. Leaving it empty means the org is not using the three addresses at all. |
+| Preferred Phone | picklist(Home, Mobile, Other) | no | Which of the person's standard phone numbers (Home Phone, Mobile, Other Phone) the organization should call. Leaving it empty means the org is not using the choice at all. Contact only. |
 | Employer | reference(Organization) | no | The organization this person works for, used to recognize the employer when a matching gift arrives (G-10). |
 | Household | reference(Household) | conditional | The household this person belongs to; in contact mode this is the person's Account. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
@@ -598,6 +599,14 @@ addresses in sees no change in behavior at all. When Preferred Email names an ad
 is empty the save is refused with a message that says which address to fill in: blanking
 the standard email would quietly cut the person off from every mailing.
 
+**R-C6a Preferred phone.** The standard Phone is the number list views and dialers read, so
+it is kept in step with the choice the same way. When Preferred Phone names Home, Mobile or
+Other, Phone is copied from Home Phone, Mobile Phone or Other Phone on every save of the
+contact, before the record is written. When Preferred Phone is empty nothing is copied and
+Phone is left as entered. When the chosen number is empty the save is refused with a message
+that names the number to fill in. Contact only: a person held as an account has its phone
+numbers on person fields that exist only in some orgs, so Core does not touch them.
+
 ### Salesforce implementation
 
 - **Object:** Contact, with no packaged record type (R-C4).
@@ -628,6 +637,7 @@ shape naming and greetings read, so no naming code knows which object a person c
 | Work Email | `Work_Email__c` | Email |
 | Alternate Email | `Alternate_Email__c` | Email |
 | Preferred Email | `Preferred_Email__c` | Picklist: Personal, Work, Alternate (restricted) |
+| Preferred Phone (Contact only) | `Preferred_Phone__c` | Picklist: Home, Mobile, Other (restricted); sources are the standard `HomePhone`, `MobilePhone`, `OtherPhone`, target the standard `Phone` |
 
 These four are person attributes like the seven above and are carried on Account for the
 same reason. The standard email R-C6 keeps in step is `Email` on Contact and, where the org
@@ -8554,6 +8564,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Giving QA fixes: pledge balance. No object or field added. R-CM5: a pledge saved with Amount and Installments Planned and no Expected Total gets their product. R-CM4: a refund or write-off carries the original's commitment and installment, takes its amount off both and reopens a pledge it takes short; installments, completion and the Paid To Date and Paid Amount rollups count the same statuses (Received, Refunded, Written off). R-CM1: the donor of an Active or Paused commitment, or that person's account, is not deleted (`GiftDonorDeleteGuardHandler`); a merge and an erasure still work. |
 | v0.8 | 2026-10-20 | Erasure audit fixes B3 and S2. No object or field added. R-ER3: a household left with members whose name was typed by hand has Custom Name turned off and is named again from the remaining members; a household Nonprofit Cloud names is listed for staff to check; each is reported with the fields that really changed. Giving deletes the person's automatic Household Member soft credits in the erasure and lists them as Deleted (ADR-0110 amended). |
 | v0.8 | 2026-10-21 | Rollups after a partial save. No object or field added. R-RQ3: a partial save's retry (allOrNone false, some records refused) asks for a processor again and marks its records again, instead of leaving its entries Pending until the nightly run. R-CM1 and R-G15: the donor delete guards read the commitments and the books at each delete, so a donor refused earlier in the transaction is deleted once nothing holds them. |
+| v0.8 | 2026-10-25 | Preferred Phone: added `Preferred_Phone__c` to Contact (Home, Mobile, Other) with rule R-C6a. When set, the standard Phone is copied from the number it names on every save; empty copies nothing; naming an empty number refuses the save. |
 
 ---
 ## 32. Entity ownership by package
