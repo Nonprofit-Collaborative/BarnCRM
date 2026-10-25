@@ -93,7 +93,10 @@ export default class CustomMetadataManager extends LightningElement {
           ...columns,
           { type: 'action', typeAttributes: { rowActions: this.rowActions } }
         ],
-        shippedColumns: columns,
+        // A shipped row can only be archived or restored, and only where its type allows it.
+        shippedColumns: type.shippedArchivable
+          ? [...columns, { type: 'action', typeAttributes: { rowActions: this.shippedRowActions } }]
+          : columns,
         ownRows: own,
         hasOwnRows: own.length > 0,
         shippedRows: rows.filter((row) => row.shipped),
@@ -101,6 +104,12 @@ export default class CustomMetadataManager extends LightningElement {
       };
     });
   }
+
+  shippedRowActions = (row, done) => {
+    done([
+      row.archived ? { label: RESTORE, name: 'restore' } : { label: ARCHIVE, name: 'archive' }
+    ]);
+  };
 
   // A function, so each row offers Archive or Restore as fits it.
   rowActions = (row, done) => {

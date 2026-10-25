@@ -43,6 +43,15 @@ public with sharing class CustomMetadataManagerService {
         /** A field whose value has to be an active choice of a picklist on choicesObject. */
         public Map<Schema.SObjectField, Schema.SObjectField> choicesFrom;
         public Schema.SObjectType choicesObject;
+        /** A shipped row may be archived and restored, and nothing else changed (ADR-0133). */
+        public Boolean shippedArchivable = false;
+        /** Checks a save against the org beyond the field rules here, or null. */
+        public RowValidator validator;
+    }
+
+    /** A type's own check of a save; throws CustomMetadataManagerException to refuse it. */
+    public interface RowValidator {
+        void validate(Map<String, Object> values);
     }
 
     /** What the page draws for one type. */
@@ -53,6 +62,8 @@ public with sharing class CustomMetadataManagerService {
         public String label;
         @AuraEnabled
         public String help;
+        @AuraEnabled
+        public Boolean shippedArchivable;
         @AuraEnabled
         public List<FieldView> fields;
         @AuraEnabled
@@ -127,7 +138,36 @@ public with sharing class CustomMetadataManagerService {
             Relationship_Type__mdt.Reciprocal_Type__c => Relationship__c.Type__c
         };
         relationshipTypes.choicesObject = Relationship__c.SObjectType;
-        return new Map<String, EditableType>{ nameOf(relationshipTypes) => relationshipTypes };
+
+        EditableType matchSources = new EditableType();
+        matchSources.type = Match_Source__mdt.SObjectType;
+        matchSources.label = System.Label.Core_CmdtManager_MatchSources;
+        matchSources.help = System.Label.Core_CmdtManager_MatchSourcesHelp;
+        matchSources.fields = new List<Schema.SObjectField>{
+            Match_Source__mdt.Object_Name__c,
+            Match_Source__mdt.Value_Field__c,
+            Match_Source__mdt.Postal_Code_Field__c,
+            Match_Source__mdt.Parent_Field__c,
+            Match_Source__mdt.Normalization__c
+        };
+        matchSources.required = new Set<Schema.SObjectField>{
+            Match_Source__mdt.Object_Name__c,
+            Match_Source__mdt.Value_Field__c,
+            Match_Source__mdt.Parent_Field__c,
+            Match_Source__mdt.Normalization__c
+        };
+        matchSources.archiveField = Match_Source__mdt.Active__c;
+        matchSources.choicesFrom = new Map<Schema.SObjectField, Schema.SObjectField>{
+            Match_Source__mdt.Normalization__c => Match_Source__mdt.Normalization__c
+        };
+        matchSources.choicesObject = Match_Source__mdt.SObjectType;
+        matchSources.shippedArchivable = true;
+        matchSources.validator = new MatchSourceService.Validator();
+
+        return new Map<String, EditableType>{
+            nameOf(relationshipTypes) => relationshipTypes,
+            nameOf(matchSources) => matchSources
+        };
     }
 
     // ------------------------------------------------------------------ reading
@@ -145,6 +185,7 @@ public with sharing class CustomMetadataManagerService {
         view.typeName = nameOf(editable);
         view.label = editable.label;
         view.help = editable.help;
+        view.shippedArchivable = editable.shippedArchivable;
         view.fields = new List<FieldView>();
         for (Schema.SObjectField token : editable.fields) {
             Schema.DescribeFieldResult field = token.getDescribe();
@@ -212,6 +253,12 @@ public with sharing class CustomMetadataManagerService {
     public static Id setArchived(String typeName, String developerName, Boolean archived) {
         EditableType editable = editableType(typeName);
         List<CustomMetadataManagerSelector.StoredRow> rows = rowsOf(editable);
+        if (editable.shippedArchivable) {
+            CustomMetadataManagerSelector.StoredRow found = rowNamed(rows, developerName);
+            if (isShipped(found)) {
+                return setShippedArchived(editable, found, archived != true);
+            }
+        }
         CustomMetadataManagerSelector.StoredRow existing = changeableRow(
             editable,
             rows,
@@ -229,6 +276,32 @@ public with sharing class CustomMetadataManagerService {
         Boolean active = archived != true;
         Map<String, Object> values = validated(editable, rows, input, existing, active);
         return enqueue(editable, existing.developerName, existing.label, values, existing);
+    }
+
+    /**
+     * Archives or restores a shipped row of a type that allows it (ADR-0133): every other value
+     * is deployed exactly as shipped and the row stays marked shipped. A packaged row's name
+     * carries the package prefix once the namespace exists.
+     */
+    private static Id setShippedArchived(
+        EditableType editable,
+        CustomMetadataManagerSelector.StoredRow shipped,
+        Boolean active
+    ) {
+        Map<String, Object> values = new Map<String, Object>();
+        for (Schema.SObjectField token : editable.fields) {
+            String name = token.getDescribe().getLocalName();
+            values.put(name, shipped.values.get(name));
+        }
+        values.put(editable.archiveField.getDescribe().getLocalName(), active);
+        values.put(SHIPPED_FIELD, true);
+        return enqueue(
+            editable,
+            NamespaceUtil.qualify(shipped.developerName),
+            shipped.label,
+            values,
+            shipped
+        );
     }
 
     /**
@@ -275,6 +348,10 @@ public with sharing class CustomMetadataManagerService {
                 requireChoice(value, editable.choicesFrom.get(token), editable.choicesObject);
             }
             values.put(field.getLocalName(), value);
+        }
+        // An archived row is not used, so archiving one never waits on the org's checks.
+        if (active && editable.validator != null) {
+            editable.validator.validate(values);
         }
         if (active && editable.uniqueField != null) {
             requireUnique(editable, rows, values, existing);
@@ -454,16 +531,24 @@ public with sharing class CustomMetadataManagerService {
         List<CustomMetadataManagerSelector.StoredRow> rows,
         String developerName
     ) {
+        CustomMetadataManagerSelector.StoredRow row = rowNamed(rows, developerName);
+        if (isShipped(row)) {
+            throw new CustomMetadataManagerException(
+                String.format(
+                    System.Label.Core_CmdtManager_ShippedReadOnly,
+                    new List<Object>{ row.label }
+                )
+            );
+        }
+        return row;
+    }
+
+    private static CustomMetadataManagerSelector.StoredRow rowNamed(
+        List<CustomMetadataManagerSelector.StoredRow> rows,
+        String developerName
+    ) {
         for (CustomMetadataManagerSelector.StoredRow row : rows) {
             if (row.developerName == developerName) {
-                if (isShipped(row)) {
-                    throw new CustomMetadataManagerException(
-                        String.format(
-                            System.Label.Core_CmdtManager_ShippedReadOnly,
-                            new List<Object>{ row.label }
-                        )
-                    );
-                }
                 return row;
             }
         }

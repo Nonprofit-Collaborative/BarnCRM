@@ -288,4 +288,60 @@
         <shortDescription>Custom metadata page: button that reloads the list and the save's outcome</shortDescription>
         <value>Check again</value>
     </labels>
+    <labels>
+        <fullName>Core_CmdtManager_MatchSources</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading of the match sources list</shortDescription>
+        <value>Match sources</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_MatchSourcesHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: what the match sources list is for</shortDescription>
+        <value>Related records whose values pair people or households as likely duplicates, in the duplicate scan and in imports. A source whose object is not in this org does nothing. A shipped source can be archived and restored.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchSource_NoSuchObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: {0} is the object name typed</shortDescription>
+        <value>{0} is not an object in this org. Check its API name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchSource_NoSuchField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: {0} is the field name typed, {1} the object</shortDescription>
+        <value>{0} is not a field on {1}. Check its API name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchSource_NotFilterableText</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: {0} is the field label, {1} the object</shortDescription>
+        <value>{0} on {1} cannot be matched on. The value and postal code fields have to be text, email or phone fields a search can filter on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchSource_NotALookup</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: {0} is the parent field, {1} the object</shortDescription>
+        <value>{0} on {1} is not a lookup to a contact, account or Individual. The parent field has to link each value to its person, household or Individual.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchSource_PostalRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: an address source has no postal code field</shortDescription>
+        <value>An address source needs a postal code field: the street is compared together with it.</value>
+    </labels>
 </CustomLabels>

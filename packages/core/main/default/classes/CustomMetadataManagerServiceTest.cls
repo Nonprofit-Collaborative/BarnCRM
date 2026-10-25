@@ -345,9 +345,10 @@ private class CustomMetadataManagerServiceTest {
             List<CustomMetadataManagerService.TypeView> types = CustomMetadataManagerService.getTypes();
             Test.stopTest();
 
-            Assert.areEqual(1, types.size(), 'Relationship types is the one editable list');
-            CustomMetadataManagerService.TypeView view = types[0];
-            Assert.areEqual(TYPE_NAME, view.typeName, 'Named without a namespace');
+            Assert.areEqual(2, types.size(), 'Relationship types and match sources');
+            CustomMetadataManagerService.TypeView view = viewNamed(types, TYPE_NAME);
+            Assert.isNotNull(view, 'Named without a namespace');
+            Assert.isFalse(view.shippedArchivable, 'A shipped relationship type has no actions');
             Assert.areEqual(3, view.fields.size(), 'Type, reciprocal type and description');
             Assert.isFalse(view.fields[0].choices.isEmpty(), 'Type offers the Type list choices');
             Assert.isTrue(view.rows[0].shipped, 'Spouse is shipped');
@@ -365,17 +366,257 @@ private class CustomMetadataManagerServiceTest {
             List<CustomMetadataManagerService.TypeView> types = CustomMetadataManagerService.getTypes();
             Test.stopTest();
 
-            Integer shipped = 0;
-            for (CustomMetadataManagerService.RowView view : types[0].rows) {
-                if (!view.developerName.startsWith(CustomMetadataManagerService.ORG_PREFIX)) {
-                    Assert.isTrue(
-                        view.shipped,
-                        view.developerName + ' ships and must be read only'
-                    );
-                    shipped++;
+            Map<String, Integer> shippedByType = new Map<String, Integer>();
+            for (CustomMetadataManagerService.TypeView type : types) {
+                Integer shipped = 0;
+                for (CustomMetadataManagerService.RowView view : type.rows) {
+                    if (!view.developerName.startsWith(CustomMetadataManagerService.ORG_PREFIX)) {
+                        Assert.isTrue(
+                            view.shipped,
+                            view.developerName + ' ships and must be marked shipped'
+                        );
+                        shipped++;
+                    }
                 }
+                shippedByType.put(type.typeName, shipped);
             }
-            Assert.isTrue(shipped >= 11, 'The eleven shipped relationship types are read');
+            Assert.isTrue(
+                shippedByType.get(TYPE_NAME) >= 11,
+                'The eleven shipped relationship types are read'
+            );
+            Assert.isTrue(
+                shippedByType.get(SOURCE_TYPE) >= 6,
+                'The six shipped match sources are read'
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------ match sources
+
+    private static final String SOURCE_TYPE = 'Match_Source__mdt';
+
+    private static CustomMetadataManagerService.TypeView viewNamed(
+        List<CustomMetadataManagerService.TypeView> types,
+        String typeName
+    ) {
+        for (CustomMetadataManagerService.TypeView type : types) {
+            if (type.typeName == typeName) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    private static CustomMetadataManagerSelector.StoredRow source(
+        String developerName,
+        Boolean active,
+        Boolean shipped
+    ) {
+        CustomMetadataManagerSelector.StoredRow stored = new CustomMetadataManagerSelector.StoredRow();
+        stored.developerName = developerName;
+        stored.label = 'Address (person)';
+        stored.values.put('Object_Name__c', 'Address__c');
+        stored.values.put('Value_Field__c', 'Street__c');
+        stored.values.put('Postal_Code_Field__c', 'Postal_Code__c');
+        stored.values.put('Parent_Field__c', 'Contact__c');
+        stored.values.put('Normalization__c', 'Address');
+        stored.values.put('Active__c', active);
+        stored.values.put('Is_Shipped__c', shipped);
+        return stored;
+    }
+
+    private static void stubSources(List<CustomMetadataManagerSelector.StoredRow> rows) {
+        CustomMetadataManagerSelector.rowsOverride = new Map<String, List<CustomMetadataManagerSelector.StoredRow>>{
+            Match_Source__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getName() => rows
+        };
+    }
+
+    private static CustomMetadataManagerService.RowInput sourceInput(
+        String objectName,
+        String valueField,
+        String postalField,
+        String parentField,
+        String normalization
+    ) {
+        CustomMetadataManagerService.RowInput given = new CustomMetadataManagerService.RowInput();
+        given.label = 'Volunteer address';
+        given.values = new Map<String, String>{
+            'Object_Name__c' => objectName,
+            'Value_Field__c' => valueField,
+            'Postal_Code_Field__c' => postalField,
+            'Parent_Field__c' => parentField,
+            'Normalization__c' => normalization
+        };
+        return given;
+    }
+
+    private static String sourceRefusal(CustomMetadataManagerService.RowInput given) {
+        try {
+            CustomMetadataManagerService.save(SOURCE_TYPE, given);
+        } catch (CustomMetadataManagerService.CustomMetadataManagerException e) {
+            return e.getMessage();
+        }
+        return null;
+    }
+
+    @IsTest
+    static void aShippedSourceIsArchivedAndRestoredButNeverEdited() {
+        System.runAs(TestUsers.admin()) {
+            stubSources(
+                new List<CustomMetadataManagerSelector.StoredRow>{
+                    source('Address_Person', true, true)
+                }
+            );
+            CapturingDeployer deployer = new CapturingDeployer();
+            CustomMetadataManagerService.deployer = deployer;
+
+            Test.startTest();
+            CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', true);
+            Metadata.CustomMetadata archived = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
+            CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', false);
+            Metadata.CustomMetadata restored = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
+            CustomMetadataManagerService.RowInput edit = sourceInput(
+                'Address__c',
+                'City__c',
+                'Postal_Code__c',
+                'Contact__c',
+                'Address'
+            );
+            edit.developerName = 'Address_Person';
+            String editRefusal = sourceRefusal(edit);
+            Test.stopTest();
+
+            Assert.areEqual(
+                NamespaceUtil.prefix() +
+                    'Match_Source.' +
+                    NamespaceUtil.prefix() +
+                    'Address_Person',
+                archived.fullName,
+                'The shipped row itself is deployed, by its packaged name'
+            );
+            Map<String, Object> values = valuesOf(archived);
+            Assert.areEqual(false, values.get('Active__c'), 'Archived');
+            Assert.areEqual(true, values.get('Is_Shipped__c'), 'Still marked shipped');
+            Assert.areEqual(
+                'Street__c',
+                values.get('Value_Field__c'),
+                'Values deployed as shipped'
+            );
+            Assert.areEqual('Address (person)', archived.label, 'Label kept');
+            Assert.areEqual(true, valuesOf(restored).get('Active__c'), 'Restored');
+            Assert.areEqual(
+                String.format(
+                    Label.Core_CmdtManager_ShippedReadOnly,
+                    new List<Object>{ 'Address (person)' }
+                ),
+                editRefusal,
+                'Nothing else about a shipped source changes'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSourceIsCheckedAgainstTheOrgBeforeItIsSaved() {
+        System.runAs(TestUsers.admin()) {
+            stubSources(new List<CustomMetadataManagerSelector.StoredRow>());
+            CapturingDeployer deployer = new CapturingDeployer();
+            CustomMetadataManagerService.deployer = deployer;
+
+            Test.startTest();
+            String noObject = sourceRefusal(
+                sourceInput('No_Such_Thing__c', 'Street__c', null, 'Contact__c', 'Email')
+            );
+            String noField = sourceRefusal(
+                sourceInput('Address__c', 'No_Such_Field__c', null, 'Contact__c', 'Email')
+            );
+            String notLookup = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', null, 'City__c', 'Email')
+            );
+            // OwnerId is a lookup, but to a user: no person or household behind it.
+            String notAPersonLookup = sourceRefusal(
+                sourceInput('Contact', 'Email', null, 'OwnerId', 'Email')
+            );
+            String notText = sourceRefusal(
+                sourceInput('Address__c', 'Is_Default__c', null, 'Contact__c', 'Email')
+            );
+            String postalNotText = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', 'Is_Default__c', 'Contact__c', 'Address')
+            );
+            String noPostal = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Address')
+            );
+            String notAChoice = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Fax')
+            );
+            String accepted = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', 'Postal_Code__c', 'Contact__c', 'Address')
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                String.format(
+                    Label.Core_MatchSource_NoSuchObject,
+                    new List<Object>{ 'No_Such_Thing__c' }
+                ),
+                noObject,
+                'An object the org does not have is refused'
+            );
+            Assert.isTrue(
+                noField.contains('No_Such_Field__c'),
+                'A missing field is named: ' + noField
+            );
+            Assert.isTrue(
+                notLookup.contains('City__c'),
+                'A parent that is not a lookup: ' + notLookup
+            );
+            Assert.isTrue(
+                notAPersonLookup != null && notAPersonLookup.contains('OwnerId'),
+                'A lookup to anything but a contact, account or Individual: ' + notAPersonLookup
+            );
+            String notTextMessage = String.format(
+                Label.Core_MatchSource_NotFilterableText,
+                new List<Object>{
+                    Address__c.Is_Default__c.getDescribe().getLabel(),
+                    Schema.SObjectType.Address__c.getLabel()
+                }
+            );
+            Assert.areEqual(notTextMessage, notText, 'A value field that is not text');
+            Assert.areEqual(notTextMessage, postalNotText, 'A postal field that is not text');
+            Assert.areEqual(
+                Label.Core_MatchSource_PostalRequired,
+                noPostal,
+                'Address needs postal'
+            );
+            Assert.isNotNull(notAChoice, 'Normalization is one of its choices');
+            Assert.isNull(accepted, 'A source the org can use is saved');
+            Map<String, Object> values = valuesOf(
+                (Metadata.CustomMetadata) deployer.container.getMetadata()[0]
+            );
+            Assert.areEqual(false, values.get('Is_Shipped__c'), 'Her source is her own');
+            Assert.areEqual(true, values.get('Active__c'), 'A new source is active');
+        }
+    }
+
+    @IsTest
+    static void herOwnSourceIsArchivedEvenWhenItsObjectIsGone() {
+        System.runAs(TestUsers.admin()) {
+            CustomMetadataManagerSelector.StoredRow gone = source('Org_Gone_ab12', true, false);
+            gone.values.put('Object_Name__c', 'No_Such_Thing__c');
+            stubSources(new List<CustomMetadataManagerSelector.StoredRow>{ gone });
+            CapturingDeployer deployer = new CapturingDeployer();
+            CustomMetadataManagerService.deployer = deployer;
+
+            Test.startTest();
+            CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Org_Gone_ab12', true);
+            Test.stopTest();
+
+            Assert.areEqual(
+                false,
+                valuesOf((Metadata.CustomMetadata) deployer.container.getMetadata()[0])
+                    .get('Active__c'),
+                'An archive is never refused by the org checks'
+            );
         }
     }
 }
