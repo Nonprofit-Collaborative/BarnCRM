@@ -252,6 +252,22 @@ public with sharing class VolunteerHoursService {
     }
 
     /**
+     * Empties the Rejection Reason on these entries, for erasing a person. Status and approval
+     * fields are untouched; the entries are opened to the change for the save only. A refusal
+     * (an entry the user cannot edit) stops the erasure with its message.
+     */
+    public static void clearRejectionReasons(List<Id> hoursIds) {
+        List<Volunteer_Hours__c> moves = new List<Volunteer_Hours__c>();
+        for (Id hoursId : hoursIds) {
+            moves.add(new Volunteer_Hours__c(Id = hoursId, Rejection_Reason__c = null));
+        }
+        StatusChange result = save(moves);
+        if (!result.refused.isEmpty()) {
+            throw new VolunteerHoursException(result.refused.values()[0]);
+        }
+    }
+
+    /**
      * Saves the moves with these entries open to a status change, and closes them again
      * whatever happens. The earlier open set is restored rather than emptied. Each entry is
      * saved on its own terms: one the user cannot edit is reported, and the others move.

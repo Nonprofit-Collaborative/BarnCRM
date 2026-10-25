@@ -160,7 +160,11 @@ public with sharing class FeatureSwitchService {
             new Item(AFFILIATIONS, KIND_FEATURE).runs(new List<String>{ 'Affiliation_Primary' }),
             new Item(PREFERRED_EMAIL, KIND_FEATURE)
                 .runs(
-                    new List<String>{ 'Preferred_Email_Contact', 'Preferred_Email_Person_Account' }
+                    new List<String>{
+                        'Preferred_Email_Contact',
+                        'Preferred_Email_Person_Account',
+                        'Preferred_Phone_Contact'
+                    }
                 )
         };
     }
