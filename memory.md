@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-25 (through D-114; open question 28 resolved by D-114, open question 29 added).
+Last refreshed from BMemory 2026-10-25 (through D-115; open questions 28 and 29 resolved by D-114 and D-115).
 
 ## Decision log (plan Section 12)
 
@@ -122,6 +122,7 @@ Last refreshed from BMemory 2026-10-25 (through D-114; open question 28 resolved
 | D-112 | 2026-10-25 | Address verification is a new optional module, BarnCRM Address Verification (Brandon; C-46; amends plan Section 4.7, which put it out of scope): bring-your-own provider key in the BarnCRM Settings console; verifies `Address__c` and writes Verification Status and Latest Verified Date (R-AD6 placeholders). No provider bundled, no paid service by BarnCRM |
 | D-113 | 2026-10-25 | Related-record duplicate matching in Core, steps 1 to 3 (Brandon; C-44; plan Section 4.9): configurable match sources (object, field, parent link, normalization); shipped sources for the three Contact Point objects and `Address__c`, active only when the object exists (dynamic SOQL); the duplicate scan adds pairs to the review list with a reason naming the source, and import matching uses the same sources. Not included: a save-time warning. Reason: Salesforce duplicate and matching rules cannot see related objects |
 | D-114 | 2026-10-25 | Erasing a person also empties Rejection Reason on their volunteer hours (Brandon; closes Section 11.2 item 28) |
+| D-115 | 2026-10-25 | Erasing a person keeps deleting the generated volunteer hour letters and certificates, as D-108 says; no behaviour change (Brandon; closes Section 11.2 item 29) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
@@ -139,7 +140,7 @@ D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the 
 - 24: Neutral labels for nonprofits: accepted 2026-10-14 (Brandon); the product-branded "BarnCRM ..." names stay (D-92).
 - 27: Plan corrections: resolved 2026-10-13, applied (D-80).
 - 28: Whether erasing a person also empties Rejection Reason on their volunteer hours: resolved 2026-10-25 (Brandon), yes (D-114).
-- 29: Whether erasing a person keeps or deletes the volunteer hour letters and certificates BarnCRM generated (deleted today, D-108). Raised 2026-10-25; Brandon asked what hour letters are (V-08, D-104). Open.
+- 29: Whether erasing a person keeps or deletes the volunteer hour letters and certificates BarnCRM generated (deleted today, D-108). Raised 2026-10-25; Brandon asked what hour letters are (V-08, D-104). Resolved 2026-10-25 (Brandon): keep today's behaviour, erasure deletes them (D-115).
 - Provisional (confirm when the owner tests): 8 primary person through the person contact, 9 guards only, 10 membership-mode switch guard only.
 
 ## Parking lot (plan Section 11.3)
