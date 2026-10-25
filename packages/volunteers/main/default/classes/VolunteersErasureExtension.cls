@@ -99,6 +99,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
             VolunteerHoursService.canManage() &&
             Schema.SObjectType.Volunteer_Hours__c.isUpdateable() &&
             Schema.SObjectType.Volunteer_Hours__c.fields.Notes__c.isUpdateable() &&
+            Schema.SObjectType.Volunteer_Hours__c.fields.Rejection_Reason__c.isUpdateable() &&
             Schema.SObjectType.Volunteer_Signup__c.isUpdateable() &&
             Schema.SObjectType.Volunteer_Signup__c.fields.Status__c.isUpdateable() &&
             Schema.SObjectType.Volunteer_Signup__c.fields.Notes__c.isUpdateable() &&
@@ -169,8 +170,8 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
     }
 
     /**
-     * Hours are kept and counted; the notes typed on them are emptied as the user. A Rejection
-     * Reason is kept, and listed as kept.
+     * Hours are kept and counted; the notes typed on them and any Rejection Reason are emptied
+     * as the user.
      */
     private static List<PersonErasure.Change> eraseHours(List<Volunteer_Hours__c> entries) {
         List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
@@ -187,24 +188,14 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
             )
         );
         List<Volunteer_Hours__c> cleared = new List<Volunteer_Hours__c>();
-        Integer withReason = 0;
+        List<Id> withReason = new List<Id>();
         for (Volunteer_Hours__c entry : entries) {
             if (String.isNotBlank(entry.Notes__c)) {
                 cleared.add(new Volunteer_Hours__c(Id = entry.Id, Notes__c = null));
             }
             if (String.isNotBlank(entry.Rejection_Reason__c)) {
-                withReason++;
+                withReason.add(entry.Id);
             }
-        }
-        if (withReason > 0) {
-            changes.add(
-                new PersonErasure.Change(
-                    PersonErasure.KEPT,
-                    objectLabel,
-                    withReason,
-                    Label.Volunteers_Erase_RejectionReasonKept
-                )
-            );
         }
         if (!cleared.isEmpty()) {
             Database.update(cleared, true, AccessLevel.USER_MODE);
@@ -214,6 +205,19 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
                     objectLabel,
                     idsOf(cleared),
                     new List<String>{ Volunteer_Hours__c.Notes__c.getDescribe().getLabel() }
+                )
+            );
+        }
+        if (!withReason.isEmpty()) {
+            VolunteerHoursService.clearRejectionReasons(withReason);
+            changes.add(
+                new PersonErasure.Change(
+                    PersonErasure.CLEARED,
+                    objectLabel,
+                    withReason,
+                    new List<String>{
+                        Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel()
+                    }
                 )
             );
         }

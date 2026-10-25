@@ -486,6 +486,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Contact.Preferred_Phone__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Work_Phone__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Contact.Preferred_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>

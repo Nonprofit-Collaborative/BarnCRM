@@ -501,7 +501,7 @@ anything is refused:
 | Onboarding requirements | Deleted, and emptied from the Recycle Bin. | A background check result lives nowhere else. |
 | Volunteer totals on the person | Kept. | They say nothing about who the person was, and they still match the hours kept. |
 | Hour letters and certificates | The ones BarnCRM generated for the person are deleted, and emptied from the Recycle Bin. The preview lists them as **Deleted**. Any other file on the person's record, including a letter you saved or uploaded yourself or one whose template has since been renamed or deleted, is kept and counted with the person's other files, as **Kept** (the generated letters listed as Deleted are not counted there): delete those by hand. | A generated letter prints the person's name, and BarnCRM knows exactly which files it made; the hours it reported are kept. A file someone else saved can hold anything, so BarnCRM lists it rather than erasing it ([Erasing a person](erase-a-person.md)). |
-| Rejection Reason on hours | Kept. The preview lists it as **Kept** when any of their entries has one. | A coordinator wrote it to say why an entry was refused, and only the approval screen changes it. |
+| Rejection Reason on hours | Emptied, on every entry that has one (the entry stays Rejected). The preview lists it as **Cleared**. | A reason a coordinator typed can name the person or what they did, so it goes like the Notes. |
 
 The preview lists each of these before you confirm. The person erasing must hold **Volunteers
 Admin** or **Volunteers Coordinator** when the person has any volunteer records: otherwise
