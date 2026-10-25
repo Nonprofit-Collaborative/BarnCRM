@@ -67,6 +67,14 @@
 # MetadataRelationship field: such a field is resolved against the org at deploy time, so a
 # value naming another system's object would be a real reference. If the type ever gains one,
 # revisit this exemption.
+#
+# Match sources
+# -------------
+# A shipped match source (customMetadata/Match_Source.*.md-meta.xml) names a related object
+# such as ContactPointEmail as text. MatchSourceService resolves it through describe at run
+# time and skips a source whose object is absent, so the word refuses no deployment (ADR-NEXT,
+# NEXT-related-record-matching.md). These files are listed with the template headings, by
+# path, on the same terms: safe only while Match_Source has no MetadataRelationship field.
 
 set -euo pipefail
 
@@ -81,6 +89,7 @@ NPC_INCLUDES=(--include='*.cls' --include='*.trigger' --include='*.xml')
 
 MARKER='// detection-only:'
 TEMPLATE_HEADINGS='/customMetadata/Import_Template_Default.'
+MATCH_SOURCES='/customMetadata/Match_Source.'
 
 FAILED=0
 EXEMPTED=()
@@ -101,7 +110,8 @@ for DIR in "${DIRS[@]}"; do
     FILE="${LINE%%:*}"
     if [[ "$FILE" == *.cls || "$FILE" == *.trigger ]] && [[ "$LINE" == *"$MARKER"* ]]; then
       EXEMPTED+=("$LINE")
-    elif [[ "$FILE" == *"$TEMPLATE_HEADINGS"*.md-meta.xml ]]; then
+    elif [[ "$FILE" == *"$TEMPLATE_HEADINGS"*.md-meta.xml ||
+      "$FILE" == *"$MATCH_SOURCES"*.md-meta.xml ]]; then
       HEADINGS+=("$FILE")
     else
       VIOLATIONS+=("$LINE")
@@ -115,7 +125,7 @@ if [[ "${#EXEMPTED[@]}" -gt 0 ]]; then
 fi
 
 if [[ "${#HEADINGS[@]}" -gt 0 ]]; then
-  echo "== Import template column headings, not references =="
+  echo "== Import template column headings and match sources, not references =="
   printf '%s\n' "${HEADINGS[@]}" | sort -u
 fi
 

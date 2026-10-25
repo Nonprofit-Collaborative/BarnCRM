@@ -7,14 +7,22 @@ that travels with the app. The **Custom metadata** page in BarnCRM Settings lets
 your own entries to the lists that are meant to be extended, change them, and archive them,
 without opening Salesforce Setup.
 
-Today that list is **Relationship types**: what the other side of a relationship becomes.
+The first list is **Relationship types**: what the other side of a relationship becomes.
 BarnCRM ships eleven types (Spouse, Parent and Child, and so on). If your organization
 records godparents, mentors, or guardians, you add the pairs here and BarnCRM keeps both
 sides in step for them the same way it does for its own.
 
+Below it is **Match sources**: the related records the duplicate scan and imports look at
+to tell that two people, or two households, are the same. Salesforce's duplicate rules only
+compare fields on the person or account itself, so an email kept only on a contact point
+email record, or an address kept only on a BarnCRM address, is never compared. Each source
+names an object, the field holding the value, the field linking it to its person or
+household, and how values are compared (Email, Phone or Address). See
+[Duplicates](duplicates.md) for what the scan does with them.
+
 The entries BarnCRM ships are shown on the same page, marked **Shipped with BarnCRM**,
-and cannot be changed. Upgrades keep them up to date, and they never overwrite what you
-added.
+and cannot be changed, except that a shipped match source can be archived and restored.
+Upgrades keep them up to date, and they never overwrite what you added.
 
 ## How to turn it on
 
@@ -94,11 +102,52 @@ them.
   its API name in Setup, for example `Org_Mentor_k3x9`, so the second add never overwrites
   the first. You may end up with two entries: archive the one you do not want.
 
+## Match sources
+
+BarnCRM ships five:
+
+| Source | Object | Value | Linked by | Compared as |
+|---|---|---|---|---|
+| Contact Point Email | Contact Point Email | Email Address | Parent | Email |
+| Contact Point Phone | Contact Point Phone | Telephone Number | Parent | Phone |
+| Contact Point Address | Contact Point Address | Street and Postal Code | Parent | Address |
+| Address (person) | Address | Street and Postal Code | Contact | Address |
+| Address (household) | Address | Street and Postal Code | Account | Address |
+
+The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
+object is missing, its source does nothing; nothing breaks.
+
+How values are compared:
+
+- **Email**: spaces at either end are ignored, and capitals do not matter.
+- **Phone**: only the digits count, so (555) 123-4567 and 555.123.4567 match. A North
+  American number written with a leading 1 matches the same number without it. A number with
+  fewer than seven digits is ignored.
+- **Address**: the street, with capitals, punctuation and extra spaces ignored and common
+  words shortened (Street and St, Avenue and Ave match), together with the postal code
+  (spaces ignored; a ZIP+4 counts as its first five digits).
+
+A contact point record can belong to a person, an account, or a Salesforce **Individual**
+(the privacy record behind a person). A person or an account is used as it is; an Individual
+counts as every person who carries it. A record that belongs to anything else is skipped.
+
+A value shared by more than ten people or households, such as an office's main number, is
+ignored: it says nothing about whether two of them are the same.
+
+To add your own source, choose **Add** under **Match sources** and fill in the object's API
+name (for example `Volunteer_Profile__c`), the field holding the value, the lookup to the
+person or household, and **Normalization**. For **Address**, also fill in **Postal Code
+Field**. The page checks that the object and fields exist and that the link is a lookup.
+
+To stop using a shipped source, open the menu on its row under **Shipped with BarnCRM** and
+choose **Archive**. **Restore** brings it back.
+
 ## Which lists can be extended
 
 | List | Here | Why |
 |---|---|---|
 | Relationship types | Add, edit, archive | BarnCRM reads the list directly, so an entry you add is used at once. |
+| Match sources | Add, edit, archive; archive and restore a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
 | Automations, settings | No | These describe BarnCRM's own code and pages. An entry you added would point at nothing. |
 | Receipt templates (Giving) | No | Copied into the Receipts page, where you edit your own. |

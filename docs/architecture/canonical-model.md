@@ -1298,6 +1298,33 @@ because the relationship service reads it directly rather than through a materia
 copy. Administrators add, edit and archive their rows from the Custom metadata page in
 BarnCRM Settings (ADR-0085, `0085-custom-metadata-manager-edits-only-types-read-directly.md`).
 
+### Match Source
+
+`Match_Source__mdt` (ADR-NEXT, `NEXT-related-record-matching.md`): a related object whose
+values pair people or households as likely duplicates, read directly by the duplicate scan
+(Section 29A) and by import matching (R-IT16). One row per object and parent link. Registered with the
+custom metadata manager, where an administrator adds, edits and archives their own rows and
+archives or restores a shipped one (R-D2).
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the source. |
+| Label | `MasterLabel` | text | The source as the review list names it, for example Contact Point Email. |
+| Object Name | `Object_Name__c` | text (80) | The related object's API name, unprefixed, for example `ContactPointEmail` or `Address__c`. A row whose object is not in the org is skipped. |
+| Value Field | `Value_Field__c` | text (80) | The field holding the value compared: the email, the phone number, or the street. |
+| Postal Code Field | `Postal_Code_Field__c` | text (80) | Address sources only: the field holding the postal code, compared with the street. |
+| Parent Field | `Parent_Field__c` | text (80) | The lookup to the record the value belongs to. A parent that is a Contact or an Account is used; an Individual resolves to the contacts that carry it; any other parent is skipped. |
+| Normalization | `Normalization__c` | picklist(Email, Phone, Address) | How a value is made comparable: Email trimmed and lower case; Phone digits only, an 11 digit number starting 1 without the 1; Address street folded (lower case, no punctuation, common words abbreviated) plus postal code (no spaces, upper case, US ZIP+4 cut to five). |
+| Active | `Active__c` | boolean, default true | Whether the source is used. Subscriber controlled, so archiving a shipped source survives an upgrade. |
+| Is Shipped | `Is_Shipped__c` | boolean, default false | True on every row the package ships (R-D2). |
+
+Shipped rows: Contact Point Email (`ContactPointEmail`, `EmailAddress`, `ParentId`, Email),
+Contact Point Phone (`ContactPointPhone`, `TelephoneNumber`, `ParentId`, Phone), Contact Point
+Address (`ContactPointAddress`, `Street` with `PostalCode`, `ParentId`, Address), and Address
+twice (`Address__c`, `Street__c` with `Postal_Code__c`, Address): by `Contact__c` for people
+and by `Account__c` for households. Core never names a contact point object in code: every
+read is dynamic SOQL built from describe (ADR-0013, ADR-0110).
+
 ### Release Note
 
 `Release_Note__mdt` (C-27): the notes the What's new card on the BarnCRM home page shows after
@@ -1345,8 +1372,10 @@ names the modules a module's package needs installed first (ADR-0125
 each feature pull request may extend them. Any new custom metadata field is added to the
 tables above before the metadata file is created.
 **R-D2** The custom metadata manager edits only the types registered in
-`CustomMetadataManagerService` as admin-editable; today that is Relationship Type alone.
-For a registered type: a row with `Is_Shipped__c` true is never changed by the manager;
+`CustomMetadataManagerService` as admin-editable; today Relationship Type and Match Source.
+For a registered type: a row with `Is_Shipped__c` true is never changed by the manager,
+except that a type registered as shipped-archivable (Match Source) lets a shipped row be
+archived and restored, its other values deployed unchanged (ADR-NEXT);
 a row the manager creates has `Is_Shipped__c` false, is not protected, and has a
 DeveloperName starting `Org_`, a prefix no shipped row uses, so a later package version
 can never ship a row with the same name; archiving clears the type's active field and
@@ -8554,6 +8583,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-20 | Giving QA fixes: pledge balance. No object or field added. R-CM5: a pledge saved with Amount and Installments Planned and no Expected Total gets their product. R-CM4: a refund or write-off carries the original's commitment and installment, takes its amount off both and reopens a pledge it takes short; installments, completion and the Paid To Date and Paid Amount rollups count the same statuses (Received, Refunded, Written off). R-CM1: the donor of an Active or Paused commitment, or that person's account, is not deleted (`GiftDonorDeleteGuardHandler`); a merge and an erasure still work. |
 | v0.8 | 2026-10-20 | Erasure audit fixes B3 and S2. No object or field added. R-ER3: a household left with members whose name was typed by hand has Custom Name turned off and is named again from the remaining members; a household Nonprofit Cloud names is listed for staff to check; each is reported with the fields that really changed. Giving deletes the person's automatic Household Member soft credits in the erasure and lists them as Deleted (ADR-0110 amended). |
 | v0.8 | 2026-10-21 | Rollups after a partial save. No object or field added. R-RQ3: a partial save's retry (allOrNone false, some records refused) asks for a processor again and marks its records again, instead of leaving its entries Pending until the nightly run. R-CM1 and R-G15: the donor delete guards read the commitments and the books at each delete, so a donor refused earlier in the transaction is deleted once nothing holds them. |
+| v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-NEXT, `NEXT-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with five shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 
 ---
 ## 32. Entity ownership by package
@@ -8602,6 +8632,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
+| Match Source (shipped default, admin rows) | Core | v0.8 | 13 |
 | Interaction Note (Task, no packaged schema) | Core | v0.9 | 29G |
 | Erasure | Core | not scheduled (owner decision 2026-10-13) | 29H |
 | Acknowledgment Rule | Giving | v0.4 | 25F |

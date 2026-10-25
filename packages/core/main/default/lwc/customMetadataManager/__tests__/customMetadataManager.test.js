@@ -250,6 +250,33 @@ describe('c-custom-metadata-manager', () => {
     expect(offered.mock.calls[1][0].map((action) => action.name)).toEqual(['edit', 'restore']);
   });
 
+  it('archives and restores a shipped row only where its type allows it', async () => {
+    const archivable = types();
+    archivable[0].shippedArchivable = true;
+    getTypes.mockResolvedValue(archivable);
+    const element = await build();
+    const shipped = find(element, 'shipped-rows');
+    const actions = shipped.columns.find((column) => column.type === 'action');
+    const offered = jest.fn();
+
+    actions.typeAttributes.rowActions({ archived: false }, offered);
+    actions.typeAttributes.rowActions({ archived: true }, offered);
+    expect(offered.mock.calls[0][0].map((action) => action.name)).toEqual(['archive']);
+    expect(offered.mock.calls[1][0].map((action) => action.name)).toEqual(['restore']);
+
+    shipped.dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'archive' }, row: shipped.data[0] }
+      })
+    );
+    await flush();
+    expect(setArchived).toHaveBeenCalledWith({
+      typeName: TYPE,
+      developerName: 'Spouse',
+      archived: true
+    });
+  });
+
   it('shows a load failure in words', async () => {
     getTypes.mockRejectedValue({});
     const element = await build();
