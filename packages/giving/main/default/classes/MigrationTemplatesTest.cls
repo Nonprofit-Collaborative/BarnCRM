@@ -714,6 +714,10 @@ private class MigrationTemplatesTest {
                         'Contact1.Personal_Email__c' => 'ana.okafor@example.org',
                         'Contact1.Work_Email__c' => 'aokafor@example.com',
                         'Contact1.Preferred_Email__c' => 'Personal',
+                        'Contact1.HomePhone' => '503-555-0103',
+                        'Contact1.MobilePhone' => '503-555-0102',
+                        'Contact1.Work_Phone__c' => '503-555-0105',
+                        'Contact1.Preferred_Phone__c' => 'Work',
                         'Contact1.MailingCity' => 'Portland',
                         'Contact1.MailingPostalCode' => '97201',
                         'Contact1.Deceased__c' => 'false',
@@ -722,6 +726,8 @@ private class MigrationTemplatesTest {
                     new Map<String, String>{
                         'Contact1.FirstName' => 'Robert',
                         'Contact1.LastName' => 'Hale',
+                        'Contact1.HomePhone' => '503-555-0106',
+                        'Contact1.Preferred_Phone__c' => 'Household',
                         'Contact1.Deceased__c' => 'true',
                         'Contact1.DoNotCall' => 'true'
                     }
@@ -737,10 +743,22 @@ private class MigrationTemplatesTest {
                 Assert.isNotNull(row.Household__c, 'Each person has a household.');
             }
             Contact ana = [
-                SELECT Title, Birthdate, Email, Personal_Email__c, Work_Email__c, Preferred_Email__c
+                SELECT
+                    Title,
+                    Birthdate,
+                    Email,
+                    Personal_Email__c,
+                    Work_Email__c,
+                    Preferred_Email__c,
+                    Phone,
+                    Work_Phone__c,
+                    Preferred_Phone__c
                 FROM Contact
                 WHERE LastName = 'Okafor'
             ];
+            Assert.areEqual('503-555-0105', ana.Work_Phone__c, 'Work phone.');
+            Assert.areEqual('Work', ana.Preferred_Phone__c, 'The preferred phone, same name.');
+            Assert.areEqual('503-555-0105', ana.Phone, 'And the phone to use.');
             Assert.areEqual('Engineer', ana.Title, 'Title.');
             Assert.areEqual(Date.newInstance(1980, 6, 1), ana.Birthdate, 'Birthdate.');
             Assert.areEqual(
@@ -755,7 +773,17 @@ private class MigrationTemplatesTest {
                 'The preferred one, by the same name.'
             );
             Assert.areEqual('ana.okafor@example.org', ana.Email, 'And the email to use.');
-            Contact robert = [SELECT Deceased__c, DoNotCall FROM Contact WHERE LastName = 'Hale'];
+            Contact robert = [
+                SELECT Deceased__c, DoNotCall, HomePhone, Phone, Preferred_Phone__c
+                FROM Contact
+                WHERE LastName = 'Hale'
+            ];
+            Assert.areEqual('503-555-0106', robert.HomePhone, 'Home phone comes across.');
+            Assert.isNull(
+                robert.Preferred_Phone__c,
+                'A preferred phone BarnCRM has no word for is empty.'
+            );
+            Assert.isNull(robert.Phone, 'So the ordinary phone is not touched.');
             Assert.isTrue(robert.Deceased__c, 'Deceased comes across.');
             Assert.isTrue(
                 importerMayEdit(Contact.DoNotCall),
