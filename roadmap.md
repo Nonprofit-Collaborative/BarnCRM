@@ -23,6 +23,8 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
    - Erase a person in Core, with a Giving extension (D-52, D-86). Landed (#377).
    - Shipped import templates added at install and on upgrade (D-55). Landed (#377).
    - Deleting people never deletes their household (D-88, R-H12). Landed (#377).
+   - Preferred Phone on a person, keeping the standard Phone in step (C-43, D-110; Brandon, 2026-10-25). Planned.
+   - Related-record duplicate matching, steps 1 to 3: match sources, shipped Contact Point and `Address__c` sources, duplicate scan and import matching; no save-time warning (C-44, D-113; Brandon, 2026-10-25). Planned.
 2. On hold: C-38 scheduled imports and connections, until Brandon is ready to start the next version (D-39).
 3. After the Core quality pass: the non-core modules, in plan Section 6 order.
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
@@ -30,6 +32,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 6. Release prerequisites (namespace, Dev Hub, steward entity): after a v1.0 pilot (D-87).
 7. Rename Connect to Mirror (D-103, ADR-0126): Landed (#441, 98583f12, ADR-0126).
 8. Test org cleanup of old Connect metadata (destructive deploy; owner approved): `oi-test` done (176 components); `oi-pa` done (module record, then 175 components); `barn-core` had no Connect module (nothing to remove); `barn-npc` done 2026-10-15 (Mirror deployed from main 702616e6 first, then 176 components). Done on all four test orgs.
+9. New optional modules approved 2026-10-25 (Brandon), not yet scheduled (plan 6.0 item 4): BarnCRM Contact Point Sync (C-45, D-111) and BarnCRM Address Verification (C-46, D-112). Each needs a new ADR before build.
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
 |---|---|---|
