@@ -67,7 +67,7 @@ private class CustomMetadataManagerControllerTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(1, types.size(), 'One editable list');
+        Assert.areEqual(2, types.size(), 'Relationship types and match sources');
         Assert.areEqual(String.valueOf(JOB), jobId, 'The deployment Id comes back');
         Assert.areEqual(CustomMetadataManagerController.PENDING, pending.status, 'Still running');
         Assert.areEqual(CustomMetadataManagerController.SUCCEEDED, done.status, 'Finished');
