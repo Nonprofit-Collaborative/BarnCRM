@@ -191,10 +191,18 @@ private class PreferredPhoneServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             List<Contact> people = manyWhoPreferMobile(251);
 
+            // Generated names and numbers look alike to the org's duplicate rules, which are not
+            // under test here, so the save is allowed through them.
+            Database.DMLOptions options = new Database.DMLOptions();
+            options.duplicateRuleHeader.allowSave = true;
+
             Test.startTest();
-            insert people;
+            List<Database.SaveResult> results = Database.insert(people, options);
             Test.stopTest();
 
+            for (Database.SaveResult result : results) {
+                Assert.isTrue(result.isSuccess(), 'Every person was saved');
+            }
             Assert.areEqual(251, copied(people), 'Every person carries their mobile number');
         }
     }
