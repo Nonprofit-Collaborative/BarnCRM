@@ -2350,15 +2350,20 @@ alone and the run log says so; nothing is rejected for it. A matcher failure is 
 Error Log only when a rule was known to be active.
 
 A person the rules matched nobody for, or could not be asked about, is then looked up through
-the active match sources (`Match_Source__mdt`, Section 13; ADR-NEXT,
-`NEXT-related-record-matching.md`), as R-DP6 does in the scan: the person's Email, its Phone,
+the active match sources (`Match_Source__mdt`, Section 13; ADR-0133,
+`0133-related-record-matching.md`), as R-DP6 does in the scan: the person's Email, its Phone,
 MobilePhone, HomePhone and OtherPhone, and its mailing and other street with postal code are
 normalized by each source that can point at the person's object (Contact, or Account for person
-accounts), one lookup per source per chunk, and a value held by more than ten records is not
-used. The records found are read back as above (user mode, the person record types for person
-accounts) and handled like a rule's matches: Several Matches applies and Matched By Duplicate
-Rule is ticked. Organizations are not looked up through sources. A source that cannot be read
-is written to the Error Log and skipped.
+accounts), with the lookups bounded as in R-DP6 (at most 100 patterns to a query, 5,000 rows
+to a lookup), and a value held by more than ten records is not used. A person the rules matched
+is never looked up this way. The records found are read back as above (user mode, the person
+record types for person accounts) with their last name, and a record is kept only when its last
+name (a person account's person last name) agrees with the incoming person's, trimmed and
+without regard to capitals: a shared address or phone never loads one person into another's
+record. The records kept are handled like a rule's matches: Several Matches applies and Matched
+By Duplicate Rule is ticked; with none kept the row is handled as unmatched. Organizations are
+not looked up through sources. A source that cannot be read is written to the Error Log and
+skipped.
 
 For a one-object template (R-IT12) with Use Duplicate Rules ticked, the rules are asked only
 under Insert and Upsert by external ID, and only about a row that would create a record: a

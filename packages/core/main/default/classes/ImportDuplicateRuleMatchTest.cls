@@ -577,22 +577,28 @@ private class ImportDuplicateRuleMatchTest {
         ImportTestDataFactory.rows(batch, values);
     }
 
+    /** One existing person, Okonkwo, whose address is held only on an Address record. */
+    private static Contact okonkwoAtHarborRoad() {
+        addressSourceOnly();
+        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+        Contact existing = new Contact(LastName = 'Okonkwo');
+        insert existing;
+        insert new Address__c(
+            Contact__c = existing.Id,
+            Street__c = '7 Harbor Road',
+            Postal_Code__c = '04101'
+        );
+        return existing;
+    }
+
     @IsTest
     static void aPersonTheRulesMissIsMatchedThroughARelatedRecord() {
         System.runAs(TestUsers.admin()) {
-            addressSourceOnly();
-            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
-            Contact existing = new Contact(LastName = 'Okonkwo');
-            insert existing;
-            insert new Address__c(
-                Contact__c = existing.Id,
-                Street__c = '7 Harbor Road',
-                Postal_Code__c = '04101'
-            );
+            Contact existing = okonkwoAtHarborRoad();
             givenAddresses(
                 new List<Map<String, String>>{
                     new Map<String, String>{
-                        'Last' => 'Okonkwo-Bell',
+                        'Last' => ' OKONKWO ',
                         'Street' => '7 harbor rd.',
                         'Zip' => '04101-2200'
                     }
@@ -609,6 +615,87 @@ private class ImportDuplicateRuleMatchTest {
             Assert.isTrue(loaded.Duplicate_Rule_Match__c, 'Ticked as a looser match.');
             Assert.areEqual(0, committed.created, 'Nobody created.');
             Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Still one person.');
+        }
+    }
+
+    @IsTest
+    static void aRelatedRecordMatchWithAnotherLastNameIsNotUsed() {
+        System.runAs(TestUsers.admin()) {
+            Contact existing = okonkwoAtHarborRoad();
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => 'Okonkwo-Bell',
+                        'Street' => '7 harbor rd.',
+                        'Zip' => '04101-2200'
+                    }
+                },
+                true
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Import_Row__c loaded = rows()[0];
+            Assert.areNotEqual(
+                existing.Id,
+                loaded.Contact_1__c,
+                'Same address, another last name: not loaded into Okonkwo: ' + loaded
+            );
+            Assert.isFalse(loaded.Duplicate_Rule_Match__c, 'No looser match.');
+            Assert.areEqual(1, committed.created, 'Handled as unmatched: a new person.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Okonkwo is untouched.');
+        }
+    }
+
+    @IsTest
+    static void twoHundredPeopleAreMatchedThroughRelatedRecordsInOneChunk() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+            Integer count = 200;
+            List<Contact> existing = new List<Contact>();
+            for (Integer index = 0; index < count; index++) {
+                existing.add(new Contact(LastName = 'Bulkperson' + index));
+            }
+            insert existing;
+            List<Address__c> addresses = new List<Address__c>();
+            List<Map<String, String>> incoming = new List<Map<String, String>>();
+            for (Integer index = 0; index < count; index++) {
+                String zip = String.valueOf(10000 + index);
+                addresses.add(
+                    new Address__c(
+                        Contact__c = existing[index].Id,
+                        Street__c = (index + 1) + ' Harbor Road',
+                        Postal_Code__c = zip
+                    )
+                );
+                incoming.add(
+                    new Map<String, String>{
+                        'Last' => 'Bulkperson' + index,
+                        'Street' => (index + 1) + ' harbor rd',
+                        'Zip' => zip
+                    }
+                );
+            }
+            insert addresses;
+            givenAddresses(incoming, true);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            List<Import_Row__c> loaded = rows();
+            Assert.areEqual(count, loaded.size());
+            for (Integer index = 0; index < count; index++) {
+                Assert.areEqual(
+                    existing[index].Id,
+                    loaded[index].Contact_1__c,
+                    'Row ' + index + ' loaded into its person: ' + loaded[index]
+                );
+            }
+            Assert.areEqual(0, committed.created, 'Nobody created.');
         }
     }
 

@@ -2647,10 +2647,16 @@ public with sharing class ImportRowProcessor {
             outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
         }
         // The match sources answer for a person the rules found nobody for, or could not ask
-        // about: values on related records the rules cannot see (ADR-NEXT).
+        // about: values on related records the rules cannot see (ADR-0133). A person the rules
+        // matched is not looked up (null), and a source candidate counts only when its last
+        // name agrees with the person's.
+        List<Map<String, String>> unmatched = new List<Map<String, String>>();
+        for (Integer i = 0; i < probes.size(); i++) {
+            unmatched.add(found != null && !found[i].isEmpty() ? null : values[i]);
+        }
         List<List<SObject>> bySource = ImportDuplicateRuleMatcher.matchesBySources(
             type,
-            values,
+            unmatched,
             allowedTypes
         );
         for (Integer i = 0; i < probes.size(); i++) {
