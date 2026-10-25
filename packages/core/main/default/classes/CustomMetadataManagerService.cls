@@ -43,7 +43,7 @@ public with sharing class CustomMetadataManagerService {
         /** A field whose value has to be an active choice of a picklist on choicesObject. */
         public Map<Schema.SObjectField, Schema.SObjectField> choicesFrom;
         public Schema.SObjectType choicesObject;
-        /** A shipped row may be archived and restored, and nothing else changed (ADR-NEXT). */
+        /** A shipped row may be archived and restored, and nothing else changed (ADR-0133). */
         public Boolean shippedArchivable = false;
         /** Checks a save against the org beyond the field rules here, or null. */
         public RowValidator validator;
@@ -279,7 +279,7 @@ public with sharing class CustomMetadataManagerService {
     }
 
     /**
-     * Archives or restores a shipped row of a type that allows it (ADR-NEXT): every other value
+     * Archives or restores a shipped row of a type that allows it (ADR-0133): every other value
      * is deployed exactly as shipped and the row stays marked shipped. A packaged row's name
      * carries the package prefix once the namespace exists.
      */

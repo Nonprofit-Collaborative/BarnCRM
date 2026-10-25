@@ -1,6 +1,6 @@
 /**
  * Match sources: related records whose values pair people or households as likely duplicates
- * (ADR-NEXT, `NEXT-related-record-matching.md`; canonical model Section 13, Match Source).
+ * (ADR-0133, `0133-related-record-matching.md`; canonical model Section 13, Match Source).
  *
  * A duplicate rule compares fields on the record itself, so an email kept only on a related
  * record is never compared. A source names that related object, the field holding the value,
@@ -134,17 +134,32 @@ public with sharing class MatchSourceService {
     private static final Integer MAX_OWNERS_PER_VALUE = 10;
 
     private static final String INDIVIDUAL = 'Individual';
-    private static final String INDIVIDUAL_FIELD = 'IndividualId';
 
-    private static Boolean contactCarriesIndividual;
+    /** The field on each target object naming the Individual behind a person. */
+    private static final Map<Schema.SObjectType, String> INDIVIDUAL_FIELDS = new Map<Schema.SObjectType, String>{
+        Contact.SObjectType => 'IndividualId',
+        Account.SObjectType => 'PersonIndividualId'
+    };
 
-    /** Whether Contact has IndividualId in this org, read by name (ADR-0013). */
-    private static Boolean contactCarriesIndividual() {
-        if (contactCarriesIndividual == null) {
-            contactCarriesIndividual = Schema.SObjectType.Contact.fields.getMap()
-                .containsKey(INDIVIDUAL_FIELD.toLowerCase());
+    private static Map<Schema.SObjectType, String> individualFieldByTarget = new Map<Schema.SObjectType, String>();
+
+    /**
+     * The field naming a person's Individual on the target object, IndividualId on Contact or
+     * PersonIndividualId on Account, or null when the org does not have it (no data
+     * protection, or no person accounts). Read by name (ADR-0013).
+     */
+    @TestVisible
+    private static String individualFieldOf(Schema.SObjectType target) {
+        if (!individualFieldByTarget.containsKey(target)) {
+            String name = INDIVIDUAL_FIELDS.get(target);
+            Boolean present =
+                name != null &&
+                target.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .fields.getMap()
+                    .containsKey(name.toLowerCase());
+            individualFieldByTarget.put(target, present ? name : null);
         }
-        return contactCarriesIndividual;
+        return individualFieldByTarget.get(target);
     }
 
     private static Boolean isIndividual(Schema.SObjectType type) {
@@ -153,8 +168,8 @@ public with sharing class MatchSourceService {
     }
 
     /**
-     * Whether a source's parent can be a record of this object: its lookup points there, or,
-     * for people, at an Individual the contacts carry.
+     * Whether a source's parent can be a record of this object: its lookup points there, or at
+     * an Individual the target's records carry (contacts, or person accounts).
      */
     @TestVisible
     private static Boolean appliesTo(Source source, Schema.SObjectType target) {
@@ -169,9 +184,7 @@ public with sharing class MatchSourceService {
         ) {
             if (
                 referenced == target ||
-                (target == Contact.SObjectType &&
-                isIndividual(referenced) &&
-                contactCarriesIndividual())
+                (isIndividual(referenced) && individualFieldOf(target) != null)
             ) {
                 return true;
             }
@@ -328,6 +341,7 @@ public with sharing class MatchSourceService {
             return result;
         }
         Map<String, Set<Id>> holders = ownersOf(source, target, heldHere.keySet());
+        Map<Id, Id> households = householdsToTellApart(source, target, heldHere, holders);
         String reason = reasonFor(source);
         for (String key : heldHere.keySet()) {
             Set<Id> everyone = holders.get(key);
@@ -336,7 +350,7 @@ public with sharing class MatchSourceService {
             }
             for (Id mine : heldHere.get(key)) {
                 for (Id other : everyone) {
-                    if (other != mine) {
+                    if (other != mine && !sameHousehold(households, mine, other)) {
                         DuplicateService.Pair pair = new DuplicateService.Pair(mine, other, null);
                         pair.reason = reason;
                         result.add(pair);
@@ -348,34 +362,70 @@ public with sharing class MatchSourceService {
     }
 
     /**
-     * Every record of the target object holding each of these keys on this source, found
-     * with one bounded query and compared exactly after normalization.
+     * For a phone or address source over people, each person's household, so two people of
+     * one household are not paired: sharing a home phone or an address is what a household
+     * is. An email is personal, so an email source pairs them still, and so does any source
+     * over accounts. Empty when nothing is to be told apart.
+     */
+    private static Map<Id, Id> householdsToTellApart(
+        Source source,
+        Schema.SObjectType target,
+        Map<String, Set<Id>> heldHere,
+        Map<String, Set<Id>> holders
+    ) {
+        if (source.normalization == EMAIL || target != Contact.SObjectType) {
+            return new Map<Id, Id>();
+        }
+        Set<Id> people = new Set<Id>();
+        for (String key : heldHere.keySet()) {
+            people.addAll(heldHere.get(key));
+            if (holders.containsKey(key)) {
+                people.addAll(holders.get(key));
+            }
+        }
+        return HouseholdService.getHouseholdIdsFor(people);
+    }
+
+    private static Boolean sameHousehold(Map<Id, Id> households, Id first, Id second) {
+        Id home = households.get(first);
+        return home != null && home == households.get(second);
+    }
+
+    /** The most LIKE clauses sent in one query; more go in further queries. */
+    @TestVisible
+    private static final Integer MAX_PATTERNS_PER_QUERY = 100;
+
+    /**
+     * Every record of the target object holding each of these keys on this source, found with
+     * bounded queries and compared exactly after normalization: emails by equality in one
+     * query, phones and addresses by LIKE clauses, at most 100 to a query.
      */
     public static Map<String, Set<Id>> ownersOf(
         Source source,
         Schema.SObjectType target,
         Set<String> keys
     ) {
-        Set<String> equalTo = new Set<String>();
-        Set<String> patterns = new Set<String>();
-        String likeField = null;
-        for (String key : keys) {
-            if (source.normalization == EMAIL) {
-                equalTo.add(key);
-            } else if (source.normalization == PHONE) {
-                likeField = source.valueField;
-                patterns.add(spread(key));
-            } else {
-                likeField = source.postalField;
-                patterns.add(spread(key.substringAfterLast('|')).removeStart('%'));
+        List<SObject> rows = new List<SObject>();
+        if (source.normalization == EMAIL) {
+            rows.addAll(MatchSourceSelector.rowsByValues(source, keys, null));
+        } else {
+            Map<String, Map<String, String>> clauses = new Map<String, Map<String, String>>();
+            for (String key : keys) {
+                Map<String, String> clause = likeClause(source, key);
+                clauses.put(String.join(clause.values(), '|'), clause);
+            }
+            List<Map<String, String>> batch = new List<Map<String, String>>();
+            for (Map<String, String> clause : clauses.values()) {
+                batch.add(clause);
+                if (batch.size() == MAX_PATTERNS_PER_QUERY) {
+                    rows.addAll(MatchSourceSelector.rowsByValues(source, null, batch));
+                    batch = new List<Map<String, String>>();
+                }
+            }
+            if (!batch.isEmpty()) {
+                rows.addAll(MatchSourceSelector.rowsByValues(source, null, batch));
             }
         }
-        List<SObject> rows = MatchSourceSelector.rowsByValues(
-            source,
-            equalTo,
-            likeField,
-            new List<String>(patterns)
-        );
         Map<String, Set<Id>> found = owners(source, target, rows, null);
         Map<String, Set<Id>> result = new Map<String, Set<Id>>();
         for (String key : keys) {
@@ -396,12 +446,48 @@ public with sharing class MatchSourceService {
         return '%' + String.join(characters, '%') + '%';
     }
 
+    /** The words normalization writes in place of others; a stored street may not hold them. */
+    private static final Set<String> SHORTENED = new Set<String>(STREET_WORDS.values());
+
+    /**
+     * The LIKE clause that reads every row which could hold this key, by field. A phone: its
+     * digits in order in the value field. An address: its postal code in the postal field and,
+     * to keep a common postal code from reading thousands of rows, the street's first word
+     * that normalization leaves as written (usually the house number) in the value field. Such
+     * a word is a run of letters and digits of the stored street, so no row that matches is
+     * missed; a word normalization may have shortened ("st" for "Street") is never used.
+     */
+    @TestVisible
+    private static Map<String, String> likeClause(Source source, String key) {
+        if (source.normalization == PHONE) {
+            return new Map<String, String>{ source.valueField => spread(key) };
+        }
+        Map<String, String> clause = new Map<String, String>{
+            source.postalField => spread(key.substringAfterLast('|')).removeStart('%')
+        };
+        for (String word : key.substringBeforeLast('|').split(' ')) {
+            if (String.isNotBlank(word) && !SHORTENED.contains(word)) {
+                clause.put(source.valueField, '%' + word + '%');
+                break;
+            }
+        }
+        return clause;
+    }
+
     /** The records whose source rows are looked up: the records, and their Individuals. */
     private static Set<Id> parentIdsOf(Schema.SObjectType target, Set<Id> records) {
         Set<Id> parents = new Set<Id>(records);
-        if (target == Contact.SObjectType && contactCarriesIndividual()) {
-            for (Contact person : MatchSourceSelector.contactsWithIndividuals(records, null)) {
-                parents.add((Id) person.get(INDIVIDUAL_FIELD));
+        String individualField = individualFieldOf(target);
+        if (individualField != null) {
+            for (
+                SObject holder : MatchSourceSelector.holdersOfIndividuals(
+                    target,
+                    individualField,
+                    records,
+                    null
+                )
+            ) {
+                parents.add((Id) holder.get(individualField));
             }
         }
         return parents;
@@ -409,7 +495,8 @@ public with sharing class MatchSourceService {
 
     /**
      * Normalized key to the target records that hold it, out of source rows. A parent of the
-     * target object is itself; an Individual is every contact carrying it; anything else is
+     * target object is itself; an Individual is every record of the target carrying it
+     * (contacts by IndividualId, person accounts by PersonIndividualId); anything else is
      * skipped. With `onlyThese`, other records are left out.
      */
     private static Map<String, Set<Id>> owners(
@@ -425,14 +512,22 @@ public with sharing class MatchSourceService {
                 individuals.add(parent);
             }
         }
-        Map<Id, Set<Id>> contactsByIndividual = new Map<Id, Set<Id>>();
-        if (target == Contact.SObjectType && !individuals.isEmpty() && contactCarriesIndividual()) {
-            for (Contact person : MatchSourceSelector.contactsWithIndividuals(null, individuals)) {
-                Id individual = (Id) person.get(INDIVIDUAL_FIELD);
-                if (!contactsByIndividual.containsKey(individual)) {
-                    contactsByIndividual.put(individual, new Set<Id>());
+        Map<Id, Set<Id>> holdersByIndividual = new Map<Id, Set<Id>>();
+        String individualField = individualFieldOf(target);
+        if (individualField != null && !individuals.isEmpty()) {
+            for (
+                SObject holder : MatchSourceSelector.holdersOfIndividuals(
+                    target,
+                    individualField,
+                    null,
+                    individuals
+                )
+            ) {
+                Id individual = (Id) holder.get(individualField);
+                if (!holdersByIndividual.containsKey(individual)) {
+                    holdersByIndividual.put(individual, new Set<Id>());
                 }
-                contactsByIndividual.get(individual).add(person.Id);
+                holdersByIndividual.get(individual).add(holder.Id);
             }
         }
         Map<String, Set<Id>> result = new Map<String, Set<Id>>();
@@ -448,7 +543,7 @@ public with sharing class MatchSourceService {
             }
             Set<Id> holders = parent.getSObjectType() == target
                 ? new Set<Id>{ parent }
-                : contactsByIndividual.get(parent);
+                : holdersByIndividual.get(parent);
             if (holders == null) {
                 continue;
             }
@@ -556,8 +651,10 @@ public with sharing class MatchSourceService {
 
     /**
      * Throws with a message the page shows as it is unless the object exists, the value field
-     * exists, the parent field is a lookup, and an address source names a postal code field
-     * that exists.
+     * exists and is text a query can filter on, the parent field is a lookup to a Contact, an
+     * Account or an Individual (the only parents a source resolves), and an address source
+     * names a postal code field that exists and is filterable text too. The lookups filter on
+     * the value and postal fields, so a field a query cannot filter would fail every run.
      */
     public static void validate(Map<String, Object> values) {
         String objectName = (String) values.get('Object_Name__c');
@@ -569,13 +666,16 @@ public with sharing class MatchSourceService {
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         Map<String, Schema.SObjectField> fields = described.fields.getMap();
-        requireField(fields, (String) values.get('Value_Field__c'), described.getLabel());
+        requireText(
+            requireField(fields, (String) values.get('Value_Field__c'), described.getLabel()),
+            described.getLabel()
+        );
         Schema.SObjectField parent = requireField(
             fields,
             (String) values.get('Parent_Field__c'),
             described.getLabel()
         );
-        if (parent.getDescribe().getType() != Schema.DisplayType.REFERENCE) {
+        if (!isPersonOrHouseholdLookup(parent)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
                     Label.Core_MatchSource_NotALookup,
@@ -590,7 +690,52 @@ public with sharing class MatchSourceService {
                     Label.Core_MatchSource_PostalRequired
                 );
             }
-            requireField(fields, postal, described.getLabel());
+            requireText(requireField(fields, postal, described.getLabel()), described.getLabel());
+        }
+    }
+
+    /** The parents a source can resolve to a person or a household. */
+    private static final Set<String> PARENT_OBJECTS = new Set<String>{
+        'Contact',
+        'Account',
+        'Individual'
+    };
+
+    private static Boolean isPersonOrHouseholdLookup(Schema.SObjectField token) {
+        Schema.DescribeFieldResult described = token.getDescribe();
+        if (described.getType() != Schema.DisplayType.REFERENCE) {
+            return false;
+        }
+        for (Schema.SObjectType referenced : described.getReferenceTo()) {
+            if (
+                PARENT_OBJECTS.contains(
+                    referenced.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Field types holding text a value can be read from and filtered on. */
+    private static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE,
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.URL
+    };
+
+    private static void requireText(Schema.SObjectField token, String objectLabel) {
+        Schema.DescribeFieldResult described = token.getDescribe();
+        if (!TEXT_TYPES.contains(described.getType()) || !described.isFilterable()) {
+            throw new CustomMetadataManagerService.CustomMetadataManagerException(
+                String.format(
+                    Label.Core_MatchSource_NotFilterableText,
+                    new List<Object>{ described.getLabel(), objectLabel }
+                )
+            );
         }
     }
 

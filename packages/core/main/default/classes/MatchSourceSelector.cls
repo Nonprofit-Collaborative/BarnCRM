@@ -1,6 +1,6 @@
 /**
  * Every query related-record matching makes (plan Section 7.2: every query lives in a
- * Selector). ADR-NEXT, `NEXT-related-record-matching.md`.
+ * Selector). ADR-0133, `0133-related-record-matching.md`.
  */
 public with sharing class MatchSourceSelector {
     @TestVisible
@@ -31,9 +31,21 @@ public with sharing class MatchSourceSelector {
         ];
     }
 
-    /** The most rows one lookup reads; a lookup that reaches it reads a sample, never fails. */
+    /**
+     * The most rows one lookup reads. A lookup that reaches it reads a sample and never fails,
+     * but matches past the cap are missed, so it is counted and logged (ADR-0133 decision 8).
+     */
     @TestVisible
-    private static final Integer MAX_ROWS = 5000;
+    private static Integer maxRows = 5000;
+
+    /** How many lookups in this transaction reached `maxRows`. */
+    @TestVisible
+    private static Integer cappedLookups = 0;
+
+    /** The sources already logged as capped in this transaction: one warning each. */
+    private static Set<String> cappedLogged = new Set<String>();
+
+    private static final String LOG_CONTEXT = 'Match sources';
 
     /**
      * A source's rows whose parent is one of these, with a value. The object and fields come
@@ -44,57 +56,70 @@ public with sharing class MatchSourceSelector {
         if (parentIds == null || parentIds.isEmpty()) {
             return new List<SObject>();
         }
-        return Database.queryWithBinds(
-            selectFrom(source) +
-                ' WHERE ' +
-                String.escapeSingleQuotes(source.parentField) +
-                ' IN :parentIds AND ' +
-                String.escapeSingleQuotes(source.valueField) +
-                ' != null LIMIT ' +
-                MAX_ROWS,
-            new Map<String, Object>{ 'parentIds' => parentIds },
-            AccessLevel.USER_MODE
+        return capped(
+            source.developerName,
+            Database.queryWithBinds(
+                selectFrom(source) +
+                    ' WHERE ' +
+                    String.escapeSingleQuotes(source.parentField) +
+                    ' IN :parentIds AND ' +
+                    String.escapeSingleQuotes(source.valueField) +
+                    ' != null LIMIT ' +
+                    maxRows,
+                new Map<String, Object>{ 'parentIds' => parentIds },
+                AccessLevel.USER_MODE
+            )
         );
     }
 
     /**
      * A source's rows that may hold one of these values: equal to one of `equalTo` in the value
-     * field (emails, compared without regard to capitals by SOQL), or like one of `likePatterns`
-     * in `likeField` (phones and postal codes, whose separators vary). The caller normalizes
-     * each row and keeps only exact matches.
+     * field (emails, compared without regard to capitals by SOQL), or matching one of
+     * `likeClauses`, each a map of field to LIKE pattern that must all match (phones by the
+     * value field; addresses by the postal code and a word of the street), since separators
+     * vary. The caller sends at most 100 clauses at a time, normalizes each row and keeps only
+     * exact matches.
      */
     public static List<SObject> rowsByValues(
         MatchSourceService.Source source,
         Set<String> equalTo,
-        String likeField,
-        List<String> likePatterns
+        List<Map<String, String>> likeClauses
     ) {
         Map<String, Object> binds = new Map<String, Object>();
         String filter;
         if (equalTo != null && !equalTo.isEmpty()) {
             binds.put('equalTo', equalTo);
             filter = String.escapeSingleQuotes(source.valueField) + ' IN :equalTo';
-        } else if (likePatterns != null && !likePatterns.isEmpty()) {
+        } else if (likeClauses != null && !likeClauses.isEmpty()) {
             // One bind per pattern: a list bound to LIKE is not relied on in dynamic SOQL.
             List<String> clauses = new List<String>();
-            for (Integer index = 0; index < likePatterns.size(); index++) {
-                binds.put('p' + index, likePatterns[index]);
-                clauses.add(String.escapeSingleQuotes(likeField) + ' LIKE :p' + index);
+            for (Integer index = 0; index < likeClauses.size(); index++) {
+                List<String> parts = new List<String>();
+                Integer part = 0;
+                for (String field : likeClauses[index].keySet()) {
+                    String name = 'p' + index + '_' + part++;
+                    binds.put(name, likeClauses[index].get(field));
+                    parts.add(String.escapeSingleQuotes(field) + ' LIKE :' + name);
+                }
+                clauses.add('(' + String.join(parts, ' AND ') + ')');
             }
             filter = '(' + String.join(clauses, ' OR ') + ')';
         } else {
             return new List<SObject>();
         }
-        return Database.queryWithBinds(
-            selectFrom(source) +
-                ' WHERE ' +
-                filter +
-                ' AND ' +
-                String.escapeSingleQuotes(source.parentField) +
-                ' != null LIMIT ' +
-                MAX_ROWS,
-            binds,
-            AccessLevel.USER_MODE
+        return capped(
+            source.developerName,
+            Database.queryWithBinds(
+                selectFrom(source) +
+                    ' WHERE ' +
+                    filter +
+                    ' AND ' +
+                    String.escapeSingleQuotes(source.parentField) +
+                    ' != null LIMIT ' +
+                    maxRows,
+                binds,
+                AccessLevel.USER_MODE
+            )
         );
     }
 
@@ -110,23 +135,57 @@ public with sharing class MatchSourceSelector {
     }
 
     /**
-     * Contacts and the Individual each carries, by contact or by Individual. `IndividualId` is
-     * read by name, and only by a caller that found it in Contact's describe, so Core runs in an
-     * org without it.
+     * Records of the target object (Contact, or Account for person accounts) and the Individual
+     * each carries, by record or by Individual. The field (`IndividualId` or
+     * `PersonIndividualId`) is read by name, and only by a caller that found it in the target's
+     * describe, so Core runs in an org without it.
      */
-    public static List<Contact> contactsWithIndividuals(Set<Id> contactIds, Set<Id> individualIds) {
-        String filter = contactIds != null ? 'Id IN :ids' : 'IndividualId IN :ids';
-        Set<Id> ids = contactIds != null ? contactIds : individualIds;
+    public static List<SObject> holdersOfIndividuals(
+        Schema.SObjectType target,
+        String individualField,
+        Set<Id> recordIds,
+        Set<Id> individualIds
+    ) {
+        String field = String.escapeSingleQuotes(individualField);
+        String filter = recordIds != null ? 'Id IN :ids' : field + ' IN :ids';
+        Set<Id> ids = recordIds != null ? recordIds : individualIds;
         if (ids == null || ids.isEmpty()) {
-            return new List<Contact>();
+            return new List<SObject>();
         }
-        return Database.queryWithBinds(
-            'SELECT Id, IndividualId FROM Contact WHERE ' +
-                filter +
-                ' AND IndividualId != null LIMIT ' +
-                MAX_ROWS,
-            new Map<String, Object>{ 'ids' => ids },
-            AccessLevel.USER_MODE
+        return capped(
+            individualField,
+            Database.queryWithBinds(
+                'SELECT Id, ' +
+                    field +
+                    ' FROM ' +
+                    target.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                    ' WHERE ' +
+                    filter +
+                    ' AND ' +
+                    field +
+                    ' != null LIMIT ' +
+                    maxRows,
+                new Map<String, Object>{ 'ids' => ids },
+                AccessLevel.USER_MODE
+            )
         );
+    }
+
+    /** The rows, counted and logged once per name when the lookup reached its cap. */
+    private static List<SObject> capped(String name, List<SObject> rows) {
+        if (rows.size() >= maxRows) {
+            cappedLookups++;
+            if (cappedLogged.add(name)) {
+                ErrorLogger.logMessage(
+                    String.format(
+                        System.Label.Core_MatchSource_RowCapReached,
+                        new List<Object>{ name, String.valueOf(maxRows) }
+                    ),
+                    LOG_CONTEXT,
+                    ErrorLogger.SEVERITY_WARNING
+                );
+            }
+        }
+        return rows;
     }
 }

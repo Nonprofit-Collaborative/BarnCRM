@@ -104,7 +104,7 @@ them.
 
 ## Match sources
 
-BarnCRM ships five:
+BarnCRM ships six:
 
 | Source | Object | Value | Linked by | Compared as |
 |---|---|---|---|---|
@@ -113,6 +113,7 @@ BarnCRM ships five:
 | Contact Point Address | Contact Point Address | Street and Postal Code | Parent | Address |
 | Address (person) | Address | Street and Postal Code | Contact | Address |
 | Address (household) | Address | Street and Postal Code | Account | Address |
+| Address (person account) | Address | Street and Postal Code | Person Account | Address |
 
 The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
 object is missing, its source does nothing; nothing breaks.
@@ -129,7 +130,12 @@ How values are compared:
 
 A contact point record can belong to a person, an account, or a Salesforce **Individual**
 (the privacy record behind a person). A person or an account is used as it is; an Individual
-counts as every person who carries it. A record that belongs to anything else is skipped.
+counts as every person who carries it, contacts and, where your org has person accounts,
+person accounts too. A record that belongs to anything else is skipped.
+
+When you add your own source, the value field (and, for an address, the postal code field)
+must be a text, email or phone field Salesforce can search on, and the parent field must be a
+lookup to a contact, an account or an Individual. The page refuses anything else.
 
 A value shared by more than ten people or households, such as an office's main number, is
 ignored: it says nothing about whether two of them are the same.

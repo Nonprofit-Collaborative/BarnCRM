@@ -96,13 +96,23 @@ for a pair a match source found, what the two share and where ("Same address on 
 merge and dismiss these pairs exactly like the others; a dismissed pair is not proposed again
 by either.
 
-Two limits to know:
+Limits to know:
 
 - **A match source pair still needs an active duplicate rule for the same kind of record.**
   Salesforce will not store a suggestion without one. With no active rule for people, the scan
-  does not run its people pass at all, sources included.
+  does not run its people pass at all, sources included. Salesforce's own **Duplicate Record
+  Sets** tab, and any report on it, shows a match source pair under that active rule's name,
+  because Salesforce makes every suggestion name a rule; the reason is shown only here, on the
+  review list.
 - **A value shared by more than ten people or households is ignored**, such as an office's
   main number, because it says nothing about whether two of them are the same.
+- **People in the same household are not paired by a shared phone or address**, since that
+  is what living together looks like. A shared email still pairs them.
+- **Pairs are proposed between contacts or between households.** A person stored as a person
+  account is never proposed by the scan, by a rule or by a source.
+- **Each lookup reads at most 5,000 related records.** If a source's values are so common
+  that a lookup reaches that limit, some pairs are missed and a warning naming the source is
+  written to the Error Log.
 
 ## Common mistakes
 

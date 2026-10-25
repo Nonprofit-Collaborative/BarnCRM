@@ -234,15 +234,19 @@ public with sharing class DuplicateSelector {
         for (Id setId : setIds == null ? new Set<Id>() : setIds) {
             keys.add(String.valueOf(setId));
         }
-        // A reviewer without a BarnCRM role reads no reasons and sees the rule's name instead.
-        if (keys.isEmpty() || !Schema.SObjectType.Duplicate_Reason__c.isAccessible()) {
+        if (keys.isEmpty()) {
             return new List<Duplicate_Reason__c>();
         }
+        // System mode on purpose: a reason holds nothing sensitive, only the label of the match
+        // source that found the pair ("Same email on Contact Point Email"), and it is read only
+        // for suggestions the reviewer can already see. Reading it in user mode would hide why
+        // a pair is listed from a reviewer who holds Duplicate Review but no BarnCRM role.
+        // Writes and deletes stay in user mode (DuplicateService).
         return [
             SELECT Id, Set_Id__c, Reason__c
             FROM Duplicate_Reason__c
             WHERE Set_Id__c IN :keys
-            WITH USER_MODE
+            WITH SYSTEM_MODE
         ];
     }
 
