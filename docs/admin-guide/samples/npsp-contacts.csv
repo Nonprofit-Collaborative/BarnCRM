@@ -1,3 +1,3 @@
-Salutation,FirstName,LastName,Title,Birthdate,Email,npe01__HomeEmail__c,npe01__WorkEmail__c,npe01__AlternateEmail__c,npe01__Preferred_Email__c,Phone,HomePhone,MobilePhone,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry,npsp__Deceased__c,HasOptedOutOfEmail,DoNotCall
-Ms.,Ana,Okafor,Engineer,1980-06-01,ana.okafor@example.org,ana.okafor@example.org,aokafor@example.com,,Personal,,,,,Portland,,97201,,false,false,false
-,Robert,Hale,,,,,,,,,,,,,,,,true,false,true
+Salutation,FirstName,LastName,Title,Birthdate,Email,npe01__HomeEmail__c,npe01__WorkEmail__c,npe01__AlternateEmail__c,npe01__Preferred_Email__c,Phone,HomePhone,MobilePhone,npe01__WorkPhone__c,npe01__PreferredPhone__c,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry,npsp__Deceased__c,HasOptedOutOfEmail,DoNotCall
+Ms.,Ana,Okafor,Engineer,1980-06-01,ana.okafor@example.org,ana.okafor@example.org,aokafor@example.com,,Personal,,503-555-0103,503-555-0102,503-555-0105,Work,,Portland,,97201,,false,false,false
+,Robert,Hale,,,,,,,,,503-555-0106,,,Household,,,,,,true,false,true
