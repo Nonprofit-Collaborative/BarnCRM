@@ -862,7 +862,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase a person: why volunteer hours are kept</shortDescription>
-        <value>Kept with their dates and hours, credited to the anonymous record, so totals stay right. Notes on them are emptied.</value>
+        <value>Kept with their dates and hours, credited to the anonymous record, so totals stay right. Notes and Rejection Reasons on them are emptied.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Erase_SignupsKept</fullName>
@@ -1215,14 +1215,6 @@
         <protected>false</protected>
         <shortDescription>Erase preview and result: the hour letter files BarnCRM generated</shortDescription>
         <value>Hour letters and certificates</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Erase_RejectionReasonKept</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: why the Rejection Reason on hours is kept</shortDescription>
-        <value>Rejection Reason kept: a coordinator wrote why the entry was refused, and only the approval screen changes it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_NeedsManageSettings</fullName>
