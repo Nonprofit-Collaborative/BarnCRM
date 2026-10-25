@@ -533,7 +533,7 @@ private class VolunteersErasureExtensionTest {
     }
 
     @IsTest
-    static void listsTheRejectionReasonsItKeeps() {
+    static void emptiesTheRejectionReasonsAndListsThemAsCleared() {
         System.runAs(eraser()) {
             VolunteersTestData.contactModeWithoutAutomaticHouseholds();
             VolunteersTestData.volunteerSettings(true, true);
@@ -550,30 +550,33 @@ private class VolunteersErasureExtensionTest {
 
             Boolean listed = false;
             for (
-                Map<String, Object> kept : changesLabelled(
+                Map<String, Object> cleared : changesLabelled(
                     preview,
                     Volunteer_Hours__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                         .getLabelPlural(),
-                    PersonErasure.KEPT
+                    PersonErasure.CLEARED
                 )
             ) {
-                if (kept.get('note') == Label.Volunteers_Erase_RejectionReasonKept) {
-                    Assert.areEqual(1, kept.get('count'), 'One entry has a reason');
+                if (
+                    JSON.serialize(cleared)
+                        .contains(Volunteer_Hours__c.Rejection_Reason__c.getDescribe().getLabel())
+                ) {
                     listed = true;
                 }
             }
-            Assert.isTrue(listed, 'The preview lists the kept Rejection Reason');
+            Assert.isTrue(listed, 'The preview lists the Rejection Reason as cleared');
 
             Test.startTest();
             PersonErasure.erase(jordan.Id, 'Ana Lee', null);
             Test.stopTest();
 
-            Assert.areEqual(
-                'Entered twice',
-                [SELECT Rejection_Reason__c FROM Volunteer_Hours__c WHERE Id = :entries[0].Id]
-                .Rejection_Reason__c,
-                'The reason is kept'
-            );
+            Volunteer_Hours__c rejected = [
+                SELECT Rejection_Reason__c, Status__c
+                FROM Volunteer_Hours__c
+                WHERE Id = :entries[0].Id
+            ];
+            Assert.isNull(rejected.Rejection_Reason__c, 'The reason is emptied');
+            Assert.areEqual('Rejected', rejected.Status__c, 'The entry stays Rejected');
         }
     }
 
