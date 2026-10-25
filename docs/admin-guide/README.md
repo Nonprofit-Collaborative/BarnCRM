@@ -140,6 +140,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving | v0.4 |
 | G-18 In-kind gifts | [in-kind-gifts.md](in-kind-gifts.md) | Giving | v0.4 |
 | C-25 Multiple email addresses on a person | [emails.md](emails.md) | Core | v0.5 |
+| C-25 Preferred phone on a person | [preferred-phone.md](preferred-phone.md) | Core | v0.8 |
 | G-17 Gift batches | [gift-batches.md](gift-batches.md) | Giving | v0.5 |
 | C-20 Duplicates | [duplicates.md](duplicates.md) | Core | v0.5 |
 | G-23 and G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Giving | v0.5 |

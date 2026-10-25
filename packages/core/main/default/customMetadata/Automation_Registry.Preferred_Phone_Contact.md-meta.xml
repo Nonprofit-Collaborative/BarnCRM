@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Copy preferred phone on a person</label>
+  <protected>true</protected>
+  <values>
+    <field>Enabled_By_Default__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies the number a person chose as preferred (home, mobile, work or other) into their standard phone when the person is saved. It is separate from household upkeep, so switching household upkeep off does not stop it. Switch this off and the standard phone is left as typed.</value>
+  </values>
+  <values>
+    <field>Handler_Class__c</field>
+    <value xsi:type="xsd:string">PreferredPhoneContactHandler</value>
+  </values>
+  <values>
+    <field>Object_Name__c</field>
+    <value xsi:type="xsd:string">Contact</value>
+  </values>
+  <values>
+    <field>Execution_Order__c</field>
+    <value xsi:type="xsd:double">16</value>
+  </values>
+</CustomMetadata>

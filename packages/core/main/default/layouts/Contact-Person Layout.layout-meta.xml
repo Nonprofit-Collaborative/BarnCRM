@@ -64,6 +64,14 @@
         <behavior>Edit</behavior>
         <field>Phone</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Work_Phone__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Preferred_Phone__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>

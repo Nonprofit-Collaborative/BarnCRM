@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Phones_PreferredEmpty</fullName>
+        <categories>Phones</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save refused: the preferred phone is empty; {0} is its kind, such as Mobile</shortDescription>
+        <value>The {0} phone number is empty, so there is nothing to put in the ordinary Phone box. Type that number in, or choose a different preferred phone.</value>
+    </labels>
+</CustomLabels>

@@ -117,16 +117,16 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Name of the Preferred email feature in Settings, General.</shortDescription>
-        <value>Preferred email</value>
+        <shortDescription>Name of the Preferred email and phone feature in Settings, General.</shortDescription>
+        <value>Preferred email and phone</value>
     </labels>
     <labels>
         <fullName>Core_Feature_PreferredEmail_Description</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>What the Preferred email feature covers.</shortDescription>
-        <value>Copies the email address a person prefers into the standard Email field.</value>
+        <shortDescription>What the Preferred email and phone feature covers.</shortDescription>
+        <value>Copies the email address and the phone number a person prefers into the standard Email and Phone fields.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_OneWayWarning</fullName>
