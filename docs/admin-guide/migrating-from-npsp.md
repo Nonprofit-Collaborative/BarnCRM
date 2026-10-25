@@ -73,7 +73,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
    ```sql
    SELECT Salutation, FirstName, LastName, Title, Birthdate, Email, npe01__HomeEmail__c,
        npe01__WorkEmail__c, npe01__AlternateEmail__c, npe01__Preferred_Email__c, Phone,
-       HomePhone, MobilePhone, MailingStreet, MailingCity, MailingState, MailingPostalCode,
+       HomePhone, MobilePhone, npe01__WorkPhone__c, npe01__PreferredPhone__c, MailingStreet, MailingCity, MailingState, MailingPostalCode,
        MailingCountry, npsp__Deceased__c, HasOptedOutOfEmail, DoNotCall
    FROM Contact
    ```
@@ -230,4 +230,6 @@ their capitals.
 | `Salutation`, `FirstName`, `LastName`, `Title`, `Birthdate`, `Email`, `Phone`, `HomePhone`, `MobilePhone`, the mailing address, `HasOptedOutOfEmail`, `DoNotCall` | The person's field of the same name |
 | `npe01__HomeEmail__c`, `npe01__WorkEmail__c`, `npe01__AlternateEmail__c` | Personal, work and alternate email |
 | `npe01__Preferred_Email__c` | Preferred email (Personal, Work or Alternate, the same words as NPSP) |
+| `npe01__WorkPhone__c` | Work phone |
+| `npe01__PreferredPhone__c` | Preferred phone (Home, Mobile, Work or Other, the same words as NPSP). Any other value, such as "Household", loads as an empty Preferred Phone, so the ordinary Phone is left as it was exported |
 | `npsp__Deceased__c` | Deceased |
