@@ -1,6 +1,6 @@
 /**
  * Match sources: which ones an org can use, and how their values are made comparable
- * (ADR-NEXT, `NEXT-related-record-matching.md`).
+ * (ADR-0133, `0133-related-record-matching.md`).
  */
 @IsTest(testFor='ApexClass:MatchSourceService')
 private class MatchSourceServiceTest {
@@ -131,7 +131,13 @@ private class MatchSourceServiceTest {
                 names.add(source.developerName);
             }
             Assert.isTrue(
-                names.containsAll(new Set<String>{ 'Address_Person', 'Address_Household' }),
+                names.containsAll(
+                    new Set<String>{
+                        'Address_Person',
+                        'Address_Household',
+                        'Address_Person_Account'
+                    }
+                ),
                 'Core\'s own address object is in every org: ' + names
             );
         }

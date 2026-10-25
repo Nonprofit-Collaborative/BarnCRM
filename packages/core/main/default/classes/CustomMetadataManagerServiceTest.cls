@@ -385,8 +385,8 @@ private class CustomMetadataManagerServiceTest {
                 'The eleven shipped relationship types are read'
             );
             Assert.isTrue(
-                shippedByType.get(SOURCE_TYPE) >= 5,
-                'The five shipped match sources are read'
+                shippedByType.get(SOURCE_TYPE) >= 6,
+                'The six shipped match sources are read'
             );
         }
     }
@@ -533,6 +533,16 @@ private class CustomMetadataManagerServiceTest {
             String notLookup = sourceRefusal(
                 sourceInput('Address__c', 'Street__c', null, 'City__c', 'Email')
             );
+            // OwnerId is a lookup, but to a user: no person or household behind it.
+            String notAPersonLookup = sourceRefusal(
+                sourceInput('Contact', 'Email', null, 'OwnerId', 'Email')
+            );
+            String notText = sourceRefusal(
+                sourceInput('Address__c', 'Is_Default__c', null, 'Contact__c', 'Email')
+            );
+            String postalNotText = sourceRefusal(
+                sourceInput('Address__c', 'Street__c', 'Is_Default__c', 'Contact__c', 'Address')
+            );
             String noPostal = sourceRefusal(
                 sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Address')
             );
@@ -560,6 +570,19 @@ private class CustomMetadataManagerServiceTest {
                 notLookup.contains('City__c'),
                 'A parent that is not a lookup: ' + notLookup
             );
+            Assert.isTrue(
+                notAPersonLookup != null && notAPersonLookup.contains('OwnerId'),
+                'A lookup to anything but a contact, account or Individual: ' + notAPersonLookup
+            );
+            String notTextMessage = String.format(
+                Label.Core_MatchSource_NotFilterableText,
+                new List<Object>{
+                    Address__c.Is_Default__c.getDescribe().getLabel(),
+                    Schema.SObjectType.Address__c.getLabel()
+                }
+            );
+            Assert.areEqual(notTextMessage, notText, 'A value field that is not text');
+            Assert.areEqual(notTextMessage, postalNotText, 'A postal field that is not text');
             Assert.areEqual(
                 Label.Core_MatchSource_PostalRequired,
                 noPostal,

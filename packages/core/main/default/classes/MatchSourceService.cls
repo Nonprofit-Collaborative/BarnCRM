@@ -1,6 +1,6 @@
 /**
  * Match sources: related records whose values pair people or households as likely duplicates
- * (ADR-NEXT, `NEXT-related-record-matching.md`; canonical model Section 13, Match Source).
+ * (ADR-0133, `0133-related-record-matching.md`; canonical model Section 13, Match Source).
  *
  * A duplicate rule compares fields on the record itself, so an email kept only on a related
  * record is never compared. A source names that related object, the field holding the value,
@@ -212,8 +212,10 @@ public with sharing class MatchSourceService {
 
     /**
      * Throws with a message the page shows as it is unless the object exists, the value field
-     * exists, the parent field is a lookup, and an address source names a postal code field
-     * that exists.
+     * exists and is text a query can filter on, the parent field is a lookup to a Contact, an
+     * Account or an Individual (the only parents a source resolves), and an address source
+     * names a postal code field that exists and is filterable text too. The lookups filter on
+     * the value and postal fields, so a field a query cannot filter would fail every run.
      */
     public static void validate(Map<String, Object> values) {
         String objectName = (String) values.get('Object_Name__c');
@@ -225,13 +227,16 @@ public with sharing class MatchSourceService {
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         Map<String, Schema.SObjectField> fields = described.fields.getMap();
-        requireField(fields, (String) values.get('Value_Field__c'), described.getLabel());
+        requireText(
+            requireField(fields, (String) values.get('Value_Field__c'), described.getLabel()),
+            described.getLabel()
+        );
         Schema.SObjectField parent = requireField(
             fields,
             (String) values.get('Parent_Field__c'),
             described.getLabel()
         );
-        if (parent.getDescribe().getType() != Schema.DisplayType.REFERENCE) {
+        if (!isPersonOrHouseholdLookup(parent)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
                     Label.Core_MatchSource_NotALookup,
@@ -246,7 +251,52 @@ public with sharing class MatchSourceService {
                     Label.Core_MatchSource_PostalRequired
                 );
             }
-            requireField(fields, postal, described.getLabel());
+            requireText(requireField(fields, postal, described.getLabel()), described.getLabel());
+        }
+    }
+
+    /** The parents a source can resolve to a person or a household. */
+    private static final Set<String> PARENT_OBJECTS = new Set<String>{
+        'Contact',
+        'Account',
+        'Individual'
+    };
+
+    private static Boolean isPersonOrHouseholdLookup(Schema.SObjectField token) {
+        Schema.DescribeFieldResult described = token.getDescribe();
+        if (described.getType() != Schema.DisplayType.REFERENCE) {
+            return false;
+        }
+        for (Schema.SObjectType referenced : described.getReferenceTo()) {
+            if (
+                PARENT_OBJECTS.contains(
+                    referenced.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Field types holding text a value can be read from and filtered on. */
+    private static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE,
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.URL
+    };
+
+    private static void requireText(Schema.SObjectField token, String objectLabel) {
+        Schema.DescribeFieldResult described = token.getDescribe();
+        if (!TEXT_TYPES.contains(described.getType()) || !described.isFilterable()) {
+            throw new CustomMetadataManagerService.CustomMetadataManagerException(
+                String.format(
+                    Label.Core_MatchSource_NotFilterableText,
+                    new List<Object>{ described.getLabel(), objectLabel }
+                )
+            );
         }
     }
 

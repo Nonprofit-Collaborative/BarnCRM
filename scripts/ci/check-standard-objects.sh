@@ -72,8 +72,8 @@
 # -------------
 # A shipped match source (customMetadata/Match_Source.*.md-meta.xml) names a related object
 # such as ContactPointEmail as text. MatchSourceService resolves it through describe at run
-# time and skips a source whose object is absent, so the word refuses no deployment (ADR-NEXT,
-# NEXT-related-record-matching.md). These files are listed with the template headings, by
+# time and skips a source whose object is absent, so the word refuses no deployment (ADR-0133,
+# 0133-related-record-matching.md). These files are listed with the template headings, by
 # path, on the same terms: safe only while Match_Source has no MetadataRelationship field.
 
 set -euo pipefail
