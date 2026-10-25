@@ -124,6 +124,257 @@ public with sharing class MatchSourceService {
         return token != null && token.getDescribe().isAccessible();
     }
 
+    // ------------------------------------------------------------------ matching
+
+    /**
+     * A value held by more people or households than this is not used: an office switchboard
+     * or a shared mailbox says nothing about whether two of them are the same.
+     */
+    @TestVisible
+    private static final Integer MAX_OWNERS_PER_VALUE = 10;
+
+    private static final String INDIVIDUAL = 'Individual';
+    private static final String INDIVIDUAL_FIELD = 'IndividualId';
+
+    private static Boolean contactCarriesIndividual;
+
+    /** Whether Contact has IndividualId in this org, read by name (ADR-0013). */
+    private static Boolean contactCarriesIndividual() {
+        if (contactCarriesIndividual == null) {
+            contactCarriesIndividual = Schema.SObjectType.Contact.fields.getMap()
+                .containsKey(INDIVIDUAL_FIELD.toLowerCase());
+        }
+        return contactCarriesIndividual;
+    }
+
+    private static Boolean isIndividual(Schema.SObjectType type) {
+        return type != null &&
+            type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() == INDIVIDUAL;
+    }
+
+    /**
+     * Whether a source's parent can be a record of this object: its lookup points there, or,
+     * for people, at an Individual the contacts carry.
+     */
+    @TestVisible
+    private static Boolean appliesTo(Source source, Schema.SObjectType target) {
+        for (
+            Schema.SObjectType referenced : source.objectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .fields.getMap()
+                .get(source.parentField)
+                .getDescribe()
+                .getReferenceTo()
+        ) {
+            if (
+                referenced == target ||
+                (target == Contact.SObjectType &&
+                isIndividual(referenced) &&
+                contactCarriesIndividual())
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** What the review list says about a pair a source found. */
+    public static String reasonFor(Source source) {
+        String format = source.normalization == EMAIL
+            ? Label.Core_Duplicates_ReasonEmail
+            : source.normalization == PHONE
+                  ? Label.Core_Duplicates_ReasonPhone
+                  : Label.Core_Duplicates_ReasonAddress;
+        return String.format(format, new List<Object>{ source.label });
+    }
+
+    /**
+     * The pairs the active sources find among these records, which must all be of one object
+     * (people or accounts): each record paired with every other record of that object that
+     * holds the same normalized value on the same source. Each pair carries the source's
+     * reason and no rule. A pair may appear twice; DuplicateService.pairsToRecord folds it.
+     */
+    public static List<DuplicateService.Pair> pairsFor(List<Id> recordIds) {
+        List<DuplicateService.Pair> result = new List<DuplicateService.Pair>();
+        if (recordIds == null || recordIds.isEmpty()) {
+            return result;
+        }
+        Schema.SObjectType target = recordIds[0].getSObjectType();
+        Set<Id> records = new Set<Id>(recordIds);
+        for (Source source : usableSources()) {
+            if (!appliesTo(source, target)) {
+                continue;
+            }
+            try {
+                result.addAll(pairsOn(source, target, records));
+            } catch (Exception caught) {
+                // One source that cannot be read is logged and counted; the rest still run.
+                DuplicateService.failureCount++;
+                ErrorLogger.log(caught, CONTEXT + source.developerName);
+            }
+        }
+        return result;
+    }
+
+    private static final String CONTEXT = 'Duplicate scan: matching through source ';
+
+    private static List<DuplicateService.Pair> pairsOn(
+        Source source,
+        Schema.SObjectType target,
+        Set<Id> records
+    ) {
+        List<DuplicateService.Pair> result = new List<DuplicateService.Pair>();
+        Map<String, Set<Id>> heldHere = owners(
+            source,
+            target,
+            MatchSourceSelector.rowsByParents(source, parentIdsOf(target, records)),
+            records
+        );
+        if (heldHere.isEmpty()) {
+            return result;
+        }
+        Map<String, Set<Id>> holders = ownersOf(source, target, heldHere.keySet());
+        String reason = reasonFor(source);
+        for (String key : heldHere.keySet()) {
+            Set<Id> everyone = holders.get(key);
+            if (everyone == null || everyone.size() > MAX_OWNERS_PER_VALUE) {
+                continue;
+            }
+            for (Id mine : heldHere.get(key)) {
+                for (Id other : everyone) {
+                    if (other != mine) {
+                        DuplicateService.Pair pair = new DuplicateService.Pair(mine, other, null);
+                        pair.reason = reason;
+                        result.add(pair);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Every record of the target object holding each of these keys on this source, found
+     * with one bounded query and compared exactly after normalization.
+     */
+    public static Map<String, Set<Id>> ownersOf(
+        Source source,
+        Schema.SObjectType target,
+        Set<String> keys
+    ) {
+        Set<String> equalTo = new Set<String>();
+        Set<String> patterns = new Set<String>();
+        String likeField = null;
+        for (String key : keys) {
+            if (source.normalization == EMAIL) {
+                equalTo.add(key);
+            } else if (source.normalization == PHONE) {
+                likeField = source.valueField;
+                patterns.add(spread(key));
+            } else {
+                likeField = source.postalField;
+                patterns.add(spread(key.substringAfterLast('|')).removeStart('%'));
+            }
+        }
+        List<SObject> rows = MatchSourceSelector.rowsByValues(
+            source,
+            equalTo,
+            likeField,
+            new List<String>(patterns)
+        );
+        Map<String, Set<Id>> found = owners(source, target, rows, null);
+        Map<String, Set<Id>> result = new Map<String, Set<Id>>();
+        for (String key : keys) {
+            if (found.containsKey(key)) {
+                result.put(key, found.get(key));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * A LIKE pattern matching the characters in order with anything between them, so (555)
+     * 123-4567 and +1 555.123.4567 are both read for 5551234567. Letters and digits only.
+     */
+    @TestVisible
+    private static String spread(String value) {
+        List<String> characters = value.replaceAll('[^A-Za-z0-9]', '').split('');
+        return '%' + String.join(characters, '%') + '%';
+    }
+
+    /** The records whose source rows are looked up: the records, and their Individuals. */
+    private static Set<Id> parentIdsOf(Schema.SObjectType target, Set<Id> records) {
+        Set<Id> parents = new Set<Id>(records);
+        if (target == Contact.SObjectType && contactCarriesIndividual()) {
+            for (Contact person : MatchSourceSelector.contactsWithIndividuals(records, null)) {
+                parents.add((Id) person.get(INDIVIDUAL_FIELD));
+            }
+        }
+        return parents;
+    }
+
+    /**
+     * Normalized key to the target records that hold it, out of source rows. A parent of the
+     * target object is itself; an Individual is every contact carrying it; anything else is
+     * skipped. With `onlyThese`, other records are left out.
+     */
+    private static Map<String, Set<Id>> owners(
+        Source source,
+        Schema.SObjectType target,
+        List<SObject> rows,
+        Set<Id> onlyThese
+    ) {
+        Set<Id> individuals = new Set<Id>();
+        for (SObject row : rows) {
+            Id parent = (Id) row.get(source.parentField);
+            if (parent != null && isIndividual(parent.getSObjectType())) {
+                individuals.add(parent);
+            }
+        }
+        Map<Id, Set<Id>> contactsByIndividual = new Map<Id, Set<Id>>();
+        if (target == Contact.SObjectType && !individuals.isEmpty() && contactCarriesIndividual()) {
+            for (Contact person : MatchSourceSelector.contactsWithIndividuals(null, individuals)) {
+                Id individual = (Id) person.get(INDIVIDUAL_FIELD);
+                if (!contactsByIndividual.containsKey(individual)) {
+                    contactsByIndividual.put(individual, new Set<Id>());
+                }
+                contactsByIndividual.get(individual).add(person.Id);
+            }
+        }
+        Map<String, Set<Id>> result = new Map<String, Set<Id>>();
+        for (SObject row : rows) {
+            Id parent = (Id) row.get(source.parentField);
+            String key = key(
+                source.normalization,
+                text(row.get(source.valueField)),
+                source.postalField == null ? null : text(row.get(source.postalField))
+            );
+            if (parent == null || key == null) {
+                continue;
+            }
+            Set<Id> holders = parent.getSObjectType() == target
+                ? new Set<Id>{ parent }
+                : contactsByIndividual.get(parent);
+            if (holders == null) {
+                continue;
+            }
+            for (Id holder : holders) {
+                if (onlyThese == null || onlyThese.contains(holder)) {
+                    if (!result.containsKey(key)) {
+                        result.put(key, new Set<Id>());
+                    }
+                    result.get(key).add(holder);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static String text(Object value) {
+        return value == null ? null : String.valueOf(value);
+    }
+
     // ------------------------------------------------------------------ normalization
 
     /**

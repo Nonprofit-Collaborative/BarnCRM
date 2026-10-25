@@ -376,4 +376,28 @@
         <shortDescription>Duplicates panel: view dismissed pairs link</shortDescription>
         <value>View</value>
     </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonEmail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same email on {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonPhone</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same phone on {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonAddress</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same address on {0}</value>
+    </labels>
 </CustomLabels>

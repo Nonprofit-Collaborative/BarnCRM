@@ -228,6 +228,24 @@ public with sharing class DuplicateSelector {
         ];
     }
 
+    /** The reasons written for these suggestions by a match source (R-DP6). */
+    public static List<Duplicate_Reason__c> reasonRows(Set<Id> setIds) {
+        Set<String> keys = new Set<String>();
+        for (Id setId : setIds == null ? new Set<Id>() : setIds) {
+            keys.add(String.valueOf(setId));
+        }
+        // A reviewer without a BarnCRM role reads no reasons and sees the rule's name instead.
+        if (keys.isEmpty() || !Schema.SObjectType.Duplicate_Reason__c.isAccessible()) {
+            return new List<Duplicate_Reason__c>();
+        }
+        return [
+            SELECT Id, Set_Id__c, Reason__c
+            FROM Duplicate_Reason__c
+            WHERE Set_Id__c IN :keys
+            WITH USER_MODE
+        ];
+    }
+
     /** The pairs among these that somebody already said are not duplicates. */
     public static Set<String> dismissedKeys(Set<String> pairKeys) {
         Set<String> result = new Set<String>();

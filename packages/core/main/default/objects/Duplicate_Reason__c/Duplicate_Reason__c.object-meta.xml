@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    Why the duplicate scan proposed a suggestion it found through a match source rather than a
+    duplicate rule, for example Same email on Contact Point Email (canonical model Section 29A,
+    rule R-DP6). One per duplicate record set, keyed by its identifier, and deleted with the
+    suggestion. Public read and write, like Duplicate Dismissal.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Duplicate Reason</label>
+  <nameField>
+    <displayFormat>DR-{000000}</displayFormat>
+    <label>Duplicate Reason Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Duplicate Reasons</pluralLabel>
+  <sharingModel>ReadWrite</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

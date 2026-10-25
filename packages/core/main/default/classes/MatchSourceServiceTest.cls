@@ -136,4 +136,176 @@ private class MatchSourceServiceTest {
             );
         }
     }
+
+    // ------------------------------------------------------------------ matching
+
+    private static Set<String> keysOf(List<DuplicateService.Pair> pairs) {
+        Set<String> keys = new Set<String>();
+        for (DuplicateService.Pair pair : pairs) {
+            keys.add(pair.key);
+        }
+        return keys;
+    }
+
+    private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
+        Database.DMLOptions options = new Database.DMLOptions();
+        options.DuplicateRuleHeader.allowSave = true;
+        Database.insert(records, options);
+        return records;
+    }
+
+    @IsTest
+    static void peopleSharingAnAddressHeldOnlyOnAddressRecordsArePaired() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row(
+                    'Address_Person',
+                    'Address__c',
+                    'Street__c',
+                    'Postal_Code__c',
+                    'Contact__c',
+                    'Address'
+                )
+            };
+            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+                new List<Contact>{
+                    new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
+                    new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez'),
+                    new Contact(FirstName = 'Ben', LastName = 'Okafor')
+                }
+            );
+            insert new List<Address__c>{
+                new Address__c(
+                    Contact__c = people[0].Id,
+                    Street__c = '12 North Main Street',
+                    Postal_Code__c = '02139'
+                ),
+                new Address__c(
+                    Contact__c = people[1].Id,
+                    Street__c = '12 n. MAIN st',
+                    Postal_Code__c = '02139-4307'
+                ),
+                new Address__c(
+                    Contact__c = people[2].Id,
+                    Street__c = '99 Elm Road',
+                    Postal_Code__c = '02139'
+                )
+            };
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id, people[2].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(people[0].Id, people[1].Id) },
+                keysOf(pairs),
+                'Only the two people at the same address, written two ways'
+            );
+            Assert.areEqual('Same address on Address_Person', pairs[0].reason, 'Names the source');
+            Assert.isNull(pairs[0].ruleName, 'No rule found it');
+        }
+    }
+
+    @IsTest
+    static void householdsWhosePeopleShareAPhoneArePairedWhateverItsFormat() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Phone', 'Contact', 'Phone', null, 'AccountId', 'Phone')
+            };
+            List<Account> homes = new List<Account>{
+                AddressTestDataFactory.newHousehold('Lee Household'),
+                AddressTestDataFactory.newHousehold('Li Household'),
+                AddressTestDataFactory.newHousehold('Park Household')
+            };
+            insertAllowingDuplicates(homes);
+            List<String> phones = new List<String>{
+                '(555) 123-4567',
+                '+1 555.123.4567',
+                '555 999 0000'
+            };
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < homes.size(); index++) {
+                Contact person = AddressTestDataFactory.newContact(
+                    'Sam',
+                    'Member' + index,
+                    homes[index].Id
+                );
+                person.Phone = phones[index];
+                people.add(person);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id, homes[2].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(homes[0].Id, homes[1].Id) },
+                keysOf(pairs),
+                'The two households with the same number, however it is written'
+            );
+            Assert.areEqual('Same phone on Member_Phone', pairs[0].reason, 'Names the source');
+        }
+    }
+
+    @IsTest
+    static void aValueHeldByMoreThanTenIsNotUsed() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
+            };
+            List<Account> homes = new List<Account>();
+            for (Integer index = 0; index <= MatchSourceService.MAX_OWNERS_PER_VALUE; index++) {
+                homes.add(AddressTestDataFactory.newHousehold('Office ' + index));
+            }
+            insertAllowingDuplicates(homes);
+            List<Contact> people = new List<Contact>();
+            for (Account home : homes) {
+                Contact person = AddressTestDataFactory.newContact('Front', 'Desk', home.Id);
+                person.Email = 'info@shared-office.example.org';
+                people.add(person);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id }
+            );
+            Test.stopTest();
+
+            Assert.isTrue(pairs.isEmpty(), 'A shared mailbox pairs nobody: ' + pairs.size());
+        }
+    }
+
+    @IsTest
+    static void aSourceThatCannotPointAtTheRecordsIsNotAsked() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row(
+                    'Address_Household',
+                    'Address__c',
+                    'Street__c',
+                    'Postal_Code__c',
+                    'Account__c',
+                    'Address'
+                )
+            };
+            Contact person = new Contact(FirstName = 'Ida', LastName = 'Nobody');
+            insert person;
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ person.Id }
+            );
+            Integer queries = Limits.getQueries();
+            Test.stopTest();
+
+            Assert.isTrue(pairs.isEmpty(), 'A household source finds no people');
+            Assert.isTrue(queries <= 2, 'Only the sources are read, never the rows: ' + queries);
+        }
+    }
 }
