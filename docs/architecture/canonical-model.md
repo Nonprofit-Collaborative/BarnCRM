@@ -6210,18 +6210,27 @@ removes the grouping and never touches the records. An administrator can delete 
 which is how a pair is put back in front of a reviewer. A household merge from the review
 page deletes the suggestion without a dismissal, because the pair no longer exists.
 
-**R-DP6 Related records add pairs the rules cannot see** (ADR-NEXT,
-`NEXT-related-record-matching.md`). In each chunk of the scan, after the rules are asked, the
+**R-DP6 Related records add pairs the rules cannot see** (ADR-0133,
+`0133-related-record-matching.md`). In each chunk of the scan, after the rules are asked, the
 active match sources (`Match_Source__mdt`, Section 13) that can point at the chunk's object are
 read: each record's values on the source are normalized, the other records holding the same
 value are found, and each pair is added with a reason naming the source ("Same email on
 Contact Point Email"). A parent resolves to a Contact or an Account as itself, an Individual to
-the contacts carrying it; anything else is skipped. A value held by more than ten records is
-not used. A pair a rule also found is written once, as the rule's; R-DP2 to R-DP5 apply as to
-any pair. The set still names an active rule for the object, as the platform requires, so a
-pass with no active rule writes no source pair either. The reason is kept in a Duplicate
-Reason row and shown on the review list (the rule's name is shown otherwise); it is deleted
-with its suggestion. A source that cannot be read is logged and counted as a failure.
+the contacts carrying it (and, for accounts, the person accounts carrying it); anything else is
+skipped. A value held by more than ten records is not used. Two people in the same household
+are not paired by a Phone or Address source (sharing a home phone or address is what a
+household is); an Email source still pairs them. Phone and address candidates are read with at
+most 100 patterns to a query, an address by its postal code with the street's first word
+normalization leaves as written; a lookup that reaches its 5,000 row cap is logged as a
+warning, once per source per transaction. A pair a rule also found is written once, as the
+rule's; R-DP2 to R-DP5 apply as to any pair. The set still names an active rule for the
+object, as the platform requires (any active rule stands in, so Salesforce's own Duplicate
+Record Sets tab shows the pair under that rule), and a pass with no active rule writes no
+source pair either. The reason is kept in a Duplicate Reason row and shown on the review list
+(the rule's name is shown otherwise), read in system mode since it holds only a source's label;
+it is deleted with its suggestion when dismissed or closed by a merge. A reason row whose set
+is gone any other way is never read again and is harmless. A source that cannot be read is
+logged and counted as a failure.
 
 ### Salesforce implementation
 

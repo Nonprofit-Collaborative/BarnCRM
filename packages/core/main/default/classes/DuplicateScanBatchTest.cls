@@ -388,4 +388,114 @@ private class DuplicateScanBatchTest {
             );
         }
     }
+
+    @IsTest
+    static void aSourcePairsReasonGoesWhenItsSuggestionIsClosedByAMerge() {
+        System.runAs(TestUsers.admin()) {
+            List<Contact> people = neighboursOnlyBySource();
+            DuplicateService.stubMatches = new List<DuplicateService.Pair>();
+            Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
+                new Set<String>{ 'Contact' }
+            );
+            Integer written = DuplicateScanBatch.scanChunk(people, rules);
+            if (!ruleActiveFor('Contact')) {
+                // Skipped: the platform requires an active rule behind every suggestion.
+                Assert.areEqual(0, written, 'With no active rule nothing is written.');
+                return;
+            }
+            DuplicateRecordSet suggestion = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
+            Assert.areEqual(1, [SELECT COUNT() FROM Duplicate_Reason__c], 'Reason written.');
+
+            Test.startTest();
+            DuplicateService.closeSet(suggestion.Id);
+            Test.stopTest();
+
+            Assert.areEqual(0, [SELECT COUNT() FROM DuplicateRecordSet], 'Suggestion closed.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Duplicate_Reason__c],
+                'The reason goes with a suggestion a merge closed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void peopleOfOneHouseholdArePairedByEmailButNotByAddress() {
+        System.runAs(TestUsers.admin()) {
+            Account home = AddressTestDataFactory.newHousehold('Sourcepair Household');
+            insertAllowingDuplicates(new List<Account>{ home });
+            List<Contact> people = new List<Contact>{
+                AddressTestDataFactory.newContact('Wen', 'Sourcepair', home.Id),
+                AddressTestDataFactory.newContact('Wendy', 'Sourcepair', home.Id)
+            };
+            insertAllowingDuplicates(people);
+            // Each address row also carries an email in City, read by a second source as an
+            // email held on a related record.
+            insert new List<Address__c>{
+                new Address__c(
+                    Contact__c = people[0].Id,
+                    Street__c = '4 Elm Avenue',
+                    Postal_Code__c = '60601',
+                    City__c = 'wen@sourcepair.example.org'
+                ),
+                new Address__c(
+                    Contact__c = people[1].Id,
+                    Street__c = '4 elm ave.',
+                    Postal_Code__c = '60601',
+                    City__c = 'WEN@sourcepair.example.org'
+                )
+            };
+            Assert.areEqual(
+                HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[0].Id }).get(people[0].Id),
+                HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[1].Id }).get(people[1].Id),
+                'Both in one household'
+            );
+
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                (Match_Source__mdt) JSON.deserialize(
+                    JSON.serialize(
+                        new Map<String, Object>{
+                            'DeveloperName' => 'Address_Person',
+                            'MasterLabel' => 'Address (person)',
+                            NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+                            NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
+                            NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
+                            NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+                            NamespaceUtil.qualify('Normalization__c') => 'Address'
+                        }
+                    ),
+                    Match_Source__mdt.class
+                ),
+                (Match_Source__mdt) JSON.deserialize(
+                    JSON.serialize(
+                        new Map<String, Object>{
+                            'DeveloperName' => 'Address_Email',
+                            'MasterLabel' => 'Address email',
+                            NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+                            NamespaceUtil.qualify('Value_Field__c') => 'City__c',
+                            NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+                            NamespaceUtil.qualify('Normalization__c') => 'Email'
+                        }
+                    ),
+                    Match_Source__mdt.class
+                )
+            };
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id }
+            );
+            Test.stopTest();
+
+            Set<String> reasons = new Set<String>();
+            for (DuplicateService.Pair pair : pairs) {
+                reasons.add(pair.reason);
+            }
+            Assert.areEqual(
+                new Set<String>{ 'Same email on Address email' },
+                reasons,
+                'One household: the shared email pairs them, the shared address does not'
+            );
+        }
+    }
 }
