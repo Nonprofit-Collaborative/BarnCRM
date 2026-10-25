@@ -1,6 +1,6 @@
 /**
  * Every query related-record matching makes (plan Section 7.2: every query lives in a
- * Selector). ADR-NEXT, `NEXT-related-record-matching.md`.
+ * Selector). ADR-0133, `0133-related-record-matching.md`.
  */
 public with sharing class MatchSourceSelector {
     @TestVisible

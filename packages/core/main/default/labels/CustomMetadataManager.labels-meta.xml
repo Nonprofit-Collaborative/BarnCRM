@@ -321,12 +321,20 @@
         <value>{0} is not a field on {1}. Check its API name.</value>
     </labels>
     <labels>
+        <fullName>Core_MatchSource_NotFilterableText</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Match source save refused: {0} is the field label, {1} the object</shortDescription>
+        <value>{0} on {1} cannot be matched on. The value and postal code fields have to be text, email or phone fields a search can filter on.</value>
+    </labels>
+    <labels>
         <fullName>Core_MatchSource_NotALookup</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Match source save refused: {0} is the parent field, {1} the object</shortDescription>
-        <value>{0} on {1} is not a lookup. The parent field has to link each value to its person, household or Individual.</value>
+        <value>{0} on {1} is not a lookup to a contact, account or Individual. The parent field has to link each value to its person, household or Individual.</value>
     </labels>
     <labels>
         <fullName>Core_MatchSource_PostalRequired</fullName>
