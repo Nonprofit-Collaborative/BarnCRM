@@ -537,4 +537,108 @@ private class ImportDuplicateRuleMatchTest {
             );
         }
     }
+
+    // ------------------------------------------------------------------ match sources
+
+    /** The one source in use: addresses held on Address records, by person. */
+    private static void addressSourceOnly() {
+        MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+            (Match_Source__mdt) JSON.deserialize(
+                JSON.serialize(
+                    new Map<String, Object>{
+                        'DeveloperName' => 'Address_Person',
+                        'MasterLabel' => 'Address (person)',
+                        NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+                        NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
+                        NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
+                        NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+                        NamespaceUtil.qualify('Normalization__c') => 'Address'
+                    }
+                ),
+                Match_Source__mdt.class
+            )
+        };
+    }
+
+    /** A people template matching by email, its rows giving a name and an address. */
+    private static void givenAddresses(List<Map<String, String>> values, Boolean useRules) {
+        ImportMapping mapping = new ImportMapping();
+        mapping.columns.add(new ImportMapping.Column('Last', 'Contact1.LastName'));
+        mapping.columns.add(new ImportMapping.Column('Street', 'Contact1.MailingStreet'));
+        mapping.columns.add(new ImportMapping.Column('Zip', 'Contact1.MailingPostalCode'));
+        template = ImportTestDataFactory.template(
+            mapping.serialize(),
+            ImportTemplateService.RULE_EMAIL
+        );
+        template.Use_Duplicate_Rules__c = useRules;
+        update template;
+        template = ImportTemplateSelector.selectById(template.Id);
+        batch = ImportTestDataFactory.batch(template);
+        ImportTestDataFactory.rows(batch, values);
+    }
+
+    @IsTest
+    static void aPersonTheRulesMissIsMatchedThroughARelatedRecord() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+            Contact existing = new Contact(LastName = 'Okonkwo');
+            insert existing;
+            insert new Address__c(
+                Contact__c = existing.Id,
+                Street__c = '7 Harbor Road',
+                Postal_Code__c = '04101'
+            );
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => 'Okonkwo-Bell',
+                        'Street' => '7 harbor rd.',
+                        'Zip' => '04101-2200'
+                    }
+                },
+                true
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Import_Row__c loaded = rows()[0];
+            Assert.areEqual(existing.Id, loaded.Contact_1__c, 'Loaded into the person: ' + loaded);
+            Assert.isTrue(loaded.Duplicate_Rule_Match__c, 'Ticked as a looser match.');
+            Assert.areEqual(0, committed.created, 'Nobody created.');
+            Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Still one person.');
+        }
+    }
+
+    @IsTest
+    static void withoutLooserMatchingTheSourcesAreNotAsked() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            Contact existing = new Contact(LastName = 'Okonkwo');
+            insert existing;
+            insert new Address__c(
+                Contact__c = existing.Id,
+                Street__c = '7 Harbor Road',
+                Postal_Code__c = '04101'
+            );
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => 'Okonkwo-Bell',
+                        'Street' => '7 Harbor Road',
+                        'Zip' => '04101'
+                    }
+                },
+                false
+            );
+
+            Test.startTest();
+            run(false);
+            Test.stopTest();
+
+            Assert.areNotEqual(existing.Id, rows()[0].Contact_1__c, 'A new person, as before.');
+        }
+    }
 }

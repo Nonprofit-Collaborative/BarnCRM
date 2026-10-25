@@ -149,6 +149,45 @@ public with sharing class ImportDuplicateRuleMatcher {
     }
 
     /**
+     * What the match sources match for each incoming person (R-IT16, ADR-NEXT
+     * `NEXT-related-record-matching.md`), in the same shape as `matchesFor`: the records of the
+     * object that hold one of the person's email, phone or address values on an active source,
+     * read back in the user's mode with the allowed record types. Values are keyed by Contact
+     * attribute name.
+     *
+     * @param type Contact, or Account for person accounts
+     * @param people each person's values
+     * @param allowedRecordTypes the record types a match may have, or null for any
+     */
+    @NamespaceAccessible
+    public static List<List<SObject>> matchesBySources(
+        Schema.SObjectType type,
+        List<Map<String, String>> people,
+        Set<Id> allowedRecordTypes
+    ) {
+        List<List<SObject>> result = new List<List<SObject>>();
+        if (people == null || people.isEmpty()) {
+            return result;
+        }
+        List<Set<Id>> holders = MatchSourceService.holdersOfPeople(type, people);
+        Set<Id> all = new Set<Id>();
+        for (Set<Id> ids : holders) {
+            all.addAll(ids);
+        }
+        Map<Id, SObject> visible = visible(type, all, allowedRecordTypes);
+        for (Set<Id> ids : holders) {
+            List<SObject> kept = new List<SObject>();
+            for (Id matched : ids) {
+                if (visible.containsKey(matched)) {
+                    kept.add(visible.get(matched));
+                }
+            }
+            result.add(kept);
+        }
+        return result;
+    }
+
+    /**
      * Whether the last `matchesFor` answered null because the matcher failed, with a rule
      * active or the rules unreadable, rather than because the object has no active rule. A
      * caller that must not create a duplicate rejects instead of creating then.

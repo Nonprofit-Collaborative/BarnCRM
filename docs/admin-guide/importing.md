@@ -542,6 +542,15 @@ record, **When more than one record matches** decides, as for any match. Only or
 taken for organizations, and only people for people, whatever the rule compares. The choice is
 saved with the mapping.
 
+The same box also asks your **match sources** (see
+[Custom metadata](custom-metadata.md#match-sources)) about a person the duplicate rules found
+nobody for: the row's email, its phones, and its mailing and other street with postal code are
+compared with the values on contact point records and BarnCRM addresses, in the same way the
+duplicate scan compares them. A person whose email is kept only on a contact point email record
+is found this way. These rows are ticked **Matched By Duplicate Rule** too, and follow **When
+more than one record matches** as well. Match sources are not asked about organizations, and
+not when the box is unticked. The sources are asked even when no duplicate rule is switched on.
+
 If no duplicate rule is switched on for people (or for organizations), the box changes nothing for
 them, the matching step says so, and the run log says the rule above was used alone. Where your
 org keeps people as person accounts, a contact import never takes a person account as the
