@@ -145,6 +145,18 @@
         <identifier>RecordField_PreferredEmail</identifier>
       </fieldInstance>
     </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Work_Phone__c</fieldItem>
+        <identifier>RecordField_WorkPhone</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Preferred_Phone__c</fieldItem>
+        <identifier>RecordField_PreferredPhone</identifier>
+      </fieldInstance>
+    </itemInstances>
     <name>Facet-reaching-column1</name>
     <type>Facet</type>
   </flexiPageRegions>

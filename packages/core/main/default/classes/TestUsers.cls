@@ -345,6 +345,8 @@ public class TestUsers {
             'Department',
             'Description',
             'HomePhone',
+            'MobilePhone',
+            'OtherPhone',
             'Title'
         }
     };

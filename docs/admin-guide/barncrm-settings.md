@@ -102,7 +102,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Addresses | Address capture and the default address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
 | Affiliations | The primary affiliation | Its automation |
-| Preferred email | Copying the preferred email into the standard email | Its two automations |
+| Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
 
 Rules that enforce data (relationship, affiliation and rollup definition checks) belong to no
 feature and always run. Once a feature is on, the Automation section still lets you pause any
