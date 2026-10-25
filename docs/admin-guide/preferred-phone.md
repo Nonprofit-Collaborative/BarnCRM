@@ -1,13 +1,13 @@
 # Preferred phone
 
-**Feature:** C-25 Multiple email addresses on a person, preferred phone extension (R-C6a)
+**Feature:** C-43 Preferred phone on a person (R-C6a)
 **Package:** Core
 
 ## What it does
 
-A person often has a home number, a mobile and another number. Salesforce lists, dialers and
-reports read the ordinary **Phone** box. BarnCRM adds one choice, **Preferred Phone**: Home,
-Mobile or Other. Whatever you choose is copied into the ordinary Phone box every time the
+A person often has a home number, a mobile, a work number and another number. Salesforce
+lists, dialers and reports read the ordinary **Phone** box. BarnCRM adds a **Work Phone** box
+and one choice, **Preferred Phone**: Home, Mobile, Work or Other. Whatever you choose is copied into the ordinary Phone box every time the
 person is saved, the same way **Preferred Email** fills the ordinary Email box (see
 [Emails](emails.md)).
 
@@ -26,9 +26,9 @@ exactly as typed.
 
 | Permission set | What they can do with Preferred Phone |
 |---|---|
-| BarnCRM Admin | Read and change it |
-| BarnCRM Staff | Read and change it |
-| BarnCRM Read Only | Read it, change nothing |
+| BarnCRM Admin | Read and change it and Work Phone |
+| BarnCRM Staff | Read and change it and Work Phone |
+| BarnCRM Read Only | Read them, change nothing |
 
 Preferred Phone is on people held as contacts. People held as accounts in an org that uses
 person accounts are not touched, because their phone numbers live on fields only some orgs have.
@@ -61,6 +61,7 @@ stops the copying, it does not undo it. Type over it if you want a different num
 
 | Where | Field label | Purpose |
 |---|---|---|
-| Person | Home Phone, Mobile, Other Phone | The numbers to choose from (Salesforce standard fields) |
-| Person | Preferred Phone | Home, Mobile or Other: which number to call. Copied into Phone on every save |
+| Person | Home Phone, Mobile, Other Phone | Numbers to choose from (Salesforce standard fields) |
+| Person | Work Phone | The number this person uses at work |
+| Person | Preferred Phone | Home, Mobile, Work or Other: which number to call. Copied into Phone on every save |
 | Person | Phone | The ordinary Salesforce phone field that lists and dialers read |

@@ -26,6 +26,11 @@
         <label>Mobile</label>
       </value>
       <value>
+        <fullName>Work</fullName>
+        <default>false</default>
+        <label>Work</label>
+      </value>
+      <value>
         <fullName>Other</fullName>
         <default>false</default>
         <label>Other</label>

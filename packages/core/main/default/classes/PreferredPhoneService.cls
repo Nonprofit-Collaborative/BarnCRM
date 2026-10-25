@@ -14,6 +14,7 @@ public with sharing class PreferredPhoneService {
     private static final Map<String, String> FIELD_BY_PREFERENCE = new Map<String, String>{
         'Home' => 'HomePhone',
         'Mobile' => 'MobilePhone',
+        'Work' => 'Work_Phone__c',
         'Other' => 'OtherPhone'
     };
 

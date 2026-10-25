@@ -39,6 +39,22 @@ private class PreferredPhoneServiceTest {
     }
 
     @IsTest
+    static void choosingWorkCopiesTheWorkPhone() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = mariaWithTwoNumbers();
+            maria.Work_Phone__c = '503-555-0104';
+            maria.Preferred_Phone__c = 'Work';
+
+            Test.startTest();
+            insert maria;
+            Test.stopTest();
+
+            Assert.areEqual('503-555-0104', phoneOf(maria.Id), 'The work number was copied in');
+        }
+    }
+
+    @IsTest
     static void changingTheChoiceCopiesTheOtherNumber() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

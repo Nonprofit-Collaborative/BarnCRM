@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Copies the number a person chose as preferred (home, mobile or other) into their standard phone when the person is saved. It is separate from household upkeep, so switching household upkeep off does not stop it. Switch this off and the standard phone is left as typed.</value>
+    <value xsi:type="xsd:string">Copies the number a person chose as preferred (home, mobile, work or other) into their standard phone when the person is saved. It is separate from household upkeep, so switching household upkeep off does not stop it. Switch this off and the standard phone is left as typed.</value>
   </values>
   <values>
     <field>Handler_Class__c</field>
