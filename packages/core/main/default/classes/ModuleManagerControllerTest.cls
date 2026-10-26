@@ -139,7 +139,7 @@ private class ModuleManagerControllerTest {
                 false
             );
             SettingsService.clearCaches();
-            Boolean stored = SettingsService.getSettings().Show_Nonprofit_Modules__c;
+            Boolean stored = SettingsService.getSettings().Hide_Nonprofit_Modules__c;
             ModuleManagerController.ManagerState shown = ModuleManagerController.saveShowNonprofitModules(
                 true
             );
@@ -147,7 +147,7 @@ private class ModuleManagerControllerTest {
 
             Assert.isTrue(fresh.showNonprofitModules, 'Shown until someone clears it');
             Assert.isFalse(cleared.showNonprofitModules, 'Cleared is returned');
-            Assert.isFalse(stored, 'Cleared is stored for the whole org');
+            Assert.isTrue(stored, 'Cleared is stored for the whole org as Hide Nonprofit Modules');
             Assert.isTrue(shown.showNonprofitModules, 'Ticked again is returned');
             Map<String, Boolean> nonprofit = new Map<String, Boolean>();
             for (ModuleManagerService.ModuleStatus module : cleared.modules) {
@@ -164,9 +164,34 @@ private class ModuleManagerControllerTest {
                 [
                     SELECT COUNT()
                     FROM Setting_Change__c
-                    WHERE Setting_Name__c LIKE '%Show_Nonprofit_Modules__c'
+                    WHERE Setting_Name__c LIKE '%Hide_Nonprofit_Modules__c'
                 ],
                 'Each change is audited like any other setting'
+            );
+        }
+    }
+
+    @IsTest
+    static void anExistingSettingsRowThatNeverSetTheFieldShowsTheNonprofitModules() {
+        System.runAs(TestUsers.admin()) {
+            volunteersInstalled();
+            // An org that saved its settings before this field existed: a row with other keys
+            // set and nothing said about hiding.
+            insert new BarnCRM_Settings__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                Suite__c = ModuleDetectionService.SUITE_IMPACT
+            );
+            SettingsService.clearCaches();
+
+            Test.startTest();
+            ModuleManagerController.ManagerState state = ModuleManagerController.getState();
+            Test.stopTest();
+
+            Assert.isTrue(state.showNonprofitModules, 'A saved row that never hid them shows them');
+            Assert.isTrue(ModuleManagerService.showNonprofitModules(), 'The service agrees');
+            Assert.isFalse(
+                SettingsService.getSettings().Hide_Nonprofit_Modules__c == true,
+                'Nothing was hidden'
             );
         }
     }

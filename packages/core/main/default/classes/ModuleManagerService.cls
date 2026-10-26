@@ -23,7 +23,7 @@ public with sharing class ModuleManagerService {
     private static final String CORE = 'Core';
     private static final String TURNED_OFF_KEY = 'Modules_Turned_Off__c';
     private static final Integer TURNED_OFF_LENGTH = 255;
-    private static final String SHOW_NONPROFIT_KEY = 'Show_Nonprofit_Modules__c';
+    private static final String HIDE_NONPROFIT_KEY = 'Hide_Nonprofit_Modules__c';
 
     /** A count stops here, so no object is ever too big to count inside the query limits. */
     @TestVisible
@@ -180,20 +180,22 @@ public with sharing class ModuleManagerService {
     }
 
     /**
-     * Whether the Module Manager lists the nonprofit modules. A blank value counts as on: the
-     * shipped value is on (`SettingsService.SHIPPED_DEFAULTS`, ADR-0035).
+     * Whether the Module Manager lists the nonprofit modules. The stored field is the opposite
+     * sense, `Hide_Nonprofit_Modules__c`, so a settings row saved before the field existed, or a
+     * blank value, shows them: only a deliberate tick hides.
      */
     public static Boolean showNonprofitModules() {
-        return SettingsService.getSettings().Show_Nonprofit_Modules__c != false;
+        return SettingsService.getSettings().Hide_Nonprofit_Modules__c != true;
     }
 
     /**
-     * Saves the Show Nonprofit Modules checkbox, org wide, through the settings save path, which
-     * audits the change. It hides rows only: nothing is installed, removed or turned off. The
-     * caller checks Manage BarnCRM Settings (`ModuleManagerController`).
+     * Saves the Show Nonprofit Modules checkbox, org wide, as its opposite `Hide_Nonprofit_Modules__c`
+     * through the settings save path, which audits the change. It hides rows only: nothing is
+     * installed, removed or turned off. The caller checks Manage BarnCRM Settings
+     * (`ModuleManagerController`).
      */
     public static void setShowNonprofitModules(Boolean show) {
-        SettingsService.saveSystemValue(SHOW_NONPROFIT_KEY, show != false);
+        SettingsService.saveSystemValue(HIDE_NONPROFIT_KEY, show == false);
     }
 
     /**
