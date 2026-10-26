@@ -13,8 +13,8 @@
  * `RollupDateWindow`, and attribute names must be plain API names.
  *
  * What a target attribute may be depends on the aggregate (canonical model R-R15): checkbox for
- * ANY and NONE, text for the text lists, a number for COUNT_DISTINCT, text as well as numbers and
- * dates for FIRST and LAST, and numbers and dates for the rest. `targetTypeProblem` is the one
+ * ANY and NONE, text for the text lists, a number for COUNT_DISTINCT, text and picklists as well
+ * as numbers and dates for FIRST and LAST, and numbers and dates for the rest. `targetTypeProblem` is the one
  * place that rule lives, read here and by the save check.
  */
 public with sharing class RollupPlanner {
@@ -161,6 +161,13 @@ public with sharing class RollupPlanner {
                 ? null
                 : System.Label.Core_Rollups_ErrorTextTarget;
         }
+        // A picklist holds one of its values: FIRST and LAST copy one (ADR-0136).
+        if (type == Schema.DisplayType.PICKLIST) {
+            return operation == 'FIRST' ||
+                operation == 'LAST'
+                ? null
+                : System.Label.Core_Rollups_ErrorPicklistTarget;
+        }
         return NUMBER_AND_DATE_TYPES.contains(type)
             ? null
             : System.Label.Core_Rollups_ErrorTargetType;
@@ -229,7 +236,9 @@ public with sharing class RollupPlanner {
                 result.definitions.add(definition);
                 result.targetFields.add(targetField);
                 result.targetFilters.add(targetFilter);
-                Boolean asText = TEXT_TYPES.contains(targetField.getDescribe().getType());
+                Schema.DisplayType fieldType = targetField.getDescribe().getType();
+                Boolean asText =
+                    TEXT_TYPES.contains(fieldType) || fieldType == Schema.DisplayType.PICKLIST;
                 for (SourceQuery query : planned) {
                     query.measures[0].definitionIndex = index;
                     query.measures[0].asText = asText;

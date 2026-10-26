@@ -292,6 +292,41 @@ private class RollupChangesTest {
     }
 
     /**
+     * ADR-0136: a filter on a parent's field chosen in the Builder, through a standard lookup
+     * (`Account.Description`, read through `AccountId`), marks like `Gift__r.Status__c` does.
+     */
+    @IsTest
+    static void aParentFieldFilterThroughAStandardLookupMarksTheRowsUnderIt() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Account riverbend = organization('Riverbend');
+            insert riverbend;
+            insert new Contact(LastName = 'Okafor', AccountId = riverbend.Id);
+            List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
+                definition('Contact', 'AccountId', filter('Account.Description', 'equals', 'Board'))
+            };
+            Account before = new Account(Id = riverbend.Id, Name = 'Riverbend', Description = null);
+
+            Test.startTest();
+            RollupChanges.Marked marked = RollupChanges.forSave(
+                'Account',
+                new List<SObject>{
+                    new Account(Id = riverbend.Id, Name = 'Riverbend', Description = 'Board')
+                },
+                new Map<Id, SObject>{ riverbend.Id => before },
+                false,
+                definitions
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<Id>{ riverbend.Id },
+                markedAccounts(marked),
+                'The organization whose people the changed description filters'
+            );
+        }
+    }
+
+    /**
      * The platform deletes a household's membership rows with it and restores them with it,
      * without their triggers: their targets are read before the delete and after the undelete.
      */

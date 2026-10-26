@@ -3,6 +3,7 @@ import RollupWizard from 'c/rollupWizard';
 import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetFields';
 import getSources from '@salesforce/apex/RollupBuilderController.getSources';
 import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceFields';
+import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
 
@@ -16,6 +17,11 @@ jest.mock('@salesforce/apex/RollupBuilderController.getSources', () => ({ defaul
 });
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getSourceFields',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/RollupBuilderController.getParentFields',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -80,7 +86,8 @@ const flush = () =>
 async function build(draft, model = MODEL, instant = true) {
   getTargetFields.mockResolvedValue([
     { value: 'Total_Giving__c', label: 'Total Giving', type: 'currency' },
-    { value: 'Has_Given__c', label: 'Has Given', type: 'boolean', filledBy: 'Another rollup' }
+    { value: 'Has_Given__c', label: 'Has Given', type: 'boolean', filledBy: 'Another rollup' },
+    { value: 'Last_Channel__c', label: 'Last Channel', type: 'picklist' }
   ]);
   getSources.mockResolvedValue([
     {
@@ -95,7 +102,11 @@ async function build(draft, model = MODEL, instant = true) {
   getSourceFields.mockResolvedValue([
     { value: 'Amount__c', label: 'Amount', type: 'currency' },
     { value: 'Gift_Date__c', label: 'Gift Date', type: 'date' },
-    { value: 'Received_At__c', label: 'Received At', type: 'datetime' }
+    { value: 'Received_At__c', label: 'Received At', type: 'datetime' },
+    { value: 'Channel__c', label: 'Channel', type: 'picklist' }
+  ]);
+  getParentFields.mockResolvedValue([
+    { value: 'Appeal__r.Type__c', label: 'Appeal > Type', type: 'picklist' }
   ]);
   preview.mockResolvedValue({ maintains: 'This rollup will maintain about 1,204 records.' });
   const element = createElement('c-rollup-wizard', { is: RollupWizard });
@@ -241,6 +252,41 @@ describe('c-rollup-wizard', () => {
     await next(element);
     const offered = query(element, 'window-date').options.map((option) => option.value);
     expect(offered).toEqual(['Gift_Date__c']);
+  });
+
+  it('fills a picklist with First or Last, copied from a picklist or text', async () => {
+    const element = await build({ ...DRAFT, targetField: 'Last_Channel__c', aggregate: 'FIRST' });
+    await next(element);
+    await next(element);
+    const offered = query(element, 'aggregate').options.map((option) => option.value);
+    expect(offered).toEqual(['FIRST', 'LAST']);
+    const copied = query(element, 'source-field').options.map((option) => option.value);
+    expect(copied).toEqual(['Channel__c']);
+  });
+
+  it('filters on a field one lookup away, and says when it may not update at once', async () => {
+    const element = await build(DRAFT);
+    await next(element);
+    await next(element);
+    await next(element);
+    const filter = element.shadowRoot.querySelector(
+      'c-rollup-filter-builder[data-name="filterJson"]'
+    );
+    expect(filter.fields.map((field) => field.value)).toContain('Appeal__r.Type__c');
+    expect(query(element, 'parent-field-note')).toBeNull();
+
+    filter.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          value: JSON.stringify({
+            version: 1,
+            conditions: [{ id: 1, field: 'Appeal__r.Type__c', operator: 'equals', value: 'Mail' }]
+          })
+        }
+      })
+    );
+    await flush();
+    expect(query(element, 'parent-field-note')).not.toBeNull();
   });
 
   it('saves the draft and reports the notice', async () => {

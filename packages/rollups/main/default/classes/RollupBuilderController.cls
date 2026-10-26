@@ -62,7 +62,15 @@ public with sharing class RollupBuilderController {
     private static final Set<Schema.DisplayType> TARGET_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.BOOLEAN,
         Schema.DisplayType.STRING,
-        Schema.DisplayType.TEXTAREA
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.PICKLIST
+    };
+
+    /** Lookups the platform keeps for itself, whose records no filter needs (ADR-0136). */
+    private static final Set<String> NOT_FOLLOWED = new Set<String>{
+        'createdbyid',
+        'lastmodifiedbyid',
+        'masterrecordid'
     };
 
     private static final Set<String> READS_NO_FIELD = new Set<String>{ 'COUNT', 'ANY', 'NONE' };
@@ -267,6 +275,52 @@ public with sharing class RollupBuilderController {
         }
     }
 
+    /**
+     * Step 4: the fields of each record the counted records point to, one lookup away and as the
+     * user sees them, named by path (`Appeal__r.Type__c`) for the filter (R-R2, ADR-0136).
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<FieldOption> getParentFields(String sourceObject) {
+        try {
+            List<FieldOption> options = new List<FieldOption>();
+            for (Schema.SObjectField field : fieldMap(requireEntity(sourceObject)).values()) {
+                Schema.DescribeFieldResult lookup = field.getDescribe();
+                if (
+                    !isParentLookup(lookup) || NOT_FOLLOWED.contains(lookup.getName().toLowerCase())
+                ) {
+                    continue;
+                }
+                String lookupLabel = lookup.getLabel().removeEndIgnoreCase(' ID');
+                for (
+                    Schema.SObjectField parentField : fieldMap(lookup.getReferenceTo()[0]).values()
+                ) {
+                    Schema.DescribeFieldResult described = parentField.getDescribe();
+                    if (!described.isAccessible() || !described.isFilterable()) {
+                        continue;
+                    }
+                    FieldOption option = toOption(described);
+                    option.value = lookup.getRelationshipName() + '.' + described.getName();
+                    option.label = String.format(
+                        Label.Core_RollupBuilder_ParentField,
+                        new List<String>{ lookupLabel, described.getLabel() }
+                    );
+                    options.add(option);
+                }
+            }
+            return sorted(options);
+        } catch (Exception caught) {
+            throw asUserError(caught);
+        }
+    }
+
+    /** A lookup a filter may read through: readable, named, and to one object only. */
+    private static Boolean isParentLookup(Schema.DescribeFieldResult lookup) {
+        return lookup.getType() == Schema.DisplayType.REFERENCE &&
+            lookup.isAccessible() &&
+            String.isNotBlank(lookup.getRelationshipName()) &&
+            lookup.getReferenceTo().size() == 1;
+    }
+
     /** An existing rollup, to edit or to copy. */
     @AuraEnabled
     public static Draft getDraft(Id definitionId) {
@@ -465,6 +519,9 @@ public with sharing class RollupBuilderController {
         if (problem == null) {
             problem = sourceProblem(draft, aggregate);
         }
+        if (problem == null && target.getDescribe().getType() == Schema.DisplayType.PICKLIST) {
+            problem = picklistProblem(draft, target.getDescribe());
+        }
         if (problem == null) {
             problem = filterProblem(draft, targetType);
         }
@@ -559,6 +616,42 @@ public with sharing class RollupBuilderController {
         return null;
     }
 
+    /**
+     * A picklist target is filled from a picklist or text attribute, and a source picklist may
+     * hold only values the target has (R-R15). Text is checked as it is written (`RollupWriter`).
+     */
+    private static String picklistProblem(Draft draft, Schema.DescribeFieldResult target) {
+        Schema.SObjectField source = String.isBlank(draft.sourceField)
+            ? null
+            : fieldMap(SettingsService.typeByName(draft.sourceObject))
+                  .get(draft.sourceField.toLowerCase());
+        Schema.DisplayType readType = source == null ? null : source.getDescribe().getType();
+        if (readType == Schema.DisplayType.STRING) {
+            return null;
+        }
+        if (readType != Schema.DisplayType.PICKLIST) {
+            return Label.Core_RollupBuilder_ErrorPicklistSource;
+        }
+        Set<String> targetValues = new Set<String>();
+        for (Schema.PicklistEntry entry : target.getPicklistValues()) {
+            if (entry.isActive()) {
+                targetValues.add(entry.getValue().toLowerCase());
+            }
+        }
+        List<String> missing = new List<String>();
+        for (Schema.PicklistEntry entry : source.getDescribe().getPicklistValues()) {
+            if (entry.isActive() && !targetValues.contains(entry.getValue().toLowerCase())) {
+                missing.add(entry.getValue());
+            }
+        }
+        return missing.isEmpty()
+            ? null
+            : String.format(
+                  Label.Core_RollupBuilder_ErrorPicklistValues,
+                  new List<String>{ String.join(missing, ', ') }
+              );
+    }
+
     /** Both filter documents read, and name only attributes their entity has (R-R2). */
     private static String filterProblem(Draft draft, Schema.SObjectType targetType) {
         String problem = documentProblem(
@@ -576,11 +669,38 @@ public with sharing class RollupBuilderController {
         }
         Map<String, Schema.SObjectField> fields = fieldMap(entity);
         for (String field : RollupFilterParser.fieldsOf(document)) {
-            if (!field.contains('.') && !fields.containsKey(field.toLowerCase())) {
-                return Label.Core_RollupBuilder_ErrorFieldUnknown;
+            String problem = field.contains('.')
+                ? parentFieldProblem(fields, field)
+                : (fields.containsKey(field.toLowerCase())
+                      ? null
+                      : Label.Core_RollupBuilder_ErrorFieldUnknown);
+            if (problem != null) {
+                return problem;
             }
         }
         return null;
+    }
+
+    /**
+     * A field of a record one lookup away (`Appeal__r.Type__c`): the lookup is readable and to
+     * one object, and the field is on it and readable, all as the administrator sees them.
+     */
+    private static String parentFieldProblem(Map<String, Schema.SObjectField> fields, String path) {
+        List<String> parts = path.split('\\.');
+        if (parts.size() > 2) {
+            return Label.Core_RollupBuilder_ErrorOneLookup;
+        }
+        for (Schema.SObjectField field : fields.values()) {
+            Schema.DescribeFieldResult lookup = field.getDescribe();
+            if (isParentLookup(lookup) && parts[0].equalsIgnoreCase(lookup.getRelationshipName())) {
+                Schema.SObjectField parentField = fieldMap(lookup.getReferenceTo()[0])
+                    .get(parts[1].toLowerCase());
+                return parentField != null && parentField.getDescribe().isAccessible()
+                    ? null
+                    : Label.Core_RollupBuilder_ErrorFieldUnknown;
+            }
+        }
+        return Label.Core_RollupBuilder_ErrorFieldUnknown;
     }
 
     /**

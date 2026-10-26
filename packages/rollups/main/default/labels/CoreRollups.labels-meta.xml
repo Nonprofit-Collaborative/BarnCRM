@@ -185,6 +185,22 @@
         <value>A text field can show only First, Last or a text list. Choose one of those calculations, or choose another field.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorPicklistTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a picklist field is given a calculation other than First or Last.</shortDescription>
+        <value>A picklist field can show only First or Last. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_PicklistValueRefused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a value not in the target picklist. {0} is the value, {1} the field.</shortDescription>
+        <value>A rollup could not put "{0}" in {1}, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorTargetType</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

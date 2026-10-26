@@ -201,3 +201,35 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Click **Edit** on **Test children per household** and go to **Check and save**. | **Instantly** is offered and no notice is shown: people (Contact) have instant updates. Click **Cancel**. |
 
 **Cleanup:** delete **Test open tasks** (or set it inactive) if T-RB-10's cleanup has not.
+## T-RB-16: A Condition on a Field One Lookup Away
+
+**Purpose:** confirm a condition can read a field of the record the counted records point to, one lookup away, and that the Builder says when such a total may not update at once.
+**Prerequisites:** admin user; T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. Choose **Account** and **Test Children Count**, then **Contact, by Account ID**, then **Calculation** = **Count**, and click **Next** until **Which records count?** | Step 4 shows the **Conditions** builder. No note about another record is shown. |
+| 2 | Under **Conditions**, click **Add condition** and open **Field**. | After the contact's own fields, the list offers fields of the records a contact points to, written as the lookup and the field, for example **Account > Account Name** and **Reports To > Last Name**. No **Created By > ...** or **Last Modified By > ...** fields are offered, and nothing two lookups away (such as **Account > Parent Account > ...**). |
+| 3 | Choose **Account > Account Name**, **Comparison** = **is**, **Value** = `The Garcia Family`. | The sentence reads about contacts whose Account > Account Name is The Garcia Family. Below the conditions a grey note reads "This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right." |
+| 4 | Click **Next**. In **See it on a record**, pick **The Garcia Family**. | The preview starts "Calculated: 3." (Harper, Luis and Diego). No error. |
+| 5 | Pick any other household. | The preview starts "Calculated: 0." |
+| 6 | Click **Back**, remove the condition. | The note about another record disappears. Click **Cancel**; nothing is saved. |
+
+**Cleanup:** None.
+
+## T-RB-17: A Picklist Filled by Last, and a Value It Does Not Have
+
+**Purpose:** confirm First and Last can fill a picklist, the save refuses a source picklist with values the target lacks, and a text value the picklist lacks is left out and logged.
+**Prerequisites:** admin user; T-RB-02 done. In Setup, on **Account**, create a Picklist field labelled **Test Last Role** (API name `Test_Last_Role__c`) with the values **Head**, **Child** and **Other** only (no **Spouse or Partner**), visible to your profile and on the household page layout.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. Choose **Account** and, in **Field that shows the total**, **Test Last Role**. Choose **Contact, by Account ID** and click **Next**. | **Test Last Role** was offered in step 1. **Calculation** offers only **First** and **Last**. |
+| 2 | Choose **Last**. Open **Field to calculate**. | Only picklist and text fields are offered (for example **Household Role**, **Last Name**), no number or date fields. |
+| 3 | Choose **Household Role** and **Which record comes first, by** = **Created Date**. Click **Next** twice, name it `Test last role`, and click **Save**. | Nothing is saved. A red message reads "The picklist you fill does not have these values of the field you copy: Spouse or Partner. Add them to that picklist, or choose another field." |
+| 4 | Keep the Builder open. In Setup, add the value **Spouse or Partner** to **Test Last Role**. Back in the Builder, click **Save and calculate now**. | "Rollup saved, and its recalculation has started." |
+| 5 | Wait a minute and open **The Garcia Family**. | **Test Last Role** shows the Household Role of the Garcia person created last (Head, Spouse or Partner, or Child). |
+| 6 | Click **Edit** on **Test last role**. On step 3 change **Field to calculate** to **Last Name**. Save and calculate now, wait a minute, and refresh **The Garcia Family**. | **Test Last Role** still shows the role from step 5: a last name is not a value of the picklist. |
+| 7 | Open the **Error Log**. | A Warning from `RollupWriter` reads "A rollup could not put "Garcia" in Test Last Role, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup." (with that person's last name). |
+
+**Cleanup:** switch **Test last role** off and delete the **Test Last Role** field in Setup.
