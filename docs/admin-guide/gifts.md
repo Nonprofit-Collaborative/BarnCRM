@@ -138,6 +138,11 @@ when money went back (see [Refunds](refunds.md)), and correcting a receipt is th
 answer when the document itself is wrong. The override is for the case where neither
 reaches the problem.
 
+## List views
+
+**Gifts** has **All Gifts**, **My Gifts** (the gifts you entered), **Pending Gifts**, **Gifts to
+Acknowledge** and **Refunds and Write-offs**.
+
 ## Common mistakes
 
 - **Filling in both Donor Contact and Donor Account.** The save is refused with "Enter a

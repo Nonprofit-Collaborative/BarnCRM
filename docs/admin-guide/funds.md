@@ -45,6 +45,12 @@ You are David, and you are setting up funds before your first gift entry session
    Raised** shows the gift and **Rollups Last Calculated** shows when the number was worked
    out.
 
+## List views
+
+**Funds** has **All Funds**, **Active Funds** and **Inactive Funds**. No fund ships ready made,
+because the name, the accounting code and which fund is the default are your decisions; the
+steps above create the first one.
+
 ## Common mistakes
 
 - **No fund is marked as the default.** A gift entered without a designation then fails to

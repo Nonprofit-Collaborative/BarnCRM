@@ -217,3 +217,18 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 5 | As read-only, open a person with gifts in the Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
 
 **Cleanup:** none.
+
+## T-GIFT-13: List views for gifts, funds, appeals, donor levels and batches
+
+**Purpose:** each giving object opens with an All view and the status views an admin expects.
+**Prerequisites:** staff user, sample data loaded (the Inactive views are empty until you switch something off).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Gifts** tab and the list view menu. | **All Gifts**, **My Gifts**, **Pending Gifts**, **Gifts to Acknowledge** and **Refunds and Write-offs** are listed. |
+| 2 | Enter a gift as yourself, then choose **My Gifts**. | The new gift shows. Gifts the sample loader created do not, unless you own them. |
+| 3 | Open the **Funds** tab. | **All Funds**, **Active Funds** and **Inactive Funds** are listed. Untick **Active** on a sample fund that has no gifts: it moves to **Inactive Funds** and leaves **Active Funds**. Tick it again. |
+| 4 | Open **Appeals** and **Donor Levels** and open each list view menu. | **All Appeals**, **Active Appeals**, **Inactive Appeals**; **All Donor Levels**, **Active Donor Levels**, **Inactive Donor Levels**. |
+| 5 | Open **Gift Batches**. | **All Gift Batches**, **Open Batches** and **My Gift Batches** are listed. A batch you create shows in **My Gift Batches**. |
+
+**Cleanup:** none.

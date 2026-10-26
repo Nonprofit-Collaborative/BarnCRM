@@ -38,7 +38,7 @@ page, even if that puts it out of reading order.
 | [Before you test](before-you-test.md) | | | Test org, modules, sample data, test users, editions, recording and reporting results |
 | [People and households](people-and-households.md) | HH | 16 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages |
 | [Addresses](addresses.md) | ADDR | 9 | Address records, default address, seasonal addresses and the nightly swap |
-| [Relationships and affiliations](relationships-and-affiliations.md) | REL | 9 | Two-sided relationships, affiliations, primary affiliation |
+| [Relationships and affiliations](relationships-and-affiliations.md) | REL | 10 | Two-sided relationships, affiliations, primary affiliation |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 13 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page |
 | [Setup Assistant](setup-assistant.md) | SA | 10 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 11 | Import wizard, mappings, row rules, matching (including match sources), undo |
@@ -48,14 +48,14 @@ page, even if that puts it out of reading order.
 | [Duplicates](duplicates.md) | DUP | 9 | Duplicate scan, review and merge, match sources |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
-| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 12 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
-| [Giving: commitments](giving-commitments.md) | COM | 9 | Pledges, recurring gifts, payments, nightly jobs |
+| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 13 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
+| [Giving: commitments](giving-commitments.md) | COM | 10 | Pledges, recurring gifts, payments, nightly jobs |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
-| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 11 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
+| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
-| [Volunteers](volunteers.md) | VOL | 12 | Jobs, shifts, sign-ups, hours and approval, skills |
+| [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
 | [Rollup Builder](rollup-builder.md) | RB | 9 | Building, recalculating and switching rollups |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 

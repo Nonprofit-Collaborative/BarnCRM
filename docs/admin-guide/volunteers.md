@@ -61,11 +61,13 @@ coordinators and admins, and **Volunteer Letter Templates** and **Volunteer Sett
 admins only.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
-**All Jobs** and **Active Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
+**All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
 from today with places left) and **Past Shifts Still Open** (shifts that ended more than 7 days ago and
 are still Open); **All Hours** and **Awaiting Approval**; **All Requirements** and
-**Not Current**; **All Skills** and **Active Skills**; and **All Sign-ups** (on the **Volunteer
-Sign-ups** tab, after Shifts). Pick one from the list view menu at the top left.
+**Not Current**; **All Skills**, **Active Skills** and **Inactive Skills**; **All Volunteer Letter
+Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates**; and
+**All Sign-ups** (on the **Volunteer Sign-ups** tab, after Shifts). Pick one from the list view
+menu at the top left.
 
 ## Roles and permission sets
 

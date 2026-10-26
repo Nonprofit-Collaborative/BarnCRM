@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Active_Plan_Templates</fullName>
+  <columns>NAME</columns>
+  <columns>Trigger_Event__c</columns>
+  <columns>Minimum_Amount__c</columns>
+  <filters>
+    <field>Active__c</field>
+    <operation>equals</operation>
+    <value>1</value>
+  </filters>
+  <filterScope>Everything</filterScope>
+  <label>Active Plan Templates</label>
+</ListView>

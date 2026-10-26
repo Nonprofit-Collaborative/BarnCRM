@@ -162,6 +162,12 @@ and deletes nothing.
 15. Switch to **Upcoming 30 Days** to see what should arrive next, which is the list Jen
     uses when she reconciles the bank statement.
 
+## List views
+
+**Commitments** has **All Commitments**, **My Commitments**, **Active Pledges**, **Active
+Recurring Gifts** and **Paused Commitments**. **Installments** has **All Installments**,
+**Overdue** and **Upcoming 30 Days**.
+
 ## Common mistakes
 
 **Entering the total in the amount field.** Amount is what is expected each time. A

@@ -85,6 +85,11 @@ stops the post and names the line, and nothing is created.
 Two lines can pay the same payment, for example two checks that each pay half of it. The
 payment counts both, and shows Partially paid until they add up to what it expects.
 
+## List views
+
+**Gift Batches** has **All Gift Batches**, **Open Batches** and **My Gift Batches** (the batches
+you created).
+
 ## Common mistakes
 
 **The batch does not balance.** The message says how far out it is and in which direction:
