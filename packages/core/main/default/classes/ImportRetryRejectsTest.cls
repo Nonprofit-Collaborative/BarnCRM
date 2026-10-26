@@ -107,6 +107,7 @@ private class ImportRetryRejectsTest {
             SELECT COUNT()
             FROM Import_Row__c
             WHERE Import_Batch__c = :batchId AND Status__c = :status
+            WITH SYSTEM_MODE
         ];
     }
 

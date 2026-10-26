@@ -15,6 +15,7 @@ private class PersonErasureHistoryCleanupTest {
             SELECT Context__c
             FROM Error_Log__c
             WHERE Context__c LIKE 'PersonErasureHistoryCleanup%'
+            WITH SYSTEM_MODE
         ];
     }
 

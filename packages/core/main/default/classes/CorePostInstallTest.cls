@@ -659,6 +659,7 @@ private class CorePostInstallTest {
         for (Automation_Setting__c setting : [
             SELECT Id, Automation_Name__c, Enabled__c, Always_Runs__c
             FROM Automation_Setting__c
+            WITH SYSTEM_MODE
         ]) {
             byName.put(setting.Automation_Name__c, setting);
         }
