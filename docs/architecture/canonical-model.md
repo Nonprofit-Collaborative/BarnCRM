@@ -1082,7 +1082,7 @@ a BarnCRM record.
 |---|---|---|---|
 | `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
 
-### App navigation key
+### App Navigation Key
 
 Added with the four BarnCRM apps (ADR-0136).
 Shown in the console's General section as **App Navigation Style**.
