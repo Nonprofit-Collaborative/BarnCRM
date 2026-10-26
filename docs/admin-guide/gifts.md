@@ -45,11 +45,12 @@ You are David, and a check from Maria's neighbour arrived this morning.
 3. Open the **Gifts** tab and click **New**.
 4. In **Donor Contact**, choose a person who belongs to a household. Leave **Donor Account**
    empty: a gift has one donor, either a person or an organization, never both.
-5. Enter an **Amount** of 250, choose the **Payment Method** `Check`, and leave **Gift Date** empty.
+5. Enter an **Amount** of 250 and choose the **Payment Method** `Check`. **Gift Date** already
+   reads today, because a new gift defaults to today; leave it.
    (Had this been a gift of goods you would choose `In-kind` here instead, leave the amount
    at zero, and describe the goods: [In-kind gifts](in-kind-gifts.md).)
 6. Choose `Spring appeal` in **Appeal** and save.
-7. Look at the saved gift. **Gift Date** is today, because you left it blank. **Household**
+7. Look at the saved gift. **Gift Date** is today. **Household**
    shows the donor's household, filled in by BarnCRM rather than by you. The gift stays
    with that household: if the donor later moves to another household, this gift still
    counts for the household it was given from, and only their new gifts count for the new
@@ -69,9 +70,11 @@ You are David, and a check from Maria's neighbour arrived this morning.
 In the Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
 carries **Edit**, **Refund or Write Off** and **Delete**. **Refund or Write Off** shows only
 while the gift's **Status** is `Received`, because only a received gift can be refunded. The
-**Gift Allocations** list (largest first) and the **Refunds and Write-offs** list (newest
-first) are part of the page itself, so they look the same whichever page layout your
-profiles use. The
+**Gift Allocations** list (largest first), the **Refunds and Write-offs** list (newest
+first), the **Tributes** list (with **New**) and the **Acknowledgments** list are part of the
+page itself, so they look the same whichever page layout your profiles use. A gift that pays
+a pledge or recurring gift shows it in **Commitment** and **Installment**, both of which you
+can also set on the new gift form. The
 **Activity** panel can log a call, create a task or create an event.
 
 To add another list, such as one your organization built, open the page in the Lightning

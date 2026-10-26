@@ -4,8 +4,10 @@
 
 When David opens a person, a household or an organization in the **Fundraising** app, the
 record shows what they gave: a **Giving** section with their totals, their donor level and
-when those numbers were last calculated, and lists of their gifts, commitments and soft
-credits. A **New Gift** button records a gift with the donor already filled in.
+when those numbers were last calculated, and lists of their gifts, commitments, soft
+credits, receipts and stewardship plans. A person also shows their **Employer**, which
+[matching gifts](matching-gifts.md) check against. A **New Gift** button records a gift with
+the donor already filled in.
 
 Nothing here is calculated on the page. The totals are the rollups BarnCRM keeps (see
 [Rollups](rollups.md)), and **Rollups Last Calculated** says how fresh they are.
@@ -28,7 +30,7 @@ Two things to know:
 - **If your organization has its own Contact or Account record page,** it keeps showing
   wherever you assigned it. To add giving to it instead, open it in the Lightning App Builder
   and add the giving fields from the field list, and the **Dynamic Related List - Single**
-  component for Gifts, Commitments and Soft Credits.
+  component for Gifts, Commitments, Soft Credits, Receipts and Stewardship Plans.
 
 ## A five-minute walkthrough
 

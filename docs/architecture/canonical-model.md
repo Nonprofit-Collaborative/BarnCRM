@@ -3257,7 +3257,7 @@ refund is another gift rather than an edit (ADR-0010).
 | Donor Contact | reference(Contact) | conditional | The person credited with the gift, where people are Contacts. |
 | Donor Account | reference(Organization) | conditional | The account credited with the gift: an organization, a household giving in its own name, or a person Account. |
 | Household | reference(Household) | computed | The household credited with the gift, derived from the donor when the gift is given and kept when the donor later moves households (R-G2). |
-| Gift Date | date | yes | The date the gift was received, which is the date that appears on the receipt. |
+| Gift Date | date | yes (defaults today) | The date the gift was received, which is the date that appears on the receipt. |
 | Amount | decimal | yes | The money received, negative for a refund or a write-off, and zero on an in-kind gift, which is goods rather than money (R-G12). |
 | Payment Method | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. Labelled Type before v0.6; the API name is still `Type__c`. |
 | Status | picklist(Received, Pending, Refunded, Written off, Cancelled) | yes | Where the gift stands; Received, Refunded and Written off count in the packaged giving totals, so a reversal nets against its original (ADR-0022), and Pending and Cancelled do not. Cancelled is a Pending gift that will never be paid (R-G16). |
@@ -3479,7 +3479,7 @@ receipt.
 | Donor Contact | `Donor_Contact__c` | Lookup to Contact |
 | Donor Account | `Donor_Account__c` | Lookup to Account |
 | Household | `Household__c` | Lookup to Account |
-| Gift Date | `Gift_Date__c` | Date |
+| Gift Date | `Gift_Date__c` | Date, default today |
 | Amount | `Amount__c` | Currency |
 | Payment Method | `Type__c` | Picklist: Cash, Check, Card, ACH, Stock, In-kind, Grant, Other |
 | Status | `Status__c` | Picklist: Received, Pending, Refunded, Written off, Cancelled |

@@ -463,8 +463,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Fundraising app | Major | An app with tabs for gifts, funds, appeals, commitments, batches, receipts and Quick Gift Entry. | Shipped | G-06, ADR-0018 |
-| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Shipped | ADR-0064 (UX pass) |
+| Fundraising app | Major | An app with tabs for gifts, funds, appeals, commitments, batches, tributes, receipts, stewardship plans and Quick Gift Entry, plus the Acknowledgment Queue, Receipt Letters, Donor Level Ladder and Stewardship Plan Setup pages for whoever may open them. | Shipped | G-06, ADR-0018 |
+| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments, soft credits, receipts and stewardship plans, the person's Employer, and a New Gift action. | Shipped | ADR-0064 (UX pass) |
 | Gift, Commitment and Gift Batch record pages | Minor | Packaged record pages for Giving records, opened automatically in the Fundraising app. | Shipped | ADR-0043 |
 | Actions and lists placed on the Giving pages | Minor | Gift, commitment and batch pages carry their own actions (Refund or Write Off only on a received gift) and sorted lists of allocations, refunds and a commitment's gifts; donor pages gain Log an interaction; the gift's activity panel can log calls, tasks and events. | Shipped (#377) | Q-08, ADR-0097 |
 | Giving permission sets | Minor | Giving Admin, Giving Staff and Giving Read Only, given per person on the Access page under Extra permissions; the Fundraising Staff role includes Giving Staff. | Shipped | C-06, ADR-0132 |

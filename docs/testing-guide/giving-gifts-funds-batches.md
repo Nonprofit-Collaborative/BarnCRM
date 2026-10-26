@@ -30,7 +30,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Gifts** tab and click **New**. | The new gift form shows **Donor Contact**, **Donor Account**, **Amount**, **Gift Date**, **Payment Method**, **Status** (Received) and **Appeal**. |
+| 1 | Open the **Gifts** tab and click **New**. | The new gift form shows **Donor Contact**, **Donor Account**, **Amount**, **Gift Date** (already today), **Payment Method**, **Status** (Received), **Appeal**, **Commitment** and **Installment**. |
 | 2 | Choose **Harper Garcia** in **Donor Contact**, **Amount** `250`, **Gift Date** today, **Payment Method** `Check`, **Appeal** `Spring Appeal`. Save. | The gift opens on the gift page, named `G-` and a number. |
 | 3 | Read the **Household** field. | It names Harper's household (The Garcia Family), filled in by BarnCRM. |
 | 4 | Look at the **Gift Allocations** list. | One allocation: **General Fund**, 250.00. |

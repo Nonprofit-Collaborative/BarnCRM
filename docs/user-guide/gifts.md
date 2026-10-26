@@ -59,11 +59,11 @@ You should see: the gift in the record's **Gifts** list. The gift goes to your d
 A gift opens on the gift record page. From top to bottom:
 
 - The action bar: **Edit**, **Refund or Write Off** (only while **Status** is `Received`) and **Delete**.
-- **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
+- **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Installment** (the pledge payment the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
 - **Acknowledgment, Receipt and Recognition**: **Acknowledgment Status**, **Acknowledgment Date**, **Receipt Number**, **Matched Gift**, **Tribute**, and on a refund, **Original Gift** and **Refund Reason**.
 - **In-kind Gift**, only on an in-kind gift.
 - Side panels: **Posting**, **Receipts**, **Soft credits**, **Tribute**, and **Activity**.
-- Lists: **Gift Allocations** (which funds the gift went to) and **Refunds and Write-offs**.
+- Lists: **Gift Allocations** (which funds the gift went to), **Refunds and Write-offs**, **Tributes** and **Acknowledgments** (each thank-you sent for the gift).
 
 Gift statuses:
 
