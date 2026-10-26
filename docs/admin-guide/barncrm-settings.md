@@ -160,9 +160,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    opens with the **Setup checklist**.
 2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
-   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
-   Error Log, Access, Import, Org Optimizer, and Health. You only see the ones that have something in them,
-   and a feature that is off hides its sections: Giving and
+   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Volunteers,
+   Automation, Error Log, Access, Import, Org Optimizer, Integrations, and Health. You only see
+   the ones that have something in them, and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the

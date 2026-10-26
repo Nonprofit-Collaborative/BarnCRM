@@ -1001,9 +1001,12 @@ private class SettingsControllerTest {
                 effectiveDefaultRow('Test_Stale', 'Stale_Record_Years__c', 'Number'),
                 effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
                 effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
-                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text')
+                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text'),
+                optimizerRow(),
+                setupValueRow()
             };
             OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            SetupValueSelector.organizationNameOverride = 'Barn Rescue';
             Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
 
             SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
@@ -1016,9 +1019,15 @@ private class SettingsControllerTest {
             }
             Assert.areEqual('Daily', valueByKey.get('Error_Digest_Frequency__c'), 'Default shown');
             Assert.areEqual('5', valueByKey.get('Stale_Record_Years__c'), 'Number default shown');
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                valueByKey.get('Household_Membership_Mode__c'),
+                'A blank household choice shows one household per person selected (#570), ' +
+                'not the empty value the effective default leaves it as'
+            );
             Assert.isTrue(
-                String.isBlank(valueByKey.get('Household_Membership_Mode__c')),
-                'How people belong to a household is shown as stored: its default is decided on its own branch'
+                String.isBlank(SettingsService.getSettings().Household_Membership_Mode__c),
+                'Showing it stores nothing, so detection may still propose the flexible way'
             );
             Assert.areEqual(
                 CoexistenceService.MODE_STANDALONE,
@@ -1030,11 +1039,44 @@ private class SettingsControllerTest {
                 valueByKey.get('Household_Name_Pattern__c'),
                 'A text setting shows its shipped pattern'
             );
+            Assert.areEqual(
+                '90',
+                valueByKey.get('Unused_Login_Days__c'),
+                'An Org Optimizer threshold shows its default in its own section'
+            );
+            Assert.areEqual(
+                'Barn Rescue',
+                valueByKey.get('Name'),
+                'A value from Setup is read from Setup, never given a default of BarnCRM'
+            );
             Assert.isNull(
                 BarnCRM_Settings__c.getOrgDefaults().Id,
                 'Opening the page saved nothing'
             );
         }
+    }
+
+    private static Setting_Definition__mdt optimizerRow() {
+        Setting_Definition__mdt row = effectiveDefaultRow(
+            'Test_Unused_Login',
+            'Unused_Login_Days__c',
+            'Number'
+        );
+        row.Section__c = SettingSections.ORG_OPTIMIZER;
+        return row;
+    }
+
+    private static Setting_Definition__mdt setupValueRow() {
+        return new Setting_Definition__mdt(
+            DeveloperName = 'Test_Organization_Name',
+            MasterLabel = 'Organization name',
+            Setting_Key__c = 'Name',
+            Settings_Object__c = 'Organization',
+            Section__c = SettingSections.ORGANIZATION,
+            Module__c = 'Core',
+            Data_Type__c = 'SetupValue',
+            Sort_Order__c = 1
+        );
     }
 
     private static Setting_Definition__mdt effectiveDefaultRow(

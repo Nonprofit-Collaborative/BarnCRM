@@ -127,8 +127,9 @@ public with sharing class SettingsService {
      * stay blank (CoexistenceService reads a blank coexistence mode as unconfirmed and a blank
      * membership mode as the only one detection may change; see `blanksKeptBlank`).
      * Coexistence mode is still shown with the recommended mode selected (see
-     * `getEffectiveValue`), nothing stored. The membership mode is shown as stored here: its
-     * default is being decided on its own branch. Lower-case field names.
+     * `getEffectiveValue`), nothing stored. The membership mode is shown as stored here:
+     * `SettingsController.toSetting` shows `householdMembershipMode()` for a blank one, display
+     * only. Lower-case field names.
      */
     private static final String COEXISTENCE_FIELD = 'coexistence_mode__c';
     private static final Set<String> SHOWN_AS_STORED = new Set<String>{
@@ -148,7 +149,8 @@ public with sharing class SettingsService {
      * never blank (its shipped value is already on the record, ADR-0035). Coexistence mode,
      * whose stored blank means "not confirmed", is shown as the mode detection recommends;
      * the stored value stays blank until somebody saves it. A row in `SHOWN_AS_STORED` is shown
-     * as stored.
+     * as stored. A SetupValue row never comes here: Setup holds its value and it has no default
+     * of BarnCRM's (ADR-0135), so `SettingsController.toSetting` reads it first and returns.
      */
     @NamespaceAccessible
     public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
