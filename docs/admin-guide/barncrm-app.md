@@ -45,7 +45,7 @@ so you need not switch apps:
 |---|---|---|
 | Rollup Builder | | Rollup Builder |
 | Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup |
-| Volunteers | Volunteer Shifts, Volunteer Hours | Volunteer Settings |
+| Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
 
 - **Deployed from source** with `scripts/org/deploy-packages.sh`: the script adds the pages

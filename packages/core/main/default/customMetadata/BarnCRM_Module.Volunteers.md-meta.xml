@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Volunteer_Settings</value>
+    <value xsi:nil="true" />
   </values>
   <values>
     <field>Probe_Object__c</field>

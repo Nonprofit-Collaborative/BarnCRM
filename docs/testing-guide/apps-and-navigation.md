@@ -50,7 +50,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
-| 2 | As admin, open **BarnCRM Admin**. | After **Error Log**: **Rollup Builder**, **Accounting Periods**, **Giving Nightly Jobs**, **Donor Level Ladder**, **Stewardship Plan Setup**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export** (and **Volunteer Settings** when Volunteers was deployed). **BarnCRM Admin Console** has the same. |
+| 2 | As admin, open **BarnCRM Admin**. | After **Error Log**: **Rollup Builder**, **Accounting Periods**, **Giving Nightly Jobs**, **Donor Level Ladder**, **Stewardship Plan Setup**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export**. Volunteers adds no admin page (its settings are the **Volunteers** section of **BarnCRM Settings**). **BarnCRM Admin Console** has the same. |
 | 3 | Open **BarnCRM**. | After **Find**: **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches** (and **Volunteer Shifts**, **Volunteer Hours** with Volunteers). |
 | 4 | In **BarnCRM**, open a gift from **Gifts**. | The gift opens on the same record page as in **Fundraising**. |
 | 5 | Open **BarnCRM Console**, then a gift from **Gifts**. | The gift opens in a console tab. |

@@ -1,4 +1,4 @@
-# ADR-0136: Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation
+# ADR-0137: Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation
 
 **Status:** Accepted (owner decision, 2026-10-26)
 **Date:** 2026-10-26

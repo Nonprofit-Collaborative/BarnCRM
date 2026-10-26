@@ -22,7 +22,7 @@
  * `0125-rollup-builder-module.md`, D2), or through `giveToGroupHolders`, naming the roles
  * themselves (ADR-0131 `0131-module-access-sync-by-role.md`); Core names no module set.
  *
- * The four BarnCRM apps follow the same way (ADR-0136): each has a BarnCRM App set that shows that app
+ * The four BarnCRM apps follow the same way (ADR-0137): each has a BarnCRM App set that shows that app
  * and nothing else, its audience is every BarnCRM role (the admin apps: BarnCRM Admin only), and
  * the App Navigation Style setting says which style's sets are on.
  */
