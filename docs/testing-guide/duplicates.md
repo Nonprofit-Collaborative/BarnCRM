@@ -140,7 +140,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
 | 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Duplicates**. **Overview** lists one section. |
 | 4 | Choose **Duplicates**. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
-| 5 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open this page**. |
-| 6 | Click **Open this page**. | The **Org Optimizer** tab opens. |
+| 5 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open Org Optimizer**. |
+| 6 | Click **Open Org Optimizer**. | The **Org Optimizer** tab opens. |
 
 **Cleanup:** Remove **BarnCRM Duplicate Review** from the staff user.
