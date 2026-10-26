@@ -50,6 +50,7 @@ private class VolunteerHoursImportTest {
                 Name
             FROM Import_Template__c
             WHERE Template_Key__c = :TEMPLATE_KEY
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -129,6 +130,7 @@ private class VolunteerHoursImportTest {
             SELECT Row_Number__c, Error_Message__c
             FROM Import_Row__c
             WHERE Import_Batch__c = :lastBatch.Id
+            WITH SYSTEM_MODE
             ORDER BY Row_Number__c
         ]) {
             if (String.isNotBlank(staged.Error_Message__c)) {

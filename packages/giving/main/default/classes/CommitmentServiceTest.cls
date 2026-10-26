@@ -40,6 +40,7 @@ private class CommitmentServiceTest {
             SELECT Id, Sequence__c, Due_Date__c, Expected_Amount__c, Status__c
             FROM Installment__c
             WHERE Commitment__c = :commitmentId
+            WITH SYSTEM_MODE
             ORDER BY Sequence__c
         ];
     }

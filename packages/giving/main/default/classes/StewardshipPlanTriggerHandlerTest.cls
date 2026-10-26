@@ -14,6 +14,7 @@ private class StewardshipPlanTriggerHandlerTest {
             SELECT Id
             FROM Stewardship_Plan_Template__c
             WHERE Plan_Key__c = 'hand_closed_plan'
+            WITH SYSTEM_MODE
         ];
         Stewardship_Plan_Template__c template = found.isEmpty()
             ? new Stewardship_Plan_Template__c(
@@ -39,7 +40,12 @@ private class StewardshipPlanTriggerHandlerTest {
     }
 
     private static Stewardship_Plan__c reload(Id planId) {
-        return [SELECT Status__c, Completed_Date__c FROM Stewardship_Plan__c WHERE Id = :planId];
+        return [
+            SELECT Status__c, Completed_Date__c
+            FROM Stewardship_Plan__c
+            WHERE Id = :planId
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

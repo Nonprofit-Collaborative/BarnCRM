@@ -697,6 +697,7 @@ private class GiftBatchServiceTest {
             SELECT Id, Commitment__c, Expected_Amount__c
             FROM Installment__c
             WHERE Commitment__c = :pledge.Id
+            WITH SYSTEM_MODE
             ORDER BY Sequence__c
         ];
     }

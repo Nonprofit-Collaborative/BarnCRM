@@ -104,6 +104,7 @@ private class RollupLargeParentBatchTest {
                 Last_Error__c
             FROM Rollup_Queue__c
             WHERE Id = :entryId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -117,6 +118,7 @@ private class RollupLargeParentBatchTest {
                 Next_Attempt__c,
                 Last_Error__c
             FROM Rollup_Queue__c
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate, Id
         ];
     }
@@ -126,6 +128,7 @@ private class RollupLargeParentBatchTest {
             SELECT NumberOfEmployees, AnnualRevenue, Description, Preferred_Name__c
             FROM Account
             WHERE Id = :parentId
+            WITH SYSTEM_MODE
         ];
     }
 

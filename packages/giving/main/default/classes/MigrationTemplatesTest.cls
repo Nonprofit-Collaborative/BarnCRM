@@ -68,6 +68,7 @@ private class MigrationTemplatesTest {
                 Match_Amount_Tolerance__c
             FROM Import_Template__c
             WHERE Template_Key__c = :key
+            WITH SYSTEM_MODE
         ];
         found.Person_Mode__c = personMode;
         update found;
@@ -179,6 +180,7 @@ private class MigrationTemplatesTest {
                 Created_By_Import_Batch__c,
                 (SELECT Fund__r.Name, Amount__c FROM Gift_Allocations__r ORDER BY Fund__r.Name)
             FROM Gift__c
+            WITH SYSTEM_MODE
         ]) {
             result.put(gift.External_Id__c, gift);
         }

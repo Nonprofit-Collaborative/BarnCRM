@@ -298,6 +298,7 @@ private class GivingPostInstallTest {
         for (Automation_Setting__c setting : [
             SELECT Id, Automation_Name__c, Enabled__c, Always_Runs__c
             FROM Automation_Setting__c
+            WITH SYSTEM_MODE
         ]) {
             byName.put(setting.Automation_Name__c, setting);
         }
@@ -328,6 +329,7 @@ private class GivingPostInstallTest {
         for (Rollup_Definition__c definition : [
             SELECT Id, Definition_Key__c, Target_Field__c, Active__c, Is_Package_Default__c, Mode__c
             FROM Rollup_Definition__c
+            WITH SYSTEM_MODE
             LIMIT 1000
         ]) {
             byKey.put(definition.Definition_Key__c, definition);
