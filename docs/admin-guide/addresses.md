@@ -160,7 +160,7 @@ street on **The Garcia Family** and save: the new street becomes a new Home addr
 marked primary, the old one stays as history, and every member without an address of their
 own gets the new mailing address.
 
-## Moving a household on purpose
+## Moving a Household on Purpose
 
 Two buttons on the **Addresses** card move a household when you decide to, whatever
 **Address Updates** is set to. They need the same access as **Set as Primary**: edit on

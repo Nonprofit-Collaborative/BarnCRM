@@ -19,7 +19,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** keep the Phoenix address for T-ADDR-02 to T-ADDR-07.
 
-## T-ADDR-02: Set as Primary, and back
+## T-ADDR-02: Set as Primary, and Back
 
 **Purpose:** Set as Primary copies the address to the household and its members, and can be moved back.
 **Prerequisites:** staff user, T-ADDR-01 done, **Address Updates** set to **Everyone in the household moves together** (ships that way).
@@ -111,7 +111,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the Phoenix address.
 
-## T-ADDR-08: Overlapping seasons and deleting the primary
+## T-ADDR-08: Overlapping Seasons and Deleting the Primary
 
 **Purpose:** overlapping seasons are reported, and a deleted primary is replaced by a non-seasonal address.
 **Prerequisites:** admin, a test household: create contact `Ada` `Testaddr` with no account (a household is created).
@@ -183,7 +183,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the 27 Billing Test Ave address, and Luis's second membership if you added one.
 
-## T-ADDR-13: Nobody moves until you choose
+## T-ADDR-13: Nobody Moves Until You Choose
 
 **Purpose:** with **Address Updates** set to **Nobody moves until you choose**, a person's edit stays theirs, a household change moves the household only, and the seasonal swap still moves everyone without an address of their own.
 **Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists), the Garcia household on Sunset Ln and no member with an address of their own.
