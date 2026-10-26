@@ -63,7 +63,7 @@ to Salesforce, not to BarnCRM.
    - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household
      Summary. For an assistant that should only look things up, use a user with Read Only.
    - Record Inbound Gift needs **Giving Staff**, which covers the records involved, and
-     Mirror's **Record Inbound Gift Action** permission set (Access page, Extra permissions), which runs that one action and grants nothing else. Assign it
+     Mirror's **Record Inbound Gift Action** permission set (Access page, Extra Permissions), which runs that one action and grants nothing else. Assign it
      only to the users who may record gifts through an assistant; no BarnCRM role includes it,
      so no one gets the action without your decision.
    The actions run with the user's own access, so what each user can find or change is still

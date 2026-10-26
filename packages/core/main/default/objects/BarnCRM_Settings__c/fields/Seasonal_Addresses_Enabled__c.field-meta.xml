@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Seasonal_Addresses_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether seasonal addresses move on their own. Turning it on schedules the nightly seasonal address swap and turning it off stops it (C-18).</description>
+  <inlineHelpText>Swap seasonal addresses in and out every night.</inlineHelpText>
+  <label>Seasonal Addresses Enabled</label>
+  <type>Checkbox</type>
+</CustomField>

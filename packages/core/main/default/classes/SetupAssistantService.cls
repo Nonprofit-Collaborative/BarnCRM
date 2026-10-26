@@ -34,6 +34,12 @@ public with sharing class SetupAssistantService {
     public static final String FIELD_FILE = 'File';
     @NamespaceAccessible
     public static final String FIELD_NAVIGATE = 'Navigate';
+    /**
+     * One part of the organization address. The page lays the six parts out together as one
+     * grouped address block, so these fields are declared one per part but shown as one.
+     */
+    @NamespaceAccessible
+    public static final String FIELD_ADDRESS = 'Address';
 
     /** The coexistence modes, as plan Section 4.5 names them. */
     public static final String MODE_STANDALONE = 'Standalone';
@@ -596,37 +602,40 @@ public with sharing class SetupAssistantService {
             .withTarget(SettingSections.ACCESS);
         access.setupPath = '/lightning/setup/ManageUsers/home';
         steps.add(access);
-        steps.add(
-            new Step(
-                    'identity',
-                    50,
-                    System.Label.Core_SetupAssistant_Step5Label,
-                    System.Label.Core_SetupAssistant_Step5Description
-                )
-                .withTarget(SettingSections.ORGANIZATION)
-                .completedBy(null, 'Organization_Legal_Name__c')
-                .withField(
-                    new StepField(
-                            FIELD_TEXT,
-                            10,
-                            null,
-                            'Organization_Legal_Name__c',
-                            System.Label.Core_SetupAssistant_LegalNameLabel
-                        )
-                        .withLimits(255, null, null)
-                )
-                .withField(
-                    new StepField(
-                            FIELD_TEXT,
-                            30,
-                            null,
-                            'Organization_Address__c',
-                            System.Label.Core_SetupAssistant_AddressLabel
-                        )
-                        .withLimits(255, null, null)
-                        .asFullWidth()
-                )
-        );
+        Step identity = new Step(
+                'identity',
+                50,
+                System.Label.Core_SetupAssistant_Step5Label,
+                System.Label.Core_SetupAssistant_Step5Description
+            )
+            .withTarget(SettingSections.ORGANIZATION)
+            .completedBy(null, 'Organization_Legal_Name__c')
+            .withField(
+                new StepField(
+                        FIELD_TEXT,
+                        10,
+                        null,
+                        'Organization_Legal_Name__c',
+                        System.Label.Core_SetupAssistant_LegalNameLabel
+                    )
+                    .withLimits(255, null, null)
+            );
+        // The six address parts, which the page shows as one grouped block (sorts 30 to 35).
+        Integer addressSort = 30;
+        for (Schema.SObjectField part : OrganizationAddress.partFields()) {
+            Schema.DescribeFieldResult describe = part.getDescribe();
+            identity.withField(
+                new StepField(
+                        FIELD_ADDRESS,
+                        addressSort++,
+                        null,
+                        describe.getLocalName(),
+                        describe.getLabel()
+                    )
+                    .withLimits(describe.getLength(), null, null)
+            );
+        }
+        steps.add(identity);
         steps.add(
             new Step(
                     'modules',

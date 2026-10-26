@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Organization address</label>
+  <label>Organization Address</label>
   <protected>true</protected>
   <values>
-    <field>Setting_Key__c</field>
-    <value xsi:type="xsd:string">Organization_Address__c</value>
+    <field>Component__c</field>
+    <value xsi:type="xsd:string">organizationAddressSettings</value>
   </values>
   <values>
     <field>Settings_Object__c</field>
@@ -20,11 +20,11 @@
   </values>
   <values>
     <field>Data_Type__c</field>
-    <value xsi:type="xsd:string">Text</value>
+    <value xsi:type="xsd:string">Component</value>
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Your mailing address on one line, exactly as you want it printed on letters and documents.</value>
+    <value xsi:type="xsd:string">Your mailing address, printed on receipts and letters. Leave it blank, or fill in Street, City, State and Zip Code (Street 2 and Country are optional).</value>
   </values>
   <values>
     <field>Help_Path__c</field>

@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Custom metadata page: heading above the organization's own rows</shortDescription>
-        <value>Added by your organization</value>
+        <value>Added by Your Organization</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_OwnEmpty</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Custom metadata page: heading of the form for a new row</shortDescription>
-        <value>New row</value>
+        <value>New Row</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_EditTitle</fullName>
