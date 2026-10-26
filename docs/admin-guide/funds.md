@@ -56,7 +56,7 @@ You are David, and you are setting up funds before your first gift entry session
 - **Two funds that mean the same thing.** "General" and "General Fund" split your reporting
   in half. Pick one, move any allocations, then deactivate the other.
 - **Expecting an import to move Total Raised the instant it finishes.** A gift saved by a
-  person updates its funds' totals a few seconds after the save (see "Just after the save, or
+  person updates its funds' totals a few seconds after the save (see "After the save, or
   during it" in [Rollups](rollups.md)), and the totals from an import or other bulk change
   catch up within minutes. **Rollups Last Calculated** on the fund
   tells you when the number was worked out, so you always know whether you are looking at a

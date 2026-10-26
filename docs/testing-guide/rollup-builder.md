@@ -160,12 +160,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 ## T-RB-09: Default rollup mode decides how a new rollup starts
 
-**Purpose:** confirm the Rollup Settings tab changes the mode a new rollup starts with.
-**Prerequisites:** admin user.
+**Purpose:** confirm the Rollup Settings tab shows the shipped defaults on a fresh org and changes the mode a new rollup starts with.
+**Prerequisites:** admin user. For step 1, a fresh org or a source-deployed one where nobody has saved these two settings yet.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Rollup Builder**, open the **Rollup Settings** tab. | The settings console shows only the module's settings: **Default rollup mode** and **When instant totals are calculated**. **Fiscal year start month** is not here. |
+| 1 | In **BarnCRM Rollup Builder**, open the **Rollup Settings** tab. | The settings console shows only the module's settings: **Default rollup mode** and **When instant totals are calculated**. **Fiscal year start month** is not here. On a fresh org **Default rollup mode** shows **Both (recommended)** and **When instant totals are calculated** shows **After the save (recommended)** (neither is empty). |
 | 2 | Change **Default rollup mode** to **Every night** and save. | The setting saves and shows **Every night**. |
 | 3 | Open **BarnCRM Settings**, **Rollups** section. | **Default rollup mode** shows **Every night** there too. |
 | 4 | On the **Rollup Builder** tab, click **New rollup**, complete steps 1 to 4 (any valid choices) and go to **Check and save**. | **Mode** is preselected as **Every night**. |

@@ -2036,7 +2036,7 @@ settings console shows them in its Rollups section as before.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
-| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 
 ---
 

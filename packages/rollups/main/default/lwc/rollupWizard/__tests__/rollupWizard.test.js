@@ -71,7 +71,7 @@ const flush = () =>
     .then(() => Promise.resolve())
     .then(() => Promise.resolve());
 
-async function build(draft) {
+async function build(draft, model = MODEL) {
   getTargetFields.mockResolvedValue([
     { value: 'Total_Giving__c', label: 'Total Giving', type: 'currency' },
     { value: 'Has_Given__c', label: 'Has Given', type: 'boolean', filledBy: 'Another rollup' }
@@ -92,7 +92,7 @@ async function build(draft) {
   ]);
   preview.mockResolvedValue({ maintains: 'This rollup will maintain about 1,204 records.' });
   const element = createElement('c-rollup-wizard', { is: RollupWizard });
-  element.model = MODEL;
+  element.model = model;
   element.draft = draft;
   document.body.appendChild(element);
   await flush();
@@ -119,6 +119,19 @@ describe('c-rollup-wizard', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('starts a new rollup in the Settings default mode, Both unless the org changed it', async () => {
+    const fresh = await build(null);
+    expect(fresh.draft.mode).toBe('Both');
+
+    const changed = await build(null, { ...MODEL, defaultMode: 'Scheduled' });
+    expect(changed.draft.mode).toBe('Scheduled');
+  });
+
+  it('keeps the mode of a rollup being edited', async () => {
+    const element = await build(DRAFT, { ...MODEL, defaultMode: 'Scheduled' });
+    expect(element.draft.mode).toBe('Both');
   });
 
   it('marks a field another rollup fills', async () => {

@@ -209,6 +209,12 @@ at something, you choose it:
   Ticking none means every record type.
 - **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
 
+A dropdown or a number that has not been saved yet shows the value BarnCRM is already using
+(for example **Default rollup mode** shows **Both (recommended)** on a new org), not an empty
+box. Opening the page saves nothing. The exceptions are the settings where empty means "not
+chosen yet", such as **How people belong to a household** and **Coexistence mode**, which
+stay empty until you choose.
+
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
 

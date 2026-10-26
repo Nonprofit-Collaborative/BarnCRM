@@ -122,6 +122,51 @@ public with sharing class SettingsService {
     }
 
     /**
+     * Core settings whose blank means "nobody has chosen yet", never "the shipped default", so
+     * the console must keep showing them empty (CoexistenceService reads a blank coexistence
+     * mode as unconfirmed and a blank membership mode as the only one detection may change; see
+     * `blanksKeptBlank`). Lower-case field names.
+     */
+    private static final Set<String> BLANK_MEANS_NOT_CHOSEN = new Set<String>{
+        'coexistence_mode__c',
+        'household_membership_mode__c'
+    };
+
+    /**
+     * What the console should show for a setting: the stored value, or, when nothing is stored,
+     * the default the org is running on. An org that has never saved a module's settings has no
+     * row at all, and a first save keeps blanks blank (`blanksKeptBlank`), so a picklist or a
+     * number with a declared default read as empty and looked like "no default" even though
+     * every reader treats a blank as that default. Nothing is written: this only changes what
+     * is displayed, and saving still stores only what the administrator changed.
+     *
+     * Only Picklist and Number rows are filled in. A checkbox is never blank (its shipped value
+     * is already on the record, ADR-0035), and a free-text row may be cleared on purpose, so it
+     * is shown as stored. A row in `BLANK_MEANS_NOT_CHOSEN` is shown as stored too.
+     */
+    @NamespaceAccessible
+    public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
+        Schema.SObjectType type = settingsType(settingsObject);
+        Schema.SObjectField field = fieldFor(type, key);
+        Object stored = orgDefault(type).get(field);
+        Boolean blank =
+            stored == null || (stored instanceof String && String.isBlank((String) stored));
+        Boolean fillable =
+            PICKLIST.equalsIgnoreCase(dataType) || NUMBER_TYPE.equalsIgnoreCase(dataType);
+        if (!blank || !fillable) {
+            return stored;
+        }
+        String name = field.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .getLocalName()
+            .toLowerCase();
+        if (isCoreSettings(type) && BLANK_MEANS_NOT_CHOSEN.contains(name)) {
+            return stored;
+        }
+        Object declared = type.newSObject(null, true).get(field);
+        return declared == null ? stored : declared;
+    }
+
+    /**
      * Saves the given Core values, keyed by the API name of the BarnCRM Settings field.
      * Only keys that exist on the object and are listed in a Setting Definition row are
      * accepted. Returns the refreshed Core settings.

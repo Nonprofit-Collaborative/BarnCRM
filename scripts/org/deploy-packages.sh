@@ -509,10 +509,12 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # development org holds the rollups a real install would have. It creates only what is
   # missing. A Core-only org has no engine, so there is nothing to call. The same step carries
   # over the rollup settings an org saved on Core before the module had its own settings object,
-  # as RollupsPostInstall does at install.
+  # as RollupsPostInstall does at install, and gives an org with no Rollup Settings row one
+  # holding the shipped defaults (Default Rollup Mode Both, processing Background).
   echo ""
   echo "== Creating the shipped rollup definitions =="
-  if ! printf '%s\n' 'RollupsPostInstall.carryOverCoreSettings();' 'RollupService.ensureDefaults();' |
+  if ! printf '%s\n' 'RollupsPostInstall.carryOverCoreSettings();' \
+    'RollupsPostInstall.ensureSettingsRow();' 'RollupService.ensureDefaults();' |
     sf apex run --target-org "$ALIAS"; then
     echo "The rollup definitions were not created. Nothing else is affected: the Restore shipped"
     echo "rollups button in the Rollup Builder runs exactly the same step."

@@ -445,7 +445,11 @@ public with sharing class SettingsController {
             setting.checked = false;
             return setting;
         }
-        Object value = SettingsService.getValue(settingsObject, definition.Setting_Key__c);
+        Object value = SettingsService.getEffectiveValue(
+            settingsObject,
+            definition.Setting_Key__c,
+            definition.Data_Type__c
+        );
         setting.value = SettingsService.asText(value);
         setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
         return setting;

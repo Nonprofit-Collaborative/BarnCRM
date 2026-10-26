@@ -927,4 +927,93 @@ private class SettingsServiceTest {
             Assert.areEqual('', SettingsService.asText(null), 'Unset reads as empty');
         }
     }
+
+    @IsTest
+    static void anUnsavedPicklistAndNumberShowTheirDeclaredDefault() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
+
+            Assert.areEqual(
+                'Daily',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'A picklist nobody has saved shows the choice the org is running on'
+            );
+            Assert.areEqual(
+                5,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Stale_Record_Years__c',
+                    'Number'
+                ),
+                'And so does a number'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Reading the default writes nothing'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'And audits nothing.');
+        }
+    }
+
+    @IsTest
+    static void aSavedValueWinsOverTheDefault() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
+            settings.Error_Digest_Frequency__c = 'Weekly';
+            TestDataFactory.saveSettings(settings);
+
+            Assert.areEqual(
+                'Weekly',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'What the administrator chose is shown, not the default'
+            );
+        }
+    }
+
+    @IsTest
+    static void aBlankThatMeansNotChosenYetStaysBlank() {
+        System.runAs(TestUsers.admin()) {
+            for (
+                String key : new List<String>{
+                    'Coexistence_Mode__c',
+                    'Household_Membership_Mode__c'
+                }
+            ) {
+                Assert.isTrue(
+                    String.isBlank(
+                        (String) SettingsService.getEffectiveValue(
+                            SettingsService.CORE_SETTINGS_OBJECT,
+                            key,
+                            'Picklist'
+                        )
+                    ),
+                    key + ' is not chosen yet, so the console must not pretend it is'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void aFreeTextRowIsShownAsStoredEvenWhenItDeclaresADefault() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isTrue(
+                String.isBlank(
+                    (String) SettingsService.getEffectiveValue(
+                        SettingsService.CORE_SETTINGS_OBJECT,
+                        TEXT_KEY,
+                        'Text'
+                    )
+                ),
+                'A text value may be cleared on purpose, so it is not filled in'
+            );
+        }
+    }
 }
