@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: heading</shortDescription>
-    <value>Nightly jobs</value>
+    <value>Nightly Jobs</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_Intro</fullName>

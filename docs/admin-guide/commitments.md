@@ -36,7 +36,7 @@ create or change; existing schedules are left alone until you edit them.
 Commitments need three jobs to run overnight, and until you switch them on none of them
 runs. This is the step that makes a payment turn Overdue on its own.
 
-Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly jobs**.
+Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly Jobs**.
 The page opens with a line for each job, then one button.
 
 Choose **Schedule nightly run**. Three jobs are scheduled at once:

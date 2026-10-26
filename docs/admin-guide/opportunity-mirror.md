@@ -70,7 +70,7 @@ Opportunity mirror page says so.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of
    Opportunities does not create, and thank donors for, a gift for every one of them.
-3. Still in **Giving**, open **Opportunity mirror** (the row shows only to someone with the
+3. Still in **Giving**, open **Opportunity Mirror** (the row shows only to someone with the
    permission set). Click **Run now** once, to copy what you already have, and **Schedule
    nightly run**, so the mirror catches up every night at 1:30 AM, in your organization's time zone. The page shows when the last run
    completed and what it did, and Health Check warns if two days pass without one.
@@ -103,7 +103,7 @@ Do this as Maria, in an org that has Opportunities, with the sample data loaded.
 
 1. In **BarnCRM Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to
    Opportunities** and save.
-2. Open **Opportunity mirror** and click **Run now**. Wait a minute, then open the
+2. Open **Opportunity Mirror** and click **Run now**. Wait a minute, then open the
    **Reconciliation** section, choose this year, and click **Compare**. The gift count and total
    match the won Opportunity count and total, and there are no differences.
 3. Enter a gift of 100 from Luis Garcia with **Quick gift entry**. Open the App Launcher,

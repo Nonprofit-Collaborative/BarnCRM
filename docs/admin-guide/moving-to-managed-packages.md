@@ -58,7 +58,7 @@ had none).
    With Rollup Builder, in the **BarnCRM Rollup Builder** app, click **Stop the nightly
    recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal Address Swap**, stop the nightly
    swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Mirror, on
-   **Opportunity mirror**, click **Stop nightly run**. If automation is paused, click **Resume
+   **Opportunity Mirror**, click **Stop nightly run**. If automation is paused, click **Resume
    automation**.
 6. **Check the kit can read everything.** Run
    `python3 scripts/migration/migrate.py check --org pilot --mapping mapping.json --namespace <old-ns>`.

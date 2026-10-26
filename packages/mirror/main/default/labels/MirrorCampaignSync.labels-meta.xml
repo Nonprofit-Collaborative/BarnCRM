@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: heading</shortDescription>
-    <value>Campaign sync</value>
+    <value>Campaign Sync</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_Intro</fullName>

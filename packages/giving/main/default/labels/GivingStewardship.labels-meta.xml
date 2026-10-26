@@ -38,7 +38,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the page title</shortDescription>
-    <value>Stewardship plans</value>
+    <value>Stewardship Plans</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_Intro</fullName>
@@ -390,7 +390,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Start plan action: heading</shortDescription>
-    <value>Start a stewardship plan</value>
+    <value>Start a Stewardship Plan</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartPlanLabel</fullName>

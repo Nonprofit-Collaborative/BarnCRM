@@ -167,7 +167,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting periods**, **Open**. | Card **Accounting Periods** with **Books closed through** and "No period is closed." |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books closed through** and "No period is closed." |
 | 2 | Set **Books closed through** to today, click **Save**. | Refused: "The books can be closed through the day before yesterday at the latest..." |
 | 3 | Set it to the last day of last month (on the 1st or 2nd, the month before), click **Save**. | "Saved. The books are closed through the date shown." |
 | 4 | On **Quick Gift Entry**, enter a gift for Harper Garcia, 20, Cash, **Gift date** in last month. Save. | Not saved; the message starts "The books are closed through", naming the date. |

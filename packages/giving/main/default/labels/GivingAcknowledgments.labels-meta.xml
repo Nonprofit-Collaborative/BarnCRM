@@ -126,7 +126,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the queue section heading</shortDescription>
-    <value>Waiting to go</value>
+    <value>Waiting to Go</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_EmailQueue</fullName>
@@ -262,7 +262,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the rules section heading</shortDescription>
-    <value>Your rules, in the order they are considered</value>
+    <value>Your Rules, in the Order They Are Considered</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NewRule</fullName>
@@ -294,7 +294,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: heading of the form for a new rule</shortDescription>
-    <value>New rule</value>
+    <value>New Rule</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_EditRuleHeading</fullName>
@@ -302,7 +302,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: heading of the form for a rule</shortDescription>
-    <value>Edit rule</value>
+    <value>Edit Rule</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_TemplateField</fullName>
@@ -366,7 +366,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the runs section heading</shortDescription>
-    <value>Recent runs</value>
+    <value>Recent Runs</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NoRuns</fullName>

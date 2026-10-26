@@ -170,8 +170,8 @@ A module's sets are listed after them, only where that module is installed:
 | Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
 | Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
 | Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
-| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
-| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access. |
+| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign Sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
+| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity Mirror page. Creating Opportunities also needs Opportunity access. |
 | Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts. |
 | Inbound Gift API | Mirror | For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM. |
 | Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |

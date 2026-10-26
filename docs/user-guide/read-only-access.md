@@ -55,7 +55,7 @@ that says you cannot record a refund or start a plan.
 | Volunteer Jobs, Volunteer Shifts, sign-ups, Skills | Read them; run reports and view dashboards | Create, change or delete |
 | Volunteer Hours | Open the tab, but you see no hours entries (each person sees only the entries they made) | Enter or approve hours |
 | A person's volunteer totals | Read them on the person | Change them |
-| Volunteer Requirements, Volunteer Letter Templates, Approve Hours, Volunteer Settings | Nothing: these are not given | Anything |
+| Volunteer Requirements, Volunteer Letter Templates, Approve Hours | Nothing: these are not given | Anything |
 
 ## To check what you can see
 

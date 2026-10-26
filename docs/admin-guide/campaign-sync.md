@@ -43,7 +43,7 @@ Campaigns, and the Campaign sync page says so.
    Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
-3. Still in **Giving**, open **Campaign sync**. It shows how many appeals have a Campaign.
+3. Still in **Giving**, open **Campaign Sync**. It shows how many appeals have a Campaign.
    It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
 
 **Who gets a Campaign when they save an appeal.** The Campaign is created with the access of
@@ -78,7 +78,7 @@ time, as Data Loader does by default, is copied as usual.
 Do this as Maria, in an org that has Campaigns, with the sample data loaded and Campaign
 sync switched on as above.
 
-1. Open **BarnCRM Settings**, **Giving**, **Campaign sync**. Note the numbers: for
+1. Open **BarnCRM Settings**, **Giving**, **Campaign Sync**. Note the numbers: for
    example `0 of 6 appeals have a Campaign.`
 2. Click **Sync all appeals**. The page says the sync has started. Wait a minute and reload
    the page: every appeal now has a Campaign.

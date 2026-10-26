@@ -37,7 +37,7 @@ Receipt PDFs are attached to the **Receipt** record and, for a single gift recei
 A year-end statement lists a donor's gifts for the year in one document. With the **Issue Receipts** permission you can start a run.
 
 1. Open the **Receipt Letters** tab.
-2. Click the **Year end statements** tab.
+2. Click the **Year End Statements** tab.
 3. Check the **Statement year**.
 4. Click **Generate**.
 5. Click **Refresh** to follow the run.
@@ -51,12 +51,12 @@ Enter all the year's gifts first. A donor who already has a statement for the ye
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
 1. Open the **Acknowledgment Queue** tab.
-2. Read **Waiting to go**: **Emails ready to send**, **Letters ready to merge**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**.
+2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**.
 3. Click **Send emails now** to send the email queue.
-4. Click **Download letters to merge** to get the letter queue as a spreadsheet. Under **Recent runs**, click **Download the file**, merge it with your letter, and print.
+4. Click **Download letters to merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download the file**, merge it with your letter, and print.
 5. When the letters are posted, click **Mark as sent** on that run.
 
-You should see: each run under **Recent runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as sent**.
+You should see: each run under **Recent Runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as sent**.
 
 Only your admin can add or change rules, or turn on **Send emails nightly**. The **Gifts to Acknowledge** list view on **Gifts** shows every gift still waiting.
 

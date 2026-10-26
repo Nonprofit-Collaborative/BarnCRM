@@ -7069,7 +7069,7 @@ platform deletes with a parent are not in it.
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-counted in Org Optimizer's Field utilization section and saved there with "Save these counts"
+counted in Org Optimizer's Field utilization section and saved there with "Save Utilization Snapshot"
 (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-0101
 `0101-field-utilization-on-demand.md`). Every row of one save carries the same Taken At, so a
 saved count is the set of rows sharing it, and a trend is the same object, field and record type
@@ -7110,7 +7110,7 @@ says so.
 **R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
 **R-FU7 On demand, saved by choice.** Counting runs synchronously from the page, 40 fields per
 call (10 when the object holds more than 100,000 records); each call reads the record totals
-again. Nothing is stored until the person chooses "Save these counts"; the save checks each
+again. Nothing is stored until the person chooses "Save Utilization Snapshot"; the save checks each
 row's object, field and record type against describe and caps Filled Count at Record Count.
 Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
 standard delete.

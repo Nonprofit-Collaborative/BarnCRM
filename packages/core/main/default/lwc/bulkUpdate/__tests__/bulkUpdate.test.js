@@ -170,6 +170,12 @@ describe('c-bulk-update', () => {
     expect(
       element.shadowRoot.querySelector('[data-id="preview-table"]').getAttribute('aria-label')
     ).toBeTruthy();
+    // Jest cannot measure layout; this proves the classes that make the browser wrap, not the pixels.
+    const table = element.shadowRoot.querySelector('[data-id="preview-table"]');
+    expect(table.classList.contains('slds-table_fixed-layout')).toBe(true);
+    table
+      .querySelectorAll('th, td')
+      .forEach((cell) => expect(cell.classList.contains('slds-cell-wrap')).toBe(true));
     const start = element.shadowRoot.querySelector('[data-id="start"]');
     expect(start.disabled).toBe(true);
 

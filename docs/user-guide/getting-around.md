@@ -30,7 +30,8 @@ bar at the bottom of the screen.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer
-Requirements**, **Volunteer Settings**, **Dashboards** and **Reports**.
+Requirements**, **Dashboards** and **Reports**. The module's settings are the **Volunteers**
+section of **BarnCRM Settings**.
 
 ## To open an app
 
