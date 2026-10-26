@@ -133,6 +133,50 @@ private class SettingsControllerTest {
         }
     }
 
+    /** The shipped Org Optimizer thresholds sit in their own section, not under General. */
+    @IsTest
+    static void orgOptimizerThresholdsHaveTheirOwnSectionWhileTheFeatureIsOn() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.newInstall();
+            Set<String> before = keysBySection(SettingsController.getConsoleModel()).keySet();
+            FeatureSwitchService.turnOn(FeatureSwitchService.ORG_OPTIMIZER);
+
+            Test.startTest();
+            Map<String, Set<String>> after = keysBySection(SettingsController.getConsoleModel());
+            Test.stopTest();
+
+            Assert.isFalse(
+                before.contains(SettingSections.ORG_OPTIMIZER),
+                'The section is hidden while the Org Optimizer feature is off'
+            );
+            Assert.areEqual(
+                new Set<String>{
+                    'Stale_Record_Years__c',
+                    'Unused_Login_Days__c',
+                    'Unused_Report_Days__c'
+                },
+                after.get(SettingSections.ORG_OPTIMIZER),
+                'The three thresholds are under Org Optimizer once the feature is on'
+            );
+            Assert.isFalse(
+                after.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),
+                'The thresholds no longer show under General'
+            );
+        }
+    }
+
+    private static Map<String, Set<String>> keysBySection(SettingsController.ConsoleModel model) {
+        Map<String, Set<String>> keys = new Map<String, Set<String>>();
+        for (SettingsController.SectionModel section : model.sections) {
+            Set<String> inSection = new Set<String>();
+            for (SettingsController.SettingModel setting : section.settings) {
+                inSection.add(setting.key);
+            }
+            keys.put(section.name, inSection);
+        }
+        return keys;
+    }
+
     private static User buildDavid() {
         return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'david');
     }

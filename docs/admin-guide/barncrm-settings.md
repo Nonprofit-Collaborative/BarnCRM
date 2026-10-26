@@ -109,7 +109,7 @@ to the people who should see them, shows its settings, and starts its automation
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
 | Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
-| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
+| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the default address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
@@ -160,7 +160,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
    Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
-   Error Log, Access, Import, and Health. You only see the ones that have something in them,
+   Error Log, Access, Import, Org Optimizer, and Health. You only see the ones that have something in them,
    and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with

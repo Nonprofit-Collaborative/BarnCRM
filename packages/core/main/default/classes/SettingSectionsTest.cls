@@ -14,9 +14,9 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                15,
+                16,
                 sections.size(),
-                'Fifteen section names are agreed across the suite'
+                'Sixteen section names are agreed across the suite'
             );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.VOLUNTEERS),
