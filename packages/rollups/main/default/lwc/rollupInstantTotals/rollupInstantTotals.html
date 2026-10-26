@@ -1,0 +1,96 @@
+<template>
+    <template lwc:if={shown}>
+        <section class="slds-var-m-top_medium">
+            <template lwc:if={showIntro}>
+                <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h2>
+                <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
+            </template>
+            <template lwc:if={error}>
+                <p class="slds-text-color_error" role="alert" data-id="error">{error}</p>
+            </template>
+            <template lwc:if={notice}>
+                <p role="status" data-id="notice">{notice}</p>
+            </template>
+            <template for:each={rows} for:item="row">
+                <div key={row.key} class="slds-var-p-vertical_x-small" data-object={row.objectApiName}>
+                    <template lwc:if={showIntro}>
+                        <p class="slds-text-title_bold">{row.label}</p>
+                    </template>
+                    <p data-id="status">{row.statusText}</p>
+                    <template lwc:if={row.countText}>
+                        <p class="slds-text-color_weak" data-id="count">{row.countText}</p>
+                    </template>
+                    <div class="slds-var-m-top_xx-small">
+                        <template lwc:if={row.showTurnOn}>
+                            <lightning-button
+                                data-id="turn-on"
+                                data-object={row.objectApiName}
+                                label={labels.turnOn}
+                                disabled={busy}
+                                onclick={handleTurnOn}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:if={row.showTurnOff}>
+                            <lightning-button
+                                data-id="turn-off"
+                                data-object={row.objectApiName}
+                                label={labels.turnOff}
+                                disabled={busy}
+                                onclick={handleTurnOff}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:if={row.showRemove}>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                data-id="remove"
+                                data-object={row.objectApiName}
+                                label={labels.remove}
+                                disabled={busy}
+                                onclick={handleRemove}
+                            ></lightning-button>
+                        </template>
+                    </div>
+
+                    <template lwc:if={row.showSetup}>
+                        <div class="slds-box slds-var-m-top_small" data-id="setup">
+                            <h3 class="slds-text-heading_small">{setupTitle}</h3>
+                            <ol class="slds-list_ordered slds-var-m-vertical_small">
+                                <template for:each={setupSteps} for:item="step">
+                                    <li key={step.key}>{step.text}</li>
+                                </template>
+                            </ol>
+                            <h4 class="slds-text-title_bold">{labels.triggerHeading}</h4>
+                            <pre class="slds-box slds-box_x-small slds-theme_shade" data-id="trigger-source">{code.triggerSource}</pre>
+                            <lightning-button data-id="copy-trigger" data-part="trigger" label={labels.copy} onclick={handleCopy}></lightning-button>
+                            <h4 class="slds-text-title_bold slds-var-m-top_small">{labels.testHeading}</h4>
+                            <pre class="slds-box slds-box_x-small slds-theme_shade" data-id="test-source">{code.testSource}</pre>
+                            <lightning-button data-id="copy-test" data-part="test" label={labels.copy} onclick={handleCopy}></lightning-button>
+                            <p class="slds-var-m-top_small">{labels.setupCli}</p>
+                            <pre class="slds-box slds-box_x-small slds-theme_shade" data-id="deploy-command">{deployCommand}</pre>
+                            <div class="slds-var-m-top_x-small">
+                                <a class="slds-button slds-button_neutral" data-id="download-deploy" href={deployHref} download={deployFileName}>{labels.downloadDeploy}</a>
+                                <lightning-button class="slds-var-m-left_x-small" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template lwc:if={row.showRemoval}>
+                        <div class="slds-box slds-var-m-top_small" data-id="removal">
+                            <h3 class="slds-text-heading_small">{removeTitle}</h3>
+                            <ol class="slds-list_ordered slds-var-m-vertical_small">
+                                <template for:each={removeSteps} for:item="step">
+                                    <li key={step.key}>{step.text}</li>
+                                </template>
+                            </ol>
+                            <pre class="slds-box slds-box_x-small slds-theme_shade" data-id="removal-command">{removalCommand}</pre>
+                            <div class="slds-var-m-top_x-small">
+                                <a class="slds-button slds-button_neutral" data-id="download-removal" href={removalHref} download={removalFileName}>{labels.downloadRemoval}</a>
+                                <lightning-button class="slds-var-m-left_x-small" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </section>
+    </template>
+</template>
