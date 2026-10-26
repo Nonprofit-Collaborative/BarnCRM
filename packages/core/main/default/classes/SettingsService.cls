@@ -23,6 +23,7 @@ public with sharing class SettingsService {
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
     private static final String NUMBER_TYPE = 'Number';
+    private static final String TEXT_TYPE = 'Text';
     public static final String RECORD = 'Record';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 
@@ -119,6 +120,61 @@ public with sharing class SettingsService {
     public static Object getValue(String settingsObject, String key) {
         Schema.SObjectType type = settingsType(settingsObject);
         return orgDefault(type).get(fieldFor(type, key));
+    }
+
+    /**
+     * The Core settings whose blank means "nobody has chosen yet", so the stored value has to
+     * stay blank (CoexistenceService reads a blank coexistence mode as unconfirmed and a blank
+     * membership mode as the only one detection may change; see `blanksKeptBlank`).
+     * Coexistence mode is still shown with the recommended mode selected (see
+     * `getEffectiveValue`), nothing stored. The membership mode is shown as stored here: its
+     * default is being decided on its own branch. Lower-case field names.
+     */
+    private static final String COEXISTENCE_FIELD = 'coexistence_mode__c';
+    private static final Set<String> SHOWN_AS_STORED = new Set<String>{
+        'household_membership_mode__c'
+    };
+
+    /**
+     * What the console should show for a setting: the stored value, or, when nothing is stored,
+     * the default the org is running on. An org that has never saved a module's settings has no
+     * row at all, and a first save keeps blanks blank (`blanksKeptBlank`), so a picklist or a
+     * number with a declared default read as empty and looked like "no default" even though
+     * every reader treats a blank as that default. Nothing is written: this only changes what
+     * is displayed, and saving still stores only what the administrator changed.
+     *
+     * Picklist, Number and Text rows are filled in (a setting shows its default until changed,
+     * never an empty box; every reader treats a blank in these as the default). A checkbox is
+     * never blank (its shipped value is already on the record, ADR-0035). Coexistence mode,
+     * whose stored blank means "not confirmed", is shown as the mode detection recommends;
+     * the stored value stays blank until somebody saves it. A row in `SHOWN_AS_STORED` is shown
+     * as stored.
+     */
+    @NamespaceAccessible
+    public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
+        Schema.SObjectType type = settingsType(settingsObject);
+        Schema.SObjectField field = fieldFor(type, key);
+        Object stored = orgDefault(type).get(field);
+        Boolean blank =
+            stored == null || (stored instanceof String && String.isBlank((String) stored));
+        Boolean fillable =
+            PICKLIST.equalsIgnoreCase(dataType) ||
+            NUMBER_TYPE.equalsIgnoreCase(dataType) ||
+            TEXT_TYPE.equalsIgnoreCase(dataType);
+        if (!blank || !fillable) {
+            return stored;
+        }
+        String name = field.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .getLocalName()
+            .toLowerCase();
+        if (isCoreSettings(type) && COEXISTENCE_FIELD.equals(name)) {
+            return OrgShapeDetector.recommendedCoexistenceMode();
+        }
+        if (isCoreSettings(type) && SHOWN_AS_STORED.contains(name)) {
+            return stored;
+        }
+        Object declared = type.newSObject(null, true).get(field);
+        return declared == null ? stored : declared;
     }
 
     /**

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Donation_Match_Amount_Tolerance__c</fullName>
+  <defaultValue>0</defaultValue>
   <description>How far an imported gift's amount may differ from a scheduled payment's expected amount and still match it, where the import mapping does not say (canonical model R-DM3). Empty means 0: the amounts must be equal.</description>
   <externalId>false</externalId>
   <inlineHelpText>How far an imported gift's amount can differ from a payment's expected amount and still pay it. Empty means 0.</inlineHelpText>

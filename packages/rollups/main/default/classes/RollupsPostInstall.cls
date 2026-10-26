@@ -6,7 +6,10 @@
  * is written to the Error Log instead:
  *
  * 1. Carry over the two rollup settings an org saved on Core's settings object before the
- *    module had its own (decision 6), while the module has saved none.
+ *    module had its own (decision 6), while the module has saved none, then give an org that
+ *    still has no module settings row one holding the shipped defaults (a new rollup starts in
+ *    Both, real-time totals are recalculated just after the save), so the Settings console
+ *    and every reader of the settings find a row. A row that exists is never touched.
  * 2. Create the shipped Rollup Definitions this org does not have yet, so a fresh org has its
  *    totals without anybody pressing a button, and leave every definition already here exactly
  *    as the administrator left it (R-R6, ADR-0029). The module sees only the shipped defaults
@@ -26,6 +29,8 @@ public with sharing class RollupsPostInstall implements InstallHandler {
     private static final String ACCESS_CONTEXT = 'RollupsPostInstall.grantInstallerAccess';
     @TestVisible
     private static final String CARRY_CONTEXT = 'RollupsPostInstall.carryOverCoreSettings';
+    @TestVisible
+    private static final String SETTINGS_CONTEXT = 'RollupsPostInstall.ensureSettingsRow';
 
     /** Core's settings object, where the two rollup settings lived before the module. */
     private static final String CORE_SETTINGS_OBJECT = 'BarnCRM_Settings__c';
@@ -57,6 +62,7 @@ public with sharing class RollupsPostInstall implements InstallHandler {
         }
         // The entry points record their own failures and return, so nothing here throws.
         carryOverCoreSettings();
+        ensureSettingsRow();
         RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         Id installerId = context.installerId();
@@ -97,6 +103,33 @@ public with sharing class RollupsPostInstall implements InstallHandler {
             }
         } catch (Exception e) {
             ErrorLogger.log(e, CARRY_CONTEXT);
+        }
+    }
+
+    /**
+     * Creates the org-level Rollup Settings row with the shipped defaults when the org has none,
+     * so a new or source-deployed org shows Default Rollup Mode Both and Rollup Processing
+     * Background instead of two empty pickers. Does nothing when a row exists, whatever it
+     * holds, so no saved value is ever overwritten. Written in system mode with no audit row:
+     * it records the shipped state, not a change anybody made. Also run by
+     * `scripts/org/deploy-packages.sh`. Never throws: a failure goes to the Error Log.
+     */
+    public static void ensureSettingsRow() {
+        try {
+            if (Rollup_Settings__c.getOrgDefaults().Id != null) {
+                return;
+            }
+            Database.insert(
+                new Rollup_Settings__c(
+                    SetupOwnerId = UserInfo.getOrganizationId(),
+                    Rollup_Mode_Default__c = RollupService.MODE_BOTH,
+                    Rollup_Processing__c = RollupService.PROCESSING_BACKGROUND
+                ),
+                AccessLevel.SYSTEM_MODE
+            );
+            SettingsService.clearCaches();
+        } catch (Exception e) {
+            ErrorLogger.log(e, SETTINGS_CONTEXT);
         }
     }
 

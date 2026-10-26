@@ -474,7 +474,11 @@ public with sharing class SettingsController {
             setting.checked = false;
             return setting;
         }
-        Object value = SettingsService.getValue(settingsObject, definition.Setting_Key__c);
+        Object value = SettingsService.getEffectiveValue(
+            settingsObject,
+            definition.Setting_Key__c,
+            definition.Data_Type__c
+        );
         setting.value = SettingsService.asText(value);
         if (isMembershipMode(settingsObject, definition.Setting_Key__c)) {
             // Blank means nobody has chosen yet, and every reader treats it as the simple way,

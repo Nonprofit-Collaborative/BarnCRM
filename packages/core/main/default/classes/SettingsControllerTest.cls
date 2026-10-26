@@ -992,4 +992,67 @@ private class SettingsControllerTest {
             );
         }
     }
+
+    @IsTest
+    static void aSettingNobodyHasSavedShowsItsDefaultNotAnEmptyBox() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                effectiveDefaultRow('Test_Digest', 'Error_Digest_Frequency__c', 'Picklist'),
+                effectiveDefaultRow('Test_Stale', 'Stale_Record_Years__c', 'Number'),
+                effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text')
+            };
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            Map<String, String> valueByKey = new Map<String, String>();
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    valueByKey.put(setting.key, setting.value);
+                }
+            }
+            Assert.areEqual('Daily', valueByKey.get('Error_Digest_Frequency__c'), 'Default shown');
+            Assert.areEqual('5', valueByKey.get('Stale_Record_Years__c'), 'Number default shown');
+            Assert.isTrue(
+                String.isBlank(valueByKey.get('Household_Membership_Mode__c')),
+                'How people belong to a household is shown as stored: its default is decided on its own branch'
+            );
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                valueByKey.get('Coexistence_Mode__c'),
+                'The recommended coexistence mode is selected, not an empty box'
+            );
+            Assert.areEqual(
+                'The {LastName} Family',
+                valueByKey.get('Household_Name_Pattern__c'),
+                'A text setting shows its shipped pattern'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Opening the page saved nothing'
+            );
+        }
+    }
+
+    private static Setting_Definition__mdt effectiveDefaultRow(
+        String developerName,
+        String key,
+        String dataType
+    ) {
+        return new Setting_Definition__mdt(
+            DeveloperName = developerName,
+            MasterLabel = developerName,
+            Setting_Key__c = key,
+            Section__c = SettingSections.GENERAL,
+            Module__c = 'Core',
+            Data_Type__c = dataType,
+            Picklist_Values__c = dataType == 'Picklist'
+                ? 'Daily:Daily;Weekly:Weekly;Contact:Contact;Junction:Junction;Standalone:Standalone'
+                : null,
+            Sort_Order__c = 1
+        );
+    }
 }

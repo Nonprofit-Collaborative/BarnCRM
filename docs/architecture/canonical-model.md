@@ -2050,7 +2050,7 @@ settings console shows them in its Rollups section as before.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
-| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 
 ---
 
@@ -3808,10 +3808,10 @@ keys until v0.6 and are Giving keys now (see the v0.6 table below).
 | `Receipt_Next_Counter__c` | integer | 1 | The counter a new numbering series starts at, so an organization moving from another system continues its own sequence. |
 | `Receipt_Statement_Year__c` | integer | empty | The tax year the year end run reports on, which an administrator sets in January and leaves alone. |
 | `Receipt_Place_Of_Issue__c` | text | empty | The city and region the receipt is issued from, printed on the document. |
-| `Receipt_Renderer__c` | text | empty | Which renderer produces the PDF, as one of the two keys ADR-0016 names (`Blob PDF`, `Visualforce`) and never a class name; empty means the shipped one. A key outside that list is refused before any class is resolved or constructed. Stored as text and validated in Apex per ADR-0019. It exists because ADR-0016 names a fallback implementation and the spike that would settle the question needs an org (ADR-0016, "Consequences"). |
+| `Receipt_Renderer__c` | text | Blob PDF | Which renderer produces the PDF, as one of the two keys ADR-0016 names (`Blob PDF`, `Visualforce`) and never a class name; empty means the shipped one. A key outside that list is refused before any class is resolved or constructed. Stored as text and validated in Apex per ADR-0019. It exists because ADR-0016 names a fallback implementation and the spike that would settle the question needs an org (ADR-0016, "Consequences"). |
 | `Receipt_Print_Logo__c` | boolean | true | Whether the organization's logo is printed on receipts and statements. Off is a complete answer: a receipt with no images is a valid receipt (R-RC13), and this is also the switch an organization uses if the image path turns out not to work in its org. |
 | `Receipt_Logo_Width_Mm__c` | integer | 40 | How wide the logo prints, in millimetres. One number rather than a style sheet: a wordmark and a square crest cannot both look right at one fixed width, and the template is not the place to fix that (ADR-0016, "the admin edits text and tokens, not CSS"). |
-| `Receipt_Logo_Delivery__c` | text | empty | Which of ADR-0016's three image routes the logo is delivered by: empty means the shipped route, the file download URL. It exists for the same reason `Receipt_Renderer__c` does, and it is retired when the second spike closes (R-RC13). Stored as text under ADR-0019. |
+| `Receipt_Logo_Delivery__c` | text | File download | Which of ADR-0016's three image routes the logo is delivered by: empty means the shipped route, the file download URL. It exists for the same reason `Receipt_Renderer__c` does, and it is retired when the second spike closes (R-RC13). Stored as text under ADR-0019. |
 
 ### v0.5 keys
 
@@ -6520,7 +6520,7 @@ stop Mirror installing on an org without Opportunity (ADR-0013).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Opportunity_Mirror_Direction__c` | text | empty | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
+| `Opportunity_Mirror_Direction__c` | text | Off | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
 | `Opportunity_Mirror_Start__c` | datetime | empty | Opportunities to Gifts only: an Opportunity becomes a gift only when its Close Date is on or after this date, read as a date in the org's default time zone. Empty means no Opportunity becomes a gift (R-OM7). |
 | `Opportunity_Mirror_Record_Types__c` | text | empty | Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts. Empty means every record type (R-OM7). |
 | `Opportunity_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-OM8). |

@@ -144,8 +144,10 @@ month. If your org uses a custom fiscal year, see
 - **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
   **Every night**, or **Both (recommended)**. The next section says what each one means.
 - **When instant totals are calculated** decides when a save updates the totals in
-  **Instantly** and **Both** mode. See [Just after the save, or during
-  it](#just-after-the-save-or-during-it) below.
+  **Instantly** and **Both** mode. See [After the save, or during
+  it](#after-the-save-or-during-it) below. A fresh org shows **Both (recommended)** and
+  **After the save (recommended)** here: they are the settings in use even before anyone has
+  saved this section, and the fields are never left empty.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollup Builder page still opens and still shows every total and its last calculated
@@ -170,11 +172,11 @@ A save recalculates only the totals its change can move. Saving a soft credit re
 soft credit totals on that person and household, not their gift or pledge totals, and an
 **Every night** total waits for the nightly run even when a record it counts is saved.
 
-### Just after the save, or during it
+### After the save, or during it
 
 **When instant totals are calculated** has two choices:
 
-- **Just after the save (recommended)**, the default. The save notes which households,
+- **After the save (recommended)**, the default. The save notes which households,
   people, organizations, appeals, funds and pledges it changed, and returns. BarnCRM
   recalculates them in the background a few seconds later, usually within a minute. Every
   save stays fast, and a save can never fail because the rollups ran out of room: with the
@@ -563,7 +565,7 @@ needs to be right the moment a record is saved, set it to **Instantly** or **Bot
 Both totals are recalculated a few seconds after the save, so the donor's page you are looking
 at may still show the old total. Refresh it a moment later. If your team needs the total in
 the save itself, change **When instant totals are calculated** to **During the save** (see
-[Just after the save, or during it](#just-after-the-save-or-during-it)).
+[After the save, or during it](#after-the-save-or-during-it)).
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before

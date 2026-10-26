@@ -1075,4 +1075,110 @@ private class SettingsServiceTest {
             Assert.isNull(refusal, 'A save that leaves the address alone is not held to the rule');
         }
     }
+
+    @IsTest
+    static void anUnsavedPicklistAndNumberShowTheirDeclaredDefault() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
+
+            Assert.areEqual(
+                'Daily',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'A picklist nobody has saved shows the choice the org is running on'
+            );
+            Assert.areEqual(
+                5,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Stale_Record_Years__c',
+                    'Number'
+                ),
+                'And so does a number'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Reading the default writes nothing'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'And audits nothing.');
+        }
+    }
+
+    @IsTest
+    static void aSavedValueWinsOverTheDefault() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
+            settings.Error_Digest_Frequency__c = 'Weekly';
+            TestDataFactory.saveSettings(settings);
+
+            Assert.areEqual(
+                'Weekly',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'What the administrator chose is shown, not the default'
+            );
+        }
+    }
+
+    @IsTest
+    static void coexistenceModeShowsTheRecommendedModeButStoresNothing() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Coexistence_Mode__c',
+                    'Picklist'
+                ),
+                'An org nobody has confirmed is shown the mode detection recommends'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Showing it stores nothing, so the mode stays unconfirmed'
+            );
+            Assert.isTrue(
+                String.isBlank(SettingsService.getSettings().Coexistence_Mode__c),
+                'The stored value stays blank'
+            );
+        }
+    }
+
+    @IsTest
+    static void theMembershipModeIsLeftAsStored() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isTrue(
+                String.isBlank(
+                    (String) SettingsService.getEffectiveValue(
+                        SettingsService.CORE_SETTINGS_OBJECT,
+                        'Household_Membership_Mode__c',
+                        'Picklist'
+                    )
+                ),
+                'Its default is decided on its own branch, so this shows what is stored'
+            );
+        }
+    }
+
+    @IsTest
+    static void aFreeTextRowShowsItsShippedPattern() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'The {LastName} Family',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    TEXT_KEY,
+                    'Text'
+                ),
+                'A pattern nobody has set shows the one the household names are built from'
+            );
+        }
+    }
 }
