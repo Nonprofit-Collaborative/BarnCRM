@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
@@ -57,6 +57,16 @@ export default class SeasonalAddressJob extends LightningElement {
     } else if (result.error) {
       this.errorMessage = UNEXPECTED_ERROR;
     }
+  }
+
+  /**
+   * The console calls this after a save, because this panel stays mounted: saving the Seasonal
+   * Addresses switch schedules or stops the job, and the status line should say so at once.
+   */
+  @api
+  refresh() {
+    this.errorMessage = undefined;
+    return this.wiredSwapResult ? refreshApex(this.wiredSwapResult) : Promise.resolve();
   }
 
   get isScheduled() {

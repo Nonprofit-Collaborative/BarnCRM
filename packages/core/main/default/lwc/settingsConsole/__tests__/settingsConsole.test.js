@@ -631,6 +631,7 @@ describe('c-settings-console', () => {
               module: 'Rollups',
               component: null,
               navigationTarget: 'Rollup_Builder',
+              navigationLabel: 'Rollup Builder',
               helpUrl: null,
               value: null,
               checked: false,
@@ -647,6 +648,7 @@ describe('c-settings-console', () => {
 
     expect(element.shadowRoot.querySelectorAll('[data-kind="Picklist"]')).toHaveLength(2);
     const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.label).toBe('Open Rollup Builder');
     expect(button.dataset.target).toBe('Rollup_Builder');
     expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
   });
@@ -935,6 +937,132 @@ describe('c-settings-console', () => {
 
       expect(getConsoleModel).toHaveBeenCalledTimes(2);
       expect(FeatureSettings.refreshCount).toBe(1);
+    });
+
+    // A saved switch can change what a panel shows (Seasonal Addresses schedules the swap the
+    // panel below it reports on), so a successful save asks each mounted panel to re-read.
+    it('asks a mounted panel to refresh after a save', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Fiscal_Year_Start_Month__c',
+                label: 'Fiscal year start month',
+                description: null,
+                dataType: 'Text',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: null,
+                navigationTarget: null,
+                helpUrl: null,
+                value: '1',
+                checked: false,
+                options: []
+              },
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      saveSettings.mockResolvedValue(general);
+      FeatureSettings.refreshCount = 0;
+      const element = build();
+      await settle();
+      await settle();
+
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = '7';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+      expect(FeatureSettings.refreshCount).toBe(0);
+
+      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
+        (button) => button.variant === 'brand'
+      );
+      save.click();
+      await settle();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Fiscal_Year_Start_Month__c: '7' } });
+      expect(FeatureSettings.refreshCount).toBe(1);
+    });
+
+    it('does not refresh the panels when a save fails', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Fiscal_Year_Start_Month__c',
+                label: 'Fiscal year start month',
+                description: null,
+                dataType: 'Text',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: null,
+                navigationTarget: null,
+                helpUrl: null,
+                value: '1',
+                checked: false,
+                options: []
+              },
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      saveSettings.mockRejectedValue({ body: { message: 'No access' } });
+      FeatureSettings.refreshCount = 0;
+      const element = build();
+      await settle();
+      await settle();
+
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = '7';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
+        (button) => button.variant === 'brand'
+      );
+      save.click();
+      await settle();
+      await settle();
+
+      expect(FeatureSettings.refreshCount).toBe(0);
     });
 
     it('keeps the plain pattern rows when the section has no naming panel', async () => {

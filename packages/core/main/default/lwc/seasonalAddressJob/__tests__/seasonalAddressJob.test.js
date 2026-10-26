@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import SeasonalAddressJob from 'c/seasonalAddressJob';
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
+import { refreshApex } from '@salesforce/apex';
 
 jest.mock(
   '@salesforce/apex/SeasonalAddressController.getSwap',
@@ -13,6 +14,10 @@ jest.mock(
 );
 
 jest.mock('@salesforce/apex/SeasonalAddressController.runNow', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 
@@ -175,6 +180,24 @@ describe('c-seasonal-address-job', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="stale-warning"]').textContent).toBe(
       'The swap is scheduled but has not run in more than 36 hours.'
+    );
+  });
+
+  // The settings console calls refresh() after a save, so saving the Seasonal Addresses switch
+  // updates the status line without reloading the page.
+  it('re-reads the swap when the console asks it to refresh', async () => {
+    const element = createComponent();
+    getSwap.emit(NEVER_RUN);
+    await flush();
+    expect(refreshApex).not.toHaveBeenCalled();
+
+    await element.refresh();
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+
+    getSwap.emit(RAN_LAST_NIGHT);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
+      'The swap runs every night at 12:30 AM.'
     );
   });
 

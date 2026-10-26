@@ -407,6 +407,15 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
    */
   async reloadAndRefreshPanels() {
     await this.load();
+    this.refreshPanels();
+  }
+
+  /**
+   * Asks each mounted panel that can re-read its own data to do so. Also run after a save,
+   * since a saved setting can change what a panel shows (the Seasonal Addresses switch
+   * schedules or stops the swap the panel below it reports on).
+   */
+  refreshPanels() {
     this.template.querySelectorAll('[data-panel]').forEach((panel) => {
       if (typeof panel.refresh === 'function') {
         panel.refresh();
@@ -508,6 +517,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       this.pending = {};
       this.messageIsError = false;
       this.message = this.labels.saved;
+      this.refreshPanels();
       await this.loadChanges();
     } catch (error) {
       this.messageIsError = true;
