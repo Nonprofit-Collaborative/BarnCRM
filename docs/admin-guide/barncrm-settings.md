@@ -198,6 +198,25 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    out and there is no Save button. He can still read every description and follow every
    Learn more link.
 
+## Your organization's address
+
+The **Organization** section shows your mailing address as one **Organization address**
+block, laid out like a Salesforce address: **Street**, **Street 2**, then **City**, **State**
+and **Zip Code** on one row, then **Country**. Like the household naming patterns, the block
+has its own **Save address** button, and its changes appear in **Recent changes**.
+
+- You can leave the whole address blank.
+- Once you fill in any part, **Street**, **City**, **State** and **Zip Code** are required and
+  are marked as required. **Street 2** and **Country** stay optional.
+- If you save with a required part missing, BarnCRM keeps what was saved before and tells you
+  what is missing: "The organization address is incomplete. Add City, Zip Code, or clear every
+  part of the address."
+
+Receipts print the address as one line per part, with City, State and Zip Code together on one
+line. In a letter's body, the `{{OrganizationAddress}}` token (receipts) and
+`{OrganizationAddress}` token (volunteer letters) put the whole address on one line, with the
+parts separated by commas.
+
 ## You never type an identifier
 
 No setting asks you for a record ID, an API name or a developer name. Where a setting points

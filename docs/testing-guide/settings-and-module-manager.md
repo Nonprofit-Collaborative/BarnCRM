@@ -227,3 +227,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
 **Cleanup:** None.
+
+## T-SET-14: Organization address
+
+**Purpose:** confirm the address is one grouped block laid out like a Salesforce address, that it may be blank, that four parts are required once any is filled, and that receipts and letters print it.
+**Prerequisites:** admin user; the Organization address is blank (or note what it holds).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Organization**. | After **Organization legal name**, an **Organization address** block shows **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then **Country**. No box is marked required while the whole address is blank. There is no separate row for each part. |
+| 2 | Type `Springfield` in **City**. | **Street**, **City**, **State** and **Zip Code** are now marked required. **Street 2** and **Country** are not. |
+| 3 | Click **Save address**. | The page shows "Fill in the address parts marked required, or clear the whole address." and nothing is saved. |
+| 4 | Fill **Street** `14 Bridge Street`, **State** `IL`, **Zip Code** `62701`. Leave **Street 2** and **Country** blank. Click **Save address**. | "Organization address saved." **Recent changes** lists the four parts. |
+| 5 | Reload and open **Organization**. | The four parts you saved are in their boxes. |
+| 6 | Clear **Zip Code** and click **Save address**. | A required-part message appears and the saved address is unchanged after a reload. |
+| 7 | Search the console for `zip`, and click the **Organization zip code** result. | The console opens **Organization** and focuses the **Organization address** block, not a separate row. |
+| 8 | As read-only (T-SET-13), open **Organization**. | The address boxes are greyed out and there is no **Save address** button. |
+| 9 | Open **BarnCRM Settings**, **Organization** and clear all six boxes. Click **Save address**. | "Organization address saved." A blank address is allowed. |
+| 10 | Enter a Street 2 `Suite 3` and the four required parts again and save. Issue a receipt (see [Giving receipts and acknowledgments](giving-receipts-and-acknowledgments.md)) or make a volunteer hours letter, and open the document. | The receipt letterhead shows the address as `14 Bridge Street`, `Suite 3`, `Springfield, IL 62701` on separate lines. A letter using `{OrganizationAddress}` shows `14 Bridge Street, Suite 3, Springfield, IL 62701` on one line. |
+
+**Cleanup:** restore the address you noted in the prerequisites (or clear it) and save.
