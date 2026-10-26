@@ -1,4 +1,4 @@
-# ADR-0136: The Rollup Builder offers standard objects through describe, and closes the gaps to DLRS
+# ADR-0136: The Rollup Builder Offers Standard Objects Through Describe, and Closes the Gaps to DLRS
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-26: "Please close the gaps to bring Rollup
 Builder up to or above parity with DLRS. Adding standard objects as options is approved." The
@@ -61,6 +61,15 @@ generated trigger's entry point).
    totals, the nightly run's hour as a setting in BarnCRM Settings, a `global` Apex entry point
    for developers, export and import of definitions as a file keyed on Definition Key, and
    Delete in the rollup list. Each new attribute is specified in the canonical model first.
+   Two of them carry rules of their own:
+   - **Parent-field criteria** go one lookup deep in the Builder (a lookup to one object; the
+     filter parser and Find still allow two). A change to the parent's field is instant only
+     where the parent has a rollup trigger; otherwise the nightly run and Recalculate catch
+     it, and step 4 says so.
+   - **Picklist targets** take First and Last only. A source picklist with active values the
+     target lacks is refused on save; at run time a value is matched to the target's values
+     ignoring letter case, and a value the target lacks is left out and logged as a Warning
+     rather than failing the write, so a picklist never collects values it does not list.
 5. **Deferrals of ADR-0082 lifted:** top N, moving definitions between orgs (export and import,
    not a deploy), and Task or Event sources. Grandchild and hierarchy paths, dated currency
    rates and failure emails stay deferred.

@@ -173,7 +173,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
 
-## T-RB-10: Standard objects are offered, common ones first
+## T-RB-10: Standard Objects Are Offered, Common Ones First
 
 **Purpose:** confirm the Builder offers Salesforce standard objects, lists the common ones first and finds any other by search (ADR-0136).
 **Prerequisites:** admin user; a writable Number field on Account for the test, for example **Test Task Count** (`Test_Task_Count__c`, created in Setup); **The Garcia Family** has two open tasks (create them in Setup or on the record, **Related To** = **The Garcia Family**).
@@ -189,7 +189,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** delete **Test open tasks** (or set it inactive) and the two test tasks.
 
-## T-RB-11: Instantly alone is refused for records with no instant updates
+## T-RB-11: Instantly Alone Is Refused for Records With No Instant Updates
 
 **Purpose:** confirm a rollup that counts records with no rollup trigger cannot be Instantly only, in the Builder or from the list (ADR-0136).
 **Prerequisites:** admin user; T-RB-10 done up to step 6 (**Test open tasks** saved).
