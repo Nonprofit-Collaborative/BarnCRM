@@ -57,7 +57,7 @@
                 data-id="source-field"
                 label={labels.sourceField}
                 value={draft.sourceField}
-                options={sourceFieldOptions}
+                options={copyFieldOptions}
                 onchange={handleInput}
             ></lightning-combobox>
         </template>
@@ -108,11 +108,14 @@
         <c-rollup-filter-builder
             data-name="filterJson"
             label={labels.filter}
-            fields={sourceFields}
+            fields={filterFields}
             records-label={recordsLabel}
             value={draft.filterJson}
             onchange={handleFilter}
         ></c-rollup-filter-builder>
+        <template lwc:if={readsParentField}>
+            <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="parent-field-note">{labels.parentFieldNote}</p>
+        </template>
         <div class="slds-var-m-top_medium">
             <c-rollup-filter-builder
                 data-name="targetFilterJson"

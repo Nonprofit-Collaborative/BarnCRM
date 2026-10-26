@@ -97,6 +97,46 @@
         <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never pick the same record.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_ErrorOneLookup</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a filter reads a field more than one lookup away.</shortDescription>
+        <value>A filter can read a field of a record the counted records point to, but no further. Choose a field one lookup away.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorPicklistSource</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a picklist target is filled from a field that is not text.</shortDescription>
+        <value>A picklist can be filled only from a picklist or a text field. Choose one of those to copy, or choose another field to fill.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorPicklistValues</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: source picklist values the target lacks. {0} is the values.</shortDescription>
+        <value>The picklist you fill does not have these values of the field you copy: {0}. Add them to that picklist, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ParentField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter field on a parent record. {0} is the lookup, {1} the field.</shortDescription>
+        <value>{0} &gt; {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ParentFieldNote</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 note shown when a filter reads a field of another record.</shortDescription>
+        <value>This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_SourceBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

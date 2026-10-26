@@ -342,6 +342,104 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /** ADR-0136: the filter offers and accepts a field one lookup away, and no further. */
+    @IsTest
+    static void aFilterReadsAFieldOneLookupAway() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Map<String, String> labelByPath = new Map<String, String>();
+            for (
+                RollupBuilderController.FieldOption option : RollupBuilderController.getParentFields(
+                    'Account'
+                )
+            ) {
+                labelByPath.put(option.value, option.label);
+            }
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_ParentField,
+                    new List<String>{
+                        Account.ParentId.getDescribe().getLabel().removeEndIgnoreCase(' ID'),
+                        Account.Name.getDescribe().getLabel()
+                    }
+                ),
+                labelByPath.get('Parent.Name'),
+                'The parent organization\'s name, labelled through its lookup'
+            );
+            System.Assert.isFalse(
+                labelByPath.containsKey('CreatedBy.Name'),
+                'Lookups the platform keeps for itself are not offered'
+            );
+
+            Map<String, String> expectedByPath = new Map<String, String>{
+                'Parent.Name' => null,
+                'parent.name' => null,
+                'Parent.Nope__c' => Label.Core_RollupBuilder_ErrorFieldUnknown,
+                'Nope__r.Name' => Label.Core_RollupBuilder_ErrorFieldUnknown,
+                'Parent.Parent.Name' => Label.Core_RollupBuilder_ErrorOneLookup
+            };
+            for (String path : expectedByPath.keySet()) {
+                RollupBuilderController.Draft draft = childCount();
+                draft.filterJson = nameFilter('equals', 'Riverbend')
+                    .replace('"Name"', '"' + path + '"');
+                System.Assert.areEqual(
+                    expectedByPath.get(path),
+                    RollupBuilderController.problemWith(draft),
+                    path
+                );
+            }
+        }
+    }
+
+    /** R-R15: FIRST and LAST fill a picklist from a picklist or text, with values it has. */
+    @IsTest
+    static void aPicklistIsFilledFromAPicklistOrTextWithValuesItHas() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Map<String, String> sourceFieldByExpected = new Map<String, String>{
+                'same picklist' => 'Preferred_Email__c',
+                'text' => 'Name',
+                Label.Core_RollupBuilder_ErrorPicklistSource => 'NumberOfEmployees',
+                'missing values' => 'Household_Role__c'
+            };
+            for (String expected : sourceFieldByExpected.keySet()) {
+                RollupBuilderController.Draft draft = childCount();
+                draft.targetField = 'Preferred_Email__c';
+                draft.aggregate = 'LAST';
+                draft.sourceField = sourceFieldByExpected.get(expected);
+                draft.orderByField = 'CreatedDate';
+                String problem = RollupBuilderController.problemWith(draft);
+                if (expected == 'missing values') {
+                    System.Assert.isTrue(
+                        problem.startsWith(
+                            Label.Core_RollupBuilder_ErrorPicklistValues.substringBefore('{0}')
+                        ) && problem.contains('Head'),
+                        'Names the values the target lacks: ' + problem
+                    );
+                } else if (expected.startsWith('same') || expected == 'text') {
+                    System.Assert.isNull(problem, expected);
+                } else {
+                    System.Assert.areEqual(expected, problem, 'Only a picklist or text');
+                }
+            }
+
+            RollupBuilderController.Draft counted = childCount();
+            counted.targetField = 'Preferred_Email__c';
+            System.Assert.areEqual(
+                Label.Core_Rollups_ErrorPicklistTarget,
+                RollupBuilderController.problemWith(counted),
+                'A count is no picklist value'
+            );
+            Boolean offered = false;
+            for (
+                RollupBuilderController.FieldOption option : RollupBuilderController.getTargetFields(
+                    'Account'
+                )
+            ) {
+                offered = offered || option.value == 'Preferred_Email__c';
+            }
+            System.Assert.isTrue(offered, 'A picklist is offered as a target');
+        }
+    }
+
     /** ROLLUPS-3: the window's bounds are dates, which SOQL refuses against a date and time. */
     @IsTest
     static void aFiscalWindowIsMeasuredOnADateFieldOnly() {

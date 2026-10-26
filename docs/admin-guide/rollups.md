@@ -237,7 +237,7 @@ recalculation **Turn on** starts never writes a wrong total.
 | **Minimum**, **Maximum** | The smallest or largest value, for example the largest gift or the latest date. | A number, currency, percent or date field |
 | **Count** | How many records match. | A number field |
 | **Count distinct** | How many different values a field holds, for example how many different funds a donor has given to. Blank values are not counted. | A number field |
-| **First**, **Last** | The value from the earliest or latest record, by the field you choose to order by, for example the appeal of a donor's first gift. | A number, currency, percent, date or text field |
+| **First**, **Last** | The value from the earliest or latest record, by the field you choose to order by, for example the appeal of a donor's first gift. | A number, currency, percent, date, text or picklist field |
 | **Any** | Checked when at least one record matches, for example "has ever given a gift over $1,000". | A checkbox field |
 | **None** | Checked when no record matches, for example "has no open pledge". | A checkbox field |
 | **Text list** | Every matching value in one field, for example the names of every program a person volunteers for. Blank values are left out. | A text or long text field |
@@ -264,6 +264,13 @@ What to know about them:
   "is not blank" on that field if you want the first record that has one. When two records
   share the same order value, the one with the lower record ID wins (usually the one created
   first), so the answer never changes from one run to the next.
+- **A picklist gets one of its own values.** First and Last can fill a picklist field from
+  a picklist or a text field, for example the channel of a donor's latest gift. If the field
+  you copy is a picklist, every value it has must also be a value of the picklist you fill, or
+  the Builder will not save. A text value the picklist does not have (or a value added to the
+  source picklist later) is not written: the record keeps what it had and the Error Log names
+  the value, so add it to the picklist and click **Recalculate**. Letter case does not matter:
+  "mail" is written as the picklist's "Mail".
 - **A number or date copied into text is written plainly**, for example `1250.00` or
   `2026-03-01`, without a currency symbol or your local date format. A date and time is
   written in UTC, for example `2026-03-01 14:05`, so it reads the same whoever saved the
@@ -317,8 +324,8 @@ The Builder walks you through five steps. **Next** checks the step you are on, a
 to change, before it lets you go on.
 
 1. **Where should the number appear?** The kind of record and the field that show the total.
-   Only fields BarnCRM can write are offered: numbers, amounts, percents, dates, checkboxes
-   and text. A field another active rollup already fills is marked with that rollup's name. If
+   Only fields BarnCRM can write are offered: numbers, amounts, percents, dates, checkboxes,
+   text and picklists. A field another active rollup already fills is marked with that rollup's name. If
    the field does not exist yet, create it in Setup (a Number or Currency field is right for
    most totals) and come back.
 2. **What should be counted?** The records that feed the total and the field that links them
@@ -340,6 +347,17 @@ to change, before it lets you go on.
    **is last year** in a condition mean the calendar year (January to December); for your fiscal
    year, use the time window in step 3. **Contains** and **starts with** match what you type
    exactly, so `%` and `_` are ordinary characters.
+   A condition can also read a field of a record the counted records point to, one lookup
+   away: after the records' own fields, the list offers each lookup's fields, such as
+   **Appeal > Type** for "gifts whose appeal is a mail appeal". One lookup only: a field of
+   the appeal's campaign, two lookups away, is not offered. When you use one, step 4 says
+   so: a change on that other record (the appeal's type) updates the totals at once only
+   if its object has rollup triggers. BarnCRM ships them on contacts, gifts, gift
+   allocations, soft credits, commitments, household members and volunteer hours and sign-ups,
+   not on accounts or appeals; an object you created has them once you set up
+   [instant totals](#instant-totals-on-your-own-objects). Otherwise the nightly run, or
+   **Recalculate**, puts them right. A change on the counted record itself (a gift moved to
+   another appeal) is always picked up as usual.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
@@ -362,7 +380,10 @@ It says what to change instead of saving:
   **is in the last N days** condition. Such a total changes when the date moves on, with no record
   saved, so only the nightly run can keep it right. Choose **Both (recommended)** or **Every
   night**. Changing the mode on the Rollups list refuses it too.
-- Conditions that name a field the records do not have.
+- Conditions that name a field the records do not have, a field more than one lookup away,
+  or a field of another record you cannot see.
+- A picklist filled from anything but a picklist or a text field, or from a picklist with
+  values the picklist you fill does not have. The message lists the missing values.
 - A field another active rollup already fills for some of the same records. Two rollups may
   fill one field only when their **Only for some records** conditions never pick the same
   record, as the household and the organization giving totals do. The Builder checks your

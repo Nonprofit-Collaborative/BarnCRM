@@ -2,6 +2,7 @@ import { LightningElement, api } from 'lwc';
 import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetFields';
 import getSources from '@salesforce/apex/RollupBuilderController.getSources';
 import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceFields';
+import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
 
@@ -29,6 +30,7 @@ import CURRENCY_WARNING from '@salesforce/label/c.Core_RollupBuilder_CurrencyWar
 import NUMBER_WARNING from '@salesforce/label/c.Core_RollupBuilder_NumberWarning';
 import FILTER from '@salesforce/label/c.Core_RollupBuilder_Filter';
 import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
+import PARENT_FIELD_NOTE from '@salesforce/label/c.Core_RollupBuilder_ParentFieldNote';
 import NAME from '@salesforce/label/c.Core_RollupBuilder_Name';
 import DESCRIPTION from '@salesforce/label/c.Core_RollupBuilder_Description';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
@@ -57,11 +59,16 @@ const TEXT = new Set(['string', 'textarea']);
 const READS_NO_FIELD = new Set(['COUNT', 'ANY', 'NONE']);
 const ORDERED = new Set(['FIRST', 'LAST']);
 const LISTS = new Set(['TEXT_LIST', 'TEXT_LIST_DISTINCT']);
+/** What a picklist target can be filled from (R-R15). */
+const INTO_PICKLIST = new Set(['picklist', 'string']);
 
 /** The calculations a target field of this type can hold (canonical model R-R15). */
 function aggregatesFor(type) {
   if (type === 'boolean') {
     return ['ANY', 'NONE'];
+  }
+  if (type === 'picklist') {
+    return ['FIRST', 'LAST'];
   }
   if (TEXT.has(type)) {
     return ['FIRST', 'LAST', 'TEXT_LIST', 'TEXT_LIST_DISTINCT'];
@@ -102,6 +109,7 @@ export default class RollupWizard extends LightningElement {
     windowDate: WINDOW_DATE,
     filter: FILTER,
     targetFilter: TARGET_FILTER,
+    parentFieldNote: PARENT_FIELD_NOTE,
     name: NAME,
     description: DESCRIPTION,
     mode: MODE,
@@ -119,6 +127,8 @@ export default class RollupWizard extends LightningElement {
   targetFields = [];
   sources = [];
   sourceFields = [];
+  /** Fields of the records the counted records point to, for the filter (ADR-0136). */
+  parentFields = [];
   targetEntityFields = [];
   error;
   busy = false;
@@ -237,6 +247,29 @@ export default class RollupWizard extends LightningElement {
     return this.sourceFields.map((field) => ({ value: field.value, label: field.label }));
   }
 
+  /** The fields a value can be copied from: a picklist only from a picklist or text. */
+  get copyFieldOptions() {
+    return this.sourceFields
+      .filter((field) => this.targetFieldType !== 'picklist' || INTO_PICKLIST.has(field.type))
+      .map((field) => ({ value: field.value, label: field.label }));
+  }
+
+  /** The source filter offers the counted records' own fields, then those one lookup away. */
+  get filterFields() {
+    return [...this.sourceFields, ...this.parentFields];
+  }
+
+  /** Whether the source filter reads a field of another record, which may not update at once. */
+  get readsParentField() {
+    try {
+      const document = this.current.filterJson ? JSON.parse(this.current.filterJson) : null;
+      const conditions = document && Array.isArray(document.conditions) ? document.conditions : [];
+      return conditions.some((condition) => String(condition.field || '').includes('.'));
+    } catch {
+      return false;
+    }
+  }
+
   get dateFieldOptions() {
     return this.sourceFields
       .filter((field) => FISCAL_DATES.has(field.type))
@@ -340,11 +373,14 @@ export default class RollupWizard extends LightningElement {
   loadSource() {
     if (!this.current.sourceObject) {
       this.sourceFields = [];
+      this.parentFields = [];
       return Promise.resolve();
     }
-    return getSourceFields({ sourceObject: this.current.sourceObject })
-      .then((fields) => {
+    const sourceObject = this.current.sourceObject;
+    return Promise.all([getSourceFields({ sourceObject }), getParentFields({ sourceObject })])
+      .then(([fields, parentFields]) => {
         this.sourceFields = fields || [];
+        this.parentFields = parentFields || [];
       })
       .catch((error) => this.fail(error));
   }

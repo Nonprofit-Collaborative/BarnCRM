@@ -191,4 +191,32 @@ describe('c-rollup-filter-builder', () => {
     element.value = JSON.stringify(DOCUMENT);
     expect(element.validate()).toBeNull();
   });
+
+  it('filters on a field of the record a lookup points to, by its path', async () => {
+    const element = build(null);
+    element.fields = [
+      ...FIELDS,
+      {
+        value: 'Appeal__r.Type__c',
+        label: 'Appeal > Type',
+        type: 'picklist',
+        picklistValues: [{ value: 'Mail', label: 'Direct mail' }]
+      }
+    ];
+    element.shadowRoot.querySelector('[data-id="add-condition"]').click();
+    await Promise.resolve();
+    changeValue(element, '[data-role="field"]', 'Appeal__r.Type__c');
+    await Promise.resolve();
+    changeValue(element, '[data-role="value"]', 'Mail');
+    await Promise.resolve();
+    expect(JSON.parse(element.value).conditions[0]).toEqual({
+      id: 1,
+      field: 'Appeal__r.Type__c',
+      operator: 'equals',
+      value: 'Mail'
+    });
+    expect(element.shadowRoot.querySelector('[data-id="sentence"]').textContent).toBe(
+      'Gifts whose Appeal > Type is Direct mail'
+    );
+  });
 });

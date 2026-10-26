@@ -75,6 +75,8 @@ public without sharing class RollupWriter {
         List<Id> targetIds = new List<Id>(computed.keySet());
         targetIds.sort();
         List<SObject> toSave = new List<SObject>();
+        Map<Schema.SObjectField, Map<String, String>> picklists = new Map<Schema.SObjectField, Map<String, String>>();
+        Map<String, Id> refused = new Map<String, Id>();
         for (Id targetId : targetIds) {
             SObject current = stored.get(targetId);
             if (current == null) {
@@ -84,7 +86,23 @@ public without sharing class RollupWriter {
             Boolean anyChange = false;
             Map<Schema.SObjectField, Object> values = computed.get(targetId);
             for (Schema.SObjectField field : values.keySet()) {
-                Object value = coerce(field.getDescribe(), values.get(field));
+                Schema.DescribeFieldResult describe = field.getDescribe();
+                Object value = coerce(describe, values.get(field));
+                if (value != null && describe.getType() == Schema.DisplayType.PICKLIST) {
+                    String text = (String) value;
+                    value = picklistValueFor(picklists, field, text);
+                    if (value == null) {
+                        // R-R15: left out and logged, so the record's other totals still save.
+                        String message = String.format(
+                            System.Label.Core_Rollups_PicklistValueRefused,
+                            new List<Object>{ text, describe.getLabel() }
+                        );
+                        if (!refused.containsKey(message)) {
+                            refused.put(message, targetId);
+                        }
+                        continue;
+                    }
+                }
                 if (!sameValue(current.get(field), value)) {
                     changed.put(field, value);
                     anyChange = true;
@@ -96,6 +114,14 @@ public without sharing class RollupWriter {
                 }
                 toSave.add(changed);
             }
+        }
+        if (!refused.isEmpty()) {
+            ErrorLogger.logMessages(
+                new List<String>(refused.keySet()),
+                refused.values(),
+                'RollupWriter',
+                ErrorLogger.SEVERITY_WARNING
+            );
         }
         if (toSave.isEmpty()) {
             return result;
@@ -129,7 +155,8 @@ public without sharing class RollupWriter {
      * something: numbers rounded to the attribute's decimal places as the platform rounds them on
      * save (an average of 33.333 is stored as 33.33 and must not count as a change every night),
      * dates and datetimes converted to the attribute's type, text cut at the attribute's length,
-     * and a checkbox true or false.
+     * a picklist value as text (checked against the picklist by `writeTotals`), and a checkbox
+     * true or false.
      */
     @TestVisible
     private static Object coerce(Schema.DescribeFieldResult describe, Object value) {
@@ -139,6 +166,9 @@ public without sharing class RollupWriter {
         Schema.DisplayType type = describe.getType();
         if (type == Schema.DisplayType.BOOLEAN) {
             return value instanceof Boolean && (Boolean) value;
+        }
+        if (type == Schema.DisplayType.PICKLIST) {
+            return RollupAggregator.toText(value);
         }
         if (type == Schema.DisplayType.STRING || type == Schema.DisplayType.TEXTAREA) {
             // Cut at the attribute's length (R-R15), so the save never fails on a long list and
@@ -165,6 +195,27 @@ public without sharing class RollupWriter {
             return amount.intValue();
         }
         return type == Schema.DisplayType.LONG ? (Object) amount.longValue() : (Object) amount;
+    }
+
+    /**
+     * The picklist's own active value for this text, matched without regard to letter case, or
+     * null when the picklist has no such value (R-R15). Each picklist is described once a write.
+     */
+    private static String picklistValueFor(
+        Map<Schema.SObjectField, Map<String, String>> picklists,
+        Schema.SObjectField field,
+        String text
+    ) {
+        if (!picklists.containsKey(field)) {
+            Map<String, String> byLowerCase = new Map<String, String>();
+            for (Schema.PicklistEntry entry : field.getDescribe().getPicklistValues()) {
+                if (entry.isActive()) {
+                    byLowerCase.put(entry.getValue().toLowerCase(), entry.getValue());
+                }
+            }
+            picklists.put(field, byLowerCase);
+        }
+        return picklists.get(field).get(text.toLowerCase());
     }
 
     /** Equal stored and computed values; numbers compare by value, whatever their scale. */

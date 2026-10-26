@@ -1548,7 +1548,10 @@ version 1 reader refuses rather than misreads, so the version number does not ch
   back from that integer.
 - **Parent fields.** `field` may be a path through lookups, written with relationship
   names (`Household__r.Name`), at most two lookups deep. Each segment is checked against
-  the running user's describe of the object it is on.
+  the running user's describe of the object it is on. The Rollup Builder's source filter
+  goes one lookup deep only (ADR-0136): it offers the counted records' own fields and the
+  fields of a record each of their lookups points to (`Appeal__r.Type__c`), never a lookup
+  to more than one object, and its save refuses a path of more than one lookup (R-R10).
 - **Typed values.** The filter builder writes a number as a JSON number, a checkbox as
   `true` or `false`, a date as `YYYY-MM-DD`, a date/time as `YYYY-MM-DDThh:mm:ssZ`, and
   `in` and `not in` as a list. A reader that knows the object coerces each value to the
@@ -1665,7 +1668,10 @@ problem in plain language. The checks sit in two places:
   anything but a number, currency or percent, and MIN and MAX of anything but those or a
   date; FIRST and LAST with no Order By Attribute; a fiscal window whose offset is not 0, -1 or
   -2 or whose date attribute is not a date; a filter document that cannot be read or names an
-  attribute the entity does not have; and an overlap under R-R8.
+  attribute the entity does not have; a parent attribute in a filter that is more than one
+  lookup away, crosses a lookup to more than one object, or that the administrator cannot read
+  (R-R2); a picklist target filled from anything but a picklist or text Source Attribute, or
+  from a picklist with a value the target does not have (R-R15); and an overlap under R-R8.
 
 A definition written another way (an import, the API) that fails a Builder check is left out of
 the run by the planner, which records why in the Error Log.
@@ -1688,7 +1694,11 @@ calculations overlap. A source change marks a target record for recalculation wh
 touches an attribute a definition reads: the source, order-by and fiscal date attributes,
 the path attributes, any attribute named in the filter, and attributes read through a
 relationship (for example a gift's status, which the fund totals read from Gift Allocation
-as `Gift__r.Status__c`). A changed path marks both the old and the new target; a delete
+as `Gift__r.Status__c`). The same holds for any filter on a parent's attribute (a gift's
+appeal's type, `Appeal__r.Type__c`): a change on the parent marks the targets of the source
+records under it, when the parent entity has the rollup trigger registered (R-R12). Where it
+has none, no save reports the change, and the nightly run or Recalculate puts the totals
+right; the Rollup Builder says so when such a filter is chosen. A changed path marks both the old and the new target; a delete
 marks the old target, including when a parent record is deleted and its source records go
 with it, which fires no trigger on them (deleting a gift removes its allocations, so the
 gift's delete marks their funds); an undelete marks the target again. A person who changes
@@ -1733,7 +1743,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 |---|---|---|
 | SUM, AVG, MIN, MAX | The total, the average, the smallest and the largest value of the Source Attribute. | number, currency, percent, date, datetime |
 | COUNT | How many records match. | number, currency, percent, date, datetime (as before; a number is what makes sense) |
-| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text |
+| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text, picklist (from a picklist or text Source Attribute) |
 | COUNT_DISTINCT | How many different values the Source Attribute holds among the matching records. | number |
 | ANY | True when at least one record matches, false when none does. | checkbox |
 | NONE | True when no record matches, false when at least one does. | checkbox |
@@ -1757,6 +1767,13 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
   list is written as its plain value (`1250.00`, `2026-03-01`, `true`; a datetime in UTC as
   `2026-03-01 14:05`), not converted between currencies.
+- **Picklist targets.** FIRST and LAST may fill a picklist from a picklist or text Source
+  Attribute (ADR-0136). The value written is one of the target's active values, matched
+  without regard to letter case and written as the target spells it. The save refuses a
+  source picklist with an active value the target does not have (R-R10). A text value, or a
+  value added to the source picklist later, that the target does not have is left out of the
+  write: the record keeps what it holds and the Error Log records the value, the record and
+  the attribute, so one value never fails the save of the record's other totals.
 - **Cut at the field length.** A text result longer than the target attribute holds is cut at
   the attribute's length, so the save never fails on it and the same value is written on every
   run.
@@ -8678,6 +8695,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: parent-field criteria and picklist targets (ADR-0136, gap report rows P5 and P7). No object or field added. R-R2: the Rollup Builder's source filter offers the fields of a record each lookup of the counted records points to, one lookup deep. R-R10: the Builder's save refuses a filter path of more than one lookup, through a lookup to more than one object, or to a field the administrator cannot read, and a picklist target filled from anything but a picklist or text, or from a picklist with a value the target lacks. R-R11: a parent's change marks the totals when the parent has the rollup trigger, otherwise the nightly run or Recalculate catches it. R-R15: FIRST and LAST fill picklist targets; a value the target does not have is left out and logged. |
 
 ---
 ## 32. Entity ownership by package
