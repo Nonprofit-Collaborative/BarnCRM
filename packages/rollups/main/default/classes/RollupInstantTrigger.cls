@@ -1,7 +1,7 @@
 /**
  * What a rollup trigger the administrator deployed from the Rollup Builder runs: instant totals
  * on an object BarnCRM ships no trigger for (a standard object, another package's object, the
- * organization's own), canonical model R-R12, ADR-0137.
+ * organization's own), canonical model R-R12, ADR-0138.
  *
  * The generated trigger is one line, `RollupInstantTrigger.run();`, so editing a rollup never
  * changes code: which totals a save moves is worked out by `RollupTriggerHandler`, exactly as

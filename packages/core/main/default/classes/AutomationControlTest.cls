@@ -262,7 +262,7 @@ private class AutomationControlTest {
         }
     }
 
-    /** A generated rollup trigger's switch (ADR-0137): made once, then switched like the rest. */
+    /** A generated rollup trigger's switch (ADR-0138): made once, then switched like the rest. */
     @IsTest
     static void aSwitchNoRegistryShipsIsMadeOnceAndThenSwitches() {
         String generated = 'Generated_Switch';
