@@ -40,7 +40,7 @@
   </brand>
   <description>
     The administrators' app with standard navigation: BarnCRM Settings, the data tools, Org
-    Optimizer and the Error Log, plus the admin tools of each installed module.
+    Optimizer, Duplicate Matching and the Error Log, plus the admin tools of each installed module.
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
@@ -54,6 +54,7 @@
   <tabs>Import</tabs>
   <tabs>Bulk_Update</tabs>
   <tabs>Data_Hygiene</tabs>
+  <tabs>Duplicate_Matching</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
 </CustomApplication>

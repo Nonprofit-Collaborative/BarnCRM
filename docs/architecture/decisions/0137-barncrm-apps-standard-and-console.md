@@ -25,7 +25,7 @@ which app held which tool.
    |---|---|---|---|
    | BarnCRM | `BarnCRM_Standard` | Standard | Home, Contacts, Households, Organizations, Find |
    | BarnCRM Console | `BarnCRM` | Console | The same, plus Addresses, Relationships, Affiliations and Household Members |
-   | BarnCRM Admin | `BarnCRM_Admin_Standard` | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer (`Data_Hygiene`), Error Log |
+   | BarnCRM Admin | `BarnCRM_Admin_Standard` | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer (`Data_Hygiene`), Duplicate Matching (ADR-0139), Error Log |
    | BarnCRM Admin Console | `BarnCRM_Admin_Console` | Console | The same |
 
    The console app keeps the API name `BarnCRM` because the Metadata API refuses to change an

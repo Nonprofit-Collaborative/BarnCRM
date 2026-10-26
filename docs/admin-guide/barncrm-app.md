@@ -9,7 +9,7 @@ standard navigation and console navigation.
 |---|---|---|---|
 | **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Find |
 | **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Find, Addresses, Relationships, Affiliations, Household Members |
-| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer, Error Log |
+| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log |
 | **BarnCRM Admin Console** | The BarnCRM Admin role only | Console | The same as BarnCRM Admin |
 
 The everyday apps give you one home page that tells you what to do next, a setup checklist
@@ -27,7 +27,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | People, households, organizations, Find | **BarnCRM** or **BarnCRM Console** |
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Data Manager, Import, Bulk Update, Org Optimizer, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |

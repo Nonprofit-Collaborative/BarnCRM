@@ -184,6 +184,37 @@ class RealCatalogTest(unittest.TestCase):
                     self.assertEqual(written or name.replace("_", " "), label, f"{folder} {name}")
 
 
+class CoreAppsTest(unittest.TestCase):
+    """The four Core apps between them hold every tab Core ships, and only tabs that exist, so a
+    tab added on one branch (Duplicate Matching) or removed on another is not missed in the apps.
+    A console app maps every one of its tabs to a workspace."""
+
+    def test_every_core_tab_is_in_a_core_app_and_every_app_tab_exists(self):
+        root = os.path.join(HERE, "..", "..", "..")
+        tab_dir = os.path.join(root, CORE, "tabs")
+        shipped = {name[: -len(".tab-meta.xml")] for name in os.listdir(tab_dir)}
+        in_apps = set()
+        for app_name in mat.STAFF_APPS + mat.ADMIN_APPS:
+            app = ET.parse(os.path.join(root, CORE, "applications", app_name + ".app-meta.xml")).getroot()
+            tabs = [tab.text for tab in app.findall("m:tabs", NS)]
+            for tab in tabs:
+                if not tab.startswith("standard-"):
+                    self.assertIn(tab, shipped, f"{app_name} lists {tab}, which Core does not ship")
+            if app.findtext("m:navType", namespaces=NS) == "Console":
+                mapped = [m.findtext("m:tab", namespaces=NS) for m in app.findall("m:workspaceConfig/m:mappings", NS)]
+                self.assertEqual(set(tabs), set(mapped), f"{app_name}: every tab has a workspace mapping")
+            in_apps.update(tabs)
+        self.assertEqual(set(), shipped - in_apps, "every Core tab is in at least one Core app")
+
+    def test_duplicate_matching_is_in_both_admin_apps(self):
+        root = os.path.join(HERE, "..", "..", "..")
+        for app_name in mat.ADMIN_APPS:
+            app = ET.parse(os.path.join(root, CORE, "applications", app_name + ".app-meta.xml")).getroot()
+            tabs = [tab.text for tab in app.findall("m:tabs", NS)]
+            self.assertIn("Duplicate_Matching", tabs, app_name)
+            self.assertLess(tabs.index("Data_Hygiene"), tabs.index("Duplicate_Matching"), app_name)
+
+
 def read(path):
     with open(path, encoding="utf-8") as handle:
         return handle.read()

@@ -19,8 +19,8 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
 | 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Find**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
-| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer**, **Error Log**. It opens on **BarnCRM Settings**. |
-| 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same six tabs, opening as workspace tabs. |
+| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer**, **Duplicate Matching**, **Error Log**. It opens on **BarnCRM Settings**. |
+| 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same seven tabs, opening as workspace tabs. |
 | 8 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM** and **BarnCRM Console** are listed. **BarnCRM Admin** and **BarnCRM Admin Console** are not. |
 | 9 | As admin, on **BarnCRM Settings**, **Access**, remove the staff user's role. Wait a minute; as staff, reload and open the App Launcher. | No BarnCRM app is listed. |
 
