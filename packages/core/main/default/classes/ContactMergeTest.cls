@@ -20,6 +20,7 @@ private class ContactMergeTest {
             SELECT Household__c, Is_Primary__c
             FROM Household_Member__c
             WHERE Contact__c = :contactId AND End_Date__c = NULL
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -33,18 +34,21 @@ private class ContactMergeTest {
                 AND Is_Primary__c = TRUE
                 AND (End_Date__c = NULL
                 OR End_Date__c > TODAY)
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(1, primaries.size(), 'The household keeps exactly one current primary.');
         Assert.areEqual(personId, primaries[0].Contact__c, 'And it is the survivor.');
         Assert.areEqual(
             personId,
-            [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId].Primary_Contact__c,
+            [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
+            .Primary_Contact__c,
             'Its Primary Contact mirrors the primary member (ADR-0044).'
         );
     }
 
     private static Decimal memberCount(Id householdId) {
-        return [SELECT Member_Count__c FROM Account WHERE Id = :householdId].Member_Count__c;
+        return [SELECT Member_Count__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
+        .Member_Count__c;
     }
 
     @IsTest

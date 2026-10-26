@@ -248,7 +248,12 @@ private class ImportRowRulesTest {
     }
 
     private static Integer withReason() {
-        return [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Reason__c = 'Old'];
+        return [
+            SELECT COUNT()
+            FROM Duplicate_Dismissal__c
+            WHERE Reason__c = 'Old'
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

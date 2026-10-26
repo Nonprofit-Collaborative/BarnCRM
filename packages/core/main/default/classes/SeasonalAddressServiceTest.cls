@@ -484,6 +484,7 @@ private class SeasonalAddressServiceTest {
             SELECT Id, Type__c
             FROM Address__c
             WHERE Account__c = :garcia.Id AND Type__c = 'Home'
+            WITH SYSTEM_MODE
         ]) {
             fixture.homeId = address.Id;
         }
@@ -522,6 +523,7 @@ private class SeasonalAddressServiceTest {
                 SELECT Id, Is_Default__c, Replaced_By_Seasonal__c, Type__c, City__c
                 FROM Address__c
                 WHERE Account__c = :ownerId OR Contact__c = :ownerId
+                WITH SYSTEM_MODE
             ]
         );
     }

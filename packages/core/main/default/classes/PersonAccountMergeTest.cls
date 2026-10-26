@@ -226,12 +226,14 @@ private class PersonAccountMergeTest {
                 AND Is_Primary__c = TRUE
                 AND (End_Date__c = NULL
                 OR End_Date__c > :today)
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(1, primaries.size(), 'The household has exactly one current primary');
         Assert.areEqual(survivorId, primaries[0].Account__c, 'And it is the survivor');
         Assert.areEqual(
             contactId,
-            [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId].Primary_Contact__c,
+            [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
+            .Primary_Contact__c,
             'Its Primary Contact mirrors the survivor (R-M3)'
         );
     }
