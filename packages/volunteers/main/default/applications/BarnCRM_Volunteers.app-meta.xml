@@ -50,6 +50,8 @@
   </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
+    <logo>BarnCRM_Volunteers_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>

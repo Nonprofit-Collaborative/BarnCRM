@@ -86,8 +86,10 @@ administrator tile to staff, it shows nothing to count.
 
 ## How records open: tabs in a console
 
-Every BarnCRM app shows a blue barn logo in the app launcher; the admin apps have a navy
-header, so you can tell at a glance which app you are in.
+Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
+badge to it and have a navy header, so you can tell at a glance which app you are in; a module's
+app adds its own badge (a red heart for **Fundraising**, a green person for **BarnCRM
+Volunteers**).
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
 they keep the records you are working on open side by side in tabs across the top. In
