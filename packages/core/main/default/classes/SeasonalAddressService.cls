@@ -16,7 +16,7 @@
  * which means an administrator who has switched that automation off gets the same behavior from
  * the job as from a person pressing "Set as Primary" on the record. The swap is a household move
  * nobody has to choose, so it reaches the members who have no address of their own even when
- * the org's Address Updates setting is "Nobody moves until you choose" (R-AD3, ADR-NEXT).
+ * the org's Address Updates setting is "Nobody moves until you choose" (R-AD3, ADR-0140).
  */
 public with sharing class SeasonalAddressService {
     private static final String LOG_CONTEXT = 'Seasonal address swap';

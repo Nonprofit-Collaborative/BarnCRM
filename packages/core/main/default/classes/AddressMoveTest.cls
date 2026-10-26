@@ -1,5 +1,5 @@
 /**
- * The two household moves (R-AD9, ADR-NEXT) as AddressService makes them: Use for Whole
+ * The two household moves (R-AD9, ADR-0140) as AddressService makes them: Use for Whole
  * Household and Update Everyone's Address, in both membership modes, in "Nobody moves until
  * you choose", for many households at once, and refused for a user who may not make them.
  */

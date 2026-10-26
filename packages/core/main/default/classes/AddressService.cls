@@ -29,14 +29,14 @@ public with sharing class AddressService {
     private static final String BEHAVIOR_UPDATE_HOUSEHOLD = 'Update household';
     @TestVisible
     private static final String BEHAVIOR_PERSONAL_ADDRESS = 'Create personal address';
-    /** "Nobody moves until you choose" (ADR-NEXT). */
+    /** "Nobody moves until you choose" (ADR-0140). */
     @TestVisible
     private static final String BEHAVIOR_MANUAL = 'Manual';
 
     /**
      * Raised while a household move nobody has to wait for is saved: the seasonal swap, and a
      * move someone chose on the address card. In "Nobody moves until you choose" a household's
-     * new primary address reaches its members only then (R-AD3, ADR-NEXT).
+     * new primary address reaches its members only then (R-AD3, ADR-0140).
      */
     private static Boolean householdMoveChosen = false;
 
@@ -564,7 +564,7 @@ public with sharing class AddressService {
     }
 
     /**
-     * Use for Whole Household (R-AD9, ADR-NEXT). A copy of each person's address becomes the
+     * Use for Whole Household (R-AD9, ADR-0140). A copy of each person's address becomes the
      * primary address of the household named for it, which must be one that person currently
      * belongs to; one already holding exactly that address is not given it twice. A person
      * stored as a contact, for whom that household is their household (R-M3), stops having a
@@ -684,7 +684,7 @@ public with sharing class AddressService {
     }
 
     /**
-     * Update Everyone's Address (R-AD9, ADR-NEXT). Each household's primary address is copied
+     * Update Everyone's Address (R-AD9, ADR-0140). Each household's primary address is copied
      * to every member who takes it (R-AD3), and to the members ticked from among those with an
      * address of their own, whose own primary stops being primary and stays on file (R-AD7).
      * A tick on anyone else is ignored. Whatever the Address Updates setting, as the user, many
@@ -1555,7 +1555,7 @@ public with sharing class AddressService {
      * Marks what is saved next as a household move that was chosen, or puts the mark back,
      * and answers with what it was, so a caller can restore it in a finally block. The
      * seasonal swap raises it: in "Nobody moves until you choose" a household's new primary
-     * address reaches its members only on a move that was chosen (R-AD3, ADR-NEXT).
+     * address reaches its members only on a move that was chosen (R-AD3, ADR-0140).
      */
     public static Boolean chooseHouseholdMoves(Boolean chosen) {
         Boolean previous = householdMoveChosen;

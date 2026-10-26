@@ -1,4 +1,4 @@
-# ADR-NEXT: Address Updates Has Three Choices, and a Household Can Be Moved on Purpose
+# ADR-0140: Address Updates Has Three Choices, and a Household Can Be Moved on Purpose
 
 **Status:** Accepted (owner decision, 2026-10-26)
 **Date:** 2026-10-26

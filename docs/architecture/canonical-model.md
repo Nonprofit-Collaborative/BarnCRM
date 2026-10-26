@@ -1008,7 +1008,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-NEXT). A blank reads and shows as Update household. |
+| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-0140). A blank reads and shows as Update household. |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
@@ -6145,7 +6145,7 @@ Where the org's Address Updates setting is "Nobody moves until you choose" (R-AD
 household's or an organization's new primary is written to its own billing fields only, on
 save, on a billing edit and when a primary is deleted alike: it reaches the members above
 only on a move someone chose on the address card (R-AD9) or on the seasonal swap (R-AD4),
-which moves members in every setting (ADR-NEXT).
+which moves members in every setting (ADR-0140).
 
 The standard fields are not where a change is kept, but a change made there is captured
 rather than lost: a person's mailing address under R-AD5, and a household's or an
@@ -6200,7 +6200,7 @@ package owned data must not depend on what the person who happened to schedule i
 **R-AD5 Address Updates.** When a person's address is edited, the org's Address Updates
 setting (`Contact_Address_Change_Behavior__c`) decides what happens, and it also decides
 whether a household's change reaches its members on its own (R-AD3). Three choices
-(ADR-NEXT):
+(ADR-0140):
 
 - **Everyone in the household moves together** (`Update household`, the shipped choice, and
   what a blank or unknown value means): the edit becomes the household's new primary
@@ -6226,7 +6226,7 @@ one's primary flag. The old address is not deleted, so a mailing sent last year 
 be explained.
 
 **R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
-Updates setting (ADR-NEXT). Each checks the user's own access as any address write does,
+Updates setting (ADR-0140). Each checks the user's own access as any address write does,
 works for many records in one save, and keeps what it replaces as history (R-AD7):
 
 - On a person's own address, **Use for Whole Household** gives the person's household a new
@@ -8792,7 +8792,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Module tabs in the BarnCRM apps (ADR-0137). `BarnCRM_Module__mdt` gains `Staff_Tabs__c` and `Admin_Tabs__c`. The Rollups record's `App_Name__c` is empty: the BarnCRM Rollup Builder app is retired and its tab is in the admin apps. |
 | v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-0139). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. Match Source (Section 13) is managed on the tab's Matching Logic area and no longer listed on the Custom metadata page (R-D2). |
 | v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
-| v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-NEXT). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
+| v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-0140). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
 
 ---
 ## 32. Entity ownership by package

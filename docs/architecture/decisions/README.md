@@ -146,6 +146,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0135](0135-barncrm-uses-the-org-fiscal-year.md) | BarnCRM uses the org fiscal year, and shows Setup values read only (supersedes ADR-0025 in part) | Accepted (owner decision, 2026-10-26) |
 | [0137](0137-barncrm-apps-standard-and-console.md) | Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation | Accepted (owner decision) |
 | [0139](0139-duplicate-matching-tool.md) | Duplicate Matching is its own tool, with a tab and a settings section | Accepted (owner decision) |
+| [0140](0140-address-updates-and-household-moves.md) | Address Updates has three choices, and a household can be moved on purpose | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

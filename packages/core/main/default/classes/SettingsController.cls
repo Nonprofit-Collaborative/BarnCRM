@@ -21,7 +21,7 @@ public with sharing class SettingsController {
     /**
      * Core picklist settings whose blank means a choice, by key in lower case, with the value
      * a blank is shown as. Every reader already treats the blank as that choice, so the console
-     * shows it rather than an empty box (Address Updates, ADR-NEXT). A blank that means
+     * shows it rather than an empty box (Address Updates, ADR-0140). A blank that means
      * "nobody has chosen yet", such as the coexistence mode, is not listed here.
      */
     private static final Map<String, String> BLANK_SHOWS_AS = new Map<String, String>{
