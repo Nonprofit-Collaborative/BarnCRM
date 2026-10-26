@@ -979,40 +979,57 @@ private class SettingsServiceTest {
     }
 
     @IsTest
-    static void aBlankThatMeansNotChosenYetStaysBlank() {
+    static void coexistenceModeShowsTheRecommendedModeButStoresNothing() {
         System.runAs(TestUsers.admin()) {
-            for (
-                String key : new List<String>{
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
                     'Coexistence_Mode__c',
-                    'Household_Membership_Mode__c'
-                }
-            ) {
-                Assert.isTrue(
-                    String.isBlank(
-                        (String) SettingsService.getEffectiveValue(
-                            SettingsService.CORE_SETTINGS_OBJECT,
-                            key,
-                            'Picklist'
-                        )
-                    ),
-                    key + ' is not chosen yet, so the console must not pretend it is'
-                );
-            }
+                    'Picklist'
+                ),
+                'An org nobody has confirmed is shown the mode detection recommends'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Showing it stores nothing, so the mode stays unconfirmed'
+            );
+            Assert.isTrue(
+                String.isBlank(SettingsService.getSettings().Coexistence_Mode__c),
+                'The stored value stays blank'
+            );
         }
     }
 
     @IsTest
-    static void aFreeTextRowIsShownAsStoredEvenWhenItDeclaresADefault() {
+    static void theMembershipModeIsLeftAsStored() {
         System.runAs(TestUsers.admin()) {
             Assert.isTrue(
                 String.isBlank(
                     (String) SettingsService.getEffectiveValue(
                         SettingsService.CORE_SETTINGS_OBJECT,
-                        TEXT_KEY,
-                        'Text'
+                        'Household_Membership_Mode__c',
+                        'Picklist'
                     )
                 ),
-                'A text value may be cleared on purpose, so it is not filled in'
+                'Its default is decided on its own branch, so this shows what is stored'
+            );
+        }
+    }
+
+    @IsTest
+    static void aFreeTextRowShowsItsShippedPattern() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'The {LastName} Family',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    TEXT_KEY,
+                    'Text'
+                ),
+                'A pattern nobody has set shows the one the household names are built from'
             );
         }
     }

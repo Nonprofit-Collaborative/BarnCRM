@@ -629,14 +629,16 @@ private class SettingsControllerTest {
     }
 
     @IsTest
-    static void aSettingNobodyHasSavedShowsItsDefaultButNotAChoiceNobodyMade() {
+    static void aSettingNobodyHasSavedShowsItsDefaultNotAnEmptyBox() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
                 effectiveDefaultRow('Test_Digest', 'Error_Digest_Frequency__c', 'Picklist'),
                 effectiveDefaultRow('Test_Stale', 'Stale_Record_Years__c', 'Number'),
                 effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
-                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist')
+                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text')
             };
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
             Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
 
             SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
@@ -651,11 +653,17 @@ private class SettingsControllerTest {
             Assert.areEqual('5', valueByKey.get('Stale_Record_Years__c'), 'Number default shown');
             Assert.isTrue(
                 String.isBlank(valueByKey.get('Household_Membership_Mode__c')),
-                'Nobody chose how people belong to a household, so it stays empty'
+                'How people belong to a household is shown as stored: its default is decided on its own branch'
             );
-            Assert.isTrue(
-                String.isBlank(valueByKey.get('Coexistence_Mode__c')),
-                'Nobody confirmed a coexistence mode, so it stays empty'
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                valueByKey.get('Coexistence_Mode__c'),
+                'The recommended coexistence mode is selected, not an empty box'
+            );
+            Assert.areEqual(
+                'The {LastName} Family',
+                valueByKey.get('Household_Name_Pattern__c'),
+                'A text setting shows its shipped pattern'
             );
             Assert.isNull(
                 BarnCRM_Settings__c.getOrgDefaults().Id,

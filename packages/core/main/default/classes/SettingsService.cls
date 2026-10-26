@@ -23,6 +23,7 @@ public with sharing class SettingsService {
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
     private static final String NUMBER_TYPE = 'Number';
+    private static final String TEXT_TYPE = 'Text';
     public static final String RECORD = 'Record';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 
@@ -122,13 +123,15 @@ public with sharing class SettingsService {
     }
 
     /**
-     * Core settings whose blank means "nobody has chosen yet", never "the shipped default", so
-     * the console must keep showing them empty (CoexistenceService reads a blank coexistence
-     * mode as unconfirmed and a blank membership mode as the only one detection may change; see
-     * `blanksKeptBlank`). Lower-case field names.
+     * The Core settings whose blank means "nobody has chosen yet", so the stored value has to
+     * stay blank (CoexistenceService reads a blank coexistence mode as unconfirmed and a blank
+     * membership mode as the only one detection may change; see `blanksKeptBlank`).
+     * Coexistence mode is still shown with the recommended mode selected (see
+     * `getEffectiveValue`), nothing stored. The membership mode is shown as stored here: its
+     * default is being decided on its own branch. Lower-case field names.
      */
-    private static final Set<String> BLANK_MEANS_NOT_CHOSEN = new Set<String>{
-        'coexistence_mode__c',
+    private static final String COEXISTENCE_FIELD = 'coexistence_mode__c';
+    private static final Set<String> SHOWN_AS_STORED = new Set<String>{
         'household_membership_mode__c'
     };
 
@@ -140,9 +143,12 @@ public with sharing class SettingsService {
      * every reader treats a blank as that default. Nothing is written: this only changes what
      * is displayed, and saving still stores only what the administrator changed.
      *
-     * Only Picklist and Number rows are filled in. A checkbox is never blank (its shipped value
-     * is already on the record, ADR-0035), and a free-text row may be cleared on purpose, so it
-     * is shown as stored. A row in `BLANK_MEANS_NOT_CHOSEN` is shown as stored too.
+     * Picklist, Number and Text rows are filled in (a setting shows its default until changed,
+     * never an empty box; every reader treats a blank in these as the default). A checkbox is
+     * never blank (its shipped value is already on the record, ADR-0035). Coexistence mode,
+     * whose stored blank means "not confirmed", is shown as the mode detection recommends;
+     * the stored value stays blank until somebody saves it. A row in `SHOWN_AS_STORED` is shown
+     * as stored.
      */
     @NamespaceAccessible
     public static Object getEffectiveValue(String settingsObject, String key, String dataType) {
@@ -152,14 +158,19 @@ public with sharing class SettingsService {
         Boolean blank =
             stored == null || (stored instanceof String && String.isBlank((String) stored));
         Boolean fillable =
-            PICKLIST.equalsIgnoreCase(dataType) || NUMBER_TYPE.equalsIgnoreCase(dataType);
+            PICKLIST.equalsIgnoreCase(dataType) ||
+            NUMBER_TYPE.equalsIgnoreCase(dataType) ||
+            TEXT_TYPE.equalsIgnoreCase(dataType);
         if (!blank || !fillable) {
             return stored;
         }
         String name = field.getDescribe(SObjectDescribeOptions.DEFERRED)
             .getLocalName()
             .toLowerCase();
-        if (isCoreSettings(type) && BLANK_MEANS_NOT_CHOSEN.contains(name)) {
+        if (isCoreSettings(type) && COEXISTENCE_FIELD.equals(name)) {
+            return OrgShapeDetector.recommendedCoexistenceMode();
+        }
+        if (isCoreSettings(type) && SHOWN_AS_STORED.contains(name)) {
             return stored;
         }
         Object declared = type.newSObject(null, true).get(field);
