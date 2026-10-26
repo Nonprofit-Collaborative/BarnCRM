@@ -1002,6 +1002,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
+| `Seasonal_Addresses_Enabled__c` | boolean | false | The Seasonal Addresses switch on the Addresses page. Saving it on schedules the nightly seasonal swap (nothing happens when the job is already scheduled); saving it off stops the job. An install or upgrade with it on schedules a missing job, and an upgrade whose org already runs the job turns it on (C-18, R-AD4). |
 
 The commitment keys (`Installment_Generation_Horizon_Months__c`,
 `Installment_Overdue_Grace_Days__c`, `Auto_Apply_Gifts_To_Installments__c`, and the
@@ -8689,6 +8690,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
+| v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 
 ---
 ## 32. Entity ownership by package

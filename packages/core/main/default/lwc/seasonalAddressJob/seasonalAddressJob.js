@@ -4,7 +4,6 @@ import { refreshApex } from '@salesforce/apex';
 // namespace prefix.
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
-import setSchedule from '@salesforce/apex/SeasonalAddressController.setSchedule';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
 
 import TITLE from '@salesforce/label/c.Core_SeasonalAddress_PageTitle';
@@ -13,8 +12,7 @@ import HUB_TITLE from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
 import NEVER_RUN from '@salesforce/label/c.Core_SeasonalAddress_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Core_SeasonalAddress_NotScheduled';
 import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_SeasonalAddress_ScheduleActive';
-import SCHEDULE_BUTTON from '@salesforce/label/c.Core_SeasonalAddress_ScheduleButton';
-import STOP_BUTTON from '@salesforce/label/c.Core_SeasonalAddress_StopButton';
+import SWITCHED_OFF from '@salesforce/label/c.Core_SeasonalAddress_SwitchedOff';
 import RUN_NOW from '@salesforce/label/c.Core_SeasonalAddress_RunNow';
 import RUN_NOW_STARTED from '@salesforce/label/c.Core_SeasonalAddress_RunNowStarted';
 import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
@@ -26,8 +24,9 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_SeasonalAddress_Unexpecte
  *
  * It exists because a nightly job whose last run nobody can see is a job nobody trusts. It
  * answers, in this order, whether the job is switched on, when it last ran, and what it did,
- * and it carries the buttons that switch it on and off. Scheduling Apex is otherwise a Setup
- * task, which is the thing this product does not ask an administrator to do.
+ * and it carries the Run now button. The job is scheduled and stopped by the Seasonal Addresses
+ * switch above it in the same section (saved with the console's own Save), so scheduling Apex
+ * is never a Setup task, which is the thing this product does not ask an administrator to do.
  */
 export default class SeasonalAddressJob extends LightningElement {
   labels = {
@@ -36,6 +35,7 @@ export default class SeasonalAddressJob extends LightningElement {
     lastRunTitle: HUB_TITLE,
     neverRun: NEVER_RUN,
     notScheduled: NOT_SCHEDULED,
+    switchedOff: SWITCHED_OFF,
     scheduleActive: SCHEDULE_ACTIVE,
     runNow: RUN_NOW,
     stale: STALE,
@@ -63,6 +63,10 @@ export default class SeasonalAddressJob extends LightningElement {
     return !!(this.swap && this.swap.scheduled);
   }
 
+  get isEnabled() {
+    return !!(this.swap && this.swap.enabled);
+  }
+
   get isStale() {
     return !!(this.swap && this.swap.stale);
   }
@@ -88,15 +92,14 @@ export default class SeasonalAddressJob extends LightningElement {
   }
 
   get scheduleMessage() {
+    if (!this.isEnabled && !this.isScheduled) {
+      return this.labels.switchedOff;
+    }
     return this.isScheduled ? this.labels.scheduleActive : this.labels.notScheduled;
   }
 
-  get scheduleButtonLabel() {
-    return this.isScheduled ? STOP_BUTTON : SCHEDULE_BUTTON;
-  }
-
   /**
-   * The permission is read from the platform rather than from the payload, so the buttons are
+   * The permission is read from the platform rather than from the payload, so the button is
    * disabled before the first round trip finishes rather than flickering from enabled to
    * disabled. The controller checks it again, which is where the real gate is.
    */
@@ -110,10 +113,6 @@ export default class SeasonalAddressJob extends LightningElement {
 
   get showReadOnlyNote() {
     return !this.canManage;
-  }
-
-  handleSchedule() {
-    this.runAction(setSchedule({ scheduled: !this.isScheduled }));
   }
 
   handleRunNow() {
