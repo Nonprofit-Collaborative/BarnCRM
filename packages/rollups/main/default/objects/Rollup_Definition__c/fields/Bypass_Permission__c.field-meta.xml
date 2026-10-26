@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bypass_Permission__c</fullName>
+    <description>The API name of a custom permission. Saves made by people who hold it do not recalculate or queue this rollup; the nightly run and Recalculate still cover it. Must name a custom permission in the org.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Optional. People with this custom permission, such as a data migration user, do not update this total when they save records. Leave blank so everyone does.</inlineHelpText>
+    <label>Bypass Permission</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

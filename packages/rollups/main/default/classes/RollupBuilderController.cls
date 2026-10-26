@@ -158,6 +158,8 @@ public with sharing class RollupBuilderController {
         public String mode { get; set; }
         @AuraEnabled
         public Boolean active { get; set; }
+        @AuraEnabled
+        public String bypassPermission { get; set; }
     }
 
     // ----------------------------------------------------------------------------------- reads
@@ -717,6 +719,7 @@ public with sharing class RollupBuilderController {
         draft.fiscalDateField = definition.Fiscal_Date_Field__c;
         draft.mode = definition.Mode__c;
         draft.active = definition.Active__c;
+        draft.bypassPermission = definition.Bypass_Permission__c;
         return draft;
     }
 
@@ -745,7 +748,10 @@ public with sharing class RollupBuilderController {
             Mode__c = valuesOf(Rollup_Definition__c.Mode__c).contains(draft.mode)
                 ? draft.mode
                 : RollupService.defaultMode(),
-            Active__c = draft.active != false
+            Active__c = draft.active != false,
+            Bypass_Permission__c = String.isBlank(draft.bypassPermission)
+                ? null
+                : draft.bypassPermission.trim()
         );
         if (String.isNotBlank(draft.recordId)) {
             record.Id = Id.valueOf(draft.recordId);

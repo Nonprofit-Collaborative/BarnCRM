@@ -129,6 +129,22 @@
         <value>That rollup no longer exists. Refresh the page and try again.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorUnknownBypassPermission</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save error: {0} is the bypass permission name typed</shortDescription>
+        <value>No custom permission named {0} exists in this org. Enter the API name shown in Setup, Custom Permissions, or leave the field blank.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorNoRollupNamed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: {0} is the rollup name the Flow action got</shortDescription>
+        <value>Recalculate totals on this record: no active rollup on the record's object has the Definition Key or name {0}, so nothing was recalculated. Check the name on the Rollup Builder tab.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorInvalidMode</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

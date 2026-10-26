@@ -34,6 +34,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Rollup_Definition__c.Bypass_Permission__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Rollup_Definition__c.Description__c</field>
     <readable>true</readable>
   </fieldPermissions>

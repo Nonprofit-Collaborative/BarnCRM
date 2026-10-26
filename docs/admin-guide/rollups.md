@@ -343,7 +343,9 @@ to change, before it lets you go on.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
-   and calculate now** to start its recalculation straight away.
+   and calculate now** to start its recalculation straight away. **Skip for people with this
+   custom permission (optional)** is for a data migration user: see
+   [Skipping a rollup for some people](#skipping-a-rollup-for-some-people).
 
 ### What the Builder will not save
 
@@ -487,6 +489,64 @@ automation for you:
 
 If you prefer no code in your org, the Flow template above does the same job.
 
+## Skipping a rollup for some people
+
+A large data load can spend most of its time updating totals that the nightly run would
+put right anyway. To have one person's saves leave a rollup alone:
+
+1. In Setup, open **Custom Permissions** and create one, for example **Data Migration**
+   (API name `Data_Migration`), or use one you already have.
+2. Give it to that person through a permission set.
+3. In the Rollup Builder, edit the rollup and, on the last step, enter the API name in **Skip
+   for people with this custom permission (optional)**. Save.
+
+What to know:
+
+- **Saves by people who hold the permission do not update that total**, instantly or in the
+  queue. Everyone else's saves update it as usual.
+- **The nightly run still covers it** when the rollup runs **Every night** or **Both
+  (recommended)**, and so do **Recalculate** and **Recalculate all**. A rollup set to
+  **Instantly** is put right only when you click **Recalculate**, so prefer **Both** for a
+  rollup you skip.
+- **A name that does not exist is refused** when you save, with the name in the message.
+  Enter it exactly as the API name in Setup. A custom permission from an installed package is
+  written with its prefix, for example `prefix__Name`.
+- Leave the field blank to have everyone's saves update the total.
+
+## Recalculating from a Flow or from Apex
+
+### Recalculate totals on this record (Flow)
+
+The Flow action **Recalculate totals on this record** (category **BarnCRM**) recalculates the
+totals a record shows, for example from a screen flow button on a household or from a
+scheduled flow:
+
+- **Record ID** (required): the record that shows the totals.
+- **Rollup (optional)**: the **Definition Key** or the name of one rollup. Leave it empty to
+  recalculate every active rollup on that record's object, whatever its mode.
+
+The totals are recalculated straight away when the flow has room, and otherwise queued and
+recalculated a minute or two later. A rollup name that matches no active rollup on the
+record's object recalculates nothing and leaves a Warning in the Error Log; the flow carries
+on. This action is not a save, so **Skip for people with this custom permission** does not
+apply to it.
+
+### For developers: Apex
+
+Code that used the DLRS Apex service can call `RollupApi` instead (prefix it with the
+package namespace in a subscriber org):
+
+- `RollupApi.recalculate(Set<Id> recordIds)`: the totals on these records, as the Flow action
+  above does for every rollup.
+- `RollupApi.recalculateChanges(List<SObject> records, Map<Id, SObject> oldRecords, Boolean deleting)`:
+  the totals that changed records affect, exactly as the **Recalculate rollups** action and
+  BarnCRM's own triggers work them out. Call it after the save with the records and their
+  prior values (null for new records), or before a delete with `deleting` set to true, which
+  queues the totals for after the delete. Records of several objects can go in one call.
+
+Neither method throws for a total: a failure goes to the Error Log and the nightly run puts it
+right. Pausing all automation stops `recalculateChanges`, as it stops the Flow action.
+
 ## Current limits
 
 Fund totals and soft credit totals, including a household's soft credit totals, now update
@@ -613,6 +673,7 @@ For report builders only. Nothing on this page requires you to know these.
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
+| Skip for people with this custom permission | `Bypass_Permission__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
 With Giving installed:

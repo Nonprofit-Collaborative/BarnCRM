@@ -1482,6 +1482,7 @@ Core (`decisions/0125-rollup-builder-module.md`).
 | Last Calculated | datetime | computed | When this definition last completed a calculation, of any scope. |
 | Is Package Default | boolean | yes (defaults false) | Marks a definition materialized from a shipped default rather than created by the admin. |
 | Active | boolean | yes (defaults true) | Whether the engine runs this definition; turning it off never deletes the values already calculated. |
+| Bypass Permission | text | no | The API name of a custom permission. A save made by a person who holds it neither recalculates nor queues this rollup; the nightly run, Recalculate and Recalculate all still cover it (R-R4a). Must name a custom permission in the org. |
 
 ### Relationships
 
@@ -1602,6 +1603,18 @@ missed; it is the mode the packaged giving definitions ship with, because it is 
 combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
+
+**R-R4a Bypass by custom permission.** A definition whose Bypass Permission names a custom
+permission the running user holds is left out of every real-time path for that user's saves:
+the packaged triggers, the delete and merge paths, the Recalculate rollups Flow action and
+`RollupApi.recalculateChanges`. It is neither recalculated in the save nor written to the Rollup
+Queue, so a data migration user's load leaves those totals to the nightly run (Scheduled and
+Both) or to Recalculate. Asking for a record's totals by name (the Recalculate totals on this
+record action, `RollupApi.recalculate`) is not a save and is never bypassed. The permission is
+checked with `FeatureManagement.checkPermission`, once per user and name in a transaction. A
+save of the definition is refused when no custom permission of that name exists in the org,
+matched on Developer Name and, when the value is written `prefix__Name`, on the namespace
+prefix too, so no prefix is ever assumed (ADR-0136).
 
 A merge has its own path, whichever `Rollup_Processing__c` says (of people, Section 29A, or of households,
 R-H13).
@@ -1792,12 +1805,15 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Last Calculated | `Last_Calculated__c` | DateTime |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
 | Active | `Active__c` | Checkbox |
+| Bypass Permission | `Bypass_Permission__c` | Text(255) |
 
 - **Shipped defaults:** `Rollup_Definition_Default__mdt` (Section 13).
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
   target or the source attribute, so switching a definition on or off never re-checks it. It
+  also refuses a Bypass Permission that names no custom permission in the org (R-R4a), on an
+  insert and when the value changes, with one query for every name in the save. It
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
@@ -1844,6 +1860,21 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   It does nothing while all automation is paused. `Recalculate_Rollups_Template` is a
   record-triggered Flow template (on Contact, never active) an administrator saves as her own
   copy and points at her entity.
+- **Recalculating named records (R-R12 note, ADR-0136):** `RollupRecalcRecordAction`, the
+  invocable action "Recalculate totals on this record", takes a target record Id and, optionally,
+  one rollup's Definition Key or name, and recalculates that record's totals: every active
+  definition targeting its entity, whatever the mode, or the one named. A request naming no
+  active definition on the record's entity recalculates nothing and is written to the Error
+  Log. `RollupService.recalculateTargets` does the work: in the same transaction when it has
+  room (R-R4's limits, whatever `Rollup_Processing__c` says, since the caller asked for the
+  totals now), queued otherwise, and nothing while the module is turned off.
+- **Global Apex (R-R12 note, ADR-0136):** `RollupApi`, for developers who called
+  `dlrs.RollupService`: `recalculate(Set<Id>)` is the action above for every active definition,
+  and `recalculateChanges(List<SObject>, Map<Id, SObject>, Boolean)` is the Recalculate rollups
+  Flow action (`RollupService.runForFlow`) for changed source records of any entities, with
+  their prior values and whether they are being deleted. Global is permanent once a managed
+  version is released, so the module makes nothing global without an ADR recording it
+  (ADR-0136 lists these two classes and the Flow actions).
 
 ## 14A. Rollup Queue
 
@@ -8678,6 +8709,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder parity operations (ADR-0136). Rollup Definition gains `Bypass_Permission__c` (Section 14) with rule R-R4a: holders of the named custom permission skip the rollup on their saves, and a name with no custom permission in the org is refused on save. Section 14 records two new `global` surfaces: the Flow action `RollupRecalcRecordAction` ("Recalculate totals on this record") and the Apex class `RollupApi`. |
 
 ---
 ## 32. Entity ownership by package

@@ -593,6 +593,22 @@
         <value>What this number means</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_BypassPermission</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 label: the optional bypass custom permission</shortDescription>
+        <value>Skip for people with this custom permission (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_BypassPermissionHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 help: what the bypass custom permission does</shortDescription>
+        <value>The API name of a custom permission, such as Data_Migration. Records saved by people who hold it do not update this total. Recalculate still does, and so does the nightly run when the rollup runs Every night or Both.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_Summary</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

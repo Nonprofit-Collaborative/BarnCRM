@@ -179,6 +179,24 @@ describe('c-rollup-wizard', () => {
     expect(saved.mock.calls[0][0].detail.notice).toBe('Rollup saved.');
   });
 
+  it('saves the optional bypass custom permission from the last step', async () => {
+    save.mockResolvedValue({ recordId: DRAFT.recordId, notice: 'Rollup saved.' });
+    const element = await build(DRAFT);
+    await toLastStep(element);
+    const bypass = query(element, 'bypass-permission');
+    expect(bypass.value).toBeUndefined();
+
+    bypass.dispatchEvent(new CustomEvent('change', { detail: { value: 'Data_Migration' } }));
+    await flush();
+    query(element, 'save').click();
+    await flush();
+
+    expect(save).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ bypassPermission: 'Data_Migration' }),
+      calculateNow: false
+    });
+  });
+
   it('shows the server refusal on the last step', async () => {
     save.mockRejectedValue({ body: { message: 'Another rollup fills this field.' } });
     const element = await build(DRAFT);

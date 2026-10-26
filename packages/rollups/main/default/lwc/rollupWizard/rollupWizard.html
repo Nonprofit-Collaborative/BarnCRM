@@ -136,6 +136,14 @@
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
         <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
+        <lightning-input
+            name="bypassPermission"
+            data-id="bypass-permission"
+            label={labels.bypassPermission}
+            field-level-help={labels.bypassPermissionHelp}
+            value={draft.bypassPermission}
+            onchange={handleInput}
+        ></lightning-input>
     </template>
 
     <div class="slds-var-m-top_medium slds-clearfix">

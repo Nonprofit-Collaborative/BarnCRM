@@ -29,6 +29,10 @@
         <field>Mode__c</field>
       </layoutItems>
       <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Bypass_Permission__c</field>
+      </layoutItems>
+      <layoutItems>
         <behavior>Readonly</behavior>
         <field>Is_Package_Default__c</field>
       </layoutItems>
