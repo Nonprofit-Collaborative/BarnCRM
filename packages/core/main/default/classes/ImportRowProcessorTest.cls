@@ -702,6 +702,7 @@ private class ImportRowProcessorTest {
             SELECT Id, Name, Custom_Name__c, Member_Count__c
             FROM Account
             WHERE RecordTypeId = :HouseholdService.householdRecordTypeId()
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -92,6 +92,7 @@ private class BulkUpdateTransformTest {
             SELECT Status__c, Rows_Updated__c, Rows_Matched__c, Rows_Rejected__c, Run_Log__c
             FROM Import_Batch__c
             WHERE Id = :job.Id
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -101,6 +102,7 @@ private class BulkUpdateTransformTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :jobId AND Phase__c = :ImportJournalService.PHASE_COMMIT
+            WITH SYSTEM_MODE
         ]) {
             entries.addAll(ImportJournalService.entries(page));
         }

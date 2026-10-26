@@ -109,7 +109,11 @@ private class HealthCheckFixesTest {
     }
 
     private static List<Setting_Change__c> changesLogged() {
-        return [SELECT Setting_Name__c, Old_Value__c, New_Value__c FROM Setting_Change__c];
+        return [
+            SELECT Setting_Name__c, Old_Value__c, New_Value__c
+            FROM Setting_Change__c
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

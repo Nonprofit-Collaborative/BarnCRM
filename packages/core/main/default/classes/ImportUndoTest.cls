@@ -192,6 +192,7 @@ private class ImportUndoTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :batch.Id AND Phase__c = :ImportJournalService.PHASE_UNDO
+            WITH SYSTEM_MODE
         ]) {
             text += page.Entries_JSON__c;
         }

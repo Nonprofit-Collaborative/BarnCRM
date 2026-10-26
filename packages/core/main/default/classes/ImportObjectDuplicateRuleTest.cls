@@ -84,6 +84,7 @@ private class ImportObjectDuplicateRuleTest {
                 Duplicate_Rule_Match__c
             FROM Import_Row__c
             WHERE Import_Batch__c = :batch.Id
+            WITH SYSTEM_MODE
             ORDER BY Row_Number__c
         ];
     }
@@ -93,6 +94,7 @@ private class ImportObjectDuplicateRuleTest {
             SELECT COUNT()
             FROM Import_Row__c
             WHERE Import_Batch__c = :batch.Id AND Duplicate_Rule_Match__c = TRUE
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -120,7 +122,12 @@ private class ImportObjectDuplicateRuleTest {
     }
 
     private static Duplicate_Dismissal__c reread(Id recordId) {
-        return [SELECT Pair_Key__c, Reason__c FROM Duplicate_Dismissal__c WHERE Id = :recordId];
+        return [
+            SELECT Pair_Key__c, Reason__c
+            FROM Duplicate_Dismissal__c
+            WHERE Id = :recordId
+            WITH SYSTEM_MODE
+        ];
     }
 
     // -------------------------------------------------------------------------------------

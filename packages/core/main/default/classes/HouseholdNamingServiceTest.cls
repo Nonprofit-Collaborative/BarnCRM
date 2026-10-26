@@ -515,6 +515,7 @@ private class HouseholdNamingServiceTest {
             SELECT Household_Formal_Greeting__c, Household_Informal_Greeting__c
             FROM Account
             WHERE Id = :household.Id
+            WITH SYSTEM_MODE
         ];
     }
 

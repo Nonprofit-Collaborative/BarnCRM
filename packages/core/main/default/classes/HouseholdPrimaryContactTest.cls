@@ -40,7 +40,8 @@ private class HouseholdPrimaryContactTest {
     }
 
     private static Id primaryContactOf(Id householdId) {
-        return [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId].Primary_Contact__c;
+        return [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
+        .Primary_Contact__c;
     }
 
     @IsTest

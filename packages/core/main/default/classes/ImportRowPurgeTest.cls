@@ -33,7 +33,12 @@ private class ImportRowPurgeTest {
     }
 
     private static Integer rowsOf(Id batchId) {
-        return [SELECT COUNT() FROM Import_Row__c WHERE Import_Batch__c = :batchId];
+        return [
+            SELECT COUNT()
+            FROM Import_Row__c
+            WHERE Import_Batch__c = :batchId
+            WITH SYSTEM_MODE
+        ];
     }
 
     private static void keepRowsFor(Integer days) {

@@ -887,6 +887,41 @@ private class HouseholdMergeServiceTest {
         }
     }
 
+    @IsTest
+    static void minimumAccessStaffMoveMembersWhenMergingHouseholds() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User staff = TestUsers.minimumAccessUserWith(
+                'Mmover',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+            shareHousehold(survivorId, staff.Id, 'Edit');
+            shareHousehold(victimId, staff.Id, 'Edit');
+
+            Test.startTest();
+            System.runAs(staff) {
+                HouseholdMergeService.mergeHouseholds(
+                    survivorId,
+                    victimId,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            }
+            Test.stopTest();
+
+            Assert.areEqual(survivorId, householdOf(maria.Id), 'Maria stays in the kept household');
+            Assert.areEqual(
+                survivorId,
+                householdOf(wei.Id),
+                'Wei was moved into the kept household'
+            );
+        }
+    }
+
     /**
      * A person who can see both households but holds no BarnCRM permission set, and so no
      * Edit on Account, is refused with the screen's own message before anything changes.
@@ -1384,6 +1419,7 @@ private class HouseholdMergeServiceTest {
             SELECT COUNT()
             FROM Household_Member__c
             WHERE Household__c = :householdId AND (End_Date__c = NULL OR End_Date__c > TODAY)
+            WITH SYSTEM_MODE
         ];
     }
 
