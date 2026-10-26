@@ -928,4 +928,36 @@
         <shortDescription>Needs attention: the waiting records were started</shortDescription>
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantBuiltInError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: BarnCRM already updates this object instantly</shortDescription>
+        <value>BarnCRM already keeps totals on this object up to date by itself, so it needs no trigger.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantNotAvailableError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: Salesforce allows no trigger on this object</shortDescription>
+        <value>Salesforce does not allow a trigger on this object, so its totals cannot be made instant. They are calculated every night and when you click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSwitchDescription</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: generated trigger switch. {0} is the trigger name.</shortDescription>
+        <value>The rollup trigger {0}, deployed from the Rollup Builder. Switch it off to stop instant totals on this object; rollups in Both still recalculate every night.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSwitchName</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: generated trigger switch. {0} is the object label.</shortDescription>
+        <value>Instant rollups on {0}</value>
+    </labels>
 </CustomLabels>
