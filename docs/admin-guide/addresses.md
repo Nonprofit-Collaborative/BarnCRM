@@ -159,12 +159,13 @@ Two buttons on the **Addresses** card move a household when you decide to, whate
 addresses, and on the household and its people. Nothing is deleted: the address each one
 replaces stays on the card as history.
 
-- **Use for Whole Household**, on a person's own address card. The household gets a new
-  primary address copied from this one, and everyone in it who has no address of their own
-  moves to it. The person stops having an address of their own in use (their cards stay, as
-  history), so from now on they move with the household. In the flexible way of belonging,
-  the household is the person's own one; if they are a current member of more than one, the
-  card asks which.
+- **Use for Whole Household**, on a person's own address card (not a seasonal one). The
+  household gets a new primary address copied from this one, and everyone in it who has no
+  address of their own moves to it. The person stops having an address of their own in use
+  (their cards stay, as history), so from now on they move with the household. In the
+  flexible way of belonging, if they are a current member of more than one household the card
+  asks which, their own household first; choosing another household moves that household
+  and leaves the person's own address in use.
 - **Update Everyone's Address**, on the household's primary address card. A confirmation lists
   who will get this address (everyone in the household with no address of their own) and who
   has an address of their own. Those are left where they are unless you tick them; a ticked

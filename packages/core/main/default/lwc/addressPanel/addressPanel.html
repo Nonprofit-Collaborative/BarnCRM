@@ -24,7 +24,7 @@
         <p class="slds-text-body_regular" data-id="empty">{labels.emptyMessage}</p>
       </template>
 
-      <template for:each={addresses} for:item="address">
+      <template for:each={cards} for:item="address">
         <div key={address.id} class={address.cardClass} data-id="address-card">
           <div class="slds-grid slds-grid_align-spread">
             <div>
@@ -52,7 +52,105 @@
                   ></lightning-button>
                 </template>
               </template>
+              <template lwc:if={address.showUseForHousehold}>
+                <lightning-button
+                  label={labels.useForHouseholdButton}
+                  data-id={address.id}
+                  onclick={handleUseForHousehold}
+                  class="use-for-household slds-var-m-left_x-small"
+                ></lightning-button>
+              </template>
+              <template lwc:if={address.showUpdateEveryone}>
+                <lightning-button
+                  label={labels.updateEveryoneButton}
+                  data-id={address.id}
+                  onclick={handleUpdateEveryone}
+                  class="update-everyone slds-var-m-left_x-small"
+                ></lightning-button>
+              </template>
             </div>
+          </div>
+        </div>
+      </template>
+
+      <template lwc:if={isMovingForHousehold}>
+        <div class="slds-box slds-var-m-top_small" data-id="use-for-household-confirm">
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">
+            {labels.useForHouseholdTitle}
+          </h3>
+          <p class="slds-var-m-bottom_small">{labels.useForHouseholdHelp}</p>
+          <template lwc:if={showHouseholdPicker}>
+            <lightning-radio-group
+              label={labels.useForHouseholdPick}
+              options={householdOptions}
+              value={moveHouseholdId}
+              onchange={handlePickHousehold}
+              data-id="household-picker"
+            ></lightning-radio-group>
+          </template>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              label={labels.cancelButton}
+              onclick={handleCancelMove}
+              data-id="cancel-move"
+            ></lightning-button>
+            <lightning-button
+              class="slds-var-m-left_x-small"
+              variant="brand"
+              label={labels.useForHouseholdButton}
+              onclick={handleConfirmMove}
+              disabled={moveBusy}
+              data-id="confirm-move"
+            ></lightning-button>
+          </div>
+        </div>
+      </template>
+
+      <template lwc:if={isMovingEveryone}>
+        <div class="slds-box slds-var-m-top_small" data-id="update-everyone-confirm">
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">
+            {labels.updateEveryoneTitle}
+          </h3>
+          <template lwc:if={hasMoving}>
+            <p>{labels.updateEveryoneMoving}</p>
+            <ul class="slds-list_dotted slds-var-m-bottom_small">
+              <template for:each={move.moving} for:item="person">
+                <li key={person.id} data-id="moving-person">{person.name}</li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <p class="slds-var-m-bottom_small" data-id="nobody-moving">
+              {labels.updateEveryoneNobody}
+            </p>
+          </template>
+          <template lwc:if={hasWithTheirOwn}>
+            <p>{labels.updateEveryoneOwn}</p>
+            <template for:each={move.withTheirOwn} for:item="person">
+              <lightning-input
+                key={person.id}
+                type="checkbox"
+                label={person.name}
+                data-id={person.id}
+                onchange={handleTick}
+                class="own-address-person"
+              ></lightning-input>
+            </template>
+          </template>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              label={labels.cancelButton}
+              onclick={handleCancelMove}
+              data-id="cancel-move"
+            ></lightning-button>
+            <lightning-button
+              class="slds-var-m-left_x-small"
+              variant="brand"
+              label={labels.updateEveryoneButton}
+              onclick={handleConfirmMove}
+              disabled={moveBusy}
+              data-id="confirm-move"
+            ></lightning-button>
           </div>
         </div>
       </template>

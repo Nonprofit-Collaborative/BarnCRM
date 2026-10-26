@@ -44,6 +44,39 @@ You should see: "This is now the primary address, and it has been copied to the 
 address fields." The **Primary** badge moves, and the record's own address fields at the
 top of the page refresh. Nothing is deleted: the other addresses stay on the card.
 
+## To move the whole household to a person's address
+
+Use this when a person's own address becomes the household's, for example when the family
+moves into the home one of them already had.
+
+1. Open the person. On the **Addresses** card, click **Use for Whole Household** on their
+   address. (Seasonal addresses do not offer it.)
+2. If the person belongs to more than one household, choose one under **Which household?**.
+   Their own household is listed first.
+3. Click **Use for Whole Household** in the confirmation, or **Cancel**.
+
+You should see: "The household now uses this address." The household gets this address as
+its primary, and everyone in it without an address of their own moves to it. If it is the
+person's own household, they move with the household from now on; their own address stays
+on their card without the **Primary** badge.
+
+## To give everyone in the household its address
+
+Use this to bring people back to the household's address, or, if your org's **Address
+Updates** setting is **Nobody moves until you choose**, to move them after the household's
+address changes.
+
+1. Open the household. On the **Addresses** card, click **Update Everyone's Address** on the
+   primary address.
+2. The confirmation lists who will get this address, and who has an address of their own.
+   Tick anyone with their own address who should move too; the rest stay where they are.
+3. Click **Update Everyone's Address** in the confirmation, or **Cancel**.
+
+You should see: "Everyone's address has been updated." A person you ticked keeps their own
+address on their card, without the **Primary** badge.
+
+If you cannot see either button, you can read addresses but not change them. Ask your admin.
+
 ## To add a seasonal address
 
 Use this for a household that spends part of each year somewhere else.
