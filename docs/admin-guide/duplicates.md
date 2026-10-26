@@ -262,13 +262,13 @@ same pairs twice, so a second one is refused.
 from this panel or with **Merge or split** on the household's record page. That merge moves
 the members, recalculates the totals and renames the household, and lets you choose what to
 keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
-and renames the kept household, settles its primary member and keeps one default address within
+and renames the kept household, settles its primary member and keeps one primary address within
 a minute or so, in the background, because Salesforce does not let anything change the records
 while it is merging them. If a person was in both households, they are left with one membership in the kept household (the primary one, or else the earlier start), so they are counted once. It cannot ask which name or members to keep, which is why the
 household record page does not offer that merge.
 
 **A merge run by another app or a background job.** The tidy-up after a Salesforce merge (one
-membership per person, the count and name, one default address, no relationship with oneself,
+membership per person, the count and name, one primary address, no relationship with oneself,
 the primary affiliation) also runs when the merge was made by a background job, an
 integration or a deduplication app. When the merge itself runs in the background, BarnCRM
 asks for the tidy-up once the merge is saved, so it can take a minute or two longer. That

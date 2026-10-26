@@ -2,9 +2,9 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Is_Default__c</fullName>
   <defaultValue>false</defaultValue>
-  <description>Marks the address currently written to the standard address fields. Only one address per household, organization, or person can be the default.</description>
-  <inlineHelpText>Marks the address currently written to the standard address fields. Only one address per household, organization, or person can be the default.</inlineHelpText>
-  <label>Default</label>
+  <description>Marks the address currently written to the standard address fields. Only one address per household, organization, or person can be the primary.</description>
+  <inlineHelpText>Marks the address currently written to the standard address fields. Only one address per household, organization, or person can be the primary.</inlineHelpText>
+  <label>Primary</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

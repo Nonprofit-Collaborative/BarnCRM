@@ -142,7 +142,7 @@ describe('c-address-panel', () => {
     expect(buttons[0].dataset.id).toBe(WINTER.Id);
   });
 
-  it('offers neither Add address nor Set as default to someone who can only read addresses', async () => {
+  it('offers neither Add address nor Set as Primary to someone who can only read addresses', async () => {
     const element = build('Account', READ_ONLY_ACCESS);
     graphql.emit(response([HOME, WINTER]));
     await flush();
@@ -164,7 +164,7 @@ describe('c-address-panel', () => {
     expect(element.shadowRoot.querySelectorAll('.set-default').length).toBe(0);
   });
 
-  it('hides Set as default when the default field cannot be edited', async () => {
+  it('hides Set as Primary when the primary field cannot be edited', async () => {
     const element = build('Account', { ...STAFF_ACCESS, fields: {} });
     graphql.emit(response([HOME, WINTER]));
     await flush();

@@ -15,7 +15,7 @@ opens quickly however large your database is.
 | Section | What it answers | Who sees it |
 |---|---|---|
 | **Overview** | What each section is for, with a button to open it. | Everyone who can open the page |
-| **Data quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed default addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check has **Open in Find**. See [Data hygiene](data-hygiene.md). | Anyone with **Find and Export Records** |
+| **Data quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check has **Open in Find**. See [Data hygiene](data-hygiene.md). | Anyone with **Find and Export Records** |
 | **Field utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |

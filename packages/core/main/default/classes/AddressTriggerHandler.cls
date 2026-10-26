@@ -1,5 +1,5 @@
 /**
- * Address__c trigger handler, registered as "Copy default address to standard fields"
+ * Address__c trigger handler, registered as "Copy primary address to standard fields"
  * in the automation registry and dispatched by TriggerDispatcher, so an
  * administrator can switch it off from BarnCRM Settings without touching Setup.
  *

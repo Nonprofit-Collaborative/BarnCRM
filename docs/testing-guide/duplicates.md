@@ -77,7 +77,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Create an Account, record type **Household**, named `Sunset Test Household` (a name no rule would match). | The household saves. |
-| 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Default** ticked. | The address saves. |
+| 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Primary** ticked. | The address saves. |
 | 3 | On **Duplicate Matching**, **Matching Logic**, choose **Try a value** on **Address (household)**. Enter **Value** `6830 Sunset Ln`, **Postal code** `62756`, and choose **Try**. | **Compared as: 6830 sunset ln\|62756**, then **These records would match:** with **Household: The Garcia Family** and **Household: Sunset Test Household**. |
 | 4 | On **Review**, scan and refresh. | A pair of `Sunset Test Household` and **The Garcia Family**, both **Household:**, with the grey line **Same address on Address (household)**. Capitals and the full stop did not stop the match. |
 | 5 | Click **Not a duplicate**, give the reason `Test: match source`, confirm. | **Noted. This pair will not be suggested again.** |
@@ -95,7 +95,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 1 | Open the **Duplicate Matching** tab and choose **Matching Logic**. | Six cards, each marked **Shipped with BarnCRM** and **Active**: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**. In an org without contact point objects, those three say **Not used in this org**. Shipped cards have **Deactivate** and **Try a value**, and no **Edit**. |
 | 2 | Read the **Address (household)** card. | **Object** Address, **Field compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Through the lookup** the household lookup, **How values are compared** starting **Address:**. |
 | 3 | Choose **Deactivate** on **Address (household)**. | **Saving. Salesforce applies the change in the background, usually within a minute.**, then **Saved.** The card reads **Inactive**, with **Activate**. |
-| 4 | Create a household `Pine Test Household` with a default address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
+| 4 | Create a household `Pine Test Household` with a primary address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 5 | On **Review**, scan and refresh. | No pair with `Pine Test Household`. |
 | 6 | Back on **Matching Logic**, choose **Activate** on **Address (household)**. | **Saved.** The card reads **Active**. |
 | 7 | Scan and refresh. | A pair of `Pine Test Household` and **Staff Household**, reason **Same address on Address (household)**. |

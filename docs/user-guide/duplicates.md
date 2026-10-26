@@ -30,7 +30,7 @@ Within a minute or so, without you doing anything:
 
 - The kept person joins any household the other one belonged to, and their totals are
   recalculated.
-- One default address stays.
+- One primary address stays.
 - A relationship the two records had with each other is removed, and so is a second copy of a
   relationship both had with the same person.
 - Their primary affiliation is chosen again.

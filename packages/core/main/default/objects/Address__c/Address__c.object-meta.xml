@@ -3,7 +3,7 @@
   <allowInChatterGroups>false</allowInChatterGroups>
   <compactLayoutAssignment>Address_Compact</compactLayoutAssignment>
   <deploymentStatus>Deployed</deploymentStatus>
-  <description>A place a household, an organization, or a person receives mail. The default address is copied to the standard address fields so every standard feature and third party app keeps working.</description>
+  <description>A place a household, an organization, or a person receives mail. The primary address is copied to the standard address fields so every standard feature and third party app keeps working.</description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
   <enableFeeds>false</enableFeeds>
