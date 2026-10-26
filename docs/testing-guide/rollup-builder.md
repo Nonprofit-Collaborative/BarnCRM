@@ -138,7 +138,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Recalculate** on its row and wait a minute. Refresh **The Garcia Family**. | **Test Children Count** shows 0, matching Diego's new role. |
 | 7 | Open Diego Garcia, set **Household Role** back to **Child** and save. Wait a minute and refresh **The Garcia Family**. | **Test Children Count** shows 1. |
 
-**Cleanup:** None. To remove the test rollup for good, leave it switched off: the Builder has no delete, and the admin guide recommends switching off over deleting.
+**Cleanup:** None. To remove the test rollup for good, use **Delete** (T-RB-24) once the other scripts are done.
 
 ## T-RB-08: Staff and read-only users see the Builder read only
 
@@ -172,3 +172,20 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
+
+## T-RB-24: Delete a rollup you made, and not a shipped one
+
+**Purpose:** confirm Delete says what happens, removes an admin-made rollup and leaves its values, and refuses a shipped rollup with the reason.
+**Prerequisites:** admin user; T-RB-02 done. Step 6 needs Giving deployed (it ships rollups); skip it otherwise.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **Copy** on **Test children per household**, click **Next** until **Check and save**, turn off **Active** and click **Save**. | A row **Copy of Test children per household** appears, switched off. |
+| 2 | Click **Delete** on **Copy of Test children per household**. | A **Delete rollup** box reads "Delete Copy of Test children per household? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone." |
+| 3 | Click **Cancel**. | The row is still listed. |
+| 4 | Click **Delete** on the same row again, then **OK**. | The notice reads "Rollup deleted. The values it wrote stay on the records." The row is gone; **Test children per household** is still listed. |
+| 5 | Open **The Garcia Family**. | **Test Children Count** still shows 1. |
+| 6 | Back on the **Rollup Builder** tab, click **Delete** on **Account gift count**. | No confirmation opens. A red message reads "This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead." The row is still listed. |
+| 7 | Log in as the staff user and open the **Rollup Builder** tab. | **Delete** is disabled on every row, as **Edit** and **Copy** are. |
+
+**Cleanup:** None.

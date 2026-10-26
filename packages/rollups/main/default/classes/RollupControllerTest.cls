@@ -360,6 +360,71 @@ private class RollupControllerTest {
     }
 
     @IsTest
+    static void deletingAnAdminMadeRollupRemovesItFromTheList() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            insert rollup;
+
+            RollupController.RollupPageView page = RollupController.deleteRollup(rollup.Id);
+
+            System.Assert.areEqual(0, page.rollups.size(), 'The list no longer shows it');
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id],
+                'The definition is gone'
+            );
+        }
+    }
+
+    @IsTest
+    static void aShippedRollupIsTurnedOffNotDeleted() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Is_Package_Default__c = true;
+            insert rollup;
+
+            try {
+                RollupController.deleteRollup(rollup.Id);
+                System.Assert.fail('R-R6: a shipped rollup is refused');
+            } catch (AuraHandledException refused) {
+                System.Assert.areEqual(
+                    Label.Core_RollupBuilder_DeleteShipped,
+                    refused.getMessage()
+                );
+            }
+            System.Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id],
+                'It is still there, to be switched off'
+            );
+        }
+    }
+
+    @IsTest
+    static void staffCannotDeleteARollup() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            insert rollup;
+            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+            System.runAs(david) {
+                try {
+                    RollupController.deleteRollup(rollup.Id);
+                    System.Assert.fail('Only a settings manager deletes');
+                } catch (AuraHandledException refused) {
+                    System.Assert.areEqual(
+                        Label.Core_Rollups_ErrorNoPermission,
+                        refused.getMessage()
+                    );
+                }
+            }
+            System.Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id]
+            );
+        }
+    }
+
+    @IsTest
     static void staffCannotEstimateOrScheduleTonight() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });

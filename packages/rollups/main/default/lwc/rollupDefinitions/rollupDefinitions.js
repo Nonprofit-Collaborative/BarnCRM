@@ -1,5 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import LightningConfirm from 'lightning/confirm';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
@@ -13,6 +14,7 @@ import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
+import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
 
 import TITLE from '@salesforce/label/c.Core_Rollups_PageTitle';
 import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
@@ -45,6 +47,11 @@ import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkin
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
+import DELETE_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_Delete';
+import DELETE_TITLE from '@salesforce/label/c.Core_RollupBuilder_DeleteTitle';
+import DELETE_CONFIRM from '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm';
+import DELETE_SHIPPED from '@salesforce/label/c.Core_RollupBuilder_DeleteShipped';
+import DELETED from '@salesforce/label/c.Core_RollupBuilder_Deleted';
 
 /**
  * The Rollups page of the BarnCRM Settings console.
@@ -56,8 +63,8 @@ import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
  */
 export default class RollupDefinitions extends NavigationMixin(LightningElement) {
   /**
-   * True inside the Rollup Builder, which adds New, Edit and Copy and listens for `new`, `edit`
-   * and `copy` (with `detail.recordId`). On the settings page the list links to the Builder.
+   * True inside the Rollup Builder, which adds New, Edit, Copy and Delete and listens for `new`,
+   * `edit` and `copy` (with `detail.recordId`). On the settings page the list links to the Builder.
    */
   @api builder = false;
 
@@ -70,6 +77,11 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     startNow: START_NOW,
     runTonight: RUN_TONIGHT,
     cancel: CANCEL,
+    deleteRollup: DELETE_ROLLUP,
+    deleteTitle: DELETE_TITLE,
+    deleteConfirm: DELETE_CONFIRM,
+    deleteShipped: DELETE_SHIPPED,
+    deleted: DELETED,
     title: TITLE,
     intro: INTRO,
     columnRollup: COLUMN_ROLLUP,
@@ -280,6 +292,33 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
 
   handleCopy(event) {
     this.dispatchEvent(new CustomEvent('copy', { detail: { recordId: event.target.dataset.id } }));
+  }
+
+  /**
+   * Deletes an admin-made rollup after saying what happens (ADR-0136). A shipped one is not sent
+   * to the server: the reason is shown here, the same words the server would use (R-R6).
+   */
+  async handleDelete(event) {
+    const definitionId = event.target.dataset.id;
+    const rollup = (this.page.rollups || []).find((item) => item.recordId === definitionId);
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    if (!rollup) {
+      return undefined;
+    }
+    if (rollup.packageDefault) {
+      this.errorMessage = this.labels.deleteShipped;
+      return undefined;
+    }
+    const confirmed = await LightningConfirm.open({
+      label: this.labels.deleteTitle,
+      message: this.labels.deleteConfirm.replace('{0}', rollup.name),
+      theme: 'warning'
+    });
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.runAction(deleteRollup({ definitionId }), undefined, this.labels.deleted);
   }
 
   handleOpenBuilder() {

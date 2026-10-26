@@ -1622,7 +1622,12 @@ reasoning is in Section 26.
 `Rollup_Definition_Default__mdt` on install and on "Restore defaults", matched by
 Definition Key. An upgrade adds newly shipped definitions and never overwrites a
 definition the admin has edited (ADR-0006). An admin who does not want a packaged
-definition sets Active to false; packaged code never deletes an admin's records.
+definition sets Active to false; packaged code never deletes an admin's records. The
+Rollup Builder's Delete (ADR-0136) removes only a definition with Is Package Default false,
+and refuses a packaged one with that advice, since "Restore defaults" would create it again.
+Deleting a definition leaves the values it wrote on the target records; a Rollup Queue entry
+that names it skips it, as it skips an inactive one (Section 14A). Delete is refused while a
+full run is going (R-R14).
 
 **R-R7 No cross-package reference.** Source Entity, Target Entity, Source Attribute,
 Target Attribute, and Order By Attribute are text. Core therefore drives rollups over
@@ -1809,7 +1814,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   completed with the Rollup Builder, which set Filter and Target Filter). Long text attributes
   record that they changed, not the values.
 - **Rollup Builder:** the `Rollup_Builder` tab and app page, `rollupBuilder` (which nests the
-  Rollups list, `rollupDefinitions`, with New, Edit and Copy), `rollupWizard` (the five steps)
+  Rollups list, `rollupDefinitions`, with New, Edit, Copy and Delete, the last through
+  `RollupController.deleteRollup` in user mode, R-R6), `rollupWizard` (the five steps)
   and `rollupFilterBuilder` (R-R2 documents, built once and shared with Find, plan Section
   4.9). `RollupBuilderController` describes the org for the steps, in the running user's
   describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
@@ -8678,6 +8684,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
 
 ---
 ## 32. Entity ownership by package

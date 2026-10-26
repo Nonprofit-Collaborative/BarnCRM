@@ -220,6 +220,14 @@
                                                 disabled={controlsDisabled}
                                                 onclick={handleCopy}
                                             ></lightning-button>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="delete"
+                                                label={labels.deleteRollup}
+                                                disabled={controlsDisabled}
+                                                onclick={handleDelete}
+                                            ></lightning-button>
                                         </template>
                                     </td>
                                 </tr>

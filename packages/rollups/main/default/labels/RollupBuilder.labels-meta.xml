@@ -928,4 +928,44 @@
         <shortDescription>Needs attention: the waiting records were started</shortDescription>
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Delete</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row button: delete this rollup</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete confirmation: heading</shortDescription>
+        <value>Delete rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteConfirm</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete confirmation: what happens; {0} is the rollup name</shortDescription>
+        <value>Delete {0}? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteShipped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete refused: the rollup came with BarnCRM</shortDescription>
+        <value>This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Deleted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a rollup is deleted</shortDescription>
+        <value>Rollup deleted. The values it wrote stay on the records.</value>
+    </labels>
 </CustomLabels>

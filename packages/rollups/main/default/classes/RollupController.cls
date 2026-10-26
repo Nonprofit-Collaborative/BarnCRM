@@ -148,6 +148,31 @@ public with sharing class RollupController {
         }
     }
 
+    /**
+     * Deletes one rollup an administrator made (ADR-0136). The values it already wrote stay on the
+     * records; nothing updates them again. A shipped rollup is refused, since Restore defaults
+     * would only bring it back: it is turned off instead (R-R6). A queue entry that names the
+     * rollup skips it, as it skips one switched off (`RollupSelector.selectActiveByIds`). Refused
+     * while a full run is going, which would otherwise fail to stamp the run's other rollups.
+     */
+    @AuraEnabled
+    public static RollupPageView deleteRollup(Id definitionId) {
+        try {
+            requirePermission();
+            Rollup_Definition__c definition = require(definitionId);
+            if (definition.Is_Package_Default__c == true) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_RollupBuilder_DeleteShipped
+                );
+            }
+            refuseWhileAFullRunIsGoing();
+            Database.delete(new Rollup_Definition__c(Id = definition.Id), AccessLevel.USER_MODE);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Delete a rollup');
+        }
+    }
+
     /** Recalculates one rollup now. This is the admin's recalculate action (plan Section 4.10). */
     @AuraEnabled
     public static RollupPageView recalculate(Id definitionId) {
