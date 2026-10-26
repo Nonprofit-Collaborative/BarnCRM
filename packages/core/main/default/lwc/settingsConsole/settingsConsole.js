@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
@@ -165,6 +165,14 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       }
     }
   ];
+
+  /**
+   * No longer used: the console always shows every module's rows. The property stays declared
+   * because the platform refuses to remove a page property from a component that any Lightning
+   * page in the org places, so an org that had the old module settings pages could not take an
+   * upgrade without it. Any value set is ignored.
+   */
+  @api module;
 
   sections = [];
   changes = [];

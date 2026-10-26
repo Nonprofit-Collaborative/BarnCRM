@@ -13,4 +13,9 @@
   <targets>
     <target>lightning__AppPage</target>
   </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage">
+      <property name="module" type="String" label="Module" description="No longer used: every setting is shown. Kept so pages that already place this component still deploy. Leave blank." />
+    </targetConfig>
+  </targetConfigs>
 </LightningComponentBundle>

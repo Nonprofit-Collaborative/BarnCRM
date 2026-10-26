@@ -211,7 +211,11 @@ public with sharing class MatchSourceController {
         view.values.put('Postal_Code_Field__c', row.Postal_Code_Field__c);
         view.values.put('Parent_Field__c', row.Parent_Field__c);
         view.values.put('Normalization__c', row.Normalization__c);
-        Map<String, Object> asGiven = new Map<String, Object>(view.values);
+        // A Map<String, Object> cannot be built from a Map<String, String> in one step.
+        Map<String, Object> asGiven = new Map<String, Object>();
+        for (String field : view.values.keySet()) {
+            asGiven.put(field, view.values.get(field));
+        }
         view.usable = MatchSourceService.sourceFrom(row.MasterLabel, asGiven) != null;
         Schema.SObjectType type = NamespaceUtil.objectType(row.Object_Name__c);
         if (type == null) {
