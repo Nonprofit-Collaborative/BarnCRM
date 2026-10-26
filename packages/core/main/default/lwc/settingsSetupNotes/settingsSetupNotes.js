@@ -39,7 +39,7 @@ const NOTES = {
     },
     { key: 'metadata', what: METADATA_WHAT, why: METADATA_WHY, where: METADATA_WHERE }
   ],
-  households: [
+  'duplicate matching': [
     { key: 'duplicates', what: DUPLICATES_WHAT, why: DUPLICATES_WHY, where: DUPLICATES_WHERE }
   ],
   rollups: [{ key: 'rollupField', what: ROLLUP_WHAT, why: ROLLUP_WHY, where: ROLLUP_WHERE }],

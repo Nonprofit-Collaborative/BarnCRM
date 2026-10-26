@@ -14,9 +14,9 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                15,
+                16,
                 sections.size(),
-                'Fifteen section names are agreed across the suite'
+                'Sixteen section names are agreed across the suite'
             );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.VOLUNTEERS),
@@ -33,6 +33,11 @@ private class SettingSectionsTest {
                 'General comes first, because it is where a new org starts'
             );
             Assert.isTrue(SettingSections.isKnown('households'), 'The check ignores case');
+            Assert.areEqual(
+                SettingSections.HOUSEHOLDS,
+                sections[sections.indexOf(SettingSections.DUPLICATE_MATCHING) - 1],
+                'Duplicate Matching follows Households, where its review list used to be'
+            );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.RECEIPTS),
                 'Receipts is a section Giving ships rows into, so Core has to know the name'

@@ -1,7 +1,7 @@
 /**
  * Gives and takes the BarnCRM Tab permission sets, so a tool feature's tabs (Data Manager,
- * Import, Find, Bulk Update, Data Hygiene) show only while the feature is on (ADR-0124, edition
- * gates visibility).
+ * Import, Find, Bulk Update, Data Hygiene, Duplicate Matching) show only while the feature is
+ * on (ADR-0124, edition gates visibility).
  *
  * Each feature tab has a packaged permission set that shows that tab and nothing else. Its
  * audience is everyone who holds one of the permission sets the tab used to ride on, directly
@@ -29,16 +29,19 @@ public with sharing class TabAccessService {
     public static final String FIND_TAB = 'BarnCRM_Tab_Find';
     public static final String BULK_UPDATE_TAB = 'BarnCRM_Tab_Bulk_Update';
     public static final String DATA_HYGIENE_TAB = 'BarnCRM_Tab_Data_Hygiene';
+    public static final String DUPLICATE_MATCHING_TAB = 'BarnCRM_Tab_Duplicate_Matching';
 
     private static final String ADMIN = 'BarnCRM_Admin';
     private static final String FIND_AND_EXPORT = 'BarnCRM_Find_And_Export';
     private static final String BULK_UPDATE = 'BarnCRM_Bulk_Update';
     private static final String BULK_DELETE = 'BarnCRM_Bulk_Delete';
     private static final String DUPLICATE_REVIEW = 'BarnCRM_Duplicate_Review';
+    private static final String METADATA_ADMIN = 'BarnCRM_Metadata_Admin';
 
     /**
      * Each tab set, and the permission sets whose holders see that tab while it is on.
-     * Duplicate Review holders see Data Hygiene, where Org Optimizer lists the duplicates.
+     * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-NEXT),
+     * and so do Metadata Admin holders, who change its matching logic.
      */
     @TestVisible
     private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
@@ -46,7 +49,8 @@ public with sharing class TabAccessService {
         IMPORT_TAB => new List<String>{ ADMIN },
         FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
         BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-        DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, DUPLICATE_REVIEW }
+        DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+        DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN }
     };
 
     /** How many assignments one run gives or takes, well inside the 10,000 DML rows. */

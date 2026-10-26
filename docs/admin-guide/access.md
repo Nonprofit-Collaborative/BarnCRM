@@ -160,7 +160,7 @@ Core's six are always listed:
 | BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
-| BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Duplicates** list on Org Optimizer (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
+| BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Review** list on the Duplicate Matching tab (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
 
 A module's sets are listed after them, only where that module is installed:
@@ -227,7 +227,8 @@ feature is on:
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export |
 | Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export, Duplicate Review |
+| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export |
+| Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
 by a user access policy is caught up overnight, and every upgrade catches everyone up, so an

@@ -7,7 +7,7 @@ ever merged for you: every merge is a pair someone looked at and confirmed.
 
 Before you start: reviewing suggestions needs the **BarnCRM Duplicate Review** add-on, which
 Salesforce allows only for users with a Sales Cloud or Service Cloud license. With it you see
-the **Org Optimizer** tab and its **Duplicates** list. Dismissing and merging from that list,
+the **Duplicate Matching** tab and its **Review** list. Dismissing and merging from that list,
 and running the scan, also need the admin role (**BarnCRM Admin Group** on the Access page).
 Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 
@@ -50,7 +50,7 @@ households this way, never with Salesforce's own account merge. The full steps a
 
 ## To work through the Duplicates list (admins)
 
-1. Open the **Org Optimizer** tab and choose **Duplicates**.
+1. Open the **Duplicate Matching** tab. The **Review** list opens.
 2. Under **Possible duplicates**, read each pair. It is marked **Person** or **Household**, and
    says why it was suggested (see below). Press **Refresh** to see the latest.
 3. For two people, open either one and use **Compare and merge**, as above. The list reminds
@@ -97,9 +97,10 @@ any real duplicates in it first.
 - Problem: "You can see this list. Scanning, dismissing and merging here need the Manage
   BarnCRM Settings permission." Only admins act from the list. Merge people from their own
   page and households with **Merge or split**.
-- Problem: there is no **Duplicates** section on **Org Optimizer**, or no **Org Optimizer** tab.
-  The list is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or
-  use the **Potential Duplicates** card on the person.
+- Problem: there is no **Duplicate Matching** tab, or no **Duplicates** section on **Org
+  Optimizer** where you used to find it. The list moved to the **Duplicate Matching** tab, which
+  is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or use the
+  **Potential Duplicates** card on the person.
 - Problem: "No possible duplicates are waiting. Scan again after a large import." Nothing to
   review. Ask your admin to scan after an import.
 - Problem: a pair of organizations never appears. The list shows people and households only.
@@ -115,4 +116,4 @@ any real duplicates in it first.
 - [Finding people and records](find.md)
 - Admin Guide: [Duplicates](../admin-guide/duplicates.md),
   [Merging and splitting households](../admin-guide/household-merge-split.md),
-  [Org Optimizer](../admin-guide/org-optimizer.md), [Access](../admin-guide/access.md)
+  [Access](../admin-guide/access.md)

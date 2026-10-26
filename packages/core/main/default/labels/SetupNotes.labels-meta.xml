@@ -13,7 +13,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Households: what to change for duplicates</shortDescription>
+        <shortDescription>Setup note, Duplicate Matching: what to change for duplicates</shortDescription>
         <value>To review duplicates, keep the standard duplicate rules active. Give the people who will review them Duplicate Review on the Access page, under Extra permissions.</value>
     </labels>
     <labels>
@@ -21,7 +21,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Households: Setup path for duplicates</shortDescription>
+        <shortDescription>Setup note, Duplicate Matching: Setup path for duplicates</shortDescription>
         <value>Setup, Duplicate Rules</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Households: why duplicates need Setup</shortDescription>
+        <shortDescription>Setup note, Duplicate Matching: why duplicates need Setup</shortDescription>
         <value>Salesforce shows possible duplicates only to users with a Sales Cloud or Service Cloud license, and a scan applies only active duplicate rules.</value>
     </labels>
     <labels>

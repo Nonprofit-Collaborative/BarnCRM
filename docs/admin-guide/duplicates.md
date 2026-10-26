@@ -3,7 +3,7 @@
 ## What it does
 
 Finds people and households that are in your database twice, and helps you deal with them one
-pair at a time. Salesforce does the finding, with the duplicate rules every org starts with:
+pair at a time, on the **Duplicate Matching** tab. Salesforce does the finding, with the duplicate rules every org starts with:
 it warns the person typing that somebody similar already exists. What Salesforce does not do
 in most editions is look through the records you already have, so a spreadsheet imported last
 year is never checked against itself. BarnCRM adds that scan, lists every pair on one page,
@@ -20,10 +20,11 @@ sources are listed, added and archived on the **Custom metadata** page; see
 
 ## How to turn it on
 
-There is nothing to install, but on a new install the **Duplicate Review** feature is off
-until you turn it on: choose **Turn on** in the **Duplicate Review** row in **BarnCRM
+There is nothing to install, but on a new install the **Duplicate Matching** feature is off
+until you turn it on: choose **Turn on** in the **Duplicate Matching** row in **BarnCRM
 Settings**, **General** (or leave it ticked in first-run setup); see
-[BarnCRM Settings](barncrm-settings.md). Salesforce switches on its standard duplicate rules
+[BarnCRM Settings](barncrm-settings.md). While it is off the **Duplicate Matching** tab is
+hidden for everyone. Salesforce switches on its standard duplicate rules
 for people and accounts in every new org, and BarnCRM uses them. There is one permission
 step, because of a Salesforce licensing rule:
 
@@ -33,16 +34,21 @@ license**. No other license can have it, Salesforce Platform included. So BarnCR
 access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
 Settings, open **Access** and, under **Extra permissions**, give **BarnCRM Duplicate Review** to
 each person who will review duplicates. Salesforce refuses the assignment for a user
-without one of those licenses. A holder who is not an administrator also gets the **Org
-Optimizer** tab with its **Duplicates** section, which they can read; scanning, dismissing and
+without one of those licenses. A holder who is not an administrator also gets the **Duplicate
+Matching** tab with its **Review** area, which they can read; scanning, dismissing and
 merging there stay with BarnCRM Admin. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
-2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
-   **Open this page** button brings you here too.)
+**Who sees the tab.** BarnCRM gives the **Duplicate Matching** tab automatically, while the
+feature is on, to holders of **BarnCRM Admin**, **BarnCRM Duplicate Review** and **BarnCRM
+Metadata Admin** (see [Access](access.md)).
+
+1. Open the **BarnCRM** app and choose the **Duplicate Matching** tab. (In **BarnCRM
+   Settings**, the **Duplicate Matching** section's **Duplicate Matching** row has an **Open
+   this page** button that brings you here too.)
+2. The **Review** area opens first.
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -55,6 +61,14 @@ Platform user nothing usable.
 Run the scan again after a large import: Salesforce checks a record against the others when
 it is saved, but an import that saved past a warning leaves the pair for the scan to find.
 
+### Settings
+
+In **BarnCRM Settings**, the **Duplicate Matching** section holds the tool's settings: a note
+on the one Setup step (keep the duplicate rules active, give reviewers Duplicate Review) and
+the **Duplicate Matching** row, whose **Open this page** button opens the tab. The scan has
+no options to set: it always checks every person and household with your active duplicate
+rules and your active match sources.
+
 ## A five-minute walkthrough
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)). Create one duplicate
@@ -62,7 +76,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **Org Optimizer** and choose **Duplicates**.
+1. Open the **Duplicate Matching** tab. The **Review** area opens.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -178,10 +192,12 @@ Salesforce refuses that request (for example, the org has used its daily allowan
 events) does the **Error Log** get a Warning, under the context "Tidy-up after a merge",
 naming the kept records and the reason. Open each record named and correct it by hand.
 
-**A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
-Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings
-permission, which the BarnCRM Admin permission set grants, and access to duplicate record sets,
-which the BarnCRM Duplicate Review permission set grants.
+**A colleague cannot find the panel, or sees it without buttons.** The **Review** area of the
+**Duplicate Matching** tab needs BarnCRM Admin or BarnCRM Duplicate Review, and the tab
+appears a minute or so after either is given. Scanning, dismissing and merging from it need
+the Manage BarnCRM Settings permission, which the BarnCRM Admin permission set grants, and
+access to duplicate record sets, which the BarnCRM Duplicate Review permission set grants.
+Duplicates are no longer in **Org Optimizer**.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.

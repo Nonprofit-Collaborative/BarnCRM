@@ -2,7 +2,7 @@
 
 Scripts for the duplicate scan, the review list, merges, dismissals, match sources and the permissions behind them. Setup detail: [Duplicates](../admin-guide/duplicates.md); match sources: [Custom metadata](../admin-guide/custom-metadata.md#match-sources).
 
-Before you start: an org from [Before you test](before-you-test.md) on the Person Accounts shape (duplicate review needs a Sales Cloud or Service Cloud license), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. A scan reads every contact and household in the org and writes duplicate suggestion records for pairs among real people (it does not change the people); never merge or dismiss a pair that is not a fixture pair. In **BarnCRM Settings**, **General**, the **Duplicate Review**, **Addresses** and **Org Optimizer and Health Check** features are **On** (Addresses before the sample data loads, so each household has its address record). In Setup, **Duplicate Rules**, the **Standard Contact Duplicate Rule** and **Standard Account Duplicate Rule** are active.
+Before you start: an org from [Before you test](before-you-test.md) on the Person Accounts shape (duplicate review needs a Sales Cloud or Service Cloud license), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. A scan reads every contact and household in the org and writes duplicate suggestion records for pairs among real people (it does not change the people); never merge or dismiss a pair that is not a fixture pair. In **BarnCRM Settings**, **General**, the **Duplicate Matching**, **Addresses** and **Org Optimizer and Health Check** features are **On** (Addresses before the sample data loads, so each household has its address record). In Setup, **Duplicate Rules**, the **Standard Contact Duplicate Rule** and **Standard Account Duplicate Rule** are active.
 
 ## T-DUP-01: The Duplicates section and a scan
 
@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer** and choose **Duplicates**. | The **Duplicates** panel. Under **Duplicate rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
+| 1 | Open the **Duplicate Matching** tab. | The **Review** area opens on the **Duplicates** panel. Under **Duplicate rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
 | 2 | Read the buttons and counts. | **Scan for duplicates** and **Refresh** are enabled. **Dismissed pairs** shows a number. |
 | 3 | Click **Scan for duplicates**. | **Scan started. It runs in the background, and suggestions appear here as they are found.** **Scan for duplicates** is disabled and **A scan is running. Refresh the page in a minute to see what it found.** shows. |
 | 4 | Wait a minute and click **Refresh**. | **Last scan finished** with a date and time, and a line **Duplicate scan of ... finished: N new possible duplicates recorded.** in normal (not red) text. **Scan for duplicates** is enabled again. |
@@ -28,7 +28,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Create a contact: First Name `Harper`, Last Name `Garcia`, Email `harper.garcia1@example.org`. | Salesforce warns that a similar record exists. Save anyway. |
-| 2 | On **Org Optimizer**, **Duplicates**, click **Scan for duplicates**, wait, click **Refresh**. | Under **Possible duplicates** a pair of two **Harper Garcia** records, each with **Person:** and its detail. A grey line under them names the duplicate rule that found the pair. |
+| 2 | On **Duplicate Matching**, **Review**, click **Scan for duplicates**, wait, click **Refresh**. | Under **Possible duplicates** a pair of two **Harper Garcia** records, each with **Person:** and its detail. A grey line under them names the duplicate rule that found the pair. |
 | 3 | Read the pair's buttons. | No **Merge households** button. The line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** and a **Not a duplicate** button. |
 | 4 | Click the new **Harper Garcia**'s name. On the **Potential Duplicates** card choose **View Duplicates**, then **Compare and merge**, keep the sample record as the master, and confirm. | Salesforce merges the two. |
 | 5 | Open the kept **Harper Garcia** and the **The Garcia Family** household. | Harper is still a member of **The Garcia Family**. The household made for the new contact still exists, now empty. |
@@ -124,23 +124,23 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Duplicate Review** from yourself and confirm. | A message says you no longer have it. |
-| 2 | Reload **Org Optimizer**, **Duplicates**. | Under **Possible duplicates**: **Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. ...** No pairs are listed. |
+| 2 | Reload **Duplicate Matching**, **Review**. | Under **Possible duplicates**: **Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. ...** No pairs are listed. |
 | 3 | Look at **Scan for duplicates**. | Disabled. |
 
 **Cleanup:** Give yourself **BarnCRM Duplicate Review** again on the **Access** page.
 
-## T-DUP-09: Who sees the Duplicates section
+## T-DUP-09: Who sees the Duplicate Matching tab
 
-**Purpose:** Confirm the section is for administrators and BarnCRM Duplicate Review holders only, a holder who is not an admin can read it but not act, and BarnCRM Settings links to it.
+**Purpose:** Confirm the tab is for administrators and BarnCRM Duplicate Review holders, a holder who is not an admin can read the review list but not act, Org Optimizer no longer lists duplicates, and BarnCRM Settings links to the tab.
 **Prerequisites:** admin; staff given **BarnCRM Find and Export** on the **Access** page; T-DUP-01 done (at least one pair waiting).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open **Org Optimizer**. | Only **Overview** and **Data quality**. No **Duplicates**. |
+| 1 | As staff, open **Org Optimizer**. | Only **Overview** and **Data quality**. No **Duplicates**. There is no **Duplicate Matching** tab. |
 | 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
-| 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Duplicates**. **Overview** lists one section. |
-| 4 | Choose **Duplicates**. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
-| 5 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open this page**. |
-| 6 | Click **Open this page**. | The **Org Optimizer** tab opens. |
+| 3 | As staff, wait a minute, reload, and open the **Duplicate Matching** tab (from the app launcher if it is not in the navigation bar). | Only the **Review** area. |
+| 4 | Read the **Review** area. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
+| 5 | As admin, open **BarnCRM Settings**. Under **Households**, look for a duplicates row; then choose the **Duplicate Matching** section. | **Households** has no duplicates row and no duplicates note. **Duplicate Matching** shows the note about duplicate rules and Duplicate Review, and the **Duplicate Matching** row with **Open this page**. |
+| 6 | Click **Open this page**. | The **Duplicate Matching** tab opens on **Review**. |
 
 **Cleanup:** Remove **BarnCRM Duplicate Review** from the staff user.

@@ -32,30 +32,44 @@ private class TabAccessServiceTest {
             Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Data Hygiene');
             Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
             Assert.isFalse(held.contains(TabAccessService.BULK_UPDATE_TAB), 'Nor Bulk Update');
+            Assert.isFalse(
+                held.contains(TabAccessService.DUPLICATE_MATCHING_TAB),
+                'Nor Duplicate Matching'
+            );
             Assert.areEqual(
-                5,
+                6,
                 tabSetsOf(UserInfo.getUserId()).size(),
-                'An upgraded org has every feature on, so the admin keeps all five tabs'
+                'An upgraded org has every feature on, so the admin keeps all six tabs'
             );
         }
     }
 
     @IsTest
-    static void givesADuplicateReviewerDataHygieneOnly() {
+    static void givesADuplicateReviewerAndAMetadataAdminDuplicateMatchingOnly() {
         System.runAs(TestUsers.admin()) {
             User reviewer = TestUsers.standardUserWith(
                 'Reviewer',
                 new List<String>{ 'BarnCRM_Duplicate_Review' }
+            );
+            User editor = TestUsers.standardUserWith(
+                'Editor',
+                new List<String>{ 'BarnCRM_Metadata_Admin' }
             );
 
             Test.startTest();
             TabAccessService.syncNow();
             Test.stopTest();
 
+            Set<String> expected = new Set<String>{ TabAccessService.DUPLICATE_MATCHING_TAB };
             Assert.areEqual(
-                new Set<String>{ TabAccessService.DATA_HYGIENE_TAB },
+                expected,
                 tabSetsOf(reviewer.Id),
-                'Duplicate Review shows Org Optimizer, where the duplicates are listed, and nothing else'
+                'Duplicate Review shows Duplicate Matching, where the review list is, and nothing else'
+            );
+            Assert.areEqual(
+                expected,
+                tabSetsOf(editor.Id),
+                'Metadata Admin shows Duplicate Matching, where the matching logic is changed'
             );
         }
     }
@@ -329,7 +343,7 @@ private class TabAccessServiceTest {
             Assert.areEqual(first, second, 'Starting it again finds the same job');
             Assert.isTrue(TabAccessScheduler.isScheduled(), 'It is scheduled');
             Assert.areEqual(
-                5,
+                6,
                 tabSetsOf(UserInfo.getUserId()).size(),
                 'The queued sync ran and gave the admin the tabs'
             );

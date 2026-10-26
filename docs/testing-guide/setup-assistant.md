@@ -34,8 +34,8 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM** app. Choose **Standard Edition: the full core suite of BarnCRM tools**. | The **Set up BarnCRM** window shows both questions. |
-| 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Review**, **Org Optimizer and Health Check**, **Household upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred email and phone**, each with a help icon describing it. |
-| 3 | Untick **Data Manager** and **Duplicate Review**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Review** show **Turn on**; the other six say **On**. |
+| 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Household upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred email and phone**, each with a help icon describing it. |
+| 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn on**; the other six say **On**. |
 | 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** and **Find** are not listed. **Data Hygiene** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
 | 6 | Open **Modules**. | **Core** and **BarnCRM Rollup Builder** only (no nonprofit module is offered in the Standard Edition). |

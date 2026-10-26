@@ -13,8 +13,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Org Optimizer** tab. | Title **Org Optimizer**, with **What in your org needs attention. Each section runs only when you open it.** **Overview** is selected. |
-| 2 | Read **Overview**. | One line per section, each with **Open**: **Data quality**, **Duplicates**, **Field utilization**, **Health Check**, **Errors**, **Storage and limits**, **Unused setup**. |
-| 3 | Look at the vertical tabs. | **Overview**, **Data quality**, **Duplicates**, **Field utilization**, **Health Check**, **Errors**, **Storage and limits**, **Unused setup**. |
+| 2 | Read **Overview**. | One line per section, each with **Open**: **Data quality**, **Field utilization**, **Health Check**, **Errors**, **Storage and limits**, **Unused setup**. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the vertical tabs. | **Overview**, **Data quality**, **Field utilization**, **Health Check**, **Errors**, **Storage and limits**, **Unused setup**. |
 | 4 | Click **Open** on **Errors**. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
 | 5 | Choose **Health Check**. | **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
 | 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What we found in your org** and grouped findings. |

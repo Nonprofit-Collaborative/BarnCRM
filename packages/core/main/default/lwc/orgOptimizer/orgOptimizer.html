@@ -33,14 +33,6 @@
                     </lightning-tab>
                 </template>
 
-                <template lwc:if={canSeeDuplicates}>
-                    <lightning-tab label={labels.duplicates} value="duplicates" onactive={handleActive} data-id="tab-duplicates">
-                        <template lwc:if={duplicatesOpened}>
-                            <c-duplicate-review></c-duplicate-review>
-                        </template>
-                    </lightning-tab>
-                </template>
-
                 <template lwc:if={isAdmin}>
                     <lightning-tab
                         label={labels.fieldUtilization}

@@ -1,0 +1,21 @@
+<template>
+  <lightning-card title={labels.title} icon-name="standard:merge">
+    <p class="slds-var-p-horizontal_medium slds-var-p-bottom_small">{labels.intro}</p>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={hasAnyArea}>
+        <lightning-tabset active-tab-value={activeArea}>
+          <template lwc:if={canSeeReview}>
+            <lightning-tab label={labels.review} value="review" onactive={handleActive} data-id="tab-review">
+              <template lwc:if={reviewOpened}>
+                <c-duplicate-review></c-duplicate-review>
+              </template>
+            </lightning-tab>
+          </template>
+        </lightning-tabset>
+      </template>
+      <template lwc:else>
+        <p class="slds-var-p-bottom_medium" data-id="no-access" role="status">{labels.noAccess}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

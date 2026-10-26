@@ -41,22 +41,6 @@
         <value>Which records need tidying up, each check with Open in Find.</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_Duplicates</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Duplicates section name</shortDescription>
-        <value>Duplicates</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_DuplicatesText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Duplicates section answers</shortDescription>
-        <value>Which people and households are in your database twice.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_FieldUtilization</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
