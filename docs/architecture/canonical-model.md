@@ -6151,8 +6151,9 @@ person already made is not asked again the next time the scan runs.
 Nothing else about duplicates is stored here. The suggestions themselves are platform
 records: the platform's duplicate rules write a Duplicate Record Set and its Duplicate Record
 Items, and the BarnCRM scan writes the same two standard objects for duplicates that were
-already in the org before anybody looked. BarnCRM adds no object for a suggestion, no
-matching logic of its own, and no copy of what the platform found (R-DP1).
+already in the org before anybody looked. BarnCRM adds no object for a suggestion and no
+copy of what the platform found (R-DP1); its own matching is limited to related-record values
+through match sources, and a Duplicate Reason row says which source found a pair (R-DP6).
 
 ### Attributes
 
@@ -6175,7 +6176,8 @@ same household is decided by the org's own active duplicate rules for Contact an
 and nothing else. BarnCRM ships no matching rule and no duplicate rule (ADR-0050): every
 org starts with the platform's standard rules for both objects switched on, and an
 administrator's own rules are used exactly as written. No packaged code compares two records
-field by field to decide whether they are duplicates.
+field by field to decide whether they are duplicates. The one addition is R-DP6: values on
+related records the rules cannot see, compared only through the configured match sources.
 
 **R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
@@ -6208,7 +6210,38 @@ removes the grouping and never touches the records. An administrator can delete 
 which is how a pair is put back in front of a reviewer. A household merge from the review
 page deletes the suggestion without a dismissal, because the pair no longer exists.
 
+**R-DP6 Related records add pairs the rules cannot see** (ADR-0133,
+`0133-related-record-matching.md`). In each chunk of the scan, after the rules are asked, the
+active match sources (`Match_Source__mdt`, Section 13) that can point at the chunk's object are
+read: each record's values on the source are normalized, the other records holding the same
+value are found, and each pair is added with a reason naming the source ("Same email on
+Contact Point Email"). A parent resolves to a Contact or an Account as itself, an Individual to
+the contacts carrying it (and, for accounts, the person accounts carrying it); anything else is
+skipped. A value held by more than ten records is not used. Two people in the same household
+are not paired by a Phone or Address source (sharing a home phone or address is what a
+household is); an Email source still pairs them. Phone and address candidates are read with at
+most 100 patterns to a query, an address by its postal code with the street's first word
+normalization leaves as written; a lookup that reaches its 5,000 row cap is logged as a
+warning, once per source per transaction. A pair a rule also found is written once, as the
+rule's; R-DP2 to R-DP5 apply as to any pair. The set still names an active rule for the
+object, as the platform requires (any active rule stands in, so Salesforce's own Duplicate
+Record Sets tab shows the pair under that rule), and a pass with no active rule writes no
+source pair either. The reason is kept in a Duplicate Reason row and shown on the review list
+(the rule's name is shown otherwise), read in system mode since it holds only a source's label;
+it is deleted with its suggestion when dismissed or closed by a merge. A reason row whose set
+is gone any other way is never read again and is harmless. A source that cannot be read is
+logged and counted as a failure.
+
 ### Salesforce implementation
+
+- **Object** `Duplicate_Reason__c` (R-DP6), auto number Name, public read/write like the
+  dismissal. Written by the scan in user mode, best effort: a person who may not create it
+  still gets the suggestion, without the reason.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Set Id | `Set_Id__c` | Text(18), unique, external id | The Duplicate Record Set the reason explains. |
+| Reason | `Reason__c` | Text(255) | What the review list shows, naming the match source. |
 
 - **Object** `Duplicate_Dismissal__c`, with an auto number Name. Sharing is public read/write:
   a dismissal is the organization's decision, and a scan run by one administrator must pass
@@ -8598,6 +8631,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-21 | Rollups after a partial save. No object or field added. R-RQ3: a partial save's retry (allOrNone false, some records refused) asks for a processor again and marks its records again, instead of leaving its entries Pending until the nightly run. R-CM1 and R-G15: the donor delete guards read the commitments and the books at each delete, so a donor refused earlier in the transaction is deleted once nothing holds them. |
 | v0.8 | 2026-10-25 | Preferred Phone: C-43: added `Work_Phone__c` and `Preferred_Phone__c` (Home, Mobile, Work, Other) to Contact with rule R-C6a. When set, the standard Phone is copied from the number it names on every save; empty copies nothing; naming an empty number refuses the save. |
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
+| v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 
 ---
 ## 32. Entity ownership by package
@@ -8642,6 +8676,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Duplicate Reason | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | What's New Seen | Core | v0.6 | 12A |

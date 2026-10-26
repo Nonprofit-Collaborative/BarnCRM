@@ -222,6 +222,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     }
     return this.view.suggestions.map((suggestion) => ({
       setId: suggestion.setId,
+      reason: suggestion.reason,
       canMerge: suggestion.canMerge === true,
       showPeopleNotice: suggestion.canMerge !== true,
       records: suggestion.records.map((record) => ({

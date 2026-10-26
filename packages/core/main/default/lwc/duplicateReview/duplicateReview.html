@@ -105,6 +105,11 @@
             data-id="suggestion"
             class="slds-box slds-box_x-small slds-var-m-bottom_x-small"
           >
+            <template lwc:if={suggestion.reason}>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="reason">
+                {suggestion.reason}
+              </p>
+            </template>
             <ul>
               <template for:each={suggestion.records} for:item="record">
                 <li key={record.recordId} class="slds-text-body_regular">

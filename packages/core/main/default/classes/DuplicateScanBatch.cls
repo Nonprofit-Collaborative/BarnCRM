@@ -106,14 +106,20 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
         }
     }
 
-    /** One chunk: ask, keep what is new and actionable, write it down. */
+    /**
+     * One chunk: ask the rules, then the match sources (R-DP6), keep what is new and
+     * actionable, write it down. The rules' pairs come first, so a pair both found is written
+     * once, as the rule's.
+     */
     public static Integer scanChunk(List<SObject> scope, Map<String, Id> ruleIdsByName) {
         List<Id> recordIds = new List<Id>();
         for (SObject record : scope) {
             recordIds.add(record.Id);
         }
+        List<DuplicateService.Pair> found = DuplicateService.matchesFor(recordIds);
+        found.addAll(MatchSourceService.pairsFor(recordIds));
         List<DuplicateService.Pair> candidates = DuplicateService.pairsToRecord(
-            DuplicateService.matchesFor(recordIds),
+            found,
             DuplicateService.pairsAlreadySuggested(new Set<Id>(recordIds))
         );
         return DuplicateService.recordPairs(

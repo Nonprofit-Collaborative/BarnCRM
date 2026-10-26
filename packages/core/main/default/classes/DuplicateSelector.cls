@@ -228,6 +228,28 @@ public with sharing class DuplicateSelector {
         ];
     }
 
+    /** The reasons written for these suggestions by a match source (R-DP6). */
+    public static List<Duplicate_Reason__c> reasonRows(Set<Id> setIds) {
+        Set<String> keys = new Set<String>();
+        for (Id setId : setIds == null ? new Set<Id>() : setIds) {
+            keys.add(String.valueOf(setId));
+        }
+        if (keys.isEmpty()) {
+            return new List<Duplicate_Reason__c>();
+        }
+        // System mode on purpose: a reason holds nothing sensitive, only the label of the match
+        // source that found the pair ("Same email on Contact Point Email"), and it is read only
+        // for suggestions the reviewer can already see. Reading it in user mode would hide why
+        // a pair is listed from a reviewer who holds Duplicate Review but no BarnCRM role.
+        // Writes and deletes stay in user mode (DuplicateService).
+        return [
+            SELECT Id, Set_Id__c, Reason__c
+            FROM Duplicate_Reason__c
+            WHERE Set_Id__c IN :keys
+            WITH SYSTEM_MODE
+        ];
+    }
+
     /** The pairs among these that somebody already said are not duplicates. */
     public static Set<String> dismissedKeys(Set<String> pairKeys) {
         Set<String> result = new Set<String>();

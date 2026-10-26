@@ -142,4 +142,399 @@ private class MatchSourceServiceTest {
             );
         }
     }
+
+    // ------------------------------------------------------------------ matching
+
+    private static Set<String> keysOf(List<DuplicateService.Pair> pairs) {
+        Set<String> keys = new Set<String>();
+        for (DuplicateService.Pair pair : pairs) {
+            keys.add(pair.key);
+        }
+        return keys;
+    }
+
+    private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
+        Database.DMLOptions options = new Database.DMLOptions();
+        options.DuplicateRuleHeader.allowSave = true;
+        Database.insert(records, options);
+        return records;
+    }
+
+    @IsTest
+    static void peopleSharingAnAddressHeldOnlyOnAddressRecordsArePaired() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row(
+                    'Address_Person',
+                    'Address__c',
+                    'Street__c',
+                    'Postal_Code__c',
+                    'Contact__c',
+                    'Address'
+                )
+            };
+            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+                new List<Contact>{
+                    new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
+                    new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez'),
+                    new Contact(FirstName = 'Ben', LastName = 'Okafor')
+                }
+            );
+            insert new List<Address__c>{
+                new Address__c(
+                    Contact__c = people[0].Id,
+                    Street__c = '12 North Main Street',
+                    Postal_Code__c = '02139'
+                ),
+                new Address__c(
+                    Contact__c = people[1].Id,
+                    Street__c = '12 n. MAIN st',
+                    Postal_Code__c = '02139-4307'
+                ),
+                new Address__c(
+                    Contact__c = people[2].Id,
+                    Street__c = '99 Elm Road',
+                    Postal_Code__c = '02139'
+                )
+            };
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id, people[2].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(people[0].Id, people[1].Id) },
+                keysOf(pairs),
+                'Only the two people at the same address, written two ways'
+            );
+            Assert.areEqual('Same address on Address_Person', pairs[0].reason, 'Names the source');
+            Assert.isNull(pairs[0].ruleName, 'No rule found it');
+        }
+    }
+
+    @IsTest
+    static void householdsWhosePeopleShareAPhoneArePairedWhateverItsFormat() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Phone', 'Contact', 'Phone', null, 'AccountId', 'Phone')
+            };
+            List<Account> homes = new List<Account>{
+                AddressTestDataFactory.newHousehold('Lee Household'),
+                AddressTestDataFactory.newHousehold('Li Household'),
+                AddressTestDataFactory.newHousehold('Park Household')
+            };
+            insertAllowingDuplicates(homes);
+            List<String> phones = new List<String>{
+                '(555) 123-4567',
+                '+1 555.123.4567',
+                '555 999 0000'
+            };
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < homes.size(); index++) {
+                Contact person = AddressTestDataFactory.newContact(
+                    'Sam',
+                    'Member' + index,
+                    homes[index].Id
+                );
+                person.Phone = phones[index];
+                people.add(person);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id, homes[2].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(homes[0].Id, homes[1].Id) },
+                keysOf(pairs),
+                'The two households with the same number, however it is written'
+            );
+            Assert.areEqual('Same phone on Member_Phone', pairs[0].reason, 'Names the source');
+        }
+    }
+
+    @IsTest
+    static void aValueHeldByMoreThanTenIsNotUsed() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
+            };
+            List<Account> homes = new List<Account>();
+            for (Integer index = 0; index <= MatchSourceService.MAX_OWNERS_PER_VALUE; index++) {
+                homes.add(AddressTestDataFactory.newHousehold('Office ' + index));
+            }
+            insertAllowingDuplicates(homes);
+            List<Contact> people = new List<Contact>();
+            for (Account home : homes) {
+                Contact person = AddressTestDataFactory.newContact('Front', 'Desk', home.Id);
+                person.Email = 'info@shared-office.example.org';
+                people.add(person);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id }
+            );
+            Test.stopTest();
+
+            Assert.isTrue(pairs.isEmpty(), 'A shared mailbox pairs nobody: ' + pairs.size());
+        }
+    }
+
+    @IsTest
+    static void aSourceThatCannotPointAtTheRecordsIsNotAsked() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row(
+                    'Address_Household',
+                    'Address__c',
+                    'Street__c',
+                    'Postal_Code__c',
+                    'Account__c',
+                    'Address'
+                )
+            };
+            Contact person = new Contact(FirstName = 'Ida', LastName = 'Nobody');
+            insert person;
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ person.Id }
+            );
+            Integer queries = Limits.getQueries();
+            Test.stopTest();
+
+            Assert.isTrue(pairs.isEmpty(), 'A household source finds no people');
+            Assert.isTrue(queries <= 2, 'Only the sources are read, never the rows: ' + queries);
+        }
+    }
+
+    // ------------------------------------------------------------------ Individuals
+
+    /** Individuals with these last names, or null in an org without them. */
+    private static List<SObject> individuals(Integer count) {
+        Schema.SObjectType type = Schema.getGlobalDescribe().get('Individual');
+        if (
+            type == null ||
+            !type.getDescribe().isCreateable() ||
+            MatchSourceService.individualFieldOf(Contact.SObjectType) == null
+        ) {
+            return null;
+        }
+        List<SObject> result = new List<SObject>();
+        for (Integer index = 0; index < count; index++) {
+            SObject individual = type.newSObject();
+            individual.put('LastName', 'Ivy' + index);
+            result.add(individual);
+        }
+        insert result;
+        return result;
+    }
+
+    /** A source on Contact's own email, linked by the Individual the contact carries. */
+    private static Match_Source__mdt emailByIndividual() {
+        return row('Email_By_Individual', 'Contact', 'Email', null, 'IndividualId', 'Email');
+    }
+
+    @IsTest
+    static void anIndividualStandsForTheContactsThatCarryIt() {
+        System.runAs(TestUsers.admin()) {
+            List<SObject> ivys = individuals(3);
+            if (ivys == null) {
+                // Skipped: this org has no Individual, so no source can resolve one.
+                Assert.isNull(MatchSourceService.individualFieldOf(Contact.SObjectType));
+                return;
+            }
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                emailByIndividual()
+            };
+            List<Contact> people = new List<Contact>{
+                new Contact(LastName = 'Ivy', Email = 'ivy@example.org'),
+                new Contact(LastName = 'Ivy-Lane', Email = 'IVY@example.org'),
+                new Contact(LastName = 'Other', Email = 'other@example.org')
+            };
+            for (Integer index = 0; index < people.size(); index++) {
+                people[index].put('IndividualId', ivys[index].Id);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id, people[2].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(people[0].Id, people[1].Id) },
+                keysOf(pairs),
+                'Rows on two Individuals pair the contacts carrying them'
+            );
+        }
+    }
+
+    @IsTest
+    static void anIndividualStandsForThePersonAccountsThatCarryIt() {
+        System.runAs(TestUsers.admin()) {
+            if (
+                PersonAccountTestShape.skipReason() != null ||
+                MatchSourceService.individualFieldOf(Account.SObjectType) == null
+            ) {
+                // Skipped: no person accounts here, or none carry an Individual.
+                return;
+            }
+            List<SObject> ivys = individuals(2);
+            if (ivys == null) {
+                return;
+            }
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                emailByIndividual()
+            };
+            List<Account> people = new List<Account>();
+            for (Integer index = 0; index < 2; index++) {
+                Account person = new Account(
+                    RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+                );
+                person.put('LastName', 'Ivy' + index);
+                person.put('PersonEmail', 'ivy.person@example.org');
+                person.put('PersonIndividualId', ivys[index].Id);
+                people.add(person);
+            }
+            insertAllowingDuplicates(people);
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ DuplicateService.pairKey(people[0].Id, people[1].Id) },
+                keysOf(pairs),
+                'Rows on two Individuals pair the person accounts carrying them'
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------ bounded lookups
+
+    @IsTest
+    static void anAddressIsLookedUpByPostalCodeAndAWordOfItsStreet() {
+        // runs-as: deploying user (pure string building, no data or permission read)
+        MatchSourceService.Source source = new MatchSourceService.Source();
+        source.normalization = MatchSourceService.ADDRESS;
+        source.valueField = 'Street__c';
+        source.postalField = 'Postal_Code__c';
+
+        Map<String, String> numbered = MatchSourceService.likeClause(
+            source,
+            MatchSourceService.address('12 North Main Street', '02139-4307')
+        );
+        Map<String, String> unnumbered = MatchSourceService.likeClause(
+            source,
+            MatchSourceService.address('North Main St.', '02139')
+        );
+
+        Assert.areEqual('0%2%1%3%9%', numbered.get('Postal_Code__c'), 'By postal code');
+        Assert.areEqual('%12%', numbered.get('Street__c'), 'And the house number');
+        Assert.areEqual(
+            '%main%',
+            unnumbered.get('Street__c'),
+            'A word normalization shortened (n, st) is never used'
+        );
+    }
+
+    @IsTest
+    static void manyPhonesAreReadAHundredPatternsAtATime() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Phone', 'Contact', 'Phone', null, 'AccountId', 'Phone')
+            };
+            Account home = AddressTestDataFactory.newHousehold('Caller Household');
+            insertAllowingDuplicates(new List<Account>{ home });
+            Contact caller = AddressTestDataFactory.newContact('Cal', 'Caller', home.Id);
+            caller.Phone = '(555) 010-0149';
+            insertAllowingDuplicates(new List<Contact>{ caller });
+            Set<String> keys = new Set<String>();
+            for (Integer index = 0; index < 150; index++) {
+                keys.add('55501' + String.valueOf(index).leftPad(5, '0'));
+            }
+            MatchSourceService.Source source = MatchSourceService.usableSources()[0];
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            Map<String, Set<Id>> found = MatchSourceService.ownersOf(
+                source,
+                Account.SObjectType,
+                keys
+            );
+            Integer queries = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(2, queries, '150 patterns in two queries of at most 100');
+            Assert.areEqual(
+                new Set<Id>{ home.Id },
+                found.get('5550100149'),
+                'The holder is found whichever query read it'
+            );
+        }
+    }
+
+    @IsTest
+    static void aLookupThatReachesItsCapIsCountedAndLoggedOnce() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row(
+                    'Address_Person',
+                    'Address__c',
+                    'Street__c',
+                    'Postal_Code__c',
+                    'Contact__c',
+                    'Address'
+                )
+            };
+            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+                new List<Contact>{
+                    new Contact(LastName = 'Capped'),
+                    new Contact(LastName = 'Capped-Too')
+                }
+            );
+            insert new List<Address__c>{
+                new Address__c(
+                    Contact__c = people[0].Id,
+                    Street__c = '3 Oak Lane',
+                    Postal_Code__c = '30301'
+                ),
+                new Address__c(
+                    Contact__c = people[1].Id,
+                    Street__c = '3 Oak Ln',
+                    Postal_Code__c = '30301'
+                )
+            };
+            MatchSourceSelector.maxRows = 1;
+
+            Test.startTest();
+            MatchSourceService.pairsFor(new List<Id>{ people[0].Id, people[1].Id });
+            Test.stopTest();
+            Test.getEventBus().deliver();
+
+            Assert.isTrue(
+                MatchSourceSelector.cappedLookups >= 2,
+                'Each capped lookup is counted: ' + MatchSourceSelector.cappedLookups
+            );
+            List<Error_Log__c> logged = [
+                SELECT Severity__c, Message__c
+                FROM Error_Log__c
+                WHERE Context__c = 'Match sources'
+            ];
+            Assert.areEqual(1, logged.size(), 'One warning for the source: ' + logged);
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, logged[0].Severity__c);
+            Assert.isTrue(logged[0].Message__c.contains('Address_Person'), 'Names the source');
+        }
+    }
 }

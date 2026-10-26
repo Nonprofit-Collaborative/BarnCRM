@@ -166,6 +166,20 @@ describe('c-duplicate-review', () => {
     expect(qa(element, 'dismiss-button')).toHaveLength(2);
   });
 
+  it('says why each pair is proposed when the reason is known', async () => {
+    const element = await mount(
+      viewWith({
+        suggestions: [
+          { ...PEOPLE_PAIR, reason: 'Same email on Contact Point Email' },
+          HOUSEHOLD_PAIR
+        ]
+      })
+    );
+    const reasons = qa(element, 'reason');
+    expect(reasons).toHaveLength(1);
+    expect(reasons[0].textContent.trim()).toBe('Same email on Contact Point Email');
+  });
+
   it('starts a scan and says it started', async () => {
     const element = await mount(viewWith({}));
     startScan.mockResolvedValue(viewWith({ scanRunning: true }));

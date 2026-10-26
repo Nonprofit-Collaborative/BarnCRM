@@ -51,6 +51,8 @@ public with sharing class DuplicateService {
         public Id right;
         public String key;
         public String ruleName;
+        /** Set when a match source found the pair rather than a rule (R-DP6). */
+        public String reason;
 
         public Pair(Id first, Id second, String ruleName) {
             Boolean firstLower = String.valueOf(first).compareTo(String.valueOf(second)) <= 0;
@@ -281,12 +283,42 @@ public with sharing class DuplicateService {
                 );
             }
             Database.insert(items, AccessLevel.USER_MODE);
+            writeReasons(sets, writable);
             return sets.size();
         } catch (Exception caught) {
             Database.rollback(beforeWrite);
             failureCount++;
             ErrorLogger.log(caught, CONTEXT_WRITE);
             return 0;
+        }
+    }
+
+    /**
+     * A reason for each set a match source found (R-DP6). The reason only explains a
+     * suggestion, so one the user may not write is left out rather than failing the pair.
+     */
+    private static void writeReasons(List<DuplicateRecordSet> sets, List<Pair> pairs) {
+        List<Duplicate_Reason__c> reasons = new List<Duplicate_Reason__c>();
+        for (Integer index = 0; index < pairs.size(); index++) {
+            if (String.isNotBlank(pairs[index].reason)) {
+                reasons.add(
+                    new Duplicate_Reason__c(
+                        Set_Id__c = sets[index].Id,
+                        Reason__c = pairs[index].reason.left(255)
+                    )
+                );
+            }
+        }
+        if (!reasons.isEmpty() && Schema.SObjectType.Duplicate_Reason__c.isCreateable()) {
+            Database.insert(reasons, false, AccessLevel.USER_MODE);
+        }
+    }
+
+    /** Takes away the reasons of suggestions that are gone; best effort, like writing them. */
+    private static void deleteReasons(Set<Id> setIds) {
+        List<Duplicate_Reason__c> reasons = DuplicateSelector.reasonRows(setIds);
+        if (!reasons.isEmpty() && Schema.SObjectType.Duplicate_Reason__c.isDeletable()) {
+            Database.delete(reasons, false, AccessLevel.USER_MODE);
         }
     }
 
@@ -388,6 +420,7 @@ public with sharing class DuplicateService {
             Database.rollback(beforeWrite);
             throw caught;
         }
+        deleteReasons(new Set<Id>{ found.Id });
         return written;
     }
 
@@ -414,6 +447,7 @@ public with sharing class DuplicateService {
         if (!sets.isEmpty()) {
             Database.delete(sets, AccessLevel.USER_MODE);
         }
+        deleteReasons(new Set<Id>{ duplicateRecordSetId });
     }
 
     /**
