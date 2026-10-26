@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Show_Nonprofit_Modules__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>Whether the Module Manager lists the nonprofit modules, the ones only the Nonprofit Edition offers. Unticked, they are hidden and installed ones are counted. Hides rows only. Written by the Module Manager's Show Nonprofit Modules checkbox.</description>
+  <inlineHelpText>Show the nonprofit modules in the Module Manager.</inlineHelpText>
+  <label>Show Nonprofit Modules</label>
+  <type>Checkbox</type>
+</CustomField>
