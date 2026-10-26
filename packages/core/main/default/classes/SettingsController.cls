@@ -74,6 +74,9 @@ public with sharing class SettingsController {
         public String component;
         @AuraEnabled
         public String navigationTarget;
+        /** The name of the page the target opens, for the button's label. */
+        @AuraEnabled
+        public String navigationLabel;
         @AuraEnabled
         public String helpUrl;
         @AuraEnabled
@@ -175,6 +178,21 @@ public with sharing class SettingsController {
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw asAuraException(System.Label.Core_Settings_SaveErrorMessage);
+        }
+    }
+
+    /**
+     * The saved organization address, one entry per part keyed by its settings field name, for
+     * the address block in the console (a Component row). Saving goes through `saveSettings`.
+     * Not cacheable, for the reason `getConsoleModel` is not.
+     */
+    @AuraEnabled
+    public static Map<String, String> getOrganizationAddress() {
+        try {
+            return OrganizationAddress.savedParts();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
         }
     }
 
@@ -441,6 +459,7 @@ public with sharing class SettingsController {
         setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;
+        setting.navigationLabel = definition.Navigation_Label__c;
         setting.helpUrl = String.isBlank(definition.Help_Path__c)
             ? null
             : HELP_BASE + definition.Help_Path__c;
@@ -457,7 +476,13 @@ public with sharing class SettingsController {
         }
         Object value = SettingsService.getValue(settingsObject, definition.Setting_Key__c);
         setting.value = SettingsService.asText(value);
-        if (
+        if (isMembershipMode(settingsObject, definition.Setting_Key__c)) {
+            // Blank means nobody has chosen yet, and every reader treats it as the simple way,
+            // so the console shows that way as selected. Showing it is not saving it: the
+            // stored value stays blank, which is what lets detection still propose the
+            // flexible way for an org with Person Accounts or Nonprofit Cloud.
+            setting.value = SettingsService.householdMembershipMode();
+        } else if (
             String.isBlank(setting.value) &&
             SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject)
         ) {
@@ -529,6 +554,11 @@ public with sharing class SettingsController {
     private static Boolean isCoexistenceMode(String settingsObject, String key) {
         return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
             CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    private static Boolean isMembershipMode(String settingsObject, String key) {
+        return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            CoexistenceService.KEY_MEMBERSHIP_MODE.equalsIgnoreCase(key);
     }
 
     /**

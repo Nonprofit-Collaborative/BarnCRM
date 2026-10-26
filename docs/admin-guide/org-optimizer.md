@@ -47,7 +47,7 @@ hidden for everyone.
    How to turn it on). Without it the Duplicates section says so.
 
 Duplicate review no longer has a panel in **BarnCRM Settings**. Under **Households**, the
-**Duplicates** row has an **Open this page** button that takes you to this page.
+**Duplicates** row has an **Open Org Optimizer** button that takes you to this page.
 
 ## 3. A five-minute walkthrough (as Maria)
 

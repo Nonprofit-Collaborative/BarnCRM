@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings setup note: heading above what to change in Setup</shortDescription>
-        <value>Needs a change in Setup</value>
+        <value>Needs a Change in Setup</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Metadata_What</fullName>

@@ -100,7 +100,8 @@ public with sharing class ReceiptContentBuilder {
         OrganizationDetails details = new OrganizationDetails();
         details.legalName = core.Organization_Legal_Name__c;
         details.taxId = giving.Organization_EIN__c;
-        details.address = core.Organization_Address__c;
+        // One line per printable part, so the letterhead shows a real address block.
+        details.address = String.join(OrganizationAddress.lines(core), '\n');
         details.placeOfIssue = giving.Receipt_Place_Of_Issue__c;
         details.signerName = giving.Receipt_Signer_Name__c;
         details.signerTitle = giving.Receipt_Signer_Title__c;
@@ -311,7 +312,8 @@ public with sharing class ReceiptContentBuilder {
         Map<String, String> tokens = new Map<String, String>();
         tokens.put('OrganizationName', details.legalName);
         tokens.put('OrganizationTaxId', blankToEmpty(details.taxId));
-        tokens.put('OrganizationAddress', blankToEmpty(details.address));
+        // A merge token sits inside a sentence or a line of the template, so it is one line.
+        tokens.put('OrganizationAddress', blankToEmpty(details.address).replace('\n', ', '));
         tokens.put('PlaceOfIssue', blankToEmpty(details.placeOfIssue));
         tokens.put('SignerName', blankToEmpty(details.signerName));
         tokens.put('SignerTitle', blankToEmpty(details.signerTitle));

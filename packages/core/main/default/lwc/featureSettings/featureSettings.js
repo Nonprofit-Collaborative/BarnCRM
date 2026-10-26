@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getFeatures from '@salesforce/apex/FeatureController.getFeatures';
 import turnOn from '@salesforce/apex/FeatureController.turnOn';
@@ -29,6 +29,13 @@ export default class FeatureSettings extends LightningElement {
 
   connectedCallback() {
     this.load();
+  }
+
+  /** The console calls this after first-run setup finishes, because this row stays mounted. */
+  @api
+  refresh() {
+    this.errorMessage = undefined;
+    return this.load();
   }
 
   async load() {

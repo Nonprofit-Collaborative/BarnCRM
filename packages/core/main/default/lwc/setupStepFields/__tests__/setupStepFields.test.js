@@ -20,8 +20,24 @@ jest.mock(
   { virtual: true }
 );
 
-// The organization step as it arrives with a module installed: Core's two fields and the
-// fields a stand-in module adds, matching SetupAssistantTestExtension (ADR-0059, C-29).
+// The six organization address parts, declared one per part and shown as one grouped block.
+const ADDRESS_KEYS = [
+  'Organization_Street__c',
+  'Organization_Street_2__c',
+  'Organization_City__c',
+  'Organization_State__c',
+  'Organization_Postal_Code__c',
+  'Organization_Country__c'
+];
+const ADDRESS_FIELDS = ADDRESS_KEYS.map((key) => ({
+  fieldType: 'Address',
+  key,
+  label: key,
+  maxLength: 255
+}));
+
+// The organization step as it arrives with a module installed: Core's legal name and address
+// and the fields a stand-in module adds, matching SetupAssistantTestExtension (ADR-0059, C-29).
 const IDENTITY_FIELDS = [
   { fieldType: 'Text', key: 'Organization_Legal_Name__c', label: 'Legal name', maxLength: 255 },
   {
@@ -32,13 +48,7 @@ const IDENTITY_FIELDS = [
     pattern: '[A-Z]{2}-[0-9]{2}',
     patternMessage: 'Two letters, a hyphen and two digits.'
   },
-  {
-    fieldType: 'Text',
-    key: 'Organization_Address__c',
-    label: 'Address',
-    maxLength: 255,
-    fullWidth: true
-  },
+  ...ADDRESS_FIELDS,
   {
     fieldType: 'File',
     key: 'Module_Image_Document_Id__c',
@@ -70,9 +80,51 @@ describe('c-setup-step-fields', () => {
     const element = build(withValues({ Organization_Legal_Name__c: 'Riverside Community Aid' }));
 
     const inputs = element.shadowRoot.querySelectorAll('lightning-input');
-    expect(inputs).toHaveLength(3);
+    expect(inputs).toHaveLength(2);
     expect(inputs[0].value).toBe('Riverside Community Aid');
     expect(inputs[0].label).toBe('Legal name');
+  });
+
+  it('shows the six address parts as one grouped block, where the first part sits', () => {
+    const element = build(
+      withValues({ Organization_Street__c: '1 River Road', Organization_City__c: 'Riverside' })
+    );
+
+    const blocks = element.shadowRoot.querySelectorAll('c-organization-address');
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0].titled).toBe(true);
+    expect(blocks[0].values.Organization_Street__c).toBe('1 River Road');
+    expect(blocks[0].values.Organization_City__c).toBe('Riverside');
+    expect(Object.keys(blocks[0].values)).toEqual(ADDRESS_KEYS);
+  });
+
+  it('saves the address parts the block reports, keyed by setting', () => {
+    const element = build(withValues({}));
+    const saved = jest.fn();
+    element.addEventListener('save', saved);
+
+    const block = element.shadowRoot.querySelector('c-organization-address');
+    block.dispatchEvent(
+      new CustomEvent('partchange', {
+        detail: { key: 'Organization_Postal_Code__c', value: '92501' }
+      })
+    );
+    element.shadowRoot.querySelector('[data-id="save-fields"]').click();
+
+    expect(saved.mock.calls[0][0].detail.values.Organization_Postal_Code__c).toBe('92501');
+  });
+
+  it('sends nothing while the address block says a required part is still blank', () => {
+    const element = build(withValues({ Organization_Street__c: '1 River Road' }));
+    const saved = jest.fn();
+    element.addEventListener('save', saved);
+
+    const block = element.shadowRoot.querySelector('c-organization-address');
+    jest.spyOn(block, 'reportValidity').mockReturnValue(false);
+    element.shadowRoot.querySelector('[data-id="save-fields"]').click();
+
+    expect(block.reportValidity).toHaveBeenCalled();
+    expect(saved).not.toHaveBeenCalled();
   });
 
   it('saves every field the step declares, keyed by setting', () => {
@@ -88,7 +140,12 @@ describe('c-setup-step-fields', () => {
     expect(saved.mock.calls[0][0].detail.values).toEqual({
       Organization_Legal_Name__c: null,
       Module_Code__c: 'RC-01',
-      Organization_Address__c: null,
+      Organization_Street__c: null,
+      Organization_Street_2__c: null,
+      Organization_City__c: null,
+      Organization_State__c: null,
+      Organization_Postal_Code__c: null,
+      Organization_Country__c: null,
       Module_Image_Document_Id__c: null
     });
   });

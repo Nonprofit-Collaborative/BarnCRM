@@ -34,7 +34,9 @@ Assistant flow and labels as before.
    `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`,
    `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c`, `Receipt_Signature_Document_Id__c`.
    Their Setting Definition rows ship from Giving with the same labels, sections and order, so
-   the console is unchanged. `Organization_Legal_Name__c` and `Organization_Address__c` stay in
+   the console is unchanged. `Organization_Legal_Name__c` and the organization address (one
+   line, `Organization_Address__c`, when this was decided; six parts, `Organization_Street__c`
+   to `Organization_Country__c`, since 2026-10-26) stay in
    Core: every organization has a name and an address, and Giving reads them from Core. No data
    is migrated: no package version exists (plan Section 4.3, ADR-0029, ADR-0046), so there is no
    subscriber org holding values on the old fields.

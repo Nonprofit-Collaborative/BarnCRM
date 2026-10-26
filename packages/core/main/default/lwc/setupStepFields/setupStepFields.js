@@ -9,6 +9,7 @@ const TEXT = 'Text';
 const RECORD = 'Record';
 const FILE = 'File';
 const NAVIGATE = 'Navigate';
+const ADDRESS = 'Address';
 
 /**
  * The fields of one Setup Assistant step, whichever package declared them (C-29, ADR-0059):
@@ -56,6 +57,7 @@ export default class SetupStepFields extends NavigationMixin(LightningElement) {
   // Maria never sees a file's record identifier, only the picture it points at
   // (plan Section 2.3: no setting requires knowing an API name).
   get view() {
+    const firstAddress = this.declared.find((field) => field.fieldType === ADDRESS);
     return this.declared.map((field) => ({
       ...field,
       value: this.draft[field.key],
@@ -63,15 +65,29 @@ export default class SetupStepFields extends NavigationMixin(LightningElement) {
       isRecord: field.fieldType === RECORD,
       isFile: field.fieldType === FILE,
       isNavigate: field.fieldType === NAVIGATE,
-      columnClass: field.fullWidth
-        ? 'slds-col slds-size_1-of-1'
-        : 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2',
+      // The address parts are shown as one grouped block, where the first part sits.
+      isAddress: field === firstAddress,
+      columnClass:
+        field.fullWidth || field === firstAddress
+          ? 'slds-col slds-size_1-of-1'
+          : 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2',
       previewUrl: this.draft[field.key] ? `${FILE_URL}${this.draft[field.key]}` : undefined
     }));
   }
 
   get inputs() {
-    return this.view.filter((field) => field.isText || field.isRecord);
+    return this.view.filter((field) => field.isText || field.isRecord || field.isAddress);
+  }
+
+  /** What the address block shows: every address part's current draft, keyed by setting. */
+  get addressValues() {
+    const values = {};
+    this.declared
+      .filter((field) => field.fieldType === ADDRESS)
+      .forEach((field) => {
+        values[field.key] = this.draft[field.key];
+      });
+    return values;
   }
 
   get files() {
@@ -99,6 +115,10 @@ export default class SetupStepFields extends NavigationMixin(LightningElement) {
     this.draft = { ...this.draft, [key]: event.target.value };
   }
 
+  handleAddressPartChange(event) {
+    this.draft = { ...this.draft, [event.detail.key]: event.detail.value };
+  }
+
   handleRecordChange(event) {
     const key = event.target.dataset.key;
     this.draft = { ...this.draft, [key]: event.detail.recordId };
@@ -122,6 +142,12 @@ export default class SetupStepFields extends NavigationMixin(LightningElement) {
   }
 
   handleSave() {
+    // The address boxes mark what is still required and nothing is sent; the server refuses
+    // an incomplete address too, for anyone who saves another way.
+    const address = this.template.querySelector('c-organization-address');
+    if (address && address.reportValidity() === false) {
+      return;
+    }
     const values = {};
     this.declared.forEach((field) => {
       if (field.key && field.fieldType !== NAVIGATE) {
