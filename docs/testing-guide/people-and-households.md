@@ -138,10 +138,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Households**, switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
-| 2 | Tick **Delete a household once it is empty** and save. | Saved. |
-| 3 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
-| 4 | Untick **Delete a household once it is empty** and save. | Saved. |
+| 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
+| 2 | Switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
+| 3 | Tick **Delete a household once it is empty** and save. | Saved. |
+| 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
+| 5 | Untick **Delete a household once it is empty** and save. | Saved. |
 
 **Cleanup:** delete Dee Testempty.
 
