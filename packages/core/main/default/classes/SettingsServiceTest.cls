@@ -927,4 +927,152 @@ private class SettingsServiceTest {
             Assert.areEqual('', SettingsService.asText(null), 'Unset reads as empty');
         }
     }
+
+    private static final List<String> ADDRESS_KEYS = new List<String>{
+        'Organization_Street__c',
+        'Organization_Street_2__c',
+        'Organization_City__c',
+        'Organization_State__c',
+        'Organization_Postal_Code__c',
+        'Organization_Country__c'
+    };
+
+    private static void stubAddressDefinitions() {
+        List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+        for (String key : ADDRESS_KEYS) {
+            rows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = key.removeEnd('__c'),
+                    MasterLabel = key,
+                    Setting_Key__c = key,
+                    Section__c = SettingSections.ORGANIZATION,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Text'
+                )
+            );
+        }
+        SettingDefinitionSelector.stubbedRows = rows;
+    }
+
+    private static Map<String, Object> completeAddress() {
+        return new Map<String, Object>{
+            'Organization_Street__c' => '14 Bridge Street',
+            'Organization_City__c' => 'Springfield',
+            'Organization_State__c' => 'IL',
+            'Organization_Postal_Code__c' => '62701'
+        };
+    }
+
+    @IsTest
+    static void aCompleteAddressIsSavedWithStreetTwoAndCountryLeftBlank() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            SettingsService.saveValues(completeAddress());
+            Test.stopTest();
+
+            Assert.areEqual(
+                '14 Bridge Street',
+                SettingsService.getValue('Organization_Street__c'),
+                'The street is saved'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Organization_Street_2__c,
+                'Street 2 stays optional'
+            );
+            Assert.areEqual(4, SettingChangeSelector.getRecent(10).size(), 'One change per part');
+        }
+    }
+
+    @IsTest
+    static void anAddressMayBeLeftEntirelyBlank() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            Map<String, Object> blanks = new Map<String, Object>();
+            for (String key : ADDRESS_KEYS) {
+                blanks.put(key, '');
+            }
+
+            Test.startTest();
+            SettingsService.saveValues(blanks);
+            Test.stopTest();
+
+            Assert.isNull(
+                SettingsService.getValue('Organization_City__c'),
+                'A blank address is a valid answer'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPartialAddressIsRefusedNamingWhatIsMissingAndNothingIsSaved() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            String refusal = refusalOf('Organization_City__c', 'Springfield');
+            Test.stopTest();
+
+            Assert.isNotNull(refusal, 'A city alone is not an address');
+            Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_Street), 'Street');
+            Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_State), 'State');
+            Assert.isTrue(
+                refusal.contains(System.Label.Core_OrganizationAddress_PostalCode),
+                'Zip Code'
+            );
+            Assert.isNull(
+                SettingsService.getValue('Organization_City__c'),
+                'A refused save writes nothing'
+            );
+            Assert.isTrue(SettingChangeSelector.getRecent(10).isEmpty(), 'And records no change');
+        }
+    }
+
+    @IsTest
+    static void clearingARequiredPartOfASavedAddressIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            SettingsService.saveValues(completeAddress());
+
+            Test.startTest();
+            String refusal = refusalOf('Organization_Postal_Code__c', '');
+            Test.stopTest();
+
+            Assert.isNotNull(refusal, 'The rest of the address is still there, so Zip is needed');
+            Assert.areEqual(
+                '62701',
+                SettingsService.getValue('Organization_Postal_Code__c'),
+                'The saved Zip Code is unchanged'
+            );
+        }
+    }
+
+    @IsTest
+    static void aStreetTwoOrCountryAloneIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            String street2Only = refusalOf('Organization_Street_2__c', 'Suite 3');
+            String countryOnly = refusalOf('Organization_Country__c', 'USA');
+            Test.stopTest();
+
+            Assert.isNotNull(street2Only, 'Street 2 is optional but is not an address by itself');
+            Assert.isNotNull(countryOnly, 'Neither is Country');
+        }
+    }
+
+    @IsTest
+    static void savingAnotherSettingNeverChecksTheAddress() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+
+            Test.startTest();
+            String refusal = refusalOf(TEXT_KEY, 'The {LastName} Clan');
+            Test.stopTest();
+
+            Assert.isNull(refusal, 'A save that leaves the address alone is not held to the rule');
+        }
+    }
 }

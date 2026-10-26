@@ -168,6 +168,21 @@ public with sharing class SettingsController {
         }
     }
 
+    /**
+     * The saved organization address, one entry per part keyed by its settings field name, for
+     * the address block in the console (a Component row). Saving goes through `saveSettings`.
+     * Not cacheable, for the reason `getConsoleModel` is not.
+     */
+    @AuraEnabled
+    public static Map<String, String> getOrganizationAddress() {
+        try {
+            return OrganizationAddress.savedParts();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
+        }
+    }
+
     /** Where a link to a console section goes: the settings tab and the section state key. */
     public class SettingsLink {
         @AuraEnabled

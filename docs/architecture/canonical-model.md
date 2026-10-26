@@ -961,7 +961,14 @@ may add keys, and must add them here first.
 | `Setup_Steps_Skipped__c` | text (255) | empty | The comma separated keys of the Setup Assistant steps the administrator chose to skip for now, so a skipped step moves out of the way without counting as done. |
 | `Setup_Started_At__c` | datetime | empty | When the administrator first changed something in the Setup Assistant, so the completion screen can say how long setup took. |
 | `Organization_Legal_Name__c` | text (255) | empty | The organization's legal name, as it appears on its official filings. Giving prints it on receipts and year-end statements. |
-| `Organization_Address__c` | text (255) | empty | The organization's mailing address as one line, as it is printed on letters and documents. Custom settings have no long text field, so a single 255 character line is the format. |
+| `Organization_Street__c` | text (255) | empty | The street line of the organization's mailing address, as it is printed on letters and documents. |
+| `Organization_Street_2__c` | text (255) | empty | An optional second street line (suite, floor, unit). |
+| `Organization_City__c` | text (40) | empty | The city of the mailing address. |
+| `Organization_State__c` | text (80) | empty | The state or province of the mailing address. |
+| `Organization_Postal_Code__c` | text (20) | empty | The Zip or postal code of the mailing address. |
+| `Organization_Country__c` | text (80) | empty | The optional country of the mailing address. |
+
+**R-OA1 The mailing address is six parts, all or nothing.** The six parts replaced the one-line `Organization_Address__c` on 2026-10-26. The address may be left entirely blank. Once any of the six parts has a value, Street, City, State and Postal Code must all have one (Street 2 and Country stay optional). `SettingsService` refuses a save that would leave the stored address in between, with a message that names what is missing, so the console, the Setup Assistant and any direct call are held to the same rule. Giving receipts and Volunteers letters print the address through one Core helper, `OrganizationAddress`: one line per non-blank part (Street, Street 2, then `City, State Postal Code`, then Country), or the same lines joined with commas for a merge token.
 
 ### v0.2 keys
 
@@ -8340,7 +8347,8 @@ message, and so is generating with a template that is not active (an inactive te
 merged, however it was chosen).
 
 **R-VL2 Tokens are a closed set.** `{OrganizationName}` and `{OrganizationAddress}` (Core's
-`Organization_Legal_Name__c` and `Organization_Address__c`), `{PersonName}`, `{FirstName}` (the
+`Organization_Legal_Name__c` and the six address parts, `Organization_Street__c` to
+`Organization_Country__c`, on one line), `{PersonName}`, `{FirstName}` (the
 Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
 hours in the period) and `{Today}`. Every merged value is HTML escaped. An unknown token is left
 as typed, so a typo shows on the proof.
@@ -8696,6 +8704,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
+| v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
 
 ---
