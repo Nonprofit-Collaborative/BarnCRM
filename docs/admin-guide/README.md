@@ -206,3 +206,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving |
 | Nonprofit Cloud import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Giving |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package |
+
+## Report a bug or give feedback
+
+If a page here is wrong, missing or unclear, or a feature does not behave as described, open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](../../SUPPORT.md) for which template to use and what to include, and never post personal or donor data. Report security problems privately, as described in [SECURITY.md](../../SECURITY.md).
