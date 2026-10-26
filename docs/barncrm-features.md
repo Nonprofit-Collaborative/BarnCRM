@@ -109,7 +109,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Complete import exceptions file | Minor | Download exceptions holds every rejected row (up to 100,000 per download), read through an Apex pagination cursor, written with the same Excel-safe CSV writer as Find (byte-order mark, formula guard); the rejected-rows table says when it shows only the first 200. | Shipped (#377) | Q-03, C-14 |
+| Complete import exceptions file | Minor | Download rejected rows holds every rejected row (up to 100,000 per download), read through an Apex pagination cursor, written with the same Excel-safe CSV writer as Find (byte-order mark, formula guard); the rejected-rows table says when it shows only the first 200. | Shipped (#377) | Q-03, C-14 |
 | Data Job records | Minor | Import, bulk update and bulk delete records read **Data Job** (plural **Data Jobs**), since all three are data jobs; the tab stays **Import**; API names are unchanged. | Shipped (#377) | ADR-0047 |
 | Import wizard | Major | Uploads a spreadsheet, suggests column mappings, runs a dry run showing what would be created, updated, matched or rejected, then commits with per-row results; the single quote a Find export puts before = + - or @ is taken off, so an exported phone number loads as it was. | Shipped (fixes #377) | C-14 |
 | Import results file | Minor | Download results gives every row of a finished import (people or Load one object) with its outcome, the record IDs it created, updated or matched, and the reason for a rejected row, beside the row's own columns, to reconcile against the source system or load the next file by record ID. | Shipped (#377) | Data tools parity rank 3, C-14 |

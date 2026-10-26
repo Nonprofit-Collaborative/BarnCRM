@@ -116,6 +116,19 @@ admin already holds every Core set, these included, because the create script as
 that is more than a real BarnCRM Admin holds, so test a permission's absence with the staff
 user, never the admin.
 
+The create script has no switch to leave sets off: the gate needs them all. To test what an
+admin sees without a feature set (for example a BarnCRM Admin who cannot erase people or review
+duplicates), use one of these:
+
+- **A second admin user (preferred).** Create a third user as in step 1 with the **System
+  Administrator** profile, then give it only the **BarnCRM Admin Group** role on the Access page.
+  It holds what a real BarnCRM Admin holds and none of the extra permissions. Give it one extra
+  permission at a time when a script needs it.
+- **Your login user, for one script.** On the Access page, under **Extra permissions**, select
+  **Remove** beside your name for the set you are testing, run the script, then give it back.
+  Sets not listed there (BarnCRM Access Manager and the tab sets) are removed in Setup, Users,
+  your user, **Permission Set Assignments**, and added back the same way.
+
 ## Edition modes
 
 BarnCRM has two editions: the **Standard Edition** (Core, no nonprofit modules offered) and the

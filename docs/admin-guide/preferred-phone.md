@@ -14,7 +14,8 @@ person is saved, the same way **Preferred Email** fills the ordinary Email box (
 ## How to turn it on
 
 There is nothing to set up in Salesforce Setup. **Preferred Phone** arrives with Core and sits
-on the person's page next to the ordinary Phone box.
+on the person's page next to the ordinary Phone box, in the **Reaching This Person** section
+with **Home Phone**, **Mobile**, **Other Phone** and **Work Phone**.
 
 If you never choose a preferred phone, nothing changes: the ordinary Phone box keeps whatever
 you type in it. The copying only starts on a person once you choose one.

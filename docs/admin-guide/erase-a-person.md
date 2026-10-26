@@ -26,7 +26,9 @@ The person's record is kept but made anonymous, so every total stays right:
   setting; a household that is kept (the setting is off, or gifts or other records credited
   to the household, such as volunteer hours, keep it) is made anonymous too: it is renamed
   "Erased household" and its greetings and address are emptied. The preview lists it as
-  **Household**, with the note that it was kept because records are credited to it.
+  **Household**, with a note saying why it was kept: "Kept because Delete Empty Households is
+  off (BarnCRM Settings, Households)." when the setting is off, or "Kept because records are
+  credited to it." when the setting is on and records keep it.
 - **Salesforce's privacy record**: where your org uses the Individual record (Setup, Data
   Protection and Privacy), it is emptied and marked **Forget this Individual**.
 - **Field history** of the record (old values of tracked fields) is deleted a moment after the

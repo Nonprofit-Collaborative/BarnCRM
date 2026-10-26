@@ -51,7 +51,9 @@ cleans up her data, and check what removing a module would cost.
    tab. Choose who to install for (**Install for Admins Only** is the safe choice), click
    **Install**, and wait for Salesforce's email. Come back and click **Check again**: the row
    says **Installed**. If a row says "No install link is published for this module yet.", there is
-   no version to install yet; read about it with **What this module does**. If it says "Install these
+   no version to install yet; read about it with **What this module does**. Until BarnCRM
+   publishes package versions, every **Not installed** row says this and none has an **Install**
+   link; the link appears once a version exists. If it says "Install these
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
    first: Salesforce refuses Giving, Volunteers, Funders and Mirror until BarnCRM Rollup Builder is
    installed, and Funders and Mirror until Giving is too.

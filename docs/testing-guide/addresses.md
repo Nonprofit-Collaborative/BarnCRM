@@ -52,7 +52,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-04: A person's address edit moves the household
 
 **Purpose:** with the default setting, editing a member's mailing address moves everyone and keeps history.
-**Prerequisites:** admin, setting **Everyone in the household moves together**. Mailing Address is not on the shipped person page: add it to the **Reaching This Person** section first (gear icon, **Edit Page**).
+**Prerequisites:** admin, setting **Everyone in the household moves together**. Mailing Address is in the person page's **Reaching This Person** section.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -66,7 +66,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-05: A person's address edit gives a personal address
 
 **Purpose:** with **Only that person moves**, the edit stays with one person.
-**Prerequisites:** admin, Mailing Address on the person page (see T-ADDR-04).
+**Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
