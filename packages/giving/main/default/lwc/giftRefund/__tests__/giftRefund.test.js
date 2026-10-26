@@ -58,6 +58,17 @@ describe('c-gift-refund', () => {
     expect(find(element, 'remaining')).not.toBeNull();
   });
 
+  it('tells a reader they cannot record money going back, and offers nothing to save', async () => {
+    const element = build();
+    getGiftSummary.emit({ remainingAmount: 150, fullyReversed: false, canRefund: false });
+    await flush();
+
+    expect(find(element, 'no-access').textContent).toBe('c.Giving_RefundGift_NoPermission');
+    expect(find(element, 'confirm')).toBeNull();
+    expect(find(element, 'reason')).toBeNull();
+    expect(find(element, 'cancel')).not.toBeNull();
+  });
+
   it('asks for a reason before it records anything', async () => {
     const element = build();
     getGiftSummary.emit({ remainingAmount: 150, fullyReversed: false });

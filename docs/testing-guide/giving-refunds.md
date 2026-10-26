@@ -83,7 +83,7 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As read-only, open **Rosa Hall**'s 80 gift. | The gift opens. **Refunds and Write-offs** and the refund fields are readable. |
-| 2 | If **Refund or Write Off** shows, select it, type a reason, select **Record it**. | Either the button is not shown, or the save ends in an error toast. No negative gift is added to **Refunds and Write-offs**. |
+| 2 | Select **Refund or Write Off**. | The dialog says "You can see this gift but not record money going back. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." It offers no reason box and no **Record it**, only **Cancel**. Select **Cancel**; no negative gift is added to **Refunds and Write-offs**. |
 | 3 | Open the **Refunds and Write-offs** list view on the **Gifts** tab. | The refunds from T-REF-01 and T-REF-02 are listed. |
 
 **Cleanup:** None.

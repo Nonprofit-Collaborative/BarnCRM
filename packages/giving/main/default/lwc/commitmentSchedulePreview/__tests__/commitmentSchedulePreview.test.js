@@ -19,6 +19,8 @@ const SCHEDULE = {
   count: 2,
   expectedTotal: 200,
   commitmentStatus: 'Active',
+  canChange: true,
+  canGenerate: true,
   installments: [
     {
       recordId: 'a01000000000001',
@@ -79,7 +81,13 @@ describe('c-commitment-schedule-preview', () => {
   });
 
   it('offers to generate a schedule when there is none', async () => {
-    getSchedule.mockResolvedValue({ saved: true, count: 0, installments: [] });
+    getSchedule.mockResolvedValue({
+      saved: true,
+      count: 0,
+      installments: [],
+      canChange: true,
+      canGenerate: true
+    });
     generateNow.mockResolvedValue(SCHEDULE);
     const element = build();
     await Promise.resolve();
@@ -115,6 +123,32 @@ describe('c-commitment-schedule-preview', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="resume"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="pause"]')).toBeNull();
+  });
+
+  it('offers a reader no status change and no schedule to generate', async () => {
+    getSchedule.mockResolvedValue({ ...SCHEDULE, canChange: false, canGenerate: false });
+    const element = build();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(element.shadowRoot.querySelector('[data-id="actions"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('tbody tr').length).toBe(2);
+  });
+
+  it('does not offer a reader to generate a missing schedule', async () => {
+    getSchedule.mockResolvedValue({
+      saved: true,
+      count: 0,
+      installments: [],
+      canChange: false,
+      canGenerate: false
+    });
+    const element = build();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="generate"]')).toBeNull();
   });
 
   it('offers no status change on a cancelled commitment', async () => {

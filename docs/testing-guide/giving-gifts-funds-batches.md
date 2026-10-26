@@ -49,7 +49,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Click **New** on the **Gifts** tab. Fill both **Donor Contact** (Harper Garcia) and **Donor Account** (any organization), **Amount** `10`, today, `Cash`. Save. | Refused: "Enter a donor contact or a donor account, not both. A gift has exactly one donor." |
-| 2 | Clear **Donor Account**, set **Amount** `0`, save. | Refused: "A gift amount cannot be zero. Enter what was received, or enter a negative amount to record a refund..." |
+| 2 | Clear **Donor Account**, set **Amount** `0`, save. | Refused: "A gift amount cannot be zero. Enter what was received; money going back is recorded with Refund or Write Off on the original gift..." |
 | 3 | Set **Amount** `-10`, save. | Refused: "A negative gift is a refund or a write-off, so it must name the original gift it reverses. Use the Refund or Write Off action on the original gift..." Cancel the form. |
 | 4 | On the **All Gifts** list view, filter **Status** equals Pending, and open one sample gift (for example from Charlotte Osei, 450). | **Status** is Pending. |
 | 5 | Edit it, set **Status** to `Cancelled`, save. | Saved. |
@@ -103,7 +103,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | On the in-kind gift, click **Edit**, set **Amount** `800`, save. | Refused: "An in-kind gift has no amount, because goods are not money the organization holds. Leave Amount at zero..." Cancel. |
 | 2 | Edit, clear **In-kind Description**, save. | Refused: "Describe what was given. This text is printed on the donor's receipt..." Cancel. |
-| 3 | Open the T-GIFT-02 gift (Check, 250), edit, type `Chairs` in **In-kind Description**, save. | Refused: "In-kind Description and Fair Market Value belong to a gift of goods or services. Either set Type to In-kind, or clear both fields." Cancel. |
+| 3 | Open the T-GIFT-02 gift (Check, 250), edit, type `Chairs` in **In-kind Description**, save. | Refused: "In-kind Description and Fair Market Value belong to a gift of goods or services. Either set Payment Method to In-kind, or clear both fields." Cancel. |
 | 4 | Open Harper Garcia, wait a few seconds and refresh. | **Total Giving** did not rise by 800. If your page shows **In-kind Value** (it is not placed by default; add it or use a report), it includes 800. |
 
 **Cleanup:** none.
