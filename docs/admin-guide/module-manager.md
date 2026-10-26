@@ -44,7 +44,7 @@ cleans up her data, and check what removing a module would cost.
 1. Open **BarnCRM Settings**, **Modules**. Each row has the module's name, a status, a
    **What this module does** link, and its actions:
    - **Installed**: installed and working, with a link to the module's own app. Core is
-     always On.
+     always installed and on.
    - **Installed and off**: installed, and its automation is not running.
    - **Not installed**: not in your org.
 2. On a **Not installed** row, click **Install**. Salesforce's install screen opens in a new
@@ -61,7 +61,7 @@ cleans up her data, and check what removing a module would cost.
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted
    gift, keeps running. Your records stay exactly as they are.
-4. Click **Turn on**. The row says **On**, Giving's automation runs again with every switch on
+4. Click **Turn on**. The row says **Installed** again, Giving's automation runs again with every switch on
    the Automation page as you left it, and you are given the module's administrator access
    (for Giving, the Giving Admin permission set) if you did not have it. Giving it takes
    Salesforce's Assign Permission Sets permission, which a system administrator has and a

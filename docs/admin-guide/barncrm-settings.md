@@ -223,7 +223,7 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Assign a module's own permission set, such as Giving Staff, alongside the role (Setup, Users, Permission Set Assignments). Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
+| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
@@ -237,7 +237,7 @@ form at the top of that page:
 | Giving, Acknowledgments | Allow the org to send email (Setup, Deliverability, Access level: All email) | Yes |
 | Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
 | Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
-| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** (Setup, Users, Permission Set Assignments) | No |
+| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra permissions | No |
 | Giving, Campaign sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
 | Giving, Opportunity mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
 | Giving, Accounting export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |

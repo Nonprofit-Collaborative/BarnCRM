@@ -157,8 +157,8 @@ the administrator (see [Posting and Closed Periods](posting-and-closed-periods.m
 refused and the rest were retried one at a time until the chunk ran short of room. Nothing was
 saved for those rows. Load the file again: rows already loaded are matched, not duplicated.
 
-**Rows rejected with "No fund named ...".** The fund in the file is spelled differently from
-the fund in BarnCRM. Either rename the column values in your spreadsheet or give the fund
+**Rows rejected with "No fund is named ..., or has it as its accounting code."** The fund in
+the file is spelled differently from the fund in BarnCRM. Either rename the column values in your spreadsheet or give the fund
 an accounting code that matches the file.
 
 **Rows rejected because a date cannot be read.** Write dates as `2026-03-15`, or in the

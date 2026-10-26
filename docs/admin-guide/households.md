@@ -191,7 +191,7 @@ is simply absent from it.
 That is deliberate. The primary contact has to be somebody who is still in the household,
 so when that person leaves, BarnCRM clears the field rather than leaving a name that no
 longer belongs there. It does not choose a replacement for you: click **Make primary**
-on the right person in the household's **Household Members** panel. In the flexible way of
+on the right person in the household's **Members** panel. In the flexible way of
 belonging the field always follows the member marked primary, so that panel is the only
 place to change it.
 

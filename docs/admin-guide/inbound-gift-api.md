@@ -40,7 +40,7 @@ the processor's support team.
    and acknowledgment rules; creating gifts, their fund allocations and the household soft
    credits Giving adds; and the web address. It cannot edit or delete a donor, edit or
    delete a gift, change a fund, or read the Error Log, so a leaked key can do little more
-   than send gifts. Assign it in Setup: no BarnCRM role includes a module's permission sets.
+   than send gifts. Give it on the Access page, under Extra permissions: no BarnCRM role includes a module's permission sets.
 3. **Let it see your donors.** It finds a donor only among the people and organizations it
    can see. If contacts and accounts are private in your organization, share them with it
    (see "The integration user cannot see the donors" below).

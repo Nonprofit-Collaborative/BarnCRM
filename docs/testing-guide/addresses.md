@@ -40,10 +40,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **Add address** with Type **Seasonal** and Street `1 Test St`, no seasonal dates. Save. | Refused: **A seasonal address needs a start month, a start day, an end month, and an end day so we know when to use it.** |
-| 2 | Set Start Month `4`, Start Day `31`, End Month `5`, End Day `1`. Save. | Refused: **A seasonal day is a day its month has: 1 to 31, or 1 to 30 in April, June, September and November, or 1 to 29 in February.** |
-| 3 | Set Start Month `13`, Start Day `1`. Save. | Refused: **A seasonal month is a number from 1 (January) to 12 (December).** |
-| 4 | Set Start Month `11`, Start Day `1`, End Month `3`, End Day `31`. Save. | Saved, shown as **Used from November 1 to March 31** (one range across New Year). |
+| 1 | **Add address** with Type **Seasonal** and Street `1 Test St`, no seasonal dates. Submit with **Add address** in the form. | Refused: **A seasonal address needs a start month, a start day, an end month, and an end day so we know when to use it.** |
+| 2 | Set Start Month `4`, Start Day `31`, End Month `5`, End Day `1`. Submit again. | Refused: **A seasonal day is a day its month has: 1 to 31, or 1 to 30 in April, June, September and November, or 1 to 29 in February.** |
+| 3 | Set Start Month `13`, Start Day `1`. Submit again. | Refused: **A seasonal month is a number from 1 (January) to 12 (December).** |
+| 4 | Set Start Month `11`, Start Day `1`, End Month `3`, End Day `31`. Submit again. | Saved, shown as **Used from November 1 to March 31** (one range across New Year). |
 | 5 | Open the default Home address from the **Addresses** tab, untick **Default**, and save. | Refused: **This is the address in use. To change that, make another address the default, or delete this one.** |
 | 6 | On the **Addresses** tab select **New**, fill **Household or Organization** with The Garcia Family and **Person** with Harper Garcia, add a street, and save. | Refused: **An address belongs to one household, one organization, or one person. Choose only one.** |
 

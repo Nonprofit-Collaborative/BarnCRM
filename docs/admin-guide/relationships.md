@@ -95,7 +95,7 @@ from the sample data.
    - **Type**: Spouse
    - **Status**: leave it as Current
    - **Start date**: leave it empty
-   Choose **Save**.
+   Choose **Add relationship** in the form.
 4. The card now shows one line: Luis Garcia, Spouse. A current relationship carries no
    badge. Nothing else was asked of you.
 5. Open **Luis Garcia**. His **Relationships** card already shows Harper Garcia, Spouse.
