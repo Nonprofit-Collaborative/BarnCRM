@@ -64,7 +64,7 @@ ways, and they do the same thing.
 5. Click that button. A confirmation says what changes. Click **Change edition** to confirm,
    or **Cancel** to leave it as it is.
 
-The change is saved at once and listed under **Recent changes** at the bottom of BarnCRM
+The change is saved at once and listed under **Recent Changes** at the bottom of BarnCRM
 Settings. Reload any open BarnCRM page to see the new module lists.
 
 ### In Salesforce Setup
@@ -79,7 +79,7 @@ Settings. Reload any open BarnCRM page to see the new module lists.
 5. Click **Save**.
 
 Any other value is treated as no edition chosen. A change made in Setup is not listed under
-Recent changes, so prefer **BarnCRM Settings, General** (above). Setting the edition here
+Recent Changes, so prefer **BarnCRM Settings, General** (above). Setting the edition here
 before first-run setup does not skip it: the setup window still shows, with that edition
 already selected, so that you choose the features too.
 

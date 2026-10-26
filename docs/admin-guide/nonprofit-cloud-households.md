@@ -25,7 +25,7 @@ time it runs.
 1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation.
-4. Read the **What we found in your org** card. If your org has households built the
+4. Read the **What We Found in Your Org** card. If your org has households built the
    Nonprofit Cloud way, the card says so and gives you the number it counted, as information:
    this is expected, and it is BarnCRM leaving those households alone.
 5. If any Account is both a BarnCRM household and a Nonprofit Cloud household at once,
@@ -64,7 +64,7 @@ years. Her colleagues have been grouping families there the whole time.
 
 1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
-2. The **What we found in your org** card tells her that this org already has households
+2. The **What We Found in Your Org** card tells her that this org already has households
    built the Nonprofit Cloud way, and how many.
 3. She decides which way her organization is going to group families from now on. She picks
    one, and only one.

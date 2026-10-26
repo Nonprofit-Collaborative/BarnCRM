@@ -71,7 +71,7 @@ Start with no sample data loaded.
 
 Removing the sample data runs as background batch jobs, like the load, and sends a
 notification only if it stops part way ("Sample data removal did not finish"). When it
-finishes normally, the Sample data card returns to **Not loaded** and nothing is sent.
+finishes normally, the Sample Data card returns to **Not loaded** and nothing is sent.
 
 ## Common mistakes
 

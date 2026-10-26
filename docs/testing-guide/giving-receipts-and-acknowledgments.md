@@ -20,7 +20,7 @@ For every script on this page:
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, then the **Organization** section. | Your legal name and tax ID are filled in. If the legal name is blank, fill it in and select **Save** (receipts need it). |
 | 2 | Open the **Receipts** section. Set **Receipt number prefix** to `TEST`, leave **Receipt next counter** at 1, set **Statement year** to last year. Select **Save**. | The toast reads "Your settings are saved." |
-| 3 | On the **Receipt letters and year end statements** row, select **Open this page**. | The Receipt Letters page opens on the **Receipt templates** tab. |
+| 3 | On the **Receipt letters and year end statements** row, select **Open Receipt Letters**. | The Receipt Letters page opens on the **Receipt templates** tab. |
 | 4 | Open the **Letter** list. | Two letters are listed: the per gift receipt and the consolidated statement. Neither ends in ", not in use". |
 | 5 | Read the notes under the editor. | The tax note starts "The tax wording is not in this letter and cannot be edited." and a token list follows "Tokens you can use." |
 
@@ -83,7 +83,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt letters and year end statements** select **Open this page**, then the **Year end statements** tab. | **Statement year** shows last year. The runs table, or "No statement run has been started yet." |
+| 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt letters and year end statements** select **Open Receipt Letters**, then the **Year end statements** tab. | **Statement year** shows last year. The runs table, or "No statement run has been started yet." |
 | 2 | Select **Generate**. | Toast **Statements started**: "Year end statements are being generated. Click Refresh to see the run's progress below." |
 | 3 | Select **Refresh** until the run's **Status** stops changing. | One row for last year with **Donors** and **Issued** above zero and **Errors** 0. |
 | 4 | Open the **Receipts** tab in the Fundraising app, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
@@ -131,7 +131,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, turn on **Acknowledge gifts** and select **Save**. On the **Acknowledgments** row select **Open this page**. | The **Acknowledgments** page opens, with **Waiting to go** and **Your rules, in the order they are considered**. |
+| 1 | In **BarnCRM Settings**, **Giving**, turn on **Acknowledge gifts** and select **Save**. On the **Acknowledgments** row select **Open Acknowledgment Queue**. | The **Acknowledgments** page opens, with **Waiting to go** and **Your rules, in the order they are considered**. |
 | 2 | Select **New rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
 | 3 | Select **New rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
@@ -166,7 +166,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on the **Donor levels** row select **Open this page**. | The **Donor levels** page. With no rungs: "You have not created any levels yet. Choose New level to add the first rung of your ladder." |
+| 1 | In **BarnCRM Settings**, **Giving**, on the **Donor levels** row select **Open Donor Level Ladder**. | The **Donor levels** page. With no rungs: "You have not created any levels yet. Choose New level to add the first rung of your ladder." |
 | 2 | Select **New level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
 | 3 | Try a fourth level with **Minimum Amount** 500 and **Maximum Amount** 200. | Refused: "The maximum amount has to be greater than the minimum amount. Leave the maximum empty for the top level of your ladder." Cancel. |
 | 4 | In **BarnCRM Settings**, **Giving**, turn on **Donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
@@ -184,7 +184,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship plans** select **Open this page**. Select **New plan**: **Plan name** `First gift welcome`, **What starts it** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship plans** select **Open Stewardship Plan Setup**. Select **New plan**: **Plan name** `First gift welcome`, **What starts it** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
 | 2 | Change **What starts it** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running now** 0. |
 | 3 | Select the plan, then **Add step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
 | 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move up** and **Move down** reorder them. |
@@ -206,7 +206,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship plans** select **Open this page**. **New plan**: `After a meeting`, **What starts it** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn on**. | The plan is listed with **On** On. |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship plans** select **Open Stewardship Plan Setup**. **New plan**: `After a meeting`, **What starts it** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn on**. | The plan is listed with **On** On. |
 | 2 | As staff, open **Harper Garcia** in the Fundraising app and select **Start Stewardship Plan**. | The **Start a stewardship plan** window lists the plans that are on, including `After a meeting`. |
 | 3 | Select **Start plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
 | 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |

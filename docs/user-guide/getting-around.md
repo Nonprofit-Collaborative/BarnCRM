@@ -94,7 +94,7 @@ welcome says "BarnCRM automation is paused. Households and greetings are not bei
 until it resumes." It goes away by itself.
 
 Admins also see the setup checklist, Health Check and a few status tiles. See
-[The BarnCRM apps and navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
+[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
 ## To read in-app tips
 
@@ -173,7 +173,7 @@ it can still be undone. Import cards and Salesforce's own tools are for admins. 
 - [Finding people and records](find.md)
 - [People and households](people-and-households.md)
 - [Read-only access](read-only-access.md)
-- Admin Guide: [The BarnCRM apps and navigation](../admin-guide/barncrm-app.md),
+- Admin Guide: [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md),
   [What's new](../admin-guide/whats-new.md), [In-app tips](../admin-guide/in-app-guidance.md),
   [Job notifications](../admin-guide/job-notifications.md),
   [Data Manager](../admin-guide/data-manager.md)

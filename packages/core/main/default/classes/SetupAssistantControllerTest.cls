@@ -38,9 +38,9 @@ private class SetupAssistantControllerTest {
             Assert.isNotNull(state.suite, 'Step one needs the suite and where Giving is');
             Assert.isNotNull(state.coexistence, 'Step two needs what detection found');
             Assert.areEqual(
-                2,
+                7,
                 stepByKey(state.steps, 'identity').fields.size(),
-                'The organization step carries the fields it is going to edit'
+                'The organization step carries the legal name and the six address parts'
             );
             Integer installed = 0;
             for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
@@ -299,7 +299,10 @@ private class SetupAssistantControllerTest {
                 'identity',
                 new Map<String, Object>{
                     'Organization_Legal_Name__c' => 'Riverside Community Aid',
-                    'Organization_Address__c' => '1 River Road'
+                    'Organization_Street__c' => '1 River Road',
+                    'Organization_City__c' => 'Riverside',
+                    'Organization_State__c' => 'CA',
+                    'Organization_Postal_Code__c' => '92501'
                 }
             );
             Test.stopTest();
@@ -310,7 +313,42 @@ private class SetupAssistantControllerTest {
                 identity.fields[0].value,
                 'The field shows the legal name Maria saved'
             );
+            Assert.areEqual(
+                'Riverside',
+                identity.fields[3].value,
+                'And the address parts she saved, in the third address box, the city'
+            );
             Assert.isTrue(identity.completed, 'The legal name is what finishes the step');
+        }
+    }
+
+    @IsTest
+    static void refusesAHalfFilledAddressOnTheOrganizationStepAndSavesNothing() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = identityRows();
+            SetupAssistantTestExtension.useNone();
+            String message;
+
+            Test.startTest();
+            try {
+                SetupAssistantController.saveStepValues(
+                    'identity',
+                    new Map<String, Object>{
+                        'Organization_Legal_Name__c' => 'Riverside Community Aid',
+                        'Organization_Street__c' => '1 River Road'
+                    }
+                );
+            } catch (AuraHandledException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.isNotNull(message, 'A street without a city, state and Zip Code is refused');
+            Assert.isTrue(
+                message.contains(System.Label.Core_OrganizationAddress_City),
+                'The message names what is missing'
+            );
+            Assert.isNull(savedLegalName(), 'The legal name in the same save was not kept either');
         }
     }
 
@@ -743,7 +781,15 @@ private class SetupAssistantControllerTest {
     private static List<Setting_Definition__mdt> identityRows() {
         List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
         for (
-            String key : new List<String>{ 'Organization_Legal_Name__c', 'Organization_Address__c' }
+            String key : new List<String>{
+                'Organization_Legal_Name__c',
+                'Organization_Street__c',
+                'Organization_Street_2__c',
+                'Organization_City__c',
+                'Organization_State__c',
+                'Organization_Postal_Code__c',
+                'Organization_Country__c'
+            }
         ) {
             rows.add(
                 new Setting_Definition__mdt(

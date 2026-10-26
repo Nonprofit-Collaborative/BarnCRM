@@ -17,14 +17,6 @@
         <value>Access given. Add another person, or continue.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_AddressLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the organization address field on the identity step</shortDescription>
-        <value>Address, as you want it printed</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_AutomaticAccessLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>

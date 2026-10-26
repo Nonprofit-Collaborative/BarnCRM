@@ -25,11 +25,14 @@ automatically and carries a **Default** badge.
 
 - An address you add on a **household** belongs to the whole household.
 - An address you add on a **person** belongs to that person only. The rest of the household
-  keeps its own address.
+  keeps its own address, and the person keeps theirs when the household moves later.
 - If you edit a person's mailing address in the person's own **Mailing Address** field
   (**Reaching This Person** section), what happens
   depends on your org's setting: either the whole household moves, or the person gets an
   address of their own. Ask your admin which yours is.
+- If you edit a household's **Billing Address** field, the new address becomes the
+  household's default address, and everyone in the household moves with it except a person
+  with an address of their own.
 
 ## To make an address the default
 

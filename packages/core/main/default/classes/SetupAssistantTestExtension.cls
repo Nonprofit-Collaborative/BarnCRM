@@ -14,7 +14,7 @@ public class SetupAssistantTestExtension implements SetupAssistantExtension {
     public static final String IDENTITY_WORDING = 'The organization step, in the module words.';
     // A Core text setting stands in for the module's own: Core's tests have no other settings
     // object to write, and a record identifier fits in any text setting.
-    public static final String RECORD_KEY = 'Organization_Address__c';
+    public static final String RECORD_KEY = 'Organization_Legal_Name__c';
     // A setting on a settings object of the module's own, which Core's tests do not have: saving
     // it fails, after Core's own settings object has been written in the same step.
     public static final String MODULE_OBJECT = 'Module_Settings__c';

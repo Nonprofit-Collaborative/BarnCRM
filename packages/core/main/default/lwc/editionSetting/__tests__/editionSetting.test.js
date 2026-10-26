@@ -115,4 +115,18 @@ describe('c-edition-setting', () => {
     expect(find(element, 'error').textContent).toBe('No permission');
     expect(find(element, 'saved')).toBeNull();
   });
+
+  it('fetches the edition again when the console refreshes it after first-run setup', async () => {
+    getEdition.mockResolvedValueOnce({ currentSuite: null, canEdit: true });
+    const element = await build();
+    expect(find(element, 'edition-not-chosen')).not.toBeNull();
+
+    getEdition.mockResolvedValueOnce({ currentSuite: 'Community', canEdit: true });
+    element.refresh();
+    await flushPromises();
+
+    expect(getEdition).toHaveBeenCalledTimes(2);
+    expect(find(element, 'edition-not-chosen')).toBeNull();
+    expect(find(element, 'edition-name').textContent).toBe('c.Core_SuiteChoice_StandardName');
+  });
 });

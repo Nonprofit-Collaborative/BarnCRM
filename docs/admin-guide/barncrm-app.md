@@ -1,4 +1,4 @@
-# The BarnCRM apps and navigation
+# The BarnCRM Apps and Navigation
 
 ## What it does
 
@@ -20,7 +20,7 @@ tab shows only to the people whose access allows it, so a menu can be shorter th
 If you have ever installed something in Salesforce and then wondered where to start, this
 is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
 
-### Where everything is
+### Where Everything Is
 
 | What you are looking for | Where it is |
 |---|---|
@@ -36,7 +36,7 @@ The home page's **Modules** list names each installed module, with an **Open the
 for a module that has an app of its own. The Rollup Builder module has no app of its own: its
 **Rollup Builder** tab is in the admin apps.
 
-### A module's pages in the BarnCRM apps
+### A Module's Pages in the BarnCRM Apps
 
 Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
 so you need not switch apps:
@@ -74,7 +74,7 @@ every night; do not assign them by hand.
 3. Click the star next to the app name if you want it to open by default. Each person picks
    their own default app this way.
 
-### Hide one navigation style for everyone
+### Hide One Navigation Style for Everyone
 
 By default everyone sees both styles and picks the one they like. To show only one:
 
