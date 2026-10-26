@@ -1,10 +1,10 @@
 /**
  * Instant totals on an object BarnCRM ships no trigger for: a standard object, another
- * package's object or the organization's own (canonical model R-R12, ADR-0137).
+ * package's object or the organization's own (canonical model R-R12, ADR-0138).
  *
  * The Rollup Builder generates a one-line trigger and its test for the object, and the
  * administrator deploys them: in a sandbox and then with a change set, or with the Salesforce
- * CLI from the deploy package built here. BarnCRM deploys nothing itself (ADR-0137 says why).
+ * CLI from the deploy package built here. BarnCRM deploys nothing itself (ADR-0138 says why).
  * The names come from the object's API name, so the same object gives the same code in every
  * org and a sandbox's change set lands exactly what the production Builder expects to find.
  *

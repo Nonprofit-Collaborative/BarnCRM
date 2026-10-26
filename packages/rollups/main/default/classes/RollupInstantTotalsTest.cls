@@ -1,6 +1,6 @@
 /**
  * What the Rollup Builder shows and hands out for instant totals on an object BarnCRM ships no
- * trigger for (ADR-0137): the names, the generated code and packages, each object's state read
+ * trigger for (ADR-0138): the names, the generated code and packages, each object's state read
  * from the org, and the switch. A test cannot deploy a trigger, so the org's generated triggers
  * and which objects can carry one are put in front of the class through its two seams. Account
  * has no packaged rollup trigger; Contact has one (the Core_Rollups_Contact registry row).
