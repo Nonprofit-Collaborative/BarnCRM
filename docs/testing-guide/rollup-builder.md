@@ -173,7 +173,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
 
-## T-RB-16: A condition on a field one lookup away
+## T-RB-16: A Condition on a Field One Lookup Away
 
 **Purpose:** confirm a condition can read a field of the record the counted records point to, one lookup away, and that the Builder says when such a total may not update at once.
 **Prerequisites:** admin user; T-RB-02 done.
@@ -189,7 +189,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None.
 
-## T-RB-17: A picklist filled by Last, and a value it does not have
+## T-RB-17: A Picklist Filled by Last, and a Value It Does Not Have
 
 **Purpose:** confirm First and Last can fill a picklist, the save refuses a source picklist with values the target lacks, and a text value the picklist lacks is left out and logged.
 **Prerequisites:** admin user; T-RB-02 done. In Setup, on **Account**, create a Picklist field labelled **Test Last Role** (API name `Test_Last_Role__c`) with the values **Head**, **Child** and **Other** only (no **Spouse or Partner**), visible to your profile and on the household page layout.
