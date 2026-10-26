@@ -495,10 +495,6 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Volunteer_Settings</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>Volunteer_Shift__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

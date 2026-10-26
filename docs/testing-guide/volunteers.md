@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Volunteer Settings**, **Dashboards** and **Reports** show. |
+| 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
 | 3a | Open **Volunteer Sign-ups**, list view **All Sign-ups**. | The sample sign-ups are listed with their shift, person and status. |
@@ -126,7 +126,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Volunteer Settings**. | The **Volunteers** section shows **Hours require approval**, **Attendance creates hours** and the shift horizon setting (8 weeks). |
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Hours require approval**, **Attendance creates hours** and the shift horizon setting (8 weeks). |
 | 2 | Turn **Hours require approval** off. | The change saves at once. |
 | 3 | Create an hours entry for a sample person on job **Front desk**, 1 hour, yesterday. | It saves with **Status** Approved and **Reviewed By** you. |
 | 4 | Turn **Hours require approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
@@ -157,7 +157,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open **BarnCRM Volunteers**. | No **Approve Hours**, **Volunteer Requirements**, **Volunteer Letter Templates** or **Volunteer Settings** tab. |
+| 1 | As staff, open **BarnCRM Volunteers**. | No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates** tab. |
 | 2 | Open **Volunteer Hours**, list view **All Hours**. | Only entries the staff user entered show; the sample entries do not. |
 | 3 | As admin, open **BarnCRM Settings**, **Access**. Find the staff user in **Find a person**, choose **Coordinator** and click **Give access**, then confirm. | The staff user shows on the Coordinator card, still also on Team Member. |
 | 4 | Wait a minute. In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
@@ -173,7 +173,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Volunteers**. | Tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Hours** and **Skills** show. No **Approve Hours**, **Volunteer Requirements**, **Volunteer Letter Templates** or **Volunteer Settings**. |
+| 1 | Open **BarnCRM Volunteers**. | Tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Hours** and **Skills** show. No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates**. |
 | 2 | Open **Volunteer Jobs**. | Jobs list; no **New** button. Opening a job shows no **Edit**. |
 | 3 | Open an upcoming **Front desk** shift. | The **Sign-ups** card shows the figures and the people with their status as plain text. No **Add sign-up**, no status boxes, no **Attendance** column. |
 | 4 | Open **Volunteer Hours**, list view **All Hours**. | No entries are listed (hours are private, and this user entered none). |

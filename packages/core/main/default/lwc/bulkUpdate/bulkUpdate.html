@@ -162,24 +162,24 @@
                     <section class="slds-box slds-var-m-bottom_medium" data-id="preview-box">
                         <p class="slds-text-title_bold" data-id="preview-line" role="status">{previewLine}</p>
                         <table
-                            class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-vertical_small"
+                            class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer slds-var-m-vertical_small"
                             aria-label={labels.preview}
                             data-id="preview-table"
                         >
                             <thead>
                                 <tr>
-                                    <th scope="col">{labels.record}</th>
-                                    <th scope="col">{labels.field}</th>
-                                    <th scope="col">{labels.before}</th>
-                                    <th scope="col">{labels.after}</th>
+                                    <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{labels.record}</th>
+                                    <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{labels.field}</th>
+                                    <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{labels.before}</th>
+                                    <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{labels.after}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template for:each={sampleRows} for:item="row">
                                     <tr key={row.key} data-id="sample-row">
-                                        <th scope="row">{row.name}</th>
-                                        <td>{row.label}</td>
-                                        <td>{row.before}</td>
+                                        <th scope="row" class="slds-cell-wrap">{row.name}</th>
+                                        <td class="slds-cell-wrap">{row.label}</td>
+                                        <td class="slds-cell-wrap">{row.before}</td>
                                         <td class={row.afterClass}>{row.after}</td>
                                     </tr>
                                 </template>

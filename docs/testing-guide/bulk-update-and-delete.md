@@ -19,7 +19,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows shown." |
 | 2 | Select **Bulk update**. | A panel **Bulk update** opens below the results: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you preview and confirm the number of records." |
 | 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New value**. | The change is complete. **Add a change** is enabled. |
-| 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. |
+| 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. The four columns are equal width, and a long value wraps onto more lines inside its cell instead of stretching the table past the panel. |
 | 5 | Type a number other than N in **Type the number of records to confirm**. | The **Update N records** button stays disabled. |
 | 6 | Type N. | **Update N records** is enabled. |
 | 7 | Select **Update N records**. | "The bulk update started. It keeps running if you leave this page." then "Updating: X of Y chunks done." |

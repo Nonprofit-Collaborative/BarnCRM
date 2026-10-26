@@ -12,9 +12,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign sync**. | The **Campaign sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
+| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
 | 2 | In **Giving**, tick **Copy appeals to Campaigns** and save. | The setting saves. |
-| 3 | Open **Campaign sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
+| 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
 | 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see the new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
 | 6 | Open the App Launcher, search **Campaigns**, and open the list. | Seven Campaigns named after the appeals. **Spring Appeal** shows **Annual Fund** as its Parent Campaign. |
@@ -126,7 +126,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment method** (**All payment methods**), **Only gifts not yet posted** and **Download file**. |
+| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting Export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment method** (**All payment methods**), **Only gifts not yet posted** and **Download file**. |
 | 2 | Set **From** and **To** to the first and last day of last month. Click **Download file**. | `accounting-export-<from>-to-<to>.csv` downloads. The page says `<rows> rows from <gifts> gifts. Net total <amount>.` |
 | 3 | Open the file. | Header row: `Date,Gift Number,Original Gift,Donor,Fund,Accounting Code,Payment Method,Reference,Amount`. Every date is in the range, and Amount adds up to the net total. |
 | 4 | Choose **Building Fund** in **Fund** and download. | Every row says Building Fund, accounting code 4100. |

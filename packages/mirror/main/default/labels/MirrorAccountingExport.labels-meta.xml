@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Accounting export page: heading</shortDescription>
-    <value>Accounting export</value>
+    <value>Accounting Export</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_Intro</fullName>

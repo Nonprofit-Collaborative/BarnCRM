@@ -14,10 +14,8 @@ done in Setup, the setup checklist on the Hub home page sends you there with ins
 and the section of this page that depends on it says so at the top (see "When a section
 needs a change in Setup" below).
 
-A module with an app of its own can also show its settings there, on their own: the
-**Volunteer Settings** tab is this page showing only the Volunteers settings. They are the
-same settings, so a change in either place shows in both. The Rollup Builder module has no
-settings tab: its settings are in the **Rollups** section of this page.
+No module has a settings tab of its own: a module's settings are a section of this page, for
+example **Rollups** and **Volunteers**.
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.
@@ -141,8 +139,8 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
 - A module that is not installed shows **Not installed** with **Install**, which opens
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
-  Volunteers has a Settings tab in its app, and the Rollup Builder's settings are in the
-  **Rollups** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  No module app has a Settings tab: the Rollup Builder's settings are in the **Rollups**
+  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
@@ -294,9 +292,9 @@ form at the top of that page:
 | Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
 | Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
 | Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra Permissions | No |
-| Giving, Campaign sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
-| Giving, Opportunity mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
-| Giving, Accounting export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
+| Giving, Campaign Sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
+| Giving, Opportunity Mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
+| Giving, Accounting Export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
 
 ## Common mistakes
 

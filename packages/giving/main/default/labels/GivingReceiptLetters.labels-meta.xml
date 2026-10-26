@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: tab, the receipt letters</shortDescription>
-    <value>Receipt templates</value>
+    <value>Receipt Templates</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_StatementsTab</fullName>
@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: tab, year end statements</shortDescription>
-    <value>Year end statements</value>
+    <value>Year End Statements</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoTemplates</fullName>
@@ -102,7 +102,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: heading of the preview</shortDescription>
-    <value>Preview for a sample gift</value>
+    <value>Preview for a Sample Gift</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_PreviewNote</fullName>

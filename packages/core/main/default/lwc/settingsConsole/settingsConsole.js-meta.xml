@@ -13,9 +13,4 @@
   <targets>
     <target>lightning__AppPage</target>
   </targets>
-  <targetConfigs>
-    <targetConfig targets="lightning__AppPage">
-      <property name="module" type="String" label="Module" description="A module key, such as Rollups, to show only that module's settings. Leave blank to show every setting." />
-    </targetConfig>
-  </targetConfigs>
 </LightningComponentBundle>

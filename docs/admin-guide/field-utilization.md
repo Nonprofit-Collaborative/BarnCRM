@@ -36,7 +36,8 @@ Start from the sample data (see [Sample data](sample-data.md)).
 3. The table lists every field it counted, once per record type: Household and Organization.
    Each row shows the field's label and API name, how many records have it filled in, how many
    records there are, and the percentage. Sort by **Filled** to put the least used fields first.
-4. Choose **Save these counts**. The page reads, for example, "Saved 112 counts."
+4. Choose **Save Utilization Snapshot**. Small text under the button says "Keeps this count so
+   your next count shows what changed." The page reads, for example, "Saved 112 counts."
 5. Open any sample organization and fill in its **Website**. Go back to the section and choose
    **Count again**. The Website row for Organization now shows a higher percentage, **Saved**
    shows the percentage you saved in step 4, and **Change (points)** shows how many percentage
@@ -87,7 +88,7 @@ percentages look low or a record type is missing, have an administrator who can 
 count and save instead.
 
 **Expecting a trend without saving.** A count you do not save is gone when you leave the page.
-Choose **Save these counts** after any count you want to compare against later.
+Choose **Save Utilization Snapshot** after any count you want to compare against later.
 
 **Expecting a field to be counted that is not in the table.** A field is left out when it is a
 formula, a checkbox, required on every record, or hidden from you (see **What is counted**). Give

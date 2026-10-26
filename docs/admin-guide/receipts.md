@@ -70,9 +70,9 @@ Still in the Receipts section:
 
 ### 4. Write your two letters
 
-Also in the Receipts section, **Receipt letters and year end statements** opens the Receipt
+Also in the Receipts section, **Receipt Letters and Year End Statements** opens the Receipt
 Letters page (the **Receipt Letters** tab), which has two tabs. It opens as its own page rather than inside the settings console,
-which is how every page the Giving module adds behaves. On the **Receipt templates** tab,
+which is how every page the Giving module adds behaves. On the **Receipt Templates** tab,
 BarnCRM ships one letter of each kind:
 
 - **Per gift receipt**, for a single gift.
@@ -133,7 +133,7 @@ Start from the sample data.
 
 1. Open **BarnCRM Settings**, then **Receipts**. Set the prefix to `TEST`, leave the receipt next
    counter at 1, and set the statement year to last year.
-2. Open **Receipt letters and year end statements**, and on the **Receipt templates** tab
+2. Open **Receipt Letters and Year End Statements**, and on the **Receipt Templates** tab
    check that a letter of each kind is in use. If one is not, pick it and click **Use this
    letter**.
 3. Open any gift from the sample data. Click **Issue receipt** on the **Receipts** panel. A
@@ -156,8 +156,8 @@ Start from the sample data.
    both files and compare them.
 7. Go to the **Receipts** tab and look at the two records. The voided one points at its
    replacement, the replacement points back at what it replaces.
-8. Back in BarnCRM Settings, under Receipts, choose **Receipt letters and year end
-   statements** again, open the **Year end statements** tab, check
+8. Back in BarnCRM Settings, under Receipts, choose **Receipt Letters and Year End
+   Statements** again, open the **Year End Statements** tab, check
    the statement year, and click **Generate**. A run appears in the list below and counts up
    as it goes; **Refresh** updates it. When it finishes, open a household with several gifts
    in that year, open its **Receipts** related list, open the statement, and read the file:

@@ -17,9 +17,7 @@
 
             <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
-                    <template lwc:if={showSearch}>
-                        <c-settings-search onsettingselect={handleSearchSelect}></c-settings-search>
-                    </template>
+                    <c-settings-search onsettingselect={handleSearchSelect}></c-settings-search>
                     <lightning-vertical-navigation
                         class="slds-var-p-top_small"
                         selected-item={selectedSection}

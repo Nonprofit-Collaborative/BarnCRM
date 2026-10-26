@@ -57,8 +57,8 @@ finishes, BarnCRM does five things on its own:
 Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
 **Volunteer Shifts**, **Volunteer Hours**, **Skills**, **Dashboards** and **Reports** for
 everyone with a Volunteers set, **Approve Hours** and **Volunteer Requirements** for
-coordinators and admins, and **Volunteer Letter Templates** and **Volunteer Settings** for
-admins only.
+coordinators and admins, and **Volunteer Letter Templates** for admins only. The module's
+settings are in the **Volunteers** section of **BarnCRM Settings**.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
 **All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
@@ -76,7 +76,7 @@ You never assign the Volunteers permission sets by hand. Give people their BarnC
 
 | BarnCRM role | Volunteers set they get | What they can do |
 |---|---|---|
-| Admin (anyone holding BarnCRM Admin) | Volunteers Admin | Everything, including deleting a record entered by accident and the Volunteer Settings tab |
+| Admin (anyone holding BarnCRM Admin) | Volunteers Admin | Everything, including deleting a record entered by accident |
 | Coordinator | Volunteers Coordinator | Everything Staff does, plus see and correct everyone's hours to approve or reject them |
 | Team Member | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
 | Read Only | Volunteers Read Only | Look at jobs, shifts, sign-ups and volunteer details; sees no hours entries (see below) |
@@ -215,9 +215,8 @@ and delete those entries (or reject them) before you delete the person.
 
 ## Settings
 
-As an admin, open the **Volunteer Settings** tab in the BarnCRM Volunteers app, or the
-**Volunteers** section of **BarnCRM Settings**: both show the same three settings, and each
-saves as you change it.
+As an admin, open the **Volunteers** section of **BarnCRM Settings**. It shows these three
+settings, and each saves as you change it.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|
@@ -557,7 +556,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    **Approve**: the message says one entry was approved, and the list is empty.
 9. Change **Show** to **Approved**, tick the entry and click **Reopen**. It is back under
    **Submitted**. Tick it, click **Reject**, type "Wrong date" as the reason and confirm.
-10. Open **Volunteer Settings** and read the three settings. Leave them as they are.
+10. Open **BarnCRM Settings**, **Volunteers**, and read the three settings. Leave them as they are.
 
 ## Importing volunteer hours
 
@@ -580,7 +579,7 @@ Use these headings in the first row of a CSV or Excel file. Order does not matte
 | Notes | No | What the person did. |
 
 There is no Status column, and a file cannot approve its own hours. While **Hours require
-approval** is on in Volunteer Settings (the default), every row starts **Submitted** and waits in
+approval** is on in the Volunteers section of BarnCRM Settings (the default), every row starts **Submitted** and waits in
 the **Awaiting Approval** list view for a coordinator; a template changed to name any other
 status has those rows rejected. When it is off, rows are **Approved** at once, by the person who
 runs the import, as for hours entered by hand. There is no Shift column, because shift names

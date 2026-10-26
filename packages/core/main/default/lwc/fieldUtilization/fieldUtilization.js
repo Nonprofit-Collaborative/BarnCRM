@@ -11,6 +11,7 @@ import CHOOSE_PLACEHOLDER from '@salesforce/label/c.Core_FieldUtilization_Choose
 import PROGRESS from '@salesforce/label/c.Core_FieldUtilization_Progress';
 import COUNT_AGAIN from '@salesforce/label/c.Core_FieldUtilization_CountAgain';
 import SAVE from '@salesforce/label/c.Core_FieldUtilization_Save';
+import SAVE_HELP from '@salesforce/label/c.Core_FieldUtilization_SaveHelp';
 import SAVED from '@salesforce/label/c.Core_FieldUtilization_Saved';
 import TOO_LARGE from '@salesforce/label/c.Core_FieldUtilization_TooLarge';
 import NO_RECORDS from '@salesforce/label/c.Core_FieldUtilization_NoRecords';
@@ -66,7 +67,7 @@ const isBlank = (value) => value === null || value === undefined;
 /**
  * The Field Utilization tab (canonical model Section 29F, ADR-0101 field-utilization-on-demand):
  * pick a kind of record, and the page counts its fields a chunk at a time, filling the table as
- * each chunk returns. Nothing is stored until Save these counts. The controller checks Manage
+ * each chunk returns. Nothing is stored until Save Utilization Snapshot. The controller checks Manage
  * BarnCRM Settings on every call.
  */
 export default class FieldUtilization extends LightningElement {
@@ -77,6 +78,7 @@ export default class FieldUtilization extends LightningElement {
     choosePlaceholder: CHOOSE_PLACEHOLDER,
     countAgain: COUNT_AGAIN,
     save: SAVE,
+    saveHelp: SAVE_HELP,
     comparedWith: COMPARED_WITH,
     neverSaved: NEVER_SAVED,
     noRecords: NO_RECORDS,

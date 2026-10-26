@@ -144,7 +144,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Org Optimizer** and choose **Field utilization**. | **Field utilization**, with **Kind of record** set to **Choose a kind of record**. |
 | 2 | In **Kind of record**, choose **Account**. | A progress bar fills while it reads **Counted N of N fields.** The table has **Field**, **API name**, **Record type**, **Filled**, **With a value** and **Records** columns; rows appear for **Household** and **Organization**. |
 | 3 | Read the line above the table. | **No counts have been saved for this kind of record yet.** |
-| 4 | Click **Save these counts**. | **Saved N counts.** |
+| 4 | Read the small text under the button group, then click **Save Utilization Snapshot**. | The small text reads "Keeps this count so your next count shows what changed." Then **Saved N counts.** |
 | 5 | Open any sample organization and fill in **Website**. Return and click **Count again**. | The Website row for **Organization** shows a higher **Filled**; **Saved** shows the earlier percentage and **Change (points)** shows the rise. |
 | 6 | Check the bell. | No notification for the count. |
 
