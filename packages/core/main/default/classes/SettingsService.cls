@@ -166,9 +166,7 @@ public with sharing class SettingsService {
         if (!blank || !fillable) {
             return stored;
         }
-        String name = field.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getLocalName()
-            .toLowerCase();
+        String name = field.getDescribe().getLocalName().toLowerCase();
         if (isCoreSettings(type) && COEXISTENCE_FIELD.equals(name)) {
             return OrgShapeDetector.recommendedCoexistenceMode();
         }
