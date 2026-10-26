@@ -47,7 +47,7 @@ BarnCRM is a Salesforce managed package that runs inside your own Salesforce org
 - **No data leaves the org.** There is no BarnCRM server, no hosted component, and no vendor copy of your constituent data.
 - **Telemetry is opt-in and off by default**, and anonymous when it is on.
 - **REST endpoints exist only in the Mirror package** (the inbound gift API), are authenticated, and are documented. Mirror is optional and is not installed unless you install it.
-- Issues in Salesforce itself, rather than in this code, belong to Salesforce: report those through https://trust.salesforce.com. We are happy to help you tell the difference.
+- Issues in Salesforce itself, rather than in this code, belong to Salesforce: report those through https://trust.salesforce.com. If you are unsure which it is, report it privately as described above and say so.
 - Org configuration mistakes made by an administrator (over-broad profiles, sharing settings, guest user access) are not vulnerabilities in this project, but if our defaults or our documentation encouraged the mistake, that is a real issue and we want to hear it.
 
 ## Our practices

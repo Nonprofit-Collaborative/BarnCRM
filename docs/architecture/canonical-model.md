@@ -739,7 +739,7 @@ the app rather than in debug logs (plan Sections 2.3 and 4.8).
 | Record Reference | text | no | The identifier of the record involved, so the admin can open it. |
 | Object Name | text | no | The kind of record involved, in the platform's name for it, so an admin can group errors by what they affect. |
 | Message | long text | yes | A human-readable explanation of what went wrong and what to do about it. |
-| Technical Detail | long text | no | Exception type, stack trace, and query or DML detail, for a developer or a support request. |
+| Technical Detail | long text | no | Exception type, stack trace, and query or DML detail, for a developer or a bug report. |
 | Severity | picklist(Info, Warning, Error, Critical) | yes | How badly the failure affects the org's data or operations. |
 | Status | picklist(New, Acknowledged, Resolved, Ignored) | yes | Where the admin has got to with this error. |
 
