@@ -462,6 +462,119 @@ private class GivingSampleDataTest {
     }
 
     @IsTest
+    static void testWithNoDefaultFundTheSampleGeneralFundIsCreatedAndUsed() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
+
+            Fund__c sampleGeneral = [
+                SELECT Id, Sample_Data__c, Is_Default__c
+                FROM Fund__c
+                WHERE Name = 'General Fund'
+            ];
+            System.assertEquals(true, sampleGeneral.Sample_Data__c, 'it is flagged for removal');
+            System.assertEquals(false, sampleGeneral.Is_Default__c, 'it never claims the default');
+            System.assertNotEquals(
+                0,
+                [SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__c = :sampleGeneral.Id],
+                'the sample gifts are allocated to it, as they always were'
+            );
+        }
+    }
+
+    @IsTest
+    static void testAnOrgsDefaultFundStandsInForTheSampleGeneralFundAndSurvivesRemoval() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            Fund__c ownFund = GivingTestDataFactory.buildFund('General Fund', true);
+            insert ownFund;
+
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
+
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Fund__c WHERE Name = 'General Fund'],
+                'the org never has two funds named General Fund'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
+                'only the set\'s other fund is created'
+            );
+            System.assertNotEquals(
+                0,
+                [SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__c = :ownFund.Id],
+                'the gifts meant for the sample General Fund go to the org\'s default fund'
+            );
+
+            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            for (Integer stage = 0; stage < stages.stageCount(); stage++) {
+                stages.runStage(stage);
+            }
+
+            Fund__c kept = [
+                SELECT Id, Sample_Data__c, Is_Default__c
+                FROM Fund__c
+                WHERE Id = :ownFund.Id
+            ];
+            System.assertEquals(
+                false,
+                kept.Sample_Data__c,
+                'the org\'s fund is not flagged sample'
+            );
+            System.assertEquals(true, kept.Is_Default__c, 'and it is still the default');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
+                'every sample fund is gone'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'every sample gift is gone'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__c = :ownFund.Id],
+                'the sample allocations went with their gifts'
+            );
+        }
+    }
+
+    @IsTest
+    static void testADefaultFundSetOnlyInGivingSettingsIsAlsoReused() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            Fund__c ownFund = GivingTestDataFactory.buildFund('Our general fund', false);
+            insert ownFund;
+            insert new Giving_Settings__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                Default_Fund__c = String.valueOf(ownFund.Id)
+            );
+
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
+
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Fund__c WHERE Name = 'General Fund'],
+                'no sample General Fund is created beside the fund the setting names'
+            );
+            System.assertNotEquals(
+                0,
+                [SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__c = :ownFund.Id],
+                'the sample gifts go to the fund the setting names'
+            );
+        }
+    }
+
+    @IsTest
     static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePeople();

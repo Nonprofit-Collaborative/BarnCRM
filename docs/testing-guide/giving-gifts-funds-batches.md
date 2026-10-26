@@ -11,8 +11,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Funds** tab, list view **All Funds**. | The 8 sample funds show, from **General Fund** to **Memorial Fund**. |
-| 2 | Open **General Fund**, click **Edit**, tick **Is Default**, and save. | Saved. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
+| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-14), that fund is the only **General Fund** and the other 7 are sample funds. |
+| 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
 | 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
@@ -215,5 +215,20 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | As read-only, open the **Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft credits** panel's **Add credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
+
+**Cleanup:** none.
+
+## T-GIFT-15: Sample data reuses the org's default fund
+
+**Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
+**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-14), no sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Giving installed. | The load finishes. |
+| 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
+| 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
+| 4 | Select **Remove sample data** and confirm. | The removal finishes. |
+| 5 | Open **All Funds**. | **General Fund** is still there and still the default. The seven sample funds and the sample gifts are gone. |
 
 **Cleanup:** none.
