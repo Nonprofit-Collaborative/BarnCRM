@@ -32,7 +32,7 @@ so it is listed only where Giving is installed, which makes five:
 
 | Role | Who it is for | What it gives |
 |---|---|---|
-| BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings |
+| BarnCRM Admin (its card and the role list say **BarnCRM Admin Group**, its label in Salesforce) | The person who configures the app, usually you | Everything, including BarnCRM Settings |
 | Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
 | Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus program and service records when the Programs module is on |
 | Coordinator | Whoever schedules people and tracks their time | Day to day work with people, households, and organizations, plus volunteer shifts and hours when the Volunteers module is on |
@@ -114,7 +114,7 @@ Here is how she gives him access, checks it, and takes it away again.
 1. Open the BarnCRM app and click the **BarnCRM Settings** tab.
 2. In the left navigation, choose **Access**. You see a card for each role (five with Giving,
    four without), each with a short description and the people who currently hold that role. On a fresh install only your
-   own name appears, under BarnCRM Admin.
+   own name appears, on the **BarnCRM Admin Group** card.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
    each with their name and email address so you can tell two Davids apart.
 4. Choose **David Okafor**.
