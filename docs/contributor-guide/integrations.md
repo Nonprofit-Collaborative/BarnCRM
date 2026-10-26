@@ -30,7 +30,7 @@ An organization that uses a product and wants it supported uses the
 - **No namespace is hard-coded** in Core. The package keeps its own names as strings used for
   lookups.
 - **Decide it in an ADR.** A new integration needs an Architecture Decision Record in
-  `docs/architecture/decisions/` (an ADR-NEXT file on a branch) that says what is read and
+  `docs/architecture/decisions/` (numbered by the integrator at merge, as CLAUDE.md describes) that says what is read and
   written, who owns the data, and what happens when the product is removed.
 - **Update the canonical model first** for any object or field, then the four guides and the
   feature catalog.
