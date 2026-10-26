@@ -15,8 +15,8 @@ Salesforce's rules only compare fields on the person or household itself. The sc
 at **match sources**: related records such as contact point emails, phones and addresses, and
 BarnCRM addresses. Two people who share an email held only on a contact point email record are
 listed too, with a line saying why, for example "Same email on Contact Point Email". Match
-sources are listed, added and archived on the **Custom metadata** page; see
-[Custom metadata](custom-metadata.md#match-sources).
+sources are listed, added, deactivated and tried out in the tool's **Matching Logic** area;
+see [Matching Logic](#matching-logic).
 
 ## How to turn it on
 
@@ -68,6 +68,91 @@ on the one Setup step (keep the duplicate rules active, give reviewers Duplicate
 the **Duplicate Matching** row, whose **Open this page** button opens the tab. The scan has
 no options to set: it always checks every person and household with your active duplicate
 rules and your active match sources.
+
+### Matching Logic
+
+The **Matching Logic** area of the **Duplicate Matching** tab lists the match sources: the
+related records the scan and imports look at, alongside your Salesforce duplicate rules, to
+tell that two people or two households are the same. The rules themselves are listed, read
+only, in **Review**, with a link to change them in Setup.
+
+Who sees it: anyone with **Manage BarnCRM Settings** (BarnCRM Admin) or the **BarnCRM
+Metadata Admin** permission set. Adding, changing, deactivating and activating a source
+needs **BarnCRM Metadata Admin**, because saving one changes the org's metadata; without it
+the list is read only, and **Try a value** still works. If BarnCRM was installed as a
+package, saving also needs **Deploy Metadata from Non-Certified Package Versions via Apex**
+turned on in Setup, **Apex Settings**; see [Custom metadata](custom-metadata.md#how-to-turn-it-on).
+
+Each source is a card that says, in words, what it compares:
+
+- **Object**: the related object, for example Contact Point Email.
+- **Field compared**: the field holding the value: the email, the phone number, or the street.
+- **Postal code field**: address sources only; the postal code compared with the street.
+- **Belongs to**: a person, a household (or person account), or either.
+- **Through the lookup**: the field linking the value to its person or household.
+- **How values are compared**: Email, Phone or Address, with what is ignored.
+
+Each card says **Active** or **Inactive**. A source that cannot work in this org (its object
+or a field is missing, or you cannot read it) says **Not used in this org** and is skipped.
+
+BarnCRM ships six sources, marked **Shipped with BarnCRM**:
+
+| Source | Object | Field compared | Through the lookup | Compared as |
+|---|---|---|---|---|
+| Contact Point Email | Contact Point Email | Email Address | Parent | Email |
+| Contact Point Phone | Contact Point Phone | Telephone Number | Parent | Phone |
+| Contact Point Address | Contact Point Address | Street, with Postal Code | Parent | Address |
+| Address (person) | Address | Street, with Postal Code | Contact | Address |
+| Address (household) | Address | Street, with Postal Code | Account | Address |
+| Address (person account) | Address | Street, with Postal Code | Person Account | Address |
+
+The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
+object is missing, its source does nothing; nothing breaks. A shipped source can be
+deactivated and activated again, but not changed; upgrades keep it up to date and never
+overwrite what you added.
+
+How values are compared:
+
+- **Email**: spaces at either end are ignored, and capitals do not matter.
+- **Phone**: only the digits count, so (555) 123-4567 and 555.123.4567 match. A North
+  American number written with a leading 1 matches the same number without it. A number with
+  fewer than seven digits is ignored.
+- **Address**: the street, with capitals, punctuation and extra spaces ignored and common
+  words shortened (Street and St, Avenue and Ave match), together with the postal code
+  (spaces ignored; a ZIP+4 counts as its first five digits).
+
+A contact point record can belong to a person, an account, or a Salesforce **Individual**
+(the privacy record behind a person). A person or an account is used as it is; an Individual
+counts as every person who carries it, contacts and, where your org has person accounts,
+person accounts too. A record that belongs to anything else is skipped.
+
+**Add a source.** Choose **Add**. Fill in **Name**, then the object's API name under
+**Object** (for example `Volunteer_Profile__c`) and choose **Find fields**: the
+**Field compared** and **Through the lookup** lists then offer only the fields that can
+work (text, email or phone fields Salesforce can search on, and lookups to a contact, an
+account or an Individual). Choose **How values are compared**; for **Address**, also choose
+the **Postal code field**. **Save** checks the source against the org and refuses anything
+that cannot work, saying why. Saving takes about a minute, because Salesforce applies it in
+the background: the area says "Saving", then "Saved" and lists the source. If you leave
+before then, choose **Check again** when you come back. A source you added has **Edit** as
+well.
+
+**Deactivate a source.** Choose **Deactivate** on its card; **Activate** brings it back.
+Salesforce does not let an app delete custom metadata, so a source is deactivated instead.
+
+**Try a value.** Choose **Try a value** on a card, type an email, phone or street (and, for
+an address, the postal code), and choose **Try**. The area shows the value as the source
+compares it ("Compared as: 12 n main st|02139") and lists the people and households you can
+see that hold it. Nothing is saved. A value too short to compare says so.
+
+A value shared by more than ten people or households, such as an office's main number, is
+ignored: it says nothing about whether two of them are the same.
+
+Each lookup reads at most 5,000 records. When a lookup reaches that limit, or a scan or import
+step has used most of what Salesforce allows in one go so a source is skipped, the Error Log
+gets one warning naming the source, and the values that lookup found are not used, since some
+of the records holding them were not read. Some duplicates may then be missed until the next
+scan. A source whose values are very common is a candidate to deactivate.
 
 ## A five-minute walkthrough
 

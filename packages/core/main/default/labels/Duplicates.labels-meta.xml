@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error Log warning: {0} is the match source, {1} the row cap</shortDescription>
-        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates it would find may be missed. If its values are very common, consider archiving it on the Custom metadata page.</value>
+        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates it would find may be missed. If its values are very common, consider deactivating it on the Duplicate Matching tab, Matching Logic.</value>
     </labels>
     <labels>
         <fullName>Core_MatchSource_BudgetSpent</fullName>

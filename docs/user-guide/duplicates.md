@@ -70,7 +70,8 @@ Each pair shows a short reason:
   email, phone or address on the person or household itself.
 - A shared value on a related record, such as "Same email on Contact Point Email", "Same phone
   on Contact Point Phone" or "Same address on Address (person)". BarnCRM also checks these
-  related records (contact point emails, phones and addresses, and BarnCRM addresses).
+  related records (contact point emails, phones and addresses, and BarnCRM addresses). Your
+  admin chooses which on the **Duplicate Matching** tab, **Matching Logic**.
 
 A pair found both ways is listed once, under the rule. Some shared values are ignored on
 purpose: a value shared by more than ten people or households (such as an office's main

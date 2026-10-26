@@ -1327,8 +1327,10 @@ BarnCRM Settings (ADR-0085, `0085-custom-metadata-manager-edits-only-types-read-
 `Match_Source__mdt` (ADR-0133, `0133-related-record-matching.md`): a related object whose
 values pair people or households as likely duplicates, read directly by the duplicate scan
 (Section 29A) and by import matching (R-IT16). One row per object and parent link. Registered with the
-custom metadata manager, where an administrator adds, edits and archives their own rows and
-archives or restores a shipped one (R-D2).
+custom metadata manager, which saves it, but not listed on the Custom metadata page: an
+administrator adds, edits and deactivates their own rows, and deactivates or activates a
+shipped one, in the Duplicate Matching tab's Matching Logic area (R-D2; ADR-NEXT,
+`NEXT-duplicate-matching-tool.md`).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1400,7 +1402,9 @@ tables above before the metadata file is created.
 `CustomMetadataManagerService` as admin-editable; today Relationship Type and Match Source.
 For a registered type: a row with `Is_Shipped__c` true is never changed by the manager,
 except that a type registered as shipped-archivable (Match Source) lets a shipped row be
-archived and restored, its other values deployed unchanged (ADR-0133);
+archived and restored, its other values deployed unchanged (ADR-0133). A registered type
+may be unlisted: saved through the manager but edited only on its own page (Match Source,
+on Matching Logic, which shows archiving as Deactivate; ADR-NEXT);
 a row the manager creates has `Is_Shipped__c` false, is not protected, and has a
 DeveloperName starting `Org_`, a prefix no shipped row uses, so a later package version
 can never ship a row with the same name; archiving clears the type's active field and
@@ -8671,7 +8675,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
-| v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-NEXT). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. |
+| v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-NEXT). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. Match Source (Section 13) is managed on the tab's Matching Logic area and no longer listed on the Custom metadata page (R-D2). |
 
 ---
 ## 32. Entity ownership by package

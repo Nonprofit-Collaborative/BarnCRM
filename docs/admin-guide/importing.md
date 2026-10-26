@@ -543,7 +543,7 @@ taken for organizations, and only people for people, whatever the rule compares.
 saved with the mapping.
 
 The same box also asks your **match sources** (see
-[Custom metadata](custom-metadata.md#match-sources)) about a person the duplicate rules found
+[Matching Logic](duplicates.md#matching-logic)) about a person the duplicate rules found
 nobody for: the row's email, its phones, and its mailing and other street with postal code are
 compared with the values on contact point records and BarnCRM addresses, in the same way the
 duplicate scan compares them. A person whose email is kept only on a contact point email record
