@@ -27,6 +27,12 @@ trusted to combine them. A person with read only access sees the panel with a no
 they cannot make changes. Data cleanup is work Maria and David both do, so it is not locked
 behind the administrator permission.
 
+No Delete permission is needed, and none is given. Salesforce's own account merge deletes the
+household that goes away, which would normally need Delete on Account, and the BarnCRM staff
+roles deliberately leave that out. So BarnCRM checks first that the person has Edit on Account
+and edit access to both households (sharing included), and only then runs that one merge step
+itself. It never lets anyone merge away a household they could not edit.
+
 **What happens to the household you merge into.** It stays, always. "Delete a household
 when the last person leaves" is about a household somebody was the last to leave, not about
 the one you chose to keep, so merging two households that both happen to have no members in

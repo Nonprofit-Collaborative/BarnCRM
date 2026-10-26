@@ -213,3 +213,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | In **BarnCRM Settings**, **Households**, try to switch to **One household per person (simple)** and save. | Refused with a message starting **You cannot switch to the simple way of belonging yet.** The setting is unchanged. |
 
 **Cleanup:** delete Pat Testaccount and the household.
+
+## T-HH-15: Staff merge households without Delete on Account
+
+**Purpose:** a Team Member who cannot delete accounts can still merge two households they can edit, and cannot merge one they cannot edit.
+**Prerequisites:** admin; a second user `Merge Tester` on the **Minimum Access - Salesforce** profile (the Standard User profile gives Delete on Account, which would hide the problem), given the **Team Member** role on **BarnCRM Settings**, **Access**. Two households `The Mergetest Family`, created by admin with no members and then given to Merge Tester with **Change Owner** (the BarnCRM roles do not give a Minimum Access user edit on a contact's Account Name, so this script leaves people out), and a third household `The Otherowner Family` owned by admin that Merge Tester can read but not edit (only in an org whose account sharing is Private or Public Read Only).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Log in as Merge Tester. Open the first Mergetest household and select **Merge or split**. | The **Merge** tab opens. There is no notice that changes are switched off. |
+| 2 | Pick the second Mergetest household, select **Merge**, then **Merge households**. | Toast **Merged. The household you kept now holds everyone from both.** The other household no longer exists. |
+| 3 | On the kept household, select **Merge or split** and pick The Otherowner Family, then **Merge**, **Merge households**. | Refused with **You need edit access to both households to merge them.** Both households are unchanged. |
+
+**Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
