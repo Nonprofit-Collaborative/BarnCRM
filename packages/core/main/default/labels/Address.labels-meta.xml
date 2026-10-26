@@ -65,6 +65,46 @@
         <value>Loading addresses</value>
     </labels>
     <labels>
+        <fullName>Core_Address_MoveFailed</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: a household move could not be saved</shortDescription>
+        <value>We could not change these addresses, so nothing was changed. Check that you can edit addresses, the household and its people, and if it happens again ask your administrator to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MoveNoPrimary</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: Update Everyone's Address on a household with no primary</shortDescription>
+        <value>This household has no primary address yet. Choose Set as Primary on one of its addresses first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MoveNotAPersonsAddress</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: Use for Whole Household on an address that is not a person's</shortDescription>
+        <value>Use for Whole Household works on a person's own address. Open the person and choose it on one of their addresses.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MoveNotFound</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: the address to move was deleted or cannot be read</shortDescription>
+        <value>We could not find that address. Refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MoveNotTheirHousehold</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: the household chosen is not one the person belongs to</shortDescription>
+        <value>This person is not a current member of that household, so nothing was changed.</value>
+    </labels>
+    <labels>
         <fullName>Core_Address_PanelTitle</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>

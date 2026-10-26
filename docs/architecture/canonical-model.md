@@ -6213,8 +6213,9 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
 - **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
-  Addresses card reads and saves through Lightning Data Service, with no controller,
-  ADR-0093 record reads through Lightning Data Service); and for the seasonal swap
+  Addresses card reads and saves through Lightning Data Service, ADR-0093 record reads
+  through Lightning Data Service, and calls `AddressMoveController` only for the two
+  household moves of R-AD9); and for the seasonal swap
   `SeasonalAddressService`,
   `SeasonalAddressSelector`, `SeasonalAddressWriter`, `SeasonalAddressBatch`,
   `SeasonalAddressScheduler`, `SeasonalAddressController`.
