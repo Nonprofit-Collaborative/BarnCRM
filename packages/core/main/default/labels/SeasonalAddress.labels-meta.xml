@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Settings console: what the seasonal swap panel is for</shortDescription>
-        <value>A seasonal address takes over on the day its season starts, and the address it replaced comes back on the day the season ends. Schedule the nightly job here, and check below that it is really running.</value>
+        <value>A seasonal address takes over on the day its season starts, and the address it replaced comes back on the day the season ends. Turn on Seasonal Addresses above to schedule the nightly job, and check here that it is really running.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_PageTitle</fullName>
@@ -61,8 +61,8 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Schedule change refused without Manage BarnCRM Settings</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the BarnCRM Admin role.</value>
+        <shortDescription>Run now refused without Manage BarnCRM Settings</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to run the seasonal address swap. Ask your administrator for the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ReadOnly</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Note shown to a user who can see the panel but not change it</shortDescription>
-        <value>You can see when the swap last ran. Changing the schedule needs the Manage BarnCRM Settings permission.</value>
+        <value>You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_RunNow</fullName>
@@ -105,14 +105,6 @@
         <value>The swap runs every night at 12:30 AM, in your organization's time zone.</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_ScheduleButton</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that starts the nightly swap</shortDescription>
-        <value>Schedule nightly run</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_Stale</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -121,12 +113,12 @@
         <value>The swap is scheduled but has not run in more than 36 hours. Choose Run the swap now, and check the Error Log if it does not finish.</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_StopButton</fullName>
+        <fullName>Core_SeasonalAddress_SwitchedOff</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that stops the nightly swap</shortDescription>
-        <value>Stop nightly run</value>
+        <shortDescription>Status shown when Seasonal Addresses is off</shortDescription>
+        <value>Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_UnexpectedError</fullName>

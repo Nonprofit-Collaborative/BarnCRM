@@ -77,7 +77,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Address records | Major | Keeps many addresses per household, organization or person, with one default copied into the standard address fields so mail merges and other apps keep working. The first address added is the default, the address in use cannot be unticked on its own, and a deleted default is replaced by a non-seasonal address first. | Shipped | C-17 |
-| Seasonal address swap | Major | A nightly job swaps in a seasonal address on its start date and puts the previous one back when the season ends, with its last run shown in the app. | Shipped | C-18 |
+| Seasonal address swap | Major | A nightly job swaps in a seasonal address on its start date and puts the previous one back when the season ends, with its last run shown in the app. Turning on Seasonal Addresses in BarnCRM Settings schedules the job, and turning it off stops it. | Shipped | C-18 |
 | Household or personal address setting | Minor | Decides whether editing one person's address moves the whole household (default) or gives that person an address of their own. | Shipped | C-17 |
 | Person account address capture | Minor | A person held as a person account who is saved with a mailing address, or whose mailing address changes, gets an address record of their own. | Shipped (#377) | PEOPLE-17 |
 | Seasons that cross New Year | Minor | A season such as November to March is handled as one range. | Shipped | C-17, C-18 |
