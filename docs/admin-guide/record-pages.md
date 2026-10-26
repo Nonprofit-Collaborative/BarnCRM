@@ -56,7 +56,11 @@ people, households and organizations on Giving's own pages, which add giving (se
 built your own Account or Contact page and assigned it, it keeps showing wherever you
 assigned it. Each object also keeps one small fallback page layout, so a record that opens
 on a page of yours still has usable fields and related lists. No profile layout assignments
-ship.
+ship: the new layouts are unassigned, so outside the **BarnCRM** app a record keeps the
+layout your profiles already use. The pages above apply only in the **BarnCRM** app, so tell
+staff to work there. The list views BarnCRM adds (for example **Households** and
+**Organizations**) are scoped to **Everything**: each person still sees only the records
+their own access allows, but there is no "my records" filter.
 
 **Adding the Household panel to a person account page.** Where your org stores people as
 person accounts, BarnCRM ships no page for them, because the person account page is your

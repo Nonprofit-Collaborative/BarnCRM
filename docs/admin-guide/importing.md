@@ -127,7 +127,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    the Salesforce record IDs it resulted in (person, second person, household, organization,
    and a gift or other record a module loaded), the reason for a rejected row, and the row's
    own columns. Keep it to reconcile against the system the file came from, or to load the
-   next file by record ID. Like the exceptions file it opens cleanly in Excel and holds up to
+   next file by record ID. Like the rejected rows file it opens cleanly in Excel and holds up to
    100,000 rows in one download; for a larger import the screen says how many it holds.
 
 **Fixing the rejected rows.** You do not need a new import for the rows that were rejected.
@@ -138,7 +138,7 @@ those rows, against the same mapping, and shows the counts for them; select **Im
 rows** to load them into the same import. Every earlier rejected row is marked **Retried**,
 so keep in the file each rejected row you still want loaded, even one you did not change.
 The earlier rejected rows no longer count,
-so the import's rejected count and its exceptions are now the fixed rows' results, and its
+so the import's rejected count and its rejected rows are now the fixed rows' results, and its
 one **Undo** removes everything both runs created. Only the person who ran the import can
 retry it, only while it can still be undone, and a retry file may hold up to 10,000 rows.
 You can retry again if some fixed rows are still rejected. Row numbers in a retry carry on

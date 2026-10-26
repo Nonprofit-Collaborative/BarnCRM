@@ -2,7 +2,7 @@
 
 Scripts for the Find tab: building and running queries, conditions, related records, typed queries, summaries, exports and saved queries. Setup detail: [Find and export](../admin-guide/find.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts. Editing in the results table is tested in [Bulk update and delete](bulk-update-and-delete.md).
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. Run, save and export only queries whose conditions match the fixture (for example **Last Name equals Zztest**); an export of a broader query would copy real people. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts. Editing in the results table is tested in [Bulk update and delete](bulk-update-and-delete.md).
 
 ## T-FIND-01: Build and run a query
 

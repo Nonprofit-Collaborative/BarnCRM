@@ -2,7 +2,7 @@
 
 Scripts for the BarnCRM Settings console, Access, the Module Manager, Automation, Features, the edition, Custom metadata, the Error Log tile and the BarnCRM home page. Setup detail: [BarnCRM Settings](../admin-guide/barncrm-settings.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with every module deployed, the Nonprofit Edition chosen, every feature turned on in first-run setup, and sample data loaded unless a script says otherwise. Create the staff and read-only users from [Test users](before-you-test.md#test-users) first.
+Before you start: an org from [Before you test](before-you-test.md), with every module deployed, the Nonprofit Edition chosen, every feature turned on in first-run setup, and sample data loaded unless a script says otherwise. Create the staff and read-only users from [Test users](before-you-test.md#test-users) first. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data and no module: skip the scripts that need a module, a staff user or the Nonprofit Edition, and put back any setting you change.
 
 The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**, the role's label in Salesforce; the admin guide calls the role BarnCRM Admin and names the card the same way.
 
@@ -15,7 +15,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Rollups**, **Automation**, **Error Log**, **Access**, **Import** and **Health**, plus **Giving** and **Receipts** with Giving installed. |
+| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import** and **Health**, plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
 | 3 | Click **General**. | **Edition**, **Features**, **Sample data**, **Custom metadata** and the setting rows show, each with a plain description. A **Needs a change in Setup** note at the top names **Setup, Company Settings, Fiscal Year** and shows **Done** or **Not done yet**. |
 | 4 | Click **Learn more** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |

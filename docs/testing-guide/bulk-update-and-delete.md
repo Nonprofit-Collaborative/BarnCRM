@@ -2,7 +2,7 @@
 
 Scripts for changing and deleting the records a Find query returns, editing in Find's table, deleting by file, undo, and the permissions behind them. Setup detail: [Bulk update](../admin-guide/bulk-update.md) and [Bulk delete](../admin-guide/bulk-delete.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest, so every query names only fixture contacts. Check the preview count before you confirm any bulk step: 3 for Zztest, 3 for Bulkdeltest. If it is higher, cancel. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts.
 
 **Bulk Delete Records is in no role, not even BarnCRM Admin.** For the delete scripts, give admin the **BarnCRM Bulk Delete** extra permission first: BarnCRM Settings, **Access**, **Extra permissions** (see [Access](../admin-guide/access.md)).
 

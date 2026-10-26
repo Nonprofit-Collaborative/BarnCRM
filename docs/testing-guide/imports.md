@@ -2,7 +2,7 @@
 
 Scripts for the Import wizard: mappings, preview, commit, rejected rows, row rules, value changes, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
 The Import tab opens from the **Data Manager** tab: on the **Import a file** card, select **Open**. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** mapping recognizes them). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's mappings and are tested with Giving.
 
@@ -67,7 +67,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 ## T-IMP-03: Undo an import
 
 **Purpose:** confirm undo removes what an import created, keeps what it only matched, and asks before acting.
-**Prerequisites:** admin; the import from T-IMP-01 and T-IMP-02, not yet undone.
+**Prerequisites:** admin; the import from T-IMP-01 and T-IMP-02, not yet undone. The counts below assume both ran (T-IMP-02 adds Dee Nolast). If you ran only T-IMP-01, read **People to remove** 3, **Households to remove** 3, and "6 records deleted" in step 8, and skip Dee Nolast in step 6.
 **Smoke:** yes
 
 | Step | Action | Expected result |
