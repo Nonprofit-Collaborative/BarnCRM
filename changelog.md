@@ -8,6 +8,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- BMemory plan edited (gateway commits d0085185 to c695fb3f): owner decisions D-121 to D-131; Funders F-09 to F-13 (Grant Finder, grant management); new Sections 5.11 Scholarships and Outbound Grants (SG-01 to SG-08) and 5.12 Event Management (EV-01 to EV-11); PB-06, PB-07; C-48 Integrations page; 6.0 items 6 to 8; 6.1 items 19 to 21 and new 6.1.4 integration and migration opportunities; 11.2 item 32 (O-1 to O-12); grantmaking non-goal reversed (1.5, 11.3); Rollup Settings tab mentions fixed (4.8, 10.3); D-56 and D-64 amended. `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed.
 - Final whole-product QA round (ordered 2026-10-25, Core focus) landed its fixes as #558 to #565. Last full gate on main: `barn-personaccount` 3,617 of 3,617 at 29b2636 (pre-squash head of #561; main 0566375b is the tree the real-org deploys use). Flaky once: `DataTransformTest.capitalizesLongTextsWithinAChunksTime` at 4,250 ms CPU.
 - BMemory plan edited (commit 8e4eec61): C-47 multi-brand management (D-119), Section 6.1 item 17, open question 11.2 item 31, catalog rows C-40, C-41 and C-47. Mirrors refreshed in #563.
 - BMemory plan edited (commit 4171d0e8): D-120 (Territory Management becomes a module, LWC Builder module LB-01 to LB-06, C-47 legal entities and brand-restricted visibility, Portal Builder option B required); question 11.2 item 31 resolved, item 30 stays open for the terms check. Mirrors refreshed in #564.
