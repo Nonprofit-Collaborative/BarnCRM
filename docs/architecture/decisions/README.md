@@ -146,6 +146,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0135](0135-barncrm-uses-the-org-fiscal-year.md) | BarnCRM uses the org fiscal year, and shows Setup values read only (supersedes ADR-0025 in part) | Accepted (owner decision, 2026-10-26) |
 | [0136](0136-rollup-builder-dlrs-parity.md) | The Rollup Builder offers standard objects through describe, and closes the gaps to DLRS | Accepted (owner decision) |
 | [0137](0137-barncrm-apps-standard-and-console.md) | Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation | Accepted (owner decision) |
+| [0138](0138-instant-totals-generated-trigger-deployed-by-the-admin.md) | Instant totals on any object: the Builder generates the trigger, the admin deploys it (amends ADR-0082 decision 8) | Proposed (builder decision) |
 | [0139](0139-duplicate-matching-tool.md) | Duplicate Matching is its own tool, with a tab and a settings section | Accepted (owner decision) |
 | [0140](0140-address-updates-and-household-moves.md) | Address Updates has three choices, and a household can be moved on purpose | Accepted (owner decision) |
 

@@ -1792,16 +1792,22 @@ calculated together, one write per target record, and a value that did not chang
 written.
 
 **R-R12 Where real time comes from.** Each package ships the trigger registration for its
-own source entities (Automation Registry, Section 13). An administrator's own entity has no
-packaged trigger, so real time on it comes from one of two places: a trigger the Rollup
-Builder generates and deploys for the administrator (one line that hands the changed
-records to the engine, plus its test, named from the entity so the same code is produced in
-every org), or a record-triggered Flow built from the shipped template. Editing a rollup
-never regenerates the trigger, because the rollup's settings live only in the definition.
-When the last active definition on that entity is removed, the Builder offers to remove the
-generated trigger, and Health Check reports a generated trigger that no active definition
-uses. A generated trigger is switched off like any other automation, through an Automation
-Setting row (Section 10) the Builder creates with Is Package Default false.
+own source entities (Automation Registry, Section 13). Any other entity (a standard object,
+another package's object, the organization's own) has no packaged trigger, so real time on it
+comes from one of two places: a trigger the Rollup Builder generates and the administrator
+deploys (one line, `RollupInstantTrigger.run()`, that hands the changed records to the
+engine, plus its test; named `BarnRollup_` and the entity's API name so the same code is
+produced in every org), or a record-triggered Flow built from the shipped template. The
+Builder offers the trigger only for an entity that can carry an Apex trigger, and shows its
+state from the org: built in, on, turned off, inactive
+in Setup, not set up, or not available (ADR-0138,
+`0138-instant-totals-generated-trigger-deployed-by-the-admin.md`). Editing a rollup never
+regenerates the trigger, because the rollup's settings live only in the definition. A
+generated trigger is switched off like any other automation, through an Automation Setting
+row (Section 10) named after the trigger, which the Builder creates with Is Package Default
+false the first time it is turned off; removing the trigger is a deploy the administrator
+makes from the Builder's removal package. Health Check findings for generated triggers are
+deferred (ADR-0138).
 
 Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it
 today), the Builder says plainly, when that source is chosen, that its totals are updated by
