@@ -839,8 +839,9 @@ private class HouseholdMergeServiceTest {
     /**
      * BarnCRM Staff deliberately holds no Delete on Account, and the platform merge deletes the
      * household that goes away. The merge runs in system mode once BarnCRM's own checks pass,
-     * so a staff member who may edit both households can combine them, including one somebody
-     * else owns (ADR-NEXT).
+     * so a staff member who may edit both households can combine them, even two somebody else
+     * owns (ADR-NEXT). The households hold nobody, so the staff member's access to people (the
+     * profile here grants no standard contact fields) is not what this measures.
      */
     @IsTest
     static void staffWithoutDeleteOnAccountCanMergeHouseholdsTheyMayEdit() {
@@ -850,14 +851,12 @@ private class HouseholdMergeServiceTest {
                 'Mstaff',
                 new List<String>{ 'BarnCRM_Staff' }
             );
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            System.runAs(staff) {
-                insert maria;
-            }
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert wei;
-            Id survivorId = householdOf(maria.Id);
-            Id victimId = householdOf(wei.Id);
+            Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
+            insert new List<Account>{ survivor, victim };
+            Id survivorId = survivor.Id;
+            Id victimId = victim.Id;
+            shareHousehold(survivorId, staff.Id, 'Edit');
             shareHousehold(victimId, staff.Id, 'Edit');
 
             Boolean canDelete;
@@ -875,7 +874,11 @@ private class HouseholdMergeServiceTest {
 
             Assert.isFalse(canDelete, 'The staff member really has no Delete on Account');
             Assert.areEqual(survivorId, result.survivorId, 'The survivor is answered');
-            Assert.areEqual(survivorId, householdOf(wei.Id), 'Wei moved to the survivor');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :survivorId],
+                'The survivor stays'
+            );
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Account WHERE Id = :victimId AND IsDeleted = FALSE],
