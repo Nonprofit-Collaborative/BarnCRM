@@ -8,6 +8,8 @@ import restoreDefaults from '@salesforce/apex/RollupController.restoreDefaults';
 import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
+import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
+import LightningConfirm from 'lightning/confirm';
 
 jest.mock(
   '@salesforce/apex/RollupController.getPage',
@@ -42,6 +44,19 @@ jest.mock('@salesforce/apex/RollupController.estimateFullRun', () => ({ default:
 jest.mock('@salesforce/apex/RollupController.runTonight', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/RollupController.deleteRollup', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm',
+  () => ({ default: 'Delete {0}? The values stay.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupBuilder_DeleteShipped',
+  () => ({ default: 'Switch it off instead.' }),
+  { virtual: true }
+);
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -364,5 +379,62 @@ describe('c-rollup-definitions', () => {
     expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
       'One recalculation is set for 2:00 AM tonight.'
     );
+  });
+
+  describe('Delete', () => {
+    const MINE = {
+      ...ROLLUP,
+      recordId: 'a01000000000002AAA',
+      name: 'Gift count',
+      packageDefault: false
+    };
+
+    async function builderWith(rollups) {
+      const element = createComponent();
+      element.builder = true;
+      getPage.emit({ ...PAGE, rollups });
+      await flush();
+      return element;
+    }
+
+    it('says what happens, then deletes an admin-made rollup', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(true);
+      deleteRollup.mockResolvedValue({ ...PAGE, rollups: [] });
+      const element = await builderWith([MINE]);
+
+      element.shadowRoot.querySelector('[data-action="delete"]').click();
+      await flush();
+      await flush();
+
+      expect(LightningConfirm.open).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Delete Gift count? The values stay.' })
+      );
+      expect(deleteRollup).toHaveBeenCalledWith({ definitionId: MINE.recordId });
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
+    });
+
+    it('keeps the rollup when the administrator cancels', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(false);
+      const element = await builderWith([MINE]);
+
+      element.shadowRoot.querySelector('[data-action="delete"]').click();
+      await flush();
+
+      expect(deleteRollup).not.toHaveBeenCalled();
+    });
+
+    it('refuses a shipped rollup with the reason and never asks the server', async () => {
+      LightningConfirm.open = jest.fn();
+      const element = await builderWith([ROLLUP]);
+
+      element.shadowRoot.querySelector('[data-action="delete"]').click();
+      await flush();
+
+      expect(LightningConfirm.open).not.toHaveBeenCalled();
+      expect(deleteRollup).not.toHaveBeenCalled();
+      expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+        'Switch it off instead.'
+      );
+    });
   });
 });

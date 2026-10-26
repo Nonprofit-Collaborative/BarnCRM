@@ -1693,7 +1693,12 @@ reasoning is in Section 26.
 `Rollup_Definition_Default__mdt` on install and on "Restore defaults", matched by
 Definition Key. An upgrade adds newly shipped definitions and never overwrites a
 definition the admin has edited (ADR-0006). An admin who does not want a packaged
-definition sets Active to false; packaged code never deletes an admin's records.
+definition sets Active to false; packaged code never deletes an admin's records. The
+Rollup Builder's Delete (ADR-0136) removes only a definition with Is Package Default false,
+and refuses a packaged one with that advice, since "Restore defaults" would create it again.
+Deleting a definition leaves the values it wrote on the target records; a Rollup Queue entry
+that names it skips it, as it skips an inactive one (Section 14A). Delete is refused while a
+full run is going (R-R14).
 
 **R-R7 No cross-package reference.** Source Entity, Target Entity, Source Attribute,
 Target Attribute, and Order By Attribute are text. Core therefore drives rollups over
@@ -1944,7 +1949,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   completed with the Rollup Builder, which set Filter and Target Filter). Long text attributes
   record that they changed, not the values.
 - **Rollup Builder:** the `Rollup_Builder` tab and app page, `rollupBuilder` (which nests the
-  Rollups list, `rollupDefinitions`, with New, Edit and Copy), `rollupWizard` (the five steps)
+  Rollups list, `rollupDefinitions`, with New, Edit, Copy and Delete, the last through
+  `RollupController.deleteRollup` in user mode, R-R6), `rollupWizard` (the five steps)
   and `rollupFilterBuilder` (R-R2 documents, built once and shared with Find, plan Section
   4.9). `RollupBuilderController` describes the org for the steps, in the running user's
   describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
@@ -8908,6 +8914,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup Builder parity: parent-field criteria and picklist targets (ADR-0136, gap report rows P5 and P7). No object or field added. R-R2: the Rollup Builder's source filter offers the fields of a record each lookup of the counted records points to, one lookup deep. R-R10: the Builder's save refuses a filter path of more than one lookup, through a lookup to more than one object, or to a field the administrator cannot read, and a picklist target filled from anything but a picklist or text, or from a picklist with a value the target lacks. R-R11: a parent's change marks the totals when the parent has the rollup trigger, otherwise the nightly run or Recalculate catches it. R-R15: FIRST and LAST fill picklist targets; a value the target does not have is left out and logged. |
 | v0.8 | 2026-10-26 | Rollup Builder parity operations (ADR-0136). Rollup Definition gains `Bypass_Permission__c` (Section 14) with rule R-R4a: holders of the named custom permission skip the rollup on their saves, and a name with no custom permission in the org is refused on save. Section 14 records two new `global` surfaces: the Flow action `RollupRecalcRecordAction` ("Recalculate totals on this record") and the Apex class `RollupApi`. |
 | v0.8 | 2026-10-26 | Nightly rollup run hour (ADR-0136, DLRS parity P10). `Rollup_Settings__c` gains `Nightly_Run_Hour__c` (Number, default 2, Section 14B), shown as a picklist of hours. The nightly job and Run tonight start at it, and saving a new hour moves the scheduled nightly run through a third rollup engine seam, `RollupEngineExtensionV3`, that Core's settings service calls after every settings save. |
+| v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
 
 ---
 ## 32. Entity ownership by package

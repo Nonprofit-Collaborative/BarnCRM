@@ -325,7 +325,7 @@ own). Its settings are in the **Rollups** section of **BarnCRM Settings**.
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
 **Recalculate**, the nightly schedule, **Recalculate all** and **Restore shipped rollups**),
-and adds **New rollup**, and **Edit** and **Copy** on each row. The tab comes with the
+and adds **New rollup**, and **Edit**, **Copy** and **Delete** on each row. The tab comes with the
 **Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
@@ -355,7 +355,8 @@ The fiscal year is your org's, shown read only in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a
-shipped rollup is fine: an upgrade never overwrites a rollup you have changed.
+shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
+rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
@@ -512,6 +513,19 @@ every total is set for the next 2:00 AM." When it is scheduled, **Run tonight** 
 the nightly run already recalculates the **Every night** and **Both** totals at that hour,
 and a second run at the same moment would
 only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
+
+### Deleting a Rollup
+
+**Delete** on a row removes a rollup you made, after a confirmation that says what happens:
+
+- **The values it already wrote stay** on the records. Nothing updates them again, so clear
+  the field yourself if the old numbers would mislead anyone.
+- **It cannot be undone.** If you might want the rollup back, switch it off instead.
+- **Rollups that came with BarnCRM cannot be deleted.** Delete says so and does nothing, since
+  **Restore shipped rollups** would only bring them back. Switch them off instead.
+- **Not during a full recalculation.** While **Recalculate all** or the nightly run is going,
+  Delete says so; try again when it finishes. Totals already waiting to be recalculated for the
+  deleted rollup are skipped, as they are for a rollup that is switched off.
 
 ## Instant totals on your own objects
 
@@ -739,10 +753,10 @@ stops it being recalculated; it does not erase the values already on the records
 deliberate, so that turning something off never destroys data. If you want the field
 empty, clear it after you make the rollup inactive.
 
-**Deleting a rollup you do not want.** Deleting it works until the next upgrade, which
-creates it again, because a rollup that is gone is indistinguishable from one that was
-never created. Clear its **Active** box instead. That is remembered, and it leaves the
-numbers already calculated on the records.
+**Deleting a shipped rollup you do not want.** **Delete** refuses a rollup that came with
+BarnCRM, because a shipped rollup that is gone would be created again (an upgrade or
+**Restore shipped rollups** cannot tell it from one never created). Clear its **Active** box
+instead. That is remembered, and it leaves the numbers already calculated on the records.
 
 **Never starting the nightly schedule.** If nobody clicks **Schedule nightly
 recalculation**, nothing recalculates overnight and the home page tile stays in warning. Nothing
