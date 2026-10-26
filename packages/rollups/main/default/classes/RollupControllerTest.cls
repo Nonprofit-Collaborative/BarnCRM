@@ -175,7 +175,10 @@ private class RollupControllerTest {
             System.Assert.areEqual(
                 String.format(
                     Label.Core_RollupBuilder_ErrorNoInstant,
-                    new List<String>{ Task.SObjectType.getDescribe().getLabelPlural() }
+                    new List<String>{
+                        Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                            .getLabelPlural()
+                    }
                 ),
                 message
             );
