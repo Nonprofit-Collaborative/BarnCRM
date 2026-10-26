@@ -537,8 +537,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 3. Open the **BarnCRM Volunteers** app. On **Volunteer Jobs**, create a job called "Food
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.
-   **Shift Name** is optional: leave it blank and the shift is named from its job and start
-   time, or type one, for example "Saturday sort".
+   **Shift Name** is required, so type one, for example "Saturday sort".
 5. Open the shift. In the **Sign-ups** panel click **Add sign-up**, choose any person in your
    sample data and click **Save**. **Slots filled** is 1 and **Slots remaining** is 2.
 6. Click **Attended** on that sign-up's row. The panel says an hours entry was recorded. On

@@ -8,7 +8,7 @@
     <style>TwoColumnsTopToBottom</style>
     <layoutColumns>
       <layoutItems>
-        <behavior>Edit</behavior>
+        <behavior>Required</behavior>
         <field>Name</field>
       </layoutItems>
       <layoutItems>
