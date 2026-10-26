@@ -1,0 +1,74 @@
+<template>
+    <fieldset class="slds-form-element">
+        <template lwc:if={titled}>
+            <legend class="slds-form-element__legend slds-form-element__label">
+                {labels.heading}
+            </legend>
+        </template>
+        <div class="slds-form-element__control">
+            <lightning-input
+                label={labels.street}
+                data-key="Organization_Street__c"
+                value={street}
+                max-length="255"
+                required={partsRequired}
+                disabled={disabled}
+                onchange={handleChange}
+            ></lightning-input>
+            <lightning-input
+                label={labels.street2}
+                data-key="Organization_Street_2__c"
+                value={street2}
+                max-length="255"
+                disabled={disabled}
+                onchange={handleChange}
+            ></lightning-input>
+            <div class="slds-grid slds-wrap slds-gutters_x-small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                    <lightning-input
+                        label={labels.city}
+                        data-key="Organization_City__c"
+                        value={city}
+                        max-length="40"
+                        required={partsRequired}
+                        disabled={disabled}
+                        onchange={handleChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <lightning-input
+                        label={labels.state}
+                        data-key="Organization_State__c"
+                        value={state}
+                        max-length="80"
+                        required={partsRequired}
+                        disabled={disabled}
+                        onchange={handleChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <lightning-input
+                        label={labels.postalCode}
+                        data-key="Organization_Postal_Code__c"
+                        value={postalCode}
+                        max-length="20"
+                        required={partsRequired}
+                        disabled={disabled}
+                        onchange={handleChange}
+                    ></lightning-input>
+                </div>
+            </div>
+            <lightning-input
+                label={labels.country}
+                data-key="Organization_Country__c"
+                value={country}
+                max-length="80"
+                disabled={disabled}
+                onchange={handleChange}
+            ></lightning-input>
+        </div>
+        <template lwc:if={titled}>
+            <p class="slds-form-element__help slds-text-color_weak">{labels.hint}</p>
+        </template>
+    </fieldset>
+</template>

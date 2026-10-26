@@ -28,7 +28,11 @@ private class VolunteerLetterServiceTest {
             );
             settings.Auto_Create_Households__c = false;
             settings.Organization_Legal_Name__c = 'Barn & <Co>';
-            settings.Organization_Address__c = '1 Main St, <Town>';
+            settings.Organization_Street__c = '1 Main St';
+            settings.Organization_Street_2__c = 'Unit <4>';
+            settings.Organization_City__c = 'Springfield';
+            settings.Organization_State__c = 'IL';
+            settings.Organization_Postal_Code__c = '62701';
             TestDataFactory.saveSettings(settings);
             // Hours count as soon as they are saved, so every entry below is Approved.
             VolunteersTestData.volunteerSettings(false, true);
@@ -120,7 +124,10 @@ private class VolunteerLetterServiceTest {
         );
         Assert.isTrue(letter.body.contains('<li>Food pantry: 3 hours</li>'), letter.body);
         Assert.isTrue(letter.body.contains('<li>Front desk: 2.5 hours</li>'), letter.body);
-        Assert.isTrue(letter.body.contains('1 Main St, &lt;Town&gt;'), letter.body);
+        Assert.isTrue(
+            letter.body.contains('1 Main St, Unit &lt;4&gt;, Springfield, IL 62701'),
+            'The address is its parts on one line, HTML escaped: ' + letter.body
+        );
         Assert.areEqual(1, outcome.versionIds.size(), 'One file for one person.');
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
             ContentVersion file = [

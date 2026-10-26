@@ -75,8 +75,10 @@ private class ReceiptBrandingTest {
                 'The legal name is printed above the letter: ' + html
             );
             Assert.isTrue(
-                html.contains('14 Bridge Street, Springfield'),
-                'So is the address: ' + html
+                html.contains(
+                    '<p class="orgaddress">14 Bridge Street<br/>Suite 3<br/>Springfield, IL 62701</p>'
+                ),
+                'So is the address, one line per part, City, State and Zip together: ' + html
             );
             Assert.isTrue(
                 html.contains('12-3456789'),
@@ -129,6 +131,47 @@ private class ReceiptBrandingTest {
             Assert.isTrue(
                 html.contains('Thank you for supporting Hope For Homes'),
                 'And the sentence keeps its token: ' + html
+            );
+        }
+    }
+
+    @IsTest
+    static void theAddressTokenMergesTheWholeAddressOnOneLine() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            String html = receiptFrom('<p>Send to {{OrganizationAddress}}.</p>');
+            Test.stopTest();
+
+            Assert.isTrue(
+                html.contains('Send to 14 Bridge Street, Suite 3, Springfield, IL 62701.'),
+                'Inside a sentence the address is one line: ' + html
+            );
+        }
+    }
+
+    @IsTest
+    static void anOrganizationWithNoAddressPrintsNoAddressBlock() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
+            core.Organization_Street__c = null;
+            core.Organization_Street_2__c = null;
+            core.Organization_City__c = null;
+            core.Organization_State__c = null;
+            core.Organization_Postal_Code__c = null;
+            core.Organization_Country__c = null;
+            upsert core;
+
+            Test.startTest();
+            String html = receiptFrom(BARE_TEMPLATE);
+            Test.stopTest();
+
+            Assert.isFalse(
+                html.contains('class="orgaddress"'),
+                'The address is optional, so a blank one leaves no empty paragraph: ' + html
+            );
+            Assert.isTrue(
+                html.contains('<p class="orgname">Hope For Homes</p>'),
+                'The name still prints: ' + html
             );
         }
     }

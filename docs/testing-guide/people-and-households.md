@@ -90,12 +90,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Households**. | The **Household names and greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How five sample households would read**. |
+| 1 | Open **BarnCRM Settings**, **Households**. | The **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
 | 2 | Change **Household name pattern** to `{LastName} Household`. | The preview updates as you type. |
 | 3 | Select **Save**. | **Saved. New households use these patterns straight away.** |
 | 4 | Select **Update all household names**, then **Yes, recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
 | 5 | Put the pattern back to `The {LastName} Family`, save, and recompute again. | Names return to **The Garcia Family** form. |
 | 6 | As read-only, open the same panel. | **You can see these settings but not change them. Changing them needs the Manage BarnCRM Settings permission.** The patterns cannot be saved. |
+| 7 | As admin, look at the table under **How Five Sample Households Would Read** at normal desktop width. | The whole table fits inside the settings panel: long names and greetings wrap onto more lines, and there is no horizontal scroll bar on the table or the page. |
 
 **Cleanup:** pattern back to `The {LastName} Family`.
 
@@ -138,10 +139,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Households**, switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
-| 2 | Tick **Delete a household once it is empty** and save. | Saved. |
-| 3 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
-| 4 | Untick **Delete a household once it is empty** and save. | Saved. |
+| 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
+| 2 | Switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
+| 3 | Tick **Delete a household once it is empty** and save. | Saved. |
+| 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
+| 5 | Untick **Delete a household once it is empty** and save. | Saved. |
 
 **Cleanup:** delete Dee Testempty.
 

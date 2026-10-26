@@ -87,14 +87,19 @@ private class GivingSetupAssistantExtensionTest {
                 new List<String>{
                     'Organization_Legal_Name__c',
                     'Organization_EIN__c',
-                    'Organization_Address__c',
+                    'Organization_Street__c',
+                    'Organization_Street_2__c',
+                    'Organization_City__c',
+                    'Organization_State__c',
+                    'Organization_Postal_Code__c',
+                    'Organization_Country__c',
                     'Receipt_Signer_Name__c',
                     'Receipt_Signer_Title__c',
                     'Receipt_Logo_Document_Id__c',
                     'Receipt_Signature_Document_Id__c'
                 },
                 fieldKeys(identity),
-                'The seven fields, in the order the step always showed them'
+                'The fields, in the order the step always showed them, the address in six parts'
             );
             System.assertEquals(
                 Label.Giving_SetupAssistant_IdentityDescription,

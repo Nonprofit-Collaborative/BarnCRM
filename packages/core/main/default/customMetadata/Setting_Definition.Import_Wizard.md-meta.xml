@@ -27,6 +27,10 @@
     <value xsi:type="xsd:string">Import</value>
   </values>
   <values>
+    <field>Navigation_Label__c</field>
+    <value xsi:type="xsd:string">Import</value>
+  </values>
+  <values>
     <field>Description__c</field>
     <value xsi:type="xsd:string">Load a spreadsheet of people, households and organizations. BarnCRM suggests what each column means, shows you exactly what would happen before anything is written, and then tells you what did happen, row by row.</value>
   </values>

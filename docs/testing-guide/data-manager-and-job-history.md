@@ -95,7 +95,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Data Manager** and no **Org Optimizer** tab. |
-| 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra permissions**, give the staff user **BarnCRM Find and Export** with **Give permission**, and confirm. | A message says the staff user now has the permission. |
+| 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give permission**, and confirm. | A message says the staff user now has the permission. |
 | 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two cards: **Find and export records** and **Tidy and check your data**. |
 | 4 | Look for **Import mappings**, **Data jobs** and **Salesforce's own tools**. | None of them is shown. |
 | 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third card, **Change many records**, appears, and **Data jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |

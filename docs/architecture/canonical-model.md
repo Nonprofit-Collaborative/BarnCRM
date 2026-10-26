@@ -961,7 +961,14 @@ may add keys, and must add them here first.
 | `Setup_Steps_Skipped__c` | text (255) | empty | The comma separated keys of the Setup Assistant steps the administrator chose to skip for now, so a skipped step moves out of the way without counting as done. |
 | `Setup_Started_At__c` | datetime | empty | When the administrator first changed something in the Setup Assistant, so the completion screen can say how long setup took. |
 | `Organization_Legal_Name__c` | text (255) | empty | The organization's legal name, as it appears on its official filings. Giving prints it on receipts and year-end statements. |
-| `Organization_Address__c` | text (255) | empty | The organization's mailing address as one line, as it is printed on letters and documents. Custom settings have no long text field, so a single 255 character line is the format. |
+| `Organization_Street__c` | text (255) | empty | The street line of the organization's mailing address, as it is printed on letters and documents. |
+| `Organization_Street_2__c` | text (255) | empty | An optional second street line (suite, floor, unit). |
+| `Organization_City__c` | text (40) | empty | The city of the mailing address. |
+| `Organization_State__c` | text (80) | empty | The state or province of the mailing address. |
+| `Organization_Postal_Code__c` | text (20) | empty | The Zip or postal code of the mailing address. |
+| `Organization_Country__c` | text (80) | empty | The optional country of the mailing address. |
+
+**R-OA1 The mailing address is six parts, all or nothing.** The six parts replaced the one-line `Organization_Address__c` on 2026-10-26. The address may be left entirely blank. Once any of the six parts has a value, Street, City, State and Postal Code must all have one (Street 2 and Country stay optional). `SettingsService` refuses a save that would leave the stored address in between, with a message that names what is missing, so the console, the Setup Assistant and any direct call are held to the same rule. Giving receipts and Volunteers letters print the address through one Core helper, `OrganizationAddress`: one line per non-blank part (Street, Street 2, then `City, State Postal Code`, then Country), or the same lines joined with commas for a merge token.
 
 ### v0.2 keys
 
@@ -1002,6 +1009,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
+| `Seasonal_Addresses_Enabled__c` | boolean | false | The Seasonal Addresses switch on the Addresses page. Saving it on schedules the nightly seasonal swap (nothing happens when the job is already scheduled); saving it off stops the job. An install or upgrade with it on schedules a missing job, and an upgrade whose org already runs the job turns it on (C-18, R-AD4). |
 
 The commitment keys (`Installment_Generation_Horizon_Months__c`,
 `Installment_Overdue_Grace_Days__c`, `Auto_Apply_Gifts_To_Installments__c`, and the
@@ -1200,6 +1208,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
 | `Navigation_Target__c` | text (80) | The Lightning tab a module's own settings page lives on, used when the data type is Component and no component is named, because Core cannot import a component from a package that depends on it (Decision ADR-0020). |
+| `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
 | `Description__c` | long text | The plain-language help shown under the control. |
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
@@ -8331,7 +8340,8 @@ message, and so is generating with a template that is not active (an inactive te
 merged, however it was chosen).
 
 **R-VL2 Tokens are a closed set.** `{OrganizationName}` and `{OrganizationAddress}` (Core's
-`Organization_Legal_Name__c` and `Organization_Address__c`), `{PersonName}`, `{FirstName}` (the
+`Organization_Legal_Name__c` and the six address parts, `Organization_Street__c` to
+`Organization_Country__c`, on one line), `{PersonName}`, `{FirstName}` (the
 Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
 hours in the period) and `{Today}`. Every merged value is HTML escaped. An unknown token is left
 as typed, so a typo shows on the proof.
@@ -8687,7 +8697,9 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
+| v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
+| v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 | v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
 
 ---

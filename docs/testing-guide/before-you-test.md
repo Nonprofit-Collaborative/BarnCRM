@@ -53,7 +53,7 @@ Do these in order.
 3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open
    **BarnCRM Settings**, **Access**, find yourself in **Find a person**, choose **BarnCRM
    Admin Group** and select **Give access** (see [Access](../admin-guide/access.md)). That role
-   already carries Find and Export and Bulk Update. Add these under **Extra permissions** only
+   already carries Find and Export and Bulk Update. Add these under **Extra Permissions** only
    while a script needs them, and remove them afterwards:
 
    | Extra permission | Give it for | Remove it |
@@ -213,7 +213,7 @@ duplicates), use one of these:
   Administrator** profile, then give it only the **BarnCRM Admin Group** role on the Access page.
   It holds what a real BarnCRM Admin holds and none of the extra permissions. Give it one extra
   permission at a time when a script needs it.
-- **Your login user, for one script.** On the Access page, under **Extra permissions**, select
+- **Your login user, for one script.** On the Access page, under **Extra Permissions**, select
   **Remove** beside your name for the set you are testing, run the script, then give it back.
   Sets not listed there (BarnCRM Access Manager and the tab sets) are removed in Setup, Users,
   your user, **Permission Set Assignments**, and added back the same way.

@@ -56,7 +56,7 @@ had none).
    screenshot of each section is your backup.
 5. **Stop the scheduled jobs.** A package cannot be removed while one of its jobs is scheduled.
    With Rollup Builder, in the **BarnCRM Rollup Builder** app, click **Stop the nightly
-   recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal address swap**, stop the nightly
+   recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal Address Swap**, stop the nightly
    swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Mirror, on
    **Opportunity mirror**, click **Stop nightly run**. If automation is paused, click **Resume
    automation**.

@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading for the org shape findings.</shortDescription>
-        <value>Your org</value>
+        <value>Your Org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CategorySettings</fullName>
@@ -582,7 +582,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the org shape card.</shortDescription>
-        <value>What we found in your org</value>
+        <value>What We Found in Your Org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrgShapeDetail</fullName>
