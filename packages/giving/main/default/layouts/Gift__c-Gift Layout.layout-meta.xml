@@ -46,6 +46,14 @@
         <behavior>Edit</behavior>
         <field>Appeal__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Commitment__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Installment__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>
@@ -156,6 +164,20 @@
     <fields>Amount__c</fields>
     <fields>Refund_Reason__c</fields>
     <relatedList>Gift__c.Original_Gift__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Type__c</fields>
+    <fields>Honoree_Name__c</fields>
+    <fields>Notification_Sent__c</fields>
+    <relatedList>Tribute__c.Gift__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Channel__c</fields>
+    <fields>Status__c</fields>
+    <fields>Sent_On__c</fields>
+    <relatedList>Acknowledgment__c.Gift__c</relatedList>
   </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>

@@ -51,6 +51,18 @@
         <identifier>RecordField_Appeal</identifier>
       </fieldInstance>
     </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Commitment__c</fieldItem>
+        <identifier>RecordField_Commitment</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Installment__c</fieldItem>
+        <identifier>RecordField_Installment</identifier>
+      </fieldInstance>
+    </itemInstances>
     <name>Facet-gift-column1</name>
     <type>Facet</type>
   </flexiPageRegions>
@@ -534,6 +546,122 @@
         </componentInstanceProperties>
         <componentName>lst:dynamicRelatedList</componentName>
         <identifier>giftRefundsList</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>adminFilters</name>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>maxRecordsToDisplay</name>
+          <value>10</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>parentFieldApiName</name>
+          <value>Gift__c.Id</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListApiName</name>
+          <value>Tributes__r</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListDisplayType</name>
+          <value>ADVGRID</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListFieldAliases</name>
+          <valueList>
+            <valueListItems>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Type__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Honoree_Name__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Notification_Sent__c</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListLabel</name>
+          <value>Tributes</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showActionBar</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldAlias</name>
+          <value>__DEFAULT__</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldOrder</name>
+          <value>Default</value>
+        </componentInstanceProperties>
+        <componentName>lst:dynamicRelatedList</componentName>
+        <identifier>giftTributesList</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>adminFilters</name>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>maxRecordsToDisplay</name>
+          <value>10</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>parentFieldApiName</name>
+          <value>Gift__c.Id</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListApiName</name>
+          <value>Acknowledgments__r</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListDisplayType</name>
+          <value>ADVGRID</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListFieldAliases</name>
+          <valueList>
+            <valueListItems>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Channel__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Sent_On__c</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListLabel</name>
+          <value>Acknowledgments</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showActionBar</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldAlias</name>
+          <value>__DEFAULT__</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldOrder</name>
+          <value>Default</value>
+        </componentInstanceProperties>
+        <componentName>lst:dynamicRelatedList</componentName>
+        <identifier>giftAcknowledgmentsList</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

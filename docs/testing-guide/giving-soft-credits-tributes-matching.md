@@ -72,8 +72,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the gift. Look at the **Tribute** panel. | "This gift was not given in honor of or in memory of anyone." |
-| 2 | From the app launcher open **Tributes**, click **New**. **Gift** the gift above, **Type** `In memory of`, **Honoree Name** `Rosa Testname`, **Notification Recipient Contact** `Harper Garcia`, **Message** `With love from the Tuesday reading group`. Save. | Saved. |
-| 3 | Open the gift again. | **Tribute** field links to the new tribute. Panel: "In memory of Rosa Testname, Notify Harper Garcia", "Not sent yet", the message, and **Mark notification sent**. No amount is shown. |
+| 2 | On the gift's **Tributes** list, click **New**. **Gift** is the gift above; set **Type** `In memory of`, **Honoree Name** `Rosa Testname`, **Notification Recipient Contact** `Harper Garcia`, **Message** `With love from the Tuesday reading group`. Save. | Saved. |
+| 3 | Open the gift again. | The **Tributes** list shows the new tribute. **Tribute** field links to it. Panel: "In memory of Rosa Testname, Notify Harper Garcia", "Not sent yet", the message, and **Mark notification sent**. No amount is shown. |
 | 4 | Click **Mark notification sent**. | The panel says "Notification sent" with today's date; the button is gone. |
 | 5 | Open the tribute. | **Notification Sent** ticked, **Notification Sent Date** today. |
 | 6 | On the **Tributes** tab, open list view **Notifications to Send**. | This tribute is not listed. |
@@ -99,7 +99,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-CRED-07: Link a matching gift
 
 **Purpose:** confirm linking an organization's gift to an employee's gift fills both sides and soft credits the employee.
-**Prerequisites:** staff. Two new Received gifts: one from **Harper Garcia**, `500`, dated last month (the employee's gift), and one from **Founders Consulting Group** (**Donor Account**), `500`, today (the match). **Employer** is not on the packaged pages; leave it empty here.
+**Prerequisites:** staff. Two new Received gifts: one from **Harper Garcia**, `500`, dated last month (the employee's gift), and one from **Founders Consulting Group** (**Donor Account**), `500`, today (the match). Leave **Employer** empty on Harper here.
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -123,7 +123,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Set **Matched Gift** to the T-CRED-07 Founders Consulting Group gift (an organization's gift), save. | Refused: "The gift being matched has to come from a person. Choose the employee's own gift, not another organization's." |
 | 3 | On the Summit Foundation gift, set **Matched Gift** to Harper's gift (already linked). | Refused: "One of these gifts is already linked to a different gift. Unlink it first, then link it here." |
 | 4 | Refund Luis's gift in full (**Refund or Write Off**). Then on the Summit Foundation gift set **Matched Gift** to Luis's gift. | Refused: "A gift that has been refunded or written off cannot be part of a matching gift pair..." |
-| 5 | Set **Employer** on Diego Garcia to **Bayview Hardware** (from a Contacts list view with an Employer column, or Setup). Enter a gift from Diego, then link the Summit Foundation gift to it. | Refused: "That gift is from someone whose employer is a different organization. Check the employer on the person's record, or clear it if you are not sure." |
+| 5 | In the Fundraising app open Diego Garcia, **Edit**, set **Employer** (in the **Person** section) to **Bayview Hardware** and save. Enter a gift from Diego, then link the Summit Foundation gift to it. | Refused: "That gift is from someone whose employer is a different organization. Check the employer on the person's record, or clear it if you are not sure." |
 
 **Cleanup:** clear **Employer** on Diego Garcia.
 
@@ -150,6 +150,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the T-CRED-01 gift. | **Soft credits** lists the credits; **Add credit** is disabled and no **Remove** buttons show. |
 | 2 | Open the second gift from T-CRED-06 (tribute not sent). | The **Tribute** panel shows the summary; no **Mark notification sent** button. |
-| 3 | Open **Tributes** from the app launcher. | No **New** button. |
+| 3 | Open the **Tributes** tab in the Fundraising app. | No **New** button. |
 
 **Cleanup:** none.

@@ -19,6 +19,23 @@ private class GiftServiceTest {
         return gift;
     }
 
+    /**
+     * Gift Date is required, so the new gift form has to start on a date: today, the day a
+     * hand-entered gift almost always arrived (testing guide finding C3).
+     */
+    @IsTest
+    static void aNewGiftStartsDatedToday() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c fresh = (Gift__c) Gift__c.SObjectType.newSObject(null, true);
+
+            System.assertEquals(
+                Date.today(),
+                fresh.Gift_Date__c,
+                'A new gift defaults its Gift Date to today.'
+            );
+        }
+    }
+
     @IsTest
     static void aPartialRefundLeavesTheOriginalReceived() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

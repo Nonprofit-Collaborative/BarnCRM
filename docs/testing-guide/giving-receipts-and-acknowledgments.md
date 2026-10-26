@@ -69,8 +69,9 @@ For every script on this page:
 | 2 | Type `Amount was entered wrongly` and select **Void and reissue**. | Toast **Receipt reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
 | 3 | Read the panel. | Two rows: 000001 with **Status** Void and **Void reason** "Amount was entered wrongly"; 000002 with **Status** Issued. Each row has **View PDF**. |
 | 4 | Open **View PDF** on each row. | Both files open; the first is the original PDF, unchanged. |
-| 5 | As admin, open **Receipts** from the App Launcher and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
+| 5 | As admin, open the **Receipts** tab in the Fundraising app and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
 | 6 | On 000002 select **Edit**, change **Issue Date** to yesterday, select **Save**. | The save is refused: "A receipt cannot be changed once it exists. Void it and issue a new one instead." |
+| 7 | Open the gift's donor from its **Donor Contact** link. | The **Receipts** list shows 000001 (Void) and 000002 (Issued). |
 
 **Cleanup:** None.
 
@@ -84,7 +85,7 @@ For every script on this page:
 | 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt letters and year end statements** select **Open this page**, then the **Year end statements** tab. | **Statement year** shows last year. The runs table, or "No statement run has been started yet." |
 | 2 | Select **Generate**. | Toast **Statements started**: "Year end statements are being generated. Click Refresh to see the run's progress below." |
 | 3 | Select **Refresh** until the run's **Status** stops changing. | One row for last year with **Donors** and **Issued** above zero and **Errors** 0. |
-| 4 | Open **Receipts** from the App Launcher, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
+| 4 | Open the **Receipts** tab in the Fundraising app, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
 | 5 | Open the record's file. | One line per gift in that year; the total at the bottom equals the sum of the lines. |
 | 6 | Back on **Year end statements**, select **Generate** again, then **Refresh** until it finishes. | A second row with **Issued** 0: donors who already hold a statement for the year are skipped. |
 
@@ -97,7 +98,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Receipts page (**Receipt Letters** tab from the App Launcher), **Receipt templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
+| 1 | Open the Receipts page (**Receipt Letters** tab in the Fundraising app), **Receipt templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
 | 2 | Add the sentence `Testing the letter editor.` at the end. Select **Preview**. | A **Preview for a sample gift** section shows the letter filled in for a sample donor, with your sentence and the tax sentences BarnCRM adds. |
 | 3 | Select **Save**. | Toast **Letter saved**: "Your receipt letter has been saved." |
 | 4 | Remove the test sentence and select **Save**. | **Letter saved** again. |
@@ -134,9 +135,9 @@ For every script on this page:
 | 3 | Select **New rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
 | 5 | As staff, enter a gift from **Susan Ortiz** for 7777. Open the gift. | **Acknowledgment Status** is **To acknowledge**. |
-| 6 | Open the **Acknowledgments** page (**Acknowledgment Queue** tab from the App Launcher). | **Emails ready to send** is at least 1. |
+| 6 | Open the **Acknowledgments** page (**Acknowledgment Queue** tab in the Fundraising app). | **Emails ready to send** is at least 1. |
 | 7 | Select **Send emails now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent runs** with **Sent** 1 and **Did not go** 0. |
-| 8 | Open the gift again. Then open **Acknowledgments** from the App Launcher and find the newest record. | The gift's **Acknowledgment Status** is **Acknowledged** with today's **Acknowledgment Date**. The acknowledgment has **Status** Sent, **Recipient Email** `susan.work@example.org`. |
+| 8 | Open the gift again, then the newest row in its **Acknowledgments** list. | The gift's **Acknowledgment Status** is **Acknowledged** with today's **Acknowledgment Date**. The acknowledgment has **Status** Sent, **Recipient Email** `susan.work@example.org`. |
 
 **Cleanup:** On the rules list, **Edit** `Test email` and clear **Active**. Leave the gift (T-RCPT-10 uses Susan Ortiz).
 
@@ -190,6 +191,7 @@ For every script on this page:
 | 6 | Enter a gift from **Valentina Singh** for 50. | **Gift saved**. |
 | 7 | Open **Stewardship Plans** in the Fundraising app, list view **Running Plans**. Open the new plan. | **Plan Template** `First gift welcome`, **Status** Running, **Started Date** today, **Contact** Valentina Singh. Its activity shows two open tasks due tomorrow and in 7 days, assigned to the contact's owner. |
 | 8 | Enter a second gift from Valentina Singh for 50. Reopen **Running Plans**. | Still one plan for her: the same plan does not start twice while running. |
-| 9 | As read-only, open the Stewardship plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New plan** is disabled. |
+| 9 | Open Valentina Singh in the Fundraising app. | Her **Stewardship Plans** list shows the one running plan. |
+| 10 | As read-only, open the Stewardship plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New plan** is disabled. |
 
 **Cleanup:** Set the plan's **Status** to Cancelled (its tasks stay). Select **Turn off** on `First gift welcome`.

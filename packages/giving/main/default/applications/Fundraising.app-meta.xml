@@ -103,7 +103,13 @@
   <tabs>Gift_Batch__c</tabs>
   <tabs>Fund__c</tabs>
   <tabs>Appeal__c</tabs>
+  <tabs>Tribute__c</tabs>
+  <tabs>Receipt__c</tabs>
   <tabs>Stewardship_Plan__c</tabs>
+  <tabs>Acknowledgments</tabs>
+  <tabs>Receipts</tabs>
+  <tabs>Donor_Levels</tabs>
+  <tabs>Stewardship_Plans</tabs>
   <tabs>standard-Dashboard</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
