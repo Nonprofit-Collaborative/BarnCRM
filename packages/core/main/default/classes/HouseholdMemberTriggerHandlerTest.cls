@@ -31,7 +31,12 @@ private class HouseholdMemberTriggerHandlerTest {
     }
 
     private static Account reload() {
-        return [SELECT Name, Member_Count__c FROM Account WHERE Id = :household.Id];
+        return [
+            SELECT Name, Member_Count__c
+            FROM Account
+            WHERE Id = :household.Id
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

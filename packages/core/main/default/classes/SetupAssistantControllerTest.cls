@@ -764,6 +764,7 @@ private class SetupAssistantControllerTest {
             SELECT Organization_Legal_Name__c
             FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+            WITH SYSTEM_MODE
         ];
         return rows.isEmpty() ? null : rows[0].Organization_Legal_Name__c;
     }

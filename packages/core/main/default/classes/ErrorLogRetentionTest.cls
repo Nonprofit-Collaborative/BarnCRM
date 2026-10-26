@@ -40,7 +40,12 @@ private class ErrorLogRetentionTest {
 
     private static Integer remaining() {
         // Only this test's entries, so an entry the run itself logs cannot change the count.
-        return [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Retention test'];
+        return [
+            SELECT COUNT()
+            FROM Error_Log__c
+            WHERE Context__c = 'Retention test'
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

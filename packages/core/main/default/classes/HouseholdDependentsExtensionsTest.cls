@@ -87,6 +87,7 @@ private class HouseholdDependentsExtensionsTest {
                 SELECT COUNT()
                 FROM Error_Log__c
                 WHERE Context__c LIKE 'HouseholdDependentsExtensions.resolve'
+                WITH SYSTEM_MODE
             ],
             'Each unusable class is logged'
         );

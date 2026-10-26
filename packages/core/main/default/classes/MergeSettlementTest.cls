@@ -358,6 +358,7 @@ private class MergeSettlementTest {
             SELECT Message__c, Severity__c
             FROM Error_Log__c
             WHERE Context__c = :Label.Core_Households_ErrorContextMergeSettle
+            WITH SYSTEM_MODE
         ];
     }
 

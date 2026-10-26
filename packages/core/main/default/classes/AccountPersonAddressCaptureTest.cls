@@ -44,6 +44,7 @@ private class AccountPersonAddressCaptureTest {
             SELECT Id, Person_Account__c, Type__c, Is_Default__c, Street__c, City__c, Postal_Code__c
             FROM Address__c
             WHERE Person_Account__c IN :personIds
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate, Id
         ];
     }

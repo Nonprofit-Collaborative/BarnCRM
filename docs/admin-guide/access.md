@@ -47,7 +47,9 @@ Of the roles, only BarnCRM Admin gives Delete on accounts and contacts (a person
 profile may give it too). The other roles leave it out on purpose, and they do not need it for
 merging households: anyone who can edit both households can merge
 them with **Merge or split**, with no Delete permission (see
-[Household merge and split](household-merge-split.md)). Merging two people uses Salesforce's
+[Household merge and split](household-merge-split.md)). The roles do give edit on a contact's
+**Account Name** (the household), so staff can move people between households, and move members
+when they merge households, even on the Minimum Access profile. Merging two people uses Salesforce's
 own **Compare and merge**, which Salesforce allows only to people who can delete them, so
 staff ask an admin for that.
 
