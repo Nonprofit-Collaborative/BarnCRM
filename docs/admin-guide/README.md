@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main as of 2026-10-26 (commit d3eca4de). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 ## Purpose
 
@@ -92,7 +92,7 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM main as of 2026-10-26 (commit d3eca4de). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
