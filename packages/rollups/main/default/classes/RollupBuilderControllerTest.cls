@@ -252,6 +252,7 @@ private class RollupBuilderControllerTest {
             largest.orderByField = 'NumberOfEmployees';
             largest.orderDirection = 'Descending';
             largest.rowLimit = 5;
+            largest.includeDeleted = true;
             RollupBuilderController.SaveResult result;
 
             Test.startTest();
@@ -265,6 +266,7 @@ private class RollupBuilderControllerTest {
             );
             System.Assert.areEqual(5, reread.rowLimit, 'The limit');
             System.Assert.areEqual('Descending', reread.orderDirection, 'And its direction');
+            System.Assert.isTrue(reread.includeDeleted, 'Deleted records included');
             largest.orderDirection = null;
             largest.rowLimit = null;
             largest.active = false; // the saved one fills the same field
@@ -350,6 +352,10 @@ private class RollupBuilderControllerTest {
             limitedUnordered.sourceField = 'NumberOfEmployees';
             limitedUnordered.rowLimit = 3;
             drafts.put(Label.Core_Rollups_ErrorRowLimitNeedsOrder, limitedUnordered);
+
+            RollupBuilderController.Draft emptyCustom = childCount();
+            emptyCustom.delimiter = 'Custom';
+            drafts.put(Label.Core_Rollups_ErrorCustomDelimiterNeeded, emptyCustom);
 
             RollupBuilderController.Draft noDate = childCount();
             noDate.fiscalYearAware = true;

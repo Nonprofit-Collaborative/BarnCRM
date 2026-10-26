@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Delimiter__c</fullName>
-    <description>What separates the values of a text list: a comma and a space, a semicolon and a space, or a line break. Read only by the Text list calculations; blank means Comma.</description>
+    <description>What separates the values of a text list: a comma and a space, a semicolon and a space, a line break, a space, a vertical bar and a space (Pipe), or the Custom Delimiter. Read only by the Text list calculations; blank means Comma.</description>
     <externalId>false</externalId>
-    <inlineHelpText>What goes between the values of a text list. Choose Semicolon or New line when the values themselves contain commas.</inlineHelpText>
+    <inlineHelpText>What goes between the values of a text list. Choose Semicolon, New line or Pipe when the values themselves contain commas, or Custom to type your own.</inlineHelpText>
     <label>Delimiter</label>
     <required>false</required>
     <trackHistory>false</trackHistory>
@@ -26,6 +26,16 @@
                 <fullName>New line</fullName>
                 <default>false</default>
                 <label>New line</label>
+            </value>
+            <value>
+                <fullName>Pipe</fullName>
+                <default>false</default>
+                <label>Pipe</label>
+            </value>
+            <value>
+                <fullName>Custom</fullName>
+                <default>false</default>
+                <label>Custom</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -1473,7 +1473,9 @@ Core (`decisions/0125-rollup-builder-module.md`).
 | Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST and when a Row Limit is set. For a text list, optional: the order the values are listed in. |
 | Order Direction | picklist(Ascending, Descending) | no (defaults Ascending) | The direction of the Order By Attribute for a text list and a row limited aggregate (R-R15); FIRST and LAST ignore it. |
 | Row Limit | integer | no | Only the first N matching records, in the order of the Order By Attribute, are calculated (R-R15); for SUM, AVG, MIN, MAX and the text lists. Blank means every record. |
-| Delimiter | picklist(Comma, Semicolon, New line) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Delimiter | picklist(Comma, Semicolon, New line, Pipe, Custom) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Custom Delimiter | text(10) | conditional | The characters between the values when Delimiter is Custom; required then (R-R10). |
+| Include Deleted | boolean | yes (defaults false) | Whether source records in the Recycle Bin and archived activities count (R-R15). |
 | Target Attribute | text | yes | The attribute on the target entity that receives the result; its type must suit the aggregate (R-R15). |
 | Filter | long text | no | Which source records count, held as a filter document (see R-R2); empty means all of them. |
 | Target Filter | long text | no | Which target records this definition maintains, held in the same filter format; empty means all of them. |
@@ -1657,8 +1659,8 @@ problem in plain language. The checks sit in two places:
 
 - **Every save** (the "Check rollups before saving" automation) refuses a target attribute
   whose type does not suit the aggregate (R-R15), a COUNT_DISTINCT or text list with no
-  Source Attribute, and a Row Limit below 1, on an aggregate that does not take one, or with no
-  Order By Attribute. It leaves an entity or attribute the org does not have to the planner, so
+  Source Attribute, a Row Limit below 1, on an aggregate that does not take one, or with no
+  Order By Attribute, and a Custom Delimiter left empty when Delimiter is Custom. It leaves an entity or attribute the org does not have to the planner, so
   a definition for a module that is not installed can still be saved.
 - **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
   target entity or attribute the org does not have, or that the administrator saving it
@@ -1769,8 +1771,21 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   query cannot limit rows per target, so a row limited aggregate reads the matching rows, as
   a text list does, and keeps the first N per target record.
 - **Delimiter.** Comma joins with a comma and a space, Semicolon with a semicolon and a space,
-  New line with a line break. A value that contains the delimiter is written as it is, not
-  escaped, so a list of names that contain commas reads best with Semicolon or New line.
+  New line with a line break, Pipe with a space, a vertical bar and a space (` | `), and Custom
+  with the Custom Delimiter exactly as stored (up to 10 characters; a Custom Delimiter found
+  empty at run time joins with Comma). A value that contains the delimiter is written as it
+  is, not escaped, so a list of names that contain commas reads best with Semicolon, New line
+  or Pipe.
+- **Include Deleted (ADR-0136).** When true, every source query of the definition reads with
+  ALL ROWS, so records in the Recycle Bin and archived tasks and events count as if they were
+  not deleted or archived. It stays exact under recompute (R-R9): every calculation reads the
+  same rows. Two limits: a deleted record counts only until it is purged from the Recycle Bin
+  (emptied, or removed after the platform's retention period), and a purge fires no trigger,
+  so the total keeps it until the next full recalculation; and a delete marks the target as
+  usual (R-R11), but the recalculation still finds the deleted record, so the total does not
+  drop. A target whose source rows are read in chunks by the large parent route (R-RQ6) cannot
+  read deleted rows that way: the definition is left out of that record's write and the Error
+  Log says why, so the total is never written without them.
 - **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
   list is written as its plain value (`1250.00`, `2026-03-01`, `true`; a datetime in UTC as
   `2026-03-01 14:05`), not converted between currencies.
@@ -1796,7 +1811,9 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Target Entity | `Target_Object__c` | Text |
 | Relationship Path | `Relationship_Path__c` | Text |
 | Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT (labels Sum, Count, Minimum, Maximum, First, Last, Average, Count distinct, Any, None, Text list, Text list, each value once) |
-| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line (default Comma) |
+| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line, Pipe, Custom (default Comma) |
+| Custom Delimiter | `Custom_Delimiter__c` | Text (10) |
+| Include Deleted | `Include_Deleted__c` | Checkbox (default false) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |
 | Order Direction | `Order_Direction__c` | Picklist: Ascending, Descending (default Ascending) |
@@ -1816,7 +1833,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
-  target, the source attribute, the Order By Attribute or the Row Limit, so switching a definition on or off never re-checks it. It
+  target, the source attribute, the Order By Attribute, the Row Limit or the delimiters, so switching a definition on or off never re-checks it. It
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
@@ -8698,6 +8715,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Rollup Builder parity: row limit and order direction (ADR-0136). `Rollup_Definition__c` gains `Row_Limit__c` (only the first N records, for SUM, AVG, MIN, MAX and the text lists; needs an Order By Attribute) and `Order_Direction__c` (Ascending, Descending, for text lists and row limited aggregates), both with field history. R-R15 says how they combine with FIRST and LAST (not at all: FIRST stays lowest, LAST highest) and that blanks come last in either direction; R-R10 adds the row limit to the every-save check. A blank direction or limit calculates as before. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: delimiters and deleted records (ADR-0136). `Rollup_Definition__c.Delimiter__c` gains Pipe and Custom; new `Custom_Delimiter__c` (text, 10), required when Custom (R-R10), and `Include_Deleted__c` (checkbox, default false, field history on), which reads source records with ALL ROWS so Recycle Bin records and archived activities count. R-R15 says a deleted record counts until it is purged, that a delete does not remove it, and that the large parent route leaves such a definition out rather than write it without them. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
 
 ---
 ## 32. Entity ownership by package

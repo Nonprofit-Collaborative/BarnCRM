@@ -199,3 +199,31 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | In **Calculation**, choose **First**. | **Which record comes first, by** appears; **Only the first N records** and **Order** do not. |
 | 3 | Click **Cancel**. Start a new rollup on **Account** and **Test Children Count** (from T-RB-02), **Contact, by Account ID**, and go to step 3. Choose **Count**. | **Only the first N records** and **Order** do not appear. |
 | 4 | Click **Cancel**. | Nothing is saved. |
+
+## T-RB-14: Pipe and Custom Separators
+
+**Purpose:** confirm a text list can be separated by a pipe or by characters you type (ADR-0136).
+**Prerequisites:** admin user; sample data loaded; the **Test Names** field from T-RB-12.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Start a new rollup on **Account**, **Test Names**, **Contact, by Account ID**, and go to step 3. Choose **Text list** and, in **Field to calculate**, **First Name**. | **Separate the values with** appears. |
+| 2 | In **Separate the values with**, choose **Pipe**. Click **Next** twice and, in **See it on a record**, pick **The Garcia Family**. | "Calculated: Diego \| Harper \| Luis. On the record now: (empty)." |
+| 3 | Click **Back** twice. In **Separate the values with**, choose **Custom**. | A **Custom delimiter** box appears. |
+| 4 | Leave **Custom delimiter** empty and click **Next**. | The step does not move on and says "Type the characters that go between the values in Custom delimiter, or choose another delimiter." |
+| 5 | In **Custom delimiter**, type `/`. Click **Next** twice and pick **The Garcia Family**. | "Calculated: Diego/Harper/Luis. On the record now: (empty)." |
+| 6 | Click **Cancel**. | Nothing is saved. |
+
+## T-RB-15: Include Deleted and Archived Records
+
+**Purpose:** confirm a rollup counts a deleted record only when it includes deleted records (ADR-0136).
+**Prerequisites:** admin user; sample data loaded; the **Test Names** field from T-RB-12. Create a contact, First Name **Zed**, Last Name **Garcia**, Account **The Garcia Family**, then delete it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Start a new rollup on **Account**, **Test Names**, **Contact, by Account ID**, go to step 3, choose **Text list** and **First Name**, and click **Next**. | The heading reads **Which records count?** An unticked **Include deleted and archived records** box sits under the conditions. |
+| 2 | Click **Next** and pick **The Garcia Family** in **See it on a record**. | "Calculated: Diego, Harper, Luis. On the record now: (empty)." Zed is not counted. |
+| 3 | Click **Back**, tick **Include deleted and archived records**, click **Next** and pick **The Garcia Family** again. | "Calculated: Diego, Harper, Luis, Zed. On the record now: (empty)." |
+| 4 | Click **Cancel**. | Nothing is saved. |
+
+**Cleanup:** delete Zed Garcia from the Recycle Bin.

@@ -51,8 +51,12 @@ public with sharing class RollupPlanner {
     private static final Map<String, String> SEPARATOR_BY_DELIMITER = new Map<String, String>{
         'Comma' => ', ',
         'Semicolon' => '; ',
-        'New line' => '\n'
+        'New line' => '\n',
+        'Pipe' => ' | '
     };
+
+    /** The `Delimiter__c` value whose separator is the Custom Delimiter (ADR-0136). */
+    public static final String CUSTOM_DELIMITER = 'Custom';
 
     /** Aggregates that read no attribute of the source rows: the filter is the whole question. */
     private static final Set<String> READS_NO_FIELD = new Set<String>{ 'COUNT', 'ANY', 'NONE' };
@@ -121,6 +125,8 @@ public with sharing class RollupPlanner {
         /** For an ordered query: the attribute that orders the rows, and the direction. */
         public String orderBy;
         public Boolean descending = false;
+        /** True to read Recycle Bin rows and archived activities too (ALL ROWS, ADR-0136). */
+        public Boolean includeDeleted = false;
         public List<Measure> measures = new List<Measure>();
     }
 
@@ -175,6 +181,28 @@ public with sharing class RollupPlanner {
     }
 
     /**
+     * What separates the values of this definition's text list: the Custom Delimiter exactly as
+     * stored when Delimiter is Custom (Comma if it is empty), otherwise as above.
+     */
+    public static String separatorOf(Rollup_Definition__c definition) {
+        if (
+            definition.Delimiter__c == CUSTOM_DELIMITER &&
+            definition.isSet(Rollup_Definition__c.Custom_Delimiter__c) &&
+            String.isNotEmpty(definition.Custom_Delimiter__c)
+        ) {
+            return definition.Custom_Delimiter__c;
+        }
+        return separatorFor(definition.Delimiter__c);
+    }
+
+    /** Why this delimiter cannot be saved (R-R10): Custom with nothing to write. */
+    public static String delimiterProblem(String delimiter, String customDelimiter) {
+        return delimiter == CUSTOM_DELIMITER && String.isEmpty(customDelimiter)
+            ? System.Label.Core_Rollups_ErrorCustomDelimiterNeeded
+            : null;
+    }
+
+    /**
      * Why this aggregate cannot fill a target attribute of this type, in words an administrator
      * reads, or null when it can (canonical model R-R15).
      *
@@ -222,13 +250,19 @@ public with sharing class RollupPlanner {
      * @return the message to show, or null when the save may go ahead
      */
     public static String saveProblem(Rollup_Definition__c definition) {
-        String limitProblem = rowLimitProblem(
+        String optionProblem = rowLimitProblem(
             definition.Aggregate__c,
             rowLimitOf(definition),
             definition.Order_By_Field__c
         );
-        if (limitProblem != null) {
-            return limitProblem;
+        if (optionProblem == null) {
+            optionProblem = delimiterProblem(
+                definition.Delimiter__c,
+                definition.Custom_Delimiter__c
+            );
+        }
+        if (optionProblem != null) {
+            return optionProblem;
         }
         Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
         if (targetType == null || String.isBlank(definition.Target_Field__c)) {
@@ -390,6 +424,10 @@ public with sharing class RollupPlanner {
             // FIRST is the lowest and LAST the highest whatever the direction (R-R15), so a
             // saved definition means what it always meant.
             query.descending = kind == KIND_LISTED ? isDescending(definition) : aggregate == 'LAST';
+            // Read only when the caller queried it, so such a caller calculates as before.
+            query.includeDeleted =
+                definition.isSet(Rollup_Definition__c.Include_Deleted__c) &&
+                definition.Include_Deleted__c == true;
             Measure measure = new Measure();
             measure.aggregate = aggregate;
             measure.field = field;
@@ -483,7 +521,8 @@ public with sharing class RollupPlanner {
                     query.whereClause,
                     query.kind,
                     String.valueOf(query.orderBy),
-                    String.valueOf(query.descending)
+                    String.valueOf(query.descending),
+                    String.valueOf(query.includeDeleted)
                 },
                 '|'
             )
