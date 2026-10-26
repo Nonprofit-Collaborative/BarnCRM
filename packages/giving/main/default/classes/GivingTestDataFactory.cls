@@ -29,6 +29,26 @@ public class GivingTestDataFactory {
     }
 
     /**
+     * Cancels the Giving jobs the org already has scheduled (the three nightly jobs and the
+     * acknowledgment send). Scheduled jobs are visible to tests, so a test that counts them or
+     * expects none starts by clearing the ones an administrator switched on.
+     */
+    @NamespaceAccessible
+    public static void clearOrgGivingJobs() {
+        for (CronTrigger job : [
+            SELECT Id
+            FROM CronTrigger
+            WHERE
+                CronJobDetail.Name LIKE 'BarnCRM Giving%'
+                OR CronJobDetail.Name = :AcknowledgmentScheduler.JOB_NAME
+            WITH SYSTEM_MODE
+        ]) {
+            System.abortJob(job.Id);
+        }
+        ScheduledJobSelector.forget();
+    }
+
+    /**
      * The default fund, inserted only if the org has no active default fund yet. A gift saves
      * only when there is a default fund to allocate it to, so any test that inserts gifts
      * without choosing funds itself calls this first.

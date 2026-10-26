@@ -16,6 +16,14 @@ private class MirrorNightlyJobProviderTest {
         upsert settings;
     }
 
+    /** The org's own mirror job, if an administrator scheduled it, would be counted otherwise. */
+    private static void clearOrgMirrorJob() {
+        TestDataFactory.clearScheduledJobs(
+            new List<String>{ OpportunityMirrorSchedulable.JOB_NAME }
+        );
+        ScheduledJobSelector.forget();
+    }
+
     private static Integer mirrorTriggerCount() {
         return [
             SELECT COUNT()
@@ -46,6 +54,7 @@ private class MirrorNightlyJobProviderTest {
     @IsTest
     static void listsTheMirrorRunOnceADirectionIsChosen() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            clearOrgMirrorJob();
             if (!OpportunityMirrorService.isAvailable()) {
                 // No Opportunity in this org: the provider must skip, and says so by listing nothing.
                 choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
@@ -65,6 +74,7 @@ private class MirrorNightlyJobProviderTest {
     @IsTest
     static void schedulingTwiceLeavesOneJobAndItCountsAsScheduled() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            clearOrgMirrorJob();
             if (!OpportunityMirrorService.isAvailable()) {
                 return;
             }
