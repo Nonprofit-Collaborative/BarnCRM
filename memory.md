@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-25 (through D-115; open questions 28 and 29 resolved by D-114 and D-115).
+Last refreshed from BMemory 2026-10-25 (through D-116; open questions 28 and 29 resolved by D-114 and D-115).
 
 ## Decision log (plan Section 12)
 
@@ -123,6 +123,7 @@ Last refreshed from BMemory 2026-10-25 (through D-115; open questions 28 and 29 
 | D-113 | 2026-10-25 | Related-record duplicate matching in Core, steps 1 to 3 (Brandon; C-44; plan Section 4.9): configurable match sources (object, field, parent link, normalization); shipped sources for the three Contact Point objects and `Address__c`, active only when the object exists (dynamic SOQL); the duplicate scan adds pairs to the review list with a reason naming the source, and import matching uses the same sources. Not included: a save-time warning. Reason: Salesforce duplicate and matching rules cannot see related objects |
 | D-114 | 2026-10-25 | Erasing a person also empties Rejection Reason on their volunteer hours (Brandon; closes Section 11.2 item 28) |
 | D-115 | 2026-10-25 | Erasing a person keeps deleting the generated volunteer hour letters and certificates, as D-108 says; no behaviour change (Brandon; closes Section 11.2 item 29) |
+| D-116 | 2026-10-25 | Documentation upkeep is a standing rule: Overview, Admin Guide, User Guide and Testing Guide updated in the same PR as any feature change; each index has an "Applies to" line naming a main commit (Brandon; Sections 7.4 and 9.4) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
