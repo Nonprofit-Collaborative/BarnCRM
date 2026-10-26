@@ -48,11 +48,11 @@ private class RollupPartialSaveTest {
     }
 
     private static List<Gift__c> gifts() {
-        return [SELECT Id, Amount__c FROM Gift__c ORDER BY Amount__c DESC];
+        return [SELECT Id, Amount__c FROM Gift__c WITH SYSTEM_MODE ORDER BY Amount__c DESC];
     }
 
     private static Id defaultFundId() {
-        return [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1].Id;
+        return [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE WITH SYSTEM_MODE LIMIT 1].Id;
     }
 
     private static Integer refusedCount(List<Database.SaveResult> results) {
@@ -72,7 +72,12 @@ private class RollupPartialSaveTest {
     }
 
     private static Integer pendingEntries() {
-        return [SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_PENDING];
+        return [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :RollupQueue.STATUS_PENDING
+            WITH SYSTEM_MODE
+        ];
     }
 
     private static void assertTotals(Decimal total, Integer count) {

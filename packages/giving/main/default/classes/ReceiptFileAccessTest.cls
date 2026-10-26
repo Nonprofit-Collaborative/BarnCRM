@@ -296,6 +296,7 @@ private class ReceiptFileAccessTest {
             SELECT Id, Content_Document_Id__c, Donor_Account__c
             FROM Receipt__c
             WHERE Type__c = :ReceiptNumberSequence.TYPE_STATEMENT AND Status__c = 'Issued'
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(1, issued.size(), 'The run issued the one statement this test reads.');
         Assert.isNotNull(

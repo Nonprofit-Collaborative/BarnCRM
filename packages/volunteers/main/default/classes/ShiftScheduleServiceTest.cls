@@ -45,12 +45,18 @@ private class ShiftScheduleServiceTest {
             SELECT Id, Name, Start_Time__c, End_Time__c, Status__c, Volunteers_Needed__c
             FROM Volunteer_Shift__c
             WHERE Shift_Schedule__c = :scheduleId
+            WITH SYSTEM_MODE
             ORDER BY Start_Time__c
         ];
     }
 
     private static Date createdThrough(Id scheduleId) {
-        return [SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :scheduleId]
+        return [
+            SELECT Created_Through__c
+            FROM Shift_Schedule__c
+            WHERE Id = :scheduleId
+            WITH SYSTEM_MODE
+        ]
         .Created_Through__c;
     }
 

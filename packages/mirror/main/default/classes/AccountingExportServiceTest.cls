@@ -582,7 +582,7 @@ private class AccountingExportServiceTest {
         }
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM Gift__c WHERE Accounting_Posted_At__c != NULL],
+            [SELECT COUNT() FROM Gift__c WHERE Accounting_Posted_At__c != NULL WITH SYSTEM_MODE],
             'Nothing marked'
         );
         return refusal;

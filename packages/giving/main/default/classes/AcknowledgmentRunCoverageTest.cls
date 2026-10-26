@@ -75,6 +75,7 @@ private class AcknowledgmentRunCoverageTest {
                 Merge_File_Document_Id__c
             FROM Acknowledgment_Run__c
             WHERE Id = :runId
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -49,7 +49,12 @@ private class RollupModuleSwitchTest {
     }
 
     private static Integer pending() {
-        return [SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_PENDING];
+        return [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :RollupQueue.STATUS_PENDING
+            WITH SYSTEM_MODE
+        ];
     }
 
     /**
@@ -70,6 +75,7 @@ private class RollupModuleSwitchTest {
             SELECT Message__c
             FROM Error_Log__c
             WHERE Severity__c = :ErrorLogger.SEVERITY_INFO
+            WITH SYSTEM_MODE
         ]) {
             if (entry.Message__c == message) {
                 count++;

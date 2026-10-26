@@ -39,6 +39,7 @@ public class GivingTestDataFactory {
             SELECT Id, Name, Active__c, Is_Default__c
             FROM Fund__c
             WHERE Is_Default__c = TRUE AND Active__c = TRUE
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
         return existing.isEmpty() ? insertDefaultFund() : existing[0];
@@ -184,6 +185,7 @@ public class GivingTestDataFactory {
         for (Error_Log__c entry : [
             SELECT Context__c, Message__c, Technical_Detail__c
             FROM Error_Log__c
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate
             LIMIT 20
         ]) {

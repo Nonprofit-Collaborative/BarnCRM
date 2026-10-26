@@ -24,6 +24,7 @@ private class VolunteerSignupServiceTest {
         return [
             SELECT Id, Name, Volunteer_Job__c, Start_Time__c, End_Time__c
             FROM Volunteer_Shift__c
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }

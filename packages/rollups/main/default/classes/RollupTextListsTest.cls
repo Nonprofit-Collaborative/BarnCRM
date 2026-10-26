@@ -98,6 +98,7 @@ private class RollupTextListsTest {
                 SELECT Id, NumberOfEmployees, Description, Preferred_Name__c, Sample_Data_Key__c
                 FROM Account
                 WHERE Id IN :organizations
+                WITH SYSTEM_MODE
             ]
         );
     }

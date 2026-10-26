@@ -14,6 +14,7 @@ private class MirrorPostInstallTest {
             SELECT Id, Enabled__c
             FROM Automation_Setting__c
             WHERE Automation_Name__c = :CampaignSyncService.AUTOMATION_NAME
+            WITH SYSTEM_MODE
         ];
     }
 

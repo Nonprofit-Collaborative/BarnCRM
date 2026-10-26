@@ -41,6 +41,7 @@ private class AcknowledgmentSendTest {
                 Donor_Account__r.Primary_Contact__c
             FROM Gift__c
             WHERE Id IN :giftIds
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -31,7 +31,7 @@ private class DonationMatcherTest {
         );
         insert pledge;
         // The schedule the pledge generates is replaced by the payments the test names.
-        delete [SELECT Id FROM Installment__c WHERE Commitment__c = :pledge.Id];
+        delete [SELECT Id FROM Installment__c WHERE Commitment__c = :pledge.Id WITH SYSTEM_MODE];
         List<Installment__c> payments = new List<Installment__c>();
         Integer sequence = 1;
         for (Integer day : dueDays.keySet()) {
@@ -50,6 +50,7 @@ private class DonationMatcherTest {
             SELECT Id, Name, Due_Date__c, Commitment__c
             FROM Installment__c
             WHERE Id IN :payments
+            WITH SYSTEM_MODE
             ORDER BY Due_Date__c
         ];
     }

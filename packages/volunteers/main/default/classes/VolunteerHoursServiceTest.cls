@@ -29,6 +29,7 @@ private class VolunteerHoursServiceTest {
             SELECT Id, Status__c, Approved_By__c, Approved_Date__c, Rejection_Reason__c, Hours__c
             FROM Volunteer_Hours__c
             WHERE Id = :hoursId
+            WITH SYSTEM_MODE
         ];
     }
 

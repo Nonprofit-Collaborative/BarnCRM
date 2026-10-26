@@ -40,6 +40,7 @@ private class PledgeBalanceTest {
             SELECT Status__c, Expected_Total__c, Paid_To_Date__c, Balance__c
             FROM Commitment__c
             WHERE Id = :pledgeId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -48,6 +49,7 @@ private class PledgeBalanceTest {
             SELECT Id, Status__c, Paid_Amount__c
             FROM Installment__c
             WHERE Commitment__c = :pledgeId
+            WITH SYSTEM_MODE
             ORDER BY Sequence__c
             LIMIT 1
         ];

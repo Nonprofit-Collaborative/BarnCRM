@@ -28,6 +28,7 @@ private class ReceiptRendererFactoryTest {
             SELECT Receipt_Renderer__c
             FROM Giving_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+            WITH SYSTEM_MODE
             LIMIT 1
         ]
         .Receipt_Renderer__c;
