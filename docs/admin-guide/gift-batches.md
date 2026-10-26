@@ -45,9 +45,9 @@ Do this as David, with the Tuesday mail: three checks and a deposit slip that sa
 3. The batch opens. Under the batch details is the **Lines** card, with **Control total
    350.00**, **Entered 0.00**, and a line saying the lines add up to 350.00 less than the
    control total.
-4. Click **Add line**. Leave the donor type on **Person**, search for `Garcia` and pick Ana
+4. Click **Add line**. Leave the donor type on **Person**, search for `Garcia` and pick Harper
    Garcia. Type `100` in **Amount** and `1042` in **Check number**.
-5. Click **Add line** again. Choose **Organization**, pick Riverside Foundation, type
+5. Click **Add line** again. Choose **Organization**, pick The Summit Foundation, type
    `200`, and in **Fund** pick Building Fund, because their letter says so. This one line
    now goes to the Building Fund; the others still follow the batch.
 6. Add a third line: a person, `25`. The status line now says they add up to 25.00 less.

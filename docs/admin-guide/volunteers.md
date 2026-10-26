@@ -591,7 +591,7 @@ repeat; the hours still count toward the job.
 2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
 3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
 4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
-   **rejected** and named in the table with the reason; select **Download exceptions**, correct
+   **rejected** and named in the table with the reason; select **Download rejected rows**, correct
    those rows in your spreadsheet and import them again. An email shared by several people is
    handled by the **Several matches** choice (**Reject the row** unless you change it).
 5. Select **Import**. Open **Volunteer Hours** to see the new entries.

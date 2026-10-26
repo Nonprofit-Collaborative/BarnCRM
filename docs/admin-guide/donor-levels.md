@@ -35,14 +35,14 @@ Everything is in the app. You never open Setup.
    rungs; four or five is usual.
 5. Back in **BarnCRM Settings**, then **Giving**, set **Donor level source**. This is
    the total your ladder is measured on:
-   - **Total giving**, everything the donor has ever given. This is the default and the
-     safe choice: it never resets.
-   - **Giving this year**, the current fiscal year only. Choose this for an annual
+   - **Total giving, everything ever given**, everything the donor has ever given. This is
+     the default and the safe choice: it never resets.
+   - **Giving this fiscal year**, the current fiscal year only. Choose this for an annual
      society, and know that on the first day of your new fiscal year every donor starts
      again from nothing, which is what an annual society means.
-   - **Giving last year**, the fiscal year before this one.
-   - **Largest gift**, the single biggest gift the donor has given, for a ladder built on
-     one gift rather than on a total.
+   - **Giving last fiscal year**, the fiscal year before this one.
+   - **Largest single gift**, the single biggest gift the donor has given, for a ladder
+     built on one gift rather than on a total.
 6. Turn **Donor levels** on in the same section.
 7. Back on the **Donor levels** page, choose **Recalculate now**. Levels are assigned to
    everyone who already has giving. The page then shows how many donors are on each rung
@@ -63,7 +63,7 @@ Start with the sample data loaded (BarnCRM Settings, then Sample data).
 4. Choose **New level** once more. Name it `Leadership Circle`, minimum `5000`, leave
    maximum empty. Save. You now have three rungs and the page lists them lowest first.
 5. Go back to **Giving** and turn **Donor levels** on. Leave the source as **Total
-   giving**.
+   giving, everything ever given**.
 6. Open **Donor levels** again and choose **Recalculate now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
 7. Use **Quick gift entry** to enter a gift of 1200 from one of the sample households.
@@ -74,7 +74,7 @@ Start with the sample data loaded (BarnCRM Settings, then Sample data).
    5700, **Donor level** now reads `Leadership Circle`, **Previous donor level** reads
    `Sustainer`, and **Donor level changed** is today. That is the movement David wants to
    see.
-9. Refund the 4500 gift (open the gift, then **Refund**, full amount). Open the household
+9. Refund the 4500 gift (open the gift, then **Refund or Write Off**, full amount). Open the household
    once more. Total giving is back to 1200, **Donor level** reads `Sustainer` again, and
    **Previous donor level** reads `Leadership Circle`. The level always matches the total
    on the record, and the record still shows where the donor came from.
@@ -111,10 +111,10 @@ that name from every donor's current and previous level, and there is no undo. T
 rung, clear its **active** box instead: donors already on it keep the name, and nobody new
 is assigned to it.
 
-**Choosing "Giving this year" and being surprised in July.** A fiscal year source empties
+**Choosing "Giving this fiscal year" and being surprised in July.** A fiscal year source empties
 everybody's level on the first day of the new fiscal year, because nobody has given
 anything in it yet. That is correct for an annual society and startling if you did not
-mean it. If you want a ladder that never resets, the source is **Total giving**.
+mean it. If you want a ladder that never resets, the source is **Total giving, everything ever given**.
 
 **Wanting a window we do not offer, such as the last twelve months.** A level can only be
 measured on a total BarnCRM already keeps. If you need a different window, add the

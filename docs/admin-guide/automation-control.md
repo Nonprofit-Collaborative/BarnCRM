@@ -18,19 +18,6 @@ listed here, so you can find them and
 read what they do, but their switch is off, greyed out, and carries a line explaining that
 the automation always runs. See "Automations that always run" below.
 
-## What you will see in v0.1
-
-This page describes the finished feature. Two parts of it arrive with the next pieces of
-v0.1, and until they do the walkthrough below cannot be completed end to end:
-
-- The BarnCRM app, its home page, and the BarnCRM Settings console are built by
-  feature C-03. Until then there is no page to put automation control on.
-- The list of automations is empty, because the first automations (creating households,
-  naming them) arrive with feature C-01. Until then the page says so rather than listing
-  anything, and the pause button works on nothing.
-
-The pause itself, the switches, the banner and the audit trail are all built and tested.
-
 ## How to turn it on
 
 Automation control is on as soon as BarnCRM is installed. There is nothing to enable
@@ -71,10 +58,9 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
    a pause lasts" below).
-7. Now switch off a single automation instead. Find **Household naming** in the list and
-   click its switch to **Off**. Only that one stops running. Everything else carries on.
-   (In v0.1 the list is empty until feature C-01 adds the first automations, so there is
-   nothing to switch yet.)
+7. Now switch off a single automation instead. Find **Household upkeep when a person
+   changes** in the list and click its switch to **Off**. Only that one stops running.
+   Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
    and what the value was before, so you can always see who changed what.
 

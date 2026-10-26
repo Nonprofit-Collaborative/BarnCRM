@@ -97,7 +97,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 ## T-SA-06: Finish, reopen and start again
 
 **Purpose:** confirm the completion screen, the Setup complete tile, Reopen setup and Start setup again.
-**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: go back to any step marked **To do** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
+**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: go back to any step marked **To do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
 
 | Step | Action | Expected result |
 |---|---|---|

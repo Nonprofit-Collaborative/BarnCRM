@@ -97,7 +97,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
 6. Select **Preview**. Nothing is written. When it finishes you see four counts, "would
    create", "would update", "would match and change nothing", and "would be rejected",
    and a table of the rejected rows with the reason for each one (the first 200; when there
-   are more, the screen says how many it shows). Select **Download exceptions** to get every
+   are more, the screen says how many it shows). Select **Download rejected rows** to get every
    rejected row back as a CSV you can fix in your spreadsheet, up to 100,000 rows in one
    download. The file opens cleanly in Excel: accented names keep their accents, and a value
    that starts with =, +, - or @ gets a leading apostrophe so the spreadsheet never runs it
@@ -646,7 +646,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    **Leave it empty** and load the rest of the row. When a lookup, an update by a field you
    choose, or an upsert finds more than one record, the **When more than one record matches**
    choice applies, as in section 8.
-6. Select **Dry run**, read the results, and commit. After the import, **Download results**
+6. Select **Preview**, read the results, and commit. After the import, **Download results**
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
 
@@ -731,7 +731,7 @@ Records** permission (see [Bulk delete](bulk-delete.md), section 2) as well as i
 and the object must be one a bulk delete may delete. Map the ID column to **Salesforce record
 ID**; every other column is ignored, and it loads no related records.
 
-1. Select **Dry run**. Nothing is deleted. A row is **Matched** (would be deleted) when its ID
+1. Select **Preview**. Nothing is deleted. A row is **Matched** (would be deleted) when its ID
    names a record of the object that you can see; a row whose ID is wrong, of another object,
    repeats an earlier row, or names a record you cannot see is rejected.
 2. Instead of **Commit**, the results show the **Bulk delete** panel. Press **Preview**: it says
@@ -823,7 +823,7 @@ file of the same kind is fixed too.
 
 3. The panel shows the first values of the column before and after your changes. Select
    **Done**. The column shows how many changes it has.
-4. Select **Dry run**. The results show, for the first rows of the file, each changed value
+4. Select **Preview**. The results show, for the first rows of the file, each changed value
    before and after, under **Changed values**. Matching uses the changed values, so a person's
    email made lower case is matched as lower case.
 
