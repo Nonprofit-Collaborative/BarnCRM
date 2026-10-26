@@ -15,8 +15,9 @@ and the section of this page that depends on it says so at the top (see "When a 
 needs a change in Setup" below).
 
 A module with an app of its own can also show its settings there, on their own: the
-**Rollup Settings** tab of the **BarnCRM Rollup Builder** app is this page showing only the
-Rollups settings. They are the same settings, so a change in either place shows in both.
+**Volunteer Settings** tab is this page showing only the Volunteers settings. They are the
+same settings, so a change in either place shows in both. The Rollup Builder module has no
+settings tab: its settings are in the **Rollups** section of this page.
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.
@@ -140,8 +141,8 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
 - A module that is not installed shows **Not installed** with **Install**, which opens
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
-  Rollup Builder and Volunteers have a Settings tab in their app, and their settings live
-  there; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  Volunteers has a Settings tab in its app, and the Rollup Builder's settings are in the
+  **Rollups** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
