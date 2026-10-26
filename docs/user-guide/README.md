@@ -14,7 +14,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Getting started
 
-- [Getting around BarnCRM](getting-around.md): the apps, tabs, BarnCRM Home, What's new, in-app tips and notifications.
+- [Getting around BarnCRM](getting-around.md): the apps, tabs, Home, What's new, in-app tips and notifications.
 - [Read only access](read-only-access.md): what a person with the Read Only role can and cannot do.
 
 ### People and households

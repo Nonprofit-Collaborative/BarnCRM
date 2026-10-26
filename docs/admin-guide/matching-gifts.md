@@ -20,7 +20,7 @@ received.
 
 Nothing to turn on. Linking is available on every gift.
 
-You link a match by opening the company's gift and setting **Matched gift** to the
+You link a match by opening the company's gift and setting **Matched Gift** to the
 employee's gift. BarnCRM fills in the other side of the link for you, so the employee's
 gift shows the match too, and it refuses a link that cannot be right.
 
@@ -39,11 +39,11 @@ organization Founders Consulting Group.
    **500**, dated last month, status **Received**. Save. This is the employee's gift.
 3. Press **New** again. Enter a gift from **Founders Consulting Group** for **500**, dated
    today, status **Received**. Save. This is the employer's match.
-4. On the employer's gift, set **Matched gift** to Harper's gift. Save.
-5. Look at what happened on the employer's gift: **Matched gift** names Harper's gift, and
+4. On the employer's gift, set **Matched Gift** to Harper's gift. Save.
+5. Look at what happened on the employer's gift: **Matched Gift** names Harper's gift, and
    in **Soft credits** Harper Garcia appears with the role **Matched donor** and the amount
    500, marked automatic.
-6. Open **Harper Garcia's gift**. Its own **Matched gift** now names the Founders gift. The
+6. Open **Harper Garcia's gift**. Its own **Matched Gift** now names the Founders gift. The
    link reads correctly from both sides, and you only entered it once.
 7. Open **Harper Garcia**. Her **Total giving** is 500, the gift she actually made. Her
    **Total soft credits** is 500, the match she caused. Neither number has been inflated by
@@ -53,7 +53,7 @@ organization Founders Consulting Group.
    has been refunded or written off cannot be part of a matching gift pair. Unlink the match
    before recording the refund, or link the replacement gift instead.** A link that outlived
    the money would go on crediting Harper for a match you gave back.
-9. Try a link that should fail because of the employer. Go back to the employer's gift, clear **Matched gift**, save,
+9. Try a link that should fail because of the employer. Go back to the employer's gift, clear **Matched Gift**, save,
    then set it to a gift from a donor who works somewhere else. BarnCRM refuses the save
    with: **That gift is from someone whose employer is a different organization. Check the
    employer on the person's record, or clear it if you are not sure.**
