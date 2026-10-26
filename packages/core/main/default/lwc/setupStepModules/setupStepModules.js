@@ -17,7 +17,7 @@ import TABS_HOW from '@salesforce/label/c.Core_SetupAssistant_ModuleTabsHow';
  * (C-30). Turning a module on and off with one click is the Module Manager, and the notice
  * says so rather than pretending otherwise. An installed module's pages that belong in the
  * BarnCRM apps are listed with how to add them in App Manager, since Core's apps cannot name
- * a module's tab (ADR-NEXT).
+ * a module's tab (ADR-0136).
  */
 export default class SetupStepModules extends LightningElement {
   @api modules = [];

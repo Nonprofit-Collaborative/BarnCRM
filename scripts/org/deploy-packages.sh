@@ -510,7 +510,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
 
   # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
-  # BarnCRM_Module__mdt record (ADR-NEXT, NEXT-barncrm-apps-standard-and-console.md). The app
+  # BarnCRM_Module__mdt record (ADR-0136). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
   deployed_modules=(rollups giving mirror)

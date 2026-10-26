@@ -5,7 +5,7 @@
 
 Core may not name a module's tab in its own apps: a deploy of Core alone would fail on the
 missing tab, and Core runs alone (ADR-0013). So the module tabs reach the BarnCRM apps from
-outside Core's metadata (ADR-NEXT, `NEXT-barncrm-apps-standard-and-console.md`). Each module's
+outside Core's metadata (ADR-0136). Each module's
 `BarnCRM_Module__mdt` record names its tabs: `Staff_Tabs__c` go to BarnCRM and BarnCRM Console,
 `Admin_Tabs__c` to BarnCRM Admin and BarnCRM Admin Console, in the catalog's sort order. FOLDER
 is a package folder under packages/ that the deploy has just put in the org (for example
