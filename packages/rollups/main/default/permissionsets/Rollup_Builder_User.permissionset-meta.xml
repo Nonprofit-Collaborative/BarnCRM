@@ -139,8 +139,4 @@
     <tab>Rollup_Builder</tab>
     <visibility>Visible</visibility>
   </tabSettings>
-  <tabSettings>
-    <tab>Rollup_Settings</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
 </PermissionSet>

@@ -19,7 +19,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Rollups**. On the **Rollups** row select **Open this page**. | The Rollup Builder opens with one row per total, including **Household total giving**, **Account total giving**, **Contact total giving**, **Fund total raised** and **Appeal total raised**. Each shipped giving row shows mode **Both (recommended)** and is active. |
+| 1 | Open **BarnCRM Settings**, **Rollups**. On the **Rollups** row select **Open Rollup Builder**. | The Rollup Builder opens with one row per total, including **Household total giving**, **Account total giving**, **Contact total giving**, **Fund total raised** and **Appeal total raised**. Each shipped giving row shows mode **Both (recommended)** and is active. |
 | 2 | Select **Recalculate all**. | A box reads "About N records, roughly M minutes." with **Cancel**, **Start now** and **Run tonight**. |
 | 3 | Select **Start now**. | "Recalculation started. This page updates as it finishes." When it finishes, **Rollups last completed** shows a time a moment ago. |
 | 4 | Open **The Garcia Family**. Read the Giving section. | **Total Giving** 385.00, **Gift Count** 3, **Largest Gift** 250.00. **First Gift Date** and **Last Gift Date** are filled in. **Rollups Last Calculated** is recent. |

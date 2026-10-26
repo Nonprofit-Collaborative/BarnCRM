@@ -95,7 +95,7 @@ because they have not had the same amount of time.
    donor whose rollups have never run is invisible to them. After the first run the rollups
    keep themselves current as gifts are entered.
 3. **Give people access.** Assign the Giving module's **Giving Staff** or **Giving Read Only**
-   permission set on the Access page (Extra permissions), as for the dashboard. The report folder ships public read only, so
+   permission set on the Access page (Extra Permissions), as for the dashboard. The report folder ships public read only, so
    the reports themselves need no sharing.
 4. Open the **Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
 

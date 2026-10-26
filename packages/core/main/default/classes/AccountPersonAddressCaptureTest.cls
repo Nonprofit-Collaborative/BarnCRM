@@ -186,7 +186,7 @@ private class AccountPersonAddressCaptureTest {
     }
 
     @IsTest
-    static void aHouseholdBillingAddressIsStillCapturedOnInsertOnlyAndNeverOnUpdate() {
+    static void aHouseholdBillingAddressIsCapturedOnInsertAndWhenItChanges() {
         System.runAs(TestUsers.admin()) {
             quietHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Alder Family');
@@ -198,9 +198,9 @@ private class AccountPersonAddressCaptureTest {
 
             Assert.areEqual(1, afterInsert, 'Captured on insert, as before.');
             Assert.areEqual(
-                1,
+                2,
                 [SELECT COUNT() FROM Address__c WHERE Account__c = :household.Id],
-                'An update to a household is not captured: that is unchanged behavior.'
+                'A changed household billing address is captured as a new address.'
             );
         }
     }

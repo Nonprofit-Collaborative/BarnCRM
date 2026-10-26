@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel title.</shortDescription>
-        <value>Error digest</value>
+        <value>Error Digest</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_PageIntro</fullName>
