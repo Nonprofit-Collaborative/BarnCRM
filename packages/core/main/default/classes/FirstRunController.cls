@@ -50,12 +50,37 @@ public with sharing class FirstRunController {
             FeatureSwitchService.finishFirstRun(
                 featureKeys == null ? new Set<String>() : new Set<String>(featureKeys)
             );
+            giveTabsToEveryRole();
             return state();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw asAuraException(System.Label.Core_FirstRun_SaveError);
         }
     }
+
+    /**
+     * Gives the tool tabs of the features now on to everyone holding a BarnCRM role, and starts
+     * the nightly tab access check unless it is running. Turning features on queues the sync
+     * only when one is newly on, and on an org built from source every feature was already on,
+     * so finishing would otherwise leave the tool tabs hidden until somebody changed a role on
+     * the Access page. Neither step throws: the sync logs its own failure, and a check that
+     * cannot be scheduled is logged and listed by Health Check.
+     */
+    private static void giveTabsToEveryRole() {
+        TabAccessService.requestSync();
+        if (Test.isRunningTest() && !startTabCheckInTests) {
+            return;
+        }
+        try {
+            TabAccessScheduler.start();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+        }
+    }
+
+    /** Test seam: true lets a test see the nightly tab access check started. */
+    @TestVisible
+    private static Boolean startTabCheckInTests = false;
 
     private static FirstRunState state() {
         FirstRunState model = new FirstRunState();

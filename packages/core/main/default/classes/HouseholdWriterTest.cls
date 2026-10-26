@@ -138,6 +138,20 @@ private class HouseholdWriterTest {
     }
 
     @IsTest
+    static void householdsAreSavedPastDuplicateRulesOneRowAtATime() {
+        System.runAs(TestUsers.admin()) {
+            // A test cannot add a duplicate rule, so the options the writer saves with are read.
+            Database.DMLOptions options = HouseholdWriter.householdSaveOptions();
+
+            Assert.isTrue(
+                options.DuplicateRuleHeader.allowSave,
+                'A blocking Account duplicate rule cannot refuse a household, nor the person'
+            );
+            Assert.isFalse(options.optAllOrNone, 'One refused household never stops the rest');
+        }
+    }
+
+    @IsTest
     static void aSavedHouseholdHasNoFailureReason() {
         System.runAs(TestUsers.admin()) {
             List<Database.SaveResult> saves = HouseholdWriter.createHouseholds(

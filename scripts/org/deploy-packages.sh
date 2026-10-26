@@ -116,6 +116,10 @@ DEPLOY_WAIT_MINUTES="${DEPLOY_WAIT_MINUTES:-30}"
 REPORT_TIMEOUT_SECONDS="${REPORT_TIMEOUT_SECONDS:-60}"
 REPORT_FAILURE_LIMIT="${REPORT_FAILURE_LIMIT:-20}"
 RETRY_BACKOFF_SECONDS="${RETRY_BACKOFF_SECONDS:-5}"
+# 1 runs Core's post-install steps once Core is in (CorePostInstall.runAsSourceDeploy); 0 skips
+# them. run-org-tests.sh passes 0: the Apex tests assume an org that has never saved BarnCRM
+# Settings (they insert their own), and a test org marked as a new install has every feature off.
+SOURCE_POST_INSTALL="${SOURCE_POST_INSTALL:-1}"
 STALLS_RECOVERED=0
 
 ALIAS="${1:-}"
@@ -466,6 +470,22 @@ deploy_stage "Core (UI and permissions)" \
   "packages/core/main/default/quickActions" \
   "packages/core/main/default/lwc" \
   "packages/core/main/default/prompts" || exit $?
+
+# A deployment is not an install, so CorePostInstall never runs and the org would start with
+# every feature on before first-run setup, automatic households on, no nightly tab access check,
+# no Automation switches or import templates, and nobody able to open BarnCRM Settings. This runs
+# the same steps, as the person deploying. After the UI and permissions stage, because it gives
+# that person the BarnCRM Admin permission set. Safe on an org that already has BarnCRM: one with
+# saved settings or a household is treated as an upgrade, so nothing an administrator chose
+# changes, and a second run changes nothing.
+if [[ "$SOURCE_POST_INSTALL" == "1" ]]; then
+  echo ""
+  echo "== Running Core's post-install steps =="
+  if ! printf '%s\n' 'CorePostInstall.runAsSourceDeploy();' | sf apex run --target-org "$ALIAS"; then
+    echo "Core's post-install steps did not run. Run them by hand as anonymous Apex:"
+    echo "  CorePostInstall.runAsSourceDeploy();"
+  fi
+fi
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
   # The Rollup Builder module depends on Core only, and Giving depends on it (ADR-0125

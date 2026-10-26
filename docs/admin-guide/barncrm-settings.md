@@ -66,7 +66,10 @@ earlier release keeps every feature on and is not held.
      all ticked. Untick what you do not want yet.
 
   Click **Finish setup**. What you left ticked is turned on fully: its tabs, its settings and
-  its automations. What you unticked stays off, and you can turn it on later in **General**.
+  its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
+  Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
+  a few minutes, and starts the nightly tab access check if it is not already scheduled. What
+  you unticked stays off, and you can turn it on later in **General**.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
   either page. No module is installed by first-run setup: install modules later from the
   **Modules** section.
@@ -78,6 +81,12 @@ upgraded org with no edition is given the recommended one by the upgrade. If som
 edition in Salesforce Setup on a new install, the window still shows, with that edition
 already selected, because the features have not been chosen yet. Finishing with every feature
 unticked still finishes setup: the window does not come back.
+
+If BarnCRM was deployed from its source rather than installed as a package, the deploy script
+runs the same install steps once Core is in, so a fresh org gets first-run setup exactly as
+above. An org that has already saved BarnCRM Settings or holds a household is treated as an
+upgrade: nothing you chose changes. To run the steps by hand, run
+`CorePostInstall.runAsSourceDeploy();` as anonymous Apex (it is safe to run again).
 
 ## Features (General)
 

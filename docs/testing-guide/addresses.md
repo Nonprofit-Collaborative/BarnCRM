@@ -137,3 +137,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Schedule nightly run** (or **Stop nightly run**) and **Run the swap now** are disabled, with **You can see when the swap last ran. Changing the schedule needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
+
+## T-ADDR-10: State and country codes with State and Country Picklists on
+
+**Purpose:** an address typed with codes reaches the standard address fields in an org with State and Country Picklists.
+**Prerequisites:** staff user, in an org where Setup, **State and Country/Territory Picklists** are turned on. The Garcia Family with Harper Garcia as a member.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On The Garcia Family, select **Add address**. Enter Type **Home**, Street `55 Lake Street`, City `Chicago`, State `IL`, Postal Code `60601`, Country `US`. Select **Add address** in the form, then **Set as default** on the new card. | Toast **This is now the default address, and it has been copied to the standard address fields.** |
+| 2 | Look at the household's **Details**. | Billing Address reads Chicago, Illinois 60601, United States. |
+| 3 | Open Harper Garcia. | Her mailing address reads Chicago, Illinois, United States. |
+
+**Cleanup:** set the previous address as the default again and delete the Chicago address.

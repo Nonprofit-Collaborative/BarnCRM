@@ -225,6 +225,8 @@ private class SeasonalAddressBatchTest {
             Street__c = '4120 East Camelback Road',
             City__c = WINTER_CITY,
             State__c = 'AZ',
+            // A state code needs its country in an org with State and Country Picklists.
+            Country__c = 'US',
             Postal_Code__c = '85018',
             Seasonal_Start_Month__c = startMonth,
             Seasonal_Start_Day__c = startDay,

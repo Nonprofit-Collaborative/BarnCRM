@@ -23,9 +23,8 @@ private class AddressServiceTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
             garcia.BillingCity = HOME_CITY;
-            garcia.BillingState = 'IL';
+            AddressTestDataFactory.putStateAndCountry(garcia, 'Billing', 'IL', 'US');
             garcia.BillingPostalCode = '62704';
-            garcia.BillingCountry = 'United States';
 
             Test.startTest();
             insert garcia;
@@ -95,6 +94,44 @@ private class AddressServiceTest {
                 [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
                 'A household created with no address should not get an empty address record.'
             );
+        }
+    }
+
+    @IsTest
+    static void aStateTypedAsACodeReachesTheMembersInEitherKindOfOrg() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            insert ana;
+
+            Test.startTest();
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                City__c = HOME_CITY,
+                State__c = 'IL',
+                Postal_Code__c = '62704',
+                Country__c = 'US',
+                Is_Default__c = true
+            );
+            Test.stopTest();
+
+            Contact saved = [
+                SELECT MailingStreet, MailingState, MailingCountry
+                FROM Contact
+                WHERE Id = :ana.Id
+            ];
+            Assert.areEqual(HOME_STREET, saved.MailingStreet, 'The address reached Ana');
+            if (AddressService.usesStateAndCountryPicklists()) {
+                // The platform shows the name of the code that was written.
+                Assert.areEqual('Illinois', saved.MailingState, 'Written as the state code');
+                Assert.areEqual('United States', saved.MailingCountry, 'And the country code');
+            } else {
+                Assert.areEqual('IL', saved.MailingState, 'Written as typed');
+                Assert.areEqual('US', saved.MailingCountry, 'Both of them');
+            }
         }
     }
 

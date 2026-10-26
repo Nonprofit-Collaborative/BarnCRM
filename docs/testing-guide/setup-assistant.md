@@ -170,3 +170,19 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 5 | In Setup, **In-App Guidance**, find the prompts. | Four start with "BarnCRM tips": BarnCRM Settings, Import, Find and Bulk Update. |
 
 **Cleanup:** remove **BarnCRM Find and Export** from the staff user.
+
+## T-SA-11: An org deployed from source
+
+**Purpose:** confirm a source deploy runs Core's install steps on a fresh org, changes nothing on an org already set up, and that finishing first-run setup gives the tool tabs.
+**Prerequisites:** a new org with nothing of BarnCRM in it (`<alias>-src`), and the CLI logged in to it as an admin.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. |
+| 2 | Open the **BarnCRM** app as the admin who deployed. | The **Set up BarnCRM** window shows, as in T-SA-01. |
+| 3 | Choose **Standard Edition: the full core suite of BarnCRM tools**, keep **Turn on all the default core features**, and click **Finish setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
+| 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** and **Find** are listed. In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
+| 5 | Open **BarnCRM Settings**, **Automation**. | The automation switches are listed. |
+| 6 | Run the deploy script from step 1 again. | It ends **== Every stage deployed ==**. In BarnCRM Settings, **Edition** still reads **Standard Edition**, every feature is still **On**, the setup window does not come back, and **Scheduled Jobs** still lists one **BarnCRM Tab Access Check**. |
+
+**Cleanup:** None. Delete the org when done.
