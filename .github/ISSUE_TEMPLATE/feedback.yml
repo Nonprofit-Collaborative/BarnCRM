@@ -1,0 +1,44 @@
+name: Feedback or question
+description: General feedback, whether BarnCRM fits your organization, or a problem with the documentation.
+title: '[Feedback]: '
+labels: ['feedback']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for telling us. Issues are read and may shape the roadmap. Do not include personal or donor data: this issue is public. For a security problem, do not post here; see SECURITY.md.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of feedback is this
+      options:
+        - General feedback
+        - Does BarnCRM fit how my organization works
+        - Documentation problem
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Your feedback
+      description: For a fit question, describe how your organization works and what is painful today. For a documentation problem, name the page and what is wrong, missing or unclear.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: org-shape
+    attributes:
+      label: Org shape
+      description: Which Salesforce setup are you on, if any?
+      options:
+        - Platform only
+        - Sales or Service Cloud
+        - NPSP installed
+        - Nonprofit Cloud or Person Accounts
+        - Not on Salesforce yet
+        - Not sure
+    validations:
+      required: false

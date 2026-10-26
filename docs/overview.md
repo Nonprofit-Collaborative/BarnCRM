@@ -77,3 +77,7 @@ This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are 
 | Check a build, step by step, in a test org | [Testing Guide](testing-guide/README.md) |
 | See every feature and its status | [Feature catalog](barncrm-features.md) |
 | Build or contribute | [Contributor guide](contributor-guide/environment.md) |
+
+## Report a bug or give feedback
+
+Open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](../SUPPORT.md) for which template to use and what to include, and never post personal or donor data. Report security problems privately, as described in [SECURITY.md](../SECURITY.md).

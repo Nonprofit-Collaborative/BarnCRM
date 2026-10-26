@@ -1,0 +1,119 @@
+# BarnCRM Testing Guide
+
+Applies to: BarnCRM main as of 2026-10-25 (commit 63edc50e). Pre-release: no package version exists yet; this tracks the newest code on main.
+
+Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
+feature. Written for a tester: the project owner or a pilot org admin. Start with
+[Before you test](before-you-test.md).
+
+**Report a bug or give feedback** through GitHub: open
+<https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose> and choose the bug report
+template. [SUPPORT.md](../../SUPPORT.md) says what to include, and
+[Report a failure](before-you-test.md#report-a-failure) says how to fill it in from a test
+script. Never include donor or other personal data. Report a security problem privately, as
+[SECURITY.md](../../SECURITY.md) describes.
+
+## How this relates to the automated tests
+
+Two layers check every build.
+
+| Layer | What it is | What it proves |
+|---|---|---|
+| Apex test gate | `scripts/org/run-org-tests.sh <alias>` deploys the checked-out commit and runs every Apex test class in it (about 3,500 tests), then posts the result to GitHub as the commit status the merge rule requires. See [CI](../contributor-guide/ci.md), "The org test gate". | Logic: triggers, services, rollups, validation, sharing, permission checks in code. |
+| Manual scripts (this guide) | A person follows numbered steps in a real org and compares what they see with the expected result. | What the gate cannot see: that pages, tabs, buttons and labels are there and say the right thing, that setup flows work end to end, that a user without a permission set is refused in the UI, that undo really puts data back as a person sees it, and that pages work with a keyboard and on a phone. |
+
+Run the gate first. A build that fails it is not ready for manual testing. Scale and the full
+mobile audit have their own plan: [Scale and mobile test plan](../contributor-guide/scale-and-mobile-test-plan.md).
+
+## Script IDs
+
+Each script is `T-<AREA>-NN`, numbered from 01 within its page, for example `T-GIFT-04`. An ID
+is never reused for a different test. A script added later takes the next free number on its
+page, even if that puts it out of reading order.
+
+## Pages
+
+| Page | Area code | Scripts | Covers |
+|---|---|---|---|
+| [Before you test](before-you-test.md) | | | Test org, modules, sample data, test users, editions, recording and reporting results |
+| [People and households](people-and-households.md) | HH | 14 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages |
+| [Addresses](addresses.md) | ADDR | 9 | Address records, default address, seasonal addresses and the nightly swap |
+| [Relationships and affiliations](relationships-and-affiliations.md) | REL | 9 | Two-sided relationships, affiliations, primary affiliation |
+| [Settings and Module Manager](settings-and-module-manager.md) | SET | 13 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page |
+| [Setup Assistant](setup-assistant.md) | SA | 10 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
+| [Imports](imports.md) | IMP | 11 | Import wizard, mappings, row rules, matching (including match sources), undo |
+| [Find](find.md) | FIND | 9 | Query builder, typed queries, export, saved queries, summaries |
+| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 9 | Bulk update, bulk delete, edit in Find, undo |
+| [Data Manager and job history](data-manager-and-job-history.md) | DM | 10 | Data Manager, data jobs and undo, data quality checks, field utilization |
+| [Duplicates](duplicates.md) | DUP | 9 | Duplicate scan, review and merge, match sources |
+| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
+| [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
+| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 12 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
+| [Giving: commitments](giving-commitments.md) | COM | 9 | Pledges, recurring gifts, payments, nightly jobs |
+| [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
+| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 11 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
+| [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
+| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
+| [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
+| [Volunteers](volunteers.md) | VOL | 12 | Jobs, shifts, sign-ups, hours and approval, skills |
+| [Rollup Builder](rollup-builder.md) | RB | 9 | Building, recalculating and switching rollups |
+| [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
+
+## Smoke list (every build, about one hour)
+
+Run these in this order on one Person Accounts org set up as in
+[Before you test](before-you-test.md), all modules deployed and sample data loaded. Some later
+scripts use what an earlier one created, so keep the order.
+
+| # | Script | Checks |
+|---|---|---|
+| 1 | [T-SA-01](setup-assistant.md#t-sa-01-first-run-setup-every-feature-on), steps 3 to 8 | First-run setup, Nonprofit Edition. Run it on the test org the first time you open it, instead of a separate org; ignore the sentence about modules in step 3. |
+| 2 | [T-SET-01](settings-and-module-manager.md) | Settings console opens |
+| 3 | [T-SET-04](settings-and-module-manager.md) | Give and remove a role on the Access page |
+| 4 | [T-HH-01](people-and-households.md) | A new person gets a household |
+| 5 | [T-HH-07](people-and-households.md) | Merge two households |
+| 6 | [T-ADDR-01](addresses.md) | Add a seasonal address |
+| 7 | [T-REL-01](relationships-and-affiliations.md) | Two-sided relationship |
+| 8 | [T-IMP-01](imports.md) | Import a contact list |
+| 9 | [T-IMP-03](imports.md) | Undo an import |
+| 10 | [T-FIND-01](find.md) | Build and run a query |
+| 11 | [T-BULK-01](bulk-update-and-delete.md) | Bulk update |
+| 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a bulk update |
+| 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
+| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report |
+| 15 | [T-ERASE-02](erase-a-person.md) | Erase a person |
+| 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Giving scripts need it) |
+| 17 | [T-GIFT-04](giving-gifts-funds-batches.md) | Quick Gift Entry |
+| 18 | [T-GIFT-08](giving-gifts-funds-batches.md) | Gift batch: enter, balance, post |
+| 19 | [T-COM-01](giving-commitments.md) | Pledge and schedule |
+| 20 | [T-CRED-01](giving-soft-credits-tributes-matching.md) | Household soft credits |
+| 21 | [T-RCPT-01](giving-receipts-and-acknowledgments.md), [T-RCPT-02](giving-receipts-and-acknowledgments.md) | Receipt settings, then issue a receipt |
+| 22 | [T-REF-01](giving-refunds.md) | Refund a gift |
+| 23 | [T-GRD-01](giving-rollups-and-dashboards.md) | Recalculate giving totals |
+| 24 | [T-VOL-02](volunteers.md), [T-VOL-03](volunteers.md) | Create a shift, sign people up |
+| 25 | [T-RB-01](rollup-builder.md) | Rollup Builder opens, nightly run scheduled |
+
+T-ERASE-02 and T-REF-01 change sample data that other scripts name; if you go on to the full
+list in the same org, run them last or refresh the org first.
+
+## Full regression list
+
+Every script on every page above, before a release or after a change that touches many areas.
+Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
+Volunteers and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
+
+Run it on the Person Accounts shape, then repeat the Core pages and the Giving pages on the
+platform-only shape (Mirror needs Opportunity and Campaign, so skip it there). Scripts that need
+their own org (for example T-SA-01 and T-SA-02, which need an org never opened) say so in their
+prerequisites.
+
+Two scripts change org state that other scripts are hard to run after: closing an accounting
+period (T-GIFT-10) blocks removing sample data, and erasing a person (T-ERASE pages) cannot be
+undone. Each page notes this where it applies.
+
+## Keeping this guide current
+
+The guide tracks main. A pull request that adds or changes a feature visible in the UI updates
+the matching page here in the same pull request, as it does the
+[feature catalog](../barncrm-features.md). A new feature area gets a new page and a row in the
+table above.
