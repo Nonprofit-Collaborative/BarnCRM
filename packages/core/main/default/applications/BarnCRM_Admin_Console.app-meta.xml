@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households and organizations</comment>
+    <content>Account_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households and organizations</comment>
+    <content>Account_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People</comment>
+    <content>Contact_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People</comment>
+    <content>Contact_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <brand>
+    <headerColor>#032D60</headerColor>
+    <logo>BarnCRM_Admin_Logo</logo>
+    <logoVersion>1</logoVersion>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The administrators' app with console navigation: BarnCRM Settings, the data tools, Org
+    Optimizer, Duplicate Matching and the Error Log, plus the admin tools of each installed
+    module, open side by side.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+  <label>BarnCRM Admin Console</label>
+  <navType>Console</navType>
+  <tabs>BarnCRM_Settings</tabs>
+  <tabs>Data_Manager</tabs>
+  <tabs>Import</tabs>
+  <tabs>Bulk_Update</tabs>
+  <tabs>Data_Hygiene</tabs>
+  <tabs>Duplicate_Matching</tabs>
+  <tabs>Error_Log__c</tabs>
+  <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>BarnCRM_Settings</tab>
+    </mappings>
+    <mappings>
+      <tab>Data_Manager</tab>
+    </mappings>
+    <mappings>
+      <tab>Import</tab>
+    </mappings>
+    <mappings>
+      <tab>Bulk_Update</tab>
+    </mappings>
+    <mappings>
+      <tab>Data_Hygiene</tab>
+    </mappings>
+    <mappings>
+      <tab>Duplicate_Matching</tab>
+    </mappings>
+    <mappings>
+      <tab>Error_Log__c</tab>
+    </mappings>
+  </workspaceConfig>
+</CustomApplication>

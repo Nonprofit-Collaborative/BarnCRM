@@ -14,8 +14,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
+| 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
+| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Duplicate Matching**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, **Rollups** with Rollup Builder installed, and **Volunteers** with Volunteers installed (a Core-only org has no **Rollups** section). |
 | 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top names **Setup, Apex Settings**. No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
 | 4 | Click **Learn more** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |
@@ -135,11 +135,11 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-08: Turn on a feature left off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.
-**Prerequisites:** admin user, in the org from [T-SA-02](setup-assistant.md#t-sa-02-first-run-setup-choosing-features) (Data Manager and Duplicate Review left off).
+**Prerequisites:** admin user, in the org from [T-SA-02](setup-assistant.md#t-sa-02-first-run-setup-choosing-features) (Data Manager and Duplicate Matching left off).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Features**. | A warning: "A feature can't be turned off once it is turned on. Turn on only what your organization will use." Eight rows. **Data Manager** and **Duplicate Review** have **Turn on**; the rest say **On**. |
+| 1 | Open **BarnCRM Settings**, **General**, **Features**. | A warning: "A feature can't be turned off once it is turned on. Turn on only what your organization will use." Eight rows. **Data Manager** and **Duplicate Matching** have **Turn on**; the rest say **On**. |
 | 2 | Open the app's navigation menu. | **Data Manager** and **Find** are not listed. **Import** is not in the **Sections** list. |
 | 3 | Click **Turn on** on **Data Manager**. | A dialog "Turn on Data Manager?": "Data Manager will be turned on for everyone, with its tabs, settings and automations. It can't be turned off again." |
 | 4 | Click **Cancel**. | The row still shows **Turn on**. |
@@ -164,25 +164,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** leave the Nonprofit Edition.
 
-## T-SET-10: Custom Metadata: relationship types and match sources
+## T-SET-10: Custom Metadata: relationship types
 
-**Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, archive and restore a shipped match source, and that a missing picklist value is refused.
+**Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are no longer on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
 **Prerequisites:** admin user holding **BarnCRM Metadata Admin** (the create script gives it; otherwise give it on the Access page, Extra Permissions). Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Custom Metadata**. | Two lists: **Relationship types** and **Match sources**, each with **Added by Your Organization** ("Nothing added yet.") and **Shipped with BarnCRM**. Relationship types lists eleven shipped rows (Spouse, Parent, Child and so on); Match sources lists six. |
+| 1 | Open **BarnCRM Settings**, **General**, **Custom Metadata**. | One list, **Relationship types**, with **Added by Your Organization** ("Nothing added yet.") and **Shipped with BarnCRM**, which lists eleven rows (Spouse, Parent, Child and so on). There is no **Match sources** list. |
 | 2 | Under **Relationship types**, click **Add**. Enter **Name** `Godparent`, **Type** `Godparent`, **Reciprocal Type** `Mentee`. Click **Save**. | Refused: "Godparent is not a choice in the Type list on Relationship. Add it in Setup (Object Manager, Relationship, Fields, Type), then save again." |
 | 3 | Change **Name** and **Type** to `Mentor`, keep **Reciprocal Type** `Mentee`, and **Save**. | "Saving. Salesforce applies the change in the background, usually within a minute." then "Saved. Mentor is in the list." The row is under **Added by Your Organization** with **Status** **In use**. |
 | 4 | Add `Mentee` with **Reciprocal Type** `Mentor` the same way. | "Saved. Mentee is in the list." |
 | 5 | Open the row menu on **Mentee** and choose **Archive**. Wait for "Saved". | **Status** reads **Archived**. |
-| 6 | Choose **Restore** from the same menu. Wait for "Saved". | **Status** reads **In use**. |
-| 7 | Under **Match sources**, **Shipped with BarnCRM**, archive **Contact Point Phone**, then restore it. | Its status goes to **Archived**, then back to **In use**. Shipped relationship types have no Archive action. |
-| 8 | Under **Match sources**, click **Add**. Enter **Name** `Bad source`, **Object Name** `Contact`, **Value Field** `Nope__c`, **Parent Field** `AccountId`, **Normalization** **Email**, and **Save**. | Refused: "Nope__c is not a field on Contact. Check its API name." Nothing is added. |
-| 9 | Change **Value Field** to `Email` and **Parent Field** to `LastName`, and **Save**. | Refused: "LastName on Contact is not a lookup to a contact, account or Individual. The parent field has to link each value to its person, household or Individual." |
-| 10 | Change **Normalization** to **Address**, **Parent Field** to `AccountId`, leave **Postal Code Field** empty, and **Save**. | Refused: "An address source needs a postal code field: the street is compared together with it." Click **Cancel**. |
+| 6 | Choose **Restore** from the same menu. Wait for "Saved". | **Status** reads **In use**. Shipped relationship types have no Archive action. |
 
-**Cleanup:** archive Mentor and Mentee. Make sure **Contact Point Phone** is **In use**.
+**Cleanup:** archive Mentor and Mentee.
 
 ## T-SET-11: BarnCRM home page and What's new
 

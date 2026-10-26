@@ -26,6 +26,9 @@
 public with sharing class GivingSampleDataLoader {
     private static final String CONTEXT = 'GivingSampleDataLoader';
 
+    /** The key of the set's unrestricted fund, which an org's own default fund stands in for. */
+    private static final String GENERAL_FUND_KEY = 'General Fund';
+
     /** The registry rows whose delete protection the removal stands down; see removeNext(). */
     private static final String COMMITMENT_AUTOMATION = 'Commitment_Schedule';
     private static final String INSTALLMENT_AUTOMATION = 'Installment_Protection';
@@ -46,11 +49,24 @@ public with sharing class GivingSampleDataLoader {
         return idsByKey;
     }
 
+    /**
+     * Funds. When the org already has a default fund (its own, or the General Fund a new org
+     * starts with), the set's unrestricted "General Fund" is not created: the sample gifts that
+     * would have gone to it go to the org's default fund instead, so the org never has two funds
+     * of that name. The org's fund is not flagged as sample data, so removal never deletes it.
+     */
     private static Map<String, Id> insertFunds(GivingSampleDataSet data) {
         List<Fund__c> funds = new List<Fund__c>();
         List<String> keys = new List<String>();
+        Id ownDefaultFundId = GiftService.resolveDefaultFundId();
+        Map<String, Id> reused = new Map<String, Id>();
         for (Map<String, Object> row : data.funds) {
-            keys.add(GivingSampleDataSet.asString(row.get('key')));
+            String fundKey = GivingSampleDataSet.asString(row.get('key'));
+            if (ownDefaultFundId != null && fundKey == GENERAL_FUND_KEY) {
+                reused.put(fundKey, ownDefaultFundId);
+                continue;
+            }
+            keys.add(fundKey);
             funds.add(
                 new Fund__c(
                     Sample_Data__c = true,
@@ -64,7 +80,9 @@ public with sharing class GivingSampleDataLoader {
                 )
             );
         }
-        return insertAndMap(funds, keys);
+        Map<String, Id> idsByKey = insertAndMap(funds, keys);
+        idsByKey.putAll(reused);
+        return idsByKey;
     }
 
     /**

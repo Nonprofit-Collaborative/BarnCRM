@@ -10,6 +10,11 @@
                         <li key={row.name} data-id="module-row">
                             <span data-id="module-name">{row.displayName}</span>
                             <span class={row.badgeClass} data-id="module-status">{row.statusText}</span>
+                            <template lwc:if={row.appUrl}>
+                                <a class="slds-var-m-left_small" href={row.appUrl} data-id="open-app"
+                                    >{labels.openApp}<span class="slds-assistive-text">: {row.displayName}</span></a
+                                >
+                            </template>
                         </li>
                     </template>
                 </ul>

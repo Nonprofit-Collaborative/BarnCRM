@@ -28,7 +28,7 @@ record, as they do on any save. A record that is refused is listed with the reas
 still save.
 
 Values you change by editing Find's results table ([Find](find.md), section 7.6) are saved
-the same way, and each save is listed with the bulk updates under **Data jobs** on the **Data Manager** tab, its
+the same way, and each save is listed with the bulk updates under **Data Jobs** on the **Data Manager** tab, its
 run log starting "Edited in Find", with the same undo.
 
 ## 2. How to turn it on
@@ -38,7 +38,7 @@ run log starting "Edited in Find", with the same undo.
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (BarnCRM Settings, Access,
    Extra Permissions). Neither grants access to any record or field.
-   A person without both sees no bulk updates under **Data jobs** on the **Data Manager** tab,
+   A person without both sees no bulk updates under **Data Jobs** on the **Data Manager** tab,
    and no error.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk update run limit**
    (default 48,000). A bulk update that matches more records than this is refused before it
@@ -67,7 +67,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
    were updated, how many already held the new value and how many failed, with the reason for
    each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.
-7. To undo it, open the **Data Manager** tab. Find the job under **Data jobs** (choose **Bulk
+7. To undo it, open the **Data Manager** tab. Find the job under **Data Jobs** (choose **Bulk
    updates** in **Show** to list only those), press **Undo**, type the number, and confirm.
    The list shows your own bulk updates. Someone who manages BarnCRM Settings can tick **Show
    everyone's jobs** to see and undo anyone's.

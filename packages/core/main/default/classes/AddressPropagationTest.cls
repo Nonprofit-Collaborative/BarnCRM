@@ -633,6 +633,174 @@ private class AddressPropagationTest {
         }
     }
 
+    // ------------------------------------------- the three Address Updates choices (R-AD5)
+
+    @IsTest
+    static void nobodyMovesUntilYouChooseKeepsAPersonsEditTheirOwn() {
+        System.runAs(TestUsers.admin()) {
+            useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert new List<Contact>{ ana, luis };
+
+            Test.startTest();
+            update new Contact(
+                Id = ana.Id,
+                MailingStreet = MEMBER_OWN_STREET,
+                MailingCity = MEMBER_OWN_CITY
+            );
+            Test.stopTest();
+
+            List<Address__c> anasOwn = [
+                SELECT Street__c
+                FROM Address__c
+                WHERE Contact__c = :ana.Id AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(1, anasOwn.size(), 'Ana\'s edit becomes an address of her own.');
+            Assert.areEqual(MEMBER_OWN_STREET, anasOwn[0].Street__c, 'With what she typed.');
+            Assert.areEqual(
+                HOME_STREET,
+                [
+                    SELECT Street__c
+                    FROM Address__c
+                    WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
+                ]
+                .Street__c,
+                'The household keeps its primary address.'
+            );
+            Assert.isNull(
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'Nobody else moves.'
+            );
+        }
+    }
+
+    @IsTest
+    static void nobodyMovesUntilYouChooseLeavesMembersWhenTheHouseholdMoves() {
+        System.runAs(TestUsers.admin()) {
+            useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert luis;
+
+            Test.startTest();
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Is_Default__c = true
+            );
+            update new Account(Id = garcia.Id, BillingCity = 'Mesa');
+            Test.stopTest();
+
+            Account household = [
+                SELECT BillingStreet, BillingCity
+                FROM Account
+                WHERE Id = :garcia.Id
+            ];
+            Assert.areEqual(WINTER_STREET, household.BillingStreet, 'The household itself moves.');
+            Assert.areEqual('Mesa', household.BillingCity, 'Including the billing edit.');
+            Assert.isNull(
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'Neither household change reaches Luis until someone chooses to move everyone.'
+            );
+        }
+    }
+
+    @IsTest
+    static void nobodyMovesUntilYouChooseStillLetsTheSeasonalSwapMoveMembers() {
+        System.runAs(TestUsers.admin()) {
+            useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert new List<Contact>{ ana, luis };
+            insert personalAddress(ana.Id);
+            insert seasonalAddress(garcia.Id);
+
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.Id },
+                Date.newInstance(2027, 2, 14)
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, summary.movedIn, 'The household moved to its winter address.');
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'The swap is a move nobody has to choose, so Luis goes south with the household.'
+            );
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
+                'Ana keeps the address of her own.'
+            );
+            Assert.isFalse(
+                AddressService.chooseHouseholdMoves(false),
+                'The swap puts the mark back when it is done.'
+            );
+        }
+    }
+
+    @IsTest
+    static void onlyThatPersonMovesStillLetsHouseholdChangesReachMembers() {
+        System.runAs(TestUsers.admin()) {
+            useAddressUpdates(AddressService.BEHAVIOR_PERSONAL_ADDRESS);
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert new List<Contact>{ ana, luis };
+            insert personalAddress(ana.Id);
+
+            Test.startTest();
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Is_Default__c = true
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'Luis has no address of his own, so the household change reaches him.'
+            );
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
+                'Ana keeps hers.'
+            );
+        }
+    }
+
+    private static void useAddressUpdates(String choice) {
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+        settings.Contact_Address_Change_Behavior__c = choice;
+        upsert settings;
+    }
+
+    private static Address__c seasonalAddress(Id householdId) {
+        return new Address__c(
+            Account__c = householdId,
+            Type__c = AddressService.TYPE_SEASONAL,
+            Street__c = WINTER_STREET,
+            City__c = WINTER_CITY,
+            Seasonal_Start_Month__c = 1,
+            Seasonal_Start_Day__c = 1,
+            Seasonal_End_Month__c = 3,
+            Seasonal_End_Day__c = 31
+        );
+    }
+
     private static Account householdAt(String street) {
         Account household = AddressTestDataFactory.newHousehold('The Garcia Family');
         household.BillingStreet = street;

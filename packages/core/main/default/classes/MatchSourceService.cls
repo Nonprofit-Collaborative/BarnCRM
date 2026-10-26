@@ -6,7 +6,7 @@
  * record is never compared. A source names that related object, the field holding the value,
  * the lookup to its person or household, and how the value is made comparable. This class
  * reads the sources the org can use, normalizes values, and checks a source an administrator
- * saves on the Custom metadata page.
+ * saves in Duplicate Matching, Matching Logic (ADR-0139).
  *
  * No object a source names is referenced at compile time: a source is resolved through
  * describe and skipped when its object or fields are not in the org (ADR-0013, ADR-0110).
@@ -110,8 +110,7 @@ public with sharing class MatchSourceService {
     }
 
     /** A field by the name a row gives, unprefixed or not, or null. */
-    @TestVisible
-    private static Schema.SObjectField field(Map<String, Schema.SObjectField> fields, String name) {
+    public static Schema.SObjectField field(Map<String, Schema.SObjectField> fields, String name) {
         if (String.isBlank(name)) {
             return null;
         }
@@ -672,9 +671,61 @@ public with sharing class MatchSourceService {
         return code;
     }
 
+    // ------------------------------------------------------------------ trying a value
+
+    /**
+     * A source as Matching Logic describes it, by local field name, resolved in this org as
+     * the scan would resolve it, or null when the scan would skip it (ADR-0139).
+     */
+    public static Source sourceFrom(String label, Map<String, Object> values) {
+        // A metadata row's fields cannot all be set in memory, so it is read from JSON.
+        Map<String, Object> fields = new Map<String, Object>{
+            'DeveloperName' => 'Trial',
+            'MasterLabel' => String.isBlank(label) ? 'Trial' : label
+        };
+        for (String name : values.keySet()) {
+            fields.put(NamespaceUtil.qualify(name), values.get(name));
+        }
+        return resolve(
+            (Match_Source__mdt) JSON.deserialize(JSON.serialize(fields), Match_Source__mdt.class)
+        );
+    }
+
+    /**
+     * The people (contacts) and households (accounts) holding a value on a source, by object,
+     * as the scan would find them: the value normalized, and nothing for a value held by more
+     * records than a value may be. Empty when the value normalizes to nothing.
+     */
+    public static Map<Schema.SObjectType, Set<Id>> holdersOfValue(
+        Source source,
+        String value,
+        String postal
+    ) {
+        Map<Schema.SObjectType, Set<Id>> result = new Map<Schema.SObjectType, Set<Id>>();
+        String normalized = key(source.normalization, value, postal);
+        if (normalized == null) {
+            return result;
+        }
+        for (
+            Schema.SObjectType target : new List<Schema.SObjectType>{
+                Contact.SObjectType,
+                Account.SObjectType
+            }
+        ) {
+            if (!appliesTo(source, target)) {
+                continue;
+            }
+            Set<Id> found = ownersOf(source, target, new Set<String>{ normalized }).get(normalized);
+            if (found != null && found.size() <= MAX_OWNERS_PER_VALUE) {
+                result.put(target, found);
+            }
+        }
+        return result;
+    }
+
     // ------------------------------------------------------------------ saving a source
 
-    /** Checks a source the Custom metadata page is about to save, against this org. */
+    /** Checks a source Matching Logic is about to save, against this org. */
     public class Validator implements CustomMetadataManagerService.RowValidator {
         public void validate(Map<String, Object> values) {
             MatchSourceService.validate(values);
@@ -734,20 +785,30 @@ public with sharing class MatchSourceService {
     };
 
     private static Boolean isPersonOrHouseholdLookup(Schema.SObjectField token) {
-        Schema.DescribeFieldResult described = token.getDescribe();
+        return !parentObjectsOf(token.getDescribe()).isEmpty();
+    }
+
+    /**
+     * The parents a lookup can point at that a source resolves (Contact, Account, Individual),
+     * by API name; empty for any other field. Matching Logic offers only such a field.
+     */
+    public static Set<String> parentObjectsOf(Schema.DescribeFieldResult described) {
+        Set<String> result = new Set<String>();
         if (described.getType() != Schema.DisplayType.REFERENCE) {
-            return false;
+            return result;
         }
         for (Schema.SObjectType referenced : described.getReferenceTo()) {
-            if (
-                PARENT_OBJECTS.contains(
-                    referenced.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-                )
-            ) {
-                return true;
+            String name = referenced.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+            if (PARENT_OBJECTS.contains(name)) {
+                result.add(name);
             }
         }
-        return false;
+        return result;
+    }
+
+    /** Whether a field holds text a source can compare and filter on. */
+    public static Boolean isMatchableText(Schema.DescribeFieldResult described) {
+        return TEXT_TYPES.contains(described.getType()) && described.isFilterable();
     }
 
     /** Field types holding text a value can be read from and filtered on. */
@@ -761,7 +822,7 @@ public with sharing class MatchSourceService {
 
     private static void requireText(Schema.SObjectField token, String objectLabel) {
         Schema.DescribeFieldResult described = token.getDescribe();
-        if (!TEXT_TYPES.contains(described.getType()) || !described.isFilterable()) {
+        if (!isMatchableText(described)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
                     Label.Core_MatchSource_NotFilterableText,

@@ -197,15 +197,15 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Check title: default addresses with parts missing.</shortDescription>
-        <value>Default addresses with parts missing</value>
+        <shortDescription>Check title: primary addresses with parts missing.</shortDescription>
+        <value>Primary addresses with parts missing</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_IncompleteDetail</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Check detail: incomplete default addresses.</shortDescription>
+        <shortDescription>Check detail: incomplete primary addresses.</shortDescription>
         <value>The address each household, organization or person is mailed at, with no street, city or postal code. Mail sent there will not arrive.</value>
     </labels>
     <labels>
@@ -213,8 +213,8 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Check title: default addresses that failed verification.</shortDescription>
-        <value>Default addresses that failed verification</value>
+        <shortDescription>Check title: primary addresses that failed verification.</shortDescription>
+        <value>Primary addresses that failed verification</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_FailedDetail</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check detail: failed verification.</shortDescription>
-        <value>Default addresses an address verification app marked Failed. Without such an app this is always 0.</value>
+        <value>Primary addresses an address verification app marked Failed. Without such an app this is always 0.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_UnreachableTitle</fullName>

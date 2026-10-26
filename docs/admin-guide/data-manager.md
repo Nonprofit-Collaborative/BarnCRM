@@ -6,7 +6,7 @@
 ## 1. What it does
 
 **Data Manager** is the one place to start any data task and to answer "what changed last
-week, and can I undo it?" It has a card for each data tool you may use, your import mappings,
+week, and can I undo it?" It has a card for each data tool you may use, your import templates,
 and one list of every data job: imports, bulk updates and bulk deletes, newest first, each with
 its counts and its **Undo**.
 
@@ -24,19 +24,40 @@ Update** or **BarnCRM Bulk Delete** permission sets.
 
 Each card and each kind of job is shown only to people who may use it:
 
-| Card | Opens | Who sees it |
-|---|---|---|
-| **Import a file** | The **Import** tab: people, organizations, gifts (with Giving), or one object | Administrators |
-| **Find and export records** | The **Find** tab | Anyone with **Find and Export Records** |
-| **Change many records** | The **Find** tab: run a query, then **Bulk update** | Anyone with **Bulk Update Records** |
-| **Delete many records** | The **Find** tab: run a query, then **Bulk delete** | Anyone with **Bulk Delete Records** |
-| **Tidy and check your data** | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
-| **Import mappings** | The mappings you import with, and when each recurring file was last loaded | Administrators |
-| **Data jobs** | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
-| **Salesforce's own tools** | Weekly Data Export (your backup), the Recycle Bin, and the Data Import Wizard for records BarnCRM does not load | Administrators |
+| Card | Needs a file? | Opens | Who sees it |
+|---|---|---|---|
+| **Import a File** | Yes | The **Import** tab: add new records and update existing ones from a spreadsheet (people and organizations, gifts with Giving, or one object), with a dry run first | Administrators |
+| **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
+| **Update Many Records** | No | The **Find** tab: run a query, then **Bulk update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
+| **Delete Many Records** | No | The **Find** tab: run a query, then **Bulk delete** | Anyone with **Bulk Delete Records** |
+| **Tidy and Check Your Data** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
+| **Import Templates** | | The templates you import with, and when each recurring file was last loaded | Administrators |
+| **Data Jobs** | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
+| **Salesforce's Own Tools** | | Weekly Data Export (your backup), the Recycle Bin, and the Data Import Wizard for records BarnCRM does not load | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries.
+
+**Which tool changes many records?** To change the same fields on many records without a file,
+use **Update Many Records** (a Find query, then **Bulk update**). To change records from a
+spreadsheet, each row with its own values, use **Import a File**. To delete records, use
+**Delete Many Records** (a Find query, then **Bulk delete**); to delete the records a
+spreadsheet lists by record ID, an administrator uses **Import a File**, **Load one object**,
+then **Delete by record ID** in **What each row does** ([Bulk delete](bulk-delete.md)).
+
+**Delete Many Records** is marked as destructive: its **Open** button is red, and a warning box
+on the card reads "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data
+Jobs, on this page, for up to 15 days." Nothing is deleted for good: a bulk delete, and a delete
+by file, go to the Recycle Bin, and **Undo** brings them back (section 4).
+
+**Import Templates.** A template remembers how a file's columns match BarnCRM fields, so every
+file with the same layout (for example, a monthly donations export) opens already matched.
+BarnCRM ships some (the **Generic contact list**, and with Giving the gift and migration
+templates). To make your own, open **Import a File** and use **Load one object** in the first
+step (**Choose what kind of file this is**): choose the object, type a **Template name**, and
+select **Create** ([Importing](importing.md), section 9). There is no separate save step: the
+column matches, changes and row rules you settle on are saved to the template each time you
+import with it.
 
 The **Import** and **Bulk Update** tabs are no longer in the app's navigation: open them from
 here. Bookmarks to them still work. **Find** stays in the navigation, because staff use it
@@ -47,11 +68,11 @@ every day.
 Start from the sample data (see [Sample data](sample-data.md)).
 
 1. Open the **Data Manager** tab. The cards at the top are the tools you can use.
-2. Choose **Import a file**. The Import tab opens. Import a five-row file as
+2. Choose **Import a File**. The Import tab opens. Import a five-row file as
    [Importing](importing.md) describes, then come back to **Data Manager**.
-3. Under **Data jobs** your import is first, with its file name, **Complete**, how many people
+3. Under **Data Jobs** your import is first, with its file name, **Complete**, how many people
    it created, and the date it can be undone until.
-4. Choose **Find and export records**, run a query for five people, and use **Bulk update** to
+4. Choose **Find and Export Records**, run a query for five people, and use **Bulk update** to
    set a field on them (see [Bulk update](bulk-update.md)). Back on **Data Manager**, press
    **Refresh**: the bulk update is now first.
 5. In **Show**, choose **Imports**. Only your import is listed. Choose **All** again.
@@ -83,7 +104,7 @@ only once. A job that can no longer be undone is still listed, with its counts.
 - **Undo is not offered.** The undo window has passed, the job was already undone, or it is
   still running. The job's status says which.
 - **Expecting Data Manager to back up your data.** It does not copy your records anywhere. Use
-  Salesforce's **Weekly Data Export**, linked under **Salesforce's own tools**.
+  Salesforce's **Weekly Data Export**, linked under **Salesforce's Own Tools**.
 
 ## Field reference
 

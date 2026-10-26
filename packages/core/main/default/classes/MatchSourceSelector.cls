@@ -31,6 +31,53 @@ public with sharing class MatchSourceSelector {
         ];
     }
 
+    /** Every match source, active or not, for Matching Logic (tests set it). */
+    @TestVisible
+    private static List<Match_Source__mdt> allSourcesOverride;
+
+    /**
+     * Every match source, active or not, for the Matching Logic list (ADR-0139). Read as
+     * shipped, as `selectActiveSources` is.
+     */
+    public static List<Match_Source__mdt> selectAllSources() {
+        if (allSourcesOverride != null) {
+            return allSourcesOverride;
+        }
+        return [
+            SELECT
+                DeveloperName,
+                MasterLabel,
+                Object_Name__c,
+                Value_Field__c,
+                Postal_Code_Field__c,
+                Parent_Field__c,
+                Normalization__c,
+                Active__c,
+                Is_Shipped__c
+            FROM Match_Source__mdt
+            WITH SYSTEM_MODE
+            ORDER BY MasterLabel
+            LIMIT 200
+        ];
+    }
+
+    /**
+     * The names of these people or households, for "Try a value", in user mode so a record
+     * the person cannot see is not named. At most `max`.
+     */
+    public static List<SObject> namesOf(Schema.SObjectType target, Set<Id> ids, Integer max) {
+        if (ids == null || ids.isEmpty()) {
+            return new List<SObject>();
+        }
+        return Database.queryWithBinds(
+            'SELECT Id, Name FROM ' +
+                target.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                ' WHERE Id IN :ids ORDER BY Name LIMIT :max',
+            new Map<String, Object>{ 'ids' => ids, 'max' => max },
+            AccessLevel.USER_MODE
+        );
+    }
+
     /**
      * The most rows one lookup reads. A lookup that reaches it reads a sample and never fails,
      * but matches past the cap are missed, so it is counted and logged (ADR-0133 decision 8).

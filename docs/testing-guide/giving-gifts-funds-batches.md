@@ -11,8 +11,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Funds** tab, list view **All Funds**. | The 8 sample funds show, from **General Fund** to **Memorial Fund**. On an org that started with no funds there is also the org's own starting **General Fund** (T-GIFT-14), so two rows are named General Fund; the sample one has accounting code 4000. |
-| 2 | Open the sample **General Fund**, click **Edit**, tick **Is Default**, and save. | Saved. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
+| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-14), that fund is the only **General Fund** and the other 7 are sample funds. |
+| 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
 | 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
@@ -167,7 +167,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting periods**, **Open**. | Card **Accounting Periods** with **Books closed through** and "No period is closed." |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books closed through** and "No period is closed." |
 | 2 | Set **Books closed through** to today, click **Save**. | Refused: "The books can be closed through the day before yesterday at the latest..." |
 | 3 | Set it to the last day of last month (on the 1st or 2nd, the month before), click **Save**. | "Saved. The books are closed through the date shown." |
 | 4 | On **Quick Gift Entry**, enter a gift for Harper Garcia, 20, Cash, **Gift date** in last month. Save. | Not saved; the message starts "The books are closed through", naming the date. |
@@ -246,5 +246,20 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | Open the **Funds** tab. | **All Funds**, **Active Funds** and **Inactive Funds** are listed. Untick **Active** on a sample fund that has no gifts: it moves to **Inactive Funds** and leaves **Active Funds**. Tick it again. |
 | 4 | Open **Appeals** and **Donor Levels** and open each list view menu. | **All Appeals**, **Active Appeals**, **Inactive Appeals**; **All Donor Levels**, **Active Donor Levels**, **Inactive Donor Levels**. |
 | 5 | Open **Gift Batches**. | **All Gift Batches**, **Open Batches** and **My Gift Batches** are listed. A batch you create shows in **My Gift Batches**. |
+
+**Cleanup:** none.
+
+## T-GIFT-15: Sample data reuses the org's default fund
+
+**Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
+**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-14), no sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Giving installed. | The load finishes. |
+| 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
+| 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
+| 4 | Select **Remove sample data** and confirm. | The removal finishes. |
+| 5 | Open **All Funds**. | **General Fund** is still there and still the default. The seven sample funds and the sample gifts are gone. |
 
 **Cleanup:** none.

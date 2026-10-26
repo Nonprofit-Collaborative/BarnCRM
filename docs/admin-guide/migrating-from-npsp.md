@@ -5,28 +5,28 @@
 ## 1. What it does
 
 If your donors and gifts are in the Nonprofit Success Pack (NPSP), BarnCRM ships three
-ready-made import mappings that read NPSP's own exports: your contacts, and the payments your
+ready-made import templates that read NPSP's own exports: your contacts, and the payments your
 donors made, from people and from organizations. You export each file with Data Loader or
 Workbench, without renaming a column, and load it through the **Import** tab like any other
 file, with a preview first and an undo afterwards.
 
-The mappings only name columns. Nothing in BarnCRM depends on NPSP being installed.
+The templates only name columns. Nothing in BarnCRM depends on NPSP being installed.
 
 ## 2. How to turn it on
 
-BarnCRM brings the contacts mapping, and the Giving module brings the two payment mappings.
-Each package adds its mappings when it is installed, and an upgrade adds any mapping a later
+BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
+Each package adds its templates when it is installed, and an upgrade adds any template a later
 version ships, so the **Import** tab normally lists them already. An upgrade never changes a
-mapping you have edited. A shipped mapping you deleted comes back on the next upgrade: switch
+template you have edited. A shipped template you deleted comes back on the next upgrade: switch
 it off instead if you do not want it in the list.
 
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
-1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
+1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "3 shipped
-   import templates are missing" (a higher number if other shipped mappings are missing too)
+   import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
-3. Select **Restore import templates**. Your own mappings, and any shipped mapping you have
+3. Select **Restore import templates**. Your own templates, and any shipped template you have
    edited, are not touched.
 4. Open the **Import** tab. The list now has **NPSP: contacts**, **NPSP: opportunities and
    payments** and **NPSP: organization payments**.
@@ -127,7 +127,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
    columns on all but its first payment (the file is sorted so they sit together).
 7. **Funds, if you use them.** The payment export does not say which fund a gift went to, so
    every gift goes to your default fund (section 6 says how to add a fund column).
-8. **Recreate what the mappings do not load** (section 6).
+8. **Recreate what the templates do not load** (section 6).
 
 In Data Loader, choose **Export**, pick the object named after `FROM` (Payment for the payment
 queries), and paste the query into the query box. In Workbench, choose **Queries**, **SOQL
@@ -147,9 +147,9 @@ them with the people query, its last line changed to
 `AND npe01__Opportunity__r.AccountId = null`, and load that file with **NPSP: opportunities
 and payments** as well.
 
-## 5. Why three mappings and not one
+## 5. Why three templates and not one
 
-A mapping remembers the columns of the last file loaded with it, so one mapping serves one
+A template remembers the columns of the last file loaded with it, so one template serves one
 file shape. The shapes differ in ways that matter:
 
 - **Contacts and payments are separate files** because a gift file cannot carry a person's full
@@ -162,12 +162,12 @@ file shape. The shapes differ in ways that matter:
 
 ## 6. What does not come across yet
 
-These are not loaded by the three mappings. Each has what to do in the meantime.
+These are not loaded by the three templates. Each has what to do in the meantime.
 
 | Not loaded | What to do meanwhile |
 |---|---|
 | Households and who is in them | Each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
-| Relationships and affiliations | No ready-made mapping ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
 | General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
 | Soft credits (contact roles, partial and account soft credits) | A soft credit loads only on the same row as a new gift, and NPSP exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
@@ -175,7 +175,7 @@ These are not loaded by the three mappings. Each has what to do in the meantime.
 | Additional and seasonal addresses | Only the mailing address loads. Add others by hand ([Addresses](addresses.md)). |
 | Written-off and unpaid payments | The exports take paid payments only. Refunds are recorded in BarnCRM after the gift is loaded ([Refunds](refunds.md)). |
 | An organization's details | A payment file creates an organization with its name only. Add its address and phone by hand. |
-| In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the mapping a default payment method." Load them with the **Generic gift list**, the value mapped to **Gift: fair market value** and no amount. |
+| In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the template a default payment method." Load them with the **Generic gift list**, the value mapped to **Gift: fair market value** and no amount. |
 
 ## 7. Common mistakes
 
@@ -208,13 +208,13 @@ all but the first payment (section 4, step 6).
 
 **A column you set to Do not load is mapped again next time.** BarnCRM's column library
 recognises some export headings on its own, for example an account's name, and suggests them
-even after you have set them to **Do not load**. The contacts mapping leaves the account name
+even after you have set them to **Do not load**. The contacts template leaves the account name
 out on purpose, because it would create an organization for every household. Check the column
 step on every load, or delete the column from the file.
 
 ## Column reference
 
-Each mapping reads the columns its query in section 4 exports. The headings match whatever
+Each template reads the columns its query in section 4 exports. The headings match whatever
 their capitals.
 
 | Column heading | Loads into |

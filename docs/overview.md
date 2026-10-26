@@ -31,7 +31,7 @@ You choose the edition once, in the Setup Assistant. You can change it later: se
 
 | Package | What it holds | State on main |
 |---|---|---|
-| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM app, Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
+| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
 | **Rollup Builder** | The rollup engine and the Rollup Builder page where you manage totals | Built (offered in both editions; Giving depends on it) |
 | **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, stewardship plans, retention reports, posting and closed periods, gift import, the Giving dashboard, the Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |

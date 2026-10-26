@@ -6,12 +6,14 @@
 private class TabAccessServiceTest {
     private static final String PRIYA = 'Nair';
     private static final String SAM = 'Okafor';
+    private static final String TEAM_MEMBER = 'Mensah';
 
     @TestSetup
     static void createTestUsers() {
         System.runAs(TestUsers.admin()) {
             TestUsers.standardUserWith(PRIYA, new List<String>{ 'BarnCRM_Find_And_Export' });
             TestUsers.standardUserWith(SAM, new List<String>{ 'BarnCRM_Tab_Import' });
+            TestUsers.standardUserWith(TEAM_MEMBER, new List<String>{ 'BarnCRM_Staff' });
         }
     }
 
@@ -32,30 +34,44 @@ private class TabAccessServiceTest {
             Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Data Hygiene');
             Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
             Assert.isFalse(held.contains(TabAccessService.BULK_UPDATE_TAB), 'Nor Bulk Update');
+            Assert.isFalse(
+                held.contains(TabAccessService.DUPLICATE_MATCHING_TAB),
+                'Nor Duplicate Matching'
+            );
             Assert.areEqual(
-                5,
+                6,
                 tabSetsOf(UserInfo.getUserId()).size(),
-                'An upgraded org has every feature on, so the admin keeps all five tabs'
+                'An upgraded org has every feature on, so the admin keeps all six tabs'
             );
         }
     }
 
     @IsTest
-    static void givesADuplicateReviewerDataHygieneOnly() {
+    static void givesADuplicateReviewerAndAMetadataAdminDuplicateMatchingOnly() {
         System.runAs(TestUsers.admin()) {
             User reviewer = TestUsers.standardUserWith(
                 'Reviewer',
                 new List<String>{ 'BarnCRM_Duplicate_Review' }
+            );
+            User editor = TestUsers.standardUserWith(
+                'Editor',
+                new List<String>{ 'BarnCRM_Metadata_Admin' }
             );
 
             Test.startTest();
             TabAccessService.syncNow();
             Test.stopTest();
 
+            Set<String> expected = new Set<String>{ TabAccessService.DUPLICATE_MATCHING_TAB };
             Assert.areEqual(
-                new Set<String>{ TabAccessService.DATA_HYGIENE_TAB },
+                expected,
                 tabSetsOf(reviewer.Id),
-                'Duplicate Review shows Org Optimizer, where the duplicates are listed, and nothing else'
+                'Duplicate Review shows Duplicate Matching, where the review list is, and nothing else'
+            );
+            Assert.areEqual(
+                expected,
+                tabSetsOf(editor.Id),
+                'Metadata Admin shows Duplicate Matching, where the matching logic is changed'
             );
         }
     }
@@ -329,10 +345,94 @@ private class TabAccessServiceTest {
             Assert.areEqual(first, second, 'Starting it again finds the same job');
             Assert.isTrue(TabAccessScheduler.isScheduled(), 'It is scheduled');
             Assert.areEqual(
-                5,
+                6,
                 tabSetsOf(UserInfo.getUserId()).size(),
                 'The queued sync ran and gave the admin the tabs'
             );
+        }
+    }
+
+    @IsTest
+    static void everyRoleSeesBothStylesAndOnlyAdminsSeeTheAdminApps() {
+        System.runAs(TestUsers.admin()) {
+            Id staff = userId(TEAM_MEMBER);
+
+            Test.startTest();
+            TabAccessService.syncNow();
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.STANDARD_APP, TabAccessService.CONSOLE_APP },
+                appSetsOf(staff),
+                'Both is the default, so staff see BarnCRM and BarnCRM Console and no admin app'
+            );
+            Assert.areEqual(
+                new Set<String>{
+                    TabAccessService.STANDARD_APP,
+                    TabAccessService.CONSOLE_APP,
+                    TabAccessService.ADMIN_STANDARD_APP,
+                    TabAccessService.ADMIN_CONSOLE_APP
+                },
+                appSetsOf(UserInfo.getUserId()),
+                'An admin sees all four apps'
+            );
+            Assert.isTrue(
+                appSetsOf(userId(PRIYA)).isEmpty(),
+                'An extra permission alone is not a BarnCRM role, so it shows no app'
+            );
+        }
+    }
+
+    @IsTest
+    static void savingOneStyleHidesTheOtherAppsForEveryone() {
+        Id staff = userId(TEAM_MEMBER);
+        System.runAs(TestUsers.admin()) {
+            TabAccessService.syncNow();
+            Assert.areEqual(2, appSetsOf(staff).size(), 'Both styles before the change');
+        }
+        // A separate block: the platform does not mix the assignments with a settings write.
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    'App_Navigation_Style__c' => TabAccessService.STYLE_CONSOLE
+                }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.CONSOLE_APP },
+                appSetsOf(staff),
+                'The save queued the sync, which took the standard app away'
+            );
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.CONSOLE_APP, TabAccessService.ADMIN_CONSOLE_APP },
+                appSetsOf(UserInfo.getUserId()),
+                'And the admin keeps the two console apps'
+            );
+        }
+    }
+
+    @IsTest
+    static void eachStyleTurnsOnItsOwnTwoApps() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    'App_Navigation_Style__c' => TabAccessService.STYLE_STANDARD
+                }
+            );
+            Assert.areEqual(
+                new Set<String>{
+                    TabAccessService.STANDARD_APP,
+                    TabAccessService.ADMIN_STANDARD_APP
+                },
+                TabAccessService.appSetsOn(),
+                'Standard'
+            );
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_BOTH }
+            );
+            Assert.areEqual(4, TabAccessService.appSetsOn().size(), 'Both');
         }
     }
 
@@ -349,11 +449,19 @@ private class TabAccessServiceTest {
     }
 
     private static Set<String> tabSetsOf(Id userId) {
+        return setsOf(userId, 'BarnCRM_Tab_%');
+    }
+
+    private static Set<String> appSetsOf(Id userId) {
+        return setsOf(userId, 'BarnCRM_App_%');
+    }
+
+    private static Set<String> setsOf(Id userId, String pattern) {
         Set<String> names = new Set<String>();
         for (PermissionSetAssignment row : [
             SELECT PermissionSet.Name
             FROM PermissionSetAssignment
-            WHERE AssigneeId = :userId AND PermissionSet.Name LIKE 'BarnCRM_Tab_%'
+            WHERE AssigneeId = :userId AND PermissionSet.Name LIKE :pattern
             WITH SYSTEM_MODE
         ]) {
             names.add(row.PermissionSet.Name);

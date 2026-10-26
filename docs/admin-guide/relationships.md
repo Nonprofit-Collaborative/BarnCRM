@@ -19,7 +19,7 @@ Relationships is part of Core, but on a new install it is off until you turn it 
 it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
 to install and no Setup step.
 
-1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
+1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Relationships**.
 3. Leave **Keep both sides of relationships in step** switched on, which is how it ships.
    Switch it off only if your organization deliberately keeps one side of every connection,

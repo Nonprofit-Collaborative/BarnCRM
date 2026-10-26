@@ -2,7 +2,7 @@
 
 Scripts for Campaign sync, the Opportunity mirror, the accounting export, the Inbound Gift API and the Record Inbound Gift action. Setup detail: [Campaign Sync](../admin-guide/campaign-sync.md), [Opportunity Mirror](../admin-guide/opportunity-mirror.md), [Accounting Export](../admin-guide/accounting-export.md), [Inbound Gift API](../admin-guide/inbound-gift-api.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, Giving and Mirror deployed and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra permissions**, **Give permission**.
+Before you start: an org from [Before you test](before-you-test.md), with Core, Giving and Mirror deployed and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra Permissions**, **Give permission**.
 
 ## T-MIR-01: Switch on Campaign sync and sync all appeals
 
@@ -12,9 +12,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign sync**. | The **Campaign sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
+| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
 | 2 | In **Giving**, tick **Copy appeals to Campaigns** and save. | The setting saves. |
-| 3 | Open **Campaign sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
+| 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
 | 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see the new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
 | 6 | Open the App Launcher, search **Campaigns**, and open the list. | Seven Campaigns named after the appeals. **Spring Appeal** shows **Annual Fund** as its Parent Campaign. |
@@ -126,7 +126,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment method** (**All payment methods**), **Only gifts not yet posted** and **Download file**. |
+| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting Export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment method** (**All payment methods**), **Only gifts not yet posted** and **Download file**. |
 | 2 | Set **From** and **To** to the first and last day of last month. Click **Download file**. | `accounting-export-<from>-to-<to>.csv` downloads. The page says `<rows> rows from <gifts> gifts. Net total <amount>.` |
 | 3 | Open the file. | Header row: `Date,Gift Number,Original Gift,Donor,Fund,Accounting Code,Payment Method,Reference,Amount`. Every date is in the range, and Amount adds up to the net total. |
 | 4 | Choose **Building Fund** in **Fund** and download. | Every row says Building Fund, accounting code 4100. |

@@ -12,6 +12,7 @@ private class GivingSchedulerTest {
     @IsTest
     static void schedulesAllThreeNightlyJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingScheduler.scheduleAll();
             Test.stopTest();
@@ -36,6 +37,7 @@ private class GivingSchedulerTest {
     @IsTest
     static void schedulingTwiceDoesNotCreateASecondSetOfJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingScheduler.scheduleAll();
             List<Id> second = GivingScheduler.scheduleAll();
@@ -62,6 +64,7 @@ private class GivingSchedulerTest {
     @IsTest
     static void stopUnschedulesEveryJob() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingScheduler.scheduleAll();
             GivingScheduler.stopAll();
@@ -87,6 +90,7 @@ private class GivingSchedulerTest {
     @IsTest
     static void aPartlyScheduledOrgIsNotReportedAsSwitchedOn() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             System.schedule(
                 GivingScheduler.OVERDUE_JOB_NAME,

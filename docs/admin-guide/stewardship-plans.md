@@ -28,7 +28,7 @@ Three things to hold on to, because they are the questions people ask first:
 
 Everything is in the app. You never open Setup.
 
-Open **BarnCRM Settings**, choose the **Giving** section, and open **Stewardship plans**.
+Open **BarnCRM Settings**, choose the **Giving** section, and open **Stewardship Plans**.
 The page lists every plan you have written down, how many steps each one lays out, how many
 copies of it are running right now, and whether it is switched on.
 
@@ -78,7 +78,7 @@ offered no **Start plan**.
 
 ## A five-minute walkthrough
 
-1. Open **BarnCRM Settings**, **Giving**, **Stewardship plans**, and choose **New plan**.
+1. Open **BarnCRM Settings**, **Giving**, **Stewardship Plans**, and choose **New plan**.
    Call it "First gift welcome", started by **First gift**, no
    smallest gift. Leave **On** unchecked and save.
 2. Choose the plan in the list, then add three steps:

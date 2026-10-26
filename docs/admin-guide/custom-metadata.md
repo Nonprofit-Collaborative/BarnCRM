@@ -12,17 +12,14 @@ BarnCRM ships eleven types (Spouse, Parent and Child, and so on). If your organi
 records godparents, mentors, or guardians, you add the pairs here and BarnCRM keeps both
 sides in step for them the same way it does for its own.
 
-Below it is **Match sources**: the related records the duplicate scan and imports look at
-to tell that two people, or two households, are the same. Salesforce's duplicate rules only
-compare fields on the person or account itself, so an email kept only on a contact point
-email record, or an address kept only on a BarnCRM address, is never compared. Each source
-names an object, the field holding the value, the field linking it to its person or
-household, and how values are compared (Email, Phone or Address). See
-[Duplicates](duplicates.md) for what the scan does with them.
+Match sources, the related records the duplicate scan and imports compare, are custom
+metadata too, but they have their own editor: the **Matching Logic** area of the
+**Duplicate Matching** tab (see [Duplicates](duplicates.md#matching-logic)). It saves the
+same way and needs the same permission set and Setup step as this page.
 
 The entries BarnCRM ships are shown on the same page, marked **Shipped with BarnCRM**,
-and cannot be changed, except that a shipped match source can be archived and restored.
-Upgrades keep them up to date, and they never overwrite what you added.
+and cannot be changed. Upgrades keep them up to date, and they never overwrite what you
+added.
 
 ## How to turn it on
 
@@ -37,7 +34,7 @@ entry changes the org's metadata.
    Non-Certified Package Versions via Apex**. This setting is in Setup only, and BarnCRM
    cannot turn it on for you: it is Salesforce's own safeguard. If it is off, saving an
    entry says so.
-3. Open the **BarnCRM** app, click **BarnCRM Settings**, choose **General**, and scroll to
+3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
    **Custom Metadata**.
 
 A relationship type also has to be a choice in the **Type** list on a relationship, and
@@ -104,62 +101,17 @@ them.
 
 ## Match sources
 
-BarnCRM ships six:
-
-| Source | Object | Value | Linked by | Compared as |
-|---|---|---|---|---|
-| Contact Point Email | Contact Point Email | Email Address | Parent | Email |
-| Contact Point Phone | Contact Point Phone | Telephone Number | Parent | Phone |
-| Contact Point Address | Contact Point Address | Street and Postal Code | Parent | Address |
-| Address (person) | Address | Street and Postal Code | Contact | Address |
-| Address (household) | Address | Street and Postal Code | Account | Address |
-| Address (person account) | Address | Street and Postal Code | Person Account | Address |
-
-The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
-object is missing, its source does nothing; nothing breaks.
-
-How values are compared:
-
-- **Email**: spaces at either end are ignored, and capitals do not matter.
-- **Phone**: only the digits count, so (555) 123-4567 and 555.123.4567 match. A North
-  American number written with a leading 1 matches the same number without it. A number with
-  fewer than seven digits is ignored.
-- **Address**: the street, with capitals, punctuation and extra spaces ignored and common
-  words shortened (Street and St, Avenue and Ave match), together with the postal code
-  (spaces ignored; a ZIP+4 counts as its first five digits).
-
-A contact point record can belong to a person, an account, or a Salesforce **Individual**
-(the privacy record behind a person). A person or an account is used as it is; an Individual
-counts as every person who carries it, contacts and, where your org has person accounts,
-person accounts too. A record that belongs to anything else is skipped.
-
-When you add your own source, the value field (and, for an address, the postal code field)
-must be a text, email or phone field Salesforce can search on, and the parent field must be a
-lookup to a contact, an account or an Individual. The page refuses anything else.
-
-A value shared by more than ten people or households, such as an office's main number, is
-ignored: it says nothing about whether two of them are the same.
-
-Each lookup reads at most 5,000 records. When a lookup reaches that limit, or a scan or import
-step has used most of what Salesforce allows in one go so a source is skipped, the Error Log
-gets one warning naming the source, and the values that lookup found are not used, since some
-of the records holding them were not read. Some duplicates may then be missed until the next
-scan. A source whose values are very common is a candidate to archive.
-
-To add your own source, choose **Add** under **Match sources** and fill in the object's API
-name (for example `Volunteer_Profile__c`), the field holding the value, the lookup to the
-person or household, and **Normalization**. For **Address**, also fill in **Postal Code
-Field**. The page checks that the object and fields exist and that the link is a lookup.
-
-To stop using a shipped source, open the menu on its row under **Shipped with BarnCRM** and
-choose **Archive**. **Restore** brings it back.
+Match sources are no longer on this page. They are listed, added, deactivated and tried out
+in the **Matching Logic** area of the **Duplicate Matching** tab; see
+[Duplicates](duplicates.md#matching-logic). The **BarnCRM Metadata Admin** permission set
+and the Setup step above apply there too.
 
 ## Which lists can be extended
 
 | List | Here | Why |
 |---|---|---|
 | Relationship types | Add, edit, archive | BarnCRM reads the list directly, so an entry you add is used at once. |
-| Match sources | Add, edit, archive; archive and restore a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
+| Match sources | On the Duplicate Matching tab, Matching Logic: add, edit, deactivate; deactivate and activate a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
 | Automations, settings | No | These describe BarnCRM's own code and pages. An entry you added would point at nothing. |
 | Receipt templates (Giving) | No | Copied into the Receipt Letters page, where you edit your own. |

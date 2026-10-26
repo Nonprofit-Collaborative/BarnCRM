@@ -73,6 +73,16 @@ public with sharing class ModuleDetectionService {
          */
         @AuraEnabled
         public Boolean nonprofitOnly;
+        /**
+         * For a module that is here, its tabs that belong in the BarnCRM and BarnCRM Console apps
+         * (`Staff_Tabs__c`) and in the two admin apps (`Admin_Tabs__c`), by label and comma
+         * separated, so an administrator can add them in App Manager after a package install;
+         * otherwise null (ADR-0137).
+         */
+        @AuraEnabled
+        public String staffTabs;
+        @AuraEnabled
+        public String adminTabs;
     }
 
     /**
@@ -174,11 +184,14 @@ public with sharing class ModuleDetectionService {
             }
         }
         Map<String, String> appIds = appIds(hereRows);
+        Map<String, String> tabLabels = tabLabels(hereRows);
         for (BarnCRM_Module__mdt row : rows) {
             Boolean present = presentByName.get(row.DeveloperName);
             if (present || offeredIn(row, edition)) {
                 ModuleInfo info = module(row, present, appIds);
                 info.installFirst = present ? null : missing(row, presentByName, labelByName);
+                info.staffTabs = present ? labelsOf(row.Staff_Tabs__c, tabLabels) : null;
+                info.adminTabs = present ? labelsOf(row.Admin_Tabs__c, tabLabels) : null;
                 offered.add(info);
             }
         }
@@ -377,6 +390,78 @@ public with sharing class ModuleDetectionService {
             }
         } catch (Exception e) {
             ErrorLogger.log(e, 'BarnCRM module app links');
+        }
+        return found;
+    }
+
+    /** The entries in a catalog field, each `Name` or `Name:Label`, in the order written. */
+    private static List<String> tabEntries(String field) {
+        List<String> entries = new List<String>();
+        for (String part : (field == null ? '' : field).split(';')) {
+            if (String.isNotBlank(part)) {
+                entries.add(part.trim());
+            }
+        }
+        return entries;
+    }
+
+    /** The tab names in a catalog field, unprefixed, in the order written. */
+    private static List<String> tabNames(String field) {
+        List<String> names = new List<String>();
+        for (String entry : tabEntries(field)) {
+            names.add(entry.substringBefore(':').trim());
+        }
+        return names;
+    }
+
+    /**
+     * The tabs' labels, comma separated, or null when the field names none: the label an
+     * entry carries, else its object's, else its name with spaces.
+     */
+    private static String labelsOf(String field, Map<String, String> tabLabels) {
+        List<String> labels = new List<String>();
+        for (String entry : tabEntries(field)) {
+            String name = entry.substringBefore(':').trim();
+            String written = entry.substringAfter(':').trim();
+            labels.add(
+                String.isNotBlank(written)
+                    ? written
+                    : tabLabels.containsKey(name)
+                          ? tabLabels.get(name)
+                          : name.removeEnd('__c').replace('_', ' ')
+            );
+        }
+        return labels.isEmpty() ? null : String.join(labels, ', ');
+    }
+
+    /** Stands in for the tab labels in tests, by unprefixed tab name. */
+    @TestVisible
+    private static Map<String, String> tabLabelsOverride;
+
+    /**
+     * The labels of the object tabs these catalog rows name, by unprefixed name: an object
+     * tab is labelled with its object's plural label. A page tab, or an object not here, is
+     * left out, and its name stands in for its label (page tabs are named after their label).
+     */
+    private static Map<String, String> tabLabels(List<BarnCRM_Module__mdt> rows) {
+        if (tabLabelsOverride != null) {
+            return tabLabelsOverride;
+        }
+        Map<String, String> found = new Map<String, String>();
+        for (BarnCRM_Module__mdt row : rows) {
+            List<String> names = tabNames(row.Staff_Tabs__c);
+            names.addAll(tabNames(row.Admin_Tabs__c));
+            for (String name : names) {
+                Schema.SObjectType type = name.endsWith('__c')
+                    ? NamespaceUtil.packagedObjectType(name)
+                    : null;
+                if (type != null) {
+                    found.put(
+                        name,
+                        type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()
+                    );
+                }
+            }
         }
         return found;
     }

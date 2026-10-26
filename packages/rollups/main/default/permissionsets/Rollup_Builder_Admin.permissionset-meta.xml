@@ -7,10 +7,6 @@
     nightly run, and retry the queue in Needs attention. Changing a rollup also needs the
     Manage BarnCRM Settings permission.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Rollup_Builder</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>RollupAttentionController</apexClass>
     <enabled>true</enabled>

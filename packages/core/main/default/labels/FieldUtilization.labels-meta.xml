@@ -118,7 +118,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: save button</shortDescription>
-        <value>Save these counts</value>
+        <value>Save Utilization Snapshot</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_SaveHelp</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: help text under the save button</shortDescription>
+        <value>Keeps this count so your next count shows what changed.</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_Saved</fullName>

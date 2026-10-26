@@ -3,7 +3,7 @@
 ## What it does
 
 Finds people and households that are in your database twice, and helps you deal with them one
-pair at a time. Salesforce does the finding, with the duplicate rules every org starts with:
+pair at a time, on the **Duplicate Matching** tab. Salesforce does the finding, with the duplicate rules every org starts with:
 it warns the person typing that somebody similar already exists. What Salesforce does not do
 in most editions is look through the records you already have, so a spreadsheet imported last
 year is never checked against itself. BarnCRM adds that scan, lists every pair on one page,
@@ -15,15 +15,16 @@ Salesforce's rules only compare fields on the person or household itself. The sc
 at **match sources**: related records such as contact point emails, phones and addresses, and
 BarnCRM addresses. Two people who share an email held only on a contact point email record are
 listed too, with a line saying why, for example "Same email on Contact Point Email". Match
-sources are listed, added and archived on the **Custom Metadata** page; see
-[Custom metadata](custom-metadata.md#match-sources).
+sources are listed, added, deactivated and tried out in the tool's **Matching Logic** area;
+see [Matching Logic](#matching-logic).
 
 ## How to turn it on
 
-There is nothing to install, but on a new install the **Duplicate Review** feature is off
-until you turn it on: choose **Turn on** in the **Duplicate Review** row in **BarnCRM
+There is nothing to install, but on a new install the **Duplicate Matching** feature is off
+until you turn it on: choose **Turn on** in the **Duplicate Matching** row in **BarnCRM
 Settings**, **General** (or leave it ticked in first-run setup); see
-[BarnCRM Settings](barncrm-settings.md). Salesforce switches on its standard duplicate rules
+[BarnCRM Settings](barncrm-settings.md). While it is off the **Duplicate Matching** tab is
+hidden for everyone. Salesforce switches on its standard duplicate rules
 for people and accounts in every new org, and BarnCRM uses them. There is one permission
 step, because of a Salesforce licensing rule:
 
@@ -33,16 +34,22 @@ license**. No other license can have it, Salesforce Platform included. So BarnCR
 access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
 Settings, open **Access** and, under **Extra Permissions**, give **BarnCRM Duplicate Review** to
 each person who will review duplicates. Salesforce refuses the assignment for a user
-without one of those licenses. A holder who is not an administrator also gets the **Org
-Optimizer** tab with its **Duplicates** section, which they can read; scanning, dismissing and
+without one of those licenses. A holder who is not an administrator also gets the **Duplicate
+Matching** tab with its **Review** area, which they can read; scanning, dismissing and
 merging there stay with BarnCRM Admin. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
-2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
-   **Open Org Optimizer** button brings you here too.)
+**Who sees the tab.** BarnCRM gives the **Duplicate Matching** tab automatically, while the
+feature is on, to holders of **BarnCRM Admin**, **BarnCRM Duplicate Review** and **BarnCRM
+Metadata Admin** (see [Access](access.md)).
+
+1. Open the **BarnCRM Admin** app and choose the **Duplicate Matching** tab (someone without
+   that app, such as a Duplicate Review holder, finds the tab in the App Launcher). (In **BarnCRM
+   Settings**, the **Duplicate Matching** section's **Duplicate Matching** row has an **Open
+   this page** button that brings you here too.)
+2. The **Review** area opens first.
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -55,6 +62,99 @@ Platform user nothing usable.
 Run the scan again after a large import: Salesforce checks a record against the others when
 it is saved, but an import that saved past a warning leaves the pair for the scan to find.
 
+### Settings
+
+In **BarnCRM Settings**, the **Duplicate Matching** section holds the tool's settings: a note
+on the one Setup step (keep the duplicate rules active, give reviewers Duplicate Review) and
+the **Duplicate Matching** row, whose **Open this page** button opens the tab. The scan has
+no options to set: it always checks every person and household with your active duplicate
+rules and your active match sources.
+
+### Matching Logic
+
+The **Matching Logic** area of the **Duplicate Matching** tab lists the match sources: the
+related records the scan and imports look at, alongside your Salesforce duplicate rules, to
+tell that two people or two households are the same. The rules themselves are listed, read
+only, in **Review**, with a link to change them in Setup.
+
+Who sees it: anyone with **Manage BarnCRM Settings** (BarnCRM Admin) or the **BarnCRM
+Metadata Admin** permission set. Adding, changing, deactivating and activating a source
+needs **BarnCRM Metadata Admin**, because saving one changes the org's metadata; without it
+the list is read only, and **Try a value** still works. If BarnCRM was installed as a
+package, saving also needs **Deploy Metadata from Non-Certified Package Versions via Apex**
+turned on in Setup, **Apex Settings**; see [Custom metadata](custom-metadata.md#how-to-turn-it-on).
+
+Each source is a card that says, in words, what it compares:
+
+- **Object**: the related object, for example Contact Point Email.
+- **Field compared**: the field holding the value: the email, the phone number, or the street.
+- **Postal code field**: address sources only; the postal code compared with the street.
+- **Belongs to**: a person, a household (or person account), or either.
+- **Through the lookup**: the field linking the value to its person or household.
+- **How values are compared**: Email, Phone or Address, with what is ignored.
+
+Each card says **Active** or **Inactive**. A source that cannot work in this org (its object
+or a field is missing, or you cannot read it) says **Not used in this org** and is skipped.
+
+BarnCRM ships six sources, marked **Shipped with BarnCRM**:
+
+| Source | Object | Field compared | Through the lookup | Compared as |
+|---|---|---|---|---|
+| Contact Point Email | Contact Point Email | Email Address | Parent | Email |
+| Contact Point Phone | Contact Point Phone | Telephone Number | Parent | Phone |
+| Contact Point Address | Contact Point Address | Street, with Postal Code | Parent | Address |
+| Address (person) | Address | Street, with Postal Code | Contact | Address |
+| Address (household) | Address | Street, with Postal Code | Account | Address |
+| Address (person account) | Address | Street, with Postal Code | Person Account | Address |
+
+The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
+object is missing, its source does nothing; nothing breaks. A shipped source can be
+deactivated and activated again, but not changed; upgrades keep it up to date and never
+overwrite what you added.
+
+How values are compared:
+
+- **Email**: spaces at either end are ignored, and capitals do not matter.
+- **Phone**: only the digits count, so (555) 123-4567 and 555.123.4567 match. A North
+  American number written with a leading 1 matches the same number without it. A number with
+  fewer than seven digits is ignored.
+- **Address**: the street, with capitals, punctuation and extra spaces ignored and common
+  words shortened (Street and St, Avenue and Ave match), together with the postal code
+  (spaces ignored; a ZIP+4 counts as its first five digits).
+
+A contact point record can belong to a person, an account, or a Salesforce **Individual**
+(the privacy record behind a person). A person or an account is used as it is; an Individual
+counts as every person who carries it, contacts and, where your org has person accounts,
+person accounts too. A record that belongs to anything else is skipped.
+
+**Add a source.** Choose **Add**. Fill in **Name**, then the object's API name under
+**Object** (for example `Volunteer_Profile__c`) and choose **Find fields**: the
+**Field compared** and **Through the lookup** lists then offer only the fields that can
+work (text, email or phone fields Salesforce can search on, and lookups to a contact, an
+account or an Individual). Choose **How values are compared**; for **Address**, also choose
+the **Postal code field**. **Save** checks the source against the org and refuses anything
+that cannot work, saying why. Saving takes about a minute, because Salesforce applies it in
+the background: the area says "Saving", then "Saved" and lists the source. If you leave
+before then, choose **Check again** when you come back. A source you added has **Edit** as
+well.
+
+**Deactivate a source.** Choose **Deactivate** on its card; **Activate** brings it back.
+Salesforce does not let an app delete custom metadata, so a source is deactivated instead.
+
+**Try a value.** Choose **Try a value** on a card, type an email, phone or street (and, for
+an address, the postal code), and choose **Try**. The area shows the value as the source
+compares it ("Compared as: 12 n main st|02139") and lists the people and households you can
+see that hold it. Nothing is saved. A value too short to compare says so.
+
+A value shared by more than ten people or households, such as an office's main number, is
+ignored: it says nothing about whether two of them are the same.
+
+Each lookup reads at most 5,000 records. When a lookup reaches that limit, or a scan or import
+step has used most of what Salesforce allows in one go so a source is skipped, the Error Log
+gets one warning naming the source, and the values that lookup found are not used, since some
+of the records holding them were not read. Some duplicates may then be missed until the next
+scan. A source whose values are very common is a candidate to deactivate.
+
 ## A five-minute walkthrough
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)). Create one duplicate
@@ -62,7 +162,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **Org Optimizer** and choose **Duplicates**.
+1. Open the **Duplicate Matching** tab. The **Review** area opens.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -162,13 +262,13 @@ same pairs twice, so a second one is refused.
 from this panel or with **Merge or split** on the household's record page. That merge moves
 the members, recalculates the totals and renames the household, and lets you choose what to
 keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
-and renames the kept household, settles its primary member and keeps one default address within
+and renames the kept household, settles its primary member and keeps one primary address within
 a minute or so, in the background, because Salesforce does not let anything change the records
 while it is merging them. If a person was in both households, they are left with one membership in the kept household (the primary one, or else the earlier start), so they are counted once. It cannot ask which name or members to keep, which is why the
 household record page does not offer that merge.
 
 **A merge run by another app or a background job.** The tidy-up after a Salesforce merge (one
-membership per person, the count and name, one default address, no relationship with oneself,
+membership per person, the count and name, one primary address, no relationship with oneself,
 the primary affiliation) also runs when the merge was made by a background job, an
 integration or a deduplication app. When the merge itself runs in the background, BarnCRM
 asks for the tidy-up once the merge is saved, so it can take a minute or two longer. That
@@ -178,10 +278,12 @@ Salesforce refuses that request (for example, the org has used its daily allowan
 events) does the **Error Log** get a Warning, under the context "Tidy-up after a merge",
 naming the kept records and the reason. Open each record named and correct it by hand.
 
-**A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
-Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings
-permission, which the BarnCRM Admin permission set grants, and access to duplicate record sets,
-which the BarnCRM Duplicate Review permission set grants.
+**A colleague cannot find the panel, or sees it without buttons.** The **Review** area of the
+**Duplicate Matching** tab needs BarnCRM Admin or BarnCRM Duplicate Review, and the tab
+appears a minute or so after either is given. Scanning, dismissing and merging from it need
+the Manage BarnCRM Settings permission, which the BarnCRM Admin permission set grants, and
+access to duplicate record sets, which the BarnCRM Duplicate Review permission set grants.
+Duplicates are no longer in **Org Optimizer**.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.

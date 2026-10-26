@@ -1008,7 +1008,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address) | Update household | What happens when a person's address is edited: the household moves, or that person gets an address of their own (R-AD5). |
+| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-0140). A blank reads and shows as Update household. |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
@@ -1085,6 +1085,15 @@ a BarnCRM record.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
+
+### App Navigation Key
+
+Added with the four BarnCRM apps (ADR-0137).
+Shown in the console's General section as **App Navigation Style**.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `App_Navigation_Style__c` | picklist(Standard, Console, Both) | Both | Which navigation style of the BarnCRM apps BarnCRM shows: Standard shows BarnCRM and BarnCRM Admin, Console shows BarnCRM Console and BarnCRM Admin Console, Both shows all four. Stored as text (ADR-0019); a blank or unknown value reads as Both. Applied by `TabAccessService`, which gives and takes the `BarnCRM_App_*` permission sets; a change queues that sync. |
 
 ### Org Optimizer keys
 
@@ -1340,8 +1349,10 @@ BarnCRM Settings (ADR-0085, `0085-custom-metadata-manager-edits-only-types-read-
 `Match_Source__mdt` (ADR-0133, `0133-related-record-matching.md`): a related object whose
 values pair people or households as likely duplicates, read directly by the duplicate scan
 (Section 29A) and by import matching (R-IT16). One row per object and parent link. Registered with the
-custom metadata manager, where an administrator adds, edits and archives their own rows and
-archives or restores a shipped one (R-D2).
+custom metadata manager, which saves it, but not listed on the Custom metadata page: an
+administrator adds, edits and deactivates their own rows, and deactivates or activates a
+shipped one, in the Duplicate Matching tab's Matching Logic area (R-D2; ADR-0139,
+`0139-duplicate-matching-tool.md`).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1401,7 +1412,9 @@ names the modules a module's package needs installed first (ADR-0125
 | Install Version Id | `Install_Version_Id__c` | text (18) | The published package version Id (`04t`) Salesforce's installer opens, or empty until the module is first published. |
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
-| App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. |
+| App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. The home page's Modules list and the Module Manager link to it. |
+| Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the BarnCRM and BarnCRM Console apps (ADR-0137). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
+| Admin Tabs | `Admin_Tabs__c` | text (255) | Optional. The same for the module's admin tools and settings pages, which belong in the BarnCRM Admin and BarnCRM Admin Console apps (for example `Rollup_Builder`). Empty means none. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Integration App
@@ -1440,7 +1453,9 @@ tables above before the metadata file is created.
 `CustomMetadataManagerService` as admin-editable; today Relationship Type and Match Source.
 For a registered type: a row with `Is_Shipped__c` true is never changed by the manager,
 except that a type registered as shipped-archivable (Match Source) lets a shipped row be
-archived and restored, its other values deployed unchanged (ADR-0133);
+archived and restored, its other values deployed unchanged (ADR-0133). A registered type
+may be unlisted: saved through the manager but edited only on its own page (Match Source,
+on Matching Logic, which shows archiving as Deactivate; ADR-0139);
 a row the manager creates has `Is_Shipped__c` false, is not protected, and has a
 DeveloperName starting `Org_`, a prefix no shipped row uses, so a later package version
 can never ship a row with the same name; archiving clears the type's active field and
@@ -6084,7 +6099,7 @@ history is not lost when someone moves.
 | Seasonal Start Day | integer | conditional | The day of that month; required when Type is Seasonal. |
 | Seasonal End Month | integer | conditional | The month a seasonal address stops being used; required when Type is Seasonal. |
 | Seasonal End Day | integer | conditional | The day of that month; required when Type is Seasonal. |
-| Is Default | boolean | yes (defaults false) | Marks the address currently written to the standard address fields. |
+| Primary | boolean | yes (defaults false) | Marks the address currently written to the standard address fields (API name `Is_Default__c`). |
 | Verification Status | picklist(Unverified, Verified, Failed) | yes (defaults Unverified) | Whether an address verification service has confirmed this address. |
 | Latest Verified Date | date | no | When verification last succeeded. |
 | Replaced By Seasonal | boolean | yes (defaults false) | Marks the address the seasonal swap displaced, so the job knows which address to put back when the season ends. |
@@ -6093,7 +6108,7 @@ history is not lost when someone moves.
 
 - **Address to its owner**, many to one, to exactly one of Account, Contact, or Person
   Account (R-AD1).
-- Addresses have no relationship to gifts or receipts: a receipt reads the owner's default
+- Addresses have no relationship to gifts or receipts: a receipt reads the owner's primary
   address at the time it is issued and stores the text it printed (v0.4, G-13).
 
 ### Rules
@@ -6102,23 +6117,23 @@ history is not lost when someone moves.
 owned by an account is the household's or the organization's; an address owned by a person
 is theirs alone and does not affect their household.
 
-**R-AD2 One default per owner.** At most one address per owner has Is Default true.
+**R-AD2 One primary per owner.** At most one address per owner has Primary true.
 Setting it on a second clears the first. Within one save that marks several addresses of
-one owner as default, the last of them keeps the flag. Clearing the flag on an owner's only
-default, with no other put in use in the same save, is refused (label
-`Core_Address_CannotUntickOnlyDefault`). When the default is deleted, the newest remaining
+one owner as primary, the last of them keeps the flag. Clearing the flag on an owner's only
+primary, with no other put in use in the same save, is refused (label
+`Core_Address_CannotUntickOnlyDefault`). When the primary is deleted, the newest remaining
 address that is not Seasonal is promoted, and a Seasonal one only when nothing else is left.
-The first address added from the address card to an owner with none is saved as default.
+The first address added from the address card to an owner with none is saved as primary.
 
-**R-AD3 Default propagation.** The default address is copied to the standard address
+**R-AD3 Primary propagation.** The primary address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
 Account's billing address for a household or an organization, and to the Contact's mailing
 address for a person. The copy happens on save and on the seasonal swap. A household's or
-an organization's default is also copied to the mailing address of each current member of
+an organization's primary is also copied to the mailing address of each current member of
 the household, except two, who keep the address they have, on save and on the seasonal swap
 alike:
 
-- a member stored as a Contact who has a default address of their own (one owned through
+- a member stored as a Contact who has a primary address of their own (one owned through
   Contact, R-AD1), such as the one R-AD5's personal address behavior gives them. This is how
   one person lives apart from their household, with no field to say so. A member held as a
   Person Account is not asked this, because every person account carries an address of its
@@ -6126,11 +6141,17 @@ alike:
 - in junction mode, a member for whom this household is not their household (R-M3: their
   primary membership, else their earliest current one).
 
+Where the org's Address Updates setting is "Nobody moves until you choose" (R-AD5), a
+household's or an organization's new primary is written to its own billing fields only, on
+save, on a billing edit and when a primary is deleted alike: it reaches the members above
+only on a move someone chose on the address card (R-AD9) or on the seasonal swap (R-AD4),
+which moves members in every setting (ADR-0140).
+
 The standard fields are not where a change is kept, but a change made there is captured
 rather than lost: a person's mailing address under R-AD5, and a household's or an
-organization's billing address, on insert and when it changes afterwards, as a new default
+organization's billing address, on insert and when it changes afterwards, as a new primary
 address of type Home (Work for an organization), the old one kept as history (R-AD7). An
-emptied billing address, one the default already holds, and BarnCRM's own copy are not
+emptied billing address, one the primary already holds, and BarnCRM's own copy are not
 captured, and neither is a household that carries a native Nonprofit Cloud household group,
 whose standard fields this rule never writes (product-plan Section 11.2 item 9).
 
@@ -6142,26 +6163,26 @@ is. A household member, or an owner named in Person Account, that turns out to b
 household or an organization is left out of the copy rather than written and refused, which
 would refuse the address the user was saving along with it.
 
-**R-AD4 Seasonal swap.** A daily scheduled job makes the seasonal address the default
-while today falls inside its range, and restores the previous default when the range ends.
+**R-AD4 Seasonal swap.** A daily scheduled job makes the seasonal address the primary
+while today falls inside its range, and restores the previous primary when the range ends.
 Ranges may wrap the end of the year, so a November to March range is one range and not two.
 A range is inclusive at both ends: an address used from November 1 to March 31 is in use on
 November 1 and on March 31, and out of use on April 1.
 
 The job works one owner at a time and does exactly one of four things for each:
 
-1. A seasonal address is in season and is not the default: the current default is marked
-   Replaced By Seasonal, its default flag is cleared, and the seasonal address becomes the
-   default.
-2. The default is a seasonal address whose season has ended: the address marked Replaced By
-   Seasonal becomes the default again and that mark is cleared. If no address carries the
+1. A seasonal address is in season and is not the primary: the current primary is marked
+   Replaced By Seasonal, its primary flag is cleared, and the seasonal address becomes the
+   primary.
+2. The primary is a seasonal address whose season has ended: the address marked Replaced By
+   Seasonal becomes the primary again and that mark is cleared. If no address carries the
    mark, the most recently created address that is not seasonal is promoted instead, and if
    the owner has no other address the seasonal one stays in place rather than leaving the
    owner with no address at all.
 3. Two seasonal addresses are in season on the same day, which is a data entry mistake: the
    oldest wins so the outcome does not change from night to night, and the run records the
    collision in the Error Log rather than choosing silently.
-4. Nothing to do: the right address is already the default.
+4. Nothing to do: the right address is already the primary.
 
 Nothing else on the address is touched, and the propagation to the standard address fields
 (R-AD3) is the address automation's work rather than the job's, so switching that automation
@@ -6176,11 +6197,24 @@ swapping. The job reads and writes in system mode, because a nightly reconciliat
 package owned data must not depend on what the person who happened to schedule it can see
 (ADR-0027).
 
-**R-AD5 Contact address change behavior.** When a person's address is edited, the org's
-contact address change behavior setting decides what happens: update the household's
-address, so everyone in the household moves together, or create a personal address for
-that person alone. The setting is explained in those words in the settings console, not in
-terms of objects.
+**R-AD5 Address Updates.** When a person's address is edited, the org's Address Updates
+setting (`Contact_Address_Change_Behavior__c`) decides what happens, and it also decides
+whether a household's change reaches its members on its own (R-AD3). Three choices
+(ADR-0140):
+
+- **Everyone in the household moves together** (`Update household`, the shipped choice, and
+  what a blank or unknown value means): the edit becomes the household's new primary
+  address, so everyone in the household without an address of their own moves with it.
+- **Only that person moves** (`Create personal address`): the edit becomes a primary address
+  of that person's own. A household change still reaches every member with no address of
+  their own.
+- **Nobody moves until you choose** (`Manual`): the edit stays that person's own, as above,
+  and a household change reaches its members only when someone chooses to move them (R-AD9),
+  or through the seasonal swap, which still reaches every member with no address of their
+  own (R-AD4).
+
+The setting is explained in those words in the settings console, not in terms of objects,
+and the console shows a blank as the shipped choice, never an empty box.
 
 **R-AD6 Verification is a placeholder.** Verification Status and Latest Verified Date are
 never written by packaged code. They exist so that a third-party verification app can
@@ -6188,8 +6222,23 @@ write them and so that a report can find unverified addresses. Third-party verif
 out of scope (plan Section 4.7).
 
 **R-AD7 History is kept.** Moving a household creates a new address and clears the old
-one's default flag. The old address is not deleted, so a mailing sent last year can still
+one's primary flag. The old address is not deleted, so a mailing sent last year can still
 be explained.
+
+**R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
+Updates setting (ADR-0140). Each checks the user's own access as any address write does,
+works for many records in one save, and keeps what it replaces as history (R-AD7):
+
+- On a person's own address, **Use for Whole Household** gives the person's household a new
+  primary address copied from it (in junction mode their household under R-M3; where they
+  are a current member of more than one, the user picks which). A person stored as a Contact
+  stops having a primary address of their own, so they follow the household again; their
+  addresses stay on file. Every member who takes the household's address (R-AD3) moves.
+- On a household's primary address, **Update Everyone's Address** copies it to every member
+  who takes the household's address (R-AD3), after a confirmation that lists them and the
+  members with a primary address of their own. Those are left alone unless ticked; a ticked
+  member's own primary stops being primary, kept as history, and they take the household's
+  address from then on. A member for whom this is not their household is not listed.
 
 ### Salesforce implementation
 
@@ -6210,7 +6259,7 @@ be explained.
 | Seasonal Start Day | `Seasonal_Start_Day__c` | Number (0 decimals) |
 | Seasonal End Month | `Seasonal_End_Month__c` | Number (0 decimals) |
 | Seasonal End Day | `Seasonal_End_Day__c` | Number (0 decimals) |
-| Is Default | `Is_Default__c` | Checkbox |
+| Primary | `Is_Default__c` | Checkbox |
 | Verification Status | `Verification_Status__c` | Picklist: Unverified, Verified, Failed |
 | Latest Verified Date | `Latest_Verified_Date__c` | Date |
 | Replaced By Seasonal | `Replaced_By_Seasonal__c` | Checkbox |
@@ -6221,8 +6270,9 @@ be explained.
 - **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
-  Addresses card reads and saves through Lightning Data Service, with no controller,
-  ADR-0093 record reads through Lightning Data Service); and for the seasonal swap
+  Addresses card reads and saves through Lightning Data Service, ADR-0093 record reads
+  through Lightning Data Service, and calls `AddressMoveController` only for the two
+  household moves of R-AD9); and for the seasonal swap
   `SeasonalAddressService`,
   `SeasonalAddressSelector`, `SeasonalAddressWriter`, `SeasonalAddressBatch`,
   `SeasonalAddressScheduler`, `SeasonalAddressController`.
@@ -6350,9 +6400,10 @@ logged and counted as a failure.
   Cloud and Service Cloud users, so no Core role grants them: the optional permission set
   `BarnCRM_Duplicate_Review` does, and the panel says so to anyone without it (ADR-0050).
   That set also carries the custom permission `Review_Duplicate_Suggestions`, which grants
-  no record access and only shows the Duplicates section of Org Optimizer to a holder who is
-  not an administrator; its holders are in the Data Hygiene tab's audience
-  (`TabAccessService`). Scanning, dismissing and merging still need Manage BarnCRM Settings.
+  no record access and only shows the Review area of the Duplicate Matching tab to a holder
+  who is not an administrator; its holders are in that tab's audience (`TabAccessService`,
+  `BarnCRM_Tab_Duplicate_Matching`, ADR-0139). Scanning, dismissing and merging still need
+  Manage BarnCRM Settings.
 - **People merges** are the platform's. When a contact, or a person stored as an account, is
   deleted by a merge (`MasterRecordId` filled in `after delete`), its memberships are
   recreated on the survivor in junction mode (all or none; only current rows count as already
@@ -6364,7 +6415,7 @@ logged and counted as a failure.
   household's real-time rollups the same way.
 - **Merge settlement** (PEOPLE-15) runs just after any Salesforce merge, in a queued job
   (`MergeSettlement`): a person in both merged households keeps one membership, a household
-  that took in members is recounted and renamed, a survivor keeps one default address (the one
+  that took in members is recounted and renamed, a survivor keeps one primary address (the one
   matching its standard address fields: billing for a household or organization, mailing for a
   contact or a person account, read by name so Core runs without person accounts; otherwise
   the newest), and a person loses relationships with themselves and second copies and has
@@ -6390,8 +6441,9 @@ logged and counted as a failure.
   which is where the platform's own person merge starts. The Account record page does not
   carry it, so a household is never merged past R-H13.
 - **Service:** `DuplicateService`, `DuplicateSelector`, `DuplicateScanBatch`,
-  `DuplicateController`. The review page is the `duplicateReview` panel on the Households page
-  of BarnCRM Settings.
+  `DuplicateController`. The review list is the `duplicateReview` component, the Review area
+  of the Duplicate Matching tab (app page `Duplicate_Matching`, shell `duplicateMatching`,
+  ADR-0139). BarnCRM Settings has a Duplicate Matching section whose row opens that tab.
 
 ---
 
@@ -7102,7 +7154,7 @@ platform deletes with a parent are not in it.
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-counted in Org Optimizer's Field utilization section and saved there with "Save these counts"
+counted in Org Optimizer's Field utilization section and saved there with "Save Utilization Snapshot"
 (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-0101
 `0101-field-utilization-on-demand.md`). Every row of one save carries the same Taken At, so a
 saved count is the set of rows sharing it, and a trend is the same object, field and record type
@@ -7143,7 +7195,7 @@ says so.
 **R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
 **R-FU7 On demand, saved by choice.** Counting runs synchronously from the page, 40 fields per
 call (10 when the object holds more than 100,000 records); each call reads the record totals
-again. Nothing is stored until the person chooses "Save these counts"; the save checks each
+again. Nothing is stored until the person chooses "Save Utilization Snapshot"; the save checks each
 row's object, field and record type against describe and caps Filled Count at Record Count.
 Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
 standard delete.
@@ -7371,7 +7423,7 @@ gives Modify All only with Delete.
 Each set shows the BarnCRM Volunteers app and the Jobs, Shifts, Hours and Skills tabs; only the
 Admin and Coordinator sets show the Volunteer Requirements tab (R-VQ4) and the Approve Hours tab
 (R-VG5's screen; every set may run its controller, which answers read only to a user without
-`Manage_Volunteers`), and only the Admin set shows the Volunteer Settings tab. The custom
+`Manage_Volunteers`). The module's settings are the Volunteers section of BarnCRM Settings. The custom
 permission `Manage_Volunteers`
 (created with the hours change, #469) is enabled in both the Coordinator and Admin sets.
 
@@ -7850,8 +7902,8 @@ hours kept.
 ### Definition
 
 The Volunteers module's own org-wide settings (ADR-0017: each module owns a protected
-hierarchy custom setting), edited in the BarnCRM Settings console's Volunteers section and on
-the module's own Volunteer Settings page, never in Setup. Defaults are applied in Apex
+hierarchy custom setting), edited in the BarnCRM Settings console's Volunteers section (the
+module has no settings page of its own), never in Setup. Defaults are applied in Apex
 (ADR-0035, `VolunteerSettings`): a blank or out of range value reads as the shipped one.
 
 | Key | Type | Default | Definition |
@@ -8736,6 +8788,11 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
 | v0.8 | 2026-10-26 | Nonprofit modules section in the Module Manager (owner QA, M1). New field `Hide_Nonprofit_Modules__c` on BarnCRM Settings (Section 12, v0.8 keys), default false (the page's Show Nonprofit Modules checkbox is its inverse, so an existing settings row shows the modules). No object added. |
 | v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
+| v0.8 | 2026-10-26 | The four BarnCRM apps (ADR-0137). `BarnCRM_Settings__c` gains `App_Navigation_Style__c` (Section 12, app navigation key): Standard, Console or Both, default Both. |
+| v0.8 | 2026-10-26 | Module tabs in the BarnCRM apps (ADR-0137). `BarnCRM_Module__mdt` gains `Staff_Tabs__c` and `Admin_Tabs__c`. The Rollups record's `App_Name__c` is empty: the BarnCRM Rollup Builder app is retired and its tab is in the admin apps. |
+| v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-0139). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. Match Source (Section 13) is managed on the tab's Matching Logic area and no longer listed on the Custom metadata page (R-D2). |
+| v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
+| v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-0140). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
 
 ---
 ## 32. Entity ownership by package

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>App_Navigation_Style__c</fullName>
+  <defaultValue>&quot;Both&quot;</defaultValue>
+  <description>Which navigation style of the BarnCRM apps BarnCRM shows: Standard, Console or Both. Text rather than a picklist because custom settings do not support picklists (ADR-0019).</description>
+  <inlineHelpText>Which BarnCRM apps people see: standard navigation, console navigation, or both.</inlineHelpText>
+  <label>App Navigation Style</label>
+  <length>40</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

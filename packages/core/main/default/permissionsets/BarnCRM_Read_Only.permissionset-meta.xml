@@ -3,16 +3,16 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Read Only</label>
   <description>For people who look but do not change. Read access only, everywhere.</description>
-  <applicationVisibilities>
-    <application>BarnCRM</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>AccessController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
     <apexClass>AccessService</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>AddressMoveController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>

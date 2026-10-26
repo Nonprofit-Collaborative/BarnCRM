@@ -22,7 +22,7 @@ removed and the values it changed are put back (section 5).
 Import is part of the **Data Manager** feature, which on a new install is off until you turn
 it on: choose **Turn on** in the **Data Manager** row in **BarnCRM Settings**, **General**
 (or leave it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Once it
-is on, the **Import** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Import a file**
+is on, the **Import** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Import a File**
 (see [Data Manager](data-manager.md)). If you do not see the card, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
@@ -50,9 +50,9 @@ A few things are worth knowing before your first large file:
 6. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
-BarnCRM Core ships one ready-made mapping, the **Generic contact list**. You can edit it,
+BarnCRM Core ships one ready-made template, the **Generic contact list**. You can edit it,
 and your edits are never overwritten by an upgrade. With the Giving module installed (and
-only then), Giving adds a **generic gift list** and mappings that read the exports of the
+only then), Giving adds a **generic gift list** and templates that read the exports of the
 system you are moving from, without renaming a column: see [Migrating from Nonprofit
 Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-from-npsp.md).
 
@@ -74,7 +74,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    picker beside it. A column you do not want loaded is set to **Do not load**, and its
    values are kept on the staged row but written nowhere. A column only a module could
    load (an amount or a date, for example) is offered only when that module is installed;
-   without it, BarnCRM suggests **Do not load** for it. The mapping remembers your
+   without it, BarnCRM suggests **Do not load** for it. The template remembers your
    choices: the next file with the same headings opens with them, and a column you set to
    **Do not load** stays that way even when BarnCRM recognizes its heading. Besides the
    usual columns, the picker lists your org's own fields on people and organizations that
@@ -105,7 +105,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    person or organization that appears on several rows is counted once as "would create";
    their later rows count as matching them, which is what the import will do. A person on
    twelve rows of the file becomes one person with one household, not twelve.
-7. If the preview is wrong, fix the file or the mapping and preview again. Nothing you
+7. If the preview is wrong, fix the file or the template and preview again. Nothing you
    have done so far has changed a record.
 8. When the preview is right, select **Import these rows**. Processing runs in the background and
    the screen updates as it goes. The import does what the preview showed: it uses the columns,
@@ -120,7 +120,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    shows what became of them. If they are right, select **Import the remaining rows**: the rest
    of the file goes into the same import, under the same columns and matching choices, and one
    undo removes both parts. If they are wrong, undo the import (section 5), fix the file or the
-   mapping, and upload it again. An import whose trial has run cannot be previewed again.
+   template, and upload it again. An import whose trial has run cannot be previewed again.
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. Select **Download results** to get every row of the file back as
    a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
@@ -134,7 +134,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
 Select **Download rejected rows**, fix those rows in your spreadsheet (keep the same column
 headings; the Row and Reason columns are ignored), and save the file. Then, still on the
 results screen, choose the fixed file under **Retry fixed rows**. BarnCRM previews only
-those rows, against the same mapping, and shows the counts for them; select **Import these
+those rows, against the same template, and shows the counts for them; select **Import these
 rows** to load them into the same import. Every earlier rejected row is marked **Retried**,
 so keep in the file each rejected row you still want loaded, even one you did not change.
 The earlier rejected rows no longer count,
@@ -280,10 +280,10 @@ morning.
 ## 6. Files that arrive every month
 
 Some files come back on a schedule: a monthly export from your payment processor, a
-quarterly list from a partner. Mark the mapping you use for one as recurring and the Hub
+quarterly list from a partner. Mark the template you use for one as recurring and the Hub
 keeps track of it for you.
 
-1. Open the **Import** tab and choose the mapping.
+1. Open the **Import** tab and choose the template.
 2. Select **This file arrives regularly**, and give the source a name you will recognize,
    for example "Monthly processor export". The name is required while the box is ticked.
 3. Select **Next** and import the file as usual.
@@ -292,7 +292,7 @@ The BarnCRM home page then lists every recurring source with the date it was las
 imported, oldest first, and **Never** for one you have not loaded yet. When a date is older
 than you expect, that file has not been loaded this month.
 
-Marking a mapping recurring changes nothing about how its files are imported. BarnCRM
+Marking a template recurring changes nothing about how its files are imported. BarnCRM
 never fetches or loads a file on its own: every file is still uploaded, previewed and
 imported by a person, because an import nobody watched is an import nobody checked.
 
@@ -329,7 +329,7 @@ finished import cannot be previewed or imported again: undo it, which removes wh
 (anything changed since it stopped is kept), then upload the file as a new import.
 
 **"No column was matched to a name or an email."** The preview refuses to run when the
-mapping has no way to identify a person or an organization. Usually the file's header row
+template has no way to identify a person or an organization. Usually the file's header row
 is not the first row: a title line or a blank line above it means BarnCRM read the
 wrong row as the header. Delete the rows above the header in your spreadsheet and upload
 again.
@@ -390,7 +390,7 @@ counted them as would create, because a preview saves nothing for the rule to ch
 **The run log says "Not loaded: you do not have access to" a field.** Your user may not
 edit that field, so its column was skipped on every row, in the preview and in the import, and
 the rest of each row loaded. The run log names each such field once. The BarnCRM Admin role
-lets you edit the standard fields import mappings use (see "Fields the BarnCRM Admin role
+lets you edit the standard fields import templates use (see "Fields the BarnCRM Admin role
 can import" below), so this usually means a column mapped to some other field, or a user
 without that role. Ask your Salesforce administrator for edit access to the field and import
 the file again: the second import matches the people it already created and adds the
@@ -457,7 +457,7 @@ merge the two rows in the spreadsheet and load the second again if it held somet
 ## 8. How rows are matched, and values for every row
 
 The matching step of the wizard holds the choices below. How people and organizations are
-matched, and what happens when several records match, are saved with the mapping, so the next
+matched, and what happens when several records match, are saved with the template, so the next
 file loaded with it starts with the same ones; values for every row and **Match only** are for
 this file only.
 
@@ -501,7 +501,7 @@ most recently changed record.
 **Values for every row.** Select **Add a value**, choose what the value is for (the same list
 as the columns), and type it. It is used on each row of this file whose own cell is empty, and
 only for this file: the next file starts with none. A row's own value always wins, then the
-file's value, then any default the mapping holds. A value cannot be a person's name, email or
+file's value, then any default the template holds. A value cannot be a person's name, email or
 ID field, because every row would then be the same person. It can be an organization: for a
 staff list from one employer, give every row that organization's name.
 
@@ -540,10 +540,10 @@ Rows, or open the import's rows). A row whose two people the rules match to one 
 rejected. When a rule finds more than one
 record, **When more than one record matches** decides, as for any match. Only organizations are
 taken for organizations, and only people for people, whatever the rule compares. The choice is
-saved with the mapping.
+saved with the template.
 
 The same box also asks your **match sources** (see
-[Custom metadata](custom-metadata.md#match-sources)) about a person the duplicate rules found
+[Matching Logic](duplicates.md#matching-logic)) about a person the duplicate rules found
 nobody for: the row's email, its phones, and its mailing and other street with postal code are
 compared with the values on contact point records and BarnCRM addresses, in the same way the
 duplicate scan compares them. A person whose email is kept only on a contact point email record
@@ -619,8 +619,8 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
 (Health Check). You can edit it or switch it off like any other template.
 
 1. Open the **Import** tab and select **Load one object**.
-2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
-   and select **Create**. The new mapping is chosen for you. Select **Next**.
+2. Choose the object from the list, give the template a name (for example "Program sessions"),
+   and select **Create**. The new template is chosen for you. Select **Next**.
 3. Upload the file. Each column is matched to the field whose label or API name is its heading;
    anything else is **Do not load**. Change any column from the picker, which lists the fields
    of that object you may create or edit.
@@ -691,7 +691,7 @@ a record (so it never appears for contacts and accounts, which load by Update on
   run log says so and every row is matched by its ID or key alone. If a rule is switched on but
   Salesforce could not run it, each row that would create a record is rejected with that reason
   rather than risk a duplicate: import those rows again later, or untick the box. The choice is
-  saved with the mapping.
+  saved with the template.
 
 **Which objects are listed.** Your org's own custom objects, and the standard objects
 Salesforce treats as business records (ones you can find in global search), where you
@@ -700,7 +700,7 @@ may create or edit records. Never listed, whatever your access:
 - Salesforce setup and security: users, groups, queues, profiles, roles, permission sets and
   their assignments, record types, licenses and the organization itself. Manage those in Setup.
 - Custom settings, custom metadata, platform events, and history, sharing and feed records.
-- BarnCRM's own bookkeeping (import mappings, imports, import rows and journals, the error log,
+- BarnCRM's own bookkeeping (import templates, imports, import rows and journals, the error log,
   setting changes, automation settings, rollup definitions) and household membership rows,
   which households manage themselves. With Giving, receipts, receipt runs, receipt number
   series and acknowledgments are never listed either.
@@ -708,7 +708,7 @@ may create or edit records. Never listed, whatever your access:
 **People and organizations load by Update only.** Contacts and accounts can be updated by record
 ID, for example to load back an export you corrected in Excel, or by a field you choose, such
 as a contact's email, but not inserted or upserted
-here: new people, households and organizations come in through a people mapping, which builds
+here: new people, households and organizations come in through a people template, which builds
 their households. They can also be deleted by record ID, below, as a bulk delete deletes them.
 
 **Fields that are never written**, even when listed in your file: fields Salesforce fills in
@@ -746,7 +746,7 @@ ID**; every other column is ignored, and it loads no related records.
 3. The delete runs as a bulk delete: in chunks of up to 200, as you, with each record listed in
    the journal. A record deleted or hidden from you since the dry run is left alone and counted;
    a record Salesforce refuses is listed with the reason.
-4. Once it starts, the job moves from the import history to **Data jobs** on the **Data
+4. Once it starts, the job moves from the import history to **Data Jobs** on the **Data
    Manager** tab, where **Undo** brings the records back from the Recycle Bin within the bulk
    delete's undo window (at most 15 days). The import's own **Undo** refuses it.
 
@@ -801,7 +801,7 @@ that already existed.
 
 A file from another system rarely says things the way your database does: names in capitals,
 "St." where you write "Street", dates written day first, a first and a last name in two columns
-you want as one. You can fix these in the mapping instead of in the spreadsheet, so the next
+you want as one. You can fix these in the template instead of in the spreadsheet, so the next
 file of the same kind is fixed too.
 
 1. On the columns step, select **Change values** beside a column.
@@ -831,7 +831,7 @@ file of the same kind is fixed too.
    before and after, under **Changed values**. Matching uses the changed values, so a person's
    email made lower case is matched as lower case.
 
-The changes are saved with the mapping, like the columns, so the next file starts with them.
+The changes are saved with the template, like the columns, so the next file starts with them.
 They run before **Values for every row**: a column a change leaves empty is then filled by the
 file's value for every row, if you gave one. A change never runs code and never reads a record:
 it only rearranges the text of the row. A date that cannot be read the way you chose is left as
@@ -841,7 +841,7 @@ and a people load both reject the row).
 ## 11. Skipping rows, one row per key, and empty cells that clear
 
 Partner and event exports carry test rows, cancelled lines and repeats. Set these on the
-columns step, under **Rows to load**; they are saved with the mapping like the columns.
+columns step, under **Rows to load**; they are saved with the template like the columns.
 
 - **Skip rows where.** Up to five rules, each a column and a test: **equals** some text,
   **contains** it, or **is empty**. A row any rule matches is skipped. Cells are compared as they
@@ -877,7 +877,7 @@ People imports never clear a field from an empty cell.
 
 Salesforce controls standard fields one by one, and a person with only a minimal profile
 could otherwise not write them. So the BarnCRM Admin permission set grants read and edit
-access to the standard fields the import mappings write:
+access to the standard fields the import templates write:
 
 | Object | Fields |
 |---|---|
@@ -904,16 +904,16 @@ For building a report on your imports.
 | Why an import failed as a whole | Data Job | Run Log |
 | One row of the file | Import Row | Row Number, Status, Error Message |
 | Rows that matched more than one record | Import Row | Several Matches |
-| How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches, Use Duplicate Rules |
+| How a template matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches, Use Duplicate Rules |
 | Rows your duplicate rules matched | Import Row | Matched By Duplicate Rule |
-| How a mapping changes values as they load | Import Template | Column Mapping (each column's changes) |
+| How a template changes values as they load | Import Template | Column Mapping (each column's changes) |
 | The values given to every row of a file | Data Job | File Values |
 | Whether a file only matched existing records | Data Job | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
 | The control totals of a file | Data Job | Expected Count (and, with Giving, Expected Amount, File Amount) |
 | The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |
-| Which mappings are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
+| Which templates are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
 | When an import can be undone until | Data Job | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |
 | The records an import that loaded one object created | Import Journal (Phase Created), Import Row | Entries; Resulting Record |
-| What a mapping that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |
+| What a template that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |

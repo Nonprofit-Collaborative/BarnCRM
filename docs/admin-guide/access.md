@@ -160,7 +160,7 @@ Core's six are always listed:
 | BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
-| BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Duplicates** list on Org Optimizer (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
+| BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Review** list on the Duplicate Matching tab (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom Metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
 
 A module's sets are listed after them, only where that module is installed:
@@ -170,8 +170,8 @@ A module's sets are listed after them, only where that module is installed:
 | Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
 | Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
 | Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
-| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
-| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access. |
+| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign Sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
+| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity Mirror page. Creating Opportunities also needs Opportunity access. |
 | Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts. |
 | Inbound Gift API | Mirror | For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM. |
 | Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |
@@ -227,7 +227,8 @@ feature is on:
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export |
 | Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export, Duplicate Review |
+| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export |
+| Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
 by a user access policy is caught up overnight, and every upgrade catches everyone up, so an

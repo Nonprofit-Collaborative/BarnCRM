@@ -144,6 +144,11 @@ private class SeasonalAddressBatchTest {
     @IsTest
     static void schedulingTheJobCreatesOneNightlyRunAndStoppingItRemovesIt() {
         System.runAs(TestUsers.admin()) {
+            // The org's own swap, if an administrator switched it on, would be counted too.
+            TestDataFactory.clearScheduledJobs(
+                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
+            );
+            ScheduledJobSelector.forget();
             Test.startTest();
             Id first = SeasonalAddressScheduler.start();
             Id second = SeasonalAddressScheduler.start();

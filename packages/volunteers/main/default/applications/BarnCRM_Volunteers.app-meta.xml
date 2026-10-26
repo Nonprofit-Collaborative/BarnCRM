@@ -50,11 +50,13 @@
   </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
+    <logo>BarnCRM_Volunteers_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
-    The BarnCRM Volunteers module: jobs, shifts and the hours volunteers gave, and the module's own
-    settings.
+    The BarnCRM Volunteers module: jobs, shifts and the hours volunteers gave. Its settings are in
+    the Volunteers section of BarnCRM Settings.
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
@@ -71,7 +73,6 @@
   <tabs>Volunteer_Letter_Template__c</tabs>
   <tabs>Skill__c</tabs>
   <tabs>Volunteer_Requirement__c</tabs>
-  <tabs>Volunteer_Settings</tabs>
   <tabs>standard-Dashboard</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
@@ -93,9 +94,6 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Requirement__c</tab>
-    </mappings>
-    <mappings>
-      <tab>Volunteer_Settings</tab>
     </mappings>
     <mappings>
       <tab>Volunteer_Shift__c</tab>

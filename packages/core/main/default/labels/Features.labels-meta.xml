@@ -21,16 +21,16 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Name of the Duplicate Review feature in Settings, General.</shortDescription>
-        <value>Duplicate Review</value>
+        <shortDescription>Name of the Duplicate Matching feature in Settings, General.</shortDescription>
+        <value>Duplicate Matching</value>
     </labels>
     <labels>
         <fullName>Core_Feature_DuplicateReview_Description</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>What the Duplicate Review feature covers.</shortDescription>
-        <value>Suggests people and households that look like duplicates, for you to review and merge.</value>
+        <shortDescription>What the Duplicate Matching feature covers.</shortDescription>
+        <value>The Duplicate Matching tab: suggests people and households that look like duplicates, for you to review and merge, and lets you choose what pairs them.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_OrgOptimizer_Name</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Addresses feature covers.</shortDescription>
-        <value>Records address changes and keeps each household's default address in step.</value>
+        <value>Records address changes and keeps each household's primary address in step.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_Relationships_Name</fullName>

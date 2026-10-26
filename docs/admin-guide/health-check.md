@@ -23,7 +23,7 @@ install is off until you turn it on: choose **Turn on** in that row in **BarnCRM
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
 
-1. Open the **BarnCRM** app.
+1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation. The report is there.
 4. Click **Re-run** whenever you want a fresh look. On this page Health Check reads your
@@ -55,7 +55,7 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, and nothing else that keeps households is installed. She has not set anything up
 yet.
 
-1. Maria opens the **BarnCRM** app, clicks **BarnCRM Settings**, and chooses
+1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
 2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:

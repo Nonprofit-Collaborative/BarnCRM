@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: the chosen mapping no longer exists</shortDescription>
-        <value>That import mapping no longer exists. Go back and choose one from the list.</value>
+        <value>That import template no longer exists. Go back and choose one from the list.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorBatchGone</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: template asks for person accounts the org does not have</shortDescription>
-        <value>This mapping stores people as person accounts, and this org does not have them. Change the mapping to store people as contacts.</value>
+        <value>This template stores people as person accounts, and this org does not have them. Change the template to store people as contacts.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorLastNameMissing</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: a mapped attribute the org lacks; {0} the attribute</shortDescription>
-        <value>The mapping refers to {0}, which this org does not have. Those values were skipped.</value>
+        <value>The template refers to {0}, which this org does not have. Those values were skipped.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogAttributeNoAccess</fullName>
@@ -798,7 +798,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import undo: refused for a bulk delete</shortDescription>
-        <value>This is a bulk delete. Undo it from Data jobs on the Data Manager tab, which brings the records back from the Recycle Bin.</value>
+        <value>This is a bulk delete. Undo it from Data Jobs on the Data Manager tab, which brings the records back from the Recycle Bin.</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoErrorDryRun</fullName>

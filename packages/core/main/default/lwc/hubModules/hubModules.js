@@ -7,6 +7,7 @@ import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
+import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
@@ -14,9 +15,10 @@ const NOT_INSTALLED = 'NotInstalled';
 /**
  * The installed BarnCRM modules and whether each is on, on the BarnCRM home page. It reads the
  * Module Manager's own list, so the two never disagree; turning a module on or off is done there.
+ * A module with an app of its own links to it, so people find where the module's work is done.
  */
 export default class HubModules extends NavigationMixin(LightningElement) {
-  labels = { heading: HEADING, link: LINK };
+  labels = { heading: HEADING, link: LINK, openApp: OPEN_APP };
 
   rows = [];
   errorMessage;
@@ -30,6 +32,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
         .map((module) => ({
           name: module.name,
           displayName: module.label || module.name,
+          appUrl: module.appUrl,
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
           badgeClass:
             module.status === 'Off'

@@ -12,14 +12,26 @@ Only or Admin). If you cannot find the apps, ask your admin. See
 
 | App | What it is for | How it looks |
 |---|---|---|
-| **BarnCRM** | People, households, organizations, addresses, relationships and affiliations | A console: records open in tabs across the top |
+| **BarnCRM** | People, households and organizations, every day | Standard navigation: each record replaces the page |
+| **BarnCRM Console** | The same work as **BarnCRM** | Console navigation: records open in tabs across the top |
+| **BarnCRM Admin** | BarnCRM Settings and the data tools (admins only) | Standard navigation |
+| **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
 | **Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
-| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM |
+| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
 
-The **BarnCRM** app's navigation menu holds **Home**, **Households**, **Contacts**,
-**Organizations**, **Data Manager**, **Find**, **Org Optimizer**, **BarnCRM Settings**,
-**Error Log**, **Addresses**, **Relationships**, **Affiliations** and **Household Members**.
-You see only the tabs your access allows, so your menu may be shorter.
+**Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
+hold the same things and differ only in how records open, so pick the one you like and star it.
+Your admin may have hidden one of them for everyone. Open **Fundraising** for gifts and **BarnCRM
+Volunteers** for volunteers. **BarnCRM Admin** and **BarnCRM Admin Console** are for
+administrators only.
+
+**BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Find**.
+**BarnCRM Console** has the same, plus **Addresses**, **Relationships**, **Affiliations** and
+**Household Members** at the end of its navigation menu. The admin apps have **BarnCRM
+Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer** and **Error Log**.
+You see only the tabs your access allows, so your menu may be shorter. If you have an extra
+permission such as Bulk Update but not the admin role, open **Data Manager** by typing its name
+in the App Launcher.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
@@ -30,7 +42,13 @@ bar at the bottom of the screen.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer
-Requirements**, **Volunteer Settings**, **Dashboards** and **Reports**.
+Requirements**, **Dashboards** and **Reports**. The module's settings are the **Volunteers**
+section of **BarnCRM Settings**.
+
+Your admin may also have added the module pages you use most to the BarnCRM apps: **Quick Gift
+Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts** and
+**Volunteer Hours**, at the end of the navigation menu. The **Rollup Builder** is in the admin
+apps; anyone else who may view it opens it by typing its name in the App Launcher.
 
 ## To open an app
 
@@ -38,11 +56,11 @@ Requirements**, **Volunteer Settings**, **Dashboards** and **Reports**.
 2. Type `BarnCRM` (or `Fundraising`) and choose the app.
 3. Optional: click the star next to the app name to open it by default.
 
-You should see: the app's first tab. In **BarnCRM** that is **Home**.
+You should see: the app's first tab. In **BarnCRM** and **BarnCRM Console** that is **Home**.
 
 ## To work with records in console tabs
 
-In the **BarnCRM** and **BarnCRM Volunteers** apps, records stay open side by side.
+In the **BarnCRM Console** and **BarnCRM Volunteers** apps, records stay open side by side.
 
 1. Open a household, organization or person. It opens in its own tab across the top.
 2. Open something that belongs to it, such as an address on the household or a relationship
@@ -54,7 +72,7 @@ In the **BarnCRM** and **BarnCRM Volunteers** apps, records stay open side by si
 You should see: your open tabs still there when you come back later. Pages such as **Find**
 and **BarnCRM Settings** name their tab for what is on screen, for example "Find: Contact".
 
-On a phone, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
+On a phone, the Salesforce mobile app shows BarnCRM Console as an ordinary app without tabs.
 
 ## To use the home page
 
@@ -69,7 +87,7 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   automatically once you add a member. You see this button only if you can create households.
 - **Quick links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
   going back to the App Launcher.
-- **Files that arrive regularly**: shown only if you can read import mappings and a file is
+- **Files that arrive regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
 If someone has paused automation (for example during a large import), a banner under the
@@ -77,7 +95,7 @@ welcome says "BarnCRM automation is paused. Households and greetings are not bei
 until it resumes." It goes away by itself.
 
 Admins also see the setup checklist, Health Check and a few status tiles. See
-[The BarnCRM app](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
+[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
 ## To read in-app tips
 
@@ -122,17 +140,21 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 
 | Card | Opens |
 |---|---|
-| **Find and export records** | The **Find** tab |
-| **Change many records** | **Find**: run a query, then press **Bulk update** |
-| **Delete many records** | **Find**: run a query, then press **Bulk delete** |
-| **Tidy and check your data** | The **Org Optimizer** tab |
+| **Find and Export Records** | The **Find** tab |
+| **Update Many Records** | **Find**: run a query, then press **Bulk update** (no file needed) |
+| **Delete Many Records** | **Find**: run a query, then press **Bulk delete** (no file needed) |
+| **Tidy and Check Your Data** | The **Org Optimizer** tab |
+
+Deleted records go to the Recycle Bin, not away for good: the **Delete Many Records** card says
+so in a yellow warning box, and you can undo a bulk delete from **Data Jobs** for up to 15 days.
 
 1. Choose **Open** on the card you want.
-2. Under **Data jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
+2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. Import cards and Salesforce's own tools are for admins. See
+it can still be undone. **Import a File**, **Import Templates** and **Salesforce's Own Tools**
+are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common problems
@@ -156,7 +178,7 @@ it can still be undone. Import cards and Salesforce's own tools are for admins. 
 - [Finding people and records](find.md)
 - [People and households](people-and-households.md)
 - [Read-only access](read-only-access.md)
-- Admin Guide: [The BarnCRM app](../admin-guide/barncrm-app.md),
+- Admin Guide: [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md),
   [What's new](../admin-guide/whats-new.md), [In-app tips](../admin-guide/in-app-guidance.md),
   [Job notifications](../admin-guide/job-notifications.md),
   [Data Manager](../admin-guide/data-manager.md)

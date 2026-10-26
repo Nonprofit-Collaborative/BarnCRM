@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: external ID repeated in file under Never match</shortDescription>
-        <value>Gift: external ID {0} names a gift that already exists, and this mapping never matches.</value>
+        <value>Gift: external ID {0} names a gift that already exists, and this template never matches.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_LogAttributesNotLoaded</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: no payment method</shortDescription>
-        <value>The gift has no payment method. Map a column to it, or give the mapping a default payment method.</value>
+        <value>The gift has no payment method. Map a column to it, or give the template a default payment method.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorInKindAmount</fullName>
@@ -470,7 +470,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import: Match only and no scheduled payment</shortDescription>
-        <value>Gift: this mapping only pays scheduled payments, and no open payment of this donor is due near this date for this amount.</value>
+        <value>Gift: this template only pays scheduled payments, and no open payment of this donor is due near this date for this amount.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorNeverMatchInstallment</fullName>
@@ -478,7 +478,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import: Never match and a scheduled payment matches</shortDescription>
-        <value>Gift: this gift matches the scheduled payment {0}, and this mapping never matches.</value>
+        <value>Gift: this gift matches the scheduled payment {0}, and this template never matches.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_LogPaymentsMatched</fullName>

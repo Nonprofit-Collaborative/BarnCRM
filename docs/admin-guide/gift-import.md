@@ -21,7 +21,7 @@ Admin can; Giving Staff cannot), because a row is saved whole or not at all: whe
 credit or tribute is refused, the import removes the gift it had just made. Without that right
 every gift row is rejected, in the preview too, saying so.
 
-Two settings decide how donation matching behaves when a mapping does not say:
+Two settings decide how donation matching behaves when a template does not say:
 
 1. Open **BarnCRM Settings** and choose **Import**.
 2. **Days either side of a payment's due date** is 7. A gift dated within 7 days of a
@@ -30,9 +30,9 @@ Two settings decide how donation matching behaves when a mapping does not say:
    expected. Raise it (for example to 1.00) if a processor's rounding means amounts are
    sometimes a few cents out.
 
-BarnCRM ships a **generic gift list** mapping. It reads donor first name, last name,
+BarnCRM ships a **generic gift list** template. It reads donor first name, last name,
 email and organization, gift amount, date, payment method, payment reference and fund. For
-gifts exported from Nonprofit Cloud or NPSP, use the mappings in [Migrating from Nonprofit
+gifts exported from Nonprofit Cloud or NPSP, use the templates in [Migrating from Nonprofit
 Cloud](migrating-from-nonprofit-cloud.md) or [Migrating from NPSP](migrating-from-npsp.md)
 instead.
 
@@ -72,7 +72,7 @@ A row is one gift. Besides the donor, it can carry:
 - **The gift.** Amount, date and payment method are required, except that an in-kind gift
   (payment method In-kind) has no amount: leave it empty or 0 and put what the goods were
   worth in **Gift: fair market value**, with **Gift: in-kind description**. A file with no
-  payment method column can set one for every row as the mapping's default. Payment method is
+  payment method column can set one for every row as the template's default. Payment method is
   matched to BarnCRM's
   list whatever the capitals, and common words are understood: "credit card" is Card,
   "cheque" is Check, "bank transfer" is ACH. The appeal is named by its name. Payment
@@ -111,7 +111,7 @@ BarnCRM looks, in this order, for:
    If two payments qualify, the one with the closest date wins; if two are equally close, the
    row is rejected naming both, so you can decide.
 
-Each mapping says what to do, on the matching step of the wizard:
+Each template says what to do, on the matching step of the wizard:
 
 | Choice | What happens |
 |---|---|
@@ -120,11 +120,11 @@ Each mapping says what to do, on the matching step of the wizard:
 | **Match only** | Reject a gift that matches no payment. Use it for a file that should only hold pledge payments. |
 | **Never match** | Reject a gift that matches a payment or a gift you already have. Use it for a file of new gifts that should not touch pledges. |
 
-The same step lets a mapping use its own window and allowed difference instead of the ones in
+The same step lets a template use its own window and allowed difference instead of the ones in
 **BarnCRM Settings**. Leave them empty to use the settings.
 
 The import matches under the choice, window and allowed difference the preview used. If you
-change them on the mapping, or in **BarnCRM Settings**, after a preview, run the preview
+change them on the template, or in **BarnCRM Settings**, after a preview, run the preview
 again: the import keeps to what the last preview showed you.
 
 ## 6. Undoing a gift import
@@ -173,7 +173,7 @@ duplicated) or a total was typed wrong. Fix whichever is wrong and preview again
 **A gift did not pay the pledge you expected.** The payment was outside the date window, the
 amounts differed by more than the allowed difference, or the pledge belongs to somebody the
 row did not resolve to. The preview's run log counts the gifts that would pay a scheduled
-payment. Widen the window on the mapping, or check that the donor columns match the pledge's
+payment. Widen the window on the template, or check that the donor columns match the pledge's
 donor.
 
 **The same gifts appear twice.** The file had no external ID column, so loading it again

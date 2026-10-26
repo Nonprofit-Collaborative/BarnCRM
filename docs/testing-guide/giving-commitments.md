@@ -109,13 +109,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Nightly jobs**, **Open**. | Card **Nightly jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule nightly run**. |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Nightly Jobs**, **Open**. | Card **Nightly Jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule nightly run**. |
 | 2 | Click **Schedule nightly run**. | "The nightly jobs are scheduled." Each job shows a **Next run**. **Stop nightly run** and **Run the jobs now** show. |
 | 3 | Click **Run the jobs now**. | "The top up and the overdue pass have started. Refresh this page in a minute to see what they did." |
 | 4 | Refresh after a minute. | **Last run** for the top up and the overdue pass shows a time and a result line (for example a count of payments marked overdue, or that none were). |
 | 5 | Open the **Installments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
 | 6 | Switch to **Upcoming 30 Days**. | Payments due in the next 30 days. |
-| 7 | Back on **Nightly jobs**, click **Stop nightly run** (undo). | The not-scheduled message returns. Payments already Overdue stay Overdue. |
+| 7 | Back on **Nightly Jobs**, click **Stop nightly run** (undo). | The not-scheduled message returns. Payments already Overdue stay Overdue. |
 
 **Cleanup:** schedule the jobs again if later scripts need them.
 

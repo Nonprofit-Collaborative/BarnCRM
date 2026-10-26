@@ -16,8 +16,8 @@ anything: every module is a separate package that you install yourself through S
 installer, and no records change when the edition changes. You install a module from the
 **Modules** section of BarnCRM Settings, which opens Salesforce's installer. Which editions
 offer each module ships with BarnCRM as data (BarnCRM Module records), so a module offered to
-both editions, such as BarnCRM Rollup Builder, simply appears in both. Each installed module
-has its own app with its own Settings tab; the Modules section links to it. The Core features
+both editions, such as BarnCRM Rollup Builder, simply appears in both. The Modules section
+links each installed module that has an app of its own to that app. The Core features
 (see [BarnCRM Settings, Features](barncrm-settings.md#features-general)) are the same in both
 editions.
 
@@ -56,7 +56,7 @@ ways, and they do the same thing.
 
 ### In BarnCRM Settings (recommended)
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
 2. Click **BarnCRM Settings**, then **General** in the left navigation.
 3. Find **Edition**. It shows the edition in force, for example "Standard Edition".
 4. Click **Change edition** under it. It opens a short explanation and a button for the other

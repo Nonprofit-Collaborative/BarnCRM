@@ -387,6 +387,7 @@ private class AcknowledgmentRunCoverageTest {
     @IsTest
     static void theScheduleIsSwitchedOnAndOffFromThePage() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             AcknowledgmentTestData.enable();
 
             Test.startTest();

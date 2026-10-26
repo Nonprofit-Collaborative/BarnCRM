@@ -13,7 +13,8 @@ In-App Guidance (prompts), so they look and behave like any other Salesforce tip
 | Find | Floating | Run, save and export a query; bulk update and bulk delete start here |
 | Bulk Update | Floating | The tab lists recent bulk updates and deletes with their undo; new ones start in Find |
 
-Each tip appears once for each person, in the BarnCRM app only. The tips do not repeat the
+Each tip appears once for each person, in the **BarnCRM Console** app only (a Salesforce tip
+names exactly one app, and this is the app the tips were first made for). The tips do not repeat the
 Setup Assistant or the What's new card on the Home tab: those already show themselves on the
 home page, so the Settings tip only says where they are.
 
@@ -25,19 +26,21 @@ Enablement add-on, and Salesforce sets no limit today on prompts installed with 
 
 There is nothing to turn on. The tips are active as soon as BarnCRM is installed.
 
-- **Who sees them:** anyone who opens the page in the BarnCRM app. A person who cannot open a
+- **Who sees them:** anyone who opens the page in the BarnCRM Console app, including a page
+  opened there from the Home tab's **Quick links** or the app launcher. A person who cannot open a
   tab (for example Import without the BarnCRM Admin role) never sees its tip.
 - **How often:** once per person per tip. Salesforce also waits 24 hours between any two tips
   in the same app, counting your organization's own prompts, so someone who opens Settings and
   Import on their first day sees the Import tip on a later visit. BarnCRM does not skip that
   wait.
-- **Where they do not appear:** in another app that has the same tabs, and in the Salesforce
+- **Where they do not appear:** in another app that has the same tabs (BarnCRM, BarnCRM Admin
+  and BarnCRM Admin Console among them), and in the Salesforce
   mobile app, which does not show in-app guidance.
 
 ## A five-minute walkthrough
 
-1. As a person who has never opened BarnCRM Settings, open the **BarnCRM** app and the
-   **BarnCRM Settings** tab. Result: a docked panel opens at the bottom right, headed "BarnCRM
+1. As a person who has never opened BarnCRM Settings, open the **BarnCRM Console** app and,
+   under **Quick links** on the Home tab, **BarnCRM Settings**. Result: a docked panel opens at the bottom right, headed "BarnCRM
    tips", with three short paragraphs.
 2. Minimize the panel. Result: it closes. It does not come back on your next visit.
 3. The next day, open the **Find** tab. Result: a small floating tip titled "Find exactly the

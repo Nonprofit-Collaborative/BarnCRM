@@ -28,10 +28,10 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
   virtual: true
 });
-jest.mock('@salesforce/customPermission/Bulk_Update_Records', () => ({ default: true }), {
+jest.mock('@salesforce/customPermission/Bulk_Update_Records', () => ({ default: false }), {
   virtual: true
 });
-jest.mock('@salesforce/customPermission/Bulk_Delete_Records', () => ({ default: false }), {
+jest.mock('@salesforce/customPermission/Bulk_Delete_Records', () => ({ default: true }), {
   virtual: true
 });
 jest.mock(
@@ -65,13 +65,76 @@ describe('c-data-manager', () => {
     jest.clearAllMocks();
   });
 
+  it('marks the bulk delete card destructive, with the Recycle Bin warning', async () => {
+    const element = await render();
+
+    const card = element.shadowRoot.querySelector('div[data-id="delete"]');
+    const warning = card.querySelector('[data-id="delete-warning"]');
+    expect(warning.textContent).toContain('c.Core_DataManager_DeleteWarning');
+    expect(warning.querySelector('lightning-icon').alternativeText).toBe(
+      'c.Core_DataManager_WarningAlt'
+    );
+    expect(card.querySelector('lightning-button').variant).toBe('destructive-text');
+
+    // No other tool carries a warning or a red button.
+    expect(element.shadowRoot.querySelectorAll('[data-id="delete-warning"]')).toHaveLength(1);
+    const find = element.shadowRoot.querySelector('div[data-id="find"] lightning-button');
+    expect(find.variant).toBe('neutral');
+  });
+
+  it('says what an import template is above the list', async () => {
+    const element = await render();
+    expect(one(element, 'mappings-intro').textContent).toBe('c.Core_DataManager_MappingsIntro');
+  });
+
+  it('capitalizes every word of each Data Manager title and calls templates templates', () => {
+    // The labels file itself: Jest resolves a label to its name, so read the shipped values.
+    // Jest runs from the repository root (jest.config.js).
+    const fs = require('fs');
+    const xml = fs.readFileSync(
+      'packages/core/main/default/labels/DataManager.labels-meta.xml',
+      'utf8'
+    );
+    const values = {};
+    for (const match of xml.matchAll(
+      /<fullName>(\w+)<\/fullName>[\s\S]*?<value>([\s\S]*?)<\/value>/g
+    )) {
+      values[match[1]] = match[2];
+    }
+    const small = new Set(['a', 'an', 'and', 'or', 'the', 'of', 'to', 'in', 'for', 'on']);
+    const titles = [
+      'Title',
+      'ToolsHeading',
+      'ImportTitle',
+      'FindTitle',
+      'UpdateTitle',
+      'DeleteTitle',
+      'OptimizerTitle',
+      'MappingsHeading',
+      'SalesforceHeading'
+    ];
+    titles.forEach((key) => {
+      const words = values[`Core_DataManager_${key}`].split(' ');
+      words.forEach((word, index) => {
+        if (index > 0 && small.has(word)) {
+          return;
+        }
+        expect(`${key}: ${word[0]}`).toBe(`${key}: ${word[0].toUpperCase()}`);
+      });
+    });
+    expect(values.Core_DataManager_MappingsHeading).toBe('Import Templates');
+    Object.entries(values).forEach(([name, value]) =>
+      expect(`${name}: ${/mapping/i.test(value)}`).toBe(`${name}: false`)
+    );
+  });
+
   it('shows a card for each tool the person may use', async () => {
     const element = await render();
 
     expect(one(element, 'import')).not.toBeNull();
     expect(one(element, 'find')).not.toBeNull();
-    expect(one(element, 'update')).not.toBeNull();
-    expect(one(element, 'delete')).toBeNull();
+    expect(one(element, 'update')).toBeNull();
+    expect(one(element, 'delete')).not.toBeNull();
     expect(one(element, 'optimizer')).not.toBeNull();
   });
 
@@ -99,7 +162,7 @@ describe('c-data-manager', () => {
     expect(mockNavigate.mock.calls[1][0].attributes.apiName).toBe('Data_Hygiene');
   });
 
-  it('lists the import mappings, a people mapping as people', async () => {
+  it('lists the import templates, a people template as people', async () => {
     const element = await render();
     getMappings.emit([
       { id: 'a01', name: 'Generic contact list', isRecurring: false },
@@ -127,7 +190,7 @@ describe('c-data-manager', () => {
     expect(one(element, 'mappings-error').textContent).toContain('c.Core_UnexpectedError');
   });
 
-  it('says when there are no mappings, and shows a mappings error', async () => {
+  it('says when there are no templates, and shows a templates error', async () => {
     const element = await render();
     getMappings.emit([]);
     await flush();

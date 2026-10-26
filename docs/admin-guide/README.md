@@ -102,7 +102,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| C-03 BarnCRM app and setup checklist | [barncrm-app.md](barncrm-app.md) | Core |
+| C-03 BarnCRM Apps, Navigation and Setup Checklist | [barncrm-app.md](barncrm-app.md) | Core |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
@@ -143,9 +143,9 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
-| Org Optimizer (data quality, duplicates, field utilization, Health Check, errors, storage, unused setup) | [org-optimizer.md](org-optimizer.md) | Core |
+| Org Optimizer (data quality, field utilization, Health Check, errors, storage, unused setup) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data hygiene (the Data quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
-| C-20 Duplicates | [duplicates.md](duplicates.md) | Core |
+| C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 
 ### Automation, totals and health

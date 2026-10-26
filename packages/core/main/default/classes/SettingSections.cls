@@ -14,6 +14,9 @@ public with sharing class SettingSections {
     public static final String MODULES = 'Modules';
     @NamespaceAccessible
     public static final String HOUSEHOLDS = 'Households';
+    /** The Duplicate Matching tool's settings and the way into its tab (ADR-0139). */
+    @NamespaceAccessible
+    public static final String DUPLICATE_MATCHING = 'Duplicate Matching';
     @NamespaceAccessible
     public static final String AUTOMATION = 'Automation';
     /** The error digest (C-23): its own section because it is a job, not an automation. */
@@ -55,6 +58,7 @@ public with sharing class SettingSections {
             MODULES,
             ORGANIZATION,
             HOUSEHOLDS,
+            DUPLICATE_MATCHING,
             RELATIONSHIPS,
             ADDRESSES,
             GIVING,

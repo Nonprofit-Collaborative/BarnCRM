@@ -91,9 +91,9 @@ describe('c-org-optimizer as an administrator', () => {
     const names = Array.from(
       element.shadowRoot.querySelectorAll('lightning-button[data-section]')
     ).map((button) => button.dataset.section);
+    // Duplicates moved to the Duplicate Matching tab.
     expect(names).toEqual([
       'quality',
-      'duplicates',
       'fieldUtilization',
       'healthCheck',
       'errors',
@@ -117,11 +117,12 @@ describe('c-org-optimizer as an administrator', () => {
   it('opens a section from the Overview', async () => {
     const element = await render();
 
-    one(element, 'lightning-button[data-section="duplicates"]').click();
+    one(element, 'lightning-button[data-section="fieldUtilization"]').click();
     await flush();
 
-    expect(one(element, 'lightning-tabset').activeTabValue).toBe('duplicates');
-    expect(one(element, 'c-duplicate-review')).not.toBeNull();
+    expect(one(element, 'lightning-tabset').activeTabValue).toBe('fieldUtilization');
+    expect(one(element, 'c-field-utilization')).not.toBeNull();
+    expect(one(element, 'c-duplicate-review')).toBeNull();
   });
 
   it('reads storage and errors only when their sections are opened', async () => {

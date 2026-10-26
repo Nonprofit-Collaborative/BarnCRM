@@ -47,6 +47,11 @@ public with sharing class CustomMetadataManagerService {
         public Boolean shippedArchivable = false;
         /** Checks a save against the org beyond the field rules here, or null. */
         public RowValidator validator;
+        /**
+         * False for a type with a page of its own, which saves through this manager but is not
+         * listed on the Custom metadata page: Match Source, on Matching Logic (ADR-0139).
+         */
+        public Boolean listed = true;
     }
 
     /** A type's own check of a save; throws CustomMetadataManagerException to refuse it. */
@@ -163,6 +168,7 @@ public with sharing class CustomMetadataManagerService {
         matchSources.choicesObject = Match_Source__mdt.SObjectType;
         matchSources.shippedArchivable = true;
         matchSources.validator = new MatchSourceService.Validator();
+        matchSources.listed = false;
 
         return new Map<String, EditableType>{
             nameOf(relationshipTypes) => relationshipTypes,
@@ -175,7 +181,9 @@ public with sharing class CustomMetadataManagerService {
     public static List<TypeView> getTypes() {
         List<TypeView> views = new List<TypeView>();
         for (EditableType editable : registry().values()) {
-            views.add(viewOf(editable));
+            if (editable.listed) {
+                views.add(viewOf(editable));
+            }
         }
         return views;
     }

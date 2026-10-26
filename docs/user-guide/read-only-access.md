@@ -16,7 +16,7 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Area | You can | You cannot |
 |---|---|---|
 | People, households, organizations | Open and read them, their list views and global search | Create, edit or delete |
-| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set default, make primary, remove (the cards do not show these buttons) |
+| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set as primary, make primary, remove (the cards do not show these buttons) |
 | Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
 | Household merge and split | Open **Merge or split** and read it | Merge or split |
 | Home tab | **What's new in BarnCRM**, the welcome and **Quick links** | Use **New household** (it is hidden) |
@@ -24,10 +24,11 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
 | Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |
 
-Tabs you see in the **BarnCRM** app: **Home**, **Households**, **Organizations**,
-**Addresses**, **Relationships**, **Affiliations** and **BarnCRM Settings**, plus **Contacts**
-if your Salesforce profile shows it. **Household Members** and **Error Log** are yours too;
-open them from the navigation menu if they are not shown.
+Tabs you see in the **BarnCRM** app: **Home**, **Households** and **Organizations**, plus
+**Contacts** if your Salesforce profile shows it. **BarnCRM Console** adds **Addresses**,
+**Relationships**, **Affiliations** and **Household Members**. **BarnCRM Settings** and
+**Error Log** are in the admin apps, which you do not see; open them by typing their name in
+the App Launcher.
 
 If your admin gives you **BarnCRM Find and Export**, you can build, run, save and export Find
 queries over everything you can read. You still cannot change records.
@@ -55,7 +56,7 @@ that says you cannot record a refund or start a plan.
 | Volunteer Jobs, Volunteer Shifts, sign-ups, Skills | Read them; run reports and view dashboards | Create, change or delete |
 | Volunteer Hours | Open the tab, but you see no hours entries (each person sees only the entries they made) | Enter or approve hours |
 | A person's volunteer totals | Read them on the person | Change them |
-| Volunteer Requirements, Volunteer Letter Templates, Approve Hours, Volunteer Settings | Nothing: these are not given | Anything |
+| Volunteer Requirements, Volunteer Letter Templates, Approve Hours | Nothing: these are not given | Anything |
 
 ## To check what you can see
 
@@ -73,7 +74,7 @@ not offered, or say you do not have access.
 - On **Merge or split**: "You can see this household but not change it, so merging and
   splitting are switched off. Ask whoever manages access for edit access to both households."
 - On the **Addresses**, **Relationships**, **Affiliations** and **Members** cards: nothing to
-  try. **Add address**, **Set as default**, **Add relationship**, **Remove**, **Add
+  try. **Add address**, **Set as Primary**, **Add relationship**, **Remove**, **Add
   affiliation**, **Make primary**, **Add member** and **Move to another household** are not
   shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.

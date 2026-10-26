@@ -44,10 +44,13 @@ Do these in order.
    without `--core-only`, and never run `create-scratch-org.sh`, `seed-sample-data.sh` or script
    T-SA-08. Skip the "Deploy the modules", "Load sample data" and "Test users" steps below.
    Core alone runs on Contacts and Accounts.
-2. **Work in the BarnCRM app.** The BarnCRM Contact and Account record pages apply only in the
-   **BarnCRM** app (App Launcher, **BarnCRM**). In any other app a record opens on the org's own
-   page and steps that name a panel or action will not match. Open every record, **Contacts**
-   and **Accounts** included, from the BarnCRM app. The new page layouts ship unassigned, and
+2. **Work in the BarnCRM apps.** The BarnCRM Contact and Account record pages apply only in the
+   four BarnCRM apps (App Launcher, **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** or
+   **BarnCRM Admin Console**). In any other app a record opens on the org's own page and steps
+   that name a panel or action will not match. Open every record, **Contacts** and **Accounts**
+   included, from a BarnCRM app; a script that says "the **BarnCRM** app" works the same in
+   **BarnCRM Console**, and one that names a tool tab such as **BarnCRM Settings** means
+   **BarnCRM Admin** or **BarnCRM Admin Console**. The new page layouts ship unassigned, and
    the shipped list views show everything the user can see (no "my records" filter), so expect
    the org's own layouts elsewhere and the full list in the BarnCRM list views.
 3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open

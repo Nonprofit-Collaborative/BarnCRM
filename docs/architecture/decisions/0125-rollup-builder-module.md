@@ -112,9 +112,11 @@ subscriber migration.
    **Amended 2026-10-26 (owner request RS1):** the Rollup Settings tab and app page are removed.
    The module's settings are only the Rollups section of BarnCRM Settings (Default rollup mode,
    When instant totals are calculated, and a Rollups row that opens the Rollup Builder tab).
-   The console's `module` property stays, for the Volunteers settings tab. A source deploy does
-   not delete the old tab from an org that has it; remove `Rollup_Settings` (tab and flexipage)
-   with a destructive deploy.
+   The console's `module` property stopped filtering with the Volunteer Settings tab, its last
+   user. It stays declared and is ignored, because the platform refuses to remove a page
+   property from a component that any Lightning page in the org places.
+   A source deploy does not delete the old tabs from an org that has them; remove
+   `Rollup_Settings` and `Volunteer_Settings` (tab and flexipage each) with a destructive deploy.
 8. **Permission sets.** The rollup grants leave `BarnCRM_Admin`, `BarnCRM_Staff` and
    `BarnCRM_Read_Only` for `Rollup_Builder_Admin` (build, recalculate, retry, the queue) and
    `Rollup_Builder_User` (read the Builder and definitions, as Staff and Read Only can today).

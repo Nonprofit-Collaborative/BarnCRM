@@ -6,16 +6,16 @@
 ## 1. What it does
 
 **Org Optimizer** is one page that answers "what in my org needs attention?" It brings
-together the checks that used to live in four places: the record checks of the Data Hygiene
-tab, the duplicate review from BarnCRM Settings, field utilization, and Health Check. Each one
+together the checks that used to live in several places: the record checks of the Data
+Hygiene tab, field utilization, and Health Check. (Duplicate review has its own tab,
+**Duplicate Matching**; see [Duplicates](duplicates.md).) Each one
 is a section of the page, and nothing in a section runs until you open it, so the page itself
 opens quickly however large your database is.
 
 | Section | What it answers | Who sees it |
 |---|---|---|
 | **Overview** | What each section is for, with a button to open it. | Everyone who can open the page |
-| **Data quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed default addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check has **Open in Find**. See [Data hygiene](data-hygiene.md). | Anyone with **Find and Export Records** |
-| **Duplicates** | Which people and households are in your database twice. Scan, review each pair, merge two households, or say a pair is not the same. See [Duplicates](duplicates.md). | Administrators |
+| **Data quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check has **Open in Find**. See [Data hygiene](data-hygiene.md). | Anyone with **Find and Export Records** |
 | **Field utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
@@ -35,19 +35,14 @@ choose **Turn on** in that row in **BarnCRM Settings**, **General** (or leave it
 first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tab is
 hidden for everyone.
 
-1. Open the **BarnCRM** app and choose the **Org Optimizer** tab. (It is the tab that used to
+1. Open the **BarnCRM Admin** app and choose the **Org Optimizer** tab. (It is the tab that used to
    be called **Data Hygiene**; bookmarks to it still work.)
-2. The **BarnCRM Admin** role, the **BarnCRM Find and Export** permission set and the
-   **BarnCRM Duplicate Review** permission set each give the tab. Staff with Find and Export
-   see **Overview** and **Data quality**; staff with Duplicate Review see **Overview** and
-   **Duplicates**, which they can read but not scan, dismiss or merge from; administrators see
-   every section.
-3. Duplicate review also needs the **BarnCRM Duplicate Review** permission set, which only
-   users with a Sales Cloud or Service Cloud license can have (see [Duplicates](duplicates.md),
-   How to turn it on). Without it the Duplicates section says so.
+2. The **BarnCRM Admin** role and the **BarnCRM Find and Export** permission set each give
+   the tab. Staff with Find and Export see **Overview** and **Data quality**; administrators
+   see every section.
 
-Duplicate review no longer has a panel in **BarnCRM Settings**. Under **Households**, the
-**Duplicates** row has an **Open Org Optimizer** button that takes you to this page.
+Duplicates are no longer a section here: they are on the **Duplicate Matching** tab, which
+the **Duplicate Matching** section of **BarnCRM Settings** opens.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -58,15 +53,13 @@ Start from the sample data (see [Sample data](sample-data.md)).
    household** says **0** on fresh sample data.
 3. Choose **Field utilization**. In **Kind of record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.
-4. Choose **Duplicates** and press **Scan for duplicates**. The scan runs in the background;
-   come back in a minute to see any pairs.
-5. Choose **Health Check** and press **Run Health Check**. The findings appear, most serious
+4. Choose **Health Check** and press **Run Health Check**. The findings appear, most serious
    first, each with what to do.
-6. Choose **Storage and limits**. **Data storage (MB)** shows how much of your allowance is
+5. Choose **Storage and limits**. **Data storage (MB)** shows how much of your allowance is
    used, and **What BarnCRM stores** lists the sample data's import and error records.
-7. Choose **Unused setup**. In a fresh org most lines say **0**; any with a count list the
+6. Choose **Unused setup**. In a fresh org most lines say **0**; any with a count list the
    first five names, and **Open in Setup** takes you to the page where you can remove them.
-8. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
+7. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
 
 ## 4. Why sections load only when opened
 
@@ -104,8 +97,8 @@ Nothing here is deleted or changed for you:
 
 - **Looking for the Data Hygiene tab.** It is the same tab, renamed **Org Optimizer**. The
   record checks are under **Data quality**.
-- **Looking for duplicates in BarnCRM Settings.** Duplicate review moved here. The
-  **Duplicates** row under **Households** in BarnCRM Settings opens this page.
+- **Looking for duplicates here.** Duplicate review moved to its own tab, **Duplicate
+  Matching**. The **Duplicate Matching** section of BarnCRM Settings opens it.
 - **Seeing only two sections.** The others are for administrators. Ask whoever set up your
   org for the **BarnCRM Admin** role on the **Access** page.
 - **Expecting Health Check to run as the page opens.** It runs when you press **Run Health

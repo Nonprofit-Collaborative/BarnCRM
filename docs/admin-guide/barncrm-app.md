@@ -1,27 +1,93 @@
-# The BarnCRM app
+# The BarnCRM Apps and Navigation
 
 ## What it does
 
-The BarnCRM app is the app you work in every day, whatever kind of organization you are.
-It gives you one home page that tells
-you what to do next, a setup checklist that remembers how far you got, and a short list of
-the places you go most: your households, your people, your organizations, and your
-settings.
+BarnCRM Core comes as four apps: two for everyday work and two for administrators, each in
+standard navigation and console navigation.
+
+| App | For | Navigation | Tabs |
+|---|---|---|---|
+| **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Find |
+| **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Find, Addresses, Relationships, Affiliations, Household Members |
+| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log |
+| **BarnCRM Admin Console** | The BarnCRM Admin role only | Console | The same as BarnCRM Admin |
+
+The everyday apps give you one home page that tells you what to do next, a setup checklist
+that remembers how far you got, and the places you go most: your households, your people and
+your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
+tab shows only to the people whose access allows it, so a menu can be shorter than the list.
 
 If you have ever installed something in Salesforce and then wondered where to start, this
-is the answer to that question. You start here.
+is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
+
+### Where Everything Is
+
+| What you are looking for | Where it is |
+|---|---|
+| People, households, organizations, Find | **BarnCRM** or **BarnCRM Console** |
+| Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
+| BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
+| Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
+
+The home page's **Modules** list names each installed module, with an **Open the app** link
+for a module that has an app of its own. The Rollup Builder module has no app of its own: its
+**Rollup Builder** tab is in the admin apps.
+
+### A Module's Pages in the BarnCRM Apps
+
+Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
+so you need not switch apps:
+
+| Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
+|---|---|---|
+| Rollup Builder | | Rollup Builder |
+| Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup |
+| Volunteers | Volunteer Shifts, Volunteer Hours | |
+| Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
+
+- **Deployed from source** with `scripts/org/deploy-packages.sh`: the script adds the pages
+  of every module it deployed itself, as its last step. Nothing to do.
+- **Installed as packages**: Salesforce does not let one package add its pages to another
+  package's app, so you add them once by hand. **Home**, **Setup checklist**, **Modules**
+  lists the pages for each installed module. For each BarnCRM app you use:
+  1. In Setup, open **App Manager** and click **Edit** next to the app.
+  2. Open **Navigation Items**, move the listed pages to **Selected Items**, and click
+     **Save**. Skip any page that is already there.
+
+A page shows only to people whose access allows it, so adding a page to an everyday app does
+not show it to anyone who cannot use it.
 
 ## How to turn it on
 
-There is nothing to turn on. The app is installed with BarnCRM Core. A module can add its
-own app, and the home page lists it under **Modules** once that module is installed (with
-Giving, that is the **Fundraising** app).
+There is nothing to turn on. The apps are installed with BarnCRM Core, and BarnCRM gives each
+one to the right people itself: the everyday apps to everyone with a BarnCRM role, the admin
+apps to the **BarnCRM Admin** role only. It does this through four permission sets named
+**BarnCRM App: ...**, which it gives and takes as roles change on the Access page and again
+every night; do not assign them by hand.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
-2. Type `BarnCRM` and choose **BarnCRM**.
-3. Click the star next to the app name if you want it to open by default.
+2. Type `BarnCRM` and choose **BarnCRM** or **BarnCRM Console** (an administrator also sees
+   **BarnCRM Admin** and **BarnCRM Admin Console**).
+3. Click the star next to the app name if you want it to open by default. Each person picks
+   their own default app this way.
 
-Everyone who has been given a BarnCRM role can open the app. The home page shows each
+### Hide One Navigation Style for Everyone
+
+By default everyone sees both styles and picks the one they like. To show only one:
+
+1. Open **BarnCRM Settings** (in **BarnCRM Admin**) and click **General**.
+2. Set **App Navigation Style** to **Standard navigation only** or **Console navigation only**.
+   **Both (each person chooses)** is the default.
+3. Click **Save**. Within a minute or two the other style's apps leave everyone's App Launcher.
+   Set it back to **Both (each person chooses)** to show them again.
+
+The setting hides the everyday app and the admin app of the other style together. Each
+person can still choose their own default app in the App Launcher among the apps they see.
+
+Everyone who has been given a BarnCRM role can open the everyday apps. The home page shows each
 person what they can act on:
 
 | Part of the home page | Who sees it |
@@ -47,9 +113,14 @@ administrator tile to staff, it shows nothing to count.
 
 ## How records open: tabs in a console
 
-The BarnCRM app is a console app, shown with a blue barn logo in the app launcher. Instead of
-replacing the page each time you click, it keeps the records you are working on open side by
-side in tabs across the top.
+Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
+badge to it and have a navy header, so you can tell at a glance which app you are in; a module's
+app adds its own badge (a red heart for **Fundraising**, a green person for **BarnCRM
+Volunteers**).
+**BarnCRM Console** and
+**BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
+they keep the records you are working on open side by side in tabs across the top. In
+**BarnCRM** and **BarnCRM Admin** each record replaces the page, as in most Salesforce apps.
 
 - **Households, organizations, people and Error Log entries open in their own tab** (a
   workspace tab). Open three households and you have three tabs; click one to go back to it.
@@ -60,20 +131,22 @@ side in tabs across the top.
 
   If that link is blank (for example an address that belongs to a person, not a household),
   the record opens in its own tab instead.
-- **Pages such as Find, Data Manager and BarnCRM Settings open as tabs too.** Choose them from
-  the navigation menu (the arrow next to the app name). Addresses, Relationships, Affiliations
-  and Household Members are at the end of that menu. Import and Bulk Update are not in the
-  menu: open them from **Data Manager** (see [Data Manager](data-manager.md)).
+- **Pages such as Find and BarnCRM Settings open as tabs too.** Choose them from the
+  navigation menu (the arrow next to the app name). In **BarnCRM Console**, Addresses,
+  Relationships, Affiliations and Household Members are at the end of that menu. In **BarnCRM
+  Admin Console** the menu holds BarnCRM Settings, Data Manager, Import, Bulk Update, Org
+  Optimizer and Error Log.
 - **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
   still there when you come back.
-- **On a phone**, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
+- **On a phone**, the Salesforce mobile app shows each BarnCRM app as an ordinary app without
+  tabs.
 
 ## A five-minute walkthrough
 
 Maria has just installed BarnCRM and has the sample data loaded. She has the BarnCRM
 Admin role.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM** (or **BarnCRM Console**). The home page
    opens with the heading **Welcome to BarnCRM** and the sentence "Start with the setup
    checklist below."
 2. Read the **Setup checklist**. It opens on the first step you have not finished, with
@@ -153,7 +226,7 @@ you can move, remove, or add tiles in the Lightning App Builder without any code
    Settings, equals true**. Use the same filter to hide your own tiles from staff.
 5. Click **Save**. If the App Builder says the page cannot be edited because it came with
    the package, click **Save As** to make your own copy, then **Activation** to make the
-   copy the home page of the BarnCRM app.
+   copy the home page of the **BarnCRM** and **BarnCRM Console** apps.
 
 A copy you made does not receive changes from later BarnCRM versions. After an upgrade,
 compare it with the page that came with the package.
@@ -163,7 +236,15 @@ compare it with the page that came with the package.
 - **Looking for the app in Setup.** BarnCRM is an app, not a Setup page. Use the app
   launcher, not the gear icon. If `BarnCRM` does not appear in the app launcher, you
   have not been assigned a BarnCRM role: ask whoever installed the package to add you
-  on the Access page.
+  on the Access page. If the role was given a moment ago, wait a minute: BarnCRM gives the
+  apps in a queued job.
+- **Looking for BarnCRM Settings or Data Manager in the BarnCRM app.** The tools are in
+  **BarnCRM Admin** and **BarnCRM Admin Console**, which only the BarnCRM Admin role sees.
+  Someone without that role who has the Bulk Update, Find and Export or Duplicate Review
+  permission opens Data Manager or Org Optimizer by typing its name in the app launcher.
+- **Hiding a style and wondering why a person still has it as their default.** **App
+  Navigation Style** takes the other style's apps away; the next time that person opens
+  Salesforce they land in an app they can still see. Nothing else about their access changes.
 - **Wondering where the checklist went for a staff member.** The checklist, the Health
   Check and the status tiles show only to people with the Manage BarnCRM Settings
   permission. A staff member sees the welcome and the quick links, on purpose.
@@ -177,8 +258,9 @@ compare it with the page that came with the package.
   the page you were on stays open in its own tab. If the screen feels crowded, close the tabs
   you have finished with.
 - **Updating an org that already had the BarnCRM app without tabs.** Salesforce will not
-  switch an existing app to console tabs during a deployment. Before deploying, open Setup,
-  **App Manager**, click the arrow next to **BarnCRM**, choose **Edit**, then under **App
+  switch an existing app to console tabs during a deployment, and the console app keeps the
+  old app's API name (`BarnCRM`), now labelled **BarnCRM Console**. Before deploying, open
+  Setup, **App Manager**, click the arrow next to that app, choose **Edit**, then under **App
   Options** set **Navigation Style** to **Console Navigation** and save. A new installation
   needs nothing.
 - **Assuming an empty Errors tile means nothing failed.** The tile counts errors with the

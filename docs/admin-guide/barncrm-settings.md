@@ -14,10 +14,8 @@ done in Setup, the setup checklist on the Hub home page sends you there with ins
 and the section of this page that depends on it says so at the top (see "When a section
 needs a change in Setup" below).
 
-A module with an app of its own can also show its settings there, on their own: the
-**Volunteer Settings** tab is this page showing only the Volunteers settings. They are the
-same settings, so a change in either place shows in both. The Rollup Builder module has no
-settings tab: its settings are in the **Rollups** section of this page.
+No module has a settings tab of its own: a module's settings are a section of this page, for
+example **Rollups** and **Volunteers**.
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.
@@ -26,7 +24,7 @@ BarnCRM support page on GitHub in a new tab.
 
 There is nothing to turn on, but there is one permission to give out.
 
-1. Open the **BarnCRM** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
 2. If you can change values, you already have the **Manage BarnCRM Settings**
    permission. If you see a notice at the top of the page saying you can read but not
    change settings, you do not.
@@ -109,10 +107,10 @@ to the people who should see them, shows its settings, and starts its automation
 | Feature | What it covers | Hidden or stopped while off |
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
-| Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
+| Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
-| Addresses | Address capture and the default address | Its three automations and the Addresses section |
+| Addresses | Address capture and the primary address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
@@ -141,8 +139,8 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
 - A module that is not installed shows **Not installed** with **Install**, which opens
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
-  Volunteers has a Settings tab in its app, and the Rollup Builder's settings are in the
-  **Rollups** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  No module app has a Settings tab: the Rollup Builder's settings are in the **Rollups**
+  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
@@ -156,13 +154,14 @@ Builder ships as its own package, installed from this section like the others. S
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
-   opens with the **Setup checklist**.
-2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin** (or **BarnCRM Admin
+   Console**). It opens on the **BarnCRM Settings** tab.
+2. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
-   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Volunteers,
-   Automation, Error Log, Access, Import, Org Optimizer, Integrations, and Health. You only see
-   the ones that have something in them, and a feature that is off hides its sections: Giving and
+   Organization, Households, Duplicate Matching, Relationships, Addresses, Giving, Receipts,
+   Rollups, Volunteers, Automation, Error Log, Access, Import, Org Optimizer, Integrations, and
+   Health. You only see the ones that have something in them, and a feature that is off hides
+   its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
@@ -276,7 +275,7 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Section | What to change in Setup | Checked by BarnCRM |
 |---|---|---|
 | General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | No |
-| Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
+| Duplicate Matching | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
 | Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra Permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra Permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
@@ -294,9 +293,9 @@ form at the top of that page:
 | Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
 | Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
 | Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra Permissions | No |
-| Giving, Campaign sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
-| Giving, Opportunity mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
-| Giving, Accounting export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
+| Giving, Campaign Sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
+| Giving, Opportunity Mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
+| Giving, Accounting Export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
 
 ## Common mistakes
 

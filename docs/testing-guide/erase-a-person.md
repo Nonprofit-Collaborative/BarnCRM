@@ -116,7 +116,7 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Data Manager** and read **Data jobs**. | No erasure is listed; erasing is not a data job. |
+| 1 | Open **Data Manager** and read **Data Jobs**. | No erasure is listed; erasing is not a data job. |
 | 2 | Open the Erasure record from T-ERASE-02. | No undo or restore button. **Details** names records and fields only. |
 | 3 | Open the Recycle Bin and search for the street of Luis Garcia's deleted address (if the preview listed one). | Not there: the erasure empties deleted records from the Recycle Bin. The erased contact is not there either (it was kept and made anonymous). |
 

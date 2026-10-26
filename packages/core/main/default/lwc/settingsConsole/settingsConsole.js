@@ -167,9 +167,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   ];
 
   /**
-   * A module key (Rollups, for example) set on a module's own settings page: the console then
-   * shows only that module's rows, and no search, which looks across every module. Blank on
-   * BarnCRM Settings, which shows everything.
+   * No longer used: the console always shows every module's rows. The property stays declared
+   * because the platform refuses to remove a page property from a component that any Lightning
+   * page in the org places, so an org that had the old module settings pages could not take an
+   * upgrade without it. Any value set is ignored.
    */
   @api module;
 
@@ -332,29 +333,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** False on a module's own page, where a search hit could name a section it does not show. */
-  get showSearch() {
-    return !this.module;
-  }
-
-  /** The sections to show: all of them, or only a module's rows when `module` is set. */
-  forModule(sections) {
-    if (!this.module) {
-      return sections;
-    }
-    const wanted = this.module.trim().toLowerCase();
-    return sections
-      .map((section) => ({
-        ...section,
-        settings: (section.settings || []).filter(
-          (setting) => (setting.module || '').toLowerCase() === wanted
-        )
-      }))
-      .filter((section) => section.settings.length > 0);
-  }
-
   applyModel(model) {
-    this.sections = this.forModule((model && model.sections) || []);
+    this.sections = (model && model.sections) || [];
     this.canEdit = Boolean(model && model.canEdit);
     if (!this.selectRequestedSection() && !this.selectedSection && this.sections.length > 0) {
       this.selectedSection = this.sections[0].name;

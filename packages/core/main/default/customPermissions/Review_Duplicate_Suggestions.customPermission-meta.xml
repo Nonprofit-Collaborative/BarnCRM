@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Shows the Duplicates section of Org Optimizer to a user who is not an administrator. Only in
-    BarnCRM Duplicate Review. Grants no record access; scanning, dismissing and merging still
-    need Manage BarnCRM Settings.
+    Shows the review list on the Duplicate Matching tab to a user who is not an administrator.
+    Only in BarnCRM Duplicate Review. Grants no record access; scanning, dismissing and merging
+    still need Manage BarnCRM Settings.
   </description>
   <isLicensed>false</isLicensed>
   <label>Review Duplicate Suggestions</label>

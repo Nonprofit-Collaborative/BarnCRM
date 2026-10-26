@@ -53,7 +53,7 @@ import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCount
 const SETUP_DUPLICATE_RULES = '/lightning/setup/DuplicateRules/home';
 
 /**
- * The Duplicates panel on the Households page of BarnCRM Settings (C-20).
+ * The review list on the Duplicate Matching tab (C-20, ADR-0139).
  *
  * Everything it lists was found by the org's own duplicate rules, so the first thing it shows
  * is whether those rules are on: "nothing to review" while nothing is being checked would be

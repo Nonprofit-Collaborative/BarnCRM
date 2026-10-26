@@ -194,7 +194,7 @@ export default class BulkUpdate extends LightningElement {
           label: change.label,
           before: shown(change.before),
           after: change.problem ? change.problem : shown(change.after),
-          afterClass: change.problem ? 'slds-text-color_error' : ''
+          afterClass: change.problem ? 'slds-cell-wrap slds-text-color_error' : 'slds-cell-wrap'
         });
       });
     }

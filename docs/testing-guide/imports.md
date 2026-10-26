@@ -1,10 +1,10 @@
 # Imports
 
-Scripts for the Import wizard: mappings, preview, commit, rejected rows, row rules, value changes, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
+Scripts for the Import wizard: templates, preview, commit, rejected rows, row rules, value changes, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
-The Import tab opens from the **Data Manager** tab: on the **Import a file** card, select **Open**. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** mapping recognizes them). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's mappings and are tested with Giving.
+The Import tab opens from the **Data Manager** tab: on the **Import a File** card, select **Open**. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
 
 `import-test-1.csv` (5 rows: 3 new people, 1 existing sample person, 1 row with no last name):
 
@@ -29,13 +29,13 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 ## T-IMP-01: Preview and import a contact list
 
-**Purpose:** confirm the main path: choose a mapping, upload, check columns, preview, import and read the results.
+**Purpose:** confirm the main path: choose a template, upload, check columns, preview, import and read the results.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); `import-test-1.csv`.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Data Manager** tab. On the **Import a file** card, select **Open**. | The **Import** tab opens on the card **Import a spreadsheet**, step heading **Choose what kind of file this is**. A **Recent imports** list shows below the wizard. |
+| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a spreadsheet**, step heading **Choose what kind of file this is**. A **Recent imports** list shows below the wizard. |
 | 2 | In **Choose what kind of file this is**, choose **Generic contact list**. | Its description appears under the picker ("A list of people with their contact details..."). **Next** is enabled. |
 | 3 | Select **Next**. | Heading **Upload the file**, with an **Upload file** control. |
 | 4 | Upload `import-test-1.csv`. | Heading **Check the columns**. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in your file**, **What it means** and **First values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
@@ -72,7 +72,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a file**, **Open**). | **Recent imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and an **Undo** button. |
+| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and an **Undo** button. |
 | 2 | Select **Undo** beside it. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo this import**. Nothing has changed yet. |
 | 3 | Select **Cancel**. | The box closes. The import is unchanged and **Undo** is still offered. |
 | 4 | Select **Undo** again, then **Undo this import**. | "The undo has started. The import shows Undone when it has finished; refresh the page to check." |
@@ -145,7 +145,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 | 7 | Read **Changed values (first rows)**. | Row 1 shows `ANA.RT@EXAMPLE.ORG` before and `ana.rt@example.org` after, and `RAMIREZ-TEST` before and `Ramirez-Test` after. |
 | 8 | Select **Import these rows**, then undo the import from **Recent imports**. | **Created** 2. After the undo, Ana Ramirez-Test and Cy Dupe are gone. |
 
-**Cleanup:** the changes and rules are saved with the **Generic contact list** mapping. Upload `import-test-2.csv` with it again, remove both changes and the skip and one-row-per rules, and select **Preview**; then leave the page without importing.
+**Cleanup:** the changes and rules are saved with the **Generic contact list** template. Upload `import-test-2.csv` with it again, remove both changes and the skip and one-row-per rules, and select **Preview**; then leave the page without importing.
 
 ## T-IMP-08: Matching choices
 
@@ -165,7 +165,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 ## T-IMP-09: Matching through match sources
 
 **Purpose:** confirm a person known only by a related address record is matched when first and last names agree, and not matched when either differs (a relative at the same address is never loaded into the person).
-**Prerequisites:** admin; the shipped match source **Address (person)** active (BarnCRM Settings, **Custom Metadata**, see [Custom metadata](../admin-guide/custom-metadata.md#match-sources)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
+**Prerequisites:** admin; the shipped match source **Address (person)** active (**Duplicate Matching** tab, **Matching Logic**, see [Matching Logic](../admin-guide/duplicates.md#matching-logic)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
 
 Save `import-match.csv`:
 
@@ -191,23 +191,23 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 ## T-IMP-10: Load one object, update by record ID, and undo
 
-**Purpose:** confirm a one-object mapping can be created, updates a record, appears in the mapping list, and its undo puts the value back.
+**Purpose:** confirm a one-object template can be created, updates a record, appears in the template list, and its undo puts the value back.
 **Prerequisites:** admin; the sample organization **Bayview Hardware**. Note its **Phone** value and copy its record ID from the address bar.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Save a CSV `org-phone.csv` with the heading `Id,Phone` and one row: the record ID, then `555-0199`. | Saved. |
-| 2 | Open the Import tab. Under **Load one object**, select **Load one object**. | An **Object** picker, a **Mapping name** box and a **Create** button. **Create** is disabled until both are filled. |
-| 3 | Choose **Account** as **Object**, type `Test org phone update` as **Mapping name**, and select **Create**. | The new mapping is chosen in **Choose what kind of file this is**. |
+| 2 | Open the Import tab. Under **Load one object**, select **Load one object**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
+| 3 | Choose **Account** as **Object**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Choose what kind of file this is**. |
 | 4 | Select **Next** and upload `org-phone.csv`. | The columns step. If **Id** is not already **Salesforce record ID**, choose it; **Phone** maps to the Phone field. Each column has an **Empty cells clear the field (update and upsert)** box. |
 | 5 | Select **Next**. | **What each row does** offers update choices only, for example **Update by record ID** and **Update by a field you choose**; **Create new records** is not offered for accounts. |
 | 6 | Choose **Update by record ID** and select **Preview**. | **Would update** 1, **Would be rejected** 0. |
 | 7 | Select **Import these rows**. Open Bayview Hardware. | **Phone** reads `555-0199`. |
-| 8 | Open the **Data Manager** tab. | **Import mappings** lists **Test org phone update**. **Data jobs** lists the import first. |
-| 9 | In **Data jobs**, select **Undo** beside the import. | The box shows **Changed values to put back** 1 and 0 people, households and organizations to remove. |
+| 8 | Open the **Data Manager** tab. | **Import Templates** lists **Test org phone update**. **Data Jobs** lists the import first. |
+| 9 | In **Data Jobs**, select **Undo** beside the import. | The box shows **Changed values to put back** 1 and 0 people, households and organizations to remove. |
 | 10 | Select **Undo this import**, then **Refresh** until the job reads **Undone**. Open Bayview Hardware. | **Phone** is back to the value you noted. |
 
-**Cleanup:** none (the test mapping may stay; it changes nothing on its own).
+**Cleanup:** none (the test template may stay; it changes nothing on its own).
 
 ## T-IMP-11: Access to Import
 
@@ -218,7 +218,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 |---|---|---|
 | 1 | Log in as staff. Open the App Launcher and search for "Import" and "Data Manager". | Neither BarnCRM tab is found. |
 | 2 | Log in as read-only and repeat. | Neither tab is found. |
-| 3 | As admin, on **BarnCRM Settings**, **Access**, give staff the **BarnCRM Find and Export** extra permission. Log in as staff and open **Data Manager**. | The tab opens. There is no **Import a file** card and no **Import mappings** list. |
+| 3 | As admin, on **BarnCRM Settings**, **Access**, give staff the **BarnCRM Find and Export** extra permission. Log in as staff and open **Data Manager**. | The tab opens. There is no **Import a File** card and no **Import Templates** list. |
 | 4 | Still as staff, search the App Launcher for "Import". | No Import tab. |
 
 **Cleanup:** as admin, remove **BarnCRM Find and Export** from staff on the **Access** page.

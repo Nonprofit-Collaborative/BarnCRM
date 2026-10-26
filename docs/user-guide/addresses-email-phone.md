@@ -1,7 +1,7 @@
 # Addresses, email and phone
 
 BarnCRM keeps every address a household, organization or person uses, and marks one as the
-default. The default is copied into the standard address fields, so letters and reports always
+primary. The primary is copied into the standard address fields, so letters and reports always
 use the right one. People also get three email boxes and a choice of which one you write to,
 and a choice of which phone number to call.
 
@@ -18,8 +18,8 @@ admin has turned on the Addresses feature. Ask your admin; see
 4. Fill in **Street**, **City**, **State**, **Postal Code** and **Country**.
 5. Click **Add address** at the foot of the form.
 
-You should see: "Address saved." The first address a record gets is made the default
-automatically and carries a **Default** badge.
+You should see: "Address saved." The first address a record gets is made the primary
+automatically and carries a **Primary** badge.
 
 ## To choose household or personal
 
@@ -28,19 +28,54 @@ automatically and carries a **Default** badge.
   keeps its own address, and the person keeps theirs when the household moves later.
 - If you edit a person's mailing address in the person's own **Mailing Address** field
   (**Reaching This Person** section), what happens
-  depends on your org's setting: either the whole household moves, or the person gets an
-  address of their own. Ask your admin which yours is.
+  depends on your org's **Address Updates** setting: either the whole household moves, or
+  the person gets an address of their own. Ask your admin which yours is.
 - If you edit a household's **Billing Address** field, the new address becomes the
-  household's default address, and everyone in the household moves with it except a person
-  with an address of their own.
+  household's primary address, and everyone in the household moves with it except a person
+  with an address of their own. If your org's setting is **Nobody moves until you choose**,
+  only the household moves until someone chooses **Update Everyone's Address** on its
+  primary address card.
 
-## To make an address the default
+## To Make an Address the Primary
 
-1. On the **Addresses** card, click **Set as default** on the address you want to use.
+1. On the **Addresses** card, click **Set as Primary** on the address you want to use.
 
-You should see: "This is now the default address, and it has been copied to the standard
-address fields." The **Default** badge moves, and the record's own address fields at the
+You should see: "This is now the primary address, and it has been copied to the standard
+address fields." The **Primary** badge moves, and the record's own address fields at the
 top of the page refresh. Nothing is deleted: the other addresses stay on the card.
+
+## To Move the Whole Household to a Person's Address
+
+Use this when a person's own address becomes the household's, for example when the family
+moves into the home one of them already had.
+
+1. Open the person. On the **Addresses** card, click **Use for Whole Household** on their
+   address. (Seasonal addresses do not offer it.)
+2. If the person belongs to more than one household, choose one under **Which household?**.
+   Their own household is listed first.
+3. Click **Use for Whole Household** in the confirmation, or **Cancel**.
+
+You should see: "The household now uses this address." The household gets this address as
+its primary, and everyone in it without an address of their own moves to it. If it is the
+person's own household, they move with the household from now on; their own address stays
+on their card without the **Primary** badge.
+
+## To Give Everyone in the Household Its Address
+
+Use this to bring people back to the household's address, or, if your org's **Address
+Updates** setting is **Nobody moves until you choose**, to move them after the household's
+address changes.
+
+1. Open the household. On the **Addresses** card, click **Update Everyone's Address** on the
+   primary address.
+2. The confirmation lists who will get this address, and who has an address of their own.
+   Tick anyone with their own address who should move too; the rest stay where they are.
+3. Click **Update Everyone's Address** in the confirmation, or **Cancel**.
+
+You should see: "Everyone's address has been updated." A person you ticked keeps their own
+address on their card, without the **Primary** badge.
+
+If you cannot see either button, you can read addresses but not change them. Ask your admin.
 
 ## To add a seasonal address
 
@@ -53,7 +88,7 @@ Use this for a household that spends part of each year somewhere else.
 4. Click **Add address**.
 
 You should see: the address on the card with its dates, for example "Used from January 1 to
-March 31". A nightly job makes it the default when the season starts and puts the previous
+March 31". A nightly job makes it the primary when the season starts and puts the previous
 address back when it ends. You do not move it by hand.
 
 ## To change or delete an address
@@ -99,14 +134,14 @@ BarnCRM's **Work Phone**.
   day is a day its month has ..." Correct the number.
 - Problem: "An address belongs to one household, one organization, or one person. Choose only
   one." Clear one of **Household or Organization** and **Person** on the address.
-- Problem: "This is the address in use. To change that, make another address the default, or
-  delete this one." You tried to untick **Default** on the only address in use. Use **Set as
-  default** on another address instead.
+- Problem: "This is the address in use. To change that, make another address the primary, or
+  delete this one." You tried to untick **Primary** on the only address in use. Use **Set as
+  Primary** on another address instead.
 - Problem: "The address could not be saved. Check the fields marked in the form and try
   again." Fix the marked fields.
-- Problem: "We could not make that the default address. Check that you have permission to
+- Problem: "We could not make that the primary address. Check that you have permission to
   edit addresses ..." Ask your admin for edit access.
-- Problem: the **Addresses** card has no **Add address** or **Set as default** button. Your
+- Problem: the **Addresses** card has no **Add address** or **Set as Primary** button. Your
   access lets you read addresses but not change them (the Read Only role, for example). Ask
   your admin.
 - Problem: "The Work email address is empty, so there is nothing to put in the ordinary Email

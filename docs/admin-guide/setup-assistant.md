@@ -279,6 +279,13 @@ leaves nothing behind in your org: no objects, no tabs, no automation. Installin
 opening its install link and following the Salesforce install screens yourself: the
 assistant never installs anything for you.
 
+Under each installed module, the step also lists its pages that belong in the BarnCRM apps:
+"Add to BarnCRM and BarnCRM Console" for everyday pages, and "Add to BarnCRM Admin and BarnCRM
+Admin Console" for admin pages, with how to add them in App Manager. A package cannot add its
+pages to another package's app, so this is the one step you do by hand after a package install;
+a source deploy adds them itself. See
+[A Module's Pages in the BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps).
+
 To turn an installed module on or off, or to see what uninstalling one would delete, use the
 [Module Manager](module-manager.md): the **Modules** section of BarnCRM Settings.
 

@@ -612,7 +612,16 @@ describe('c-settings-console', () => {
     expect(notes.section).toBe('General');
   });
 
-  it("shows only a module's rows, and no search, on that module's own page", async () => {
+  // The module property stays declared, because an org whose pages place this component cannot
+  // take an upgrade that removes it, but it no longer filters anything.
+  it('keeps the page property module declared and ignores its value', async () => {
+    // Jest runs from the repository root (jest.config.js).
+    const meta = require('fs').readFileSync(
+      'packages/core/main/default/lwc/settingsConsole/settingsConsole.js-meta.xml',
+      'utf8'
+    );
+    expect(meta).toMatch(/<property name="module" type="String"/);
+
     const row = (key, section, module) => ({
       key,
       label: key,
@@ -630,13 +639,7 @@ describe('c-settings-console', () => {
       canEdit: true,
       sections: [
         { name: 'General', settings: [row('Coexistence_Mode__c', 'General', 'Core')] },
-        {
-          name: 'Rollups',
-          settings: [
-            row('Rollup_Mode_Default__c', 'Rollups', 'Rollups'),
-            row('Rollup_Processing__c', 'Rollups', 'Rollups')
-          ]
-        }
+        { name: 'Rollups', settings: [row('Rollup_Mode_Default__c', 'Rollups', 'Rollups')] }
       ]
     });
     const element = createElement('c-settings-console', { is: SettingsConsole });
@@ -645,14 +648,12 @@ describe('c-settings-console', () => {
     await settle();
 
     const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item');
-    expect(navItems).toHaveLength(1);
-    expect(navItems[0].name).toBe('Rollups');
-    expect(element.shadowRoot.querySelectorAll('lightning-input')).toHaveLength(2);
-    expect(element.shadowRoot.querySelector('c-settings-search')).toBeNull();
+    expect(navItems).toHaveLength(2);
+    expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
   });
 
   // The Rollup Builder module has no settings tab of its own: BarnCRM Settings, opened on the
-  // Rollups section, shows both its settings and the link to the Builder (no module filter).
+  // Rollups section, shows both its settings and the link to the Builder.
   it('shows every Rollups row in the main console when a link opens that section', async () => {
     const pick = (key) => ({
       key,

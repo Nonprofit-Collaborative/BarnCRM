@@ -5,30 +5,30 @@
 ## 1. What it does
 
 If your donors and gifts are in Salesforce Nonprofit Cloud, BarnCRM
-ships four ready-made import mappings that read Nonprofit Cloud's own exports: your people, and
+ships four ready-made import templates that read Nonprofit Cloud's own exports: your people, and
 your gifts with the funds they were designated to. You export each file with Data Loader or
 Workbench, without renaming a column, and load it through the **Import** tab like any other
 file, with a preview first and an undo afterwards.
 
-The mappings only name columns. Nothing in BarnCRM depends on Nonprofit Cloud being
+The templates only name columns. Nothing in BarnCRM depends on Nonprofit Cloud being
 installed, so they work the same whether you are moving to a new org or loading into the org
 Nonprofit Cloud is in.
 
 ## 2. How to turn it on
 
-BarnCRM brings the person accounts mapping, and the Giving module brings the three gift
-mappings. Each package adds its mappings when it is installed, and an upgrade adds any mapping
+BarnCRM brings the person accounts template, and the Giving module brings the three gift
+templates. Each package adds its templates when it is installed, and an upgrade adds any template
 a later version ships, so the **Import** tab normally lists them already. An upgrade never
-changes a mapping you have edited. A shipped mapping you deleted comes back on the next
+changes a template you have edited. A shipped template you deleted comes back on the next
 upgrade: switch it off instead if you do not want it in the list.
 
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
-1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
+1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "4 shipped
-   import templates are missing" (a higher number if other shipped mappings are missing too)
+   import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
-3. Select **Restore import templates**. Your own mappings, and any shipped mapping you have
+3. Select **Restore import templates**. Your own templates, and any shipped template you have
    edited, are not touched.
 4. Open the **Import** tab. The list now has **Nonprofit Cloud: person accounts**,
    **Nonprofit Cloud: gift transactions**, **Nonprofit Cloud: undesignated gifts**
@@ -148,7 +148,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
    ACH, Stock and In-kind, plus common words such as "Credit Card", "EFT" and "Wire Transfer".
    Any other value is rejected in the preview, naming it and the values to use; use **Find and
    Replace** in the spreadsheet on that column.
-9. **Recreate what the mappings do not load** (section 6).
+9. **Recreate what the templates do not load** (section 6).
 
 In Data Loader, choose **Export**, pick the object named after `FROM`, and paste the query into
 the query box. In Workbench, choose **Queries**, **SOQL Query**, paste it, and choose **Bulk
@@ -156,9 +156,9 @@ CSV**. Before the full export, add `LIMIT 5` to a query and compare the rows wit
 they came from: the field names above come from Salesforce's documentation, and an org can
 differ.
 
-## 5. Why four mappings and not one
+## 5. Why four templates and not one
 
-A mapping remembers the columns of the last file loaded with it, so one mapping serves one
+A template remembers the columns of the last file loaded with it, so one template serves one
 file shape. The shapes differ in ways that matter:
 
 - **People and gifts are separate files** because a gift file cannot carry a person's full
@@ -169,18 +169,18 @@ file shape. The shapes differ in ways that matter:
   export, which is the only export that says where a designated gift's money went.
 - **A split gift arrives as one line per designation.** BarnCRM reads a split from one row
   (Fund 1 with Amount 1, Fund 2 with Amount 2, and so on). Each line on its own claims part of
-  the gift is the whole gift, so the mapping loads a line's designation amount as **Amount 1**:
+  the gift is the whole gift, so the template loads a line's designation amount as **Amount 1**:
   the parts then do not add up to the gift, and the line is rejected where you can see it,
   rather than loaded as a gift to one fund only.
 
 ## 6. What does not come across yet
 
-These are not loaded by the four mappings. Each has what to do in the meantime.
+These are not loaded by the four templates. Each has what to do in the meantime.
 
 | Not loaded | What to do meanwhile |
 |---|---|
 | Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). |
-| Relationships and affiliations | No ready-made mapping ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | Tributes | Same: add them by hand to the gift ([Tributes](tributes.md)). |
@@ -197,9 +197,9 @@ Skip step 3 of section 4: the gift files find each donor by email. Two things di
 that keeps people as person accounts:
 
 - A person a gift file has to create gets their name only. Their email and postal code are
-  skipped, and the run log says "The mapping refers to Email, which this org does not have.
+  skipped, and the run log says "The template refers to Email, which this org does not have.
   Those values were skipped." Make sure every donor exists before loading gifts. The person
-  accounts mapping is for loading into a new org, where people are stored as contacts.
+  accounts template is for loading into a new org, where people are stored as contacts.
 - An organization donor is found by name only if its account is a BarnCRM organization.
   A business account of another record type gets a new BarnCRM organization of the same
   name. Check the preview's "would create" count for organizations before you import.
@@ -238,7 +238,7 @@ column from the file.
 
 ## Column reference
 
-Each mapping reads the columns its query in section 4 exports. The headings match whatever
+Each template reads the columns its query in section 4 exports. The headings match whatever
 their capitals.
 
 | Column heading | Loads into |

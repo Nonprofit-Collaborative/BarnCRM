@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Lets a user add, edit and archive the organization's own custom metadata rows, such as
-    relationship types, on the Custom metadata page in BarnCRM Settings. Saving changes the
-    org's metadata, so it is granted only by BarnCRM Metadata Admin.
+    Lets a user add, edit and archive the org's own custom metadata rows: relationship types
+    on the Custom metadata page, match sources on Matching Logic. Saving changes metadata, so
+    only BarnCRM Metadata Admin grants it.
   </description>
   <isLicensed>false</isLicensed>
   <label>Manage BarnCRM Metadata</label>

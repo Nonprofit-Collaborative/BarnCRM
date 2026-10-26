@@ -22,7 +22,7 @@ every time a household's membership changes, every time an address is saved, and
 new person would otherwise get a household of their own. Health Check reads your org every
 time it runs.
 
-1. Open the **BarnCRM** app.
+1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation.
 4. Read the **What We Found in Your Org** card. If your org has households built the
@@ -62,7 +62,7 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
 Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two
 years. Her colleagues have been grouping families there the whole time.
 
-1. Maria opens the **BarnCRM** app, clicks **BarnCRM Settings**, and chooses
+1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
 2. The **What We Found in Your Org** card tells her that this org already has households
    built the Nonprofit Cloud way, and how many.

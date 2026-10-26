@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data job history: heading of the list of every kind of job</shortDescription>
-        <value>Data jobs</value>
+        <value>Data Jobs</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_Empty</fullName>

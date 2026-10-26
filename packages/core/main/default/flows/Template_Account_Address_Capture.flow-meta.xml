@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description
-  >Template for the automation "Keep the address an account started with" (registry row Account_Address_Capture). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. When a household or an organization is created with an address in its billing fields, keeps that address on file as its first address, marked default. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  >Template for the automation "Keep the address an account started with" (registry row Account_Address_Capture). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. When a household or an organization is created with an address in its billing fields, keeps that address on file as its first address, marked primary. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
   <environments>Default</environments>
   <formulas>
     <description>Home for a household, Work for an organization, the same types BarnCRM gives a first address.</description>
@@ -33,7 +33,7 @@
   </processMetadataValues>
   <processType>AutoLaunchedFlow</processType>
   <recordCreates>
-    <description>Creates the first address from the billing fields, marked default. The automation that copies the default address back to the standard fields then runs on it as on any other address.</description>
+    <description>Creates the first address from the billing fields, marked primary. The automation that copies the primary address back to the standard fields then runs on it as on any other address.</description>
     <name>Create_First_Address</name>
     <label>Create first address</label>
     <locationX>176</locationX>

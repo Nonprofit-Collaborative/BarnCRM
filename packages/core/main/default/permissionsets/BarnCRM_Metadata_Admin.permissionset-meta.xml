@@ -3,11 +3,16 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Metadata Admin</label>
   <description>
-    Optional: the Custom metadata page in BarnCRM Settings, where saving changes the org's
-    metadata. For people who already administer the org. In no role on purpose.
+    Optional: the Custom metadata page in BarnCRM Settings and Matching Logic on the Duplicate
+    Matching tab, where saving changes the org's metadata. For people who already administer
+    the org. In no role on purpose.
   </description>
   <classAccesses>
     <apexClass>CustomMetadataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>MatchSourceController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <customPermissions>

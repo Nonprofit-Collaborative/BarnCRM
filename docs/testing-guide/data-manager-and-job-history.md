@@ -6,19 +6,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-DM-01: Data Manager shows every card to an admin
 
-**Purpose:** Confirm the Data Manager tab lists each tool, the import mappings, the job list and Salesforce's own tools for an administrator.
+**Purpose:** Confirm the Data Manager tab lists each tool, the import templates, the job list and Salesforce's own tools for an administrator.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Data Manager** tab. | The page title is **Data Manager**, with the line **Start a data task, or see and undo what changed.** |
-| 2 | Look under **Start a task**. | Five cards, each with an **Open** button: **Import a file**, **Find and export records**, **Change many records**, **Delete many records**, **Tidy and check your data**. |
-| 3 | Look under **Import mappings**. | A table with the columns **Mapping**, **Loads**, **Arrives regularly as**, **Last loaded**, listing the shipped import templates (or **No import mappings yet.** if there are none). |
-| 4 | Look at the job list card. | It is headed **Data jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it says **No data jobs to show yet.** |
-| 5 | Look under **Salesforce's own tools**. | Three links: **Weekly Data Export (your backup)**, **Recycle Bin**, **Data Import Wizard (records BarnCRM does not load)**. |
-| 6 | Click **Recycle Bin**. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
-| 7 | Check the app's navigation bar. | **Data Manager** and **Find** are there. **Import** and **Bulk Update** are not. |
+| 2 | Look under **Start a Task**. | Five cards, each with an **Open** button: **Import a File**, **Find and Export Records**, **Update Many Records**, **Delete Many Records**, **Tidy and Check Your Data**. Each card says whether it needs a file: **Import a File** starts "Needs a file."; the other four start "No file needed". **Update Many Records** reads "No file needed. Change up to five fields on many records at once: find the records in Find, then press Bulk update. To update records from a spreadsheet, use Import a File." |
+| 3 | Look at **Delete Many Records**. | Its **Open** button has red text. Under the card's text a yellow box with a warning icon reads "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days." No other card has a warning box or a red button. |
+| 4 | Look under **Import Templates**. | A line starting "A template remembers how a file's columns match BarnCRM fields", then a table with the columns **Template**, **Loads**, **Arrives regularly as**, **Last loaded**, listing the shipped import templates (or **No import templates yet.** if there are none). |
+| 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it says **No data jobs to show yet.** |
+| 6 | Look under **Salesforce's Own Tools**. | Three links: **Weekly Data Export (your backup)**, **Recycle Bin**, **Data Import Wizard (records BarnCRM does not load)**. |
+| 7 | Click **Recycle Bin**. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
+| 8 | Check the app's navigation bar. | **Data Manager** and **Find** are there. **Import** and **Bulk Update** are not. |
 
 **Cleanup:** None.
 
@@ -29,15 +30,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Data Manager**, click **Open** on **Import a file**. | The **Import** tab opens. |
-| 2 | Go back to **Data Manager**. Click **Open** on **Find and export records**. | The **Find** tab opens. |
-| 3 | Go back. Click **Open** on **Change many records**. | The **Find** tab opens (bulk update starts from a Find query). |
-| 4 | Go back. Click **Open** on **Delete many records**. | The **Find** tab opens. |
-| 5 | Go back. Click **Open** on **Tidy and check your data**. | The **Org Optimizer** tab opens on **Overview**. |
+| 1 | On **Data Manager**, click **Open** on **Import a File**. | The **Import** tab opens. |
+| 2 | Go back to **Data Manager**. Click **Open** on **Find and Export Records**. | The **Find** tab opens. |
+| 3 | Go back. Click **Open** on **Update Many Records**. | The **Find** tab opens (bulk update starts from a Find query). |
+| 4 | Go back. Click **Open** on **Delete Many Records**. | The **Find** tab opens. |
+| 5 | Go back. Click **Open** on **Tidy and Check Your Data**. | The **Org Optimizer** tab opens on **Overview**. |
 
 **Cleanup:** None.
 
-## T-DM-03: A bulk update appears in Data jobs, with a notification
+## T-DM-03: A bulk update appears in Data Jobs, with a notification
 
 **Purpose:** Confirm a bulk update is listed newest first with its counts, the filter works, and the starter gets one bell notification.
 **Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Tell people when their long jobs finish** is ticked.
@@ -48,13 +49,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Press **Bulk update** and set **Title** to `Test title` on all 6, confirming with the count (steps in [Bulk update](../admin-guide/bulk-update.md)). | The bulk update starts. |
 | 3 | When it finishes, check the bell at the top of the page. | One new notification titled **Bulk update finished**, reading **6 updated, 0 already right, 0 no longer matched, 0 could not be saved. Open the bulk update for the run log.** |
 | 4 | Click the notification. | The bulk update's **Data Job** record opens, with its run log. |
-| 5 | Open **Data Manager** and press **Refresh** on **Data jobs**. | The bulk update is first. Its title names the job, **Bulk update**, **Contact** and its status; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and an **Undo** button. |
+| 5 | Open **Data Manager** and press **Refresh** on **Data Jobs**. | The bulk update is first. Its title names the job, **Bulk update**, **Contact** and its status; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and an **Undo** button. |
 | 6 | In **Show**, choose **Imports**. | The bulk update is no longer listed. |
 | 7 | In **Show**, choose **Bulk updates**, then **All**. | The bulk update is listed again each time. |
 
 **Cleanup:** Leave the job for T-DM-04.
 
-## T-DM-04: Undo a bulk update from Data jobs
+## T-DM-04: Undo a bulk update from Data Jobs
 
 **Purpose:** Confirm the typed-count confirmation guards the undo and the values go back.
 **Prerequisites:** admin; T-DM-03 done.
@@ -62,7 +63,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Data Manager**, under **Data jobs**, press **Undo** beside the bulk update. | A box opens: **Undo puts back the values on 6 records, except any somebody changed since. Type 6 to confirm.**, with **Type the number of records to confirm**, **Cancel** and **Undo bulk update**. |
+| 1 | On **Data Manager**, under **Data Jobs**, press **Undo** beside the bulk update. | A box opens: **Undo puts back the values on 6 records, except any somebody changed since. Type 6 to confirm.**, with **Type the number of records to confirm**, **Cancel** and **Undo bulk update**. |
 | 2 | Type `5`. | **Undo bulk update** stays disabled. |
 | 3 | Press **Cancel**. | The box closes. Nothing is undone; the job still shows **Undo**. |
 | 4 | Press **Undo** again, type `6`, press **Undo bulk update**. | A success message: **The undo started. Press Refresh to see when it has finished.** |
@@ -72,7 +73,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-05: Undo a bulk delete from Data jobs
+## T-DM-05: Undo a bulk delete from Data Jobs
 
 **Purpose:** Confirm a bulk delete is listed and its undo brings the record back from the Recycle Bin.
 **Prerequisites:** admin (holds **BarnCRM Bulk Delete** from the create script). Create a contact `Dana Deletetest`.
@@ -96,9 +97,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Data Manager** and no **Org Optimizer** tab. |
 | 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give permission**, and confirm. | A message says the staff user now has the permission. |
-| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two cards: **Find and export records** and **Tidy and check your data**. |
-| 4 | Look for **Import mappings**, **Data jobs** and **Salesforce's own tools**. | None of them is shown. |
-| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third card, **Change many records**, appears, and **Data jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
+| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two cards: **Find and Export Records** and **Tidy and Check Your Data**. |
+| 4 | Look for **Import Templates**, **Data Jobs** and **Salesforce's Own Tools**. | None of them is shown. |
+| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third card, **Update Many Records**, appears, and **Data Jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
 | 6 | As staff, check whether the admin's bulk update from T-DM-03 is listed. | It is not: staff see their own jobs only. |
 
 **Cleanup:** As admin, remove both extra permissions from the staff user on the **Access** page.
@@ -144,7 +145,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Org Optimizer** and choose **Field utilization**. | **Field utilization**, with **Kind of record** set to **Choose a kind of record**. |
 | 2 | In **Kind of record**, choose **Account**. | A progress bar fills while it reads **Counted N of N fields.** The table has **Field**, **API name**, **Record type**, **Filled**, **With a value** and **Records** columns; rows appear for **Household** and **Organization**. |
 | 3 | Read the line above the table. | **No counts have been saved for this kind of record yet.** |
-| 4 | Click **Save these counts**. | **Saved N counts.** |
+| 4 | Read the small text under the button group, then click **Save Utilization Snapshot**. | The small text reads "Keeps this count so your next count shows what changed." Then **Saved N counts.** |
 | 5 | Open any sample organization and fill in **Website**. Return and click **Count again**. | The Website row for **Organization** shows a higher **Filled**; **Saved** shows the earlier percentage and **Change (points)** shows the rise. |
 | 6 | Check the bell. | No notification for the count. |
 
@@ -158,7 +159,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **General**, clear **Tell people when their long jobs finish** and click **Save**. | **Your settings are saved.** |
-| 2 | Run a bulk update as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data jobs**. |
+| 2 | Run a bulk update as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
 | 3 | Check the bell. | No new notification. |
 | 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
 
