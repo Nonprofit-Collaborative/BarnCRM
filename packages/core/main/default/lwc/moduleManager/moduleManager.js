@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
@@ -64,6 +64,12 @@ export default class ModuleManager extends LightningElement {
 
   load() {
     return this.run(getState, {});
+  }
+
+  /** The console calls this after first-run setup finishes, because this row stays mounted. */
+  @api
+  refresh() {
+    return this.load();
   }
 
   get canEdit() {

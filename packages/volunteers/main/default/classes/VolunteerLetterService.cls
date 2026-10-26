@@ -123,9 +123,7 @@ public with sharing class VolunteerLetterService {
             'OrganizationName' => escape(
                 BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
             ),
-            'OrganizationAddress' => escape(
-                BarnCRM_Settings__c.getOrgDefaults().Organization_Address__c
-            ),
+            'OrganizationAddress' => escape(OrganizationAddress.oneLine()),
             'FromDate' => escape(fromDate.format()),
             'ToDate' => escape(toDate.format()),
             'Today' => escape(Date.today().format())

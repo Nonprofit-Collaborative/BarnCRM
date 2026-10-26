@@ -16,6 +16,15 @@
                             onchange={handleFieldChange}
                         ></lightning-input>
                     </template>
+                    <template lwc:if={field.isAddress}>
+                        <c-organization-address
+                            class="slds-var-m-top_x-small"
+                            titled
+                            values={addressValues}
+                            disabled={isReadOnly}
+                            onpartchange={handleAddressPartChange}
+                        ></c-organization-address>
+                    </template>
                     <template lwc:if={field.isRecord}>
                         <lightning-record-picker
                             class="slds-var-m-top_x-small"

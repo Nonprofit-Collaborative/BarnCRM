@@ -79,7 +79,7 @@ loader's.
 ## 2. How to turn it on
 
 1. Open **BarnCRM Settings**.
-2. In the **General** section, find **Sample data** and open it. If you do not see it,
+2. In the **General** section, find **Sample Data** and open it. If you do not see it,
    type "sample" in the settings search box.
 3. Read the warning, then select **Load sample data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
@@ -117,7 +117,7 @@ household records, names, greetings, member counts, and Members panel.
 
 ## 3. A five-minute walkthrough (as Maria)
 
-1. Open **BarnCRM Settings**, go to **Sample data**, and select **Load sample data**.
+1. Open **BarnCRM Settings**, go to **Sample Data**, and select **Load sample data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
    contacts, organizations, connections, affiliations, and, with Giving installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
@@ -145,7 +145,7 @@ household records, names, greetings, member counts, and Members panel.
 8. With Giving installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
-9. Return to **BarnCRM Settings**, **Sample data**, and select **Remove sample data**.
+9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove sample data**.
    Confirm the dialog. The card shows **Removing** while it deletes the set in steps of
    about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
    record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
@@ -164,7 +164,7 @@ household records, names, greetings, member counts, and Members panel.
 
 - **Loading sample data into a production org.** Sample data is meant for scratch orgs,
   sandboxes, and demos, never for the org your organization runs on day to day. The
-  warning on the Sample data card says so before you confirm; if you see real
+  warning on the Sample Data card says so before you confirm; if you see real
   records in a report next to "Garcia Family" or "Staff Household," you loaded it by
   mistake. Remove it right away with **Remove sample data**, and audit any receipts,
   exports, or emails sent while it was present.

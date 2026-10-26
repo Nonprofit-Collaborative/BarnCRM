@@ -196,6 +196,37 @@ private class SettingsControllerTest {
         }
     }
 
+    /** The button for a row that opens another page names that page, so the row carries its name. */
+    @IsTest
+    static void aRowThatOpensAnotherPageCarriesThePageName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Opens_Another_Page',
+                    MasterLabel = 'Another page',
+                    Section__c = SettingSections.HOUSEHOLDS,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Component',
+                    Navigation_Target__c = 'Data_Hygiene',
+                    Navigation_Label__c = 'Org Optimizer',
+                    Sort_Order__c = 1
+                )
+            };
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            SettingsController.SettingModel row;
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    row = setting;
+                }
+            }
+            Assert.isNotNull(row, 'The row arrives');
+            Assert.areEqual('Data_Hygiene', row.navigationTarget, 'It names the tab it opens');
+            Assert.areEqual('Org Optimizer', row.navigationLabel, 'And the name of that page');
+        }
+    }
+
     /** A module's own settings page shows only its rows, so each row says whose it is. */
     @IsTest
     static void eachRowNamesTheModuleItBelongsTo() {
@@ -367,6 +398,126 @@ private class SettingsControllerTest {
         }
     }
 
+    private static void stubMembershipRows() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+            new Setting_Definition__mdt(
+                DeveloperName = 'Household_Membership_Mode',
+                MasterLabel = 'How people belong to a household',
+                Setting_Key__c = CoexistenceService.KEY_MEMBERSHIP_MODE,
+                Section__c = SettingSections.HOUSEHOLDS,
+                Module__c = 'Core',
+                Data_Type__c = 'Picklist',
+                Picklist_Values__c = 'Contact:One household per person (simple);Junction:A person can belong to more than one household (flexible)',
+                Sort_Order__c = 1
+            ),
+            new Setting_Definition__mdt(
+                DeveloperName = 'Household_Name_Pattern',
+                MasterLabel = 'Household name pattern',
+                Setting_Key__c = TEXT_KEY,
+                Section__c = SettingSections.HOUSEHOLDS,
+                Module__c = 'Core',
+                Data_Type__c = 'Text',
+                Sort_Order__c = 2
+            ),
+            // Detection saves the coexistence mode with the membership mode, and a save needs
+            // a row for every key it writes.
+            new Setting_Definition__mdt(
+                DeveloperName = 'Coexistence_Mode_Choice',
+                MasterLabel = 'How BarnCRM fits your org',
+                Setting_Key__c = CoexistenceService.KEY_COEXISTENCE_MODE,
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = 'Picklist',
+                Picklist_Values__c = 'Standalone:On its own;NPSP:Alongside NPSP;NonprofitCloud:Alongside Nonprofit Cloud',
+                Sort_Order__c = 1
+            )
+        };
+    }
+
+    private static String membershipValueShown() {
+        for (
+            SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
+        ) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                if (setting.key == CoexistenceService.KEY_MEMBERSHIP_MODE) {
+                    return setting.value;
+                }
+            }
+        }
+        return 'not shown';
+    }
+
+    @IsTest
+    static void aHouseholdChoiceNobodyHasMadeShowsOneHouseholdPerPersonSelected() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+            Test.startTest();
+            String shown = membershipValueShown();
+            Test.stopTest();
+
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                shown,
+                'A blank choice is shown as the simple way, never as an empty picklist'
+            );
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'Showing the default does not save it: blank still means not chosen yet'
+            );
+        }
+    }
+
+    @IsTest
+    static void savingAnUnrelatedSettingLeavesTheHouseholdChoiceOpenForDetection() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasPersonAccounts = true;
+            OrgShapeDetector.overrideShape = shape;
+
+            Test.startTest();
+            SettingsController.saveSettings(new Map<String, Object>{ TEXT_KEY => '{LastName}' });
+            Test.stopTest();
+
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'An unrelated save must not write the household choice'
+            );
+            CoexistenceService.applyRecommendedIfUnset();
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                CoexistenceService.getMembershipMode(),
+                'Detection still proposes the flexible way for an org with Person Accounts'
+            );
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                membershipValueShown(),
+                'And the console then shows the flexible way'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSavedHouseholdChoiceIsShownAsSaved() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    CoexistenceService.KEY_MEMBERSHIP_MODE => CoexistenceService.MEMBERSHIP_JUNCTION
+                }
+            );
+
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                membershipValueShown(),
+                'A choice somebody made is never replaced by the default'
+            );
+        }
+    }
+
     @IsTest
     static void savesWhatMariaChanged() {
         System.runAs(TestUsers.admin()) {
@@ -392,6 +543,87 @@ private class SettingsControllerTest {
                 1,
                 SettingsController.getRecentChanges(10).size(),
                 'Her change is on the recent changes list'
+            );
+        }
+    }
+
+    private static final List<String> ADDRESS_KEYS = new List<String>{
+        'Organization_Street__c',
+        'Organization_Street_2__c',
+        'Organization_City__c',
+        'Organization_State__c',
+        'Organization_Postal_Code__c',
+        'Organization_Country__c'
+    };
+
+    private static void stubAddressDefinitions() {
+        List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+        for (String key : ADDRESS_KEYS) {
+            rows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = key.removeEnd('__c'),
+                    MasterLabel = key,
+                    Setting_Key__c = key,
+                    Section__c = SettingSections.ORGANIZATION,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Text'
+                )
+            );
+        }
+        SettingDefinitionSelector.stubbedRows = rows;
+    }
+
+    @IsTest
+    static void savesTheOrganizationAddressAndReadsItBackByPart() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            SettingsController.saveSettings(
+                new Map<String, Object>{
+                    'Organization_Street__c' => '14 Bridge Street',
+                    'Organization_City__c' => 'Springfield',
+                    'Organization_State__c' => 'IL',
+                    'Organization_Postal_Code__c' => '62701'
+                }
+            );
+            Map<String, String> parts = SettingsController.getOrganizationAddress();
+            Test.stopTest();
+
+            Assert.areEqual('Springfield', parts.get('Organization_City__c'), 'The city she typed');
+            Assert.areEqual('', parts.get('Organization_Country__c'), 'Country stayed optional');
+            Assert.areEqual(6, parts.size(), 'Every part is answered, saved or not');
+        }
+    }
+
+    @IsTest
+    static void refusesAHalfFilledAddressWithAFriendlyMessageAndSavesNothing() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            String message;
+
+            Test.startTest();
+            try {
+                SettingsController.saveSettings(
+                    new Map<String, Object>{
+                        'Organization_Street__c' => '14 Bridge Street',
+                        'Organization_City__c' => 'Springfield'
+                    }
+                );
+            } catch (AuraHandledException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.isNotNull(message, 'A street and city alone are not an address');
+            Assert.isTrue(
+                message.contains(System.Label.Core_OrganizationAddress_PostalCode),
+                'The message names the missing Zip Code'
+            );
+            Assert.areEqual(
+                '',
+                SettingsController.getOrganizationAddress().get('Organization_Street__c'),
+                'Nothing was saved'
             );
         }
     }

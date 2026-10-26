@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Seasonal address swap</label>
+  <label>Seasonal Address Swap</label>
   <protected>true</protected>
   <values>
     <field>Component__c</field>
@@ -12,7 +12,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The nightly job that makes a seasonal address the one in use when its season starts and puts the previous address back when it ends. Schedule it here, see when it last ran and what it did, or run it now.</value>
+    <value xsi:type="xsd:string">The nightly job that makes a seasonal address the one in use when its season starts and puts the previous address back when it ends. Seasonal Addresses above schedules it. See here when it last ran and what it did, or run it now.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
