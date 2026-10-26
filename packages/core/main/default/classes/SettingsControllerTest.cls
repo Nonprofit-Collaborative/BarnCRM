@@ -1101,6 +1101,108 @@ private class SettingsControllerTest {
         }
     }
 
+    private static Map<String, SettingsController.SettingModel> rowsByKey(
+        SettingsController.ConsoleModel model
+    ) {
+        Map<String, SettingsController.SettingModel> rows = new Map<String, SettingsController.SettingModel>();
+        for (SettingsController.SectionModel section : model.sections) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                rows.put(setting.key, setting);
+            }
+        }
+        return rows;
+    }
+
+    @IsTest
+    static void anUnsavedDefaultIsMarkedAndKeepingItSavesExactlyThatValue() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                effectiveDefaultRow('Test_Digest', 'Error_Digest_Frequency__c', 'Picklist'),
+                effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Auto_Create', CHECKBOX_KEY, 'Checkbox')
+            };
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            Map<String, SettingsController.SettingModel> before = rowsByKey(
+                SettingsController.getConsoleModel()
+            );
+            Assert.isTrue(before.get('Coexistence_Mode__c').unsavedDefault, 'Mode not saved');
+            Assert.isTrue(
+                before.get('Household_Membership_Mode__c').unsavedDefault,
+                'Membership not saved'
+            );
+            Assert.isTrue(before.get('Error_Digest_Frequency__c').unsavedDefault, 'Not saved');
+            Assert.isFalse(
+                before.get(CHECKBOX_KEY).unsavedDefault,
+                'A checkbox is never an unsaved default'
+            );
+
+            Test.startTest();
+            Map<String, SettingsController.SettingModel> after = rowsByKey(
+                SettingsController.saveSettings(
+                    new Map<String, Object>{
+                        'Coexistence_Mode__c' => before.get('Coexistence_Mode__c').value,
+                        'Household_Membership_Mode__c' => before.get('Household_Membership_Mode__c')
+                            .value
+                    }
+                )
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                CoexistenceService.getCurrentMode(),
+                'Keeping the shown mode confirms exactly that mode'
+            );
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                SettingsService.getSettings().Household_Membership_Mode__c,
+                'Keeping the shown household choice stores exactly that choice'
+            );
+            Assert.areEqual(
+                2,
+                SettingsController.getRecentChanges(10).size(),
+                'Each kept default is in the change history, as a choice by hand would be'
+            );
+            Assert.isFalse(after.get('Coexistence_Mode__c').unsavedDefault, 'Now saved');
+            Assert.isFalse(after.get('Household_Membership_Mode__c').unsavedDefault, 'Saved');
+            Assert.isTrue(
+                after.get('Error_Digest_Frequency__c').unsavedDefault,
+                'A default nobody kept is still offered'
+            );
+        }
+    }
+
+    @IsTest
+    static void keepingTheShownCoexistenceModeWritesNothingElse() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasPersonAccounts = true;
+            OrgShapeDetector.overrideShape = shape;
+            String shown = rowsByKey(SettingsController.getConsoleModel())
+                .get(CoexistenceService.KEY_COEXISTENCE_MODE)
+                .value;
+
+            Test.startTest();
+            SettingsController.saveSettings(
+                new Map<String, Object>{ CoexistenceService.KEY_COEXISTENCE_MODE => shown }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(shown, CoexistenceService.getCurrentMode(), 'The shown mode is kept');
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'The console save writes only the mode, as choosing it by hand does'
+            );
+            Assert.areEqual(
+                1,
+                SettingsController.getRecentChanges(10).size(),
+                'One change, one history row'
+            );
+        }
+    }
+
     private static Setting_Definition__mdt optimizerRow() {
         Setting_Definition__mdt row = effectiveDefaultRow(
             'Test_Unused_Login',

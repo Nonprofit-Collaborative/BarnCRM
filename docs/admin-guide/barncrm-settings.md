@@ -241,6 +241,14 @@ shows the mode BarnCRM detects as right for your org, and stays unconfirmed unti
 one and save. Settings that point at a record (such as a default fund), a list of record
 types, or a date have no default to show and stay empty until you choose.
 
+A setting showing a default nobody has saved says **Default, not yet saved.** under it. If you
+agree with the value shown, click **Keep this setting** beside that note: it saves exactly the
+value shown, as if you had chosen it yourself, with the same permission, checks and **Recent
+Changes** row, and anything choosing it by hand sets off (keeping **Coexistence mode**, for
+example, confirms that mode and completes its Setup Assistant step). Changes you have not saved
+yet stay on the page. A setting already saved shows no note, and people without Manage BarnCRM
+Settings see the note but no button.
+
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
 

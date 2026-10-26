@@ -283,3 +283,19 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 10 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
 
 **Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.
+
+## T-SET-18: Keep a shown default as a saved choice
+
+**Purpose:** confirm a setting that shows a default nobody saved can be kept as a saved choice in one click, through the normal save.
+**Prerequisites:** admin user, then read-only user. **Digest frequency** (Error Log), **Years before a person is not changed** and **Days before a user is unused** (Org Optimizer) never saved in this org.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Error Log**. | **Digest frequency** shows **Daily**, with "Default, not yet saved." under it and a **Keep this setting** button beside the note. A setting already saved shows no note. |
+| 2 | Click **Keep this setting** under **Digest frequency**. | "Your settings are saved." The note and the button are gone, and **Digest frequency** still shows **Daily**. |
+| 3 | Open **General** and read **Recent Changes**. | The top row is **Digest frequency**, old value empty, new value **Daily**, with your name. |
+| 4 | Open **Org Optimizer**. Change **Days before a user is unused** to `120` without saving. | Its note and button are gone; **Years before a person is not changed** still shows **5** with its note and button. |
+| 5 | Click **Keep this setting** under **Years before a person is not changed**. | "Your settings are saved." Its note is gone, **Days before a user is unused** still shows `120` and **Save** is still available. Click **Discard changes**: it shows **90** again, with its note. |
+| 6 | Sign in as the read-only user and open **Org Optimizer**. | **Days before a user is unused** says "Default, not yet saved." with no **Keep this setting** button. |
+
+**Cleanup:** none. The values kept are the defaults BarnCRM was already using, so nothing behaves differently.

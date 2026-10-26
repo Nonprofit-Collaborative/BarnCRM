@@ -179,6 +179,25 @@
                                 </template>
                             </template>
 
+                            <template lwc:if={row.showsUnsavedDefault}>
+                                <p
+                                    class="slds-text-body_small slds-text-color_weak"
+                                    data-default-note={row.key}
+                                >
+                                    {labels.defaultNotSaved}
+                                    <template lwc:if={row.canKeepDefault}>
+                                        <lightning-button
+                                            class="slds-var-m-left_x-small"
+                                            variant="base"
+                                            label={labels.keepDefault}
+                                            aria-label={row.keepDefaultLabel}
+                                            data-keep={row.key}
+                                            onclick={handleKeepDefault}
+                                        ></lightning-button>
+                                    </template>
+                                </p>
+                            </template>
+
                             <template lwc:if={row.description}>
                                 <p
                                     class="slds-form-element__help slds-text-color_weak"

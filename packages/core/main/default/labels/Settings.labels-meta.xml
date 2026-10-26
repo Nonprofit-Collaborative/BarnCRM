@@ -65,6 +65,30 @@
         <value>Discard changes</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_DefaultNotSaved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: note under a setting that shows a default nobody saved</shortDescription>
+        <value>Default, not yet saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_KeepDefaultButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: button that saves the default a setting shows</shortDescription>
+        <value>Keep this setting</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_KeepDefaultAria</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: screen reader name of the keep button; {0} is the setting</shortDescription>
+        <value>Keep {0} as a saved setting</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_EmptySectionMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>

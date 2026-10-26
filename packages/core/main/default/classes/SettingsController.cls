@@ -93,6 +93,13 @@ public with sharing class SettingsController {
         public Decimal minValue;
         @AuraEnabled
         public Decimal maxValue;
+        /**
+         * True when the value shown is a default nobody has saved: nothing is stored, so the
+         * console offers to keep the shown value as a saved choice. Saving it stores exactly
+         * that value through `saveSettings`, a real change from the stored blank.
+         */
+        @AuraEnabled
+        public Boolean unsavedDefault;
     }
 
     public class Option {
@@ -507,7 +514,17 @@ public with sharing class SettingsController {
                 ? BLANK_SHOWS_AS.get(key)
                 : setting.value;
         }
-        setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
+        Boolean isCheckbox = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c);
+        setting.checked = isCheckbox && value == true;
+        // A checkbox is never blank (its shipped value is on the record, ADR-0035).
+        setting.unsavedDefault =
+            !isCheckbox &&
+            String.isNotBlank(setting.value) &&
+            String.isBlank(
+                SettingsService.asText(
+                    SettingsService.getValue(settingsObject, definition.Setting_Key__c)
+                )
+            );
         return setting;
     }
 
