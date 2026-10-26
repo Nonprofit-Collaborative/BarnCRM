@@ -16,7 +16,9 @@ BarnCRM calculates and you only read. The section shows once a person has a Volu
 (Prospective, Active or Inactive; a status value you add yourself also needs adding to the
 section's visibility rule in the Lightning App Builder, on a clone of the packaged page, because
 an upgrade replaces the packaged one) or approved hours. Admins and Coordinators (who hold
-Manage Volunteers) always see it, so they can set the status of someone new. On an account, the person details show only on a person
+Manage Volunteers) always see it, so they can set the status of someone new. A Team Member
+(Volunteers Staff) does not see it until the person has a status or approved hours, so a
+Coordinator sets a new person's first status. On an account, the person details show only on a person
 account; a household or organization shows its hour totals once it has some. Other apps keep
 their own person page (see Readiness at a glance, under Onboarding requirements).
 
@@ -62,8 +64,8 @@ Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list 
 **All Jobs** and **Active Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
 from today with places left) and **Past Shifts Still Open** (shifts that ended more than 7 days ago and
 are still Open); **All Hours** and **Awaiting Approval**; **All Requirements** and
-**Not Current**; **All Skills** and **Active Skills**; and **All Sign-ups**. Pick one from the
-list view menu at the top left.
+**Not Current**; **All Skills** and **Active Skills**; and **All Sign-ups** (on the **Volunteer
+Sign-ups** tab, after Shifts). Pick one from the list view menu at the top left.
 
 ## Roles and permission sets
 
@@ -444,7 +446,7 @@ The module ships one dashboard, **Volunteers**, and four reports it reads, in fo
 
 | Chart | What it shows |
 |---|---|
-| Approved hours this year, by job | One bar per job: the approved hours with a Date Worked this calendar year. Submitted and Rejected hours are not counted. |
+| Approved hours this year, by job | One bar per job: the approved hours with a Date Worked this calendar year (1 January to 31 December). Submitted and Rejected hours are not counted. The totals on a person or household, **Volunteer Hours This Year**, follow the fiscal year start month in BarnCRM Settings, so the two can differ when your fiscal year does not start in January. |
 | Hours awaiting approval | Every entry still **Submitted**, oldest first, with the date it was entered and the **Days Waiting** since. Ten rows show; click the title for the whole list. |
 | Unfilled shifts, next 14 days | **Open** shifts starting in the next 14 days with **Slots Remaining** above zero, soonest first. Cancelled and completed shifts are left out. |
 | Lapsing volunteers | People whose **Last Volunteer Date** (last approved hours) was between six and twelve months ago, longest gap first. It reads the Last Volunteer Date total on the person, so it follows approved hours only. |
@@ -452,8 +454,9 @@ The module ships one dashboard, **Volunteers**, and four reports it reads, in fo
 The reports are ordinary Salesforce reports in the same folder, built on four report types the
 module ships (**Volunteer Hours with Job and Shift**, **Volunteer Shifts with Job**, **Volunteer
 Sign-ups** and **Volunteers**). Anyone can open one, change a filter and save a copy of their own
-without changing what everyone else sees. The Volunteers report type reads people on Contact; an
-org whose people are person accounts builds the lapsing report on its own account-based type.
+without changing what everyone else sees. The Volunteers report type reads people on Contact, so
+the **Lapsing volunteers** report can show no rows in an org whose people are person accounts;
+that org builds its own lapsing report on an account-based report type.
 
 **Who sees what.** The dashboard reads as **The dashboard viewer**, so each person sees only
 the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all

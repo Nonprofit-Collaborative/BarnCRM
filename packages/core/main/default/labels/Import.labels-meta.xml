@@ -726,7 +726,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: rejected rows table; {0} rows shown, {1} rows rejected</shortDescription>
-        <value>Showing the first {0} of {1} rejected rows. Select Download exceptions to get all of them.</value>
+        <value>Showing the first {0} of {1} rejected rows. Select Download rejected rows to get all of them.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ExceptionsCapped</fullName>

@@ -72,7 +72,7 @@ Gift statuses:
 - **Refunded** and **Written off**: set for you when the whole gift has gone back. See [Refunds and write-offs](refunds.md).
 - **Cancelled**: a Pending gift that will never be paid. See [Refunds and write-offs](refunds.md#to-cancel-a-pending-gift).
 
-A gift without a fund goes in full to your organization's default fund, as one line in **Gift Allocations**. Allocations always add up to the gift. Quick Gift Entry designates one fund; to split a gift across several funds, ask your admin, because changing one allocation row at a time is refused.
+A gift without a fund goes in full to your organization's default fund, as one line in **Gift Allocations**. Allocations always add up to the gift. Quick Gift Entry designates one fund; to split a gift across several funds, ask your admin: a split has to arrive all at once, through the gift import, because changing one allocation row at a time is refused.
 
 ## To add a soft credit
 

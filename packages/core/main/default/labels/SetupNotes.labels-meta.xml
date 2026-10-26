@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup note, Access: why module permission sets need Setup</shortDescription>
-        <value>A role here carries what Core provides, not what a module adds. Core's extra permissions are given on this page, but a module's permission set can be assigned only in Setup for now.</value>
+        <value>A role here carries what Core provides, not what a module adds. Core's extra permissions, and any permission set an installed module lists here, are given on this page. A module permission set not listed here is assigned in Setup.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Where</fullName>

@@ -39,8 +39,9 @@ For every script on this page:
 | 3 | Read the panel row. | **Number** TEST-<this year>-000001, **Status** Issued, **Amount** 125.00, **Issued** today, and a **View PDF** link. **Issue receipt** is gone; a **Why is this receipt being voided?** box and **Void and reissue** button show instead. |
 | 4 | Refresh the page and read **Receipt Number** on the gift. | It holds the same number. |
 | 5 | Select **View PDF**. | The file preview opens. The PDF shows the organization's name and address at the top, the amount 125.00, the gift date, the tax ID, and the sentence "No goods or services were provided in exchange for this contribution." |
+| 6 | Enter a gift from **Rosa Hall** for 40 with **Status** Pending. Open it and select **Issue receipt**. | Refused: "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first." No receipt number is added. Set **Status** to Received and select **Issue receipt**: it is issued. |
 
-**Cleanup:** None. T-RCPT-03 and T-RCPT-04 use this gift.
+**Cleanup:** None. T-RCPT-03 and T-RCPT-04 use the 125 gift.
 
 ## T-RCPT-03: The receipt lock refuses changes to a receipted gift
 
@@ -193,5 +194,7 @@ For every script on this page:
 | 8 | Enter a second gift from Valentina Singh for 50. Reopen **Running Plans**. | Still one plan for her: the same plan does not start twice while running. |
 | 9 | Open Valentina Singh in the Fundraising app. | Her **Stewardship Plans** list shows the one running plan. |
 | 10 | As read-only, open the Stewardship plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New plan** is disabled. |
+| 11 | As the admin, open the running plan, select **Edit**, set **Status** to **Complete** and leave **Completed Date** empty. **Save**. | Saved, with no error. **Completed Date** is today. |
+| 12 | Edit the plan again and set **Status** back to **Running**. **Save**. | Saved. **Completed Date** is empty. |
 
 **Cleanup:** Set the plan's **Status** to Cancelled (its tasks stay). Select **Turn off** on `First gift welcome`.

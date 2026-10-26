@@ -147,6 +147,24 @@
     </itemInstances>
     <itemInstances>
       <fieldInstance>
+        <fieldItem>Record.HomePhone</fieldItem>
+        <identifier>RecordField_HomePhone</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.MobilePhone</fieldItem>
+        <identifier>RecordField_MobilePhone</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.OtherPhone</fieldItem>
+        <identifier>RecordField_OtherPhone</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
         <fieldItem>Record.Preferred_Email__c</fieldItem>
         <identifier>RecordField_PreferredEmail</identifier>
       </fieldInstance>
@@ -183,6 +201,12 @@
       <fieldInstance>
         <fieldItem>Record.Alternate_Email__c</fieldItem>
         <identifier>RecordField_AlternateEmail</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.MailingAddress</fieldItem>
+        <identifier>RecordField_MailingAddress</identifier>
       </fieldInstance>
     </itemInstances>
     <name>Facet-reaching-column2</name>
