@@ -155,6 +155,38 @@ private class RollupControllerTest {
         }
     }
 
+    /** ADR-0136: records with no rollup trigger cannot be Instantly only, from the list either. */
+    @IsTest
+    static void aTotalOfRecordsWithNoTriggerCannotBeSwitchedToInstantlyOnly() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Source_Object__c = 'Task';
+            rollup.Relationship_Path__c = 'WhatId';
+            insert rollup;
+
+            String message;
+            try {
+                RollupController.setMode(rollup.Id, RollupService.MODE_REAL_TIME);
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+            RollupController.setMode(rollup.Id, RollupService.MODE_SCHEDULED);
+
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_ErrorNoInstant,
+                    new List<String>{ Task.SObjectType.getDescribe().getLabelPlural() }
+                ),
+                message
+            );
+            System.Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                [SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
+                'Every night is allowed'
+            );
+        }
+    }
+
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {

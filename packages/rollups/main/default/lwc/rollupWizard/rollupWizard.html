@@ -13,6 +13,14 @@
     </template>
 
     <template lwc:if={isStep1}>
+        <lightning-input
+            type="search"
+            data-id="target-search"
+            label={labels.targetSearch}
+            value={targetSearch}
+            field-level-help={labels.targetSearchHelp}
+            onchange={handleTargetSearch}
+        ></lightning-input>
         <lightning-combobox
             name="targetObject"
             data-id="target-object"
@@ -134,7 +142,12 @@
         </template>
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
-        <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <template lwc:if={noInstantNotice}>
+            <div class="slds-box slds-box_x-small slds-theme_info slds-var-m-vertical_small" role="status">
+                <span data-id="no-instant">{noInstantNotice}</span>
+            </div>
+        </template>
+        <lightning-radio-group name="mode" data-id="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
         <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
     </template>
 

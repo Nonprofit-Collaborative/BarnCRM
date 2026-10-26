@@ -449,6 +449,38 @@
         <value>Only fields BarnCRM can write are listed. If the field you need does not exist, create a Number or Currency field in Setup, then come back.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_TargetSearch</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 label: a search box that finds any object to show the total on.</shortDescription>
+        <value>Find another object</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetSearchHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 help for the object search box.</shortDescription>
+        <value>The list shows the objects most often used. Type part of a name to find any other object you can see, then pick it from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 notice: counted records have no rollup trigger. {0} plural name.</shortDescription>
+        <value>Instant totals are not available yet for {0}. This total is updated by the nightly run and when you click Recalculate. To make it instant now, use the Recalculate rollups Flow template and choose Both (recommended).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorNoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: Instantly only, counted records have no trigger. {0} plural.</shortDescription>
+        <value>Instant totals are not available yet for {0}, so this total cannot be Instantly only. Choose Both (recommended) or Every night.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_FilledBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

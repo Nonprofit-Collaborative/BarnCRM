@@ -111,6 +111,37 @@ public with sharing class RollupService {
         return AutomationControl.isPaused() || isTurnedOff();
     }
 
+    /** The handler a package registers on an entity to make its rollups real time (R-R12). */
+    private static final String REAL_TIME_HANDLER = 'RollupTriggerHandler';
+
+    /**
+     * Whether saving a record of this entity recalculates the totals that count it at once: a
+     * package registers `RollupTriggerHandler` for it in the Automation Registry (R-R12,
+     * ADR-0136). Any other entity's totals are recalculated in the background, by the nightly
+     * run and Recalculate, unless an administrator's own Flow calls `RollupRecalcAction`, which
+     * the engine cannot see. False for an entity the org does not have.
+     */
+    @NamespaceAccessible
+    public static Boolean hasInstantUpdates(String entity) {
+        Schema.SObjectType type = SettingsService.typeByName(entity);
+        if (type == null) {
+            return false;
+        }
+        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
+            String handler = String.isBlank(entry.Handler_Class__c) ? '' : entry.Handler_Class__c;
+            if (handler.contains('.')) {
+                handler = handler.substringAfterLast('.');
+            }
+            if (
+                REAL_TIME_HANDLER.equalsIgnoreCase(handler) &&
+                SettingsService.typeByName(entry.Object_Name__c) == type
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Puts every total right after the module is turned on again (ADR-0125 decision 9, owner
      * decision: totals are right after Turn on): starts the processor for the entries that

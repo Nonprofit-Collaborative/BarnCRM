@@ -6,6 +6,9 @@ rule does not apply to the rollup aggregation core.
 **Amended by:** ADR-0125 (`0125-rollup-builder-module.md`): the engine this ADR describes, with
 the Rollup Builder, is the BarnCRM Rollup Builder module (`packages/rollups`), not Core; Core
 reaches it only through `RollupEngineExtension` and the Health Check and nightly job seams.
+ADR-0136 (`0136-rollup-builder-dlrs-parity.md`): the Builder offers standard objects through
+describe; top N, moving definitions between orgs and Task or Event sources are no longer
+deferred; a Flow action and a developer entry point are `global` besides the trigger's.
 **Date:** 2026-10-12
 **Source:** owner decision 2026-10-12; plan Section 4.10; builds on ADR-0011, ADR-0015,
 ADR-0021, ADR-0022 and ADR-0040

@@ -39,6 +39,12 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_RollupBuilder_NoInstant',
+  () => ({ default: 'Instant totals are not available yet for {0}.' }),
+  { virtual: true }
+);
+
 const MODEL = {
   multiCurrency: true,
   defaultMode: 'Both',
@@ -71,7 +77,7 @@ const flush = () =>
     .then(() => Promise.resolve())
     .then(() => Promise.resolve());
 
-async function build(draft) {
+async function build(draft, model = MODEL, instant = true) {
   getTargetFields.mockResolvedValue([
     { value: 'Total_Giving__c', label: 'Total Giving', type: 'currency' },
     { value: 'Has_Given__c', label: 'Has Given', type: 'boolean', filledBy: 'Another rollup' }
@@ -82,7 +88,8 @@ async function build(draft) {
       label: 'Gift, by Household',
       sourceObject: 'Gift__c',
       relationshipPath: 'Household__c',
-      recordsLabel: 'Gifts'
+      recordsLabel: 'Gifts',
+      instant
     }
   ]);
   getSourceFields.mockResolvedValue([
@@ -92,7 +99,7 @@ async function build(draft) {
   ]);
   preview.mockResolvedValue({ maintains: 'This rollup will maintain about 1,204 records.' });
   const element = createElement('c-rollup-wizard', { is: RollupWizard });
-  element.model = MODEL;
+  element.model = model;
   element.draft = draft;
   document.body.appendChild(element);
   await flush();
@@ -126,6 +133,68 @@ describe('c-rollup-wizard', () => {
     const labels = query(element, 'target-field').options.map((option) => option.label);
     expect(labels).toContain('Total Giving');
     expect(labels.some((label) => label.includes('Another rollup'))).toBe(true);
+  });
+
+  it('lists the common objects first and finds any other by search', async () => {
+    const element = await build(null, {
+      ...MODEL,
+      targets: [
+        { value: 'Account', label: 'Account', common: true },
+        { value: 'Asset', label: 'Asset', common: true },
+        { value: 'WorkOrder', label: 'Work Order', common: false }
+      ]
+    });
+    const values = () => query(element, 'target-object').options.map((option) => option.value);
+    expect(values()).toEqual(['Account', 'Asset']);
+
+    query(element, 'target-search').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'work' } })
+    );
+    await flush();
+
+    expect(values()).toEqual(['WorkOrder']);
+  });
+
+  it('says plainly when the counted records have no instant updates', async () => {
+    const element = await build(
+      {
+        ...DRAFT,
+        sourceObject: undefined,
+        relationshipPath: undefined,
+        aggregate: 'COUNT',
+        mode: 'Real-time'
+      },
+      {
+        ...MODEL,
+        modes: [
+          { value: 'Real-time', label: 'Instantly' },
+          { value: 'Scheduled', label: 'Every night' },
+          { value: 'Both', label: 'Both (recommended)' }
+        ]
+      },
+      false
+    );
+    await next(element);
+    query(element, 'source').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Gift__c|Household__c' } })
+    );
+    await flush();
+    await next(element);
+    await next(element);
+    await next(element);
+
+    expect(query(element, 'no-instant').textContent).toBe(
+      'Instant totals are not available yet for Gifts.'
+    );
+    const mode = query(element, 'mode');
+    expect(mode.options.map((option) => option.value)).toEqual(['Scheduled', 'Both']);
+    expect(mode.value).toBe('Both');
+  });
+
+  it('shows no notice for records that update instantly', async () => {
+    const element = await build(DRAFT);
+    await toLastStep(element);
+    expect(query(element, 'no-instant')).toBeNull();
   });
 
   it('will not move on from step 1 without a field', async () => {

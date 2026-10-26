@@ -28,7 +28,23 @@ public with sharing class RollupBuilderController {
         'setting_change__c'
     };
 
-    private static final Set<String> STANDARD_ENTITIES = new Set<String>{ 'account', 'contact' };
+    /** The two standard entities Core itself holds, always offered first (R-R7). */
+    private static final Set<String> CORE_ENTITIES = new Set<String>{ 'account', 'contact' };
+
+    /**
+     * The standard objects most often rolled up from or to, listed first with Account, Contact
+     * and the org's own objects; every other object is found by searching (ADR-0136). Names
+     * only, resolved through describe: an object the org does not have is skipped.
+     */
+    private static final String COMMON_STANDARD = 'Opportunity,OpportunityLineItem,Case,Campaign,CampaignMember,Lead,Task,Event,Asset,Order,OrderItem,Contract'; // detection-only: Builder shortlist resolved through describe, an absent object is skipped (ADR-0136)
+
+    /** The platform's companion objects: sharing, history, feeds and change events. */
+    private static final List<String> COMPANION_SUFFIXES = new List<String>{
+        'share',
+        'history',
+        'feed',
+        'changeevent'
+    };
 
     private static final Set<Schema.DisplayType> NUMBER_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.DOUBLE,
@@ -64,6 +80,9 @@ public with sharing class RollupBuilderController {
         public String value { get; set; }
         @AuraEnabled
         public String label { get; set; }
+        /** For an entity: true when it is listed before searching (ADR-0136). */
+        @AuraEnabled
+        public Boolean common { get; set; }
 
         public Option(String value, String label) {
             this.value = value;
@@ -100,6 +119,9 @@ public with sharing class RollupBuilderController {
         /** The counted records' plural name, for the filter sentence: "Gifts". */
         @AuraEnabled
         public String recordsLabel { get; set; }
+        /** Whether saving one of them updates the total at once (R-R12, ADR-0136). */
+        @AuraEnabled
+        public Boolean instant { get; set; }
     }
 
     /** What the Builder needs before step 1. */
@@ -392,6 +414,10 @@ public with sharing class RollupBuilderController {
                     Label.Core_RollupBuilder_ErrorInstantMovesWithDate
                 );
             }
+            String instantProblem = instantProblem(definition);
+            if (instantProblem != null) {
+                throw new RollupService.RollupServiceException(instantProblem);
+            }
             RollupWriter.saveAsUser(definition);
             SaveResult result = new SaveResult();
             result.recordId = definition.Id;
@@ -446,6 +472,27 @@ public with sharing class RollupBuilderController {
             problem = overlapProblem(draft, targetType, target);
         }
         return problem;
+    }
+
+    /**
+     * Why this rollup cannot be Instantly only, or null: its source entity has no rollup trigger,
+     * so nothing would update it between nightly runs (R-R12, ADR-0136). Both and Every night
+     * are always allowed; with the Flow template, Both is still instant. The rollup list's mode
+     * change asks the same.
+     */
+    public static String instantProblem(Rollup_Definition__c definition) {
+        if (
+            definition == null ||
+            !RollupService.MODE_REAL_TIME.equals(definition.Mode__c) ||
+            RollupService.hasInstantUpdates(definition.Source_Object__c)
+        ) {
+            return null;
+        }
+        Schema.SObjectType sourceType = SettingsService.typeByName(definition.Source_Object__c);
+        String records = sourceType == null
+            ? definition.Source_Object__c
+            : sourceType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+        return String.format(Label.Core_RollupBuilder_ErrorNoInstant, new List<String>{ records });
     }
 
     /** The source entity, the path, the attributes read and the fiscal window. */
@@ -601,44 +648,106 @@ public with sharing class RollupBuilderController {
 
     // --------------------------------------------------------------------------------- helpers
 
+    /**
+     * Every entity a total can be shown on: common ones first (Account, Contact, the org's own
+     * objects and the standard shortlist), then every other the user may see, by label.
+     */
     private static List<Option> targetEntities() {
-        List<Option> options = new List<Option>();
+        List<Option> common = new List<Option>();
+        List<Option> others = new List<Option>();
+        Set<String> shortlist = commonStandard();
         for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
             String name = String.valueOf(type).toLowerCase();
-            Boolean candidate =
-                STANDARD_ENTITIES.contains(name) ||
-                (name.endsWith('__c') && !NOT_TARGETS.contains(localName(name)));
-            if (!candidate) {
+            if (!plausible(name) || NOT_TARGETS.contains(localName(name))) {
                 continue;
             }
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             );
-            if (described.isCustomSetting() || !described.isUpdateable()) {
+            if (!offered(described, shortlist) || !described.isUpdateable()) {
                 continue;
             }
-            options.add(new Option(described.getName(), described.getLabel()));
+            Option option = new Option(described.getName(), described.getLabel());
+            option.common = isCommon(name, shortlist);
+            if (option.common) {
+                common.add(option);
+            } else {
+                others.add(option);
+            }
         }
-        return sortedOptions(options);
+        List<Option> options = sortedOptions(common);
+        options.addAll(sortedOptions(others));
+        return options;
+    }
+
+    /** The standard shortlist, in lower case. */
+    private static Set<String> commonStandard() {
+        return new Set<String>(COMMON_STANDARD.toLowerCase().split(','));
+    }
+
+    private static Boolean isCommon(String name, Set<String> shortlist) {
+        return name.endsWith('__c') || CORE_ENTITIES.contains(name) || shortlist.contains(name);
+    }
+
+    /**
+     * Whether a name can be an entity the Builder offers, before paying for its describe: an
+     * object of the org's own (`__c`) or a standard one, and not a companion object.
+     */
+    private static Boolean plausible(String name) {
+        if (name.endsWith('__c')) {
+            return true;
+        }
+        if (name.contains('__')) {
+            return false;
+        }
+        for (String suffix : COMPANION_SUFFIXES) {
+            if (name.endsWith(suffix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Whether the Builder offers this entity (ADR-0136): the user can read and query it, and it
+     * is not a custom setting or retired. A standard object off the shortlist must also be one
+     * people create and search for, which leaves out logs and the platform's own records.
+     */
+    private static Boolean offered(Schema.DescribeSObjectResult described, Set<String> shortlist) {
+        if (
+            !described.isQueryable() ||
+            !described.isAccessible() ||
+            described.isCustomSetting() ||
+            described.isDeprecatedAndHidden()
+        ) {
+            return false;
+        }
+        String name = described.getName().toLowerCase();
+        return isCommon(name, shortlist) || (described.isCreateable() && described.isSearchable());
     }
 
     private static List<SourceOption> childrenOf(Schema.SObjectType parent, String token) {
         List<SourceOption> options = new List<SourceOption>();
+        Set<String> shortlist = commonStandard();
         for (
             Schema.ChildRelationship child : parent.getDescribe(SObjectDescribeOptions.DEFERRED)
                 .getChildRelationships()
         ) {
+            String name = String.valueOf(child.getChildSObject()).toLowerCase();
+            if (!plausible(name) || (token != null && name == 'account')) {
+                continue;
+            }
             Schema.DescribeSObjectResult childType = child.getChildSObject()
                 .getDescribe(SObjectDescribeOptions.DEFERRED);
-            String name = childType.getName().toLowerCase();
-            Boolean candidate = STANDARD_ENTITIES.contains(name) || name.endsWith('__c');
-            if (!candidate || !childType.isQueryable() || childType.isCustomSetting()) {
-                continue;
-            }
-            if (token != null && child.getChildSObject() == Account.SObjectType) {
-                continue;
-            }
             Schema.DescribeFieldResult reference = child.getField().getDescribe();
+            // The engine's query filters and groups on the reference (RollupAggregator).
+            if (
+                !offered(childType, shortlist) ||
+                !reference.isFilterable() ||
+                !reference.isGroupable()
+            ) {
+                continue;
+            }
             SourceOption option = new SourceOption();
             option.sourceObject = childType.getName();
             option.relationshipPath = token == null
@@ -646,6 +755,7 @@ public with sharing class RollupBuilderController {
                 : reference.getName() + ' > ' + token;
             option.value = option.sourceObject + '|' + option.relationshipPath;
             option.recordsLabel = childType.getLabelPlural();
+            option.instant = RollupService.hasInstantUpdates(option.sourceObject);
             option.label = String.format(
                 token == null
                     ? Label.Core_RollupBuilder_SourceBy

@@ -9,6 +9,7 @@
  * v0.1 ships the type with no records. Feature C-01 adds the first entries, for the contact and
  * account handlers, in the same change that adds those triggers.
  */
+@NamespaceAccessible
 public with sharing class AutomationRegistrySelector {
     /**
      * Custom metadata cannot be inserted by a test, so tests put in-memory records here and
@@ -55,8 +56,10 @@ public with sharing class AutomationRegistrySelector {
      * cache, across transactions) and returns a long text area cut to 255 characters, which the
      * framework never reads. A query here selected the description and so cost one counted SOQL
      * in every transaction that fired a BarnCRM trigger (ADR-0094).
-     * The rows come back unordered: `selectForObject` sorts them.
+     * The rows come back unordered: `selectForObject` sorts them. The Rollup Builder module reads
+     * them too, to tell which objects have a rollup trigger (ADR-0136).
      */
+    @NamespaceAccessible
     public static List<Automation_Registry__mdt> selectForFramework() {
         if (registryOverride != null) {
             return registryOverride;

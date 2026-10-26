@@ -172,3 +172,32 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
+
+## T-RB-10: Standard objects are offered, common ones first
+
+**Purpose:** confirm the Builder offers Salesforce standard objects, lists the common ones first and finds any other by search (ADR-0136).
+**Prerequisites:** admin user; a writable Number field on Account for the test, for example **Test Task Count** (`Test_Task_Count__c`, created in Setup); **The Garcia Family** has two open tasks (create them in Setup or on the record, **Related To** = **The Garcia Family**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **New rollup** and open **Record that shows the total**. | The list starts with Account, Contact, BarnCRM's objects and the common standard objects this org has, for example Task, Event and Asset, and in an org with Sales Cloud also Opportunity, Case and Campaign. No sharing or history objects (such as Account Share) are listed. |
+| 2 | In **Find another object**, type `work`. Open **Record that shows the total** again. | Only objects whose name contains "work" are listed (for example Work Order, if the org has it). Clearing the box shows the common list again. |
+| 3 | Clear **Find another object**. Choose **Account** and **Test Task Count**. Click **Next**. | Step 2 lists, among the others, **Task, by Related To ID** (and in an org with Sales Cloud, **Opportunity, by Account ID**). |
+| 4 | Choose **Task, by Related To ID**. Click **Next**. Choose **Calculation** = **Count**. Click **Next**. Add the condition **Status** **is not** **Completed**. Click **Next**. | Step 5 shows the sentence, and the notice "Instant totals are not available yet for Tasks. This total is updated by the nightly run and when you click Recalculate. To make it instant now, use the Recalculate rollups Flow template and choose Both (recommended)." |
+| 5 | In **See it on a record**, choose **The Garcia Family**. | The preview shows 2 as the calculated total. |
+| 6 | Name it **Test open tasks**, leave the mode, click **Save and calculate now**. | Saved. After the recalculation finishes, **The Garcia Family** shows **Test Task Count** 2. |
+
+**Cleanup:** delete **Test open tasks** (or set it inactive) and the two test tasks.
+
+## T-RB-11: Instantly alone is refused for records with no instant updates
+
+**Purpose:** confirm a rollup that counts records with no rollup trigger cannot be Instantly only, in the Builder or from the list (ADR-0136).
+**Prerequisites:** admin user; T-RB-10 done up to step 6 (**Test open tasks** saved).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **Edit** on **Test open tasks** and go to **Check and save**. | **Mode** offers **Every night** and **Both (recommended)** only; **Instantly** is not offered. The "Instant totals are not available yet for Tasks" notice is shown. |
+| 2 | Click **Cancel**. In the rollup list, change the mode of **Test open tasks** to **Instantly**. | An error message reads "Instant totals are not available yet for Tasks, so this total cannot be Instantly only. Choose Both (recommended) or Every night." The mode stays as it was. |
+| 3 | Click **Edit** on **Test children per household** and go to **Check and save**. | **Instantly** is offered and no notice is shown: people (Contact) have instant updates. Click **Cancel**. |
+
+**Cleanup:** delete **Test open tasks** (or set it inactive) if T-RB-10's cleanup has not.

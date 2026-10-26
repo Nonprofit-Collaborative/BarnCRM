@@ -1627,7 +1627,15 @@ definition sets Active to false; packaged code never deletes an admin's records.
 **R-R7 No cross-package reference.** Source Entity, Target Entity, Source Attribute,
 Target Attribute, and Order By Attribute are text. Core therefore drives rollups over
 Giving objects without holding a reference to them, which the package dependency
-direction forbids (ADR-0014).
+direction forbids (ADR-0014). The same holds for standard objects: a definition that names
+Opportunity or Case names it as data, resolved through describe, so it is not a dependency on
+the object and a Platform-only org simply never offers it (ADR-0013, ADR-0136). The Rollup
+Builder offers every entity the administrator can read and query (and, as a target, update):
+Account, Contact, the org's own objects and standard objects, leaving out custom settings, the
+platform's sharing, history, feed and change event objects, retired objects and BarnCRM's own
+bookkeeping. A short list of common standard objects is shown first; a standard object off it
+must also be one people create and search for. A source is offered only through a reference
+attribute that can be filtered and grouped on, as the engine's query needs.
 
 **R-R8 Disjoint targets.** Two active definitions may write the same Target Attribute on
 the same Target Entity only when their Target Filters make their target record sets
@@ -1710,6 +1718,13 @@ When the last active definition on that entity is removed, the Builder offers to
 generated trigger, and Health Check reports a generated trigger that no active definition
 uses. A generated trigger is switched off like any other automation, through an Automation
 Setting row (Section 10) the Builder creates with Is Package Default false.
+
+Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it
+today), the Builder says plainly, when that source is chosen, that its totals are updated by
+the nightly run and Recalculate and not instantly, does not offer Instantly alone, and refuses
+a save or a mode change on the rollup list that would make such a rollup Instantly alone
+(ADR-0136). Both and Every night are allowed; a Flow built from the template still makes Both
+instant, which the engine cannot see.
 
 **R-R13 Freshness stamps are written when the work is done.** A calculation writes
 `Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section
@@ -8678,6 +8693,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder offers standard objects (`decisions/0136-rollup-builder-dlrs-parity.md`). No object or field added. R-R7 says a standard object named in a definition is data offered through describe, not a dependency (ADR-0013), and which objects the Builder offers. R-R12 says what the Builder does for a source entity with no rollup trigger: it says so, does not offer Instantly alone, and a save or mode change to Instantly alone is refused. |
 
 ---
 ## 32. Entity ownership by package
