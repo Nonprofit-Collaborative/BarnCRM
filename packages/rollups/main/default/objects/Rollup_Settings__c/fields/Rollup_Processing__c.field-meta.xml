@@ -5,7 +5,7 @@
     <description
   >When real-time (Instantly and Both) totals are recalculated: Background (queued in the save and recalculated just after it, the default) or In_Save (recalculated in the save when it is small enough). Blank means Background. Custom settings cannot hold a picklist, so the allowed values are declared on the Rollup_Processing setting definition and validated by the settings service.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Just after the save (recommended) keeps saves fast; During the save updates totals before the page refreshes.</inlineHelpText>
+    <inlineHelpText>After the save (recommended) keeps saves fast; During the save updates totals before the page refreshes.</inlineHelpText>
     <label>Rollup Processing</label>
     <length>20</length>
     <required>false</required>

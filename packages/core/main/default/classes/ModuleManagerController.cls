@@ -13,6 +13,9 @@ public with sharing class ModuleManagerController {
         public Boolean canEdit;
         @AuraEnabled
         public List<ModuleManagerService.ModuleStatus> modules;
+        /** The Show Nonprofit Modules checkbox: false hides the nonprofit modules. */
+        @AuraEnabled
+        public Boolean showNonprofitModules;
     }
 
     @AuraEnabled
@@ -21,6 +24,18 @@ public with sharing class ModuleManagerController {
             return buildState();
         } catch (Exception e) {
             throw logged(e, System.Label.Core_ModuleManager_LoadErrorMessage);
+        }
+    }
+
+    /** Saves the Show Nonprofit Modules checkbox for the whole org; it hides rows and changes nothing else. */
+    @AuraEnabled
+    public static ManagerState saveShowNonprofitModules(Boolean show) {
+        requireEdit();
+        try {
+            ModuleManagerService.setShowNonprofitModules(show);
+            return buildState();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
         }
     }
 
@@ -71,6 +86,7 @@ public with sharing class ModuleManagerController {
         ManagerState state = new ManagerState();
         state.canEdit = BarnCRMPermissions.canManageSettings();
         state.modules = ModuleManagerService.getModules();
+        state.showNonprofitModules = ModuleManagerService.showNonprofitModules();
         return state;
     }
 

@@ -8,86 +8,113 @@
         </p>
     </template>
 
-    <ul class="slds-has-dividers_bottom-space">
-        <template for:each={rows} for:item="module">
-            <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
-                <div>
-                    <span class="slds-text-heading_x-small" data-id="name">{module.displayName}</span>
-                    <span class={module.badgeClass} data-id="status">{module.statusText}</span>
-                    <template lwc:if={module.appUrl}>
-                        <a class="slds-var-m-left_small" href={module.appUrl} data-id="open-app"
-                            >{labels.openApp}<span class="slds-assistive-text">: {module.displayName}</span></a
-                        >
-                    </template>
-                    <a class="slds-var-m-left_small" href={module.docsUrl} target="_blank" rel="noopener noreferrer"
-                        >{labels.learnMore}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
-                    >
-                </div>
-                <template lwc:if={module.installFirstText}>
-                    <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="install-first">
-                        {module.installFirstText}
+    <template for:each={groups} for:item="group">
+        <div key={group.key} data-group={group.key}>
+            <template lwc:if={group.isNonprofit}>
+                <h3
+                    class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small"
+                    data-id="nonprofit-title"
+                >
+                    {labels.nonprofitTitle}
+                </h3>
+                <lightning-input
+                    type="checkbox"
+                    label={labels.showNonprofit}
+                    checked={showNonprofit}
+                    disabled={isReadOnly}
+                    data-id="show-nonprofit"
+                    onchange={handleShowNonprofitChange}
+                ></lightning-input>
+                <template lwc:if={group.hiddenText}>
+                    <p class="slds-text-body_small slds-var-m-top_x-small" role="status" data-id="nonprofit-hidden">
+                        {group.hiddenText}
                     </p>
                 </template>
-                <template lwc:if={canEdit}>
-                    <div class="slds-var-m-top_x-small">
-                        <template lwc:if={module.showInstall}>
-                            <a
-                                class="slds-button slds-button_neutral"
-                                href={module.installUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-id="install"
-                                >{labels.install}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
-                            >
-                        </template>
-                        <template lwc:if={module.noInstallLink}>
-                            <p class="slds-text-body_small" data-id="no-install-link">{labels.noInstallLink}</p>
-                        </template>
-                        <template lwc:if={module.isOn}>
-                            <lightning-button
-                                label={labels.turnOff}
-                                data-id="turn-off"
-                                data-name={module.name}
-                                onclick={handleTurnOff}
-                            ></lightning-button>
-                        </template>
-                        <template lwc:if={module.isOff}>
-                            <lightning-button
-                                variant="brand"
-                                label={labels.turnOn}
-                                data-id="turn-on"
-                                data-name={module.name}
-                                onclick={handleTurnOn}
-                            ></lightning-button>
-                        </template>
-                        <template lwc:if={module.canSwitch}>
-                            <lightning-button
-                                class="slds-var-m-left_x-small"
-                                label={labels.report}
-                                data-id="report"
-                                data-name={module.name}
-                                onclick={handleReport}
-                            ></lightning-button>
-                        </template>
-                    </div>
-                </template>
-                <template lwc:if={module.hasReport}>
-                    <div class="slds-box slds-var-m-top_x-small" data-id="report-panel">
-                        <p class="slds-text-body_small">{labels.reportIntro}</p>
-                        <ul class="slds-list_dotted">
-                            <template for:each={module.report} for:item="line">
-                                <li key={line.objectLabel}>{line.objectLabel}: {line.countText}</li>
+            </template>
+            <template lwc:if={group.showRows}>
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={group.rows} for:item="module">
+                        <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
+                            <div>
+                                <span class="slds-text-heading_x-small" data-id="name">{module.displayName}</span>
+                                <span class={module.badgeClass} data-id="status">{module.statusText}</span>
+                                <template lwc:if={module.appUrl}>
+                                    <a class="slds-var-m-left_small" href={module.appUrl} data-id="open-app"
+                                        >{labels.openApp}<span class="slds-assistive-text">: {module.displayName}</span></a
+                                    >
+                                </template>
+                                <a class="slds-var-m-left_small" href={module.docsUrl} target="_blank" rel="noopener noreferrer"
+                                    >{labels.learnMore}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
+                                >
+                            </div>
+                            <template lwc:if={module.installFirstText}>
+                                <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="install-first">
+                                    {module.installFirstText}
+                                </p>
                             </template>
-                        </ul>
-                        <template lwc:if={module.reportEmpty}>
-                            <p class="slds-text-body_small" data-id="report-empty">{labels.reportEmpty}</p>
-                        </template>
-                        <a href={installedPackagesUrl} data-id="installed-packages">{labels.installedPackages}</a>
-                    </div>
-                </template>
-            </li>
-        </template>
-    </ul>
+                            <template lwc:if={canEdit}>
+                                <div class="slds-var-m-top_x-small">
+                                    <template lwc:if={module.showInstall}>
+                                        <a
+                                            class="slds-button slds-button_neutral"
+                                            href={module.installUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            data-id="install"
+                                            >{labels.install}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
+                                        >
+                                    </template>
+                                    <template lwc:if={module.noInstallLink}>
+                                        <p class="slds-text-body_small" data-id="no-install-link">{labels.noInstallLink}</p>
+                                    </template>
+                                    <template lwc:if={module.isOn}>
+                                        <lightning-button
+                                            label={labels.turnOff}
+                                            data-id="turn-off"
+                                            data-name={module.name}
+                                            onclick={handleTurnOff}
+                                        ></lightning-button>
+                                    </template>
+                                    <template lwc:if={module.isOff}>
+                                        <lightning-button
+                                            variant="brand"
+                                            label={labels.turnOn}
+                                            data-id="turn-on"
+                                            data-name={module.name}
+                                            onclick={handleTurnOn}
+                                        ></lightning-button>
+                                    </template>
+                                    <template lwc:if={module.canSwitch}>
+                                        <lightning-button
+                                            class="slds-var-m-left_x-small"
+                                            label={labels.report}
+                                            data-id="report"
+                                            data-name={module.name}
+                                            onclick={handleReport}
+                                        ></lightning-button>
+                                    </template>
+                                </div>
+                            </template>
+                            <template lwc:if={module.hasReport}>
+                                <div class="slds-box slds-var-m-top_x-small" data-id="report-panel">
+                                    <p class="slds-text-body_small">{labels.reportIntro}</p>
+                                    <ul class="slds-list_dotted">
+                                        <template for:each={module.report} for:item="line">
+                                            <li key={line.objectLabel}>{line.objectLabel}: {line.countText}</li>
+                                        </template>
+                                    </ul>
+                                    <template lwc:if={module.reportEmpty}>
+                                        <p class="slds-text-body_small" data-id="report-empty">{labels.reportEmpty}</p>
+                                    </template>
+                                    <a href={installedPackagesUrl} data-id="installed-packages">{labels.installedPackages}</a>
+                                </div>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+    </template>
 
     <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">{labels.tabsNotice}</p>
     <div class="slds-var-m-top_x-small">

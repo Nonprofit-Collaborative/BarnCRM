@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Outbound Funds Module</label>
+  <protected>false</protected>
+  <values>
+    <field>Category__c</field>
+    <value xsi:type="xsd:string">Alternative</value>
+  </values>
+  <values>
+    <field>Status__c</field>
+    <value xsi:type="xsd:string">InProgress</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Grants you give: funding requests, disbursements and the funding programs they come from. It does the same work as BarnCRM Funders.</value>
+  </values>
+  <values>
+    <field>Maintainer__c</field>
+    <value xsi:type="xsd:string">Salesforce.org (open source repository)</value>
+  </values>
+  <values>
+    <field>License_Cost__c</field>
+    <value xsi:type="xsd:string">Free, open source</value>
+  </values>
+  <values>
+    <field>Link_Url__c</field>
+    <value xsi:type="xsd:string">https://github.com/SalesforceFoundation/OutboundFundsModule</value>
+  </values>
+  <values>
+    <field>Install_Url__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Detection_Objects__c</field>
+    <value xsi:type="xsd:string">outfunds.Funding_Request__c</value>
+  </values>
+  <values>
+    <field>Related_Module__c</field>
+    <value xsi:type="xsd:string">BarnCRM Funders</value>
+  </values>
+  <values>
+    <field>Compatibility__c</field>
+    <value xsi:type="xsd:string">Use one or the other for the same records, not both. It installs the SFDO Base package, which is closed source. Not built and not yet tested alongside BarnCRM. BarnCRM may offer a migration path to BarnCRM Funders in a future release.</value>
+  </values>
+  <values>
+    <field>Migration_Path__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Show_Only_When_Installed__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">30</value>
+  </values>
+</CustomMetadata>

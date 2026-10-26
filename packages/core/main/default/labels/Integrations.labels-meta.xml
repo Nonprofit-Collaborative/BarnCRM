@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Integrations_LoadErrorMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: the list could not be read</shortDescription>
+        <value>The list of other products could not be read. Reload the page, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_Intro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the page is, what In Progress and Installed mean</shortDescription>
+        <value>This page is a roadmap of other products BarnCRM plans to work with. In Progress means planned and not built: nothing listed here is integrated with BarnCRM yet, and a product has not been tested with it unless its note says so. BarnCRM does not depend on any of them. Installed in this org means one of the product's own objects is in this org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupComplement</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: heading of the group of complementary apps</shortDescription>
+        <value>Complementary Apps</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupComplementIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the complementary apps are</shortDescription>
+        <value>Free community apps that add something BarnCRM does not do.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupInDevelopment</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: heading of the group of apps still in development</shortDescription>
+        <value>In Development</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupInDevelopmentIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the in development apps are</shortDescription>
+        <value>Projects that are not finished themselves. Read each note before you try one.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupAlternative</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: heading of the group of alternatives to a BarnCRM module</shortDescription>
+        <value>Alternatives to BarnCRM Modules</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GroupAlternativeIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the alternatives are</shortDescription>
+        <value>Each of these does the same work as a BarnCRM module, and is listed here only because it is installed in this org. Use one or the other for the same records, not both.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_Installed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: badge on a product that is in this org</shortDescription>
+        <value>Installed in this org</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_NotInstalled</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: badge on a product that is not in this org</shortDescription>
+        <value>Not installed</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_StatusInProgress</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: status of an integration that is planned, not built</shortDescription>
+        <value>In Progress</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_StatusAvailable</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: status of an integration that is built</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_Maintainer</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: who maintains a product. {0} is the maintainer</shortDescription>
+        <value>Maintained by {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_LicenseCost</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: cost and license of a product. {0} is the cost and license</shortDescription>
+        <value>Cost and license: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_RelatedModule</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: the BarnCRM module a product overlaps. {0} is the module name</shortDescription>
+        <value>Overlaps with {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_CompatibilityHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: label before a product's compatibility note</shortDescription>
+        <value>Compatibility with BarnCRM</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_MigrationPath</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: where to find a migration. {0} is the migration note</shortDescription>
+        <value>Migration: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_LearnMore</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: link to a product's own page</shortDescription>
+        <value>Learn more</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_InstallLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: link to where a product is installed from</shortDescription>
+        <value>Install</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_EmptyMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: the catalog holds no products</shortDescription>
+        <value>No other products are listed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_RequestHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: heading of the request section at the bottom</shortDescription>
+        <value>Request an Integration</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_RequestIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the request section offers</shortDescription>
+        <value>Tell us what you need; requests shape the roadmap. BarnCRM is self-service, so a request is a public suggestion, not a support ticket, and nothing here promises a reply or a date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_RequestLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: link for an organization to request an integration</shortDescription>
+        <value>Request an integration</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_RequestUrl</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: address of the integration request form</shortDescription>
+        <value>https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new?template=integration-request.yml</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_PartnerIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: what the provider path is</shortDescription>
+        <value>Build or maintain a product? Propose an integration for it, and read how one is built.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_PartnerLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: link for a solution provider to propose an integration</shortDescription>
+        <value>Propose an integration for your product</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_PartnerUrl</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: address of the provider proposal form</shortDescription>
+        <value>https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new?template=integration-partner.yml</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GuideLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: link to how an integration is built</shortDescription>
+        <value>How an integration is built</value>
+    </labels>
+    <labels>
+        <fullName>Core_Integrations_GuideUrl</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integrations: address of the guide to building an integration</shortDescription>
+        <value>https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/contributor-guide/integrations.md</value>
+    </labels>
+</CustomLabels>

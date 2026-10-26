@@ -80,6 +80,10 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
    **Previous donor level** reads `Leadership Circle`. The level always matches the total
    on the record, and the record still shows where the donor came from.
 
+## List views
+
+**Donor Levels** has **All Donor Levels**, **Active Donor Levels** and **Inactive Donor Levels**.
+
 ## Common mistakes
 
 **A big in-kind donor is not on the ladder.** Levels are measured on a giving total, and a

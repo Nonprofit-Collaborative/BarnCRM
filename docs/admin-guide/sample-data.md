@@ -29,7 +29,7 @@ With the **Giving** package installed, the same action also loads:
 
 | Records | How many | What is in them |
 |---|---|---|
-| Funds | 8 | General Fund plus seven restricted funds, each with an accounting code. None of them is made your default fund |
+| Funds | 8 | General Fund plus seven restricted funds, each with an accounting code. None of them is made your default fund. A new org already has its own **General Fund**, so the sample one is a second row of that name; removing sample data removes only the sample one |
 | Appeals | 7 | An Annual Fund with three appeals under it, a gala, an emergency appeal, a legacy circle, each with a goal and a cost |
 | Gifts | About 700 | Three years of giving: checks, cards, ACH, cash, stock, grants and about twenty in-kind gifts, weighted the way a real list is (most under 500, a few above 10,000). The in-kind gifts carry no amount, as every in-kind gift does, so they are in the In-kind value total on their donor and in none of the cash totals ([In-kind gifts](in-kind-gifts.md)) |
 | Gift allocations | About 750 | One fund for most gifts, two for the gifts a donor designated twice |

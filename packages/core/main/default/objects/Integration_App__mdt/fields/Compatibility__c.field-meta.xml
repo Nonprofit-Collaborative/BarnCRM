@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Compatibility__c</fullName>
+  <description>What BarnCRM knows about using the two together: tested or not, and what to watch for.</description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Compatibility</label>
+  <length>1000</length>
+  <required>false</required>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

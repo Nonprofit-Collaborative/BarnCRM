@@ -135,3 +135,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | As read-only, look at the **Affiliations** card header. | There is no **Add affiliation** button. |
 
 **Cleanup:** as admin, delete Luis's Bayview Hardware affiliation.
+
+## T-REL-10: List views and ready-to-use types on a fresh org
+
+**Purpose:** Relationships and Affiliations open with useful list views, and a new org can add a relationship without any sample data.
+**Prerequisites:** staff user, **Relationships** and **Affiliations** on. Best run on an org with no sample data loaded; on an org with sample data the lists also hold sample rows.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Relationships** tab and open the list view menu. | The views **All Relationships**, **Current Relationships**, **Former Relationships** and **My Relationships** are listed, besides Recently Viewed. |
+| 2 | Choose **All Relationships**. | The list opens with columns for the person, Type, the related person and Status. On a fresh org it is empty. |
+| 3 | Open the **Affiliations** tab and open the list view menu. | The views **All Affiliations**, **Current Affiliations**, **Former Affiliations** and **My Affiliations** are listed. |
+| 4 | Open any person, select **Add relationship** and open the **Type** list. | The 11 shipped types are there: Spouse, Partner, Parent, Child, Sibling, Grandparent, Grandchild, Friend, Colleague, Employer contact and Other. Nothing had to be set up first. |
+| 5 | Add a relationship of Type **Friend**, then return to **Current Relationships** and **My Relationships**. | Both sides of the relationship show in **Current Relationships** and in **My Relationships**. **Former Relationships** is empty. |
+| 6 | Set an end date on one side (see T-REL-02) and refresh **Former Relationships**. | Both sides now show there, with the end date, and have left **Current Relationships**. |
+| 7 | Add an affiliation (see T-REL-07) and check **Current Affiliations**, then end it and check **Former Affiliations**. | The affiliation moves from **Current Affiliations** to **Former Affiliations**. **My Affiliations** shows it throughout. |
+
+**Cleanup:** delete the relationships and affiliations you added.

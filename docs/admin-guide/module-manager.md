@@ -28,6 +28,18 @@ Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders a
 Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
+The modules that only the Nonprofit Edition offers (Giving, Volunteers, Programs, Funders and
+Mirror; the module catalog decides, not a fixed list) are grouped in their own section at the
+bottom of the list, titled **Nonprofit Modules**. Core and the modules both editions offer come
+first. The section has a **Show Nonprofit Modules** checkbox, ticked by default. Clear it and
+the nonprofit modules are hidden from the list; the checkbox stays so you can tick it again.
+The choice is saved for the whole org, needs the **Manage BarnCRM Settings** permission to
+change (others see the checkbox greyed out), and hides rows only: it installs, removes and
+turns off nothing. If any of the hidden modules is installed, a line under the checkbox says
+"Installed nonprofit modules hidden: " and how many, so an installed module never disappears
+without a sign. A Standard Edition org that has no nonprofit module installed lists none, so it
+shows no section.
+
 No module is installed with Core or by first-run setup: a module is installed only when you
 install it from this section. An installed module's row links to its own app. Rollup
 Builder and Volunteers have a Settings tab there, where their settings live; Giving's
@@ -80,6 +92,9 @@ visibility. To hide a module from a colleague, take away its role on the
 
 ## Common mistakes
 
+- **Expecting Show Nonprofit Modules to remove or pause anything.** It only hides rows. A
+  hidden module that is installed keeps working, and it is counted in the line under the
+  checkbox.
 - **Expecting Turn off to remove the module.** It pauses the module's automation and keeps
   every record. Use Salesforce's uninstall, after reading the report, to remove it.
 - **Expecting Turn off to hide the tabs.** It does not. Change the person's role on the

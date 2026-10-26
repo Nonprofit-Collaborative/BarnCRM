@@ -51,6 +51,11 @@
         <default>false</default>
         <label>Component</label>
       </value>
+      <value>
+        <fullName>SetupValue</fullName>
+        <default>false</default>
+        <label>Value from Setup</label>
+      </value>
     </valueSetDefinition>
   </valueSet>
 </CustomField>

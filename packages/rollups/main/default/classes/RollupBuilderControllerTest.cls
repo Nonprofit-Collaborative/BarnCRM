@@ -215,6 +215,37 @@ private class RollupBuilderControllerTest {
     }
 
     @IsTest
+    static void aNewRollupStartsInTheSettingsDefaultMode() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            System.Assert.areEqual(
+                RollupService.MODE_BOTH,
+                RollupBuilderController.getModel().defaultMode,
+                'The wizard starts a new rollup in Both on an org that never saved the setting'
+            );
+            RollupBuilderController.Draft draft = childCount();
+            draft.mode = null;
+            RollupBuilderController.SaveResult result = RollupBuilderController.save(draft, false);
+            System.Assert.areEqual(
+                RollupService.MODE_BOTH,
+                [SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :result.recordId].Mode__c,
+                'A rollup saved with no mode lands in Both'
+            );
+
+            SettingsService.saveValues(
+                RollupService.SETTINGS_OBJECT,
+                new Map<String, Object>{
+                    RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED
+                }
+            );
+            System.Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                RollupBuilderController.getModel().defaultMode,
+                'And in the org default once it is changed in Settings'
+            );
+        }
+    }
+
+    @IsTest
     static void editingAShippedRollupKeepsItsKey() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Rollup_Definition__c shipped = existing('Shipped count', null);

@@ -25,6 +25,10 @@ apexcov.json
 # OS
 .DS_Store
 
+# Python bytecode, written next to scripts/ whenever their tests run
+__pycache__/
+*.pyc
+
 # Local tool caches
 # Matches the directory and any stray symlink of the same name: an agent worktree can
 # leave one pointing outside the repo, which a "git add -A" would otherwise commit.

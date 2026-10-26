@@ -176,6 +176,9 @@ private class CorePostInstallTest {
     static void everyRunSchedulesTheNightlyTabCheckOnce() {
         System.runAs(TestUsers.admin()) {
             CorePostInstall.scheduleTabCheckInTests = true;
+            // The org's own check, if an install already scheduled it, would be counted too.
+            TestDataFactory.clearScheduledJobs(new List<String>{ TabAccessScheduler.JOB_NAME });
+            ScheduledJobSelector.forget();
 
             new CorePostInstall().onInstall(new InstallBy(null, null, false));
             new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));

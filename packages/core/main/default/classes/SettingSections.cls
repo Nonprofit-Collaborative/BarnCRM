@@ -21,6 +21,9 @@ public with sharing class SettingSections {
     public static final String ERROR_LOG = 'Error Log';
     @NamespaceAccessible
     public static final String ACCESS = 'Access';
+    /** The Org Optimizer thresholds (how old is stale, how long is unused): the tool's own section. */
+    @NamespaceAccessible
+    public static final String ORG_OPTIMIZER = 'Org Optimizer';
     @NamespaceAccessible
     public static final String HEALTH = 'Health';
     @NamespaceAccessible
@@ -40,6 +43,9 @@ public with sharing class SettingSections {
     public static final String ADDRESSES = 'Addresses';
     @NamespaceAccessible
     public static final String RELATIONSHIPS = 'Relationships';
+    /** Other products that complement or overlap BarnCRM, listed and linked, never depended on. */
+    @NamespaceAccessible
+    public static final String INTEGRATIONS = 'Integrations';
 
     /** Every section name a package may use, in the order the console lists them. */
     @NamespaceAccessible
@@ -59,6 +65,8 @@ public with sharing class SettingSections {
             ERROR_LOG,
             ACCESS,
             IMPORTING,
+            ORG_OPTIMIZER,
+            INTEGRATIONS,
             HEALTH
         };
     }

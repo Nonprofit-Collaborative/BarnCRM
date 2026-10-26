@@ -2,9 +2,9 @@
  * The fiscal year window a fiscal-aware rollup is limited to.
  *
  * Canonical model R-R3: the window is never stored on the definition. It is computed at run time
- * from the org's fiscal year start month (BarnCRM Settings `Fiscal_Year_Start_Month__c`) and the
- * definition's Fiscal Year Offset, so changing the start month and recalculating corrects every
- * fiscal total in the org without touching a single definition.
+ * from the org's fiscal year start month (Setup, Company Settings, Fiscal Year; ADR-0135) and the
+ * definition's Fiscal Year Offset, so changing the start month in Setup and recalculating
+ * corrects every fiscal total in the org without touching a single definition.
  *
  * Offset 0 is the fiscal year the org is in today, -1 the one before it, -2 the one before that.
  * A window runs from the first day of the start month, inclusive, to the same day one year later,
@@ -43,12 +43,12 @@ public with sharing class RollupDateWindow {
     }
 
     /**
-     * The month the fiscal year starts, 1 through 12, defaulting to January when the setting has
-     * never been touched or holds something the platform cannot mean. Core owns the setting and
-     * reads it (`FiscalYearSelector`), so the engine and Core's checks share one reading.
+     * The month the org's fiscal year starts, 1 through 12. Core reads it from Setup
+     * (`FiscalYearSelector`), the same way for every user a rollup runs as, so the engine,
+     * Core's checks and the reports' fiscal year date literals share one fiscal year.
      */
     public static Integer fiscalYearStartMonth() {
-        return FiscalYearSelector.settingsFiscalYearStartMonth();
+        return FiscalYearSelector.fiscalYearStartMonth();
     }
 
     /** The window for an offset, counted back from the fiscal year the org is in today. */

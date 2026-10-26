@@ -41,6 +41,10 @@ You are David, and the spring letter goes out on Monday.
    Appeal** to `Spring appeal`, so the phone effort is reported inside the campaign it
    belongs to.
 
+## List views
+
+**Appeals** has **All Appeals**, **Active Appeals** and **Inactive Appeals**.
+
 ## Common mistakes
 
 - **Making an appeal its own parent, or a loop.** BarnCRM refuses the save with "An

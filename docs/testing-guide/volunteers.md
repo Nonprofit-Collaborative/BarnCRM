@@ -193,3 +193,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Tick **Active** again and save. | It is back in **Active Jobs**. |
 
 **Cleanup:** None (step 3 restores the job).
+
+## T-VOL-13: Inactive list views for jobs, skills and letter templates
+
+**Purpose:** jobs, skills and letter templates open with All, Active and Inactive views.
+**Prerequisites:** volunteer coordinator or admin, sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Volunteer Jobs** tab and the list view menu. | **All Jobs**, **Active Jobs** and **Inactive Jobs** are listed. **Inactive Jobs** is empty. |
+| 2 | Untick **Active** on a sample job that has no shifts or hours and save. | The job shows in **Inactive Jobs** and has left **Active Jobs**. Tick **Active** again. |
+| 3 | Open the **Skills** tab and the list view menu. | **All Skills**, **Active Skills** and **Inactive Skills** are listed. |
+| 4 | Open **Volunteer Letter Templates** and the list view menu. | **All Volunteer Letter Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates** are listed. A shipped template that is switched off shows under the Inactive view. |
+
+**Cleanup:** tick **Active** on anything you switched off.

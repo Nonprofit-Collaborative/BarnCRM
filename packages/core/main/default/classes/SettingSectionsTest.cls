@@ -14,9 +14,29 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                15,
+                17,
                 sections.size(),
-                'Fifteen section names are agreed across the suite'
+                'Seventeen section names are agreed across the suite'
+            );
+            Assert.isTrue(
+                SettingSections.isKnown(SettingSections.INTEGRATIONS),
+                'Integrations is the section that lists other products'
+            );
+            Assert.isTrue(
+                SettingSections.isKnown(SettingSections.ORG_OPTIMIZER),
+                'Org Optimizer is the section that holds the tool thresholds'
+            );
+            Integer last = sections.size() - 1;
+            Assert.areEqual(SettingSections.HEALTH, sections[last], 'Health is listed last');
+            Assert.areEqual(
+                SettingSections.INTEGRATIONS,
+                sections[last - 1],
+                'Integrations, about other products, comes just before Health'
+            );
+            Assert.areEqual(
+                SettingSections.ORG_OPTIMIZER,
+                sections[last - 2],
+                'Org Optimizer follows Import, with the other data tools'
             );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.VOLUNTEERS),

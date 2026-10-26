@@ -983,13 +983,16 @@ their API names and definitions unchanged.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 | `Import_Trial_Rows__c` | integer | 25 | How many of a file's first rows a trial import commits before the rest (R-IB16); the wizard starts from it and the administrator can change it per file. Held between 1 and 2,000. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
 separated set of keys within 255 characters, which the eight step checklist fits with
 room to spare.
+
+`Fiscal_Year_Start_Month__c`, published here in v0.2, was removed in v0.8 (ADR-0135, owner
+decision 2026-10-26). BarnCRM has one fiscal year, the org's: R-R3 windows read the month the
+fiscal year starts in Setup, and the console's General section shows it read only.
 
 ### v0.3 keys
 
@@ -1065,6 +1068,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 | `Suite__c` | picklist(Community, Impact) | empty | Which edition the administrator chose in the Setup Assistant's first step: the Standard Edition (Core alone, the full core suite of tools) or the Nonprofit Edition (Core with Giving). Any org may choose either; empty until chosen. Shown as Standard Edition and Nonprofit Edition. When `Impact`, the modules step, the Module Manager and the home Modules card offer the nonprofit modules; otherwise Core shows none that is not installed. It installs and removes nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). Chosen once in the Setup Assistant; changed later only through the console's Change edition control or Setup, Custom Settings (ADR-0124, `0124-edition-gates-visibility.md`). |
 | `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
 | `Features_Turned_On__c` | text (255) | empty | The comma separated keys of the Core features turned on (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `HouseholdUpkeep`, `Addresses`, `Relationships`, `Affiliations`, `PreferredEmail`). Empty means every feature is on: an org upgraded from before features existed. A new install stores `None` (every feature off) until first-run setup; finishing it with every feature unticked stores `NoneChosen` (every feature off, setup done). A key once added is never removed: features are one-way. While a key is missing, its tabs' BarnCRM Tab permission sets are held by nobody, its rows are hidden in BarnCRM Settings, and its group's automations do not run. Written by General, Features and first-run setup, not edited as a setting (ADR-0124, `0124-edition-gates-visibility.md`). |
+| `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Community`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
 
 ### Field utilization keys
 
@@ -1203,7 +1207,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example Households, Automation, Access, Health. |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
 | `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
@@ -1400,6 +1404,33 @@ names the modules a module's package needs installed first (ADR-0125
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
+### Integration App
+
+`Integration_App__mdt`: the catalog of other products the Settings, Integrations page lists, one
+record per product, read as shipped and never materialized. Core ships the records and never
+depends on any of these products: whether one is installed is detected by describe only
+(`IntegrationAppService`), and a row can be added or changed without code. A product that is not
+in the org is listed as Not installed. The page says that BarnCRM has not tested a product
+alongside itself until a row's compatibility note says otherwise.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable key of the product. Health Check findings look a product up by it. |
+| Label | `MasterLabel` | text | The product's name as shown on the page. |
+| Category | `Category__c` | text (40) | Where the page groups it: `Complement` (Complementary Apps), `InDevelopment` (In Development) or `Alternative` (Alternatives to BarnCRM Modules). A blank or unknown value is listed as `Complement`. |
+| Status | `Status__c` | text (40), default `InProgress` | Where BarnCRM's integration with the product stands: `InProgress` (planned, not built) or `Available`. A blank or unknown value is shown as In Progress. Every shipped row is In Progress: the page is a roadmap, and no integration behavior exists (owner direction, 2026-10-26). |
+| Description | `Description__c` | long text (1000) | One line saying what the product does and what the planned integration would do. Plain text. |
+| Maintainer | `Maintainer__c` | text (120) | Who maintains it. |
+| License and Cost | `License_Cost__c` | text (120) | The price and license, for example Free, BSD-3-Clause. |
+| Link URL | `Link_Url__c` | URL | The product's home or documentation page, opened in a new tab. |
+| Install URL | `Install_Url__c` | URL | Optional. Where the product is installed from, opened in a new tab. |
+| Detection Objects | `Detection_Objects__c` | text (255) | Optional. The product's own objects, separated by semicolons, that show it is installed: the org has any one of them. A packaged object is written `namespace.Object__c` (a dot where the platform has two underscores), an object with no namespace `Object__c`. Empty means the page cannot tell and shows no Installed badge. |
+| Related Module | `Related_Module__c` | text (80) | Optional. The BarnCRM module the product overlaps, by its name shown, for example BarnCRM Volunteers. Empty for a complement. |
+| Compatibility | `Compatibility__c` | long text (1000) | What BarnCRM knows about using the two together, written honestly: tested or not, and what to watch for. |
+| Show Only When Installed | `Show_Only_When_Installed__c` | checkbox, default false | When true, the product is listed only in an org where it is detected, so a product that matches one of BarnCRM's own modules is mentioned only to someone who already has it (owner rule, 2026-10-26). A group left with no product is not shown at all. |
+| Migration Path | `Migration_Path__c` | text (255) | Optional. A short line saying where to find BarnCRM's migration to the matching module, once one exists; shown under the compatibility note. Empty for every product today. |
+| Sort Order | `Sort_Order__c` | number | The order within its group, lowest first. |
+
 ### Rules
 
 **R-D1** These lists are the **starting inventory** for the iterations covered here and
@@ -1581,7 +1612,9 @@ builder is the only writer, and the `version` key exists so the format can chang
 anyone having to guess what an older row meant.
 
 **R-R3 Fiscal-year windows.** When Fiscal Year Aware is true, the window is computed at
-run time from the org's fiscal year start month (Section 12) and Fiscal Year Offset, and
+run time from the org's fiscal year start month (the month the fiscal year starts in Setup,
+Company Settings, Fiscal Year: `Organization.FiscalYearStartMonth`, read the same way for every
+user; ADR-0135) and Fiscal Year Offset, and
 it is measured on the Fiscal Date Attribute. A definition that sums an amount has no date
 of its own to bound, so the attribute that decides which year a record falls in is named
 separately; a definition that aggregates a date directly may leave it empty, and the
@@ -1803,8 +1836,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
-- **Settings keys:** `Fiscal_Year_Start_Month__c` (Section 12), `Rollup_Mode_Default__c`
-  (Section 14B).
+- **Settings keys:** `Rollup_Mode_Default__c` (Section 14B). The fiscal year is not a
+  BarnCRM setting: it is the org's, read from Setup (R-R3).
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
   Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
   how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
@@ -2045,7 +2078,7 @@ settings console shows them in its Rollups section as before.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
-| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 
 ---
 
@@ -3803,10 +3836,10 @@ keys until v0.6 and are Giving keys now (see the v0.6 table below).
 | `Receipt_Next_Counter__c` | integer | 1 | The counter a new numbering series starts at, so an organization moving from another system continues its own sequence. |
 | `Receipt_Statement_Year__c` | integer | empty | The tax year the year end run reports on, which an administrator sets in January and leaves alone. |
 | `Receipt_Place_Of_Issue__c` | text | empty | The city and region the receipt is issued from, printed on the document. |
-| `Receipt_Renderer__c` | text | empty | Which renderer produces the PDF, as one of the two keys ADR-0016 names (`Blob PDF`, `Visualforce`) and never a class name; empty means the shipped one. A key outside that list is refused before any class is resolved or constructed. Stored as text and validated in Apex per ADR-0019. It exists because ADR-0016 names a fallback implementation and the spike that would settle the question needs an org (ADR-0016, "Consequences"). |
+| `Receipt_Renderer__c` | text | Blob PDF | Which renderer produces the PDF, as one of the two keys ADR-0016 names (`Blob PDF`, `Visualforce`) and never a class name; empty means the shipped one. A key outside that list is refused before any class is resolved or constructed. Stored as text and validated in Apex per ADR-0019. It exists because ADR-0016 names a fallback implementation and the spike that would settle the question needs an org (ADR-0016, "Consequences"). |
 | `Receipt_Print_Logo__c` | boolean | true | Whether the organization's logo is printed on receipts and statements. Off is a complete answer: a receipt with no images is a valid receipt (R-RC13), and this is also the switch an organization uses if the image path turns out not to work in its org. |
 | `Receipt_Logo_Width_Mm__c` | integer | 40 | How wide the logo prints, in millimetres. One number rather than a style sheet: a wordmark and a square crest cannot both look right at one fixed width, and the template is not the place to fix that (ADR-0016, "the admin edits text and tokens, not CSS"). |
-| `Receipt_Logo_Delivery__c` | text | empty | Which of ADR-0016's three image routes the logo is delivered by: empty means the shipped route, the file download URL. It exists for the same reason `Receipt_Renderer__c` does, and it is retired when the second spike closes (R-RC13). Stored as text under ADR-0019. |
+| `Receipt_Logo_Delivery__c` | text | File download | Which of ADR-0016's three image routes the logo is delivered by: empty means the shipped route, the file download URL. It exists for the same reason `Receipt_Renderer__c` does, and it is retired when the second spike closes (R-RC13). Stored as text under ADR-0019. |
 
 ### v0.5 keys
 
@@ -6515,7 +6548,7 @@ stop Mirror installing on an org without Opportunity (ADR-0013).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Opportunity_Mirror_Direction__c` | text | empty | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
+| `Opportunity_Mirror_Direction__c` | text | Off | `GiftsToOpportunities`, `OpportunitiesToGifts` or `Off`, shown as Gifts to Opportunities, Opportunities to Gifts and Off. Empty reads as Off (R-OM1). |
 | `Opportunity_Mirror_Start__c` | datetime | empty | Opportunities to Gifts only: an Opportunity becomes a gift only when its Close Date is on or after this date, read as a date in the org's default time zone. Empty means no Opportunity becomes a gift (R-OM7). |
 | `Opportunity_Mirror_Record_Types__c` | text | empty | Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts. Empty means every record type (R-OM7). |
 | `Opportunity_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-OM8). |
@@ -8700,6 +8733,9 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 | v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
+| v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
+| v0.8 | 2026-10-26 | Nonprofit modules section in the Module Manager (owner QA, M1). New field `Hide_Nonprofit_Modules__c` on BarnCRM Settings (Section 12, v0.8 keys), default false (the page's Show Nonprofit Modules checkbox is its inverse, so an existing settings row shows the modules). No object added. |
+| v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
 
 ---
 ## 32. Entity ownership by package

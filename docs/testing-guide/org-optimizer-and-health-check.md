@@ -48,7 +48,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
 | 3 | Find **Your org at a glance**. | An **Information** finding that ends by saying Shield Platform Encryption cannot be detected from inside the app. |
 | 4 | Find the automation finding. | **Automation is running normally**, **Information**. |
-| 5 | Click **Re-run**. | **Reading your org**, then the report again. |
+| 5 | Look for a fiscal year finding. | With a standard fiscal year in Setup (the default), there is none. An org that uses a custom fiscal year shows **Your org uses a custom fiscal year**, **Information**, naming the start month, with no button. |
+| 6 | Click **Re-run**. | **Reading your org**, then the report again. |
 
 **Cleanup:** None.
 
@@ -132,7 +133,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Org Optimizer**, choose **Unused setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then eight checks, including **Active users who have not logged in for 90 days**, **Permission sets nobody is assigned**, **Reports not run for 365 days**, **Email templates never used**, **Inactive flows**, **Scheduled jobs owned by inactive users**, **Objects near their custom field limit**, **Record types no record uses, or inactive**. |
 | 2 | Read a check with a count above 0. | Up to five names and **Open in Setup**. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
-| 4 | In **BarnCRM Settings**, **General**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
+| 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
 | 5 | Set it to `60`, **Save**, then **Refresh** on **Unused setup**. | **Your settings are saved.** The first check reads **Active users who have not logged in for 60 days**. |
 
 **Cleanup:** Set **Days before a user is unused** back to `90`.

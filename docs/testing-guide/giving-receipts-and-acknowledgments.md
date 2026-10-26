@@ -215,3 +215,18 @@ For every script on this page:
 | 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start plan** button. |
 
 **Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn off** on `After a meeting`.
+
+## T-RCPT-13: List views for acknowledgments, rules, plans and templates
+
+**Purpose:** the acknowledgment and stewardship objects open with All, status and (where it applies) My views.
+**Prerequisites:** staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Acknowledgments** tab and the list view menu. | **All Acknowledgments**, **Queued Acknowledgments** and **Failed Acknowledgments** are listed. |
+| 2 | Open **Acknowledgment Rules** and **Acknowledgment Runs** and open each list view menu. | **All Acknowledgment Rules**, **Active Acknowledgment Rules**, **Inactive Acknowledgment Rules**; **All Acknowledgment Runs**. |
+| 3 | Untick **Active** on a rule and refresh **Active Acknowledgment Rules**. | The rule has left **Active Acknowledgment Rules** and shows in **Inactive Acknowledgment Rules**. Tick it again. |
+| 4 | Open **Stewardship Plan Templates**. | **All Plan Templates**, **Active Plan Templates**, **Inactive Plan Templates** and **Automatic Plan Templates** are listed. |
+| 5 | Open **Stewardship Plans**. | **All Stewardship Plans**, **Running Plans** and **My Stewardship Plans** are listed. A plan you start shows in **My Stewardship Plans**. |
+
+**Cleanup:** none.

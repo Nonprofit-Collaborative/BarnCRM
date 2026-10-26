@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Stewardship_Plans</fullName>
+  <columns>NAME</columns>
+  <columns>Stewardship_Plan_Template__c</columns>
+  <columns>Contact__c</columns>
+  <columns>Account__c</columns>
+  <columns>Status__c</columns>
+  <columns>Started_Date__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Stewardship Plans</label>
+</ListView>

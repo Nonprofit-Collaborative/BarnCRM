@@ -110,7 +110,7 @@ to the people who should see them, shows its settings, and starts its automation
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
 | Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
-| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
+| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the default address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
@@ -160,9 +160,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    opens with the **Setup checklist**.
 2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
-   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
-   Error Log, Access, Import, and Health. You only see the ones that have something in them,
-   and a feature that is off hides its sections: Giving and
+   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Volunteers,
+   Automation, Error Log, Access, Import, Org Optimizer, Integrations, and Health. You only see
+   the ones that have something in them, and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
@@ -229,10 +229,34 @@ at something, you choose it:
 - **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
-- **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
+- **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
+
+Every setting shows its default until you change it. A dropdown, a number or a text setting
+that has not been saved yet shows the value BarnCRM is already using (for example **Default
+rollup mode** shows **Both (recommended)** on a new org, and **Household name pattern** shows
+the shipped pattern), not an empty box. Opening the page saves nothing. **Coexistence mode**
+shows the mode BarnCRM detects as right for your org, and stays unconfirmed until you choose
+one and save. Settings that point at a record (such as a default fund), a list of record
+types, or a date have no default to show and stay empty until you choose.
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
+
+## Values that come from Setup
+
+A few things BarnCRM needs are already held by Salesforce Setup. BarnCRM shows them on this
+page, read only, and keeps no copy that could drift from Setup. Each one says where in Setup it
+is changed; after you change it there, reload this page to see the new value.
+
+| Section | Shown | Where to change it |
+|---|---|---|
+| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Setup, Company Settings, Fiscal Year |
+| Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Setup, Company Settings, Company Information |
+
+BarnCRM follows the standard fiscal year: each year starts on the first day of the start month.
+If your org uses a custom fiscal year, Health Check says so, because reports then follow your
+custom periods while BarnCRM totals stay in whole years (see
+[Health Check](health-check.md#what-health-check-looks-at)).
 
 ## When a section needs a change in Setup
 
@@ -242,8 +266,7 @@ one, a note at the top of the section says, before any setting:
 
 - **what** to change in Setup,
 - **why** BarnCRM needs it, in one sentence,
-- **where** it is, as a path in plain words, for example "Setup, Company Settings, Fiscal
-  Year".
+- **where** it is, as a path in plain words, for example "Setup, Apex Settings".
 
 Where BarnCRM can read the answer without any extra permission, the note also says whether it
 is already done: **Done** with a green tick, or **Not done yet** with a warning icon. Otherwise
@@ -252,7 +275,6 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 
 | Section | What to change in Setup | Checked by BarnCRM |
 |---|---|---|
-| General | Make the Setup fiscal year start in the same month as **Fiscal year start month** (Setup, Company Settings, Fiscal Year) | Yes |
 | General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | No |
 | Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |

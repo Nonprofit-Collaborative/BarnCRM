@@ -57,30 +57,6 @@
         <value>When Deliverability is set to system email only or no access, Salesforce sends no digest, and only Setup can change it.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupNote_FiscalYear_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: what to change for the fiscal year</shortDescription>
-        <value>Start the fiscal year in Setup in the same month as Fiscal year start month in this section.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_FiscalYear_Where</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: Setup path for the fiscal year</shortDescription>
-        <value>Setup, Company Settings, Fiscal Year</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_FiscalYear_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: why the fiscal years must match</shortDescription>
-        <value>Salesforce reports, including the retention reports, read the fiscal year in Setup, and BarnCRM totals read the one here. If the months differ, they disagree about what counts as this year.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupNote_Heading</fullName>
         <categories>Core</categories>
         <language>en_US</language>

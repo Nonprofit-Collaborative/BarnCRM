@@ -301,12 +301,31 @@ private class HealthCheckFixesTest {
         return gone.Id;
     }
 
+    /**
+     * Cancels every BarnCRM scheduled job the org already has, such as the nightly tab access
+     * check an install schedules. Scheduled jobs are visible to tests, and the test seam that
+     * gives a job an inactive owner applies to every job read, so a test that names the jobs it
+     * expects clears the org's own first.
+     */
+    private static void clearOrgBarnCrmJobs() {
+        for (CronTrigger job : [
+            SELECT Id
+            FROM CronTrigger
+            WHERE CronJobDetail.Name LIKE 'BarnCRM%'
+            WITH SYSTEM_MODE
+        ]) {
+            System.abortJob(job.Id);
+        }
+        ScheduledJobSelector.forget();
+    }
+
     @IsTest
     static void jobsOfADeactivatedOwnerAreScheduledAgainAndTheRestNamedAsStopped() {
         System.runAs(TestUsers.admin()) {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
             Id gone = inactiveUserId();
             String otherJob = 'BarnCRM Fix test job';
+            clearOrgBarnCrmJobs();
             ErrorDigestScheduler.start();
             ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
             NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.ErrorDigestJob() };
@@ -358,6 +377,70 @@ private class HealthCheckFixesTest {
             Assert.isNotNull(
                 ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME),
                 'The known job runs again'
+            );
+        }
+    }
+
+    @IsTest
+    static void aJobTheOrgAlreadyHasIsHandledLikeAnyOtherAndOnlyWhenItsOwnerIsGone() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+            Id gone = inactiveUserId();
+            String otherJob = 'BarnCRM Fix test job';
+            String orgJob = TabAccessScheduler.JOB_NAME;
+            clearOrgBarnCrmJobs();
+            // What an install leaves behind: the tab access check, owned by an active user.
+            TabAccessScheduler.start();
+            ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
+            NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.TabAccessJob() };
+            String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
+
+            System.runAs(maria) {
+                Assert.isTrue(
+                    HealthCheckService.fixScope(fixKey).isEmpty(),
+                    'Jobs of an active owner are left alone, the org\'s own included'
+                );
+
+                ScheduledJobSelector.ownerOverride = gone;
+                ScheduledJobSelector.forget();
+                List<String> scope = HealthCheckService.fixScope(fixKey);
+                Assert.areEqual(
+                    new List<String>{ otherJob, orgJob },
+                    scope,
+                    'Once the owner is gone, every one of the jobs is named'
+                );
+
+                // No startTest: the scheduled run must not execute inside the test.
+                HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
+
+                Assert.isTrue(
+                    report.fixOutcome.contains(
+                        String.format(
+                            System.Label.Core_HealthCheck_FixScheduled,
+                            new List<Object>{ orgJob }
+                        )
+                    ),
+                    'The org\'s own job Health Check knows is scheduled again: ' + report.fixOutcome
+                );
+                Assert.isTrue(
+                    report.fixOutcome.contains(
+                        String.format(
+                            System.Label.Core_HealthCheck_FixStoppedOnly,
+                            new List<Object>{ otherJob }
+                        )
+                    ),
+                    'The one it never schedules is said to be stopped only: ' + report.fixOutcome
+                );
+            }
+            ScheduledJobSelector.ownerOverride = null;
+            ScheduledJobSelector.forget();
+            Assert.isNotNull(
+                ScheduledJobSelector.triggerIdByName(orgJob),
+                'The org\'s own job is scheduled again'
+            );
+            Assert.isNull(
+                ScheduledJobSelector.triggerIdByName(otherJob),
+                'The unknown job was stopped'
             );
         }
     }

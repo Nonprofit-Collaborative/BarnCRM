@@ -139,6 +139,18 @@
                                 ></lightning-checkbox-group>
                             </template>
 
+                            <template lwc:elseif={row.isSetupValue}>
+                                <lightning-input
+                                    type="text"
+                                    label={row.label}
+                                    value={row.value}
+                                    read-only
+                                    field-level-help={labels.fromSetupHelp}
+                                    data-key={row.key}
+                                    data-kind="SetupValue"
+                                ></lightning-input>
+                            </template>
+
                             <template lwc:elseif={row.isComponent}>
                                 <h3
                                     class="slds-text-heading_small slds-var-m-bottom_x-small"

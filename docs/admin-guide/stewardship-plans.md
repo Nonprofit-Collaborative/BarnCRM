@@ -91,6 +91,12 @@ offered no **Start plan**.
    tasks now sit in the record owner's list, due tomorrow, next week, and next month.
 6. Go back to the page. The plan now says **1** under Running now.
 
+## List views
+
+**Stewardship Plans** has **All Stewardship Plans**, **Running Plans** and **My Stewardship
+Plans**. **Stewardship Plan Templates** has **All Plan Templates**, **Active Plan Templates**,
+**Inactive Plan Templates** and **Automatic Plan Templates**.
+
 ## Common mistakes
 
 - **Steps added after the plan started.** They do not appear on plans already running.
