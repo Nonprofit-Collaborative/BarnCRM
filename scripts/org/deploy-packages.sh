@@ -287,7 +287,9 @@ deploy_stage() {
   local dir
   if [[ "${1:-}" == "--metadata-dir" ]]; then
     # A metadata-format package written for this run, such as the module tabs in the apps.
-    [[ -f "$2/package.xml" ]] && dirs=(--metadata-dir "$2" --single-package)
+    # No --single-package: the CLI zips the folder itself, so package.xml is not at the zip
+    # root and the API answers "No package.xml found" (oi-test gate, 2026-10-26).
+    [[ -f "$2/package.xml" ]] && dirs=(--metadata-dir "$2")
   else
     for dir in "$@"; do
       if [[ -d "$dir" ]]; then
