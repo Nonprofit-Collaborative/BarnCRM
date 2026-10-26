@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
+import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_Suggestions';
 
 import TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
 import INTRO from '@salesforce/label/c.Core_OrgOptimizer_Intro';
@@ -30,8 +31,10 @@ const OVERVIEW_TAB = 'overview';
  * The Org Optimizer page (ADR-0103 org-optimizer-and-data-manager-pages, admin guide
  * org-optimizer.md): one vertical tab per section. A section's component is created only when
  * its tab is first opened, and Health Check only on Run Health Check, so opening the page runs
- * no check (core review ADMIN-7). Data quality needs Find and Export Records; the other
- * sections need Manage BarnCRM Settings. Each embedded component keeps its own server check.
+ * no check (core review ADMIN-7). Data quality needs Find and Export Records; Duplicates needs
+ * Manage BarnCRM Settings or Review Duplicate Suggestions (BarnCRM Duplicate Review, which
+ * reads the list but cannot scan, dismiss or merge); the other sections need Manage BarnCRM
+ * Settings. Each embedded component keeps its own server check.
  */
 export default class OrgOptimizer extends LightningElement {
   labels = {
@@ -63,15 +66,21 @@ export default class OrgOptimizer extends LightningElement {
     return Boolean(canManageSettings);
   }
 
+  get canSeeDuplicates() {
+    return Boolean(canManageSettings || canReviewDuplicates);
+  }
+
   /** The Overview's list: one line per section the person may open. */
   get overviewSections() {
     const sections = [];
     if (canFind) {
       sections.push({ name: 'quality', title: QUALITY, text: QUALITY_TEXT });
     }
+    if (this.canSeeDuplicates) {
+      sections.push({ name: 'duplicates', title: DUPLICATES, text: DUPLICATES_TEXT });
+    }
     if (canManageSettings) {
       sections.push(
-        { name: 'duplicates', title: DUPLICATES, text: DUPLICATES_TEXT },
         { name: 'fieldUtilization', title: FIELD_UTILIZATION, text: FIELD_UTILIZATION_TEXT },
         { name: 'healthCheck', title: HEALTH_CHECK, text: HEALTH_CHECK_TEXT },
         { name: 'errors', title: ERRORS, text: ERRORS_TEXT },

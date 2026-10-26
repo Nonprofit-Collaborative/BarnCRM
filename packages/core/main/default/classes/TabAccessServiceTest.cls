@@ -41,6 +41,26 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void givesADuplicateReviewerDataHygieneOnly() {
+        System.runAs(TestUsers.admin()) {
+            User reviewer = TestUsers.standardUserWith(
+                'Reviewer',
+                new List<String>{ 'BarnCRM_Duplicate_Review' }
+            );
+
+            Test.startTest();
+            TabAccessService.syncNow();
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.DATA_HYGIENE_TAB },
+                tabSetsOf(reviewer.Id),
+                'Duplicate Review shows Org Optimizer, where the duplicates are listed, and nothing else'
+            );
+        }
+    }
+
+    @IsTest
     static void aNewInstallShowsNoFeatureTabUntilTheFeatureIsOn() {
         System.runAs(TestUsers.admin()) {
             FeatureSwitchService.markNewInstall();

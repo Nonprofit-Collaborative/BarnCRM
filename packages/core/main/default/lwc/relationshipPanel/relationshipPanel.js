@@ -2,6 +2,9 @@ import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import { gql, graphql } from 'lightning/graphql';
 import { deleteRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+
+import RELATIONSHIP_SCHEMA from '@salesforce/schema/Relationship__c';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Relationship_PanelTitle';
 import ADD_BUTTON from '@salesforce/label/c.Core_Relationship_AddButton';
@@ -141,6 +144,26 @@ export default class RelationshipPanel extends LightningElement {
       this.errorMessage = undefined;
       this.loaded = true;
     }
+  }
+
+  /** What the user may do with relationships; nothing is offered until it is known. */
+  relationshipInfo;
+
+  @wire(getObjectInfo, { objectApiName: RELATIONSHIP_SCHEMA })
+  receiveRelationshipInfo({ data }) {
+    if (data) {
+      this.relationshipInfo = data;
+    }
+  }
+
+  /** Add relationship, only for someone who can create relationships (Read Only cannot). */
+  get canAdd() {
+    return Boolean(this.relationshipInfo && this.relationshipInfo.createable);
+  }
+
+  /** Remove, only for someone who can delete relationships. */
+  get canRemove() {
+    return Boolean(this.relationshipInfo && this.relationshipInfo.deletable);
   }
 
   get isLoading() {

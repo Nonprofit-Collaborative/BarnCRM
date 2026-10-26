@@ -7,6 +7,9 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
   virtual: true
 });
+jest.mock('@salesforce/customPermission/Review_Duplicate_Suggestions', () => ({ default: false }), {
+  virtual: true
+});
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

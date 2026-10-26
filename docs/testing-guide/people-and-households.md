@@ -148,13 +148,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-10: Read-only user on people and households
 
 **Purpose:** a read-only user sees households but cannot change BarnCRM membership or settings.
-**Prerequisites:** read-only user. The test users have the **Standard User** profile, which itself allows editing accounts and contacts, so this script checks what BarnCRM controls.
+**Prerequisites:** read-only user, with the Salesforce **Read Only** profile as [Before you test](before-you-test.md#test-users) says (a profile that can edit accounts and contacts would show the buttons below).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Households** tab and The Garcia Family. | The **Members** panel and **Name and Greetings** show. |
-| 2 | Flexible way only: select **Make primary** on a member. | **The primary contact could not be changed. Check that you can edit this household and try again.** The badge does not move. |
-| 3 | Open **BarnCRM Settings**, **Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
+| 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add member**, **Move to another household** or **Make primary** button. |
+| 3 | Open the **Household Members** tab (from the navigation menu if it is not shown). | It opens and lists membership records (none in the simple way of belonging); no **New** button. |
+| 4 | Open **BarnCRM Settings**, **Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
 
 **Cleanup:** None.
 

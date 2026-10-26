@@ -1,8 +1,10 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getObjectInfo, getObjectInfos } from 'lightning/uiObjectInfoApi';
 import Toast from 'lightning/toast';
+import CONTACT_SCHEMA from '@salesforce/schema/Contact';
+import HOUSEHOLD_MEMBER_SCHEMA from '@salesforce/schema/Household_Member__c';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
 import getMembershipMode from '@salesforce/apex/HouseholdController.getMembershipMode';
 import moveContact from '@salesforce/apex/HouseholdController.moveContact';
@@ -125,9 +127,48 @@ export default class HouseholdMembersPanel extends LightningElement {
       this.householdRecordTypeId = Object.keys(infos).find(
         (id) => infos[id].developerName === HOUSEHOLD || infos[id].name === HOUSEHOLD
       );
+      this.accountUpdateable = data.updateable === true;
     } else if (error) {
       this.errorMessage = this.readError(error);
     }
+  }
+
+  // What the user may do with people and memberships; nothing is offered until it is known,
+  // so a Read Only user never sees Add member, Move or Make primary (they could only fail).
+  accountUpdateable = false;
+  contactAccess = {};
+  membershipAccess = {};
+
+  @wire(getObjectInfos, { objectApiNames: [CONTACT_SCHEMA, HOUSEHOLD_MEMBER_SCHEMA] })
+  wiredAccessInfos({ data }) {
+    if (data && data.results) {
+      const [contact, membership] = data.results.map((entry) => {
+        return entry && entry.statusCode === 200 && entry.result ? entry.result : {};
+      });
+      this.contactAccess = contact || {};
+      this.membershipAccess = membership || {};
+    }
+  }
+
+  /**
+   * In the flexible membership mode every member action writes a membership record; in the
+   * simple mode adding creates a contact, moving edits the contact and making primary edits
+   * the household.
+   */
+  get canCreateMember() {
+    return this.isJunctionMode
+      ? this.membershipAccess.createable === true
+      : this.contactAccess.createable === true;
+  }
+
+  get canMoveMembers() {
+    return this.isJunctionMode
+      ? this.membershipAccess.updateable === true
+      : this.contactAccess.updateable === true;
+  }
+
+  get canChangePrimary() {
+    return this.isJunctionMode ? this.membershipAccess.updateable === true : this.accountUpdateable;
   }
 
   @wire(getMembershipMode)
@@ -162,7 +203,7 @@ export default class HouseholdMembersPanel extends LightningElement {
   }
 
   get canAddMember() {
-    return this.isHousehold;
+    return this.isHousehold && this.canCreateMember;
   }
 
   get hasMembers() {
@@ -208,8 +249,9 @@ export default class HouseholdMembersPanel extends LightningElement {
         // A person stored as an account can only be moved, or named primary, where their
         // membership is a record of its own. Offering the button elsewhere only lets the
         // user click and be refused.
-        canMove: this.isJunctionMode || !storedAsAccount,
-        canMakePrimary: !isPrimary && (this.isJunctionMode || !storedAsAccount),
+        canMove: this.canMoveMembers && (this.isJunctionMode || !storedAsAccount),
+        canMakePrimary:
+          this.canChangePrimary && !isPrimary && (this.isJunctionMode || !storedAsAccount),
         moveLabel: MOVE_FOR.replace('{0}', member.name),
         makePrimaryLabel: MAKE_PRIMARY_FOR.replace('{0}', member.name)
       };

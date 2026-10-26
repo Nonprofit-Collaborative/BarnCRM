@@ -3,7 +3,7 @@
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getObjectInfo, getObjectInfos } from 'lightning/uiObjectInfoApi';
 import HouseholdMembersPanel from 'c/householdMembersPanel';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
 import getMembershipMode from '@salesforce/apex/HouseholdController.getMembershipMode';
@@ -68,6 +68,7 @@ const PERSON_ACCOUNT_ID = '001000000000009AAA';
 const HOUSEHOLD_RECORD_TYPE_ID = '012000000000001AAA';
 
 const ACCOUNT_INFO = {
+  updateable: true,
   recordTypeInfos: {
     [HOUSEHOLD_RECORD_TYPE_ID]: {
       recordTypeId: HOUSEHOLD_RECORD_TYPE_ID,
@@ -127,12 +128,23 @@ function flush() {
     .then(() => {});
 }
 
-function build() {
+/** Contact and Household Member access as the platform reports it, in that order. */
+function accessInfos(createable, updateable) {
+  const entry = { statusCode: 200, result: { createable, updateable } };
+  return { results: [entry, entry] };
+}
+
+/** A Staff user by default: may add, move and make primary. */
+function build({ accountUpdateable = true, createable = true, updateable = true } = {}) {
   const element = createElement('c-household-members-panel', { is: HouseholdMembersPanel });
   element.recordId = HOUSEHOLD_ID;
   document.body.appendChild(element);
+  getObjectInfo.emit({ ...ACCOUNT_INFO, updateable: accountUpdateable });
+  getObjectInfos.emit(accessInfos(createable, updateable));
   return element;
 }
+
+const READ_ONLY = { accountUpdateable: false, createable: false, updateable: false };
 
 describe('c-household-members-panel', () => {
   beforeEach(() => {
@@ -309,6 +321,44 @@ describe('c-household-members-panel', () => {
 
     expect(element.shadowRoot.querySelector('.move-button')).toBeNull();
     expect(element.shadowRoot.querySelector('.make-primary-button')).toBeNull();
+  });
+
+  it('offers no Add member, Move or Make primary to a Read Only user in the simple mode', async () => {
+    const element = build(READ_ONLY);
+    getRecord.emit(recordOfType('Household', PERSON_ID));
+    getMembershipMode.emit('Contact');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('.member-row').length).toBe(2);
+    expect(element.shadowRoot.querySelector('.add-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.move-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.make-primary-button')).toBeNull();
+  });
+
+  it('offers no Add member, Move or Make primary to a Read Only user in the flexible mode', async () => {
+    const element = build(READ_ONLY);
+    getRecord.emit(recordOfType('Household', null));
+    getMembershipMode.emit('Junction');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('.member-row').length).toBe(2);
+    expect(element.shadowRoot.querySelector('.add-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.move-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.make-primary-button')).toBeNull();
+  });
+
+  it('offers Make primary in the simple mode only to someone who can edit the household', async () => {
+    const element = build({ accountUpdateable: false });
+    getRecord.emit(recordOfType('Household', PERSON_ID));
+    getMembershipMode.emit('Contact');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.make-primary-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.move-button')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('.add-button')).not.toBeNull();
   });
 
   it('says so politely on a record that is not a household', async () => {

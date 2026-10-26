@@ -1,11 +1,13 @@
 <template>
   <lightning-card title={labels.panelTitle} icon-name="standard:account">
-    <lightning-button
-      slot="actions"
-      label={labels.addButton}
-      onclick={handleAdd}
-      data-id="add-affiliation"
-    ></lightning-button>
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        label={labels.addButton}
+        onclick={handleAdd}
+        data-id="add-affiliation"
+      ></lightning-button>
+    </template>
 
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={isLoading}>
@@ -51,13 +53,15 @@
                   data-id="former-badge"
                 ></lightning-badge>
               </template>
-              <template lwc:if={affiliation.showMakePrimary}>
-                <lightning-button
-                  label={labels.makePrimaryButton}
-                  data-id={affiliation.id}
-                  onclick={handleMakePrimary}
-                  class="make-primary"
-                ></lightning-button>
+              <template lwc:if={canMakePrimary}>
+                <template lwc:if={affiliation.showMakePrimary}>
+                  <lightning-button
+                    label={labels.makePrimaryButton}
+                    data-id={affiliation.id}
+                    onclick={handleMakePrimary}
+                    class="make-primary"
+                  ></lightning-button>
+                </template>
               </template>
             </div>
           </div>
