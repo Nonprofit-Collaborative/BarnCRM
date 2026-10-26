@@ -25,7 +25,8 @@ public with sharing class SetupValueSelector {
      * does not is left out of the console, as a row naming a missing setting is.
      */
     public static Boolean supports(String settingsObject, String key) {
-        return ORGANIZATION.equalsIgnoreCase(String.valueOf(settingsObject).trim()) &&
+        return String.isNotBlank(settingsObject) &&
+            ORGANIZATION.equalsIgnoreCase(settingsObject.trim()) &&
             (KEY_ORGANIZATION_NAME.equalsIgnoreCase(key) ||
             KEY_FISCAL_YEAR_START.equalsIgnoreCase(key));
     }
