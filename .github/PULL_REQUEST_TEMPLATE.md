@@ -23,6 +23,7 @@
 - [ ] Permission sets updated; no new permission requires cloning.
 - [ ] Error paths logged to Error Log with human-readable messages.
 - [ ] Admin-guide page written (what it does, how to turn it on, a five-minute walkthrough, common mistakes).
+- [ ] Docs updated in this PR: Admin Guide page, User Guide page (if users touch it), Testing Guide script(s), `docs/overview.md` (if status or the module list changes); each index's "Applies to" line updated.
 - [ ] Release note line written.
 - [ ] Sample data updated if the feature adds objects.
 - [ ] Reviewed by a second agent or human against the review checklist (Section 9.4).
@@ -51,3 +52,4 @@
 - [ ] Does it degrade gracefully when a module is off or a standard object is absent?
 - [ ] Is anything overwritten on upgrade that an admin might have changed?
 - [ ] Is the label language a nonprofit's language?
+- [ ] Are the Overview, Admin Guide, User Guide and Testing Guide updated for this change (D-116)?

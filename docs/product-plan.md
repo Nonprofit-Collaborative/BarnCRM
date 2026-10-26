@@ -941,6 +941,7 @@ Because the first customers are Nonprofit Cloud / Agentforce Nonprofit orgs (Sec
 - [ ] Permission sets updated; no new permission requires cloning.
 - [ ] Error paths logged to Error Log with human-readable messages.
 - [ ] Admin-guide page written (what it does, how to turn it on, a five-minute walkthrough, common mistakes).
+- [ ] Documentation set updated in the same PR (D-116): the Admin Guide page, the User Guide page (if users touch the feature), the Testing Guide script(s) and, if the feature's status or the module list changes, `docs/overview.md`.
 - [ ] Release note line written.
 - [ ] Sample data updated if the feature adds objects.
 - [ ] Reviewed by a second agent or human against this checklist (Section 9.4).
@@ -1036,6 +1037,7 @@ Split by **module and layer**, never by "front end vs back end" across the same 
 - Does it degrade gracefully when a module is off or a standard object is absent?
 - Is anything overwritten on upgrade that an admin might have changed?
 - Is the label language a nonprofit's language?
+- Are the Admin Guide page, the User Guide page (if users touch it), the Testing Guide script(s) and, if status or the module list changed, `docs/overview.md` updated in this PR, and does each index's "Applies to" line name a current main commit (D-116)?
 - Does every class state its sharing and every query and DML its access mode (`check-apex-access-modes.py`), and does every test run as a permission-set user (`check-tests-run-as.py`)?
 
 ### 9.5 Reporting format (end of each iteration)
@@ -1370,6 +1372,7 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-113 | Related-record duplicate matching in Core, steps 1 to 3 (Brandon, 2026-10-25; C-44; Section 4.9): (1) configurable match sources in the BarnCRM Settings console (object, field, parent link to Contact or Account, normalization: email lowercase and trim, phone digits only, address normalized); (2) shipped source rows for `ContactPointEmail`, `ContactPointPhone`, `ContactPointAddress` and `Address__c`, active only when the object exists in the org (dynamic SOQL, as X-07 does); (3) the duplicate scan adds pairs found through these sources to the existing review list with a reason naming the source, and import matching uses the same sources | A save-time warning (explicitly not included) | Salesforce duplicate and matching rules cannot see related objects |
 | D-114 | Erasing a person also empties Rejection Reason on their volunteer hours (Brandon, 2026-10-25; closes Section 11.2 item 28) | Keep it, listed by Core as Kept | A rejection reason can describe the person; erasure should leave nothing about them |
 | D-115 | Erasing a person keeps deleting the hour letters and certificates BarnCRM generated for them, as D-108 already says; no behaviour change (Brandon, 2026-10-25; closes Section 11.2 item 29) | Keep the generated letters for an admin to delete | Generated letters carry only the person's own data, so erasure should leave nothing about them |
+| D-116 | Documentation upkeep is a standing rule (Brandon, 2026-10-25): an Overview (`docs/overview.md`), Admin Guide (`docs/admin-guide/`), User Guide (`docs/user-guide/`) and step-by-step Testing Guide (`docs/testing-guide/`) are kept current with the newest version. A feature is not done until its Admin Guide page, User Guide page (if users touch it), Testing Guide script(s) and, if status or the module list changes, the Overview are updated in the same PR (Sections 7.4 and 9.4). Each index carries an "Applies to" line naming the main commit it was checked against | Update the guides in a periodic sweep | Guides written after the fact drift from the product; the same-PR rule keeps them true to the latest version |
 
 ---
 
