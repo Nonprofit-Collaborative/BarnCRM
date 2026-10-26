@@ -1,0 +1,71 @@
+name: Integration proposal from a solution provider
+description: Propose an integration between your product and BarnCRM.
+title: '[Integration proposal]: '
+labels: ['integration']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        BarnCRM is open source and self-service. This is a public proposal, not a support ticket, and it does not promise a reply or a date. Do not include personal data: this issue is public. Read [how an integration is built](https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/contributor-guide/integrations.md) first.
+
+  - type: input
+    id: product-name
+    attributes:
+      label: Product name
+    validations:
+      required: true
+
+  - type: input
+    id: product-link
+    attributes:
+      label: Product link
+      description: Its website, documentation or source repository.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-it-does
+    attributes:
+      label: What the product does
+    validations:
+      required: true
+
+  - type: input
+    id: contact-role
+    attributes:
+      label: Your role
+      description: 'For example, maintainer, product manager or consultant. A role only: do not post a name, email address or phone number.'
+    validations:
+      required: true
+
+  - type: textarea
+    id: integration-points
+    attributes:
+      label: Integration points
+      description: Where the two would meet, for example the objects, events or APIs each side would read or write.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: Open source or paid
+      options:
+        - Open source and free
+        - Open source with paid services
+        - Paid product
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: maintain
+    attributes:
+      label: Willingness to maintain the integration
+      description: An integration ships as a separate package that does not change Core, and someone has to keep it working.
+      options:
+        - We would build and maintain it
+        - We would help build it and want BarnCRM to maintain it
+        - We are asking BarnCRM to build it
+    validations:
+      required: true

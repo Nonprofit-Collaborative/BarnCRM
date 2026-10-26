@@ -1404,6 +1404,33 @@ names the modules a module's package needs installed first (ADR-0125
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
+### Integration App
+
+`Integration_App__mdt`: the catalog of other products the Settings, Integrations page lists, one
+record per product, read as shipped and never materialized. Core ships the records and never
+depends on any of these products: whether one is installed is detected by describe only
+(`IntegrationAppService`), and a row can be added or changed without code. A product that is not
+in the org is listed as Not installed. The page says that BarnCRM has not tested a product
+alongside itself until a row's compatibility note says otherwise.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable key of the product. Health Check findings look a product up by it. |
+| Label | `MasterLabel` | text | The product's name as shown on the page. |
+| Category | `Category__c` | text (40) | Where the page groups it: `Complement` (Complementary Apps), `InDevelopment` (In Development) or `Alternative` (Alternatives to BarnCRM Modules). A blank or unknown value is listed as `Complement`. |
+| Status | `Status__c` | text (40), default `InProgress` | Where BarnCRM's integration with the product stands: `InProgress` (planned, not built) or `Available`. A blank or unknown value is shown as In Progress. Every shipped row is In Progress: the page is a roadmap, and no integration behavior exists (owner direction, 2026-10-26). |
+| Description | `Description__c` | long text (1000) | One line saying what the product does and what the planned integration would do. Plain text. |
+| Maintainer | `Maintainer__c` | text (120) | Who maintains it. |
+| License and Cost | `License_Cost__c` | text (120) | The price and license, for example Free, BSD-3-Clause. |
+| Link URL | `Link_Url__c` | URL | The product's home or documentation page, opened in a new tab. |
+| Install URL | `Install_Url__c` | URL | Optional. Where the product is installed from, opened in a new tab. |
+| Detection Objects | `Detection_Objects__c` | text (255) | Optional. The product's own objects, separated by semicolons, that show it is installed: the org has any one of them. A packaged object is written `namespace.Object__c` (a dot where the platform has two underscores), an object with no namespace `Object__c`. Empty means the page cannot tell and shows no Installed badge. |
+| Related Module | `Related_Module__c` | text (80) | Optional. The BarnCRM module the product overlaps, by its name shown, for example BarnCRM Volunteers. Empty for a complement. |
+| Compatibility | `Compatibility__c` | long text (1000) | What BarnCRM knows about using the two together, written honestly: tested or not, and what to watch for. |
+| Show Only When Installed | `Show_Only_When_Installed__c` | checkbox, default false | When true, the product is listed only in an org where it is detected, so a product that matches one of BarnCRM's own modules is mentioned only to someone who already has it (owner rule, 2026-10-26). A group left with no product is not shown at all. |
+| Migration Path | `Migration_Path__c` | text (255) | Optional. A short line saying where to find BarnCRM's migration to the matching module, once one exists; shown under the compatibility note. Empty for every product today. |
+| Sort Order | `Sort_Order__c` | number | The order within its group, lowest first. |
+
 ### Rules
 
 **R-D1** These lists are the **starting inventory** for the iterations covered here and
@@ -8708,6 +8735,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 | v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
 | v0.8 | 2026-10-26 | Nonprofit modules section in the Module Manager (owner QA, M1). New field `Hide_Nonprofit_Modules__c` on BarnCRM Settings (Section 12, v0.8 keys), default false (the page's Show Nonprofit Modules checkbox is its inverse, so an existing settings row shows the modules). No object added. |
+| v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
 
 ---
 ## 32. Entity ownership by package

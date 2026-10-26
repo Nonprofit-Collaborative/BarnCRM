@@ -1,0 +1,92 @@
+<template>
+    <template lwc:if={errorMessage}>
+        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+    </template>
+    <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={isEmpty}>
+        <p class="slds-text-body_small" data-id="empty">{labels.empty}</p>
+    </template>
+
+    <template for:each={groups} for:item="group">
+        <section key={group.key} class="slds-var-m-bottom_medium" data-group={group.key}>
+            <h3 class="slds-text-heading_small" data-id="group-heading">{group.heading}</h3>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="group-intro">{group.intro}</p>
+            <ul class="slds-has-dividers_bottom-space">
+                <template for:each={group.apps} for:item="app">
+                    <li key={app.key} class="slds-item slds-var-p-vertical_small" data-app={app.key}>
+                        <div>
+                            <span class="slds-text-heading_x-small" data-id="name">{app.name}</span>
+                            <span class={app.statusClass} data-id="status">{app.statusText}</span>
+                            <span class={app.badgeClass} data-id="badge">{app.badgeText}</span>
+                        </div>
+                        <p data-id="description">{app.description}</p>
+                        <p class="slds-text-body_small" data-id="facts">
+                            <template lwc:if={app.maintainerText}>
+                                <span data-id="maintainer">{app.maintainerText}</span>
+                            </template>
+                            <template lwc:if={app.licenseCostText}>
+                                <span data-id="license-cost" class="slds-var-m-left_small">{app.licenseCostText}</span>
+                            </template>
+                            <template lwc:if={app.relatedModuleText}>
+                                <span data-id="related-module" class="slds-var-m-left_small">{app.relatedModuleText}</span>
+                            </template>
+                        </p>
+                        <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="compatibility">
+                            <span class="slds-text-title_caps">{labels.compatibility}</span>
+                            {app.compatibility}
+                        </p>
+                        <template lwc:if={app.migrationPathText}>
+                            <p class="slds-text-body_small" data-id="migration-path">{app.migrationPathText}</p>
+                        </template>
+                        <p class="slds-var-m-top_xx-small">
+                            <template lwc:if={app.linkUrl}>
+                                <a href={app.linkUrl} target="_blank" rel="noopener noreferrer" data-id="learn-more"
+                                    >{app.learnMore}<span class="slds-assistive-text">: {app.name} {app.newTab}</span></a
+                                >
+                            </template>
+                            <template lwc:if={app.installUrl}>
+                                <a
+                                    class="slds-var-m-left_small"
+                                    href={app.installUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    data-id="install"
+                                    >{app.installLink}<span class="slds-assistive-text">: {app.name} {app.newTab}</span></a
+                                >
+                            </template>
+                        </p>
+                    </li>
+                </template>
+            </ul>
+        </section>
+    </template>
+
+    <section class="slds-box slds-var-m-top_medium" data-id="request">
+        <h3 class="slds-text-heading_small" data-id="request-heading">{request.heading}</h3>
+        <p data-id="request-intro">{request.intro}</p>
+        <p class="slds-var-m-top_x-small">
+            <a href={request.requestUrl} target="_blank" rel="noopener noreferrer" data-id="request-link"
+                >{request.requestLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+            >
+        </p>
+        <p class="slds-var-m-top_x-small" data-id="partner-intro">{request.partnerIntro}</p>
+        <p>
+            <a href={request.partnerUrl} target="_blank" rel="noopener noreferrer" data-id="partner-link"
+                >{request.partnerLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+            >
+            <a
+                class="slds-var-m-left_small"
+                href={request.guideUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-id="guide-link"
+                >{request.guideLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+            >
+        </p>
+    </section>
+
+    <div class="slds-var-m-top_x-small">
+        <lightning-button label={labels.checkAgain} data-id="check-again" onclick={handleCheckAgain}></lightning-button>
+    </div>
+</template>

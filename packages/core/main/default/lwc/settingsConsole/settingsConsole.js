@@ -118,6 +118,8 @@ function importCoreComponent(name) {
       return import('c/featureSettings');
     case 'organizationAddressSettings':
       return import('c/organizationAddressSettings');
+    case 'integrationsPanel':
+      return import('c/integrationsPanel');
     default:
       return null;
   }

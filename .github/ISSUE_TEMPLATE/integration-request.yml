@@ -1,0 +1,49 @@
+name: Integration request
+description: Ask for BarnCRM to work with a product your organization uses.
+title: '[Integration]: '
+labels: ['integration']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us what you need; requests shape the roadmap. BarnCRM is self-service: this is a public suggestion, not a support ticket, and it does not promise a reply or a date. Do not include personal or donor data: this issue is public.
+
+  - type: input
+    id: product-name
+    attributes:
+      label: Product name
+      description: The product you want BarnCRM to work with.
+    validations:
+      required: true
+
+  - type: input
+    id: product-link
+    attributes:
+      label: Product link
+      description: Its website, documentation or source repository.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-it-does
+    attributes:
+      label: What the product does
+      description: In a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: how-used
+    attributes:
+      label: How your organization uses it today
+      description: What you keep in it, who uses it, and what you wish worked with BarnCRM.
+    validations:
+      required: true
+
+  - type: textarea
+    id: wish
+    attributes:
+      label: What the integration should do
+      description: For example, show a person's registrations on their record.
+    validations:
+      required: false
