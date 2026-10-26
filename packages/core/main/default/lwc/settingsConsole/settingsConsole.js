@@ -34,6 +34,8 @@ import { labelTab } from 'c/workspaceTabs';
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
+/** The stored name of the General section (SettingSections.GENERAL), not a display label. */
+const GENERAL_SECTION = 'General';
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
 // saves them. Their plain rows are hidden while that panel is in the section so a pattern has
@@ -223,6 +225,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   get sectionIsEmpty() {
     return !this.loading && this.currentSettings.length === 0;
+  }
+
+  /** Recent Changes shows on the General section only, however the section was reached. */
+  get showRecentChanges() {
+    return this.selectedSection === GENERAL_SECTION;
   }
 
   get hasChangesToShow() {

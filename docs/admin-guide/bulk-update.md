@@ -37,7 +37,7 @@ run log starting "Edited in Find", with the same undo.
    because every bulk update starts from a Find query. The **BarnCRM Admin** role has both. To
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (BarnCRM Settings, Access,
-   Extra permissions). Neither grants access to any record or field.
+   Extra Permissions). Neither grants access to any record or field.
    A person without both sees no bulk updates under **Data jobs** on the **Data Manager** tab,
    and no error.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk update run limit**

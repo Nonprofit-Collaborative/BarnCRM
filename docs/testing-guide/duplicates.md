@@ -72,7 +72,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-05: A match source finds a pair the rules cannot
 
 **Purpose:** Confirm the scan pairs households that share an address held on BarnCRM addresses, and says why.
-**Prerequisites:** admin. **Address (household)** is **In use** on the **Custom metadata** page.
+**Prerequisites:** admin. **Address (household)** is **In use** on the **Custom Metadata** page.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -91,7 +91,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, scroll to **Custom metadata**, then **Match sources**. | **Shipped with BarnCRM** lists six rows: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**, each **In use**. |
+| 1 | Open **BarnCRM Settings**, **General**, scroll to **Custom Metadata**, then **Match sources**. | **Shipped with BarnCRM** lists six rows: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**, each **In use**. |
 | 2 | Open the menu on **Address (household)** and choose **Archive**. | **Saving. Salesforce applies the change in the background, usually within a minute.**, then **Saved.** The row reads **Archived**. |
 | 3 | Create a household `Pine Test Household` with a default address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 4 | Scan and refresh **Duplicates**. | No pair with `Pine Test Household`. |
@@ -107,12 +107,12 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Under **Match sources**, click **Add**. | A **New row** form. |
+| 1 | Under **Match sources**, click **Add**. | A **New Row** form. |
 | 2 | Fill in **Object Name** `Not_An_Object__c`, any **Value Field** and **Parent Field**, **Normalization** **Email**, and click **Save**. | Refused: **Not_An_Object__c is not an object in this org. Check its API name.** Nothing is added. |
 | 3 | Change **Object Name** to `Contact`, **Value Field** `Nope__c`, **Parent Field** `AccountId`. Save. | **Nope__c is not a field on Contact. Check its API name.** |
 | 4 | Set **Value Field** `Email`, **Parent Field** `Email`. Save. | Refused with a message that **Email** on **Contact** is not a lookup to a contact, account or Individual. |
 | 5 | Set **Normalization** **Address**, **Value Field** `MailingStreet`, **Parent Field** `AccountId`, leave **Postal Code Field** empty. Save. | **An address source needs a postal code field: the street is compared together with it.** |
-| 6 | Click **Cancel**. | **Added by your organization** is unchanged. |
+| 6 | Click **Cancel**. | **Added by Your Organization** is unchanged. |
 
 **Cleanup:** None.
 
@@ -123,7 +123,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Duplicate Review** from yourself and confirm. | A message says you no longer have it. |
+| 1 | In **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Duplicate Review** from yourself and confirm. | A message says you no longer have it. |
 | 2 | Reload **Org Optimizer**, **Duplicates**. | Under **Possible duplicates**: **Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. ...** No pairs are listed. |
 | 3 | Look at **Scan for duplicates**. | Disabled. |
 
@@ -137,7 +137,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open **Org Optimizer**. | Only **Overview** and **Data quality**. No **Duplicates**. |
-| 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
+| 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
 | 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Duplicates**. **Overview** lists one section. |
 | 4 | Choose **Duplicates**. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
 | 5 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open this page**. |

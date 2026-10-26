@@ -87,7 +87,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-FIND-06: Save, share and delete a query
 
 **Purpose:** confirm saved queries, Save as, sharing, and the delete confirmation.
-**Prerequisites:** admin and staff; staff given **BarnCRM Find and Export** on BarnCRM Settings, **Access**, **Extra permissions** (see [Access](../admin-guide/access.md)).
+**Prerequisites:** admin and staff; staff given **BarnCRM Find and Export** on BarnCRM Settings, **Access**, **Extra Permissions** (see [Access](../admin-guide/access.md)).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -142,7 +142,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Log in as read-only. Search the App Launcher for "Find". | No BarnCRM **Find** tab. |
 | 2 | Log in as staff and repeat. | No **Find** tab. |
-| 3 | As admin, on BarnCRM Settings, **Access**, give staff **BarnCRM Find and Export** under **Extra permissions**. Log in as staff again. | The **Find** and **Data Manager** tabs are available. |
+| 3 | As admin, on BarnCRM Settings, **Access**, give staff **BarnCRM Find and Export** under **Extra Permissions**. Log in as staff again. | The **Find** and **Data Manager** tabs are available. |
 | 4 | As staff, run a Contact query. | Results show. **Run**, **Export to CSV**, **Export to Excel**, **Export to Files** and **Summarize** are offered; **Bulk update** and **Bulk delete** are not. Cells show no edit pencil. |
 | 5 | As staff, open an object staff cannot read (if your org has one), or ask admin to note a field staff cannot see. | That object is not offered, and that field is not offered as a column or a condition. |
 | 6 | As admin, remove **BarnCRM Find and Export** from staff. Log in as staff. | **Find** is gone again. |

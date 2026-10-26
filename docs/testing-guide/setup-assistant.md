@@ -75,7 +75,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 3 | Open **BarnCRM Settings**, **Access** in another tab. | **Read Only Tester** is on the **Read Only** card. |
 | 4 | Back in the assistant, click **Next**, to step 6, **Set your organization's identity**. | **Legal name, as registered** and **Address, as you want it printed**; with Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
 | 5 | Enter `Riverside Test Trust` and `1 Main St, Springfield, IL 62701`. Click **Save**. | The step finishes and the assistant moves on. |
-| 6 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; **Organization address** reads the address. **Recent changes** lists both. |
+| 6 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; **Organization address** reads the address. Open **General**: **Recent Changes** lists both. |
 
 **Cleanup:** None.
 
@@ -88,7 +88,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 |---|---|---|
 | 1 | Go to step 7, **Choose which modules to turn on**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
 | 2 | Click **Next**. | Step 8, **Bring in your data**, with **Load the sample data** and **Import a spreadsheet**. Step 7 shows as done. |
-| 3 | Click **Load the sample data**. | The **Sample data** card opens inside the step with status **Loaded** and **Load sample data** disabled. |
+| 3 | Click **Load the sample data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load sample data** disabled. |
 | 4 | Click **Import a spreadsheet**. | The **Import** tab opens. Go back to **Home**. |
 | 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check that everything works**, opens. With Giving, an **Enter your first gift** control is offered. The forward button reads **Finish**. |
 
@@ -115,7 +115,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Sample data**. | Status **Loaded**, a warning "Sample data is for scratch orgs, sandboxes, and demos. Never load it into a production org.", tiles for **Households**, **Contacts**, **Organizations**, **Relationships** and **Affiliations**. **Load sample data** is disabled; **Remove sample data** is enabled. |
+| 1 | Open **BarnCRM Settings**, **General**, **Sample Data**. | Status **Loaded**, a warning "Sample data is for scratch orgs, sandboxes, and demos. Never load it into a production org.", tiles for **Households**, **Contacts**, **Organizations**, **Relationships** and **Affiliations**. **Load sample data** is disabled; **Remove sample data** is enabled. |
 | 2 | Click **Remove sample data**. | A dialog "Remove sample data?": "This permanently deletes every household, contact, and organization created by the sample data loader. Records you entered yourself are not affected." with **Confirm** and **Cancel**. |
 | 3 | Click **Cancel**. | Nothing changes. |
 | 4 | Click **Remove sample data** and **Confirm**. | Status **Removing**; both buttons are disabled. The card refreshes by itself. |
@@ -133,7 +133,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Sample data**, click **Load sample data**. | A dialog "Load sample data?": "This adds 200 households, 440 contacts, 25 organizations, and the relationships and affiliations between them to this org, plus sample records for each installed module..." with **Confirm**. |
+| 1 | In **Sample Data**, click **Load sample data**. | A dialog "Load sample data?": "This adds 200 households, 440 contacts, 25 organizations, and the relationships and affiliations between them to this org, plus sample records for each installed module..." with **Confirm**. |
 | 2 | Click **Confirm**. | Status **Loading**; both buttons disabled. |
 | 3 | Wait for it to finish. | Status **Loaded** and a "Sample data loaded." toast. **Households** 200, **Contacts** 440, **Organizations** 25; **Relationships** and **Affiliations** above zero. |
 | 4 | Open the bell. | One notification, **Sample data load finished**: "200 households, 440 people and 25 organizations are ready to explore." |
@@ -150,7 +150,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings**, **General**, **Sample data**. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load sample data** or **Remove sample data**. |
+| 1 | As read-only, open **BarnCRM Settings**, **General**, **Sample Data**. | The card shows its status and counts, and "You need the Manage BarnCRM Settings permission to load or remove sample data." There is no **Load sample data** or **Remove sample data**. |
 | 2 | Open **Home**. | No **Setup checklist** and no **Setup complete** tile. |
 | 3 | Repeat steps 1 and 2 as staff. | The same. |
 

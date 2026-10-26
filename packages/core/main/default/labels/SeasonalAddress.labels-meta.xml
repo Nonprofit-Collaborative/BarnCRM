@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Settings console: heading of the seasonal swap panel</shortDescription>
-        <value>Seasonal address swap</value>
+        <value>Seasonal Address Swap</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_PermissionRequired</fullName>

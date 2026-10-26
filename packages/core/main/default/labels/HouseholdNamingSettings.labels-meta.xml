@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading above the preview table</shortDescription>
-        <value>How five sample households would read</value>
+        <value>How Five Sample Households Would Read</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_ReadOnly</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Naming settings heading</shortDescription>
-        <value>Household names and greetings</value>
+        <value>Household Names and Greetings</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_TokenHelp</fullName>

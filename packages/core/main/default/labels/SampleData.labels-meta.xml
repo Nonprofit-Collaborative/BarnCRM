@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sample Data card title</shortDescription>
-        <value>Sample data</value>
+        <value>Sample Data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_ConfirmButton</fullName>
