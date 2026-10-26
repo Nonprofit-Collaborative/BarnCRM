@@ -200,10 +200,11 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
 ## Your organization's address
 
-The **Organization** section shows your mailing address as one **Organization address**
+The **Organization** section shows your mailing address as one **Organization Address**
 block, laid out like a Salesforce address: **Street**, **Street 2**, then **City**, **State**
 and **Zip Code** on one row, then **Country**. Like the household naming patterns, the block
-has its own **Save address** button, and its changes appear in **Recent changes**.
+has its own **Save address** button, and its changes appear in **Recent Changes** on the
+**General** page.
 
 - You can leave the whole address blank.
 - Once you fill in any part, **Street**, **City**, **State** and **Zip Code** are required and
