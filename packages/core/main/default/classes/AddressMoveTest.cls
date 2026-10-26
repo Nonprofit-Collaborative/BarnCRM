@@ -1,9 +1,9 @@
 /**
- * The Addresses card's two household moves (R-AD9, ADR-NEXT): Use for Whole Household and
- * Update Everyone's Address, in both membership modes, in "Nobody moves until you choose",
- * for many households at once, and refused for a user who may not make them.
+ * The two household moves (R-AD9, ADR-NEXT) as AddressService makes them: Use for Whole
+ * Household and Update Everyone's Address, in both membership modes, in "Nobody moves until
+ * you choose", for many households at once, and refused for a user who may not make them.
  */
-@IsTest(testFor='ApexClass:AddressMoveController, ApexClass:AddressService')
+@IsTest(testFor='ApexClass:AddressService, ApexClass:HouseholdService')
 private class AddressMoveTest {
     @TestSetup
     static void createTestUser() {
@@ -33,9 +33,12 @@ private class AddressMoveTest {
             insert anasOwn;
 
             Test.startTest();
-            AddressMoveController.useForWholeHousehold(anasOwn.Id, garcia.Id);
+            List<Address__c> added = AddressService.useForWholeHousehold(
+                new Map<Id, Id>{ anasOwn.Id => garcia.Id }
+            );
             Test.stopTest();
 
+            Assert.areEqual(1, added.size(), 'The household gets one new address.');
             Assert.areEqual(
                 OWN_STREET,
                 primaryStreetOf(garcia.Id),
@@ -75,7 +78,7 @@ private class AddressMoveTest {
             insert anasOwn;
 
             Test.startTest();
-            AddressMoveController.useForWholeHousehold(anasOwn.Id, garcia.Id);
+            AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => garcia.Id });
             Test.stopTest();
 
             Assert.areEqual(
@@ -87,7 +90,7 @@ private class AddressMoveTest {
     }
 
     @IsTest
-    static void inJunctionModeThePersonPicksOneOfTheirHouseholds() {
+    static void inJunctionModeAPersonsOtherHouseholdCanTakeTheirAddress() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account garcia = householdAtHome('The Garcia Family');
@@ -115,21 +118,23 @@ private class AddressMoveTest {
             insert anasOwn;
 
             Test.startTest();
-            AddressMoveController.CardContext context = AddressMoveController.getCardContext(
-                ana.Id
+            Map<Id, Set<Id>> households = HouseholdService.currentHouseholdIdsByPerson(
+                new Set<Id>{ ana.Id }
             );
             String refusal;
             try {
-                AddressMoveController.useForWholeHousehold(anasOwn.Id, stranger.Id);
-            } catch (AuraHandledException refused) {
+                AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => stranger.Id });
+            } catch (AddressService.AddressMoveException refused) {
                 refusal = refused.getMessage();
             }
-            AddressMoveController.useForWholeHousehold(anasOwn.Id, garcia.Id);
+            AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => garcia.Id });
             Test.stopTest();
 
-            Assert.isFalse(context.isHousehold, 'Ana is a person.');
-            Assert.areEqual(2, context.households.size(), 'She belongs to two households.');
-            Assert.areEqual(nowak.Id, context.households[0].id, 'Her own household comes first.');
+            Assert.areEqual(
+                new Set<Id>{ nowak.Id, garcia.Id },
+                households.get(ana.Id),
+                'Ana belongs to two households, so the card asks which.'
+            );
             Assert.areEqual(
                 System.Label.Core_Address_MoveNotTheirHousehold,
                 refusal,
@@ -145,7 +150,7 @@ private class AddressMoveTest {
     }
 
     @IsTest
-    static void aHouseholdsAddressIsNotUsedForWholeHousehold() {
+    static void aHouseholdsOwnAddressIsNotAPersonsToUse() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
             insert garcia;
@@ -159,20 +164,15 @@ private class AddressMoveTest {
             Test.startTest();
             String refusal;
             try {
-                AddressMoveController.useForWholeHousehold(householdAddress.Id, garcia.Id);
-            } catch (AuraHandledException refused) {
+                AddressService.useForWholeHousehold(
+                    new Map<Id, Id>{ householdAddress.Id => garcia.Id }
+                );
+            } catch (AddressService.AddressMoveException refused) {
                 refusal = refused.getMessage();
             }
-            AddressMoveController.CardContext context = AddressMoveController.getCardContext(
-                garcia.Id
-            );
             Test.stopTest();
 
             Assert.areEqual(System.Label.Core_Address_MoveNotAPersonsAddress, refusal, 'Refused.');
-            Assert.isTrue(
-                context.isHousehold,
-                'The household card offers Update Everyone\'s Address.'
-            );
         }
     }
 
@@ -239,16 +239,22 @@ private class AddressMoveTest {
             Assert.isNull(mailingStreetOf(luis.Id), 'In Manual the new primary reached nobody.');
 
             Test.startTest();
-            AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
-                garcia.Id
+            AddressService.HouseholdMove move = AddressService.householdMoves(
+                    new Set<Id>{ garcia.Id }
+                )
+                .get(garcia.Id);
+            AddressService.updateEveryonesAddress(
+                new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id, luis.Id } }
             );
-            AddressMoveController.updateEveryonesAddress(garcia.Id, new List<Id>{ ana.Id });
             Test.stopTest();
 
-            Assert.isTrue(preview.hasPrimary, 'The household has a primary address.');
-            Assert.areEqual(1, preview.moving.size(), 'Only Luis takes it on his own.');
-            Assert.areEqual(luis.Id, preview.moving[0].id, 'Luis.');
-            Assert.areEqual(2, preview.withTheirOwn.size(), 'Ana and Sofia have their own.');
+            Assert.areEqual(WINTER_STREET, move.primary.Street__c, 'The household\'s primary.');
+            Assert.areEqual(new Set<Id>{ luis.Id }, move.taking, 'Only Luis takes it on his own.');
+            Assert.areEqual(
+                new Set<Id>{ ana.Id, sofia.Id },
+                move.withTheirOwn,
+                'Ana and Sofia have their own.'
+            );
             Assert.areEqual(WINTER_STREET, mailingStreetOf(luis.Id), 'Luis moves.');
             Assert.areEqual(
                 WINTER_STREET,
@@ -272,8 +278,8 @@ private class AddressMoveTest {
             Test.startTest();
             String refusal;
             try {
-                AddressMoveController.updateEveryonesAddress(empty.Id, null);
-            } catch (AuraHandledException refused) {
+                AddressService.updateEveryonesAddress(new Map<Id, Set<Id>>{ empty.Id => null });
+            } catch (AddressService.AddressMoveException refused) {
                 refusal = refused.getMessage();
             }
             Test.stopTest();
@@ -334,24 +340,25 @@ private class AddressMoveTest {
         }
 
         Test.startTest();
-        List<String> refusals = new List<String>();
+        Integer refused = 0;
         System.runAs(reader) {
             try {
-                AddressMoveController.updateEveryonesAddress(garcia.Id, null);
-            } catch (AuraHandledException refused) {
-                refusals.add(refused.getMessage());
+                AddressService.updateEveryonesAddress(
+                    new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>() }
+                );
+            } catch (Exception noEdit) {
+                refused++;
             }
             try {
-                AddressMoveController.useForWholeHousehold(anasOwn.Id, garcia.Id);
-            } catch (AuraHandledException refused) {
-                refusals.add(refused.getMessage());
+                AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => garcia.Id });
+            } catch (Exception noEdit) {
+                refused++;
             }
         }
         Test.stopTest();
 
         System.runAs(TestUsers.admin()) {
-            Assert.areEqual(2, refusals.size(), 'Both moves are refused.');
-            Assert.areEqual(System.Label.Core_Address_MoveFailed, refusals[0], 'In plain words.');
+            Assert.areEqual(2, refused, 'Both moves are refused: they are written as the user.');
             Assert.isNull(mailingStreetOf(luis.Id), 'Luis did not move.');
             Assert.areEqual(HOME_STREET, primaryStreetOf(garcia.Id), 'Nor did the household.');
         }
