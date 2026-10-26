@@ -166,6 +166,10 @@
     <apexClass>StewardshipPlanController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>StewardshipStartController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Donor_Level_Changed_Date__c</field>

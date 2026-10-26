@@ -81,11 +81,11 @@ You should see: the plan leave **Running Plans**. BarnCRM does not close a plan 
 
 ## To start a stewardship plan by hand
 
-Use this for a donor who should get a plan that no gift started, for example after a meeting. Your admin chooses which plans can be started by hand ([Stewardship plans](../admin-guide/stewardship-plans.md)).
+Use this for a donor who should get a plan that no gift started, for example after a meeting. Any plan your admin has turned on can be started by hand ([Stewardship plans](../admin-guide/stewardship-plans.md)).
 
-1. Open the person or organization.
-2. Use the action that starts a stewardship plan, and choose the plan.
-3. Confirm.
+1. In the Fundraising app, open the person, household or organization.
+2. Click **Start Stewardship Plan** and choose the plan in **Plan**. Its description shows under the list.
+3. Click **Start plan**.
 
 You should see: the plan in the donor's **Stewardship Plans** list with **Status** Running, and its tasks in the task lists of the people they are assigned to. The same plan does not start twice on a donor while it is running.
 
