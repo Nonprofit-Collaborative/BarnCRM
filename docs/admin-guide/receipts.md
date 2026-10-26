@@ -38,7 +38,7 @@ In the Receipts section:
 
 - **Receipt number prefix.** Two or three letters, usually your initials. The number is
   built as prefix, year, counter: `HFH-2026-000001`.
-- **Next counter.** Leave it at 1 unless you are moving from another system and want to
+- **Receipt next counter.** Leave it at 1 unless you are moving from another system and want to
   carry on from where it stopped. Set it once, before you issue anything. This is the only
   place a receipt number is ever chosen by a person: BarnCRM issues every number itself,
   from this counter, when it creates the receipt.
@@ -69,8 +69,8 @@ Still in the Receipts section:
 
 ### 4. Write your two letters
 
-Also in the Receipts section, **Receipt letters and year end statements** opens the Receipts
-page, which has two tabs. It opens as its own page rather than inside the settings console,
+Also in the Receipts section, **Receipt letters and year end statements** opens the Receipt
+Letters page (the **Receipt Letters** tab), which has two tabs. It opens as its own page rather than inside the settings console,
 which is how every page the Giving module adds behaves. On the **Receipt templates** tab,
 BarnCRM ships one letter of each kind:
 
@@ -130,7 +130,7 @@ Staff.
 
 Start from the sample data.
 
-1. Open **BarnCRM Settings**, then **Receipts**. Set the prefix to `TEST`, leave the next
+1. Open **BarnCRM Settings**, then **Receipts**. Set the prefix to `TEST`, leave the receipt next
    counter at 1, and set the statement year to last year.
 2. Open **Receipt letters and year end statements**, and on the **Receipt templates** tab
    check that a letter of each kind is in use. If one is not, pick it and click **Use this

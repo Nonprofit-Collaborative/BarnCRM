@@ -83,8 +83,8 @@ because they have not had the same amount of time.
 
 ## How to turn it on
 
-1. **Make the two fiscal years agree.** In BarnCRM Settings, open the **Rollups** page and
-   read **Fiscal year start month**. Then, in Salesforce Setup, search for **Fiscal Year** and
+1. **Make the two fiscal years agree.** In BarnCRM Settings, open the **General** section
+   and read **Fiscal year start month**. Then, in Salesforce Setup, search for **Fiscal Year** and
    check that the org's
    fiscal year starts in the same month. Salesforce reports can only read the Setup value, and
    the donor fields these reports rest on are calculated from the BarnCRM Settings value, so
@@ -95,7 +95,7 @@ because they have not had the same amount of time.
    donor whose rollups have never run is invisible to them. After the first run the rollups
    keep themselves current as gifts are entered.
 3. **Give people access.** Assign the Giving module's **Giving Staff** or **Giving Read Only**
-   permission set in Setup, as for the dashboard. The report folder ships public read only, so
+   permission set on the Access page (Extra permissions), as for the dashboard. The report folder ships public read only, so
    the reports themselves need no sharing.
 4. Open the **Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
 

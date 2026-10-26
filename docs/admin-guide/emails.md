@@ -45,7 +45,7 @@ Maria does this from the sample data.
 
 1. Open the **BarnCRM** app, click the **Contacts** tab, and open **Maria
    Whitfield**.
-2. Look at the **Email addresses** section. The three boxes, **Personal Email**, **Work
+2. Look at the **Reaching This Person** section. The three boxes, **Personal Email**, **Work
    Email** and **Alternate Email**, are empty, and **Preferred Email** is empty too. The
    ordinary **Email** box above it already has her address in it.
 3. Click into **Personal Email** and type `maria.whitfield@example.org`. Click into **Work

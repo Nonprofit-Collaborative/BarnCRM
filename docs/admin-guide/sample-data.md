@@ -90,11 +90,12 @@ loader's.
    If a step stops on an error, the load stops there: the card shows what did load, the
    error is in the [Error Log](error-log.md), and **Remove sample data** clears it for
    another try.
-5. With Giving installed: when it says **Loaded**, open **BarnCRM Settings > Rollups** and
-   select **Recalculate**. Giving totals (total giving, this year, largest gift, fund and appeal
-   totals) are worked out by the nightly rollup run rather than as each gift is saved, so
-   until you recalculate, or until tonight, those fields are empty while the gift records
-   themselves are all there.
+5. With Giving installed: when it says **Loaded**, give the totals a few minutes. Giving
+   totals (total giving, this year, largest gift, fund and appeal totals) are shipped in
+   **Both** mode, so they are worked out in the background queue as the gifts are saved, and
+   a bulk load like this one catches up within minutes. If a total is still empty after that,
+   open **BarnCRM Settings > Rollups** and select **Recalculate**; the nightly run would also
+   correct it tonight.
 
 If you came here from the Setup Assistant, the same **Sample data** step takes you to
 this screen. Loading sample data is entirely optional; skipping it does not block any
@@ -188,8 +189,8 @@ household records, names, greetings, member counts, and Members panel.
   load, remove what loaded, then load again.
 - **Expecting the giving totals to appear straight away (with Giving).** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are
-  worked out by the rollup run. Recalculate from **BarnCRM Settings > Rollups**, or wait
-  for tonight.
+  worked out in the background queue, which catches up within minutes. If they are still
+  empty after that, Recalculate from **BarnCRM Settings > Rollups**, or wait for tonight.
 - **Reporting on sample gifts as if the dates were fixed (with Giving).** Gift dates are counted back
   from the day you loaded the set, so two orgs loaded on different days hold different
   dates. That is deliberate: it keeps "this year" full whenever you load.

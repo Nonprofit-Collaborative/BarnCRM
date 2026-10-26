@@ -101,7 +101,7 @@ Start from the sample data. The first part is David's work, the last step is Jen
 2. Set **Type** to Pledge.
 3. In **Donor**, choose a person from a household in the sample data, for example Ana
    Nguyen. Leave the account donor field empty: a commitment has one donor, not two.
-4. Set **Expected total** to 1,200 and **Amount** to 100. The amount is what is expected
+4. Set **Expected Total** to 1,200 and **Amount** to 100. The amount is what is expected
    each time, not the total.
 5. Set **Frequency** to Monthly and **Start date** to the first day of next month.
 6. Leave **Day of month** empty. The day of the start date is used.
@@ -124,7 +124,7 @@ Start from the sample data. The first part is David's work, the last step is Jen
 If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
 
-If David had left **Expected total** empty, BarnCRM would have filled it in on save as the
+If David had left **Expected Total** empty, BarnCRM would have filled it in on save as the
 amount times the installments planned, 1,200 here, so the balance is right from the start.
 It does the same whenever a pledge is saved with the total cleared. A total you type is
 always kept.
