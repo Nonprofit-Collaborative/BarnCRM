@@ -10,13 +10,22 @@ private class StewardshipPlanTriggerHandlerTest {
     }
 
     private static Stewardship_Plan__c runningPlan() {
-        Stewardship_Plan_Template__c template = new Stewardship_Plan_Template__c(
-            Name = 'Hand closed plan',
-            Plan_Key__c = 'hand_closed_plan',
-            Active__c = true,
-            Trigger_Event__c = StewardshipService.EVENT_GIFT_RECEIVED
-        );
-        insert template;
+        List<Stewardship_Plan_Template__c> found = [
+            SELECT Id
+            FROM Stewardship_Plan_Template__c
+            WHERE Plan_Key__c = 'hand_closed_plan'
+        ];
+        Stewardship_Plan_Template__c template = found.isEmpty()
+            ? new Stewardship_Plan_Template__c(
+                  Name = 'Hand closed plan',
+                  Plan_Key__c = 'hand_closed_plan',
+                  Active__c = true,
+                  Trigger_Event__c = StewardshipService.EVENT_GIFT_RECEIVED
+              )
+            : found[0];
+        if (found.isEmpty()) {
+            insert template;
+        }
         Contact person = new Contact(LastName = 'Okafor');
         insert person;
         Stewardship_Plan__c plan = new Stewardship_Plan__c(

@@ -41,6 +41,8 @@ private class ReceiptGiftStatusTest {
                 gift.Status__c = 'Cancelled';
                 update gift;
                 assertRefused(gift.Id, 'A cancelled gift was receipted.');
+                gift.Status__c = 'Pending';
+                update gift;
                 gift.Status__c = 'Received';
                 update gift;
                 Receipt__c issued = ReceiptService.issueForGift(gift.Id);
