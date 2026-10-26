@@ -207,10 +207,26 @@ at something, you choose it:
 - **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
-- **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
+- **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
+
+## Values that come from Setup
+
+A few things BarnCRM needs are already held by Salesforce Setup. BarnCRM shows them on this
+page, read only, and keeps no copy that could drift from Setup. Each one says where in Setup it
+is changed; after you change it there, reload this page to see the new value.
+
+| Section | Shown | Where to change it |
+|---|---|---|
+| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Setup, Company Settings, Fiscal Year |
+| Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Setup, Company Settings, Company Information |
+
+BarnCRM follows the standard fiscal year: each year starts on the first day of the start month.
+If your org uses a custom fiscal year, Health Check says so, because reports then follow your
+custom periods while BarnCRM totals stay in whole years (see
+[Health Check](health-check.md#what-health-check-looks-at)).
 
 ## When a section needs a change in Setup
 
@@ -220,8 +236,7 @@ one, a note at the top of the section says, before any setting:
 
 - **what** to change in Setup,
 - **why** BarnCRM needs it, in one sentence,
-- **where** it is, as a path in plain words, for example "Setup, Company Settings, Fiscal
-  Year".
+- **where** it is, as a path in plain words, for example "Setup, Apex Settings".
 
 Where BarnCRM can read the answer without any extra permission, the note also says whether it
 is already done: **Done** with a green tick, or **Not done yet** with a warning icon. Otherwise
@@ -230,7 +245,6 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 
 | Section | What to change in Setup | Checked by BarnCRM |
 |---|---|---|
-| General | Make the Setup fiscal year start in the same month as **Fiscal year start month** (Setup, Company Settings, Fiscal Year) | Yes |
 | General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra permissions | No |
 | Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |

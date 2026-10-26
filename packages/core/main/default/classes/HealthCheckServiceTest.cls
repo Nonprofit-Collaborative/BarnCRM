@@ -956,78 +956,59 @@ private class HealthCheckServiceTest {
     }
 
     @IsTest
-    static void twoFiscalYearsThatDisagreeAreReportedWithBothMonths() {
+    static void aCustomFiscalYearIsReportedWithTheStartMonth() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, false, false);
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = 1;
+            FiscalYearSelector.customFiscalYearsOverride = true;
+            FiscalYearSelector.setTestStartMonth(7);
 
             HealthCheckService.Finding finding = find(
                 HealthCheckService.run(),
-                'fiscal_year_mismatch'
+                'custom_fiscal_year'
             );
 
             System.assertNotEquals(
                 null,
                 finding,
-                'ADR-0025: the rollups are computed from the BarnCRM Settings month and the ' +
-                    'retention reports from the Setup month, so a disagreement makes every year based ' +
-                    'number wrong in a way nobody notices.'
+                'ADR-NEXT: reports follow custom fiscal year periods while BarnCRM totals run ' +
+                'in whole years, so an org with a custom year is told the two can disagree.'
             );
             System.assert(
                 finding.detail.contains(FiscalYearSelector.monthName(7)),
-                'The finding names the month BarnCRM uses. Detail was: ' + finding.detail
-            );
-            System.assert(
-                finding.detail.contains(FiscalYearSelector.monthName(1)),
-                'And the month Setup uses, because the fix is deciding which one is right. ' +
-                    'Detail was: ' +
-                    finding.detail
+                'The finding names the month the totals start from. Detail was: ' + finding.detail
             );
             System.assertEquals(
-                HealthCheckService.SEVERITY_WARNING,
+                HealthCheckService.SEVERITY_INFO,
                 finding.severity,
-                'Nothing is broken today: the numbers are simply measured on two boundaries.'
+                'Information: an org may keep its custom year on purpose.'
             );
             System.assertEquals(
-                HealthCheckService.SECTION_GENERAL,
+                null,
                 finding.fixTarget,
-                'The one field an administrator can change from inside the app is in General ' +
-                'settings, and the fix button opens it.'
+                'Only Setup can change it, so there is no fix button.'
             );
         }
     }
 
     @IsTest
-    static void twoFiscalYearsThatAgreeAreNotReported() {
+    static void aStandardFiscalYearRaisesNoFiscalYearFinding() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, false, false);
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = 7;
+            FiscalYearSelector.customFiscalYearsOverride = false;
+            FiscalYearSelector.setTestStartMonth(7);
+
+            List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'fiscal_year_mismatch'),
-                'Both fiscal years start in July, which is the state the check exists to ask for.'
+                find(findings, 'custom_fiscal_year'),
+                'A standard fiscal year is the one BarnCRM uses, so there is nothing to say.'
             );
-        }
-    }
-
-    @IsTest
-    static void aSetupFiscalYearNobodyCouldReadIsNotAMismatch() {
-        System.runAs(TestUsers.admin()) {
-            OrgShapeDetector.overrideShape = shape(false, false, false, false);
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = null;
-
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'fiscal_year_mismatch'),
-                'A value that could not be read is not evidence that the two disagree, so the ' +
-                'report says nothing rather than accusing the org of a mismatch.'
+                find(findings, 'fiscal_year_mismatch'),
+                'BarnCRM keeps no fiscal year of its own (ADR-NEXT), so there is no second ' +
+                'fiscal year to disagree with Setup.'
             );
         }
     }

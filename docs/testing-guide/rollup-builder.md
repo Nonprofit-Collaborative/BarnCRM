@@ -165,7 +165,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Rollup Builder**, open the **Rollup Settings** tab. | The settings console shows only the module's settings: **Default rollup mode** and **When instant totals are calculated**. **Fiscal year start month** is not here. |
+| 1 | In **BarnCRM Rollup Builder**, open the **Rollup Settings** tab. | The settings console shows only the module's settings: **Default rollup mode** and **When instant totals are calculated**. **Fiscal year start month** is not here (it is the org's, shown read only in **BarnCRM Settings**, **General**). |
 | 2 | Change **Default rollup mode** to **Every night** and save. | The setting saves and shows **Every night**. |
 | 3 | Open **BarnCRM Settings**, **Rollups** section. | **Default rollup mode** shows **Every night** there too. |
 | 4 | On the **Rollup Builder** tab, click **New rollup**, complete steps 1 to 4 (any valid choices) and go to **Check and save**. | **Mode** is preselected as **Every night**. |

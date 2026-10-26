@@ -497,7 +497,7 @@ describe('c-settings-console', () => {
     getConsoleModel.mockResolvedValue({
       canEdit: true,
       sections: [
-        { name: 'General', settings: [row('Fiscal_Year_Start_Month__c', 'General', 'Core')] },
+        { name: 'General', settings: [row('Coexistence_Mode__c', 'General', 'Core')] },
         {
           name: 'Rollups',
           settings: [
@@ -517,6 +517,55 @@ describe('c-settings-console', () => {
     expect(navItems[0].name).toBe('Rollups');
     expect(element.shadowRoot.querySelectorAll('lightning-input')).toHaveLength(2);
     expect(element.shadowRoot.querySelector('c-settings-search')).toBeNull();
+  });
+
+  it('shows a value from Setup read only, above the rows it heads, and never sends it', async () => {
+    const row = (key, dataType, value) => ({
+      key,
+      label: key,
+      description: null,
+      dataType,
+      section: 'Organization',
+      module: 'Core',
+      component: null,
+      helpUrl: null,
+      value,
+      checked: false,
+      options: []
+    });
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        {
+          name: 'Organization',
+          settings: [
+            row('Name', 'SetupValue', 'Barn Rescue'),
+            row('Organization_Legal_Name__c', 'Text', 'Barn Rescue Inc.')
+          ]
+        }
+      ]
+    });
+    const element = build();
+    await settle();
+
+    const inputs = element.shadowRoot.querySelectorAll('lightning-input');
+    expect(inputs).toHaveLength(2);
+    expect(inputs[0].dataset.kind).toBe('SetupValue');
+    expect(inputs[0].value).toBe('Barn Rescue');
+    expect(inputs[0].readOnly).toBe(true);
+    expect(inputs[0].fieldLevelHelp).toBe('c.Core_Settings_FromSetupHelp');
+    expect(inputs[1].dataset.key).toBe('Organization_Legal_Name__c');
+    expect(inputs[1].readOnly).toBeFalsy();
+
+    inputs[1].value = 'Barn Rescue Society';
+    inputs[1].dispatchEvent(new CustomEvent('change'));
+    await settle();
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({
+      values: { Organization_Legal_Name__c: 'Barn Rescue Society' }
+    });
   });
 
   it('offers a module its own page instead of trying to render it', async () => {

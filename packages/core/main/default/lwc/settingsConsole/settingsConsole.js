@@ -23,6 +23,7 @@ import COLUMN_NEW from '@salesforce/label/c.Core_Settings_ColumnNewValue';
 import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
+import FROM_SETUP_HELP from '@salesforce/label/c.Core_Settings_FromSetupHelp';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
@@ -120,6 +121,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
+    fromSetupHelp: FROM_SETUP_HELP,
     openSection: OPEN_SECTION,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
@@ -261,6 +263,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isRecord: setting.dataType === 'Record',
       isRecordTypeList: setting.dataType === 'RecordTypeList',
       isComponent: setting.dataType === 'Component',
+      // A value Setup holds: shown read only, never saved (ADR-NEXT).
+      isSetupValue: setting.dataType === 'SetupValue',
       hasHelp: Boolean(setting.helpUrl),
       learnMoreLabel: LEARN_MORE_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,

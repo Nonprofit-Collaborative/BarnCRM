@@ -586,38 +586,112 @@ private class SettingsControllerTest {
     @IsTest
     static void setupChecksSayWhetherEachPrerequisiteIsMet() {
         System.runAs(TestUsers.admin()) {
-            Integer barnMonth = FiscalYearSelector.settingsFiscalYearStartMonth();
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = barnMonth;
             SettingsController.emailAllowedOverride = true;
             Map<String, Boolean> met = SettingsController.getSetupChecks();
 
-            FiscalYearSelector.orgStartMonthOverride = Math.mod(barnMonth, 12) + 1;
             SettingsController.emailAllowedOverride = false;
             Map<String, Boolean> unmet = SettingsController.getSetupChecks();
 
-            Assert.isTrue(met.get(SettingsController.CHECK_FISCAL_YEAR), 'Same month is done');
             Assert.isTrue(met.get(SettingsController.CHECK_EMAIL), 'Email allowed is done');
-            Assert.isFalse(unmet.get(SettingsController.CHECK_FISCAL_YEAR), 'Months differ');
             Assert.isFalse(unmet.get(SettingsController.CHECK_EMAIL), 'Email blocked');
+            Assert.isFalse(
+                met.containsKey('fiscalYear'),
+                'BarnCRM keeps no fiscal year of its own (ADR-NEXT), so there is nothing to ' +
+                'compare with Setup and no fiscal year check'
+            );
         }
+    }
+
+    @IsTest
+    static void theConsoleShowsSetupValuesReadOnlyWhereTheyBelong() {
+        System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.setTestStartMonth(7);
+            SetupValueSelector.organizationNameOverride = 'Barn Rescue';
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            SettingsController.SettingModel fiscal = rowWithKey(
+                model,
+                'General',
+                'FiscalYearStartMonth'
+            );
+            Assert.isNotNull(fiscal, 'General shows the fiscal year start from Setup');
+            Assert.areEqual('SetupValue', fiscal.dataType, 'Shown read only, never edited here');
+            Assert.areEqual(FiscalYearSelector.monthName(7), fiscal.value, 'The org month by name');
+            Assert.areEqual('Organization', fiscal.settingsObject, 'It names Setup, not a setting');
+
+            List<SettingsController.SettingModel> organization = rowsOf(model, 'Organization');
+            Assert.areEqual('Name', organization[0].key, 'Organization name heads its section');
+            Assert.areEqual('SetupValue', organization[0].dataType, 'Read only, from Setup');
+            Assert.areEqual('Barn Rescue', organization[0].value, 'The name Setup holds');
+            Assert.areEqual(
+                'Organization_Legal_Name__c',
+                organization[1].key,
+                'The legal name sits directly below it'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSetupValueRowNamingAnUnknownValueIsLeftOut() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Unknown_Setup_Value',
+                    MasterLabel = 'Unknown',
+                    Setting_Key__c = 'Phone',
+                    Settings_Object__c = 'Organization',
+                    Section__c = 'General',
+                    Module__c = 'Core',
+                    Data_Type__c = 'SetupValue',
+                    Sort_Order__c = 1
+                )
+            };
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            Assert.isNull(
+                rowWithKey(model, 'General', 'Phone'),
+                'Only the values SetupValueSelector lists can be shown, so a row cannot be ' +
+                'pointed at an arbitrary field'
+            );
+        }
+    }
+
+    private static List<SettingsController.SettingModel> rowsOf(
+        SettingsController.ConsoleModel model,
+        String sectionName
+    ) {
+        for (SettingsController.SectionModel section : model.sections) {
+            if (section.name == sectionName) {
+                return section.settings;
+            }
+        }
+        return new List<SettingsController.SettingModel>();
+    }
+
+    private static SettingsController.SettingModel rowWithKey(
+        SettingsController.ConsoleModel model,
+        String sectionName,
+        String key
+    ) {
+        for (SettingsController.SettingModel setting : rowsOf(model, sectionName)) {
+            if (setting.key == key) {
+                return setting;
+            }
+        }
+        return null;
     }
 
     @IsTest
     static void aSetupCheckThatCannotBeReadIsLeftOut() {
         System.runAs(TestUsers.admin()) {
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = null;
             SettingsController.emailAllowedOverride = true;
             Map<String, Boolean> checks = SettingsController.getSetupChecks();
 
-            Assert.isFalse(
-                checks.containsKey(SettingsController.CHECK_FISCAL_YEAR),
-                'An unreadable fiscal year is no answer, so the note shows its instruction only'
-            );
             Assert.isTrue(
                 checks.containsKey(SettingsController.CHECK_EMAIL),
-                'The other check still answers'
+                'The email check answers'
             );
 
             SettingsController.emailAllowedOverride = null;

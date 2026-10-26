@@ -976,13 +976,16 @@ their API names and definitions unchanged.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 | `Import_Trial_Rows__c` | integer | 25 | How many of a file's first rows a trial import commits before the rest (R-IB16); the wizard starts from it and the administrator can change it per file. Held between 1 and 2,000. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
 separated set of keys within 255 characters, which the eight step checklist fits with
 room to spare.
+
+`Fiscal_Year_Start_Month__c`, published here in v0.2, was removed in v0.8 (ADR-NEXT, owner
+decision 2026-10-26). BarnCRM has one fiscal year, the org's: R-R3 windows read the month the
+fiscal year starts in Setup, and the console's General section shows it read only.
 
 ### v0.3 keys
 
@@ -1195,7 +1198,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example Households, Automation, Access, Health. |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-NEXT). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
 | `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
@@ -1572,7 +1575,9 @@ builder is the only writer, and the `version` key exists so the format can chang
 anyone having to guess what an older row meant.
 
 **R-R3 Fiscal-year windows.** When Fiscal Year Aware is true, the window is computed at
-run time from the org's fiscal year start month (Section 12) and Fiscal Year Offset, and
+run time from the org's fiscal year start month (the month the fiscal year starts in Setup,
+Company Settings, Fiscal Year: `Organization.FiscalYearStartMonth`, read the same way for every
+user; ADR-NEXT) and Fiscal Year Offset, and
 it is measured on the Fiscal Date Attribute. A definition that sums an amount has no date
 of its own to bound, so the attribute that decides which year a record falls in is named
 separately; a definition that aggregates a date directly may leave it empty, and the
@@ -1794,8 +1799,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
-- **Settings keys:** `Fiscal_Year_Start_Month__c` (Section 12), `Rollup_Mode_Default__c`
-  (Section 14B).
+- **Settings keys:** `Rollup_Mode_Default__c` (Section 14B). The fiscal year is not a
+  BarnCRM setting: it is the org's, read from Setup (R-R3).
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
   Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
   how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
@@ -8669,6 +8674,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
+| v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-NEXT, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
 
 ---
 ## 32. Entity ownership by package

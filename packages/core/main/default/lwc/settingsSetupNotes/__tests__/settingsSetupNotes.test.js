@@ -49,26 +49,33 @@ describe('c-settings-setup-notes', () => {
   });
 
   it('says Done when the check is met and Not done yet when it is not', async () => {
-    getSetupChecks.mockResolvedValue({ fiscalYear: true, emailDeliverability: false });
+    getSetupChecks.mockResolvedValue({ emailDeliverability: true });
+    const met = note(await render('Error Log'), 'emailDeliverability');
+    expect(met.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_Done');
+    expect(met.querySelector('lightning-icon').iconName).toBe('utility:success');
 
-    const general = await render('General');
-    const fiscal = note(general, 'fiscalYear');
-    expect(fiscal.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_Done');
-    expect(fiscal.querySelector('lightning-icon').iconName).toBe('utility:success');
-    expect(note(general, 'metadata').querySelector('[data-id="status"]')).toBeNull();
-
+    document.body.removeChild(document.body.firstChild);
+    getSetupChecks.mockResolvedValue({ emailDeliverability: false });
     const errorLog = await render('Error Log');
     const email = note(errorLog, 'emailDeliverability');
     expect(email.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_NotDone');
     expect(email.querySelector('lightning-icon').iconName).toBe('utility:warning');
   });
 
-  it('asks Apex once however often the section changes', async () => {
-    getSetupChecks.mockResolvedValue({ fiscalYear: true });
+  it('has no fiscal year note: the General page shows the Setup value as a row instead', async () => {
+    const general = await render('General');
 
-    const element = await render('General');
+    expect(note(general, 'fiscalYear')).toBeNull();
+    expect(note(general, 'metadata').querySelector('[data-id="status"]')).toBeNull();
+    expect(getSetupChecks).not.toHaveBeenCalled();
+  });
+
+  it('asks Apex once however often the section changes', async () => {
+    getSetupChecks.mockResolvedValue({ emailDeliverability: true });
+
+    const element = await render('Error Log');
     element.section = 'Households';
-    element.section = 'General';
+    element.section = 'Error Log';
     await flushPromises();
 
     expect(getSetupChecks).toHaveBeenCalledTimes(1);
@@ -77,12 +84,12 @@ describe('c-settings-setup-notes', () => {
   it('shows the instruction alone when the check cannot be read', async () => {
     getSetupChecks.mockRejectedValue(new Error('unavailable'));
 
-    const element = await render('General');
+    const element = await render('Error Log');
 
-    const fiscal = note(element, 'fiscalYear');
-    expect(fiscal).not.toBeNull();
-    expect(fiscal.querySelector('[data-id="status"]')).toBeNull();
-    expect(fiscal.querySelector('lightning-icon').iconName).toBe('utility:info');
+    const email = note(element, 'emailDeliverability');
+    expect(email).not.toBeNull();
+    expect(email.querySelector('[data-id="status"]')).toBeNull();
+    expect(email.querySelector('lightning-icon').iconName).toBe('utility:info');
   });
 
   it('shows the notes a module page passes in, in place of any section', async () => {

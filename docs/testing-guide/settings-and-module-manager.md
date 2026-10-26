@@ -16,7 +16,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
 | 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import** and **Health**, plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
-| 3 | Click **General**. | **Edition**, **Features**, **Sample data**, **Custom metadata** and the setting rows show, each with a plain description. A **Needs a change in Setup** note at the top names **Setup, Company Settings, Fiscal Year** and shows **Done** or **Not done yet**. |
+| 3 | Click **General**. | **Edition**, **Features**, **Sample data**, **Custom metadata** and the setting rows show, each with a plain description. A **Needs a change in Setup** note at the top names **Setup, Apex Settings**. No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-14). |
 | 4 | Click **Learn more** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
@@ -225,3 +225,19 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
 **Cleanup:** None.
+
+## T-SET-14: Values that come from Setup
+
+**Purpose:** confirm the organization name and the fiscal year start month are shown read only from Setup, never edited in BarnCRM, and follow a change made in Setup.
+**Prerequisites:** admin user. Note the org's name and fiscal year start month in **Setup, Company Settings, Company Information** before you start.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings** and click **Organization**. | The first row is **Organization name**, showing the org's name exactly as Company Information shows it. It cannot be typed in. Its description says to change it in **Setup, Company Settings, Company Information**. **Organization legal name** is the next row, directly below it, and can be edited. |
+| 2 | Hover over the help icon next to **Organization name**. | "Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy." |
+| 3 | Click **General**. | A **Fiscal year start month** row shows the month the fiscal year starts in Setup, by name (for example **January**). It cannot be changed here, and its description says to change it in **Setup, Company Settings, Fiscal Year**, then recalculate rollups. There is no month list to choose from. |
+| 4 | Change **Organization legal name** and click **Save**. | Saved. **Recent changes** lists the legal name only; **Organization name** never appears there. |
+| 5 | In Setup, open **Company Information**, click **Edit**, add ` Test` to the end of **Organization Name** and save. Reload **BarnCRM Settings**, **Organization**. | **Organization name** shows the new name. |
+| 6 | Sign in as the staff user and open **BarnCRM Settings**, **Organization**. | **Organization name** shows the same value, read only. |
+
+**Cleanup:** In Setup, **Company Information**, set **Organization Name** back to what it was. Set **Organization legal name** back if you changed it in step 4.

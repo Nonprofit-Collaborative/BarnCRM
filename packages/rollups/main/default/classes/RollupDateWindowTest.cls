@@ -1,7 +1,7 @@
 /**
  * Fiscal year windows, against a fiscal year that does not start in January (canonical model R-R3).
- *
- * These tests have not been executed: no Salesforce org exists in this environment.
+ * The org's fiscal year cannot be changed from Apex, so its start month is injected through
+ * FiscalYearSelector, the one place the engine reads it (ADR-NEXT).
  */
 @IsTest(testFor='ApexClass:RollupDateWindow')
 private class RollupDateWindowTest {
@@ -11,10 +11,9 @@ private class RollupDateWindowTest {
     }
 
     @IsTest
-    static void fiscalYearWindowsResolveAgainstOrgFiscalSettings() {
+    static void fiscalYearWindowsFollowTheOrgFiscalYear() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(7);
             RollupDateWindow.todayOverride = Date.newInstance(2026, 9, 8);
 
             RollupDateWindow.Window thisYear = RollupDateWindow.windowFor(0);
@@ -47,8 +46,7 @@ private class RollupDateWindowTest {
     @IsTest
     static void aDateBeforeTheStartMonthBelongsToTheYearThatBegan() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(7);
             RollupDateWindow.todayOverride = Date.newInstance(2026, 3, 31);
 
             RollupDateWindow.Window thisYear = RollupDateWindow.windowFor(0);
@@ -64,8 +62,7 @@ private class RollupDateWindowTest {
     @IsTest
     static void aBoundaryDatedRecordLandsInTheLaterWindowOnly() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(7);
             RollupDateWindow.todayOverride = Date.newInstance(2026, 9, 8);
 
             String clause = RollupDateWindow.toWhereClause(true, 0, 'Gift_Date__c');
@@ -79,16 +76,11 @@ private class RollupDateWindowTest {
     }
 
     @IsTest
-    static void anOrgThatHasNeverSetTheMonthStartsInJanuary() {
+    static void aCalendarFiscalYearStartsInJanuary() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(1);
             RollupDateWindow.todayOverride = Date.newInstance(2026, 9, 8);
 
-            System.Assert.areEqual(
-                1,
-                RollupDateWindow.fiscalYearStartMonth(),
-                'January is the default'
-            );
             System.Assert.areEqual(
                 Date.newInstance(2026, 1, 1),
                 RollupDateWindow.windowFor(0).startInclusive,
@@ -98,18 +90,27 @@ private class RollupDateWindowTest {
     }
 
     @IsTest
-    static void theEngineReadsTheFiscalYearCoreChecks() {
+    static void theEngineReadsTheOrgFiscalYear() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-
             System.Assert.areEqual(
-                FiscalYearSelector.settingsFiscalYearStartMonth(),
+                FiscalYearSelector.fiscalYearStartMonth(),
                 RollupDateWindow.fiscalYearStartMonth(),
-                'The number Health Check compares is the number the totals were computed from. ' +
-                    'Reading the setting a second way would let the check pass while the totals ' +
-                    'were measured on another boundary.'
+                'ADR-NEXT: the window starts in the month the fiscal year starts in Setup, the ' +
+                'same month the reports read, with no BarnCRM setting in between.'
             );
-            System.Assert.areEqual(7, RollupDateWindow.fiscalYearStartMonth(), 'July');
+            System.Assert.areEqual(
+                [SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1]
+                .FiscalYearStartMonth,
+                RollupDateWindow.fiscalYearStartMonth(),
+                'Read from the org, not from a stored copy'
+            );
+
+            FiscalYearSelector.setTestStartMonth(10);
+            System.Assert.areEqual(
+                10,
+                RollupDateWindow.fiscalYearStartMonth(),
+                'Changing the org month moves the window with nothing else touched'
+            );
         }
     }
 

@@ -252,8 +252,7 @@ private class RollupRegressionAmountsTest {
     @IsTest
     static void fiscalTotalsFollowAJulyStart() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(7);
             Contact ana = ana();
             Date thisYearStart = currentFiscalYearStart(7);
             giftsAroundTheBoundaries(ana.Id, thisYearStart);
@@ -267,10 +266,11 @@ private class RollupRegressionAmountsTest {
         }
     }
 
-    /** With the start month never set, the fiscal year is the calendar year. */
+    /** An org whose fiscal year starts in January totals by the calendar year. */
     @IsTest
-    static void fiscalTotalsDefaultToTheCalendarYear() {
+    static void fiscalTotalsFollowACalendarYear() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            FiscalYearSelector.setTestStartMonth(1);
             Contact ana = ana();
             Date thisYearStart = currentFiscalYearStart(1);
             giftsAroundTheBoundaries(ana.Id, thisYearStart);
@@ -291,8 +291,7 @@ private class RollupRegressionAmountsTest {
     @IsTest
     static void aRefundCountsInTheYearItIsDated() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-            SettingsService.clearCaches();
+            FiscalYearSelector.setTestStartMonth(7);
             Contact ana = ana();
             Date thisYearStart = currentFiscalYearStart(7);
             Gift__c gift = datedGift(ana.Id, 300, thisYearStart.addYears(-2));

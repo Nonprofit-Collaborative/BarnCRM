@@ -424,7 +424,8 @@ approved again.
 | Volunteer shift | Total Hours | Approved hours on the shift. |
 | Volunteer shift | Slots Filled | Sign-ups that are not Cancelled. Slots Remaining is Volunteers Needed less this. |
 
-The fiscal year follows the fiscal year start month in **BarnCRM Settings**. A total moves when
+The fiscal year is your org's fiscal year in Setup (shown read only in **BarnCRM Settings**,
+**General**). A total moves when
 the hours or sign-up is saved, by anyone who saves it (a total is read only for every role, so
 nobody types one), and the nightly run checks every total again.
 

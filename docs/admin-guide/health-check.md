@@ -112,7 +112,7 @@ Nothing is broken today.
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |
 | Settings | Whether any relationship has no person on one side, or any affiliation has no person, because the person was deleted. |
-| Settings | Whether the fiscal year in Setup is the same month as the fiscal year start month in BarnCRM Settings. |
+| Settings | Whether your org uses a custom fiscal year (**Your org uses a custom fiscal year**, information only). BarnCRM totals for this year, last year and two years ago run in whole years from the month your fiscal year starts in Setup; reports filtered or grouped by fiscal year follow your custom periods, so where a custom year starts on another day or is not twelve months long, the two can disagree. Only Setup can change it, so there is no fix button. With a standard fiscal year there is nothing to report: BarnCRM uses the same fiscal year as your reports. |
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
 | Settings | With the Rollup Builder module: whether any of the totals BarnCRM ships are missing from the Rollup Builder. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
@@ -126,17 +126,16 @@ Nothing is broken today.
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 | Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
 
-Five of those are new: the two fiscal years, and, with a module installed, the Override
-Receipt Lock permission, the failed receipts, the unposted gifts in a closed period (all
-with Giving), and the stalled Opportunity mirror (with Mirror). Each one is a quiet problem, where
-nothing looks broken and the cost arrives months later, so each is explained in full below.
+Four of those need a module: the Override Receipt Lock permission, the failed receipts, the
+unposted gifts in a closed period (all with Giving), and the stalled Opportunity mirror (with
+Mirror). Each one is a quiet problem, where nothing looks broken and the cost arrives months
+later, so each is explained in full below.
 
-## The five quiet findings
+## The four quiet findings
 
 | Finding | What it means | Why it matters | What to do |
 |---|---|---|---|
 | **Someone can override the receipt lock** (with Giving) | One or more active people hold the **Override Receipt Lock** permission. BarnCRM ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
-| **Your two fiscal years do not match** | The fiscal year in **Setup** starts in a different month from **Fiscal Year Start Month** in BarnCRM Settings. | BarnCRM computes its year based totals (with Giving: Giving This Year, Giving Last Year and Giving Two Years Ago) from its own setting, and Salesforce reports read the fiscal year from Setup (with Giving, that includes the packaged retention reports: LYBUNT, SYBUNT, new versus retained, conversion). When the two disagree, every one of those numbers is measured on a different year boundary. Nothing errors: with Giving, a donor simply appears on the LYBUNT list while their Giving This Year is not zero, and usually nobody asks until a year end number is questioned. | Decide which month is right, then set both to it: **Setup, Company Information, Fiscal Year**, and **BarnCRM Settings, General, Fiscal Year Start Month**. The **Open general settings** button on the finding takes you to the second one. Recalculate rollups afterwards. |
 | **Receipts failed to generate** (with Giving) | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
 | **Gifts in a closed period are not posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
 | **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop nightly run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
@@ -257,9 +256,9 @@ report because the failure mode is forgetting: nobody notices a permission that 
 assigned six months later, and while it is assigned, an issued receipt no longer means the
 gift behind it cannot change.
 
-**Fixing the fiscal year in one place.** Setting BarnCRM Settings and leaving Setup alone
-(or the reverse) leaves the finding on the report and the reports wrong. Both values are a
-month, and they have to be the same month.
+**Looking for a fiscal year setting in BarnCRM.** There is none to keep in step: BarnCRM uses
+your org's fiscal year from Setup. Change it in **Setup, Company Settings, Fiscal Year**, then
+recalculate rollups.
 
 **Deleting the "Generation failed" receipts to clear the finding (with Giving).** Those records are what
 account for the numbers that were used. Deleting them turns an explained gap into an

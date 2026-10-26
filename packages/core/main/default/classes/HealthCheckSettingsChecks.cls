@@ -1,7 +1,7 @@
 /**
  * The Health Check questions about how BarnCRM is set up and what it has been doing:
- * whether automation is paused (and whether anything will end the pause), whether the two
- * fiscal years agree, and whether anything is waiting in the Error Log
+ * whether automation is paused (and whether anything will end the pause), whether the org
+ * uses a custom fiscal year, and whether anything is waiting in the Error Log
  * (plan Section 4.8, feature C-11). Since C-21 it also asks whether the package defaults
  * materialized from shipped metadata are all here; those findings carry a fix button
  * (ADR-0048). The rollup checks belong to the Rollup Builder module
@@ -23,7 +23,7 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
-    /** Whether the fiscal year in Setup and the one in BarnCRM Settings agree. */
+    /** Whether the org's custom fiscal year can make reports and totals disagree. */
     public class FiscalYearCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return fiscalYearFinding();
@@ -223,36 +223,27 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
-     * Whether the fiscal year in Setup and the one in BarnCRM Settings start in the same
-     * month (ADR-0025). They have to: the rollups are computed from the setting and the
-     * packaged retention reports are filtered on Setup's fiscal year date literals, so a
-     * disagreement makes every year based number quietly measure a different window.
+     * Whether the org uses a custom fiscal year (ADR-NEXT). BarnCRM windows are whole years
+     * from the org's fiscal year start month; report date literals follow custom periods, so
+     * with a custom year the two can disagree. Said as information, with no fix button: the
+     * only change is in Setup, and an org may keep its custom year on purpose.
      */
     private static HealthCheckService.Finding fiscalYearFinding() {
-        Integer orgMonth = FiscalYearSelector.orgFiscalYearStartMonth();
-        Integer settingsMonth = FiscalYearSelector.settingsFiscalYearStartMonth();
-        if (orgMonth == null || settingsMonth == null || orgMonth == settingsMonth) {
+        if (!FiscalYearSelector.usesCustomFiscalYears()) {
             return null;
         }
-
-        String detail = String.format(
-            System.Label.Core_HealthCheck_FiscalYearMismatchDetail,
-            new List<Object>{
-                FiscalYearSelector.monthName(settingsMonth),
-                FiscalYearSelector.monthName(orgMonth)
-            }
-        );
         return new HealthCheckService.Finding(
-                'fiscal_year_mismatch',
-                System.Label.Core_HealthCheck_FiscalYearMismatchTitle,
-                detail,
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(
-                System.Label.Core_HealthCheck_FiscalYearFix,
-                HealthCheckService.SECTION_GENERAL
-            );
+            'custom_fiscal_year',
+            System.Label.Core_HealthCheck_CustomFiscalYearTitle,
+            String.format(
+                System.Label.Core_HealthCheck_CustomFiscalYearDetail,
+                new List<Object>{
+                    FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth())
+                }
+            ),
+            HealthCheckService.SEVERITY_INFO,
+            HealthCheckService.CATEGORY_SETTINGS
+        );
     }
 
     /**
