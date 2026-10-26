@@ -345,7 +345,12 @@ private class CustomMetadataManagerServiceTest {
             List<CustomMetadataManagerService.TypeView> types = CustomMetadataManagerService.getTypes();
             Test.stopTest();
 
-            Assert.areEqual(2, types.size(), 'Relationship types and match sources');
+            Assert.areEqual(
+                1,
+                types.size(),
+                'Relationship types only: match sources have their own page, Matching Logic'
+            );
+            Assert.isNull(viewNamed(types, SOURCE_TYPE), 'Match sources are not listed here');
             CustomMetadataManagerService.TypeView view = viewNamed(types, TYPE_NAME);
             Assert.isNotNull(view, 'Named without a namespace');
             Assert.isFalse(view.shippedArchivable, 'A shipped relationship type has no actions');
@@ -384,10 +389,7 @@ private class CustomMetadataManagerServiceTest {
                 shippedByType.get(TYPE_NAME) >= 11,
                 'The eleven shipped relationship types are read'
             );
-            Assert.isTrue(
-                shippedByType.get(SOURCE_TYPE) >= 6,
-                'The six shipped match sources are read'
-            );
+            // Match sources are checked the same way by MatchSourceControllerTest.
         }
     }
 

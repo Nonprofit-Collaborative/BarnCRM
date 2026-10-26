@@ -165,7 +165,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 ## T-IMP-09: Matching through match sources
 
 **Purpose:** confirm a person known only by a related address record is matched when first and last names agree, and not matched when either differs (a relative at the same address is never loaded into the person).
-**Prerequisites:** admin; the shipped match source **Address (person)** active (BarnCRM Settings, **Custom Metadata**, see [Custom metadata](../admin-guide/custom-metadata.md#match-sources)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
+**Prerequisites:** admin; the shipped match source **Address (person)** active (**Duplicate Matching** tab, **Matching Logic**, see [Matching Logic](../admin-guide/duplicates.md#matching-logic)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
 
 Save `import-match.csv`:
 

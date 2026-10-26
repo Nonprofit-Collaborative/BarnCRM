@@ -164,25 +164,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** leave the Nonprofit Edition.
 
-## T-SET-10: Custom Metadata: relationship types and match sources
+## T-SET-10: Custom Metadata: relationship types
 
-**Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, archive and restore a shipped match source, and that a missing picklist value is refused.
+**Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are no longer on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
 **Prerequisites:** admin user holding **BarnCRM Metadata Admin** (the create script gives it; otherwise give it on the Access page, Extra Permissions). Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Custom Metadata**. | Two lists: **Relationship types** and **Match sources**, each with **Added by Your Organization** ("Nothing added yet.") and **Shipped with BarnCRM**. Relationship types lists eleven shipped rows (Spouse, Parent, Child and so on); Match sources lists six. |
+| 1 | Open **BarnCRM Settings**, **General**, **Custom Metadata**. | One list, **Relationship types**, with **Added by Your Organization** ("Nothing added yet.") and **Shipped with BarnCRM**, which lists eleven rows (Spouse, Parent, Child and so on). There is no **Match sources** list. |
 | 2 | Under **Relationship types**, click **Add**. Enter **Name** `Godparent`, **Type** `Godparent`, **Reciprocal Type** `Mentee`. Click **Save**. | Refused: "Godparent is not a choice in the Type list on Relationship. Add it in Setup (Object Manager, Relationship, Fields, Type), then save again." |
 | 3 | Change **Name** and **Type** to `Mentor`, keep **Reciprocal Type** `Mentee`, and **Save**. | "Saving. Salesforce applies the change in the background, usually within a minute." then "Saved. Mentor is in the list." The row is under **Added by Your Organization** with **Status** **In use**. |
 | 4 | Add `Mentee` with **Reciprocal Type** `Mentor` the same way. | "Saved. Mentee is in the list." |
 | 5 | Open the row menu on **Mentee** and choose **Archive**. Wait for "Saved". | **Status** reads **Archived**. |
-| 6 | Choose **Restore** from the same menu. Wait for "Saved". | **Status** reads **In use**. |
-| 7 | Under **Match sources**, **Shipped with BarnCRM**, archive **Contact Point Phone**, then restore it. | Its status goes to **Archived**, then back to **In use**. Shipped relationship types have no Archive action. |
-| 8 | Under **Match sources**, click **Add**. Enter **Name** `Bad source`, **Object Name** `Contact`, **Value Field** `Nope__c`, **Parent Field** `AccountId`, **Normalization** **Email**, and **Save**. | Refused: "Nope__c is not a field on Contact. Check its API name." Nothing is added. |
-| 9 | Change **Value Field** to `Email` and **Parent Field** to `LastName`, and **Save**. | Refused: "LastName on Contact is not a lookup to a contact, account or Individual. The parent field has to link each value to its person, household or Individual." |
-| 10 | Change **Normalization** to **Address**, **Parent Field** to `AccountId`, leave **Postal Code Field** empty, and **Save**. | Refused: "An address source needs a postal code field: the street is compared together with it." Click **Cancel**. |
+| 6 | Choose **Restore** from the same menu. Wait for "Saved". | **Status** reads **In use**. Shipped relationship types have no Archive action. |
 
-**Cleanup:** archive Mentor and Mentee. Make sure **Contact Point Phone** is **In use**.
+**Cleanup:** archive Mentor and Mentee.
 
 ## T-SET-11: BarnCRM home page and What's new
 
