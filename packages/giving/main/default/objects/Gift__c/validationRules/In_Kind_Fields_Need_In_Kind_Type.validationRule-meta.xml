@@ -16,6 +16,6 @@
   <errorDisplayField>Type__c</errorDisplayField>
   <errorMessage>
     In-kind Description and Fair Market Value belong to a gift of goods or services. Either set
-    Type to In-kind, or clear both fields.
+    Payment Method to In-kind, or clear both fields.
   </errorMessage>
 </ValidationRule>
