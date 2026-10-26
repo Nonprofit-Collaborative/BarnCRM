@@ -6,6 +6,7 @@ import TITLE from '@salesforce/label/c.Core_RollupBuilder_Title';
 import COPY_OF from '@salesforce/label/c.Core_RollupBuilder_CopyOf';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 
@@ -17,7 +18,7 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
-  labels = { title: TITLE };
+  labels = { title: TITLE, otherTools: OTHER_TOOLS };
 
   model;
   draft;
@@ -50,6 +51,15 @@ export default class RollupBuilder extends LightningElement {
     } else if (error) {
       this.error = this.messageFrom(error);
     }
+  }
+
+  /** DLRS or Rollup Helper in this org: separate tools whose rollups BarnCRM does not manage. */
+  get otherToolNotices() {
+    return (this.model && this.model.otherToolNotices) || [];
+  }
+
+  get hasOtherTools() {
+    return this.otherToolNotices.length > 0;
   }
 
   get listClass() {

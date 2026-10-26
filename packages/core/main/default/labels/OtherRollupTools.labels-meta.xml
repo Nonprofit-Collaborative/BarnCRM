@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_OtherRollupTools_Title</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading over the notices about other rollup tools in the org</shortDescription>
+        <value>Other Rollup Tools</value>
+    </labels>
+    <labels>
+        <fullName>Core_OtherRollupTools_Dlrs</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice: DLRS is installed in this org</shortDescription>
+        <value>This org also runs DLRS (Declarative Lookup Rollup Summaries). It is a separate rollup tool; BarnCRM does not manage its rollups.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OtherRollupTools_RollupHelper</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice: Rollup Helper is installed in this org</shortDescription>
+        <value>This org also runs Rollup Helper. It is a separate rollup tool; BarnCRM does not manage its rollups.</value>
+    </labels>
+</CustomLabels>

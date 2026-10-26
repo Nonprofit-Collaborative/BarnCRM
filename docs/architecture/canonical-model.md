@@ -1906,6 +1906,15 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   text lists read the matching rows rather than a grouped answer, so a value found on the
   records of two household members, or of two path alternatives, is counted once.
 
+**R-R16 Other rollup tools in the org (plan D-124 item 6).** BarnCRM detects DLRS (managed
+namespace `dlrs`) and Rollup Helper (managed namespace `rh2`) by the namespace prefix of their
+objects in the org's describe, as text, never as a compile-time reference, so an org without
+either compiles and runs unchanged (ADR-0013). When one is found, the Rollup Builder, the
+Setup Assistant's coexistence step and, when Rollup Builder or Giving is installed, the
+Modules page say that it is a separate rollup tool whose rollups BarnCRM does not manage.
+BarnCRM never creates, edits, switches off or deletes the other tool's definitions or
+triggers. Rollup Helper's definitions are not read; its rollups are moved by hand.
+
 ### Salesforce implementation
 
 - **Object:** `Rollup_Definition__c`, listed and edited in the settings console.
@@ -8942,6 +8951,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
 | v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
 | v0.8 | 2026-10-26 | Rollup Builder parity and generated triggers together (ADR-0136, ADR-0138, landing batch 11). No object or field added. R-R12: a source entity whose generated trigger is active in Setup with its switch on has instant updates, so the Builder offers Instantly for it and the save no longer refuses it; the generator offers code only for an entity the Builder offers as a source (R-R7). |
+| v0.8 | 2026-10-26 | DLRS and Rollup Helper detection (plan D-124 item 6, RB-C). No object or field added. New R-R16: DLRS (`dlrs`) and Rollup Helper (`rh2`) are detected by the namespace prefix of their objects, never referenced; the Rollup Builder, the Setup Assistant and the Modules page say each is a separate tool; BarnCRM never changes the other tool, and Rollup Helper's definitions are not read. |
 
 ---
 ## 32. Entity ownership by package

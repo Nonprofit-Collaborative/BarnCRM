@@ -729,6 +729,32 @@ package namespace in a subscriber org):
 Neither method throws for a total: a failure goes to the Error Log and the nightly run puts it
 right. Pausing all automation stops `recalculateChanges`, as it stops the Flow action.
 
+## DLRS and Rollup Helper in the Same Org
+
+BarnCRM looks for two other rollup tools: DLRS (Declarative Lookup Rollup Summaries, managed
+namespace `dlrs`) and Rollup Helper (managed namespace `rh2`). It finds each by its objects,
+so nothing has to be set up. When either is installed, **Other Rollup Tools** appears with one
+line per tool:
+
+- at the top of the **Rollup Builder** tab;
+- in the Setup Assistant, on the step that says what BarnCRM found in your org;
+- in the **Modules** section of BarnCRM Settings, when Rollup Builder or Giving is installed.
+
+The line reads, for DLRS: "This org also runs DLRS (Declarative Lookup Rollup Summaries). It is
+a separate rollup tool; BarnCRM does not manage its rollups." An org without either tool sees
+nothing.
+
+What to know:
+
+- **BarnCRM never changes the other tool.** It does not edit, switch off, delete or uninstall
+  a DLRS or Rollup Helper rollup, or its triggers. You do that in the other tool, when you are
+  ready.
+- **Both can run side by side**, as long as they do not fill the same field. Two tools writing
+  one field overwrite each other, and the value you see depends on which ran last.
+- **Rollup Helper's rollups are not read.** BarnCRM only says Rollup Helper is here. To move
+  its rollups, rebuild them by hand: see
+  [Moving Rollups from Rollup Helper](moving-from-rollup-helper.md).
+
 ## Current limits
 
 Fund totals and soft credit totals, including a household's soft credit totals, now update

@@ -150,6 +150,9 @@ public with sharing class RollupBuilderController {
         public List<Option> directions { get; set; }
         @AuraEnabled
         public List<Option> modes { get; set; }
+        /** A plain notice for each other rollup tool in the org, DLRS or Rollup Helper (R-R16). */
+        @AuraEnabled
+        public List<String> otherToolNotices { get; set; }
     }
 
     /** One rollup as the Builder edits it. */
@@ -216,6 +219,7 @@ public with sharing class RollupBuilderController {
             model.delimiters = picklist(Rollup_Definition__c.Delimiter__c);
             model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
+            model.otherToolNotices = OtherRollupTools.notices();
             return model;
         } catch (Exception caught) {
             throw asUserError(caught);

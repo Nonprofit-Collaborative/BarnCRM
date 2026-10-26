@@ -427,3 +427,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the trigger** but no **Turn off instant totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
+
+## T-RB-32: BarnCRM Names DLRS and Rollup Helper Where It Matters
+
+**Purpose:** confirm BarnCRM says when another rollup tool is installed, says nothing when none is, and changes nothing in the other tool.
+**Prerequisites:** admin user with Manage BarnCRM Settings; two sandboxes or Developer Edition orgs with BarnCRM Rollup Builder: one without DLRS or Rollup Helper, one with DLRS installed (free, from the AppExchange listing "Declarative Lookup Rollup Summaries Tool").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the org without DLRS, open the **Rollup Builder** tab, the Setup Assistant step that says what BarnCRM found, and the **Modules** section of BarnCRM Settings. | None shows **Other Rollup Tools**. |
+| 2 | In the org with DLRS, open the **Rollup Builder** tab. | **Other Rollup Tools** is at the top: "This org also runs DLRS (Declarative Lookup Rollup Summaries). It is a separate rollup tool; BarnCRM does not manage its rollups." |
+| 3 | Open the Setup Assistant at the step that says what BarnCRM found in your org. | The same **Other Rollup Tools** line is under what BarnCRM found. |
+| 4 | Open the **Modules** section of BarnCRM Settings. | The same line is at the top of the list (Rollup Builder is installed). |
+| 5 | In DLRS (the **Lookup Rollup Summaries** tab), open any DLRS rollup. | It is exactly as before: BarnCRM changed nothing. |
+| 6 | If you can, repeat step 2 in an org with Rollup Helper installed. | The line reads "This org also runs Rollup Helper. It is a separate rollup tool; BarnCRM does not manage its rollups." |
+
+**Cleanup:** None.

@@ -1,6 +1,14 @@
 <template>
     <lightning-card title={labels.title} icon-name="utility:builder">
         <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={hasOtherTools}>
+                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
+                    <h3 class="slds-text-heading_x-small">{labels.otherTools}</h3>
+                    <template for:each={otherToolNotices} for:item="otherTool">
+                        <p key={otherTool} class="slds-text-body_small">{otherTool}</p>
+                    </template>
+                </div>
+            </template>
             <template lwc:if={notice}>
                 <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small" role="status">
                     <span data-id="notice">{notice}</span>

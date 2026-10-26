@@ -93,6 +93,24 @@ describe('c-rollup-builder', () => {
     expect(list(element).refresh).toHaveBeenCalled();
   });
 
+  it('says nothing about other rollup tools when the org has none', async () => {
+    const element = build();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="other-rollup-tools"]')).toBeNull();
+  });
+
+  it('names DLRS as a separate tool above the list', async () => {
+    const element = createElement('c-rollup-builder', { is: RollupBuilder });
+    document.body.appendChild(element);
+    getModel.emit({ ...MODEL, otherToolNotices: ['This org also runs DLRS.'] });
+    await flush();
+
+    const notice = element.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
+    expect(notice.textContent).toContain('c.Core_OtherRollupTools_Title');
+    expect(notice.textContent).toContain('This org also runs DLRS.');
+  });
+
   it('leaves the tab alone outside a console', async () => {
     getDraft.mockResolvedValue({ recordId: 'a01', name: 'Household total giving' });
     const element = build();

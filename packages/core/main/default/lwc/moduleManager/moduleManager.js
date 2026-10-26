@@ -28,6 +28,7 @@ import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 import NONPROFIT_TITLE from '@salesforce/label/c.Core_ModuleManager_NonprofitTitle';
 import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit';
 import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
+import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
@@ -67,7 +68,8 @@ export default class ModuleManager extends LightningElement {
     readOnly: READ_ONLY,
     openApp: OPEN_APP,
     nonprofitTitle: NONPROFIT_TITLE,
-    showNonprofit: SHOW_NONPROFIT
+    showNonprofit: SHOW_NONPROFIT,
+    otherRollupTools: OTHER_ROLLUP_TOOLS
   };
 
   connectedCallback() {
@@ -90,6 +92,15 @@ export default class ModuleManager extends LightningElement {
 
   get isReadOnly() {
     return Boolean(this.state) && !this.state.canEdit;
+  }
+
+  /** DLRS or Rollup Helper, named when Rollup Builder or Giving is installed (R-R16). */
+  get otherRollupTools() {
+    return (this.state && this.state.otherRollupTools) || [];
+  }
+
+  get hasOtherRollupTools() {
+    return this.otherRollupTools.length > 0;
   }
 
   get rows() {

@@ -16,7 +16,16 @@ public with sharing class ModuleManagerController {
         /** The Show Nonprofit Modules checkbox: false hides the nonprofit modules. */
         @AuraEnabled
         public Boolean showNonprofitModules;
+        /**
+         * A plain notice for each other rollup tool in the org (DLRS, Rollup Helper), said only
+         * when a module that calculates totals, Rollup Builder or Giving, is installed (R-R16).
+         */
+        @AuraEnabled
+        public List<String> otherRollupTools;
     }
+
+    /** The modules that calculate totals, so another rollup tool matters to them. */
+    private static final Set<String> TOTALLING_MODULES = new Set<String>{ 'Rollups', 'Giving' };
 
     @AuraEnabled
     public static ManagerState getState() {
@@ -87,6 +96,16 @@ public with sharing class ModuleManagerController {
         state.canEdit = BarnCRMPermissions.canManageSettings();
         state.modules = ModuleManagerService.getModules();
         state.showNonprofitModules = ModuleManagerService.showNonprofitModules();
+        state.otherRollupTools = new List<String>();
+        for (ModuleManagerService.ModuleStatus module : state.modules) {
+            if (
+                TOTALLING_MODULES.contains(module.name) &&
+                module.status != ModuleManagerService.STATUS_NOT_INSTALLED
+            ) {
+                state.otherRollupTools = OtherRollupTools.notices();
+                break;
+            }
+        }
         return state;
     }
 
