@@ -597,6 +597,60 @@ describe('c-settings-console', () => {
     expect(element.shadowRoot.querySelector('c-settings-search')).toBeNull();
   });
 
+  // The Rollup Builder module has no settings tab of its own: BarnCRM Settings, opened on the
+  // Rollups section, shows both its settings and the link to the Builder (no module filter).
+  it('shows every Rollups row in the main console when a link opens that section', async () => {
+    const pick = (key) => ({
+      key,
+      label: key,
+      description: null,
+      dataType: 'Picklist',
+      section: 'Rollups',
+      module: 'Rollups',
+      component: null,
+      helpUrl: null,
+      value: 'Both',
+      checked: false,
+      options: [{ label: 'Both', value: 'Both' }]
+    });
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        { name: 'General', settings: [] },
+        {
+          name: 'Rollups',
+          settings: [
+            pick('Rollup_Mode_Default__c'),
+            pick('Rollup_Processing__c'),
+            {
+              key: 'Rollup_Definitions',
+              label: 'Rollups',
+              description: null,
+              dataType: 'Component',
+              section: 'Rollups',
+              module: 'Rollups',
+              component: null,
+              navigationTarget: 'Rollup_Builder',
+              helpUrl: null,
+              value: null,
+              checked: false,
+              options: []
+            }
+          ]
+        }
+      ]
+    });
+    const element = createElement('c-settings-console', { is: SettingsConsole });
+    document.body.appendChild(element);
+    openSection('Rollups');
+    await settle();
+
+    expect(element.shadowRoot.querySelectorAll('[data-kind="Picklist"]')).toHaveLength(2);
+    const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.dataset.target).toBe('Rollup_Builder');
+    expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
+  });
+
   it('offers a module its own page instead of trying to render it', async () => {
     const element = build();
     openSection('Giving');
