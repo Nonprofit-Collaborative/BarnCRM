@@ -52,7 +52,7 @@ private class SeasonalAddressBatchTest {
     static void aRunDoesNothingWhileAddressesAreOff() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             Database.executeBatch(

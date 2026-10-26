@@ -14,7 +14,7 @@ private class FeatureControllerTest {
     @IsTest
     static void listsEveryFeatureWithItsNameAndState() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FeatureController.FeaturesModel model = FeatureController.getFeatures();
@@ -44,7 +44,7 @@ private class FeatureControllerTest {
     @IsTest
     static void mariaTurnsAFeatureOn() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FeatureController.FeaturesModel model = FeatureController.turnOn(

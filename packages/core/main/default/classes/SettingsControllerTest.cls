@@ -109,7 +109,7 @@ private class SettingsControllerTest {
     static void hidesTheRowsOfAFeatureThatIsOff() {
         System.runAs(TestUsers.admin()) {
             stubDefinitions();
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             SettingsController.ConsoleModel model = SettingsController.getConsoleModel();

@@ -150,7 +150,7 @@ private class EmptyHouseholdTidyTest {
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Id household = deletedPersonsHousehold(maria);
             purge(new List<Id>{ maria.Id });
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             runTidyUp();
 
