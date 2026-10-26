@@ -42,7 +42,7 @@ take the mode BarnCRM proposes. It reads your org, it does not guess.
 
 Coexistence mode is always on: every org has a mode. What you do is confirm or change it.
 
-1. Open the **BarnCRM** app.
+1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **General** in the left navigation.
 4. Find **Coexistence mode**. It shows the current mode and, underneath, a description of

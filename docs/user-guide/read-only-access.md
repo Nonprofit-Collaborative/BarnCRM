@@ -24,10 +24,11 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
 | Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |
 
-Tabs you see in the **BarnCRM** app: **Home**, **Households**, **Organizations**,
-**Addresses**, **Relationships**, **Affiliations** and **BarnCRM Settings**, plus **Contacts**
-if your Salesforce profile shows it. **Household Members** and **Error Log** are yours too;
-open them from the navigation menu if they are not shown.
+Tabs you see in the **BarnCRM** app: **Home**, **Households** and **Organizations**, plus
+**Contacts** if your Salesforce profile shows it. **BarnCRM Console** adds **Addresses**,
+**Relationships**, **Affiliations** and **Household Members**. **BarnCRM Settings** and
+**Error Log** are in the admin apps, which you do not see; open them by typing their name in
+the App Launcher.
 
 If your admin gives you **BarnCRM Find and Export**, you can build, run, save and export Find
 queries over everything you can read. You still cannot change records.

@@ -285,11 +285,16 @@ deploy_stage() {
   shift
   local dirs=()
   local dir
-  for dir in "$@"; do
-    if [[ -d "$dir" ]]; then
-      dirs+=(--source-dir "$dir")
-    fi
-  done
+  if [[ "${1:-}" == "--metadata-dir" ]]; then
+    # A metadata-format package written for this run, such as the module tabs in the apps.
+    [[ -f "$2/package.xml" ]] && dirs=(--metadata-dir "$2" --single-package)
+  else
+    for dir in "$@"; do
+      if [[ -d "$dir" ]]; then
+        dirs+=(--source-dir "$dir")
+      fi
+    done
+  fi
 
   if [[ "${#dirs[@]}" -eq 0 ]]; then
     echo "== Skipping ${label}: none of the given directories exist =="
@@ -502,6 +507,18 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   fi
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   deploy_stage "Mirror" "packages/mirror" || exit $?
+
+  # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
+  # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
+  # BarnCRM_Module__mdt record (ADR-0136). The app
+  # copies are written to a temporary metadata-format package; the repository's app files are
+  # never changed. Nothing is deployed when no module names a tab.
+  deployed_modules=(rollups giving mirror)
+  volunteers_has_metadata && deployed_modules+=(volunteers)
+  APP_TABS_DIR="$(mktemp -d)"
+  python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
+  deploy_stage "Module tabs in the BarnCRM apps" --metadata-dir "$APP_TABS_DIR" || exit $?
+  rm -rf "$APP_TABS_DIR"
 
   # A deployment is not an install, so no post-install script runs here and the shipped rollup
   # definitions would not exist in a development org (ADR-0029). This is the same call

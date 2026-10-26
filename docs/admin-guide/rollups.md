@@ -102,7 +102,7 @@ with no shipped totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. From the App Launcher, open the **BarnCRM Rollup Builder** app; it opens on the **Rollup
+1. From the App Launcher, open the **BarnCRM Admin** app and click the **Rollup
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
@@ -282,9 +282,9 @@ What to know about them:
 
 ## The Rollup Builder
 
-Rollups are their own module, **BarnCRM Rollup Builder**, with a console app of the same name
-and one tab, **Rollup Builder**. Its settings are in the **Rollups** section of **BarnCRM
-Settings**.
+Rollups are their own module, **BarnCRM Rollup Builder**, with one tab, **Rollup Builder**,
+in the **BarnCRM Admin** and **BarnCRM Admin Console** apps (the module has no app of its
+own). Its settings are in the **Rollups** section of **BarnCRM Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
@@ -517,7 +517,8 @@ need the Giving module; without it, do them on a rollup you have added.
 1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
    into a warning and offers a link to the Rollups section of **BarnCRM Settings**, which
-   opens the Rollup Builder. Click that link, or open the **BarnCRM Rollup Builder** app.
+   opens the Rollup Builder. Click that link, or open the **Rollup Builder** tab in
+   **BarnCRM Admin**.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("Sum Amount__c
    on Gift__c", or for a text list "Text list Name on Program__c, separated by semicolon"),

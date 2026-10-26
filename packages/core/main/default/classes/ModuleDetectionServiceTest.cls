@@ -370,6 +370,58 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
+    static void anInstalledModuleListsTheTabsToAddToTheBarnCrmApps() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt here = catalogRow('Giving', 'Impact', null, 10);
+            here.Staff_Tabs__c = 'Gift__c; Commitment__c';
+            here.Admin_Tabs__c = 'Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder';
+            BarnCRM_Module__mdt notHere = catalogRow('Events', 'Community;Impact', null, 5);
+            notHere.Staff_Tabs__c = 'Event__c';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ here, notHere };
+            ModuleDetectionService.tabLabelsOverride = new Map<String, String>{
+                'Gift__c' => 'Gifts'
+            };
+
+            Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
+            for (ModuleDetectionService.ModuleInfo info : ModuleDetectionService.getModules()) {
+                byName.put(info.name, info);
+            }
+
+            ModuleDetectionService.ModuleInfo giving = byName.get('Giving');
+            Assert.areEqual('Gifts, Commitment', giving.staffTabs, 'By label, else by name');
+            Assert.areEqual(
+                'Giving Nightly Jobs, Donor Level Ladder',
+                giving.adminTabs,
+                'The admin tools too, by the label an entry carries'
+            );
+            Assert.isNull(byName.get('Events').staffTabs, 'A module not here lists nothing');
+        }
+    }
+
+    @IsTest
+    static void aTabTheOrgDoesNotHaveIsNamedWithoutError() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = true;
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            row.Admin_Tabs__c = 'No_Such_BarnCRM_Tab';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
+
+            Test.startTest();
+            List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
+            Test.stopTest();
+
+            Assert.areEqual(
+                'No Such BarnCRM Tab',
+                modules[modules.size() - 1].adminTabs,
+                'A page tab has no object to label it, so its name stands in for the label'
+            );
+        }
+    }
+
+    @IsTest
     static void anAppThatIsNotInTheOrgYetFallsBackToTheNameFormWithoutError() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
@@ -495,12 +547,18 @@ private class ModuleDetectionServiceTest {
             );
             BarnCRM_Module__mdt rollups = shipped.get('Rollups');
             Assert.areEqual('rollups', rollups.Package_Folder__c, 'Its own package folder');
-            Assert.areEqual('BarnCRM_Rollup_Builder', rollups.App_Name__c, 'Its own app');
+            Assert.isNull(rollups.App_Name__c, 'No app of its own: its tool is in the admin apps');
+            Assert.areEqual('Rollup_Builder', rollups.Admin_Tabs__c, 'The Rollup Builder tab');
             Assert.areEqual(5, rollups.Sort_Order__c.intValue(), 'Listed before Giving');
             Assert.areEqual('Rollups', shipped.get('Giving').Requires__c, 'Giving needs it');
             BarnCRM_Module__mdt volunteers = shipped.get('Volunteers');
             Assert.areEqual('Rollups', volunteers.Requires__c, 'Volunteers needs it too');
             Assert.areEqual('BarnCRM_Volunteers', volunteers.App_Name__c, 'Its own app');
+            Assert.areEqual(
+                'Volunteer_Shift__c;Volunteer_Hours__c',
+                volunteers.Staff_Tabs__c,
+                'Its everyday tabs for the BarnCRM apps'
+            );
             Assert.areEqual('Volunteer_Hours__c', volunteers.Probe_Object__c, 'Its probe object');
         }
     }

@@ -26,9 +26,23 @@
                         {module.installFirstText}
                     </p>
                 </template>
+                <template lwc:if={module.staffTabsText}>
+                    <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="staff-tabs">
+                        {module.staffTabsText}
+                    </p>
+                </template>
+                <template lwc:if={module.adminTabsText}>
+                    <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="admin-tabs">
+                        {module.adminTabsText}
+                    </p>
+                </template>
             </li>
         </template>
     </ul>
+
+    <template lwc:if={hasTabsToAdd}>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="tabs-how">{labels.tabsHow}</p>
+    </template>
 
     <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
         {labels.managerNotice}
