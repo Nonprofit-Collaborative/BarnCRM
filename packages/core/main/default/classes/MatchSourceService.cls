@@ -231,6 +231,99 @@ public with sharing class MatchSourceService {
     }
 
     private static final String CONTEXT = 'Duplicate scan: matching through source ';
+    private static final String IMPORT_CONTEXT = 'Import: matching through source ';
+
+    /** The import attributes of a person that hold a value of each kind, as Contact names. */
+    private static final List<String> EMAIL_ATTRIBUTES = new List<String>{ 'Email' };
+    private static final List<String> PHONE_ATTRIBUTES = new List<String>{
+        'Phone',
+        'MobilePhone',
+        'HomePhone',
+        'OtherPhone'
+    };
+    private static final Map<String, String> ADDRESS_ATTRIBUTES = new Map<String, String>{
+        'MailingStreet' => 'MailingPostalCode',
+        'OtherStreet' => 'OtherPostalCode'
+    };
+
+    /**
+     * For each incoming person of an import, the existing records of the target object (Contact,
+     * or Account for person accounts) that hold one of its values on an active source (R-IT16):
+     * its email, its phones, its mailing and other addresses, normalized as the source says. A
+     * value held by more than ten records is not used. Values are keyed by Contact attribute
+     * name. One lookup per source for the whole list. A source that cannot be read is logged and
+     * skipped.
+     */
+    public static List<Set<Id>> holdersOfPeople(
+        Schema.SObjectType target,
+        List<Map<String, String>> people
+    ) {
+        List<Set<Id>> result = new List<Set<Id>>();
+        Map<String, List<Set<String>>> keysByKind = new Map<String, List<Set<String>>>{
+            EMAIL => new List<Set<String>>(),
+            PHONE => new List<Set<String>>(),
+            ADDRESS => new List<Set<String>>()
+        };
+        for (Map<String, String> values : people) {
+            result.add(new Set<Id>());
+            Map<String, String> given = values == null ? new Map<String, String>() : values;
+            keysByKind.get(EMAIL).add(keysOf(EMAIL, given, EMAIL_ATTRIBUTES));
+            keysByKind.get(PHONE).add(keysOf(PHONE, given, PHONE_ATTRIBUTES));
+            Set<String> addresses = new Set<String>();
+            for (String street : ADDRESS_ATTRIBUTES.keySet()) {
+                String found = address(
+                    given.get(street),
+                    given.get(ADDRESS_ATTRIBUTES.get(street))
+                );
+                if (found != null) {
+                    addresses.add(found);
+                }
+            }
+            keysByKind.get(ADDRESS).add(addresses);
+        }
+        for (Source source : usableSources()) {
+            if (!appliesTo(source, target)) {
+                continue;
+            }
+            List<Set<String>> perPerson = keysByKind.get(source.normalization);
+            Set<String> all = new Set<String>();
+            for (Set<String> keys : perPerson) {
+                all.addAll(keys);
+            }
+            if (all.isEmpty()) {
+                continue;
+            }
+            try {
+                Map<String, Set<Id>> holders = ownersOf(source, target, all);
+                for (Integer index = 0; index < perPerson.size(); index++) {
+                    for (String key : perPerson[index]) {
+                        Set<Id> found = holders.get(key);
+                        if (found != null && found.size() <= MAX_OWNERS_PER_VALUE) {
+                            result[index].addAll(found);
+                        }
+                    }
+                }
+            } catch (Exception caught) {
+                ErrorLogger.log(caught, IMPORT_CONTEXT + source.developerName);
+            }
+        }
+        return result;
+    }
+
+    private static Set<String> keysOf(
+        String normalization,
+        Map<String, String> values,
+        List<String> attributes
+    ) {
+        Set<String> keys = new Set<String>();
+        for (String attribute : attributes) {
+            String found = key(normalization, values.get(attribute), null);
+            if (found != null) {
+                keys.add(found);
+            }
+        }
+        return keys;
+    }
 
     private static List<DuplicateService.Pair> pairsOn(
         Source source,
