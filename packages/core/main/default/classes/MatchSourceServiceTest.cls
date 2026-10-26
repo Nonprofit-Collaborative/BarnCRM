@@ -634,8 +634,14 @@ private class MatchSourceServiceTest {
                 FROM Error_Log__c
                 WHERE Context__c = 'Match sources'
             ];
-            Assert.areEqual(1, logged.size(), 'One warning for the source: ' + logged);
-            Assert.isTrue(logged[0].Message__c.contains('Member_Email'), 'Names the source');
+            // In a person account org the Individual lookup is skipped and logged too.
+            Integer forTheSource = 0;
+            for (Error_Log__c entry : logged) {
+                if (entry.Message__c.contains('Member_Email')) {
+                    forTheSource++;
+                }
+            }
+            Assert.areEqual(1, forTheSource, 'One warning for the source: ' + logged);
         }
     }
 }
