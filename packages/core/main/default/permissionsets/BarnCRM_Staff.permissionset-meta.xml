@@ -6,10 +6,6 @@
     For everyone doing the day job. Reads the Error Log so that a problem can be
     described accurately, and changes nothing about how BarnCRM is configured.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>AccessController</apexClass>
     <enabled>true</enabled>

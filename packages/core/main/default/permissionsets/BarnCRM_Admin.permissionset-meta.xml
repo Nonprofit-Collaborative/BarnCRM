@@ -7,10 +7,6 @@
     console, automation control, and the Error Log. Later features add to this set: it is never
     meant to be cloned.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>AccessController</apexClass>
     <enabled>true</enabled>

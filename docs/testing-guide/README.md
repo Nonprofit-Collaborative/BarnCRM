@@ -39,6 +39,7 @@ page, even if that puts it out of reading order.
 | [People and households](people-and-households.md) | HH | 17 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages |
 | [Addresses](addresses.md) | ADDR | 12 | Address records, default address, seasonal addresses and the nightly swap |
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 10 | Two-sided relationships, affiliations, primary affiliation |
+| [Apps and Navigation](apps-and-navigation.md) | APP | 2 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 16 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page, organization address, values from Setup, Integrations |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 11 | Import wizard, templates, row rules, matching (including match sources), undo |

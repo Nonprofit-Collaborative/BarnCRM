@@ -34,7 +34,7 @@ Addresses is part of Core, but on a new install it is off until you turn it on. 
 ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing to
 install and no Setup step. Once it is on, two things are worth setting once.
 
-1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
+1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.
 3. Set **When a person's address is edited** to the behavior your organization wants:
    - **Everyone in the household moves together** (the default): editing one person's

@@ -35,7 +35,7 @@ choose **Turn on** in that row in **BarnCRM Settings**, **General** (or leave it
 first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tab is
 hidden for everyone.
 
-1. Open the **BarnCRM** app and choose the **Org Optimizer** tab. (It is the tab that used to
+1. Open the **BarnCRM Admin** app and choose the **Org Optimizer** tab. (It is the tab that used to
    be called **Data Hygiene**; bookmarks to it still work.)
 2. The **BarnCRM Admin** role, the **BarnCRM Find and Export** permission set and the
    **BarnCRM Duplicate Review** permission set each give the tab. Staff with Find and Export

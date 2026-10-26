@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>App Navigation Style</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Picklist</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >BarnCRM comes as two apps for everyday work (BarnCRM and BarnCRM Console) and two for administrators (BarnCRM Admin and BarnCRM Admin Console). Standard navigation opens each record in place of the page; console navigation keeps records open side by side in tabs. Choose Both to let each person pick the style they like, or one style to hide the other apps for everyone. Each person can still choose their own default app in the App Launcher.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">barncrm-app.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:type="xsd:string">Both:Both (each person chooses);Standard:Standard navigation only;Console:Console navigation only</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">App_Navigation_Style__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">8</value>
+  </values>
+</CustomMetadata>

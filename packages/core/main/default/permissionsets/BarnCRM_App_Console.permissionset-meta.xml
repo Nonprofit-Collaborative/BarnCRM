@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>BarnCRM App: BarnCRM Console</label>
+  <description>
+    Shows the BarnCRM Console app and nothing else. Given and taken by BarnCRM from each
+    person's role and the App Navigation Style setting; do not assign by hand.
+  </description>
+  <applicationVisibilities>
+    <application>BarnCRM</application>
+    <visible>true</visible>
+  </applicationVisibilities>
+</PermissionSet>

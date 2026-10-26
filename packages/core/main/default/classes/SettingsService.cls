@@ -285,6 +285,10 @@ public with sharing class SettingsService {
         }
         clearCaches();
         applySeasonalSwitch(changed);
+        // Which apps people see follows this setting through the app sets (ADR-0136).
+        if (changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c)) {
+            TabAccessService.requestSync();
+        }
         return orgDefault(type);
     }
 

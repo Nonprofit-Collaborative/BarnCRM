@@ -12,14 +12,26 @@ Only or Admin). If you cannot find the apps, ask your admin. See
 
 | App | What it is for | How it looks |
 |---|---|---|
-| **BarnCRM** | People, households, organizations, addresses, relationships and affiliations | A console: records open in tabs across the top |
+| **BarnCRM** | People, households and organizations, every day | Standard navigation: each record replaces the page |
+| **BarnCRM Console** | The same work as **BarnCRM** | Console navigation: records open in tabs across the top |
+| **BarnCRM Admin** | BarnCRM Settings and the data tools (admins only) | Standard navigation |
+| **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
 | **Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
-| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM |
+| **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
 
-The **BarnCRM** app's navigation menu holds **Home**, **Households**, **Contacts**,
-**Organizations**, **Data Manager**, **Find**, **Org Optimizer**, **BarnCRM Settings**,
-**Error Log**, **Addresses**, **Relationships**, **Affiliations** and **Household Members**.
-You see only the tabs your access allows, so your menu may be shorter.
+**Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
+hold the same things and differ only in how records open, so pick the one you like and star it.
+Your admin may have hidden one of them for everyone. Open **Fundraising** for gifts and **BarnCRM
+Volunteers** for volunteers. **BarnCRM Admin** and **BarnCRM Admin Console** are for
+administrators only.
+
+**BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Find**.
+**BarnCRM Console** has the same, plus **Addresses**, **Relationships**, **Affiliations** and
+**Household Members** at the end of its navigation menu. The admin apps have **BarnCRM
+Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer** and **Error Log**.
+You see only the tabs your access allows, so your menu may be shorter. If you have an extra
+permission such as Bulk Update but not the admin role, open **Data Manager** by typing its name
+in the App Launcher.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
@@ -39,11 +51,11 @@ section of **BarnCRM Settings**.
 2. Type `BarnCRM` (or `Fundraising`) and choose the app.
 3. Optional: click the star next to the app name to open it by default.
 
-You should see: the app's first tab. In **BarnCRM** that is **Home**.
+You should see: the app's first tab. In **BarnCRM** and **BarnCRM Console** that is **Home**.
 
 ## To work with records in console tabs
 
-In the **BarnCRM** and **BarnCRM Volunteers** apps, records stay open side by side.
+In the **BarnCRM Console** and **BarnCRM Volunteers** apps, records stay open side by side.
 
 1. Open a household, organization or person. It opens in its own tab across the top.
 2. Open something that belongs to it, such as an address on the household or a relationship
@@ -55,7 +67,7 @@ In the **BarnCRM** and **BarnCRM Volunteers** apps, records stay open side by si
 You should see: your open tabs still there when you come back later. Pages such as **Find**
 and **BarnCRM Settings** name their tab for what is on screen, for example "Find: Contact".
 
-On a phone, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
+On a phone, the Salesforce mobile app shows BarnCRM Console as an ordinary app without tabs.
 
 ## To use the home page
 
@@ -78,7 +90,7 @@ welcome says "BarnCRM automation is paused. Households and greetings are not bei
 until it resumes." It goes away by itself.
 
 Admins also see the setup checklist, Health Check and a few status tiles. See
-[The BarnCRM app](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
+[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
 ## To read in-app tips
 
@@ -161,7 +173,7 @@ are for admins. See
 - [Finding people and records](find.md)
 - [People and households](people-and-households.md)
 - [Read-only access](read-only-access.md)
-- Admin Guide: [The BarnCRM app](../admin-guide/barncrm-app.md),
+- Admin Guide: [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md),
   [What's new](../admin-guide/whats-new.md), [In-app tips](../admin-guide/in-app-guidance.md),
   [Job notifications](../admin-guide/job-notifications.md),
   [Data Manager](../admin-guide/data-manager.md)

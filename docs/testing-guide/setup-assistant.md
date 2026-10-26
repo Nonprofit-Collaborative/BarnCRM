@@ -164,7 +164,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open the **BarnCRM** app, **BarnCRM Settings** tab. | A docked panel at the bottom right headed **BarnCRM tips**, titled **Getting around BarnCRM Settings**. |
+| 1 | As staff, open the **BarnCRM Console** app and, under **Quick links** on **Home**, click **BarnCRM Settings**. | A docked panel at the bottom right headed **BarnCRM tips**, titled **Getting around BarnCRM Settings**. |
 | 2 | Minimize the panel and reload. | It does not come back. |
 | 3 | At least 24 hours later, open the **Find** tab. | A floating tip, **Find exactly the records you need**, with **Got it**. |
 | 4 | Click **Got it** and reload. | The tip does not come back. |

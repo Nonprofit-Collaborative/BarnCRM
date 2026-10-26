@@ -1086,6 +1086,15 @@ a BarnCRM record.
 |---|---|---|---|
 | `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
 
+### App Navigation Key
+
+Added with the four BarnCRM apps (ADR-0136).
+Shown in the console's General section as **App Navigation Style**.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `App_Navigation_Style__c` | picklist(Standard, Console, Both) | Both | Which navigation style of the BarnCRM apps BarnCRM shows: Standard shows BarnCRM and BarnCRM Admin, Console shows BarnCRM Console and BarnCRM Admin Console, Both shows all four. Stored as text (ADR-0019); a blank or unknown value reads as Both. Applied by `TabAccessService`, which gives and takes the `BarnCRM_App_*` permission sets; a change queues that sync. |
+
 ### Org Optimizer keys
 
 Added by Org Optimizer (ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`). Shown in
@@ -8736,6 +8745,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
 | v0.8 | 2026-10-26 | Nonprofit modules section in the Module Manager (owner QA, M1). New field `Hide_Nonprofit_Modules__c` on BarnCRM Settings (Section 12, v0.8 keys), default false (the page's Show Nonprofit Modules checkbox is its inverse, so an existing settings row shows the modules). No object added. |
 | v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
+| v0.8 | 2026-10-26 | The four BarnCRM apps (ADR-0136). `BarnCRM_Settings__c` gains `App_Navigation_Style__c` (Section 12, app navigation key): Standard, Console or Both, default Both. |
 
 ---
 ## 32. Entity ownership by package

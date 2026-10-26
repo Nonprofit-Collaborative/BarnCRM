@@ -22,7 +22,7 @@ it off instead if you do not want it in the list.
 
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
-1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
+1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "3 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.

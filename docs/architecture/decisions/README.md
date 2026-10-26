@@ -144,6 +144,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0133](0133-related-record-matching.md) | Duplicates are also matched through values on related records | Accepted (owner approved the feature) |
 | [0134](0134-household-merge-runs-in-system-mode.md) | A household merge runs in system mode once BarnCRM has authorized it | Accepted (owner decision) |
 | [0135](0135-barncrm-uses-the-org-fiscal-year.md) | BarnCRM uses the org fiscal year, and shows Setup values read only (supersedes ADR-0025 in part) | Accepted (owner decision, 2026-10-26) |
+| [0136](0136-barncrm-apps-standard-and-console.md) | Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
