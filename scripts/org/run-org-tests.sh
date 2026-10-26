@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# run-org-tests.sh <org alias> [--relevant]
+# run-org-tests.sh <org alias> [--relevant | --light]
+# run-org-tests.sh --light-selfcheck      (no org, no GitHub: checks the --light allow-list)
 #
-# Two modes. The default (full) is the merge gate described below. --relevant (or
+# Three modes. The default (full) is the merge gate described below. --relevant (or
 # ORG_TESTS_MODE=relevant) is a faster run for iteration: see "RELEVANT MODE" further down.
+# --light (or ORG_TESTS_MODE=light) is the lighter gate for screen-only changes: see "LIGHT
+# MODE" further down.
 #
 # The merge gate for main. Deploys the commit you have checked out to an org, runs every
 # Apex test class in that commit's source there, and posts the result to GitHub as the commit status
@@ -34,6 +37,19 @@
 # local)", which the main ruleset does not require, and its description says "Relevant tests
 # only". A fast run cannot satisfy "Org tests (local)".
 #
+# LIGHT MODE. Owner decision (Brandon, 2026-10-26): a change that touches only screens, labels
+# or docs (no Apex, objects or permissions) does not need the ~3,600-test org run. Before any
+# deploy, this mode lists the files changed since the merge base with RELEVANT_BASE (default
+# origin/main) and REFUSES (exit 1, no status) unless every one is on LIGHT_ALLOWED_PATTERNS
+# below. It then does the same staged deploy the full mode does (so the org ends in the same
+# state), runs no Apex test, runs `npx jest --silent`, and posts the same required context,
+# "Org tests (local)", with a description that starts "Light gate:" and says "no Apex-affecting
+# changes; deploy and Jest passed", so a reviewer can tell it from a full run. Success needs
+# both the deploy and Jest to pass; it posts failure otherwise. The full run still happens on
+# every combined landing batch (a pull request that combines several branches) before merge:
+# light mode is for a single screen-only branch, never for a batch. `--light-selfcheck` runs
+# the allow-list against sample paths with no org and no GitHub.
+#
 # HOW COVERAGE IS CHECKED. Every full run checks code coverage (owner decision, 2026-10-13:
 # due diligence happens automatically). The tests are enqueued with coverage on, so the org
 # records it, but the results are fetched without it: `sf apex run test --code-coverage` used
@@ -49,11 +65,128 @@
 
 set -euo pipefail
 
+# LIGHT MODE ALLOW-LIST. The one place that says which paths a light run may cover. Each entry
+# is a bash regex over a repo-relative path, and each is here because it cannot change the
+# outcome of any Apex test, so skipping the Apex run loses nothing:
+#   lwc, aura           browser-side bundles; Apex never reads them, and Jest covers the LWC ones
+#   labels              a test fails on a label only if it asserts the label's text; the owner
+#                       accepted that risk for screen text (2026-10-26)
+#   flexipages          Lightning page layouts; no Apex reads a Lightning page
+#   contentassets       images and similar files served to the UI; no Apex reads them
+#   jest-mocks          Jest-only stubs; not deployed
+#   docs/, *.md         documentation; not deployed
+#   ISSUE_TEMPLATE      GitHub forms; not deployed
+# Deliberately NOT here: staticresources (Apex reads SampleData and GivingSampleData), and
+# every metadata type Apex can touch or the platform enforces (classes, triggers, objects,
+# fields, permission sets and groups, custom metadata, flows, layouts, tabs, applications), plus
+# scripts, config and sfdx-project.json. Any of those needs the full mode.
+LIGHT_ALLOWED_PATTERNS=(
+  '^packages/[^/]+/main/default/lwc/.+'
+  '^packages/[^/]+/main/default/aura/.+'
+  '^packages/[^/]+/main/default/labels/.+'
+  '^packages/[^/]+/main/default/flexipages/.+'
+  '^packages/[^/]+/main/default/contentassets/.+'
+  '^packages/[^/]+/test/jest-mocks/.+'
+  '^docs/.+'
+  '\.md$'
+  '^\.github/ISSUE_TEMPLATE/.+'
+)
+
+light_path_allowed() {
+  local re
+  for re in "${LIGHT_ALLOWED_PATTERNS[@]}"; do
+    if [[ "$1" =~ $re ]]; then return 0; fi
+  done
+  return 1
+}
+
+# Reads paths on stdin, prints those the allow-list does not cover.
+light_disallowed_paths() {
+  local path
+  while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    light_path_allowed "$path" || echo "$path"
+  done
+}
+
+# No org, no GitHub: feeds sample path lists to the allow-list and fails on any wrong verdict.
+light_selfcheck() {
+  local failures=0 path left
+  check() { # check <allowed|refused> <path>
+    local got=refused
+    light_path_allowed "$2" && got=allowed
+    if [[ "$got" != "$1" ]]; then
+      echo "FAIL: $2 should be $1, was $got" >&2
+      failures=$((failures + 1))
+    fi
+  }
+  for path in \
+    packages/core/main/default/lwc/barnConfirmModal/barnConfirmModal.js \
+    packages/core/main/default/lwc/barnConfirmModal/__tests__/barnConfirmModal.test.js \
+    packages/giving/main/default/aura/Foo/Foo.cmp \
+    packages/core/main/default/labels/CustomLabels.labels-meta.xml \
+    packages/core/main/default/flexipages/Home.flexipage-meta.xml \
+    packages/core/main/default/contentassets/logo.asset-meta.xml \
+    packages/core/test/jest-mocks/lightning/modal.js \
+    docs/admin-guide/settings.md docs/images/shot.png README.md \
+    packages/core/README.md .github/ISSUE_TEMPLATE/bug_report.yml; do
+    check allowed "$path"
+  done
+  for path in \
+    packages/core/main/default/classes/Foo.cls \
+    packages/core/main/default/classes/Foo.cls-meta.xml \
+    packages/core/main/default/triggers/Foo.trigger \
+    packages/core/main/default/objects/Gift__c/Gift__c.object-meta.xml \
+    packages/core/main/default/objects/Gift__c/fields/Amount__c.field-meta.xml \
+    packages/core/main/default/permissionsets/Admin.permissionset-meta.xml \
+    packages/core/main/default/permissionsetgroups/G.permissionsetgroup-meta.xml \
+    packages/core/main/default/customMetadata/X.Y.md-meta.xml \
+    packages/core/main/default/flows/F.flow-meta.xml \
+    packages/core/main/default/layouts/L.layout-meta.xml \
+    packages/core/main/default/tabs/T.tab-meta.xml \
+    packages/core/main/default/applications/A.app-meta.xml \
+    packages/core/main/default/staticresources/SampleData.json \
+    packages/core/main/default/staticresources/SampleData.resource-meta.xml \
+    scripts/org/run-org-tests.sh scripts/ci/check-labels.py config/project-scratch-def.json \
+    sfdx-project.json package.json .github/workflows/ci.yml \
+    packages/core/main/default/lwcx/x.js packages/core/main/default/lwc \
+    xpackages/core/main/default/lwc/x.js docs-extra/x.txt notes.mdx; do
+    check refused "$path"
+  done
+  # The list filter: only the uncovered paths come back, in order.
+  left="$(printf '%s\n' docs/a.md packages/core/main/default/classes/A.cls \
+    packages/core/main/default/lwc/x/x.html sfdx-project.json | light_disallowed_paths | paste -sd, -)"
+  if [[ "$left" != "packages/core/main/default/classes/A.cls,sfdx-project.json" ]]; then
+    echo "FAIL: light_disallowed_paths returned '${left}'" >&2
+    failures=$((failures + 1))
+  fi
+  if [[ -n "$(printf '%s\n' docs/a.md packages/core/main/default/lwc/x/x.js | light_disallowed_paths)" ]]; then
+    echo "FAIL: an all-allowed list was refused" >&2
+    failures=$((failures + 1))
+  fi
+  if [[ "$failures" -ne 0 ]]; then
+    echo "light-selfcheck: ${failures} failure(s)" >&2
+    return 1
+  fi
+  echo "light-selfcheck: ok"
+}
+
+if [[ "${1:-}" == "--light-selfcheck" ]]; then
+  light_selfcheck
+  exit $?
+fi
+
 ALIAS="${1:-}"
 MODE="${ORG_TESTS_MODE:-full}"
-[[ "${2:-}" == "--relevant" ]] && MODE=relevant
-if [[ -z "$ALIAS" || ! "$MODE" =~ ^(full|relevant)$ || ( -n "${2:-}" && "${2:-}" != "--relevant" ) ]]; then
-  echo "Usage: run-org-tests.sh <org alias> [--relevant]   (ORG_TESTS_MODE=full|relevant)" >&2
+case "${2:-}" in
+  "") ;;
+  --relevant) MODE=relevant ;;
+  --light) MODE=light ;;
+  *) ALIAS="" ;;
+esac
+if [[ -z "$ALIAS" || ! "$MODE" =~ ^(full|relevant|light)$ ]]; then
+  echo "Usage: run-org-tests.sh <org alias> [--relevant | --light]   (ORG_TESTS_MODE=full|relevant|light)" >&2
+  echo "       run-org-tests.sh --light-selfcheck" >&2
   exit 2
 fi
 RELEVANT_BASE="${RELEVANT_BASE:-origin/main}"
@@ -67,6 +200,9 @@ TEST_POLL_SECONDS="${TEST_POLL_SECONDS:-30}"
 if [[ "$MODE" == "full" ]]; then
   CONTEXT="Org tests (local)"
   MODE_LABEL="Full run"
+elif [[ "$MODE" == "light" ]]; then
+  CONTEXT="Org tests (local)"
+  MODE_LABEL="Light gate"
 else
   CONTEXT="Org tests (relevant, local)"
   MODE_LABEL="Relevant tests only, not the merge gate"
@@ -79,6 +215,31 @@ if [[ -n "$(git status --porcelain)" ]]; then
   echo "posted on HEAD, so the code tested has to be exactly the code at HEAD." >&2
   git status --short >&2
   exit 1
+fi
+
+# Light mode refuses before anything else runs, so nothing is deployed and no status is posted
+# for a change that needs the full gate.
+if [[ "$MODE" == "light" ]]; then
+  if ! MERGE_BASE="$(git merge-base "$RELEVANT_BASE" HEAD)"; then
+    echo "No merge base between ${RELEVANT_BASE} and HEAD. Fetch it, or set RELEVANT_BASE." >&2
+    exit 1
+  fi
+  LIGHT_CHANGED="$(git diff --name-only --no-renames "$MERGE_BASE" HEAD)"
+  if [[ -z "$LIGHT_CHANGED" ]]; then
+    echo "No changes since ${MERGE_BASE:0:7} (${RELEVANT_BASE}), so a light gate has nothing to vouch for." >&2
+    exit 1
+  fi
+  LIGHT_REFUSED="$(printf '%s\n' "$LIGHT_CHANGED" | light_disallowed_paths)"
+  if [[ -n "$LIGHT_REFUSED" ]]; then
+    echo "The light gate covers only screens, labels and docs. These changed paths need the full run" >&2
+    echo "(run-org-tests.sh <alias> with no flag):" >&2
+    printf '%s\n' "$LIGHT_REFUSED" | sed 's/^/  /' >&2
+    exit 1
+  fi
+  if [[ ! -d node_modules ]]; then
+    echo "node_modules is missing, and the light gate runs Jest. Run: npm ci" >&2
+    exit 1
+  fi
 fi
 
 SHA="$(git rev-parse HEAD)"
@@ -116,6 +277,23 @@ fi
 
 RESULTS_DIR="test-results"
 mkdir -p "$RESULTS_DIR"
+
+if [[ "$MODE" == "light" ]]; then
+  # The staged deploy above is the same one the full mode does, and it runs no Apex test, so the
+  # org ends in the same state. Jest is the only test the light gate adds.
+  echo ""
+  echo "== Light gate: no Apex tests; running Jest =="
+  if npx jest --silent > "${RESULTS_DIR}/jest-light.log" 2>&1; then
+    tail -n 8 "${RESULTS_DIR}/jest-light.log"
+    post_status success "${MODE_LABEL}: no Apex-affecting changes; deploy and Jest passed on ${ALIAS}"
+    echo "== Posted \"${CONTEXT}\": success on ${SHA:0:7} (light gate). A landing batch still needs the full run. =="
+    exit 0
+  fi
+  tail -n 40 "${RESULTS_DIR}/jest-light.log" >&2
+  post_status failure "${MODE_LABEL}: Jest failed after a good deploy to ${ALIAS}"
+  echo "== Jest failed. Posted \"${CONTEXT}\": failure on ${SHA:0:7}. Full output: ${RESULTS_DIR}/jest-light.log ==" >&2
+  exit 1
+fi
 
 if [[ "$MODE" == "relevant" ]]; then
   # The payload: the Apex this branch changed since it left RELEVANT_BASE, and the critical
