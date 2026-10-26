@@ -1,5 +1,5 @@
 /**
- * The entry point a generated rollup trigger calls (ADR-0137). No generated trigger ships, so
+ * The entry point a generated rollup trigger calls (ADR-0138). No generated trigger ships, so
  * the trigger context is handed to `handle` directly, as `run` hands it inside a trigger, with
  * organizations counting their child organizations (`ParentId`) as `RollupTriggerHandlerTest`
  * does: Account has no packaged rollup trigger.

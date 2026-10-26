@@ -19,7 +19,7 @@
  *    Health Check fix. Every value is copied from the package's own shipped registry by
  *    `AutomationControl`; nothing an administrator types reaches this class. The one row not
  *    from the registry, a generated rollup trigger's switch (`AutomationControl.ensureSwitch`,
- *    ADR-0137), is built from describe and labels, with Always Runs false, after the same
+ *    ADR-0138), is built from describe and labels, with Always Runs false, after the same
  *    permission check.
  *
  * The permission is enforced before this class is reached: `AutomationControl` writes the pause

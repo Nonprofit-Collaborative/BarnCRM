@@ -1708,14 +1708,14 @@ engine, plus its test; named `BarnRollup_` and the entity's API name so the same
 produced in every org), or a record-triggered Flow built from the shipped template. The
 Builder offers the trigger only for an entity that can carry an Apex trigger, and shows its
 state from the org: built in, on, turned off, inactive
-in Setup, not set up, or not available (ADR-0137,
-`0137-instant-totals-generated-trigger-deployed-by-the-admin.md`). Editing a rollup never
+in Setup, not set up, or not available (ADR-0138,
+`0138-instant-totals-generated-trigger-deployed-by-the-admin.md`). Editing a rollup never
 regenerates the trigger, because the rollup's settings live only in the definition. A
 generated trigger is switched off like any other automation, through an Automation Setting
 row (Section 10) named after the trigger, which the Builder creates with Is Package Default
 false the first time it is turned off; removing the trigger is a deploy the administrator
 makes from the Builder's removal package. Health Check findings for generated triggers are
-deferred (ADR-0137).
+deferred (ADR-0138).
 
 **R-R13 Freshness stamps are written when the work is done.** A calculation writes
 `Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section

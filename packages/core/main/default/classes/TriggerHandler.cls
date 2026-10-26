@@ -218,7 +218,7 @@ public virtual with sharing class TriggerHandler {
      * stopTest move the count too, which only clears claims a test would clear itself.
      *
      * Namespace accessible for a module's own trigger entry point, which dispatches one handler
-     * without a registry row and marks progress the same way (`RollupInstantTrigger`, ADR-0137).
+     * without a registry row and marks progress the same way (`RollupInstantTrigger`, ADR-0138).
      */
     @NamespaceAccessible
     public static void noteTriggerProgress() {

@@ -109,7 +109,7 @@ public with sharing class AutomationControl {
     /**
      * Creates the switch row for an automation no registry ships, when it has none yet: a
      * rollup trigger the administrator deployed from the Rollup Builder (canonical model R-R12,
-     * ADR-0137). The row starts on, with Is Package Default false, so `setEnabled` can then
+     * ADR-0138). The row starts on, with Is Package Default false, so `setEnabled` can then
      * switch it. Written through `AutomationSettingsWriter` like the shipped rows (ADR-0021):
      * the caller builds every value from describe and its own labels, never from typed input.
      */

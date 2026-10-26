@@ -143,7 +143,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0132](0132-modules-list-their-permission-sets-on-the-access-page.md) | A module lists its permission sets on the Access page by shipping Access Add-On rows | Accepted |
 | [0133](0133-related-record-matching.md) | Duplicates are also matched through values on related records | Accepted (owner approved the feature) |
 | [0134](0134-household-merge-runs-in-system-mode.md) | A household merge runs in system mode once BarnCRM has authorized it | Accepted (owner decision) |
-| [0137](0137-instant-totals-generated-trigger-deployed-by-the-admin.md) | Instant totals on any object: the Builder generates the trigger, the admin deploys it (amends ADR-0082 decision 8) | Proposed (builder decision) |
+| [0138](0138-instant-totals-generated-trigger-deployed-by-the-admin.md) | Instant totals on any object: the Builder generates the trigger, the admin deploys it (amends ADR-0082 decision 8) | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

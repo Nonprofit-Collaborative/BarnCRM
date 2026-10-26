@@ -1,4 +1,4 @@
-# ADR-0137: Instant Totals on Any Object: the Builder Generates the Trigger, the Admin Deploys It
+# ADR-0138: Instant Totals on Any Object: the Builder Generates the Trigger, the Admin Deploys It
 
 **Status:** Proposed (builder decision, under the owner's instruction to close gap 2: "Please
 resume work to close gap 2 now instead of waiting", Brandon, 2026-10-26)
