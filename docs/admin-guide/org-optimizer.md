@@ -46,8 +46,8 @@ hidden for everyone.
    users with a Sales Cloud or Service Cloud license can have (see [Duplicates](duplicates.md),
    How to turn it on). Without it the Duplicates section says so.
 
-Duplicate review no longer has a panel in **BarnCRM Settings**. Under **Households**, the
-**Duplicates** row has an **Open Org Optimizer** button that takes you to this page.
+Duplicate review no longer has a panel in **BarnCRM Settings**. On **People and Households**, in
+the **People** box, the **Duplicates** row has an **Open Org Optimizer** button that takes you to this page.
 
 ## 3. A five-minute walkthrough (as Maria)
 

@@ -15,13 +15,13 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
+| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **People and Households**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
 | 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top names **Setup, Apex Settings**. No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
 | 4 | Click **Learn more** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
-| 7 | Click **Households**, then scroll to the bottom of the page. | There is no **Recent Changes** heading or table on **Households**. Click **Automation**, **Access** and **Organization** in turn: none shows **Recent Changes**. |
-| 8 | Type `greeting` in **Search settings** and click **Formal greeting pattern**. | The console switches to **Households**, and **Recent Changes** is still not shown. Click **General**: **Recent Changes** shows again. |
+| 7 | Click **People and Households**, then scroll to the bottom of the page. | There is no **Recent Changes** heading or table on **People and Households**. Click **Automation**, **Access** and **Organization** in turn: none shows **Recent Changes**. |
+| 8 | Type `greeting` in **Search settings** and click **Formal greeting pattern**. | The console switches to **People and Households**, and **Recent Changes** is still not shown. Click **General**: **Recent Changes** shows again. |
 
 **Cleanup:** None.
 
@@ -32,8 +32,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**. Type `greeting` in **Search settings**. | A **Search Results** list appears as you type. It includes **Formal greeting pattern (Households)** and **Informal greeting pattern (Households)**. |
-| 2 | Click **Formal greeting pattern**. | The console switches to **Households** and scrolls to the **Preview and Recompute** panel. |
+| 1 | Open **BarnCRM Settings**. Type `greeting` in **Search settings**. | A **Search Results** list appears as you type. It includes **Formal greeting pattern (People and Households)** and **Informal greeting pattern (People and Households)**. |
+| 2 | Click **Formal greeting pattern**. | The console switches to **People and Households** and scrolls to the **Preview and Recompute** panel. |
 | 3 | Clear the box and type `pause`. | The **Automation** section's entry is listed. |
 | 4 | Clear the box and type `zzqx`. | "No settings match that search. Try a shorter word, for example greeting." |
 
@@ -287,3 +287,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 10 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
 
 **Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.
+
+## T-SET-17: People and Households, and boxes on every page
+
+**Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
+**Prerequisites:** admin user. The **Household upkeep**, **Duplicate Review** and **Relationships** features on, and **Tell people when their long jobs finish** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update all household names** in step 4.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** comes right after **Organization**. There is no **Households** and no **Relationships** section. |
+| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create a household automatically**, **Duplicates**), **Households** (**Delete a household once it is empty**, **Keep the households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. The **Needs a Change in Setup** note about duplicate rules is at the top. |
+| 3 | Tick **Keep the households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
+| 4 | Back on **People and Households**, click **Update all household names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
+| 5 | Open each other section in turn: **General**, **Organization**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
+| 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
+| 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
+| 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where this lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
+
+**Cleanup:** leave **Keep the households of deleted people** unticked (the default).

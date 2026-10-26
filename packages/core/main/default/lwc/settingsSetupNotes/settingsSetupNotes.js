@@ -30,6 +30,10 @@ const NOTES = {
   households: [
     { key: 'duplicates', what: DUPLICATES_WHAT, why: DUPLICATES_WHY, where: DUPLICATES_WHERE }
   ],
+  // Households merged into People and Households (P1), which shows the Duplicates row.
+  'people and households': [
+    { key: 'duplicates', what: DUPLICATES_WHAT, why: DUPLICATES_WHY, where: DUPLICATES_WHERE }
+  ],
   rollups: [{ key: 'rollupField', what: ROLLUP_WHAT, why: ROLLUP_WHY, where: ROLLUP_WHERE }],
   'error log': [
     {

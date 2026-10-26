@@ -327,6 +327,8 @@ public with sharing class SettingsController {
                 definition.MasterLabel,
                 definition.Description__c,
                 definition.Section__c,
+                // The page the row shows on, when its section names a sub-section (P1).
+                SettingSections.pageFor(definition.Section__c),
                 definition.Setting_Key__c
             }
         ) {
@@ -450,7 +452,11 @@ public with sharing class SettingsController {
         setting.dataType = definition.Data_Type__c;
         setting.minValue = definition.Min_Value__c;
         setting.maxValue = definition.Max_Value__c;
-        setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
+        // A row that still names the old Households or Relationships page shows on People and
+        // Households (P1), so a module or a row not yet moved never makes a page of its own.
+        setting.section = String.isBlank(definition.Section__c)
+            ? ''
+            : SettingSections.pageFor(definition.Section__c);
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;
         setting.navigationLabel = definition.Navigation_Label__c;

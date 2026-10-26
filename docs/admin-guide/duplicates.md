@@ -41,7 +41,7 @@ as they type, but nobody can review or merge suggestions: not on this panel, and
 Platform user nothing usable.
 
 1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
-2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
+2. Choose **Duplicates**. (In **BarnCRM Settings**, **People and Households**, the **Duplicates** row's
    **Open Org Optimizer** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.

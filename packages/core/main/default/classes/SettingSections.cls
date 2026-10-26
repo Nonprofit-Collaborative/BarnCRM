@@ -12,8 +12,22 @@ public with sharing class SettingSections {
     /** The BarnCRM modules (ADR-0124): the one place a module is installed and opened from. */
     @NamespaceAccessible
     public static final String MODULES = 'Modules';
+    /** People, households and relationships on one page: the old Households and Relationships. */
+    @NamespaceAccessible
+    public static final String PEOPLE_AND_HOUSEHOLDS = 'People and Households';
+    /**
+     * A sub-section (a box) of People and Households. A link may name a sub-section instead of
+     * a page: the console opens the page it is on and scrolls to it. Households and
+     * Relationships were pages until P1, so a link or a row that still names them lands there.
+     */
     @NamespaceAccessible
     public static final String HOUSEHOLDS = 'Households';
+    /** A sub-section of People and Households: how a person belongs to a household. */
+    @NamespaceAccessible
+    public static final String PEOPLE = 'People';
+    /** A sub-section of People and Households: the naming patterns and their preview. */
+    @NamespaceAccessible
+    public static final String HOUSEHOLD_NAMES = 'Household Names and Greetings';
     @NamespaceAccessible
     public static final String AUTOMATION = 'Automation';
     /** The error digest (C-23): its own section because it is a job, not an automation. */
@@ -41,6 +55,7 @@ public with sharing class SettingSections {
     public static final String VOLUNTEERS = 'Volunteers';
     @NamespaceAccessible
     public static final String ADDRESSES = 'Addresses';
+    /** A sub-section of People and Households, and a page until P1 (see HOUSEHOLDS). */
     @NamespaceAccessible
     public static final String RELATIONSHIPS = 'Relationships';
     /** Other products that complement or overlap BarnCRM, listed and linked, never depended on. */
@@ -54,8 +69,7 @@ public with sharing class SettingSections {
             GENERAL,
             MODULES,
             ORGANIZATION,
-            HOUSEHOLDS,
-            RELATIONSHIPS,
+            PEOPLE_AND_HOUSEHOLDS,
             ADDRESSES,
             GIVING,
             RECEIPTS,
@@ -71,11 +85,38 @@ public with sharing class SettingSections {
         };
     }
 
-    /** True when the given name is one of the shipped sections, ignoring case and spacing. */
+    /** The sub-sections a link may name, by name in lower case, each with the page it is on. */
+    private static Map<String, String> pageBySubSection() {
+        Map<String, String> pages = new Map<String, String>();
+        for (String box : new List<String>{ PEOPLE, HOUSEHOLDS, HOUSEHOLD_NAMES, RELATIONSHIPS }) {
+            pages.put(box.toLowerCase(), PEOPLE_AND_HOUSEHOLDS);
+        }
+        return pages;
+    }
+
+    /**
+     * The page a section name is shown on: the page a sub-section is on, so a row or a link that
+     * still names the old Households or Relationships page lands on People and Households; any
+     * other name as given.
+     */
+    @NamespaceAccessible
+    public static String pageFor(String name) {
+        String key = name == null ? '' : name.trim().toLowerCase();
+        Map<String, String> pages = pageBySubSection();
+        return pages.containsKey(key) ? pages.get(key) : name;
+    }
+
+    /**
+     * True when the given name is one of the shipped sections, or a sub-section a link may name,
+     * ignoring case and spacing.
+     */
     @NamespaceAccessible
     public static Boolean isKnown(String name) {
         if (String.isBlank(name)) {
             return false;
+        }
+        if (pageBySubSection().containsKey(name.trim().toLowerCase())) {
+            return true;
         }
         for (String section : all()) {
             if (section.equalsIgnoreCase(name.trim())) {

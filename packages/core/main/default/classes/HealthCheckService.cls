@@ -148,7 +148,8 @@ public with sharing class HealthCheckService {
     public static final String SECTION_STATE_PARAMETER = 'section';
 
     public static final String SECTION_GENERAL = 'General';
-    public static final String SECTION_HOUSEHOLDS = 'Households';
+    /** The People box of People and Households, where the way of belonging lives (P1). */
+    public static final String SECTION_PEOPLE = SettingSections.PEOPLE;
     public static final String SECTION_ACCESS = 'Access';
     public static final String SECTION_AUTOMATION = 'Automation';
 

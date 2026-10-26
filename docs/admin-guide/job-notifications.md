@@ -64,7 +64,8 @@ Start with no sample data loaded.
 | Sample data load, and removal if it stops part way | BarnCRM Settings, General |
 | Rollup recalculation (Recalculate, Recalculate all) | BarnCRM Settings, Rollups |
 | Seasonal address swap (Run now) | BarnCRM Settings, Addresses |
-| Duplicate scan, household name recompute | BarnCRM Settings, Households |
+| Duplicate scan | BarnCRM Settings, People and Households, at the **People** box |
+| Household name recompute | BarnCRM Settings, People and Households, at the **Household Names and Greetings** box |
 | With Giving: year end statement run | The statement run's record |
 | With Giving: acknowledgment email send (Send now) | The acknowledgment run's record |
 | With Giving: donor level recalculation (Recalculate now) | BarnCRM Settings, Giving |

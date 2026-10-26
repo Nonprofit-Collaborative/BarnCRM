@@ -44,7 +44,22 @@
                         <p class="slds-text-color_weak">{labels.emptySection}</p>
                     </template>
 
-                    <template for:each={currentSettings} for:item="row">
+                    <!-- One box per sub-section (P1). The row markup inside keeps its indentation. -->
+                    <template for:each={currentGroups} for:item="group">
+                    <section
+                        key={group.id}
+                        class="slds-box slds-var-m-bottom_medium"
+                        data-box={group.id}
+                        aria-labelledby={group.headingId}
+                    >
+                    <h2
+                        class="slds-text-heading_small slds-var-m-bottom_small"
+                        id={group.headingId}
+                        tabindex="-1"
+                    >
+                        {group.label}
+                    </h2>
+                    <template for:each={group.rows} for:item="row">
                         <div
                             key={row.key}
                             class="slds-form-element slds-var-m-bottom_medium"
@@ -153,7 +168,7 @@
 
                             <template lwc:elseif={row.isComponent}>
                                 <h3
-                                    class="slds-text-heading_small slds-var-m-bottom_x-small"
+                                    class={row.headingClass}
                                     data-key={row.key}
                                     tabindex="-1"
                                 >
@@ -199,6 +214,8 @@
                                 </p>
                             </template>
                         </div>
+                    </template>
+                    </section>
                     </template>
 
                     <template lwc:if={message}>

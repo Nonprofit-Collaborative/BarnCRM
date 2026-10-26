@@ -45,11 +45,11 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 ## T-ERASE-03: Erase the only member of a household
 
 **Purpose:** Confirm a household left empty is kept and made anonymous when empty households are not deleted.
-**Prerequisites:** admin. **Delete Empty Households** off in **BarnCRM Settings**, **Households** (the default). Create a contact `Erin Erasetest` with an email, phone and mailing address; a household of its own is created for it.
+**Prerequisites:** admin. **Delete Empty Households** off in **BarnCRM Settings**, **People and Households** (the default). Create a contact `Erin Erasetest` with an email, phone and mailing address; a household of its own is created for it.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open `Erin Erasetest`, click **Erase person**, then **Preview**. | Among the rows: **Household**, **Changed**, with the note **Kept because Delete Empty Households is off (BarnCRM Settings, Households). Renamed, and its greetings and addresses emptied.** The household's addresses are **Deleted**. |
+| 1 | Open `Erin Erasetest`, click **Erase person**, then **Preview**. | Among the rows: **Household**, **Changed**, with the note **Kept because Delete Empty Households is off (BarnCRM Settings, People and Households). Renamed, and its greetings and addresses emptied.** The household's addresses are **Deleted**. |
 | 2 | Type `TEST-002` and `Erin Erasetest`, click **Erase**. | **Erased. The list above is what changed, and the Erasure record keeps it.** |
 | 3 | Open the household that held Erin. | Name **Erased household**. Greetings and address are empty. It is not deleted. |
 | 4 | Open **Org Optimizer**, **Data quality**, and click **Recount**. | **People with no household** does not count the erased person. |

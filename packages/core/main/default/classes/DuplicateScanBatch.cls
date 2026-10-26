@@ -171,7 +171,7 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
             Label.Core_JobNotice_DuplicateScan,
             false,
             summary,
-            JobNotifier.SECTION_HOUSEHOLDS
+            JobNotifier.SECTION_PEOPLE
         );
     }
 }

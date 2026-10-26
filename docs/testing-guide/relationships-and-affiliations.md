@@ -70,7 +70,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Relationships**, untick **Keep both sides of relationships in step** and save. | Saved. |
+| 1 | In **BarnCRM Settings**, **People and Households**, **Relationships** box, untick **Keep both sides of relationships in step** and save. | Saved. |
 | 2 | On Luis, add Related Person **Diego Garcia**, Type **Child**. | Luis shows Diego, Child. Diego's card does not show Luis. |
 | 3 | On Luis, add the same relationship again. | Still refused as a duplicate (T-REL-03). |
 | 4 | Turn the setting back on and save. Open Luis's relationship to Diego on the **Relationships** tab, select **Edit**, and save without changes. | Diego's card now shows **Luis Garcia**, **Parent**. |

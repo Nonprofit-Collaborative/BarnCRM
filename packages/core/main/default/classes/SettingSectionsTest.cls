@@ -14,9 +14,9 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                17,
+                16,
                 sections.size(),
-                'Seventeen section names are agreed across the suite'
+                'Sixteen section names are agreed across the suite'
             );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.INTEGRATIONS),
@@ -63,10 +63,60 @@ private class SettingSectionsTest {
                 'A module that has not shipped yet still has its section name reserved'
             );
             Assert.isFalse(
-                SettingSections.isKnown('Household names and greetings'),
+                SettingSections.isKnown('Household naming'),
                 'A section name nobody agreed on is not one of ours'
             );
             Assert.isFalse(SettingSections.isKnown(null), 'Nothing is not a section');
+        }
+    }
+
+    /** P1: Households and Relationships are one page, and their old names still land on it. */
+    @IsTest
+    static void peopleAndHouseholdsIsOnePageThatTheOldNamesLandOn() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<String> sections = SettingSections.all();
+            String fromHouseholds = SettingSections.pageFor('Households');
+            String fromRelationships = SettingSections.pageFor(' relationships ');
+            String fromNaming = SettingSections.pageFor(SettingSections.HOUSEHOLD_NAMES);
+            String fromPeople = SettingSections.pageFor(SettingSections.PEOPLE);
+            Test.stopTest();
+
+            Assert.isTrue(
+                sections.contains(SettingSections.PEOPLE_AND_HOUSEHOLDS),
+                'People and Households is a page'
+            );
+            Assert.isFalse(sections.contains('Households'), 'Households is no longer a page');
+            Assert.isFalse(sections.contains('Relationships'), 'Relationships is no longer a page');
+            Assert.areEqual(
+                SettingSections.ORGANIZATION,
+                sections[sections.indexOf(SettingSections.PEOPLE_AND_HOUSEHOLDS) - 1],
+                'People and Households is where Households was, after Organization'
+            );
+            for (
+                String page : new List<String>{
+                    fromHouseholds,
+                    fromRelationships,
+                    fromNaming,
+                    fromPeople
+                }
+            ) {
+                Assert.areEqual(
+                    SettingSections.PEOPLE_AND_HOUSEHOLDS,
+                    page,
+                    'A sub-section, or an old page name, opens People and Households'
+                );
+            }
+            Assert.areEqual(
+                SettingSections.GIVING,
+                SettingSections.pageFor(SettingSections.GIVING),
+                'Any other page is its own'
+            );
+            Assert.isNull(SettingSections.pageFor(null), 'Nothing stays nothing');
+            Assert.isTrue(
+                SettingSections.isKnown('household names and greetings'),
+                'A link may name a sub-section, so it is a known name'
+            );
         }
     }
 
