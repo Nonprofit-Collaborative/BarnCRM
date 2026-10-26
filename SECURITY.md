@@ -31,14 +31,13 @@ The more of this you can give us, the faster we can confirm and fix:
 - Any proof of concept code, logs, or screenshots (with real constituent data removed).
 - How you would like to be credited, or that you prefer not to be.
 
-## Response targets
+## What to expect
 
-- We acknowledge a report within 5 business days.
-- After acknowledgement we confirm or dispute the finding and tell you our assessment and a rough timeline.
-- We keep you updated as we work on a fix, and we tell you when it lands.
+- Reports are read; there is no guaranteed response time.
+- Where we can, we confirm or dispute the finding and share our assessment.
 - We coordinate public disclosure with you, and credit you in the release notes unless you prefer otherwise.
 
-These are targets for a small volunteer project, not a contractual commitment.
+BarnCRM is a free, self-service project with no support service, so none of this is a commitment.
 
 ## Scope notes
 

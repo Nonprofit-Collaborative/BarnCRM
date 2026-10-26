@@ -1,0 +1,140 @@
+# Finding people and records
+
+Most days you only need to find one person or one household. Global search and list views
+do that. When you need a precise list (everyone in one city with no email, every household
+that gave this year), the **Find** tab builds it, saves it and exports it.
+
+Before you start: global search and list views work for everyone. The **Find** tab needs the
+**BarnCRM Find and Export** add-on, and your admin must have turned on the Data Manager
+feature. Ask your admin. See [Find and export](../admin-guide/find.md).
+
+Whatever you search or export, you only ever see records and fields your own access allows.
+A colleague may see more or fewer rows than you for the same query.
+
+## To find one record with global search
+
+1. Click the search box at the top of any Salesforce page.
+2. Type part of a name, an email address or a phone number.
+3. Choose a result, or press Enter to see all results grouped by kind of record.
+
+You should see: the record open in its own tab (in the **BarnCRM** app).
+
+## To use a list view
+
+1. Open the **Households**, **Organizations** or **Contacts** tab.
+2. On **Households** and **Organizations**, the tab shows the list of that name. On
+   **Contacts**, pick a list from the list view menu.
+3. Click a column heading to sort, or open the list and use Salesforce's list filters.
+
+You should see: the **Households** list with the household name, **Member Count**,
+**Informal Greeting** and **Custom Name**; the **Organizations** list with the name, phone and
+**Primary Contact**.
+
+## To build and run a query in Find
+
+1. Open the **Find** tab.
+2. In **Object**, choose what to look for, for example **Contact** or **Account**.
+3. In **Columns**, move the fields you want from **Available fields** to **Columns, in
+   order**. To add a field from a related record, choose it in **Add fields from**.
+4. Under **Conditions**, press **Add condition**. Choose a **Field**, an **Operator** (such as
+   **equals**, **contains**, **is blank**, **is one of** or **is in the last N days**) and a
+   **Value**. Add more conditions the same way.
+5. Optional: with two or more conditions, tick **Use custom condition logic** and type, for
+   example, `1 AND (2 OR 3)` in **Condition logic**.
+6. Choose **Sort by**, **Direction** and **Rows to show** (up to 2,000).
+7. Press **Run**.
+
+You should see: a table of results and a line such as "200 rows shown." If more records
+match, the line says "Showing the first 200 rows. Export to get every matching record."
+
+**Query (read only)** under the conditions shows the query in SOQL. You never need to read it.
+
+## To keep only records that have (or lack) related records
+
+1. Under **Related records**, press **Add related records**.
+2. Choose **Has related records** or **Has no related records**.
+3. Choose the **Kind of related record**, for example gifts on a household.
+4. Optional: add conditions on those related records.
+5. Press **Run**.
+
+You should see: only the records that match. To show related records in a column instead,
+use **Related record columns** and **Add a related record column**.
+
+## To count or total instead of listing
+
+1. Build the query, then press **Summarize**.
+2. In **Summary**, choose **Count of records**, **Total of**, **Lowest** or **Highest**, and
+   for the last three a **Field to measure**.
+3. Optional: choose **Group by**.
+4. Press **Summarize**.
+
+You should see: a table with one line per group. Blank values show as "(blank)".
+
+## To save and share a query
+
+1. Run the query, type a **Query name**.
+2. Optional: tick **Show to everyone who uses Find** to share it.
+3. Press **Save**. To make a copy under a new name, press **Save as**.
+
+You should see: "Saved" followed by the name. To open it later, choose it in **Saved
+queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
+(shared by Maria Lopez)". Only the person who saved a query can change, share or delete it.
+
+## To delete a saved query
+
+1. Open the query from **Saved queries** and press **Delete**.
+2. In "Delete this saved query?", press **Delete**, or **Keep it** to leave it.
+
+You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
+removed for everyone.
+
+## To export the results
+
+1. Run the query.
+2. Press **Export to CSV** or **Export to Excel**. Every matching record is exported, not only
+   the rows on screen, up to the export row limit your admin set.
+3. For a very large export, press **Export to Files** instead. You can leave the page.
+
+You should see: a file download, and "Exported 1,234 rows." For **Export to Files**: "Export
+to Files started. You can leave this page: BarnCRM tells you when the files are ready." When
+it finishes, the page lists the files and the bell shows a notification. The files are in
+Salesforce **Files**, **Owned by Me**. Delete them there once downloaded.
+
+## To type a query instead (optional)
+
+1. Press **Type a query**.
+2. Type or paste a query in **Query (SOQL)** (SELECT, FROM, WHERE, ORDER BY and LIMIT).
+3. Press **Use this query**.
+
+You should see: the builder filled in from your text, ready to run.
+
+## Common problems
+
+- Problem: "Find needs the Find and Export Records permission. Ask your administrator to
+  assign you the BarnCRM Find and Export permission set." You do not have the add-on. Ask your
+  admin.
+- Problem: "This object is not available to you: ..." Your access does not include that kind
+  of record. Choose another, or ask your admin.
+- Problem: "This field is not available to you: ... Remove the condition, or ask your
+  administrator for access." A shared query uses a field you cannot see. Remove that condition
+  and use **Save as** to keep your own copy.
+- Problem: "Left out columns you do not have access to: ..." The same, for columns. The query
+  still runs without them.
+- Problem: "Only the person who saved this query can change, share or delete it. Use Save as
+  to keep your own copy." Use **Save as**.
+- Problem: "Exported 50000 rows, the export row limit. Narrow the conditions, or ask an
+  administrator to raise the limit." Add conditions, or use **Export to Files**.
+- Problem: "Fix the conditions marked below, then try again." A condition is incomplete
+  ("Choose a field.", "Enter a value.") or the logic is wrong ("The condition logic must use
+  every condition."). Fix the marked lines.
+- Problem: "Rows to show must be a whole number from 1 to 2000." Change **Rows to show**.
+- Problem: fewer rows than a colleague sees. Find uses your own access. This is expected.
+
+## Related
+
+- [Getting around BarnCRM](getting-around.md)
+- [People and households](people-and-households.md)
+- [Duplicates](duplicates.md)
+- Admin Guide: [Find and export](../admin-guide/find.md),
+  [Bulk update](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
+  [Access](../admin-guide/access.md)
