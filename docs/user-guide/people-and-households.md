@@ -1,0 +1,155 @@
+# People and households
+
+A household is the group of people you treat as one: one mailing, one letter, one shared
+history. BarnCRM creates a household for every new person, names it, writes its greetings and
+keeps its member count right. Organizations (employers, foundations, congregations, partners)
+are kept separately.
+
+Before you start: open the **BarnCRM** app. Adding and changing people and households needs
+the Team Member, Coordinator, Fundraising Staff or Admin role. With Read Only you can look
+but not change; see [Read-only access](read-only-access.md).
+
+## To add a person
+
+1. Open the **Contacts** tab and click **New**.
+2. Fill in the name. Leave the household (the **Account Name** field) blank.
+3. Click **Save**.
+
+You should see: the person's record, with a household already created for them, for example
+**The Garcia Family**. The **Household** card on the right of the person links to it, with
+the member count and the formal greeting. If your org turned off automatic households, or
+records membership the flexible way, the household field may stay blank: open the household
+from the **Household** card or the **Households** tab.
+
+## To start from a household
+
+1. On the **Home** tab, click **New household**.
+2. Save. Then add people with **Add member** (below).
+
+You should see: a household with a placeholder name, renamed automatically once it has a
+member.
+
+## To add a member to a household
+
+1. Open the household. Find the **Members** card.
+2. Click **Add member**.
+3. Either search under **Add someone already in Salesforce** (type in **Search by name** and
+   choose the person), or fill in **Salutation**, **First name** and **Last name** under **Or
+   add someone new**.
+4. Click **Save**.
+
+You should see: "Added. The household name and greetings have been brought up to date." The
+member list shows a **Primary** badge on the primary contact and a **Deceased** badge on
+anyone marked deceased. (In orgs that use the simple way of belonging, the search box is not
+shown; you add someone new.)
+
+## To change the primary contact
+
+1. On the household's **Members** card, click **Make primary** on the person's row.
+
+You should see: "... is now the primary contact." The **Primary** badge moves, and the
+household's **Primary Contact** field follows.
+
+## To move a person to another household
+
+1. On the **Members** card, click **Move to another household** on the person's row.
+2. Choose the household to move them to, and click **Save**.
+
+You should see: "Moved. Both households have been brought up to date."
+
+## To control names and greetings
+
+A household's name and greetings are worked out from its members. On the household, the
+**Name and Greetings** section shows **Member Count**, **Anniversary**, **Custom Name**,
+**Formal Greeting** and **Informal Greeting**. On a person, the **Person** and **Household**
+sections hold the fields that feed them.
+
+| You want | Do this |
+|---|---|
+| Keep a household name you typed yourself | Edit the household, type the name and greetings, tick **Custom Name**, save. Nothing recalculates it until you untick it. |
+| Use a nickname in greetings | Edit the person and fill in **Preferred Name**. It replaces the first name in greetings. |
+| Leave someone out of the household name | Tick **Exclude From Household Name** on the person. They still count as a member. |
+| Leave someone out of the greetings | Tick **Exclude From Greetings** on the person. |
+| Record that someone has died | Tick **Deceased** on the person. They are left out of the greetings. |
+| Record each person's place | Set **Household Role** (Head, Spouse or Partner, Child, Other). |
+
+You should see: the household's name and greetings updated on the next save, unless
+**Custom Name** is ticked.
+
+## To merge two households
+
+Use this when the same family is in BarnCRM twice. You need edit access to both households.
+
+1. Open the household you want to keep and click **Merge or split** in the action bar.
+2. Stay on the **Merge** tab. In **Find the other household**, type part of its name and pick
+   it.
+3. Read the **Household comparison**. Where the two disagree, choose **Keep this one** or **Keep
+   the other one**. Check **Members after the merge**.
+4. Click **Merge**. Read "This cannot be undone", then click **Merge households**.
+
+You should see: "Merged. The household you kept now holds everyone from both." The other
+household is deleted, and its history, files and notes move to the one you kept. A merge
+cannot be undone, so check both households first.
+
+## To split someone out of a household
+
+1. On the household, click **Merge or split**, then the **Split** tab.
+2. Under **Choose who moves out**, tick each person who is moving.
+3. Choose **A new household**, or **An existing household** and search for it.
+4. Click **Split**, then confirm **Split** in "Split this household?".
+
+You should see: "Moved. Both household names and member counts are up to date."
+
+## To log an interaction
+
+1. On a person, household or organization, click **Log an interaction** in the action bar.
+2. Fill in **Subject**. Change **Date** if it happened on another day. **Type** starts as
+   Meeting; change it if it was, for example, a call.
+3. Add the people who took part, write your notes in **Comments**, and click **Save**.
+
+You should see: the note under **Past Activity** in the activity timeline. Anyone who can see
+the record can read it, so write accordingly.
+
+## To add an organization
+
+1. Open the **Organizations** tab and open the list, then click **New**.
+2. If Salesforce asks for a record type, choose **Organization** (not **Household**).
+3. Fill in the name and details and click **Save**.
+
+You should see: the organization's page with **Details**, an **Addresses** card and an
+**Affiliations** card listing the people connected to it. See
+[Relationships and affiliations](relationships-affiliations.md).
+
+## To erase a person
+
+Erasing a person on request is admin work. See [Erase a person](../admin-guide/erase-a-person.md).
+
+## Common problems
+
+- Problem: "This person is not in a household yet". Automatic households may be off in your
+  org. Add them from a household's **Members** card, or ask your admin.
+- Problem: "You can see this household but not change it, so merging and splitting are
+  switched off. Ask whoever manages access for edit access to both households." Ask your admin.
+- Problem: "You need edit access to both households to merge them." The other household is
+  one you cannot edit. Ask your admin.
+- Problem: "Both records must be households. Choose a household, not an organization."
+  Organizations are merged with Salesforce's own tools by an admin.
+- Problem: "The two households could not be combined, so nothing was changed." Salesforce
+  refused the merge (a merge deletes the other household, which needs permission to delete).
+  The reason is in the Error Log; ask your admin.
+- Problem: "The primary contact could not be changed. Check that you can edit this household
+  and try again." Ask your admin for edit access.
+- Problem: the household name will not update. **Custom Name** is ticked. Untick it.
+- Problem: there is no **Merge or split** button. You are on an organization, or outside the
+  **BarnCRM** app.
+
+## Related
+
+- [Addresses, email and phone](addresses-email-phone.md)
+- [Relationships and affiliations](relationships-affiliations.md)
+- [Duplicates](duplicates.md)
+- Admin Guide: [Households](../admin-guide/households.md),
+  [Household members](../admin-guide/household-members.md),
+  [Household naming](../admin-guide/household-naming.md),
+  [Merging and splitting households](../admin-guide/household-merge-split.md),
+  [Interaction notes](../admin-guide/interaction-notes.md)
