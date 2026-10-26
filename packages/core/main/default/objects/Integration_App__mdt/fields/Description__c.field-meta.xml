@@ -6,7 +6,7 @@
   <fieldManageability>DeveloperControlled</fieldManageability>
   <label>Description</label>
   <length>1000</length>
-  <required>true</required>
+  <required>false</required>
   <type>LongTextArea</type>
   <visibleLines>3</visibleLines>
 </CustomField>
