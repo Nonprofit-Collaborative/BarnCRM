@@ -970,7 +970,7 @@ private class HealthCheckServiceTest {
             System.assertNotEquals(
                 null,
                 finding,
-                'ADR-NEXT: reports follow custom fiscal year periods while BarnCRM totals run ' +
+                'ADR-0135: reports follow custom fiscal year periods while BarnCRM totals run ' +
                 'in whole years, so an org with a custom year is told the two can disagree.'
             );
             System.assert(
@@ -1007,7 +1007,7 @@ private class HealthCheckServiceTest {
             System.assertEquals(
                 null,
                 find(findings, 'fiscal_year_mismatch'),
-                'BarnCRM keeps no fiscal year of its own (ADR-NEXT), so there is no second ' +
+                'BarnCRM keeps no fiscal year of its own (ADR-0135), so there is no second ' +
                 'fiscal year to disagree with Setup.'
             );
         }

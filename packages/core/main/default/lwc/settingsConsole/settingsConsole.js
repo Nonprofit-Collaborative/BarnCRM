@@ -263,7 +263,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isRecord: setting.dataType === 'Record',
       isRecordTypeList: setting.dataType === 'RecordTypeList',
       isComponent: setting.dataType === 'Component',
-      // A value Setup holds: shown read only, never saved (ADR-NEXT).
+      // A value Setup holds: shown read only, never saved (ADR-0135).
       isSetupValue: setting.dataType === 'SetupValue',
       hasHelp: Boolean(setting.helpUrl),
       learnMoreLabel: LEARN_MORE_ARIA.replace('{0}', setting.label),

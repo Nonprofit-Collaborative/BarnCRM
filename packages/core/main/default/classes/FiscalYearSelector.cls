@@ -1,5 +1,5 @@
 /**
- * The org's fiscal year, as Setup holds it (feature C-11, ADR-NEXT).
+ * The org's fiscal year, as Setup holds it (feature C-11, ADR-0135).
  *
  * BarnCRM has one fiscal year, the org's (Setup, Company Settings, Fiscal Year). Every rollup
  * window is computed from it (rule R-R3), and the packaged retention reports read it through

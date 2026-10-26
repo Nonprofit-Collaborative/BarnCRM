@@ -1,7 +1,7 @@
 /**
  * Fiscal year windows, against a fiscal year that does not start in January (canonical model R-R3).
  * The org's fiscal year cannot be changed from Apex, so its start month is injected through
- * FiscalYearSelector, the one place the engine reads it (ADR-NEXT).
+ * FiscalYearSelector, the one place the engine reads it (ADR-0135).
  */
 @IsTest(testFor='ApexClass:RollupDateWindow')
 private class RollupDateWindowTest {
@@ -95,7 +95,7 @@ private class RollupDateWindowTest {
             System.Assert.areEqual(
                 FiscalYearSelector.fiscalYearStartMonth(),
                 RollupDateWindow.fiscalYearStartMonth(),
-                'ADR-NEXT: the window starts in the month the fiscal year starts in Setup, the ' +
+                'ADR-0135: the window starts in the month the fiscal year starts in Setup, the ' +
                 'same month the reports read, with no BarnCRM setting in between.'
             );
             System.Assert.areEqual(

@@ -1,5 +1,5 @@
 /**
- * Tests for SetupValueSelector (ADR-NEXT): the values Setup holds that the settings console
+ * Tests for SetupValueSelector (ADR-0135): the values Setup holds that the settings console
  * shows read only.
  */
 @IsTest(testFor='ApexClass:SetupValueSelector')

@@ -159,7 +159,7 @@ def check_setting_rows(problems):
         if value_of(text, "Data_Type__c") == "Component":
             continue
         if value_of(text, "Data_Type__c") == "SetupValue":
-            # A value Setup holds, shown read only (ADR-NEXT). The console shows only the keys
+            # A value Setup holds, shown read only (ADR-0135). The console shows only the keys
             # SetupValueSelector lists and silently leaves any other row out, so check it here.
             key = value_of(text, "Setting_Key__c")
             if value_of(text, "Settings_Object__c") != "Organization" or key not in setup_values:

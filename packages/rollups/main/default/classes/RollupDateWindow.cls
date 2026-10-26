@@ -2,7 +2,7 @@
  * The fiscal year window a fiscal-aware rollup is limited to.
  *
  * Canonical model R-R3: the window is never stored on the definition. It is computed at run time
- * from the org's fiscal year start month (Setup, Company Settings, Fiscal Year; ADR-NEXT) and the
+ * from the org's fiscal year start month (Setup, Company Settings, Fiscal Year; ADR-0135) and the
  * definition's Fiscal Year Offset, so changing the start month in Setup and recalculating
  * corrects every fiscal total in the org without touching a single definition.
  *

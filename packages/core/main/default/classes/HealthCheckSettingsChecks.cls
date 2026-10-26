@@ -223,7 +223,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
-     * Whether the org uses a custom fiscal year (ADR-NEXT). BarnCRM windows are whole years
+     * Whether the org uses a custom fiscal year (ADR-0135). BarnCRM windows are whole years
      * from the org's fiscal year start month; report date literals follow custom periods, so
      * with a custom year the two can disagree. Said as information, with no fix button: the
      * only change is in Setup, and an org may keep its custom year on purpose.

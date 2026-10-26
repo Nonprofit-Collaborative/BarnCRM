@@ -9,7 +9,7 @@ public with sharing class SettingsController {
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
-    /** A value Setup holds, shown read only and never saved (ADR-NEXT). */
+    /** A value Setup holds, shown read only and never saved (ADR-0135). */
     private static final String TYPE_SETUP_VALUE = 'SetupValue';
     private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
     /** The module a Setting Definition row belongs to when it names none. */
@@ -450,7 +450,7 @@ public with sharing class SettingsController {
             return setting;
         }
         if (isSetupValue) {
-            // Shown, never saved: Setup holds it and BarnCRM keeps no copy (ADR-NEXT).
+            // Shown, never saved: Setup holds it and BarnCRM keeps no copy (ADR-0135).
             setting.value = SetupValueSelector.valueOf(settingsObject, definition.Setting_Key__c);
             setting.checked = false;
             return setting;

@@ -596,7 +596,7 @@ private class SettingsControllerTest {
             Assert.isFalse(unmet.get(SettingsController.CHECK_EMAIL), 'Email blocked');
             Assert.isFalse(
                 met.containsKey('fiscalYear'),
-                'BarnCRM keeps no fiscal year of its own (ADR-NEXT), so there is nothing to ' +
+                'BarnCRM keeps no fiscal year of its own (ADR-0135), so there is nothing to ' +
                 'compare with Setup and no fiscal year check'
             );
         }

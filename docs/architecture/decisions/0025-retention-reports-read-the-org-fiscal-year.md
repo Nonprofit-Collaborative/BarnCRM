@@ -1,6 +1,6 @@
 # ADR-0025: Retention reports read the org fiscal year, and the two fiscal years have to agree
 
-**Status:** Accepted; superseded in part by ADR-NEXT (BarnCRM uses the org fiscal year:
+**Status:** Accepted; superseded in part by ADR-0135 (BarnCRM uses the org fiscal year:
 decisions 1 and 4, and the two fiscal years, no longer apply)
 **Date:** 2026-09-08
 **Source:** builder decision under plan Section 9.3 (platform limitation), found while

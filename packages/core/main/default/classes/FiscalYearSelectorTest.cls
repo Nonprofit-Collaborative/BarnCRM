@@ -1,5 +1,5 @@
 /**
- * Tests for FiscalYearSelector (feature C-11, ADR-NEXT).
+ * Tests for FiscalYearSelector (feature C-11, ADR-0135).
  *
  * The fiscal year in Setup cannot be changed from Apex, so the org is read once for real, as
  * an administrator and as a user with no BarnCRM permissions at all, and injected everywhere
