@@ -1497,27 +1497,11 @@ private class HouseholdMergeServiceTest {
      */
     private static User readOnlyUser() {
         // Which standard profile gives a user no edit access is not the same in every org:
-        // "Read Only" is absent from some editions and org shapes. The first of the known
-        // ones that this org actually has is used, so the test measures the refusal rather
-        // than the org's profile list.
-        Map<String, Profile> byName = new Map<String, Profile>();
-        for (Profile candidate : [
-            SELECT Id, Name
-            FROM Profile
-            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
-        ]) {
-            byName.put(candidate.Name, candidate);
-        }
-        Profile readOnly = byName.containsKey('Read Only')
-            ? byName.get('Read Only')
-            : byName.get('Minimum Access - Salesforce');
-        Assert.isNotNull(
-            readOnly,
-            'This org has no standard profile without edit access, so a merge refused for ' +
-            'want of edit access cannot be exercised at all'
-        );
+        // "Read Only" is absent from some editions and org shapes. TestUsers finds the profile
+        // without edit access that this org actually has, so the test measures the refusal
+        // rather than the org's profile list.
         User reader = new User(
-            ProfileId = readOnly.Id,
+            ProfileId = TestUsers.readOnlyProfileId(),
             LastName = 'Reader',
             Email = 'reader@barncrm.test.invalid',
             Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',

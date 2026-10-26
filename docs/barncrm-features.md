@@ -12,14 +12,14 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 - **Built, not merged**: built on the named branch or open pull request, waiting for review, an org test run, or the branches it is stacked on.
 - **Replaced**: shipped earlier and superseded by the feature the row names; kept in the code only where the row says.
 - **Planned**: in the product plan roadmap (iteration shown where the plan gives one). "Proposed" marks an idea recorded for consideration, not approved or scheduled.
-- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders, CH = Corporate Hub, PB = Portal Builder), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
+- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders, CH = Corporate Hub, PB = Portal Builder, LB = LWC Builder), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
 
 **Editions**
 
 | Edition | What it is | Packages |
 |---|---|---|
-| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events, Corporate Hub and Portal Builder later); no nonprofit module is shown or offered |
-| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models and Funders offered as further modules (Corporate Hub and Portal Builder later, in both editions) |
+| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events, Corporate Hub, Portal Builder, Territory Management and LWC Builder later); no nonprofit module is shown or offered |
+| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models and Funders offered as further modules (Corporate Hub, Portal Builder, Territory Management and LWC Builder later, in both editions) |
 
 BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then chooses the edition once in the Setup Assistant; the Nonprofit Edition opens Salesforce's installer for Giving, and other modules are offered the same way. The Standard Edition shows no nonprofit module anywhere in Core; one already installed keeps working. A module that is never installed leaves nothing in the org. Changing the edition later: [editions.md](admin-guide/editions.md).
 
@@ -93,7 +93,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Household merge from a duplicate pair | Minor | Merges a duplicate household pair in one step using the standard household merge. | Shipped | C-20 |
 | Person merge upkeep | Minor | After Salesforce's person merge, the kept person joins the other's households and totals recalculate. Shortly after any Salesforce merge, the kept record keeps one default address, a kept person loses relationships with themselves and second copies, their primary affiliation is chosen again, and a household merged this way is recounted and renamed, with a person who was in both households left with one membership. A merge made inside a background job, or with no job left to queue, is tidied up the same way once it is saved, and a person account keeps the default matching its mailing address. | Shipped (#377); background merges and the person account default: Shipped (#403) | C-20, ADR-0118 |
 | "Not a duplicate" dismissals | Minor | A dismissed pair, with a reason, is not suggested again, including when a duplicate rule reports it again on save; any BarnCRM Admin can delete one. | Shipped (fixes #377) | C-20 |
-| Related-record duplicate matching | Major | Pairs people or households that share an email, phone or address held only on a related record (Contact Point Email, Phone and Address, BarnCRM addresses, or an admin's own source), which Salesforce duplicate rules cannot see. Match sources are managed on the Custom metadata page in BarnCRM Settings; a shipped one can be archived; a source whose object is not in the org does nothing. The duplicate scan adds the pairs they find among contacts and among households to the review list with a reason naming the source ("Same email on Contact Point Email"), once, after any rule's, and only where a duplicate rule for that kind of record is active (Salesforce's own Duplicate Record Sets tab shows them under that rule); a value shared by more than ten records is ignored, and people in one household are not paired by a shared phone or address. A people import with "Also match with my duplicate rules" also matches incoming people (contacts or person accounts) through the sources (email, phones, mailing and other address) when the rules find nobody, and loads a row into a person found that way only when the last names agree. No save-time warning. | Shipped (stacked PRs: match sources, scan, import) | Owner request 2026-10-25, ADR-0133 |
+| Related-record duplicate matching | Major | Pairs people or households that share an email, phone or address held only on a related record (Contact Point Email, Phone and Address, BarnCRM addresses, or an admin's own source), which Salesforce duplicate rules cannot see. Match sources are managed on the Custom metadata page in BarnCRM Settings; a shipped one can be archived; a source whose object is not in the org does nothing. The duplicate scan adds the pairs they find among contacts and among households to the review list with a reason naming the source ("Same email on Contact Point Email"), once, after any rule's, and only where a duplicate rule for that kind of record is active (Salesforce's own Duplicate Record Sets tab shows them under that rule); a value shared by more than ten records is ignored, and people in one household are not paired by a shared phone or address. A people import with "Also match with my duplicate rules" also matches incoming people (contacts or person accounts) through the sources (email, phones, mailing and other address) when the rules find nobody, and loads a row into a person found that way only when the first and last names agree. No save-time warning. | Shipped (stacked PRs: match sources, scan, import) | Owner request 2026-10-25, ADR-0133 |
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
 | Relationships and affiliations with no person | Minor | Health Check counts and links relationships with no person on one side and affiliations with no person (left by a person delete), changing nothing. | Shipped (#377) | PEOPLE-19 |
@@ -170,6 +170,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates (grouped only by fields Salesforce can group, dates shown as dates), XLSX export (cells cut at Excel's 32,767 characters, the sheet built a piece at a time so a large export never needs one huge string) and inline edit; the platform's share, history and feed tables are not offered; the SOQL shown reads back as typed, backslashes included, and a query of the wrong shape is refused with a message; each object is described once per request however many paths cross it. | Shipped (fixes #377) | C-36, ADR-0078 |
 | Data transforms and duplicate-rule matching | Minor | Import column changes (a declarative step list, no code evaluation) previewed before and after, a shared DataTransform engine for bulk update and bulk delete, and matching through the org's active duplicate rules with the template's several-matches policy: people and organizations of a people import (a person account rule counts for person accounts only, an account rule for organizations; a contact import never matches the contact half of a person account), and in Load one object, under Create new records and Update or create, matched by external ID, any object with an active rule (custom objects included), where a matched row updates the record instead of creating a copy, a record ID or key match always wins, an existing external ID is never overwritten, a rule that cannot run rejects rather than creates, and the dry run and commit decide alike. | Shipped; bulk update steps and bulk delete shipped (#219); one-object matching (D-47, #405); fixes #377 | C-37, ADR-0081 |
 | Scheduled imports and external sources | Minor | Loads from SFTP, cloud storage or other systems on a schedule, committing only within admin-set limits. | Planned (1.x) | C-38 |
+| Grid tool | Major | A Super Tool: a spreadsheet-style editable grid to view and edit many related records on one screen, with inline edit, related records in one view and saved grids; builds on the inline edit of Advanced Find results. | Planned (after v1.0) | C-41, D-98 |
 
 ### 1.6 Automation and Rollups
 
@@ -262,6 +263,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Unlocked-to-managed migration kit | Minor | Moves a production pilot from unlocked to managed packages: check, export, reimport with every record link translated, and verify record by record. | Shipped | C-31, ADR-0088 |
 | Telemetry (opt-in) | Minor | Anonymous, opt-in usage counts (installed modules, org shape, error counts), off by default. | Not planned (deferred indefinitely, D-24: no AppExchange listing for now; a listing would use AppExchange App Analytics instead) | C-26 |
 | CMDT Manager | Minor | A Custom metadata page in BarnCRM Settings (General) where holders of the BarnCRM Metadata Admin permission set add, edit and archive the org's own relationship types; shipped types are read only. | Shipped | plan 6.1 item 9, ADR-0085 |
+| Multi-brand management | Major | One organization runs several brands (programs, chapters, affiliates, a thrift store, DBAs): brand records with name, logo, address, phone, website, colors, default email sender and letter signature, one default brand; each brand belongs to a legal entity (legal name, tax or registration ID, registered address, fiscal year start; the organization itself by default), and gifts, funds, receipts and receipt numbering belong to the receiving legal entity; brands assigned to people, households and organizations (one person can have several), and a Brand field on module records such as gifts, appeals, volunteer jobs and programs, set by default, in bulk or on import; receipts, letters, documents and portals use the record's brand; list views and reports filter by brand; an optional setting, off by default, that shows a user only records with at least one of the user's brands (records with no brand follow normal sharing). Both editions; module features consume it. | Planned (after v1.0, not scheduled) | C-47, D-119, D-120 |
 
 ### 1.8 Monitoring and Health
 
@@ -589,6 +591,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Events package | Major | Simple event registration and attendance for non-fundraising events (both editions). | Planned (post-1.0) | plan 6.1 item 2 |
 | Contact Point Sync | Major | Optional module, not Core: keeps the standard Contact Point Email, Contact Point Phone and Contact Point Address records in step with a person's email and phone fields and the address record. A separate package so Core stays free of those objects. | Planned (1.x, not scheduled) | C-45 (D-111) |
 | Address Verification | Major | Optional module, not Core: verifies address records with a provider key the organization brings and sets in the BarnCRM Settings console, and writes Verification Status and Latest Verified Date. No provider is bundled and BarnCRM adds no paid service. | Planned (1.x, not scheduled) | C-46 (D-112) |
+| Territory Management | Major | Optional module, not Core (formerly planned as a Core Super Tool): assigns people, households and organizations to territories and owners by rules (for example geography, postal code, type or size), with a preview before reassigning and undo. Both editions. | Planned (after v1.0, not scheduled) | C-40 (D-98, D-120) |
 
 ---
 
@@ -624,13 +627,13 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 8. Portal Builder
 
-**Edition:** Both editions. Depends on Core only; each template needs only its own module and is offered only when that module is installed. No package directory exists yet. Portal users log in without Salesforce user licenses; the architecture (off-platform portal, recommended, or on-platform Salesforce Site) is still open (plan 11.2 item 30). No Experience Cloud dependency. Planned after the Core quality pass and after C-45 and C-46; not scheduled to an iteration (plan 5.9, D-118). Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
+**Edition:** Both editions. Depends on Core only; each template needs only its own module and is offered only when that module is installed. No package directory exists yet. Portal users log in at no additional Salesforce license cost: an on-platform Salesforce Site with BarnCRM's own login layer is required, and an off-platform portal is an optional later connector; confirming the on-platform option waits on a check of Salesforce's terms (plan 11.2 item 30, D-120). No Experience Cloud dependency. Planned after the Core quality pass and after C-45 and C-46; not scheduled to an iteration (plan 5.9, D-118). Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
 
 ### 8.1 Portals
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Portal Builder | Major | Builds logged-in portals from templates, for people verified against their BarnCRM record, with no Salesforce user license per login. | Planned (1.x) | PB-01 |
+| Portal Builder | Major | Builds logged-in portals from templates, for people verified against their BarnCRM record, with logins at no additional Salesforce license cost. | Planned (1.x) | PB-01 |
 | Board portal template | Major | Board members see meetings, agendas, packets and minutes, approve minutes, record votes, and complete disclosures and policy acknowledgments. Needs Corporate Hub. | Planned (1.x) | PB-02 |
 | Volunteer portal template | Major | Volunteers see shifts, sign up, log hours and keep their profile current. Needs Volunteers. | Planned (1.x) | PB-03 |
 | Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |
@@ -638,7 +641,24 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ---
 
-## 9. Cross-module platform capabilities
+## 9. LWC Builder
+
+**Edition:** Both editions. Depends on Core only. No package directory exists yet. Admins build their own components on a drag-and-drop grid canvas; one packaged component placed in Lightning App Builder shows each saved design, reading as the viewing user so permissions and sharing apply, and nothing is deployed at run time. Planned after v1.0, not scheduled to an iteration; a new ADR is needed before build (plan 5.10, D-120).
+
+### 9.1 Component building
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Grid canvas builder | Major | Drag-and-drop layout of rows, columns and sections, with preview, saved as a named component design. | Planned (after v1.0) | LB-01 |
+| Runtime component | Major | One packaged component placed on record, app and home pages that shows a chosen design, honouring the user's object, field and record access. | Planned (after v1.0) | LB-02 |
+| Building blocks | Major | Record fields, related lists, record lists, charts from standard reports, text and images. | Planned (after v1.0) | LB-03 |
+| Action buttons | Minor | Buttons that launch a quick action or a flow. | Planned (after v1.0) | LB-04 |
+| Conditional visibility | Minor | Show or hide each block by field value or by permission. | Planned (after v1.0) | LB-05 |
+| Export as source | Minor | Export a design as LWC source for developers. | Planned (later) | LB-06 |
+
+---
+
+## 10. Cross-module platform capabilities
 
 | Capability | What it means | Status | Source |
 |---|---|---|---|

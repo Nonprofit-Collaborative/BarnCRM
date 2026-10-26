@@ -152,11 +152,12 @@ public with sharing class ImportDuplicateRuleMatcher {
      * What the match sources match for each incoming person (R-IT16, ADR-0133
      * `0133-related-record-matching.md`), in the same shape as `matchesFor`: the records of the
      * object that hold one of the person's email, phone or address values on an active source,
-     * read back in the user's mode with the allowed record types, and kept only when their last
-     * name agrees with the person's (trimmed, capitals ignored). A shared address or phone
-     * says two records belong together, not that they are one person, so without the name
-     * check one person's row would load into a relative's record. Values are keyed by Contact
-     * attribute name; a null entry (a person already matched) is not looked up.
+     * read back in the user's mode with the allowed record types, and kept only when both their
+     * first and last names agree with the person's (trimmed, capitals ignored; two blank first
+     * names agree). A shared address, phone or family email says two records belong together,
+     * not that they are one person, so a last name alone would load Jane Smith's row into John
+     * Smith's record (ADR-0133 decision 12). Values are keyed by Contact attribute name; a null
+     * entry (a person already matched) is not looked up.
      *
      * @param type Contact, or Account for person accounts
      * @param people each person's values, or null to skip that person
@@ -178,18 +179,14 @@ public with sharing class ImportDuplicateRuleMatcher {
             all.addAll(ids);
         }
         Map<Id, SObject> visible = visible(type, all, allowedRecordTypes);
-        Map<Id, String> lastNames = lastNamesOf(type, visible.keySet());
+        Map<Id, String> names = namesOf(type, visible.keySet());
         for (Integer index = 0; index < holders.size(); index++) {
-            String lastName = comparableName(
-                people[index] == null ? null : people[index].get(LAST_NAME)
-            );
+            String name = people[index] == null
+                ? null
+                : nameKey(people[index].get(FIRST_NAME), people[index].get(LAST_NAME));
             List<SObject> kept = new List<SObject>();
             for (Id matched : holders[index]) {
-                if (
-                    lastName != null &&
-                    visible.containsKey(matched) &&
-                    lastName == lastNames.get(matched)
-                ) {
+                if (name != null && visible.containsKey(matched) && name == names.get(matched)) {
                     kept.add(visible.get(matched));
                 }
             }
@@ -198,18 +195,27 @@ public with sharing class ImportDuplicateRuleMatcher {
         return result;
     }
 
+    private static final String FIRST_NAME = 'FirstName';
     private static final String LAST_NAME = 'LastName';
 
-    private static String comparableName(String value) {
-        return String.isBlank(value) ? null : value.trim().toLowerCase();
+    /**
+     * First and last name, each trimmed and in lower case, as one comparable value; null with
+     * no last name, which never agrees with anything.
+     */
+    private static String nameKey(String firstName, String lastName) {
+        if (String.isBlank(lastName)) {
+            return null;
+        }
+        String first = String.isBlank(firstName) ? '' : firstName.trim().toLowerCase();
+        return first + '\n' + lastName.trim().toLowerCase();
     }
 
     /**
-     * The last name of each record, trimmed and in lower case: a contact's, or a person
-     * account's person last name, read by name since only a person account org has it on
+     * The `nameKey` of each record: a contact's first and last name, or a person account's
+     * person first and last name, read by name since only a person account org has them on
      * Account. User mode; a record whose name the user may not read is left out.
      */
-    private static Map<Id, String> lastNamesOf(Schema.SObjectType type, Set<Id> ids) {
+    private static Map<Id, String> namesOf(Schema.SObjectType type, Set<Id> ids) {
         Map<Id, String> result = new Map<Id, String>();
         if (
             ids.isEmpty() ||
@@ -221,14 +227,17 @@ public with sharing class ImportDuplicateRuleMatcher {
         }
         for (
             SObject record : Database.queryWithBinds(
-                'SELECT Id, LastName FROM ' +
+                'SELECT Id, FirstName, LastName FROM ' +
                     type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
                     ' WHERE Id IN :ids',
                 new Map<String, Object>{ 'ids' => ids },
                 AccessLevel.USER_MODE
             )
         ) {
-            result.put(record.Id, comparableName((String) record.get(LAST_NAME)));
+            result.put(
+                record.Id,
+                nameKey((String) record.get(FIRST_NAME), (String) record.get(LAST_NAME))
+            );
         }
         return result;
     }

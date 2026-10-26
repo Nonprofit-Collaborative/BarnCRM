@@ -20,14 +20,8 @@ private class ImportFieldAccessTest {
     private static final String UNGRANTED_ATTRIBUTE = 'AssistantName';
 
     private static User importer() {
-        Profile minimum = [
-            SELECT Id
-            FROM Profile
-            WHERE Name = 'Minimum Access - Salesforce'
-            LIMIT 1
-        ];
         User person = new User(
-            ProfileId = minimum.Id,
+            ProfileId = TestUsers.minimumAccessProfileId(),
             LastName = 'Fieldaccess',
             Email = 'fieldaccess@barncrm.test.invalid',
             Username = 'fieldaccess' + DateTime.now().getTime() + '@barncrm.test.invalid',

@@ -649,7 +649,15 @@ custom metadata, then labels, then static resources with custom permissions, the
 flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
 applications, tabs, quick actions, Lightning components), then Giving, then Volunteers (a no-op while `packages/volunteers` holds
 no metadata, and left out by `--core-only`), then Mirror. A failed stage asks the
-org for the component level report, by job id, in human form and then as JSON. After the last
+org for the component level report, by job id, in human form and then as JSON. Once Core's last
+stage is in, the script runs `CorePostInstall.runAsSourceDeploy()` as anonymous Apex: the steps
+Core's install handler runs, which a deployment never triggers (first-run setup on a fresh org,
+the Automation switches, the import templates, the recommended coexistence mode, the nightly tab
+access check, and the BarnCRM Admin permission set for the person deploying). It is safe on an
+org that already has BarnCRM: an org with saved BarnCRM Settings or a household is treated as an
+upgrade, so no setting, feature or edition an administrator chose changes, and a second run
+changes nothing. `run-org-tests.sh` sets `SOURCE_POST_INSTALL=0` to skip it, because the Apex
+tests assume an org that has never saved BarnCRM Settings. After the last
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no
 post-install script and would otherwise leave the org without the rollup definitions a real

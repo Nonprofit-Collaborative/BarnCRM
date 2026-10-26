@@ -217,13 +217,7 @@ private class ImportMatcherTest {
                 options
             );
             User reader = new User(
-                ProfileId = [
-                    SELECT Id
-                    FROM Profile
-                    WHERE Name = 'Minimum Access - Salesforce'
-                    LIMIT 1
-                ]
-                .Id,
+                ProfileId = TestUsers.minimumAccessProfileId(),
                 LastName = 'Noread',
                 Email = 'noread@barncrm.test.invalid',
                 Username = 'noread' + DateTime.now().getTime() + '@barncrm.test.invalid',

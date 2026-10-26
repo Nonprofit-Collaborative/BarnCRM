@@ -22,14 +22,20 @@ private class GetHouseholdSummaryActionTest {
             maria.AccountId = household.Id;
             wei.AccountId = household.Id;
             insert new List<Contact>{ maria, wei };
-            update new Account(
+            Account withAddress = new Account(
                 Id = household.Id,
                 Primary_Contact__c = wei.Id,
                 BillingStreet = '12 Elm Street',
                 BillingCity = 'Springfield',
-                BillingState = 'IL',
                 BillingPostalCode = '62701'
             );
+            AddressTestDataFactory.putStateAndCountry(withAddress, 'Billing', 'IL', 'US');
+            update withAddress;
+            Account stored = [
+                SELECT BillingState, BillingCountry
+                FROM Account
+                WHERE Id = :household.Id
+            ];
 
             Test.startTest();
             List<GetHouseholdSummaryAction.Result> results = GetHouseholdSummaryAction.summarize(
@@ -44,9 +50,10 @@ private class GetHouseholdSummaryActionTest {
             Assert.areEqual(2, summary.members.size(), 'Both members are listed');
             Assert.areEqual(2, summary.memberCount, 'The member count is kept by Core');
             Assert.isTrue(String.isNotBlank(summary.formalGreeting), 'The greeting is given');
+            // The state reads IL, or Illinois where State and Country Picklists are on.
             Assert.areEqual(
-                '12 Elm Street, Springfield, IL, 62701',
-                summary.mailingAddress,
+                '12 Elm Street, Springfield, ' + stored.BillingState + ', 62701',
+                summary.mailingAddress.removeEnd(', ' + stored.BillingCountry),
                 'The address is on one line'
             );
             Assert.isTrue(String.isNotBlank(summary.primaryContactName), 'The primary is named');

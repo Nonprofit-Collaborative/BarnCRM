@@ -15,6 +15,14 @@ or leave.
 You never have to create a household by hand, and you never have to remember to fix a
 count after a change.
 
+**Households BarnCRM creates are saved past your org's Account duplicate rules.** A household
+is named from its members, so two Garcia families give two households that look alike without
+being duplicates, and a blocking Account duplicate rule would otherwise refuse the household
+and, with it, the save of the person you were adding. A rule set to report still reports them,
+and BarnCRM's duplicate review lists them like any other account, so you can merge real
+duplicates there. A household account saved directly, from the Accounts tab or a data loader,
+is checked by your rules as usual.
+
 ## How to turn it on
 
 Households work as soon as Core is installed. Everything you can change is on the

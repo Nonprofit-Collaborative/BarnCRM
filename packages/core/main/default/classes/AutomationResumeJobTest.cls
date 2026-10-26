@@ -17,6 +17,11 @@ private class AutomationResumeJobTest {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
+    /** The org's own resume job, if automation is paused there, would be counted otherwise. */
+    private static void clearOrgResumeJob() {
+        TestDataFactory.clearScheduledJobs(new List<String>{ AutomationResumeJob.JOB_NAME });
+    }
+
     private static List<CronTrigger> resumeJobs() {
         return [
             SELECT Id, NextFireTime
@@ -32,6 +37,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void anExpiredPauseIsClearedAndTheResumeIsAudited() {
         System.runAs(TestUsers.admin()) {
+            clearOrgResumeJob();
             Datetime ended = TestDataFactory.pausedSettings(-1).Automation_Paused_Until__c;
             User maria = barnCrmAdmin();
 
@@ -64,6 +70,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void pausingSchedulesTheResumeForTheEndAndResumingCancelsIt() {
         System.runAs(TestUsers.admin()) {
+            clearOrgResumeJob();
             TestDataFactory.defaultSettings();
             User maria = barnCrmAdmin();
 
@@ -99,6 +106,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void pausingAgainReplacesTheScheduledResume() {
         System.runAs(TestUsers.admin()) {
+            clearOrgResumeJob();
             TestDataFactory.defaultSettings();
             User maria = barnCrmAdmin();
 
@@ -147,6 +155,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void aPauseStillPausesWhenItsResumeCannotBeScheduled() {
         System.runAs(TestUsers.admin()) {
+            clearOrgResumeJob();
             TestDataFactory.defaultSettings();
             User maria = barnCrmAdmin();
             AutomationControl.schedulingFailsForTest = true;
@@ -236,6 +245,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void onlyAnAdministratorCanPauseOrScheduleAResume() {
         System.runAs(TestUsers.admin()) {
+            clearOrgResumeJob();
             TestDataFactory.defaultSettings();
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 

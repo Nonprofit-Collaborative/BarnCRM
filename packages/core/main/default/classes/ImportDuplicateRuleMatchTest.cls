@@ -564,6 +564,7 @@ private class ImportDuplicateRuleMatchTest {
     /** A people template matching by email, its rows giving a name and an address. */
     private static void givenAddresses(List<Map<String, String>> values, Boolean useRules) {
         ImportMapping mapping = new ImportMapping();
+        mapping.columns.add(new ImportMapping.Column('First', 'Contact1.FirstName'));
         mapping.columns.add(new ImportMapping.Column('Last', 'Contact1.LastName'));
         mapping.columns.add(new ImportMapping.Column('Street', 'Contact1.MailingStreet'));
         mapping.columns.add(new ImportMapping.Column('Zip', 'Contact1.MailingPostalCode'));
@@ -647,6 +648,112 @@ private class ImportDuplicateRuleMatchTest {
             Assert.isFalse(loaded.Duplicate_Rule_Match__c, 'No looser match.');
             Assert.areEqual(1, committed.created, 'Handled as unmatched: a new person.');
             Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Okonkwo is untouched.');
+        }
+    }
+
+    @IsTest
+    static void janeSmithAtJohnSmithsAddressIsNotLoadedIntoJohn() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+            Contact john = new Contact(FirstName = 'John', LastName = 'Smith');
+            insert john;
+            insert new Address__c(
+                Contact__c = john.Id,
+                Street__c = '12 Elm Street',
+                Postal_Code__c = '60601'
+            );
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'First' => 'Jane',
+                        'Last' => 'Smith',
+                        'Street' => '12 Elm St',
+                        'Zip' => '60601'
+                    },
+                    new Map<String, String>{
+                        'First' => ' john ',
+                        'Last' => 'SMITH',
+                        'Street' => '12 Elm St',
+                        'Zip' => '60601'
+                    }
+                },
+                true
+            );
+
+            Test.startTest();
+            run(false);
+            Test.stopTest();
+
+            List<Import_Row__c> loaded = rows();
+            Assert.areNotEqual(john.Id, loaded[0].Contact_1__c, 'Jane is not John: ' + loaded[0]);
+            Assert.isFalse(loaded[0].Duplicate_Rule_Match__c, 'No looser match for Jane.');
+            Assert.areEqual(john.Id, loaded[1].Contact_1__c, 'John still loads: ' + loaded[1]);
+            Assert.isTrue(loaded[1].Duplicate_Rule_Match__c, 'Ticked as a looser match.');
+        }
+    }
+
+    @IsTest
+    static void janeSmithWithJohnSmithsPhoneIsNotLoadedIntoJohn() {
+        System.runAs(TestUsers.admin()) {
+            Schema.SObjectType individual = Schema.getGlobalDescribe().get('Individual');
+            if (
+                individual == null ||
+                !Schema.SObjectType.Contact.fields.getMap().containsKey('individualid')
+            ) {
+                // Skipped: this org has no Individual for a phone source to point through.
+                return;
+            }
+            SObject ivy = individual.newSObject();
+            ivy.put('LastName', 'Smith');
+            insert ivy;
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                (Match_Source__mdt) JSON.deserialize(
+                    JSON.serialize(
+                        new Map<String, Object>{
+                            'DeveloperName' => 'Phone_By_Individual',
+                            'MasterLabel' => 'Phone',
+                            NamespaceUtil.qualify('Object_Name__c') => 'Contact',
+                            NamespaceUtil.qualify('Value_Field__c') => 'Phone',
+                            NamespaceUtil.qualify('Parent_Field__c') => 'IndividualId',
+                            NamespaceUtil.qualify('Normalization__c') => 'Phone'
+                        }
+                    ),
+                    Match_Source__mdt.class
+                )
+            };
+            Contact john = new Contact(
+                FirstName = 'John',
+                LastName = 'Smith',
+                Phone = '(555) 201-3344'
+            );
+            john.put('IndividualId', ivy.Id);
+            insert john;
+
+            Test.startTest();
+            List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesBySources(
+                Contact.SObjectType,
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'FirstName' => 'Jane',
+                        'LastName' => 'Smith',
+                        'HomePhone' => '555.201.3344'
+                    },
+                    new Map<String, String>{ 'LastName' => 'Smith', 'Phone' => '5552013344' },
+                    new Map<String, String>{
+                        'FirstName' => 'John',
+                        'LastName' => 'Smith',
+                        'MobilePhone' => '+1 555 201 3344'
+                    }
+                },
+                null
+            );
+            Test.stopTest();
+
+            Assert.isTrue(found[0].isEmpty(), 'Jane is never John: ' + found[0]);
+            Assert.isTrue(found[1].isEmpty(), 'No first name is not John: ' + found[1]);
+            Assert.areEqual(1, found[2].size(), 'John is John: ' + found[2]);
+            Assert.areEqual(john.Id, found[2][0].Id);
         }
     }
 

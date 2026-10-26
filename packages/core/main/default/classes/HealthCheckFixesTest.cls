@@ -284,14 +284,13 @@ private class HealthCheckFixesTest {
 
     /** A user who has left: inactive, so a job they own has stopped running. */
     private static Id inactiveUserId() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User gone = new User(
             FirstName = 'Former',
             LastName = 'Scheduler',
             Alias = 'formsch',
             Email = 'former.scheduler.barncrm@example.com',
             Username = 'former.scheduler.barncrm.' + Datetime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
+            ProfileId = TestUsers.standardProfileId(),
             TimeZoneSidKey = 'America/New_York',
             LocaleSidKey = 'en_US',
             EmailEncodingKey = 'UTF-8',

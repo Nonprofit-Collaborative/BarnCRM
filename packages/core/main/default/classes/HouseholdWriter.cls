@@ -46,6 +46,12 @@ public with sharing class HouseholdWriter {
      * which person each row was for. The failure is logged here so that an administrator
      * can find it; the caller puts it on the person's own save so that whoever saved them
      * sees it too.
+     *
+     * Saved past the org's Account duplicate rules (`allowSave`). A household is made by the
+     * package, named from its members, so two families called Garcia are two households that
+     * look alike, not a duplicate somebody typed. A blocking Account rule would otherwise refuse
+     * the household and, with it, the ordinary save of the person it was for. A rule that
+     * reports still reports, and BarnCRM's own duplicate review finds them as for any account.
      */
     public static List<Database.SaveResult> createHouseholds(List<Account> households) {
         if (households == null || households.isEmpty()) {
@@ -59,11 +65,23 @@ public with sharing class HouseholdWriter {
         }
         List<Database.SaveResult> saves = Database.insert(
             households,
-            false,
+            householdSaveOptions(),
             AccessLevel.SYSTEM_MODE
         );
         logFailures(saves, Label.Core_Households_ErrorContextMembership);
         return saves;
+    }
+
+    /**
+     * How a new household is saved: each row on its own (one refused household never stops the
+     * rest), and past the org's duplicate rules (see createHouseholds).
+     */
+    @TestVisible
+    private static Database.DMLOptions householdSaveOptions() {
+        Database.DMLOptions options = new Database.DMLOptions();
+        options.optAllOrNone = false;
+        options.DuplicateRuleHeader.allowSave = true;
+        return options;
     }
 
     /**

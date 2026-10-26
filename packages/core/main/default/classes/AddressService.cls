@@ -729,25 +729,103 @@ public with sharing class AddressService {
     }
 
     private static Account billingCopy(Id accountId, Address__c address) {
-        return new Account(
+        Account record = new Account(
             Id = accountId,
             BillingStreet = address.Street__c,
             BillingCity = address.City__c,
-            BillingState = address.State__c,
-            BillingPostalCode = address.Postal_Code__c,
-            BillingCountry = address.Country__c
+            BillingPostalCode = address.Postal_Code__c
         );
+        putStateAndCountry(record, 'BillingState', 'BillingCountry', address);
+        return record;
     }
 
     private static Contact mailingCopy(Id contactId, Address__c address) {
-        return new Contact(
+        Contact record = new Contact(
             Id = contactId,
             MailingStreet = address.Street__c,
             MailingCity = address.City__c,
-            MailingState = address.State__c,
-            MailingPostalCode = address.Postal_Code__c,
-            MailingCountry = address.Country__c
+            MailingPostalCode = address.Postal_Code__c
         );
+        putStateAndCountry(record, 'MailingState', 'MailingCountry', address);
+        return record;
+    }
+
+    /**
+     * Writes an address's state and country onto a standard address. In an org with State and
+     * Country Picklists the text fields take only a full name ("Illinois", "United States"), so
+     * a code such as "IL" or "US", which is how most people type an address, goes to the code
+     * field (`BillingStateCode`) instead: written as text the platform refuses the whole save.
+     * A state code is used only once the country is known, since state codes repeat between
+     * countries. Anything else is written as text, as in an org without the picklists.
+     *
+     * @param record the account or contact being written
+     * @param stateField the text state field, such as `BillingState`
+     * @param countryField the text country field, such as `BillingCountry`
+     * @param address the address being copied
+     */
+    private static void putStateAndCountry(
+        SObject record,
+        String stateField,
+        String countryField,
+        Address__c address
+    ) {
+        String state = address.State__c;
+        String country = address.Country__c;
+        if (!usesStateAndCountryPicklists()) {
+            record.put(stateField, state);
+            record.put(countryField, country);
+            return;
+        }
+        String countryCode = String.isBlank(country)
+            ? null
+            : countryCodeByText.get(country.trim().toUpperCase());
+        if (countryCode == null) {
+            record.put(countryField, country);
+        } else {
+            record.put(countryField + 'Code', countryCode);
+        }
+        String stateCode = String.isBlank(state) ? null : state.trim().toUpperCase();
+        if (countryCode != null && stateCodes.contains(stateCode)) {
+            record.put(stateField + 'Code', stateCode);
+        } else {
+            record.put(stateField, state);
+        }
+    }
+
+    /** Country codes by code and by name, upper case; null until the picklists are read. */
+    private static Map<String, String> countryCodeByText;
+    /** Every state code the org knows, upper case. */
+    private static Set<String> stateCodes;
+
+    /**
+     * Whether the org has State and Country Picklists turned on, read once per transaction from
+     * the contact's mailing address, which carries the code fields only when they are on.
+     */
+    @TestVisible
+    private static Boolean usesStateAndCountryPicklists() {
+        if (countryCodeByText != null) {
+            return !countryCodeByText.isEmpty();
+        }
+        countryCodeByText = new Map<String, String>();
+        stateCodes = new Set<String>();
+        Map<String, Schema.SObjectField> contactFields = Contact.SObjectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .fields
+            .getMap();
+        Schema.SObjectField countryCode = contactFields.get('mailingcountrycode');
+        Schema.SObjectField stateCode = contactFields.get('mailingstatecode');
+        if (countryCode == null || stateCode == null) {
+            return false;
+        }
+        for (Schema.PicklistEntry entry : countryCode.getDescribe().getPicklistValues()) {
+            countryCodeByText.put(entry.getValue().toUpperCase(), entry.getValue());
+            countryCodeByText.put(entry.getLabel().toUpperCase(), entry.getValue());
+        }
+        for (Schema.PicklistEntry entry : stateCode.getDescribe().getPicklistValues()) {
+            stateCodes.add(entry.getValue().toUpperCase());
+        }
+        return !countryCodeByText.isEmpty();
     }
 
     /**
@@ -762,9 +840,8 @@ public with sharing class AddressService {
         Account record = existing == null ? new Account(Id = accountId) : existing;
         record.put(PERSON_MAILING_STREET, address.Street__c);
         record.put(PERSON_MAILING_CITY, address.City__c);
-        record.put(PERSON_MAILING_STATE, address.State__c);
         record.put(PERSON_MAILING_POSTAL_CODE, address.Postal_Code__c);
-        record.put(PERSON_MAILING_COUNTRY, address.Country__c);
+        putStateAndCountry(record, PERSON_MAILING_STATE, PERSON_MAILING_COUNTRY, address);
         return record;
     }
 
