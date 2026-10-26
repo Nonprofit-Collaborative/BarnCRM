@@ -615,8 +615,9 @@ describe('c-settings-console', () => {
   // The module property stays declared, because an org whose pages place this component cannot
   // take an upgrade that removes it, but it no longer filters anything.
   it('keeps the page property module declared and ignores its value', async () => {
+    // Jest runs from the repository root (jest.config.js).
     const meta = require('fs').readFileSync(
-      require('path').join(__dirname, '..', 'settingsConsole.js-meta.xml'),
+      'packages/core/main/default/lwc/settingsConsole/settingsConsole.js-meta.xml',
       'utf8'
     );
     expect(meta).toMatch(/<property name="module" type="String"/);

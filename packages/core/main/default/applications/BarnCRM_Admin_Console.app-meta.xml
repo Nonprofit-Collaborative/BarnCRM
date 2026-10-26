@@ -40,7 +40,8 @@
   </brand>
   <description>
     The administrators' app with console navigation: BarnCRM Settings, the data tools, Org
-    Optimizer, Duplicate Matching and the Error Log, plus the admin tools of each installed module, open side by side.
+    Optimizer, Duplicate Matching and the Error Log, plus the admin tools of each installed
+    module, open side by side.
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
