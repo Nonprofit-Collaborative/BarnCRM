@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: too many skip rules or key columns; {0} is the most of each</shortDescription>
-        <value>A mapping can have at most {0} Skip rows rules and {0} One row per columns.</value>
+        <value>A template can have at most {0} Skip rows rules and {0} One row per columns.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorSkipRule</fullName>

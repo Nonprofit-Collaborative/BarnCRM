@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import row: duplicate rules matched several records</shortDescription>
-        <value>Your duplicate rules matched more than one record for this row, and the mapping says to reject such a row. Merge the duplicates, or choose Use the most recently changed.</value>
+        <value>Your duplicate rules matched more than one record for this row, and the template says to reject such a row. Merge the duplicates, or choose Use the most recently changed.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorDuplicateRuleRecordRepeated</fullName>

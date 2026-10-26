@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what a column&apos;s changes do</shortDescription>
-        <value>Changes run in order, before the values are matched or saved, and are saved with the mapping.</value>
+        <value>Changes run in order, before the values are matched or saved, and are saved with the template.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesAdd</fullName>

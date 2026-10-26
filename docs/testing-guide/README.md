@@ -41,7 +41,7 @@ page, even if that puts it out of reading order.
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 9 | Two-sided relationships, affiliations, primary affiliation |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 13 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page |
 | [Setup Assistant](setup-assistant.md) | SA | 10 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
-| [Imports](imports.md) | IMP | 11 | Import wizard, mappings, row rules, matching (including match sources), undo |
+| [Imports](imports.md) | IMP | 11 | Import wizard, templates, row rules, matching (including match sources), undo |
 | [Find](find.md) | FIND | 9 | Query builder, typed queries, export, saved queries, summaries |
 | [Bulk update and delete](bulk-update-and-delete.md) | BULK | 9 | Bulk update, bulk delete, edit in Find, undo |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 10 | Data Manager, data jobs and undo, data quality checks, field utilization |

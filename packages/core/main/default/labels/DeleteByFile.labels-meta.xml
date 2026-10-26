@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Delete by file: commit refused, confirm the count instead</shortDescription>
-        <value>This mapping deletes records. Type the number of records to confirm, then press Delete.</value>
+        <value>This template deletes records. Type the number of records to confirm, then press Delete.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorDeleteCountDiffers</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load operation help: delete by record ID</shortDescription>
-        <value>Deletes the record whose Salesforce record ID is in the row, as a bulk delete does: dry run first, then type the number of records to confirm. Only the ID column is read. Risk: every record the file names is deleted, with the related records Salesforce deletes with it; undo from Data jobs on the Data Manager tab within 15 days.</value>
+        <value>Deletes the record whose Salesforce record ID is in the row, as a bulk delete does: dry run first, then type the number of records to confirm. Only the ID column is read. Risk: every record the file names is deleted, with the related records Salesforce deletes with it; undo from Data Jobs on the Data Manager tab within 15 days.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_FileIntro</fullName>
@@ -54,6 +54,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Delete by file panel: what it does.</shortDescription>
-        <value>Delete every record this dry run found, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from Data jobs on the Data Manager tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
+        <value>Delete every record this dry run found, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from Data Jobs on the Data Manager tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
     </labels>
 </CustomLabels>

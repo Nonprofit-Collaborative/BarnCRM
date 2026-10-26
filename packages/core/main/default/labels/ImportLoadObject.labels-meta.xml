@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: the new mapping has no name</shortDescription>
-        <value>Give the mapping a name.</value>
+        <value>Give the template a name.</value>
     </labels>
     <labels>
         <fullName>Core_Import_RecordIdOption</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: user lacks the object access; {0} is the object</shortDescription>
-        <value>You cannot read, create or edit {0} as this mapping needs. Ask your Salesforce administrator for access, or choose another action for each row.</value>
+        <value>You cannot read, create or edit {0} as this template needs. Ask your Salesforce administrator for access, or choose another action for each row.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorPeopleUpdateOnly</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: people load by update only; {0} is the object plural</shortDescription>
-        <value>{0} can only be updated by record ID here. Add new people and organizations with a people mapping, which also builds their households.</value>
+        <value>{0} can only be updated by record ID here. Add new people and organizations with a people template, which also builds their households.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorNothingMapped</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: several records hold the row's external ID</shortDescription>
-        <value>More than one record has this row's external ID, and the mapping says to reject such a row. Fix the duplicates, or choose Use the most recently changed.</value>
+        <value>More than one record has this row's external ID, and the template says to reject such a row. Fix the duplicates, or choose Use the most recently changed.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorLookupNotFound</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: lookup finds several records; {0} field, {1} value</shortDescription>
-        <value>More than one record matches "{1}" for {0}, and the mapping says to reject such a row. Find it by a unique field, or choose Use the most recently changed.</value>
+        <value>More than one record matches "{1}" for {0}, and the template says to reject such a row. Find it by a unique field, or choose Use the most recently changed.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorMatchOnlyWouldCreate</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object log: some lookups left empty; {0} is the field</shortDescription>
-        <value>Some rows name no record you can see for {0}. They were loaded with it left empty, as the mapping says.</value>
+        <value>Some rows name no record you can see for {0}. They were loaded with it left empty, as the template says.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogLookupPolymorphic</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: name of a new one-object mapping</shortDescription>
-        <value>Mapping name</value>
+        <value>Template name</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadObjectCreateButton</fullName>

@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete panel: what it does.</shortDescription>
-        <value>Delete every record this query returns, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from Data jobs on the Data Manager tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
+        <value>Delete every record this query returns, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from Data Jobs on the Data Manager tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_PreviewCount</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete: where to undo a finished job.</shortDescription>
-        <value>To bring these records back, use Undo next to the job under Data jobs on the Data Manager tab.</value>
+        <value>To bring these records back, use Undo next to the job under Data Jobs on the Data Manager tab.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_UndoConfirm</fullName>

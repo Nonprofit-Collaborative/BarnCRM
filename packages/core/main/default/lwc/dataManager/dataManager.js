@@ -18,11 +18,14 @@ import UPDATE_TITLE from '@salesforce/label/c.Core_DataManager_UpdateTitle';
 import UPDATE_TEXT from '@salesforce/label/c.Core_DataManager_UpdateText';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
 import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
+import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
+import WARNING_ALT from '@salesforce/label/c.Core_DataManager_WarningAlt';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_DataManager_OptimizerTitle';
 import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
 import OPEN from '@salesforce/label/c.Core_DataManager_Open';
 import OPEN_ARIA from '@salesforce/label/c.Core_DataManager_OpenAria';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';
+import MAPPINGS_INTRO from '@salesforce/label/c.Core_DataManager_MappingsIntro';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
 import COLUMN_NAME from '@salesforce/label/c.Core_DataManager_ColumnName';
 import COLUMN_LOADS from '@salesforce/label/c.Core_DataManager_ColumnLoads';
@@ -54,9 +57,10 @@ const SALESFORCE_LINKS = [
 
 /**
  * The Data Manager tab (admin guide data-manager.md): a card for each data tool the person may
- * use, the import mappings, every data job with its undo (c-data-job-history), and links to
+ * use, the import templates, every data job with its undo (c-data-job-history), and links to
  * Salesforce's own export and Recycle Bin. Each tool keeps its own permission check; the cards
- * only hide what the tool would refuse.
+ * only hide what the tool would refuse. The bulk delete card is marked destructive: a red Open
+ * button and a warning that the records go to the Recycle Bin and can be undone.
  */
 export default class DataManager extends NavigationMixin(LightningElement) {
   labels = {
@@ -65,7 +69,9 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     toolsHeading: TOOLS_HEADING,
     open: OPEN,
     mappingsHeading: MAPPINGS_HEADING,
+    mappingsIntro: MAPPINGS_INTRO,
     mappingsEmpty: MAPPINGS_EMPTY,
+    warningAlt: WARNING_ALT,
     salesforceHeading: SALESFORCE_HEADING
   };
 
@@ -114,7 +120,13 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       tools.push({ key: 'update', title: UPDATE_TITLE, text: UPDATE_TEXT, tab: TABS.find });
     }
     if (canBulkDelete) {
-      tools.push({ key: 'delete', title: DELETE_TITLE, text: DELETE_TEXT, tab: TABS.find });
+      tools.push({
+        key: 'delete',
+        title: DELETE_TITLE,
+        text: DELETE_TEXT,
+        tab: TABS.find,
+        warning: DELETE_WARNING
+      });
     }
     if (canFind || canManageSettings) {
       tools.push({
@@ -124,7 +136,12 @@ export default class DataManager extends NavigationMixin(LightningElement) {
         tab: TABS.optimizer
       });
     }
-    return tools.map((tool) => ({ ...tool, openLabel: OPEN_ARIA.replace('{0}', tool.title) }));
+    return tools.map((tool) => ({
+      ...tool,
+      openLabel: OPEN_ARIA.replace('{0}', tool.title),
+      // A destructive tool reads as one: a warning box and a red Open button.
+      buttonVariant: tool.warning ? 'destructive-text' : 'neutral'
+    }));
   }
 
   get hasMappings() {

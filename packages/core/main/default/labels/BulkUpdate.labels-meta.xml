@@ -526,7 +526,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>After a bulk update finishes: where to undo it.</shortDescription>
-        <value>To undo it, open Data jobs on the Data Manager tab.</value>
+        <value>To undo it, open Data Jobs on the Data Manager tab.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ActionTransform</fullName>
