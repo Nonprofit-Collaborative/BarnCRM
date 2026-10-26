@@ -180,6 +180,13 @@ private class CommitmentControllerTest {
             );
             Assert.isTrue(own.canChange, 'An administrator may change the commitment.');
             Assert.isTrue(own.canGenerate, 'An administrator may generate a schedule.');
+            // Commitments are private: the reader sees this one through a read share.
+            insert new Commitment__Share(
+                ParentId = commitment.Id,
+                UserOrGroupId = reader.Id,
+                AccessLevel = 'Read',
+                RowCause = Schema.Commitment__Share.RowCause.Manual
+            );
         }
 
         CommitmentController.SchedulePreview seen;
