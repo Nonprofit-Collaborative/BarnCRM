@@ -55,7 +55,7 @@ announce: your fiscal year turning over, and a ladder you edited.
 
 ## A five-minute walkthrough
 
-Start with the sample data loaded (BarnCRM Settings, then Sample data).
+Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Donor levels**. The ladder is
    empty.

@@ -65,7 +65,7 @@ Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has
 Opportunity mirror page says so.
 
 1. Give yourself the **Opportunity Mirror** permission set on the Access page, under Extra
-   permissions: the roles there do not include it.
+   Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and set **Opportunity mirror direction**.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of

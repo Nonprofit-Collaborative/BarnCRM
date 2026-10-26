@@ -128,8 +128,8 @@ rollup stays inactive across every upgrade, and the values it has already calcul
 on the records.
 
 Three settings in **BarnCRM Settings** change how every rollup behaves: the first is in the
-**General** section, the other two in the **Rollups** section. The **Rollup Settings** tab of
-the **BarnCRM Rollup Builder** app shows the same two Rollups settings on their own.
+**General** section, the other two in the **Rollups** section. The Rollup Builder module has no
+settings tab of its own: open **BarnCRM Settings** and choose **Rollups**.
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
   begin. Choose the month your fiscal year starts from the list. Changing it and clicking
@@ -283,7 +283,8 @@ What to know about them:
 ## The Rollup Builder
 
 Rollups are their own module, **BarnCRM Rollup Builder**, with a console app of the same name
-and two tabs: **Rollup Builder** and **Rollup Settings**.
+and one tab, **Rollup Builder**. Its settings are in the **Rollups** section of **BarnCRM
+Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
@@ -311,10 +312,9 @@ Warning from `RollupQueue.announceReady`. To have them catch up within minutes, 
 user **Rollup Builder User**. People with a BarnCRM role get it at install, at each **Turn
 on** and with each nightly run; until then the same wait applies to them.
 
-The **Rollup Settings** tab shows the module's own settings and nothing else: **Default rollup
-mode**, **When instant totals are calculated**, and the link to the Builder. They are the same
-settings as the **Rollups** section of **BarnCRM Settings**, so a change in either place shows
-in both. **Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
+The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
+rollup mode**, **When instant totals are calculated**, and a button that opens the Builder.
+**Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a

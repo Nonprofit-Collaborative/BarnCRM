@@ -228,7 +228,20 @@ public with sharing class SettingsService {
             Database.insert(changes, AccessLevel.USER_MODE);
         }
         clearCaches();
+        applySeasonalSwitch(changed);
         return orgDefault(type);
+    }
+
+    /**
+     * Seasonal Addresses is the one setting that starts and stops a nightly job, so the save is
+     * where the job follows it, whichever way the value was written. Scheduling is idempotent,
+     * so saving the switch on twice never doubles the job.
+     */
+    private static void applySeasonalSwitch(Map<Schema.SObjectField, Object> changed) {
+        Schema.SObjectField token = BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c;
+        if (changed.containsKey(token)) {
+            SeasonalAddressScheduler.applySwitch(changed.get(token) == true);
+        }
     }
 
     /**

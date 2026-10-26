@@ -13,11 +13,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM** app and the **BarnCRM Settings** tab. Press Tab until focus reaches the page content. | A visible focus ring sits on the **Search settings** box. |
-| 2 | Type `greeting`. | A **Search results** list appears under the box as you type. |
-| 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **Households** section opens on the right, the page scrolls to the **Preview and recompute** panel and focus is on its heading. |
+| 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
+| 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
 | 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create a household automatically** and press Space. | The checkbox changes state. **Save** and **Discard changes** become enabled. |
-| 6 | Tab to **Discard changes** and press Enter. | The checkbox returns to its original state and nothing is saved. **Recent changes** has no new row. |
+| 6 | Tab to **Discard changes** and press Enter. | The checkbox returns to its original state and nothing is saved. On **General**, **Recent Changes** has no new row. |
 | 7 | Tab to the **Learn more** link under the same setting and press Enter. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
 | 8 | Press Tab through the rest of the section. | Focus never lands on something invisible, and the order follows the page from top to bottom. |
 
