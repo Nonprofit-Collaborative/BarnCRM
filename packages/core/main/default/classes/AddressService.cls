@@ -547,6 +547,208 @@ public with sharing class AddressService {
         return today >= start || today <= finish;
     }
 
+    // ---------------------------------------------------------------- moves someone chose
+
+    /** A move refused with a message the address card shows as it is (R-AD9). */
+    public class AddressMoveException extends Exception {
+    }
+
+    /** Who a household's primary address reaches, for the confirmation (R-AD9). */
+    public class HouseholdMove {
+        /** The household's primary address, or null when it has none. */
+        public Address__c primary;
+        /** The members who take the household's address (R-AD3). */
+        public Set<Id> taking = new Set<Id>();
+        /** The members left where they are for an address of their own, unless ticked. */
+        public Set<Id> withTheirOwn = new Set<Id>();
+    }
+
+    /**
+     * Use for Whole Household (R-AD9, ADR-NEXT). A copy of each person's address becomes the
+     * primary address of the household named for it, which must be one that person currently
+     * belongs to; one already holding exactly that address is not given it twice. A person
+     * stored as a contact, for whom that household is their household (R-M3), stops having a
+     * primary address of their own, so they follow the household again; their addresses stay
+     * on file (R-AD7). The household's new primary reaches every member who takes it (R-AD3),
+     * whatever the Address Updates setting. Written as the user, many at once.
+     *
+     * @param householdByAddressId the household each person's address is to be used for
+     * @return the household addresses added
+     */
+    public static List<Address__c> useForWholeHousehold(Map<Id, Id> householdByAddressId) {
+        List<Address__c> added = new List<Address__c>();
+        if (householdByAddressId == null || householdByAddressId.isEmpty()) {
+            return added;
+        }
+        List<Address__c> sources = AddressSelector.selectByIds(householdByAddressId.keySet());
+        if (sources.size() != householdByAddressId.size()) {
+            throw new AddressMoveException(System.Label.Core_Address_MoveNotFound);
+        }
+        Set<Id> personIds = new Set<Id>();
+        for (Address__c source : sources) {
+            Id personId = source.Contact__c != null ? source.Contact__c : source.Person_Account__c;
+            if (personId == null) {
+                throw new AddressMoveException(System.Label.Core_Address_MoveNotAPersonsAddress);
+            }
+            personIds.add(personId);
+        }
+        Map<Id, Set<Id>> householdsByPerson = HouseholdService.currentHouseholdIdsByPerson(
+            personIds
+        );
+        Map<Id, Id> ownHouseholdByPerson = HouseholdService.getHouseholdIdsFor(personIds);
+        Map<Id, Address__c> primaryByHousehold = new Map<Id, Address__c>();
+        for (
+            Address__c current : AddressSelector.selectDefaultsByOwnerIds(
+                new Set<Id>(householdByAddressId.values()),
+                null
+            )
+        ) {
+            if (current.Account__c != null) {
+                primaryByHousehold.put(current.Account__c, current);
+            }
+        }
+        Set<Id> released = new Set<Id>();
+        for (Address__c source : sources) {
+            Id personId = source.Contact__c != null ? source.Contact__c : source.Person_Account__c;
+            Id householdId = householdByAddressId.get(source.Id);
+            Set<Id> theirs = householdsByPerson.get(personId);
+            if (householdId == null || theirs == null || !theirs.contains(householdId)) {
+                throw new AddressMoveException(System.Label.Core_Address_MoveNotTheirHousehold);
+            }
+            if (source.Contact__c != null && ownHouseholdByPerson.get(personId) == householdId) {
+                released.add(personId);
+            }
+            if (!sameAddress(primaryByHousehold.get(householdId), source)) {
+                Address__c copy = householdCopyOf(source, householdId);
+                added.add(copy);
+                primaryByHousehold.put(householdId, copy);
+            }
+        }
+        moveChosen(added, released, primaryByHousehold.values());
+        return added;
+    }
+
+    /** A new primary address for the household, with what the person's address says. */
+    private static Address__c householdCopyOf(Address__c source, Id householdId) {
+        Address__c copy = new Address__c(
+            Account__c = householdId,
+            Type__c = source.Type__c,
+            Street__c = source.Street__c,
+            City__c = source.City__c,
+            State__c = source.State__c,
+            Postal_Code__c = source.Postal_Code__c,
+            Country__c = source.Country__c,
+            Is_Default__c = true
+        );
+        if (source.Type__c == TYPE_SEASONAL) {
+            copy.Seasonal_Start_Month__c = source.Seasonal_Start_Month__c;
+            copy.Seasonal_Start_Day__c = source.Seasonal_Start_Day__c;
+            copy.Seasonal_End_Month__c = source.Seasonal_End_Month__c;
+            copy.Seasonal_End_Day__c = source.Seasonal_End_Day__c;
+        }
+        return copy;
+    }
+
+    /**
+     * Who each household's primary address would reach, for the Update Everyone's Address
+     * confirmation (R-AD9). Every household asked about is in the answer.
+     */
+    public static Map<Id, HouseholdMove> householdMoves(Set<Id> householdIds) {
+        Map<Id, HouseholdMove> moves = new Map<Id, HouseholdMove>();
+        if (householdIds == null || householdIds.isEmpty()) {
+            return moves;
+        }
+        for (Id householdId : householdIds) {
+            moves.put(householdId, new HouseholdMove());
+        }
+        for (Address__c primary : AddressSelector.selectDefaultsByOwnerIds(householdIds, null)) {
+            if (moves.containsKey(primary.Account__c)) {
+                moves.get(primary.Account__c).primary = primary;
+            }
+        }
+        Map<Id, Set<Id>> keptBack = new Map<Id, Set<Id>>();
+        Map<Id, Set<Id>> taking = membersWhoTakeTheHouseholdAddress(
+            membersOf(householdIds),
+            keptBack
+        );
+        for (Id householdId : householdIds) {
+            HouseholdMove move = moves.get(householdId);
+            if (taking.get(householdId) != null) {
+                move.taking.addAll(taking.get(householdId));
+            }
+            if (keptBack.get(householdId) != null) {
+                move.withTheirOwn.addAll(keptBack.get(householdId));
+            }
+        }
+        return moves;
+    }
+
+    /**
+     * Update Everyone's Address (R-AD9, ADR-NEXT). Each household's primary address is copied
+     * to every member who takes it (R-AD3), and to the members ticked from among those with an
+     * address of their own, whose own primary stops being primary and stays on file (R-AD7).
+     * A tick on anyone else is ignored. Whatever the Address Updates setting, as the user, many
+     * households at once.
+     *
+     * @param tickedByHousehold each household to move, with the members with an address of
+     *        their own who are to move too (empty or null for none)
+     */
+    public static void updateEveryonesAddress(Map<Id, Set<Id>> tickedByHousehold) {
+        if (tickedByHousehold == null || tickedByHousehold.isEmpty()) {
+            return;
+        }
+        Map<Id, HouseholdMove> moves = householdMoves(tickedByHousehold.keySet());
+        List<Address__c> primaries = new List<Address__c>();
+        Set<Id> released = new Set<Id>();
+        for (Id householdId : tickedByHousehold.keySet()) {
+            HouseholdMove move = moves.get(householdId);
+            if (move.primary == null) {
+                throw new AddressMoveException(System.Label.Core_Address_MoveNoPrimary);
+            }
+            primaries.add(move.primary);
+            Set<Id> ticked = tickedByHousehold.get(householdId);
+            for (Id personId : ticked == null ? new Set<Id>() : ticked) {
+                if (move.withTheirOwn.contains(personId)) {
+                    released.add(personId);
+                }
+            }
+        }
+        moveChosen(new List<Address__c>(), released, primaries);
+    }
+
+    /**
+     * Saves a move someone chose: the household addresses to add, the people whose own primary
+     * address stops being primary, then the copy of every household primary to its members.
+     * Raised as a chosen move, so it reaches members in "Nobody moves until you choose" too.
+     */
+    private static void moveChosen(
+        List<Address__c> toAdd,
+        Set<Id> releasedPeople,
+        List<Address__c> primaries
+    ) {
+        Boolean movesWereChosen = chooseHouseholdMoves(true);
+        isPropagating = true;
+        try {
+            if (!toAdd.isEmpty()) {
+                Database.insert(toAdd, AccessLevel.USER_MODE);
+                clearOtherDefaults(toAdd);
+            }
+            List<Address__c> released = new List<Address__c>();
+            for (Address__c own : AddressSelector.selectDefaultsByOwnerIds(releasedPeople, null)) {
+                if (own.Contact__c != null) {
+                    released.add(new Address__c(Id = own.Id, Is_Default__c = false));
+                }
+            }
+            if (!released.isEmpty()) {
+                Database.update(released, AccessLevel.USER_MODE);
+            }
+            applyToStandardFields(primaries);
+        } finally {
+            isPropagating = false;
+            chooseHouseholdMoves(movesWereChosen);
+        }
+    }
+
     // ---------------------------------------------------------------- internals
 
     private static List<Address__c> defaultsOnly(List<Address__c> addresses) {
@@ -725,9 +927,18 @@ public with sharing class AddressService {
      *
      * One query for the personal addresses, and in junction mode one for the households,
      * whatever the number of households. Returns new sets: the map given is not changed.
+     * When `keptForTheirOwn` is given, each household's members left out only for an address
+     * of their own are put in it, for the Update Everyone's Address confirmation (R-AD9).
      */
     private static Map<Id, Set<Id>> membersWhoTakeTheHouseholdAddress(
         Map<Id, Set<Id>> membersByHousehold
+    ) {
+        return membersWhoTakeTheHouseholdAddress(membersByHousehold, null);
+    }
+
+    private static Map<Id, Set<Id>> membersWhoTakeTheHouseholdAddress(
+        Map<Id, Set<Id>> membersByHousehold,
+        Map<Id, Set<Id>> keptForTheirOwn
     ) {
         Set<Id> personIds = new Set<Id>();
         Set<Id> contactIds = new Set<Id>();
@@ -762,15 +973,24 @@ public with sharing class AddressService {
         Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
         for (Id householdId : membersByHousehold.keySet()) {
             Set<Id> taking = new Set<Id>();
+            Set<Id> keptBack = new Set<Id>();
             Set<Id> memberIds = membersByHousehold.get(householdId);
             for (Id memberId : memberIds == null ? new Set<Id>() : memberIds) {
                 Id ownHousehold = ownHouseholdByPerson.get(memberId);
                 Boolean livesElsewhere = ownHousehold != null && ownHousehold != householdId;
-                if (!withAnAddressOfTheirOwn.contains(memberId) && !livesElsewhere) {
+                if (livesElsewhere || memberId == null || memberId == householdId) {
+                    continue;
+                }
+                if (withAnAddressOfTheirOwn.contains(memberId)) {
+                    keptBack.add(memberId);
+                } else {
                     taking.add(memberId);
                 }
             }
             result.put(householdId, taking);
+            if (keptForTheirOwn != null) {
+                keptForTheirOwn.put(householdId, keptBack);
+            }
         }
         return result;
     }

@@ -141,4 +141,33 @@ public with sharing class AddressSelector {
             LIMIT 10000
         ];
     }
+
+    /** These addresses, as the user may read them; one they cannot read is left out. */
+    public static List<Address__c> selectByIds(Set<Id> addressIds) {
+        if (addressIds == null || addressIds.isEmpty()) {
+            return new List<Address__c>();
+        }
+        return [
+            SELECT
+                Id,
+                Account__c,
+                Contact__c,
+                Person_Account__c,
+                Type__c,
+                Street__c,
+                City__c,
+                State__c,
+                Postal_Code__c,
+                Country__c,
+                Seasonal_Start_Month__c,
+                Seasonal_Start_Day__c,
+                Seasonal_End_Month__c,
+                Seasonal_End_Day__c,
+                Is_Default__c
+            FROM Address__c
+            WHERE Id IN :addressIds
+            WITH USER_MODE
+            LIMIT 10000
+        ];
+    }
 }

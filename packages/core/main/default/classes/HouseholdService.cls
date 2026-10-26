@@ -498,6 +498,44 @@ public with sharing class HouseholdService {
         return result;
     }
 
+    /**
+     * Every household each of these people currently belongs to, by person: in junction mode
+     * each household they hold a current membership of, in contact mode the one household
+     * their record points at. Every person asked about is in the answer, with an empty set when
+     * they belong to none. For a screen that asks which household a change is for (R-AD9).
+     */
+    @NamespaceAccessible
+    public static Map<Id, Set<Id>> currentHouseholdIdsByPerson(Set<Id> personIds) {
+        Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
+        if (personIds == null || personIds.isEmpty()) {
+            return result;
+        }
+        for (Id personId : personIds) {
+            result.put(personId, new Set<Id>());
+        }
+        if (isJunctionMode()) {
+            for (
+                Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(
+                    personIds
+                )
+            ) {
+                Id personId = personOf(membership);
+                if (result.containsKey(personId) && membership.Household__c != null) {
+                    result.get(personId).add(membership.Household__c);
+                }
+            }
+            return result;
+        }
+        Map<Id, Id> householdByPerson = getHouseholdIdsFor(personIds);
+        for (Id personId : householdByPerson.keySet()) {
+            Id householdId = householdByPerson.get(personId);
+            if (householdId != null && result.containsKey(personId)) {
+                result.get(personId).add(householdId);
+            }
+        }
+        return result;
+    }
+
     /** Who joined or left which households in one save, for `membershipChangeOf`. */
     @NamespaceAccessible
     public class MembershipChange {
