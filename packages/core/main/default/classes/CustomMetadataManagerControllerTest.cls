@@ -67,7 +67,12 @@ private class CustomMetadataManagerControllerTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(2, types.size(), 'Relationship types and match sources');
+        Assert.areEqual(
+            1,
+            types.size(),
+            'Relationship types only: match sources have their own page, Matching Logic'
+        );
+        Assert.areEqual(TYPE_NAME, types[0].typeName, 'The relationship types are listed');
         Assert.areEqual(String.valueOf(JOB), jobId, 'The deployment Id comes back');
         Assert.areEqual(CustomMetadataManagerController.PENDING, pending.status, 'Still running');
         Assert.areEqual(CustomMetadataManagerController.SUCCEEDED, done.status, 'Finished');

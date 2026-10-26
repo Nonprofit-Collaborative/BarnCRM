@@ -512,8 +512,10 @@ private class GivingSampleDataTest {
                 'the gifts meant for the sample General Fund go to the org\'s default fund'
             );
 
+            // Counted once, as SampleDataStageBatch counts it: each stage deletes what it counted.
             GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
-            for (Integer stage = 0; stage < stages.stageCount(); stage++) {
+            Integer stageCount = stages.stageCount();
+            for (Integer stage = 0; stage < stageCount; stage++) {
                 stages.runStage(stage);
             }
 
