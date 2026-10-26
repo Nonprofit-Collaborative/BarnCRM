@@ -65,9 +65,17 @@ Start with [docs/contributor-guide/environment.md](docs/contributor-guide/enviro
 
 ## Documentation
 
+The four documents below are kept current with the newest code on main; each opens with the date and commit it applies to.
+
+- [docs/overview.md](docs/overview.md): Overview. What BarnCRM is, the two editions, the modules and their state, and what comes next.
+- [docs/admin-guide/README.md](docs/admin-guide/README.md): Admin Guide. One page per feature, for the person who sets up and runs BarnCRM.
+- [docs/user-guide/README.md](docs/user-guide/README.md): User Guide. Task-by-task steps for staff who use BarnCRM every day.
+- [docs/testing-guide/README.md](docs/testing-guide/README.md): Testing Guide. Step-by-step test scripts for checking a build in a test org.
+
+More documentation:
+
 - [docs/product-plan.md](docs/product-plan.md): the full product plan, roadmap, and engineering standards.
 - [docs/architecture/](docs/architecture/): the canonical data model and architecture decision records (`docs/architecture/decisions/`).
-- [docs/admin-guide/](docs/admin-guide/): one page per feature, written for nonprofit administrators.
 - [docs/contributor-guide/](docs/contributor-guide/): environment setup, scratch orgs, CI, and the [dynamic Apex conventions](docs/contributor-guide/dynamic-apex.md) for reaching objects and classes an org may not have.
 - [docs/release-notes/](docs/release-notes/): what shipped in each iteration.
 - [docs/barncrm-features.md](docs/barncrm-features.md): the feature catalog, every feature by module with its status (shipped, built on a branch, or planned).
