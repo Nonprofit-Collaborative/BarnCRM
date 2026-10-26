@@ -173,7 +173,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
 
-## T-RB-12: Only the first N records, in descending order
+## T-RB-12: Only the First N Records, in Descending Order
 
 **Purpose:** confirm a text list keeps only its first values in the order chosen (ADR-0136).
 **Prerequisites:** admin user; sample data loaded. In Setup, on **Account**, create a Text field labelled **Test Names** (API name `Test_Names__c`, length 255), visible to your profile.
@@ -188,7 +188,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Back** twice, clear **Only the first N records**, click **Next** twice and pick **The Garcia Family** again. | "Calculated: Luis, Harper, Diego. On the record now: (empty)." |
 | 7 | Click **Cancel**. | Nothing is saved. |
 
-## T-RB-13: First and Last take no limit or order, Count takes no limit
+## T-RB-13: First and Last Take No Limit or Order, Count Takes No Limit
 
 **Purpose:** confirm the Builder offers a row limit and a direction only where they mean something.
 **Prerequisites:** admin user; the **Test Names** field from T-RB-12.
