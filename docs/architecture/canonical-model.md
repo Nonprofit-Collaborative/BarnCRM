@@ -1967,6 +1967,24 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   how the last full run ended); its Retry, for the selected records' entries or all, goes
   through `RollupQueue.retry`, which sets them Pending with Attempts 0 and no Next Attempt in
   system mode (R-RQ4, R-RQ5).
+- **Moving rollups between orgs (ADR-0136; lifts ADR-0082's deferral):**
+  `RollupDefinitionTransfer`, from the Builder's list. Export writes a JSON file
+  `{"format": "BarnCRM rollups", "version": 1, "rollups": [...]}` of the ticked rollups, or
+  every one with Is Package Default false; each entry is the definition as the Builder edits it
+  (its `Draft`) with its Definition Key and without its record Id, Last Calculated or Is
+  Package Default. Shipped definitions are never exported or imported: each org has them from
+  the package (R-R6). **Keying rule:** an import matches an entry to an existing definition by
+  Definition Key, ignoring case; a match is updated in place, no match is created with the
+  file's key, so importing the same file twice changes nothing more. Import first says what it
+  would do to each entry, then saves each entry on its own through the Builder's save checks
+  (`RollupBuilderController.checkedRecord`: R-R10, R-R8), in user mode, so each is checked
+  against those saved before it. An entry keeps the file's Active value only by passing every
+  check; one that fails is not saved, and the reason is reported. Also refused per entry: a key
+  that is blank or appears twice, a shipped key, and an attribute this version's Builder does
+  not know (a file from a newer version is never saved as a different rollup). A file with
+  another format name or a higher version is refused whole. An import recalculates nothing;
+  the next run does. It stops before the transaction's query or DML limit and reports the
+  remaining entries as not imported yet, which a second import of the same file finishes.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
   the vendored apex-rollup tree, `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` were
@@ -8915,6 +8933,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup Builder parity operations (ADR-0136). Rollup Definition gains `Bypass_Permission__c` (Section 14) with rule R-R4a: holders of the named custom permission skip the rollup on their saves, and a name with no custom permission in the org is refused on save. Section 14 records two new `global` surfaces: the Flow action `RollupRecalcRecordAction` ("Recalculate totals on this record") and the Apex class `RollupApi`. |
 | v0.8 | 2026-10-26 | Nightly rollup run hour (ADR-0136, DLRS parity P10). `Rollup_Settings__c` gains `Nightly_Run_Hour__c` (Number, default 2, Section 14B), shown as a picklist of hours. The nightly job and Run tonight start at it, and saving a new hour moves the scheduled nightly run through a third rollup engine seam, `RollupEngineExtensionV3`, that Core's settings service calls after every settings save. |
 | v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
+| v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
 
 ---
 ## 32. Entity ownership by package

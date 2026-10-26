@@ -359,3 +359,31 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Log in as the staff user and open the **Rollup Builder** tab. | **Delete** is disabled on every row, as **Edit** and **Copy** are. |
 
 **Cleanup:** None.
+## T-RB-25: Export Rollups to a File and Import Them Again
+
+**Purpose:** confirm Export writes only the rollups you made, keyed by Definition Key, and Import says what it will do, matches by key and reports each rollup.
+**Prerequisites:** admin user; T-RB-02 done. Step 7 needs a second org with Core and BarnCRM Rollup Builder but without the **Test Children Count** field; skip it if you have none.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, tick **Include in the export** on **Test children per household** and click **Export to a file**. | The browser saves `barncrm-rollups.json`. Rows of rollups that came with BarnCRM have no tick box. |
+| 2 | Open the file in a text editor. | It starts with `"format" : "BarnCRM rollups"` and `"version" : 1`, and holds one rollup with `"name" : "Test children per household"` and a `"definitionKey"` starting `Custom_`. It has no `recordId` and no last calculated date. |
+| 3 | Back on the tab, under **Import from a file**, choose the file. | A table lists **Test children per household** with "Will replace the rollup here with the same Definition Key". Nothing is saved yet. |
+| 4 | Click **Cancel**. | The table closes. |
+| 5 | Choose the file again and click **Import these rollups**. | The table reads **Updated** for the rollup, and the notice reads "Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate." The list still has one **Test children per household**, still active. |
+| 6 | Untick the box and click **Export to a file** again. | The file holds every rollup you made and none that came with BarnCRM. |
+| 7 | In the second org, on the **Rollup Builder** tab, import the file from step 1 and click **Import these rollups**. | The table reads "Not saved: BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only." Nothing is saved. |
+
+**Cleanup:** None.
+
+## T-RB-26: A File That Is Not an Export Is Refused, and Staff Cannot Export or Import
+
+**Purpose:** confirm Import refuses a file it cannot read and that Export and Import are admin only.
+**Prerequisites:** admin and staff users; T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Save a text file named `not-rollups.json` holding `{}`. On the **Rollup Builder** tab, choose it under **Import from a file**. | A red message reads "This is not a BarnCRM rollups file. Choose a file made by Export to a file." No table opens. |
+| 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a file**, **Import from a file** and the tick boxes are disabled or not shown. |
+
+**Cleanup:** delete `not-rollups.json`.

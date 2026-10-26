@@ -10,6 +10,28 @@ import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
 import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
 import LightningConfirm from 'lightning/confirm';
+import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
+import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
+
+jest.mock(
+  '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/RollupDefinitionTransfer.importDefinitions',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportWillCreate', () => ({ default: 'New' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportRefused', () => ({ default: 'Refused' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportCreated', () => ({ default: 'Created' }), {
+  virtual: true
+});
 
 jest.mock(
   '@salesforce/apex/RollupController.getPage',
@@ -435,6 +457,95 @@ describe('c-rollup-definitions', () => {
       expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
         'Switch it off instead.'
       );
+    });
+  });
+
+  describe('Export and import', () => {
+    const MINE = { ...ROLLUP, recordId: 'a01000000000002AAA', packageDefault: false };
+
+    async function builderWith(rollups) {
+      const element = createComponent();
+      element.builder = true;
+      getPage.emit({ ...PAGE, rollups });
+      await flush();
+      return element;
+    }
+
+    function settle() {
+      // FileReader finishes on a later task, not a microtask.
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
+      return new Promise((resolve) => setTimeout(resolve, 20)).then(flush);
+    }
+
+    it('offers a tick box on admin-made rollups only, and exports the ticked ones', async () => {
+      const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      exportDefinitions.mockResolvedValue('{"format":"BarnCRM rollups"}');
+      const element = await builderWith([ROLLUP, MINE]);
+
+      const boxes = element.shadowRoot.querySelectorAll('[data-action="select"]');
+      expect(boxes).toHaveLength(1);
+      boxes[0].checked = true;
+      boxes[0].dispatchEvent(new CustomEvent('change'));
+      element.shadowRoot.querySelector('[data-id="export"]').click();
+      await flush();
+
+      expect(exportDefinitions).toHaveBeenCalledWith({ definitionIds: [MINE.recordId] });
+      expect(click).toHaveBeenCalled();
+      click.mockRestore();
+    });
+
+    it('says what the file would do, then imports it and says what happened', async () => {
+      importDefinitions
+        .mockResolvedValueOnce([
+          { definitionKey: 'Custom_1', name: 'Gift count', outcome: 'created' },
+          { definitionKey: 'Custom_2', name: 'Pledges', outcome: 'refused', reason: 'No field.' }
+        ])
+        .mockResolvedValueOnce([
+          { definitionKey: 'Custom_1', name: 'Gift count', outcome: 'created' },
+          { definitionKey: 'Custom_2', name: 'Pledges', outcome: 'refused', reason: 'No field.' }
+        ]);
+      const element = await builderWith([MINE]);
+
+      const input = element.shadowRoot.querySelector('[data-id="import-file"]');
+      const file = new File(['{"format":"BarnCRM rollups"}'], 'rollups.json');
+      input.dispatchEvent(new CustomEvent('change', { detail: { files: [file] } }));
+      await settle();
+
+      expect(importDefinitions).toHaveBeenCalledWith({
+        fileText: '{"format":"BarnCRM rollups"}',
+        save: false
+      });
+      const cells = [...element.shadowRoot.querySelectorAll('[data-id="import-row"] td')];
+      expect(cells.map((cell) => cell.textContent)).toEqual(['New', 'Refused: No field.']);
+
+      element.shadowRoot.querySelector('[data-id="apply-import"]').click();
+      await settle();
+
+      expect(importDefinitions).toHaveBeenLastCalledWith({
+        fileText: '{"format":"BarnCRM rollups"}',
+        save: true
+      });
+      expect(element.shadowRoot.querySelector('[data-id="import-row"] td').textContent).toBe(
+        'Created'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="apply-import"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
+    });
+
+    it('shows why a file is refused', async () => {
+      importDefinitions.mockRejectedValue({ body: { message: 'Not a rollups file.' } });
+      const element = await builderWith([MINE]);
+
+      const input = element.shadowRoot.querySelector('[data-id="import-file"]');
+      input.dispatchEvent(
+        new CustomEvent('change', { detail: { files: [new File(['x'], 'x.json')] } })
+      );
+      await settle();
+
+      expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+        'Not a rollups file.'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="import"]')).toBeNull();
     });
   });
 });

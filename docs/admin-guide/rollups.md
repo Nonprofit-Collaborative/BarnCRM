@@ -494,6 +494,38 @@ Under the list, **Needs attention** shows what the engine has not finished:
   that saves a record also takes it off the list.
 - A warning when the nightly run is not scheduled, and how the last full run ended.
 
+### Moving Rollups to Another Org
+
+Build and check rollups in a sandbox, then move them to production with a file:
+
+1. In the sandbox, on the **Rollup Builder** tab, tick **Include in the export** on the rollups
+   to move, or tick none to move every rollup you made. Click **Export to a file**. Your
+   browser saves `barncrm-rollups.json`.
+2. In production, on the **Rollup Builder** tab, choose the file under **Import from a file**.
+   A table says what would happen to each rollup: **New: will be created**, **Will replace the
+   rollup here with the same Definition Key**, or **Not saved** with the reason. Nothing is
+   saved yet.
+3. Click **Import these rollups** (or **Cancel**). The table then says what happened to each one.
+
+What to know:
+
+- **Rollups are matched by Definition Key.** A rollup moved once and changed in the sandbox
+  replaces its copy in production when you import it again; nothing is duplicated.
+- **Each rollup goes through the same checks as Save in the Builder**, against production's own
+  objects, fields and rollups. One that fails is not saved at all and the table says why (for
+  example, a field production does not have yet: create it in Setup and import again). The
+  others are saved.
+- **A rollup arrives switched on or off as it was in the file**, and only when every check
+  passes. Nothing is recalculated by the import: the next nightly run does it, or click
+  **Recalculate** on the row.
+- **Rollups that came with BarnCRM are not moved.** Every org has them; use **Restore shipped
+  rollups** if one is missing.
+- **The file holds no record Ids or dates**, only how each rollup is calculated, so it works
+  between any two orgs with BarnCRM Rollup Builder. A file from a newer version of BarnCRM is
+  refused until this org is upgraded.
+- **A very large file** may stop part way, saying **Not imported yet** on the rest; import the
+  same file again to finish.
+
 ### Recalculate all, now or tonight
 
 **Recalculate all** rebuilds every active rollup, whatever its mode: **Instantly** totals as
