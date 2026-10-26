@@ -9,6 +9,14 @@
         <value>That parent appeal would create a loop, because this appeal is already above it. Choose a different parent appeal, or leave Parent Appeal empty.</value>
     </labels>
     <labels>
+        <fullName>Giving_Fund_DefaultName</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Name of the fund a new org starts with</shortDescription>
+        <value>General Fund</value>
+    </labels>
+    <labels>
         <fullName>Giving_Fund_DefaultNotSaved</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

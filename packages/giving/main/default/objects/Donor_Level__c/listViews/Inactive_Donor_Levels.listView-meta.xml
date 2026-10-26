@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Inactive_Donor_Levels</fullName>
+  <columns>NAME</columns>
+  <columns>Minimum_Amount__c</columns>
+  <columns>Maximum_Amount__c</columns>
+  <filters>
+    <field>Active__c</field>
+    <operation>equals</operation>
+    <value>0</value>
+  </filters>
+  <filterScope>Everything</filterScope>
+  <label>Inactive Donor Levels</label>
+</ListView>

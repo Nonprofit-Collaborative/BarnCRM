@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Current_Affiliations</fullName>
+  <columns>NAME</columns>
+  <columns>Contact__c</columns>
+  <columns>Person_Account__c</columns>
+  <columns>Organization__c</columns>
+  <columns>Role__c</columns>
+  <columns>Is_Primary__c</columns>
+  <columns>Start_Date__c</columns>
+  <filters>
+    <field>Status__c</field>
+    <operation>equals</operation>
+    <value>Current</value>
+  </filters>
+  <filterScope>Everything</filterScope>
+  <label>Current Affiliations</label>
+</ListView>

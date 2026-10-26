@@ -144,3 +144,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | As read-only, open an Active recurring gift. | No **Edit** or **Delete**. The **Payment schedule** card lists the payments. |
 | 4 | Look at the card's buttons. | No **Pause**, **Resume**, **Mark complete** or **Cancel commitment**. On a commitment with no payments yet, the card has no **Generate now**. |
 **Cleanup:** none.
+
+## T-COM-10: List views for commitments and installments
+
+**Purpose:** commitments and installments open with an All view, a My view and the status views.
+**Prerequisites:** staff user, sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Commitments** tab and the list view menu. | **All Commitments**, **My Commitments**, **Active Pledges**, **Active Recurring Gifts** and **Paused Commitments** are listed. |
+| 2 | Choose **All Commitments**. | Every commitment shows, with Type, Amount, Frequency and Status columns. |
+| 3 | Pause a sample recurring gift (see T-COM-06) and choose **Paused Commitments**. | It shows there and has left **Active Recurring Gifts**. Resume it afterwards. |
+| 4 | Open the **Installments** tab and the list view menu. | **All Installments**, **Overdue** and **Upcoming 30 Days** are listed. **All Installments** shows every payment. |
+
+**Cleanup:** resume the paused commitment.

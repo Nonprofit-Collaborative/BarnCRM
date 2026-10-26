@@ -73,6 +73,13 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
    print, and then press **Mark as sent** on the run. Until you press it the gifts stay in
    the letter queue, because BarnCRM cannot tell whether you printed anything.
 
+## List views
+
+**Acknowledgments** has **All Acknowledgments**, **Queued Acknowledgments** and **Failed
+Acknowledgments**. **Acknowledgment Rules** has **All Acknowledgment Rules**, **Active
+Acknowledgment Rules** and **Inactive Acknowledgment Rules**. **Acknowledgment Runs** has **All
+Acknowledgment Runs**.
+
 ## Common mistakes
 
 **Two rules that both match, in the wrong order.** A rule with no minimum and no maximum

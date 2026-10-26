@@ -99,6 +99,16 @@ among your contacts works where. Start from the sample data.
 8. Check the Households tab. Harper is still in The Garcia Family, exactly where she was.
    Nothing about an affiliation moves a person.
 
+## List views and what ships ready to use
+
+The **Affiliations** tab opens with four list views: **All Affiliations**, **Current
+Affiliations**, **Former Affiliations** (with the end date) and **My Affiliations** (the ones you
+created). Pick one from the list view menu at the top left.
+
+There is no list of roles to set up: **Role** is free text, so a new org can add affiliations
+straight away, with no sample data. Affiliations themselves are not shipped, because they
+connect your own people and organizations.
+
 ## Common mistakes
 
 **Expecting an affiliation to move the person to the organization.** It does not, and that
