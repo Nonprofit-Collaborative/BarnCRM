@@ -19,7 +19,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main (newest first)
 
-- #605 (squash 334c93ca): landing batch 9, owner QA fixes (O1, F1, N1, RM1, M1, IN1, LV1, light gate), merging #569, #574, #576, #573, #586, #589, #584, #598:
+- #605 (squash 334c93ca, gate `oi-test` 3,704 of 3,704, coverage 93%): landing batch 9, owner QA fixes (O1, F1, N1, RM1, M1, IN1, LV1, light gate), merging #569, #574, #576, #573, #586, #589, #584, #598:
   - #569: BarnCRM Settings Org Optimizer thresholds moved from General to a new Org Optimizer section (O1).
   - #574: BarnCRM uses the org fiscal year (Setup) for every rollup window and check (F1); removed the Fiscal Year Start Month setting, its Setup note and the mismatch Health Check finding; added a custom fiscal year finding and read-only "value from Setup" console rows (Fiscal year start month in General, Organization name above Organization legal name); ADR-0135 supersedes ADR-0025 in part.
   - #576: Settings console shows the effective default for an unsaved Picklist, Number or Text setting (coexistence mode shows the recommended mode, household membership mode shows one household per person, nothing stored); install and source deploy create the Rollup Settings row (Both, After the save); "Just after the save" relabelled "After the save (recommended)" (RM1).
@@ -30,7 +30,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
   - #598: Health Check deactivated-owner fix test and the post-install tab check test clear the org's own BarnCRM scheduled jobs first; a new test covers a pre-existing job.
   - Integration: section order and count, effective defaults vs #570 membership display, SetupValue rows, T-SET renumbering and Testing Guide README counts, Python bytecode untracked (`__pycache__/`, `*.pyc` in `.gitignore`).
   - Plan follow-up from #574: Section 4 `Rollup_Definition__c` bullet should say the org fiscal year in Setup (BMemory first).
-- #587 (squash 0dbf94c7): landing batch 8, owner QA fixes (T1, R1, C1, B1, G1, G2, S1, RS1), merging #571, #572, #577, #578, #579, #580 plus main (#575):
+- #587 (squash 0dbf94c7, gate `oi-test` 3,661 of 3,661): landing batch 8, owner QA fixes (T1, R1, C1, B1, G1, G2, S1, RS1), merging #571, #572, #577, #578, #579, #580 plus main (#575):
   - #571: household naming preview table (and import column-change preview) fits the settings panel (fixed layout, wrapping cells).
   - #572: Settings console shows Recent Changes only on General; section, panel and sub-section titles are Title Case (display labels only); admin and testing guides updated.
   - #577: buttons that open a module's own page name it ("Open Rollup Builder") via new `Setting_Definition__mdt.Navigation_Label__c`; blank falls back to "Open this page".
