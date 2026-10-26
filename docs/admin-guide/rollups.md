@@ -254,7 +254,20 @@ What to know about them:
   choose a semicolon or a new line so the list still reads clearly. A new line suits a long
   text field.
 - **A text list is in order.** If you choose a field to order by, the values follow it,
-  oldest or smallest first. Otherwise they are listed alphabetically.
+  oldest or smallest first, or with **Order** set to **Descending**, newest or largest first.
+  Otherwise they are listed alphabetically (Z to A when descending). Records whose order field
+  is blank come last either way.
+- **Only the first N records.** **Sum**, **Average**, **Minimum**, **Maximum** and the text
+  lists can count only the first few records, in the order you choose: enter a number in
+  **Only the first N records** and choose the field to order by. For example, the sum of the 5
+  largest gifts is **Sum** of Amount, 5, ordered by Amount, **Descending**; the last 3 gift
+  amounts as a text list is **Text list** of Amount, 3, ordered by Gift Date, **Descending**.
+  Records with a blank value are skipped, so N means N records that have one. **Text list,
+  each value once** lists the first N different values. Count, Count distinct, Any, None, First
+  and Last take no limit.
+- **Order does not change First and Last.** First is always the record with the lowest value
+  of the order field (the earliest date), and Last the one with the highest. For "the most
+  recent", choose Last.
 - **A text that is too long is cut.** A list longer than the field holds is cut at the
   field's length, so a 255 character field shows the first 255 characters. Use a long text
   field for a list that can grow.
@@ -328,7 +341,9 @@ to change, before it lets you go on.
 3. **How should it be calculated?** Any calculation in
    [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
    hold, the field it reads, for First and Last the field that decides which record comes
-   first, and the time window: all time, this fiscal year, last fiscal year, or two fiscal
+   first (**Which record comes first, by**), for a sum, an average, a minimum, a maximum or a
+   text list **Only the first N records** if you want a limit, for a text list or a limit the
+   **Order** (Ascending or Descending), and the time window: all time, this fiscal year, last fiscal year, or two fiscal
    years ago, with the date that decides which year a record falls in (a date field, not a
    date and time field).
 4. **Which records count?** Conditions you pick from lists (a field, a comparison and a
@@ -356,6 +371,9 @@ It says what to change instead of saving:
 - A sum or average of something that is not a number or an amount, and a minimum or maximum
   of something that is not a number, an amount or a date.
 - First or Last without the field that decides which record comes first.
+- **Only the first N records** below 1, without a field to order by, or on a calculation that
+  takes no limit (Count, Count distinct, Any, None, First, Last). Every save checks this, not
+  only the Builder.
 - A fiscal year window without a date to measure it on, or measured on a date and time field.
   Choose a date field, such as the gift date.
 - An **Instantly** total with a fiscal year window, or with an **is this year**, **is last year** or
@@ -613,6 +631,7 @@ For report builders only. Nothing on this page requires you to know these.
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
+| Which record comes first, by; Order; Only the first N records | `Order_By_Field__c`, `Order_Direction__c` and `Row_Limit__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
 With Giving installed:

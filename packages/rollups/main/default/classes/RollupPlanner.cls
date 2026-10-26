@@ -57,6 +57,19 @@ public with sharing class RollupPlanner {
     /** Aggregates that read no attribute of the source rows: the filter is the whole question. */
     private static final Set<String> READS_NO_FIELD = new Set<String>{ 'COUNT', 'ANY', 'NONE' };
 
+    /**
+     * Aggregates that take a row limit (R-R15, ADR-0136). A grouped query cannot limit rows per
+     * target, so a limited one is read as rows, as a text list is, and the first N are kept.
+     */
+    public static final Set<String> ROW_LIMITED = new Set<String>{
+        'SUM',
+        'AVG',
+        'MIN',
+        'MAX',
+        'TEXT_LIST',
+        'TEXT_LIST_DISTINCT'
+    };
+
     private static final Set<Schema.DisplayType> NUMBER_AND_DATE_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.DOUBLE,
         Schema.DisplayType.INTEGER,
@@ -119,6 +132,39 @@ public with sharing class RollupPlanner {
         public String field;
         /** True when the target is text, so a value is copied as it was entered, never converted. */
         public Boolean asText = false;
+        /** Only the first this many rows, in the query's order, count; null for every row. */
+        public Integer rowLimit;
+    }
+
+    /**
+     * Why this row limit cannot be used, or null when it can or there is none (R-R10, R-R15):
+     * below 1, on an aggregate that takes none, or with no order to say which rows come first.
+     */
+    public static String rowLimitProblem(String aggregate, Decimal rowLimit, String orderBy) {
+        if (rowLimit == null) {
+            return null;
+        }
+        if (rowLimit < 1) {
+            return System.Label.Core_Rollups_ErrorRowLimitInvalid;
+        }
+        if (String.isBlank(aggregate) || !ROW_LIMITED.contains(aggregate.toUpperCase())) {
+            return System.Label.Core_Rollups_ErrorRowLimitAggregate;
+        }
+        return String.isBlank(orderBy) ? System.Label.Core_Rollups_ErrorRowLimitNeedsOrder : null;
+    }
+
+    /**
+     * A definition's row limit, or null. Read only when the caller queried it, so a caller that
+     * queried a definition without it still calculates every row, as before ADR-0136.
+     */
+    private static Decimal rowLimitOf(Rollup_Definition__c definition) {
+        return definition.isSet(Rollup_Definition__c.Row_Limit__c) ? definition.Row_Limit__c : null;
+    }
+
+    /** Whether a text list or row limited aggregate is ordered descending; Ascending when unread. */
+    private static Boolean isDescending(Rollup_Definition__c definition) {
+        return definition.isSet(Rollup_Definition__c.Order_Direction__c) &&
+            definition.Order_Direction__c == 'Descending';
     }
 
     /** What separates the values of a text list for this `Delimiter__c` value. */
@@ -176,6 +222,14 @@ public with sharing class RollupPlanner {
      * @return the message to show, or null when the save may go ahead
      */
     public static String saveProblem(Rollup_Definition__c definition) {
+        String limitProblem = rowLimitProblem(
+            definition.Aggregate__c,
+            rowLimitOf(definition),
+            definition.Order_By_Field__c
+        );
+        if (limitProblem != null) {
+            return limitProblem;
+        }
         Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
         if (targetType == null || String.isBlank(definition.Target_Field__c)) {
             return null;
@@ -304,7 +358,16 @@ public with sharing class RollupPlanner {
         String field = READS_NO_FIELD.contains(aggregate)
             ? null
             : checkedPath(definition.Source_Field__c);
-        // FIRST and LAST need an order; a text list may have one, and is otherwise alphabetical.
+        Decimal rowLimit = rowLimitOf(definition);
+        String limitProblem = rowLimitProblem(aggregate, rowLimit, definition.Order_By_Field__c);
+        if (limitProblem != null) {
+            throw new RollupPlanException(limitProblem);
+        }
+        if (rowLimit != null) {
+            kind = KIND_LISTED;
+        }
+        // FIRST and LAST need an order; a text list may have one, and is otherwise alphabetical;
+        // a row limit has one (checked above).
         String orderBy = kind == KIND_ORDERED ||
             (kind == KIND_LISTED && String.isNotBlank(definition.Order_By_Field__c))
             ? checkedPath(definition.Order_By_Field__c)
@@ -324,10 +387,13 @@ public with sharing class RollupPlanner {
             query.whereClause = whereClause;
             query.kind = kind;
             query.orderBy = orderBy;
-            query.descending = aggregate == 'LAST';
+            // FIRST is the lowest and LAST the highest whatever the direction (R-R15), so a
+            // saved definition means what it always meant.
+            query.descending = kind == KIND_LISTED ? isDescending(definition) : aggregate == 'LAST';
             Measure measure = new Measure();
             measure.aggregate = aggregate;
             measure.field = field;
+            measure.rowLimit = rowLimit == null ? null : rowLimit.intValue();
             query.measures.add(measure);
             queries.add(query);
             earlier.add(query.keyExpression);

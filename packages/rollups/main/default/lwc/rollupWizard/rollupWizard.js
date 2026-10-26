@@ -18,6 +18,10 @@ import SOURCE from '@salesforce/label/c.Core_RollupBuilder_Source';
 import AGGREGATE from '@salesforce/label/c.Core_RollupBuilder_Aggregate';
 import SOURCE_FIELD from '@salesforce/label/c.Core_RollupBuilder_SourceField';
 import ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_OrderBy';
+import ORDER_DIRECTION from '@salesforce/label/c.Core_RollupBuilder_OrderDirection';
+import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
+import ROW_LIMIT_HELP from '@salesforce/label/c.Core_RollupBuilder_RowLimitHelp';
+import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
@@ -57,6 +61,8 @@ const TEXT = new Set(['string', 'textarea']);
 const READS_NO_FIELD = new Set(['COUNT', 'ANY', 'NONE']);
 const ORDERED = new Set(['FIRST', 'LAST']);
 const LISTS = new Set(['TEXT_LIST', 'TEXT_LIST_DISTINCT']);
+/** The calculations that take "only the first N records" (R-R15, ADR-0136). */
+const ROW_LIMITED = new Set(['SUM', 'AVG', 'MIN', 'MAX', ...LISTS]);
 
 /** The calculations a target field of this type can hold (canonical model R-R15). */
 function aggregatesFor(type) {
@@ -97,6 +103,9 @@ export default class RollupWizard extends LightningElement {
     aggregate: AGGREGATE,
     sourceField: SOURCE_FIELD,
     orderBy: ORDER_BY,
+    orderDirection: ORDER_DIRECTION,
+    rowLimit: ROW_LIMIT,
+    rowLimitHelp: ROW_LIMIT_HELP,
     delimiter: DELIMITER,
     window: WINDOW,
     windowDate: WINDOW_DATE,
@@ -226,7 +235,30 @@ export default class RollupWizard extends LightningElement {
   }
 
   get needsOrderBy() {
-    return ORDERED.has(this.current.aggregate) || LISTS.has(this.current.aggregate);
+    return (
+      ORDERED.has(this.current.aggregate) || LISTS.has(this.current.aggregate) || this.hasRowLimit
+    );
+  }
+
+  get takesRowLimit() {
+    return ROW_LIMITED.has(this.current.aggregate);
+  }
+
+  get hasRowLimit() {
+    return this.takesRowLimit && this.current.rowLimit != null && this.current.rowLimit !== '';
+  }
+
+  /** First is always the lowest and Last the highest, so only lists and limits take a direction. */
+  get takesDirection() {
+    return LISTS.has(this.current.aggregate) || this.hasRowLimit;
+  }
+
+  get orderDirection() {
+    return this.current.orderDirection || 'Ascending';
+  }
+
+  get directionOptions() {
+    return this.model && this.model.directions ? this.model.directions : [];
   }
 
   get isTextList() {
@@ -424,6 +456,9 @@ export default class RollupWizard extends LightningElement {
       if (ORDERED.has(draft.aggregate) && !draft.orderByField) {
         return ERROR_ORDER_BY;
       }
+      if (this.hasRowLimit && !draft.orderByField) {
+        return ERROR_ROW_LIMIT_ORDER;
+      }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
         return ERROR_WINDOW_DATE;
       }
@@ -480,6 +515,9 @@ export default class RollupWizard extends LightningElement {
     if (READS_NO_FIELD.has(draft.aggregate)) {
       draft.sourceField = null;
     }
+    // A limit or a direction the calculation does not take is not saved with it.
+    draft.rowLimit = this.hasRowLimit ? Number(draft.rowLimit) : null;
+    draft.orderDirection = this.takesDirection ? this.orderDirection : 'Ascending';
     return draft;
   }
 

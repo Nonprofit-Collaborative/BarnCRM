@@ -209,6 +209,30 @@
         <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorRowLimitAggregate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is set on a calculation that does not take one.</shortDescription>
+        <value>Only the first N records works with Sum, Average, Minimum, Maximum and the text lists. Clear it for this calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorRowLimitNeedsOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is set without an order by field.</shortDescription>
+        <value>Only the first N records needs a field to order by, so BarnCRM knows which records come first. Choose one, or clear the limit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorRowLimitInvalid</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is below 1.</shortDescription>
+        <value>Only the first N records must be 1 or more. Leave it blank to count every record.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_Recalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

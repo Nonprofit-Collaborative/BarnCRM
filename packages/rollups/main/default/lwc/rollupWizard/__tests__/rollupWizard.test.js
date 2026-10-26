@@ -216,4 +216,55 @@ describe('c-rollup-wizard', () => {
       'Calculated: 250. On the record now: 200.'
     );
   });
+
+  it('offers a row limit to Sum, and asks it for an order and a direction', async () => {
+    const element = await build({ ...DRAFT, rowLimit: 5 });
+    await next(element);
+    await next(element);
+    expect(query(element, 'row-limit').value).toBe(5);
+    expect(query(element, 'order-direction').value).toBe('Ascending');
+    await next(element);
+    expect(query(element, 'error-message')).not.toBeNull();
+    expect(query(element, 'order-by')).not.toBeNull();
+  });
+
+  it('gives First no row limit or direction, and saves neither', async () => {
+    save.mockResolvedValue({ recordId: DRAFT.recordId, notice: 'Rollup saved.' });
+    const element = await build({
+      ...DRAFT,
+      aggregate: 'FIRST',
+      orderByField: 'Gift_Date__c',
+      orderDirection: 'Descending',
+      rowLimit: 3
+    });
+    await next(element);
+    await next(element);
+    expect(query(element, 'row-limit')).toBeNull();
+    expect(query(element, 'order-direction')).toBeNull();
+    await next(element);
+    await next(element);
+    query(element, 'save').click();
+    await flush();
+    expect(save).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ rowLimit: null, orderDirection: 'Ascending' }),
+      calculateNow: false
+    });
+  });
+
+  it('saves a limited Sum with its order and direction', async () => {
+    save.mockResolvedValue({ recordId: DRAFT.recordId, notice: 'Rollup saved.' });
+    const element = await build({
+      ...DRAFT,
+      orderByField: 'Amount__c',
+      orderDirection: 'Descending',
+      rowLimit: '5'
+    });
+    await toLastStep(element);
+    query(element, 'save').click();
+    await flush();
+    expect(save).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ rowLimit: 5, orderDirection: 'Descending' }),
+      calculateNow: false
+    });
+  });
 });

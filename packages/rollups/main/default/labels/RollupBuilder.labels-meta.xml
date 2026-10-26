@@ -489,6 +489,30 @@
         <value>Which record comes first, by</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_OrderDirection</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: ascending or descending order.</shortDescription>
+        <value>Order</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RowLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: calculate only the first N records.</shortDescription>
+        <value>Only the first N records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RowLimitHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 help for the row limit.</shortDescription>
+        <value>Optional. For the sum of the 5 largest gifts, enter 5 and order by Amount, Descending. Leave blank for every record.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_Delimiter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
