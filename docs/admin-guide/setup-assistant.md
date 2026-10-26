@@ -315,7 +315,7 @@ finished, because it is.
 ## Common mistakes
 
 - **Treating Skip for now as done.** Skipping moves you on without marking the step
-  finished, on purpose. A skipped step still shows as **To do**, and the next time you open
+  finished, on purpose. A skipped step shows a **Skipped** badge, not **Done**, and the next time you open
   the home page the assistant opens on it again.
 - **Marking coexistence mode and then changing your mind quietly.** Changing the mode later
   is allowed and is a real change: it changes how household membership is tracked from that

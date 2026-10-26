@@ -32,9 +32,10 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 
 | Package | Contains | Depends on | First ships |
 |---|---|---|---|
-| Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine, Import framework, health check | (none) | v0.1 |
-| Giving | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core | v0.2 |
-| Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), inbound gift REST API, accounting export | Core, Giving | v0.6 |
+| Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, Import framework, health check | (none) | v0.1 |
+| Rollup Builder | The rollup engine and the Rollup Builder page where you manage totals | Core | not yet versioned |
+| Giving | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core, Rollup Builder | v0.2 |
+| Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Nonprofit Cloud, planned), inbound gift REST API, accounting export | Core, Giving | v0.6 |
 | Volunteers | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core | v0.7 |
 | Programs | Programs, services, enrollments, attendance, service deliveries, light case notes, outcomes | Core | v0.8 |
 | Funders | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Giving | v0.9 |

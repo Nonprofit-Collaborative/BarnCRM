@@ -33,7 +33,7 @@ Start with no sample data loaded.
 2. On the same section, click **Load sample data** on the sample data card. You can leave the
    page and carry on working.
 3. After a minute or two the bell at the top of the page shows a new notification:
-   **Sample data loaded**, with the number of households, people and organizations.
+   **Sample data load finished**, with the number of households, people and organizations.
 4. Click the notification. The BarnCRM Settings console opens at the General section, where the
    sample data card shows the same counts.
 5. Open the **Find** tab, run a query that returns a few sample records, press **Bulk update**
@@ -61,7 +61,7 @@ Start with no sample data loaded.
 | Import, check before importing (dry run), import undo | The import's record |
 | Bulk update and its undo | The bulk update's record |
 | Bulk delete and its undo | The bulk delete's record |
-| Sample data load | BarnCRM Settings, General |
+| Sample data load, and removal if it stops part way | BarnCRM Settings, General |
 | Rollup recalculation (Recalculate, Recalculate all) | BarnCRM Settings, Rollups |
 | Seasonal address swap (Run now) | BarnCRM Settings, Addresses |
 | Duplicate scan, household name recompute | BarnCRM Settings, Households |
@@ -69,7 +69,9 @@ Start with no sample data loaded.
 | With Giving: acknowledgment email send (Send now) | The acknowledgment run's record |
 | With Giving: donor level recalculation (Recalculate now) | BarnCRM Settings, Giving |
 
-Removing the sample data happens while you wait, so it sends no notification.
+Removing the sample data runs as background batch jobs, like the load, and sends a
+notification only if it stops part way ("Sample data removal did not finish"). When it
+finishes normally, the Sample data card returns to **Not loaded** and nothing is sent.
 
 ## Common mistakes
 

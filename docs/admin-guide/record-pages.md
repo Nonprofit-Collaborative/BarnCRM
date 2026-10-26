@@ -30,7 +30,7 @@ What ships:
 
 What changes with the record:
 
-- **A household** shows the **Household Members** panel and a **Name and Greetings** section
+- **A household** shows the **Members** panel and a **Name and Greetings** section
   (custom name, formal and informal greetings, member count, primary contact, anniversary).
   See [Household members](household-members.md) and
   [Household names and greetings](household-naming.md).
@@ -67,8 +67,8 @@ org's. Add the panel yourself. The steps are in
 
 Start with the sample data loaded ([Sample data](sample-data.md)).
 
-1. Open the **BarnCRM** app and choose the **Households** tab. Open **Garcia Household**.
-   The page has the **Details** section, the **Household Members** panel, and **Name and
+1. Open the **BarnCRM** app and choose the **Households** tab. Open **The Garcia Family**.
+   The page has the **Details** section, the **Members** panel, and **Name and
    Greetings**, with the formal and informal greetings.
 2. Look at the action bar at the top. **Merge or split** is there, because this is a
    household.
@@ -76,7 +76,7 @@ Start with the sample data loaded ([Sample data](sample-data.md)).
    **Reaching This Person** sections, and the **Household** panel names the household you
    came from. **Merge or split** is gone, because a person is not a household.
 4. Go back and open an organization from the **Organizations** tab. There is no **Name and
-   Greetings** section and no **Household Members** panel; the **Affiliations** panel and
+   Greetings** section and no **Members** panel; the **Affiliations** panel and
    the website show instead. The page is the same one the household used: it chose what to
    show from the record.
 5. To make the page your own, open any record, click the gear icon, and choose **Edit
