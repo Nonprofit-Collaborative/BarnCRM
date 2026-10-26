@@ -61,6 +61,7 @@ private class ShiftScheduleRebuildTest {
         return [
             SELECT Id, Job__c, Created_Through__c, Shifts_Kept__c, Rebuild_Pending__c
             FROM Shift_Schedule__c
+            WITH SYSTEM_MODE
             ORDER BY Id
         ];
     }
@@ -70,6 +71,7 @@ private class ShiftScheduleRebuildTest {
             SELECT Id, Start_Time__c
             FROM Volunteer_Shift__c
             WHERE Shift_Schedule__c = :scheduleId
+            WITH SYSTEM_MODE
             ORDER BY Start_Time__c
         ];
     }
@@ -124,7 +126,12 @@ private class ShiftScheduleRebuildTest {
         System.runAs(user(COORDINATOR)) {
             update changes;
         }
-        Integer marked = [SELECT COUNT() FROM Shift_Schedule__c WHERE Rebuild_Pending__c = TRUE];
+        Integer marked = [
+            SELECT COUNT()
+            FROM Shift_Schedule__c
+            WHERE Rebuild_Pending__c = TRUE
+            WITH SYSTEM_MODE
+        ];
         Test.stopTest();
 
         System.runAs(admin()) {
@@ -253,6 +260,7 @@ private class ShiftScheduleRebuildTest {
             SELECT COUNT()
             FROM Volunteer_Shift__c
             WHERE Volunteer_Job__c = :jobId
+            WITH SYSTEM_MODE
         ];
         Test.stopTest();
 

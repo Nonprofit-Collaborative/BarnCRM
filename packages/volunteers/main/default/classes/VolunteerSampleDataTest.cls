@@ -50,6 +50,7 @@ private class VolunteerSampleDataTest {
             SELECT Status__c status, COUNT(Id) entries
             FROM Volunteer_Hours__c
             WHERE Volunteer_Job__r.Sample_Data__c = TRUE
+            WITH SYSTEM_MODE
             GROUP BY Status__c
         ]) {
             counts.put((String) row.get('status'), (Integer) row.get('entries'));
@@ -58,31 +59,75 @@ private class VolunteerSampleDataTest {
     }
 
     private static Integer sampleRecordsLeft() {
-        return [SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Volunteer_Shift__c WHERE Volunteer_Job__r.Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Shift_Schedule__c WHERE Job__r.Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Volunteer_Hours__c WHERE Contact__r.Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Volunteer_Skill__c WHERE Contact__r.Sample_Data__c = TRUE] +
-            [SELECT COUNT() FROM Volunteer_Requirement__c WHERE Contact__r.Sample_Data__c = TRUE];
+        return [SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE] +
+            [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE] +
+            [
+                SELECT COUNT()
+                FROM Volunteer_Shift__c
+                WHERE Volunteer_Job__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Shift_Schedule__c
+                WHERE Job__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Volunteer_Hours__c
+                WHERE Contact__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Volunteer_Skill__c
+                WHERE Contact__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Volunteer_Requirement__c
+                WHERE Contact__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ];
     }
 
     private static void assertTheWholeSet() {
-        Assert.areEqual(3, [SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE]);
-        Assert.areEqual(4, [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE]);
-        Assert.areEqual(4, [SELECT COUNT() FROM Job_Skill__c WHERE Job__r.Sample_Data__c = TRUE]);
+        Assert.areEqual(
+            3,
+            [SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
+        );
+        Assert.areEqual(
+            4,
+            [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
+        );
+        Assert.areEqual(
+            4,
+            [SELECT COUNT() FROM Job_Skill__c WHERE Job__r.Sample_Data__c = TRUE WITH SYSTEM_MODE]
+        );
         Assert.areEqual(
             1,
-            [SELECT COUNT() FROM Shift_Schedule__c WHERE Job__r.Sample_Data__c = TRUE]
+            [
+                SELECT COUNT()
+                FROM Shift_Schedule__c
+                WHERE Job__r.Sample_Data__c = TRUE
+                WITH SYSTEM_MODE
+            ]
         );
         Assert.areEqual(
             36,
-            [SELECT COUNT() FROM Volunteer_Signup__c WHERE Status__c = 'Attended'],
+            [SELECT COUNT() FROM Volunteer_Signup__c WHERE Status__c = 'Attended' WITH SYSTEM_MODE],
             'Three people attended each of the twelve past shifts'
         );
         Assert.areEqual(
             8,
-            [SELECT COUNT() FROM Volunteer_Signup__c WHERE Status__c IN ('Signed up', 'Confirmed')],
+            [
+                SELECT COUNT()
+                FROM Volunteer_Signup__c
+                WHERE Status__c IN ('Signed up', 'Confirmed')
+                WITH SYSTEM_MODE
+            ],
             'Two people are booked on each of the four upcoming shifts'
         );
         Map<String, Integer> statuses = hoursByStatus();
@@ -97,6 +142,7 @@ private class VolunteerSampleDataTest {
                 WHERE
                     Status__c = :VolunteerHoursService.STATUS_REJECTED
                     AND Rejection_Reason__c = NULL
+                WITH SYSTEM_MODE
             ],
             'A rejected entry says why'
         );
@@ -180,6 +226,7 @@ private class VolunteerSampleDataTest {
             SELECT Message__c, Severity__c
             FROM Error_Log__c
             WHERE Context__c = 'VolunteerSampleDataRemoveStages'
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate, Id
         ];
     }

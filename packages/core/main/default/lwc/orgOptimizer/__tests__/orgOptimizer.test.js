@@ -11,6 +11,9 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
   virtual: true
 });
+jest.mock('@salesforce/customPermission/Review_Duplicate_Suggestions', () => ({ default: false }), {
+  virtual: true
+});
 jest.mock('@salesforce/label/c.Core_OrgOptimizer_OpenAria', () => ({ default: 'Open {0}' }), {
   virtual: true
 });

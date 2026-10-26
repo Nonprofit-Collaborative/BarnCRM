@@ -1,11 +1,13 @@
 <template>
   <lightning-card title={labels.panelTitle} icon-name="standard:address">
-    <lightning-button
-      slot="actions"
-      label={labels.addButton}
-      onclick={handleAdd}
-      data-id="add-address"
-    ></lightning-button>
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        label={labels.addButton}
+        onclick={handleAdd}
+        data-id="add-address"
+      ></lightning-button>
+    </template>
 
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={isLoading}>
@@ -40,13 +42,15 @@
               <template lwc:if={address.isDefault}>
                 <lightning-badge label={labels.defaultBadge} data-id="default-badge"></lightning-badge>
               </template>
-              <template lwc:if={address.showSetDefault}>
-                <lightning-button
-                  label={labels.setDefaultButton}
-                  data-id={address.id}
-                  onclick={handleSetDefault}
-                  class="set-default"
-                ></lightning-button>
+              <template lwc:if={canSetDefault}>
+                <template lwc:if={address.showSetDefault}>
+                  <lightning-button
+                    label={labels.setDefaultButton}
+                    data-id={address.id}
+                    onclick={handleSetDefault}
+                    class="set-default"
+                  ></lightning-button>
+                </template>
               </template>
             </div>
           </div>

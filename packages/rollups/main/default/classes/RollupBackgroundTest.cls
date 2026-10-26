@@ -75,7 +75,12 @@ private class RollupBackgroundTest {
     }
 
     private static Integer pending() {
-        return [SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_PENDING];
+        return [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :RollupQueue.STATUS_PENDING
+            WITH SYSTEM_MODE
+        ];
     }
 
     @IsTest

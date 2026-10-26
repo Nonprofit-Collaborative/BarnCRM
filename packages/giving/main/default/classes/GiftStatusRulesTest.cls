@@ -28,6 +28,7 @@ private class GiftStatusRulesTest {
             SELECT Id, Name, Status__c, Installment__c, Household__c, Gift_Date__c
             FROM Gift__c
             WHERE Amount__c = :amount
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -46,6 +47,7 @@ private class GiftStatusRulesTest {
             SELECT Message__c, Severity__c
             FROM Error_Log__c
             WHERE Context__c = 'Gift cancelled'
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate, Id
         ]) {
             Assert.areEqual(ErrorLogger.SEVERITY_INFO, entry.Severity__c);
@@ -161,6 +163,7 @@ private class GiftStatusRulesTest {
             SELECT Id
             FROM Installment__c
             WHERE Commitment__c = :pledgeId
+            WITH SYSTEM_MODE
             ORDER BY Sequence__c
             LIMIT 1
         ];

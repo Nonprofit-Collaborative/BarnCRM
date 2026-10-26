@@ -16,8 +16,8 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Area | You can | You cannot |
 |---|---|---|
 | People, households, organizations | Open and read them, their list views and global search | Create, edit or delete |
-| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set default, make primary, remove |
-| Household members | See the **Members** card | Add, move or make primary |
+| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set default, make primary, remove (the cards do not show these buttons) |
+| Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
 | Household merge and split | Open **Merge or split** and read it | Merge or split |
 | Home tab | **What's new in BarnCRM**, the welcome and **Quick links** | Use **New household** (it is hidden) |
 | BarnCRM Settings | Read every setting and its **Learn more** link | Change anything |
@@ -26,7 +26,8 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 
 Tabs you see in the **BarnCRM** app: **Home**, **Households**, **Organizations**,
 **Addresses**, **Relationships**, **Affiliations** and **BarnCRM Settings**, plus **Contacts**
-if your Salesforce profile shows it.
+if your Salesforce profile shows it. **Household Members** and **Error Log** are yours too;
+open them from the navigation menu if they are not shown.
 
 If your admin gives you **BarnCRM Find and Export**, you can build, run, save and export Find
 queries over everything you can read. You still cannot change records.
@@ -40,6 +41,7 @@ queries over everything you can read. You still cannot change records.
 | Receipts, receipt runs, acknowledgments, acknowledgment runs and rules | Read them | Issue receipts or send acknowledgments |
 | Stewardship plans and templates, donor levels | Read them | Change them |
 | Quick Gift Entry | Nothing: the tab is not given | Enter gifts |
+| Giving reports and dashboards | Run them and view dashboards | Create or change reports and dashboards |
 
 The gift panels on a record still load, so you can read them; their actions are not for you.
 A commitment's **Payment schedule** card shows no **Pause**, **Resume**, **Mark complete** or
@@ -70,15 +72,10 @@ not offered, or say you do not have access.
   administrator for the Manage BarnCRM Settings permission."
 - On **Merge or split**: "You can see this household but not change it, so merging and
   splitting are switched off. Ask whoever manages access for edit access to both households."
-- On the **Addresses** card, after **Add address**: "The address could not be saved. Check the
-  fields marked in the form and try again." **Set as default**: "We could not make that the
-  default address. Check that you have permission to edit addresses ..."
-- On the **Members** card, **Make primary**: "The primary contact could not be changed. Check
-  that you can edit this household and try again."
-- On the **Relationships** card, **Remove**: "BarnCRM could not remove that relationship.
-  Check that you can delete relationships ..."
-- On the **Affiliations** card, **Make primary**: "BarnCRM could not make that the primary
-  affiliation. Check that you can edit affiliations ..."
+- On the **Addresses**, **Relationships**, **Affiliations** and **Members** cards: nothing to
+  try. **Add address**, **Set as default**, **Add relationship**, **Remove**, **Add
+  affiliation**, **Make primary**, **Add member** and **Move to another household** are not
+  shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.
   Ask your administrator to assign you the BarnCRM Find and Export permission set."
 - On a gift batch (Giving): "You can see this batch but not change or post it. Ask your

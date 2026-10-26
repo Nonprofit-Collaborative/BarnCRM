@@ -73,6 +73,7 @@ private class ShiftScheduleTriggerHandlerTest {
         return [
             SELECT Id, Job__c, Created_Through__c, Shifts_Kept__c, Active__c
             FROM Shift_Schedule__c
+            WITH SYSTEM_MODE
             ORDER BY CreatedDate
             LIMIT 1
         ];
@@ -83,6 +84,7 @@ private class ShiftScheduleTriggerHandlerTest {
             SELECT Id, Start_Time__c, Status__c, Shift_Schedule__c
             FROM Volunteer_Shift__c
             WHERE Shift_Schedule__c = :scheduleId
+            WITH SYSTEM_MODE
             ORDER BY Start_Time__c
         ];
     }

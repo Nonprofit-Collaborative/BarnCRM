@@ -119,7 +119,12 @@ private class StewardshipPlanControllerTest {
     }
 
     private static String keyOf(Id templateId) {
-        return [SELECT Plan_Key__c FROM Stewardship_Plan_Template__c WHERE Id = :templateId]
+        return [
+            SELECT Plan_Key__c
+            FROM Stewardship_Plan_Template__c
+            WHERE Id = :templateId
+            WITH SYSTEM_MODE
+        ]
         .Plan_Key__c;
     }
 

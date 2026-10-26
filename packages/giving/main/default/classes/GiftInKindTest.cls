@@ -47,6 +47,7 @@ private class GiftInKindTest {
                 Receipt_Number__c
             FROM Gift__c
             WHERE Receipt_Number__c = :RECEIPT_NUMBER
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }

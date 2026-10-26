@@ -109,7 +109,8 @@ private class GiftStaffSaveRollupTest {
         Assert.areEqual(BULK_GIFTS, person.Gift_Count__c, 'Every gift is counted once');
         Assert.areEqual(
             BULK_GIFTS * 10,
-            [SELECT Total_Giving__c FROM Account WHERE Id = :ana.AccountId].Total_Giving__c,
+            [SELECT Total_Giving__c FROM Account WHERE Id = :ana.AccountId WITH SYSTEM_MODE]
+            .Total_Giving__c,
             'The household\'s total too'
         );
     }
@@ -144,7 +145,12 @@ private class GiftStaffSaveRollupTest {
     }
 
     private static Contact totalsOf(Id contactId) {
-        return [SELECT Total_Giving__c, Gift_Count__c FROM Contact WHERE Id = :contactId];
+        return [
+            SELECT Total_Giving__c, Gift_Count__c
+            FROM Contact
+            WHERE Id = :contactId
+            WITH SYSTEM_MODE
+        ];
     }
 
     /** No definition was refused for want of a permission on any path. */
