@@ -65,6 +65,7 @@
   <navType>Console</navType>
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
+  <tabs>Volunteer_Signup__c</tabs>
   <tabs>Volunteer_Hours__c</tabs>
   <tabs>Volunteer_Approve_Hours</tabs>
   <tabs>Volunteer_Letter_Template__c</tabs>
@@ -98,6 +99,9 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Shift__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Volunteer_Signup__c</tab>
     </mappings>
     <mappings>
       <tab>standard-Dashboard</tab>

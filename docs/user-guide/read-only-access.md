@@ -78,7 +78,7 @@ not offered, or say you do not have access.
 - On a gift batch (Giving): "You can see this batch but not change or post it. Ask your
   administrator for the Giving Staff permission set, or for edit access to this batch."
 - Issuing a receipt (Giving): "You do not have permission to issue receipts. Ask your
-  administrator for the Fundraising Staff role, together with the Giving Staff permission set."
+  administrator for the Fundraising Staff role."
 - Sending thank yous (Giving): "Sending thank yous needs the Send Acknowledgments permission.
   ..."
 - Approving hours (Volunteers): "You need the Manage Volunteers permission to approve, reject
