@@ -57,6 +57,14 @@
         <value>The new household could not be created, so nobody was moved. The Error Log has the details.</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorPersonToOrganization</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: a household member pointed at an organization (simple mode)</shortDescription>
+        <value>This person is in a household, so Account Name must stay a household, not an organization. To connect them to an organization, add an affiliation. To move them, use Move to another household.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorCreateFailedForPerson</fullName>
         <categories>Households</categories>
         <language>en_US</language>

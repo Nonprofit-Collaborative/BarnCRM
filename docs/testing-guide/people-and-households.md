@@ -227,6 +227,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
 
+## T-HH-17: A person in a household is not pointed at an organization
+
+**Purpose:** in the simple way of belonging, changing a household member's Account Name to an organization is refused, while a person already at an organization can still be moved between organizations.
+**Prerequisites:** admin, the simple way of belonging. Two organizations (Organization record type) `Zztest Library` and `Zztest Trust`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a contact `Hana` `Hhsixteen` with **Account Name** blank. | Saved, in **The Hhsixteen Family**. |
+| 2 | Edit Hana, set **Account Name** to Zztest Library, and save. | Refused with **This person is in a household, so Account Name must stay a household, not an organization. To connect them to an organization, add an affiliation. To move them, use Move to another household.** Hana is still in The Hhsixteen Family. |
+| 3 | Create a contact `Omar` `Hhsixteen` with **Account Name** Zztest Library. | Saved at Zztest Library, with no household. |
+| 4 | Edit Omar, set **Account Name** to Zztest Trust, and save. | Saved: Omar was not in a household. |
+
+**Cleanup:** delete Hana, Omar, The Hhsixteen Family and both organizations.
+
 ## T-HH-16: A blocking Account duplicate rule does not stop a new person
 
 **Purpose:** households BarnCRM creates are saved past the org's Account duplicate rules, so adding a person never fails over a look-alike household.

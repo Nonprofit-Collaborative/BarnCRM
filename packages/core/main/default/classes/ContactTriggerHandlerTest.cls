@@ -358,4 +358,88 @@ private class ContactTriggerHandlerTest {
             );
         }
     }
+
+    private static Account organization(String name) {
+        Account result = new Account(Name = name);
+        Schema.RecordTypeInfo type = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+            .get('Organization');
+        if (type != null) {
+            result.RecordTypeId = type.getRecordTypeId();
+        }
+        return result;
+    }
+
+    @IsTest
+    static void pointingSomeoneInAHouseholdAtAnOrganizationIsRefusedInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account library = organization('Riverside Library');
+            insert library;
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            String refused;
+
+            Test.startTest();
+            try {
+                update new Contact(Id = maria.Id, AccountId = library.Id);
+            } catch (DmlException thrown) {
+                refused = thrown.getDmlMessage(0);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Households_ErrorPersonToOrganization, refused);
+            Assert.areEqual(
+                household,
+                [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,
+                'Maria stays in her household'
+            );
+        }
+    }
+
+    @IsTest
+    static void someoneAlreadyAtAnOrganizationCanBePointedAtAnother() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account library = organization('Riverside Library');
+            Account trust = organization('Riverside Community Trust');
+            insert new List<Account>{ library, trust };
+            Contact tom = HouseholdTestDataFactory.newContact('Mr.', 'Tom', 'Rivera');
+            tom.AccountId = library.Id;
+            insert tom;
+
+            Test.startTest();
+            update new Contact(Id = tom.Id, AccountId = trust.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                trust.Id,
+                [SELECT AccountId FROM Contact WHERE Id = :tom.Id].AccountId,
+                'A contact at an organization was never in a household: the change stands'
+            );
+        }
+    }
+
+    @IsTest
+    static void inJunctionModeTheAccountIsAnEmployerAndMayChange() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account library = organization('Riverside Library');
+            insert new List<Account>{ household, library };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = household.Id;
+            insert maria;
+
+            Test.startTest();
+            update new Contact(Id = maria.Id, AccountId = library.Id);
+            Test.stopTest();
+
+            Assert.areEqual(
+                library.Id,
+                [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,
+                'Junction mode keeps households in membership rows, so this is allowed'
+            );
+        }
+    }
 }

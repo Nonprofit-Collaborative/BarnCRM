@@ -13,6 +13,21 @@
  */
 @NamespaceAccessible
 public with sharing class HouseholdMergeService {
+    /**
+     * Proof that `mergeHouseholds` checked these two households: only this class can make
+     * one, so HouseholdMergeWriter's system-mode merge cannot be reached any other way
+     * (ADR-0134).
+     */
+    public class MergeAuthorization {
+        public final Id survivorId;
+        public final Id victimId;
+
+        private MergeAuthorization(Id survivorId, Id victimId) {
+            this.survivorId = survivorId;
+            this.victimId = victimId;
+        }
+    }
+
     @NamespaceAccessible
     public static final String KEEP_SURVIVOR = 'Survivor';
     @NamespaceAccessible
@@ -267,7 +282,9 @@ public with sharing class HouseholdMergeService {
         // another package points at this household follow the record that goes away. It runs
         // in system mode through HouseholdMergeWriter, only after the checks at the top of this
         // method passed, so staff need no Delete on Account (ADR-0134).
-        Database.MergeResult merged = HouseholdMergeWriter.mergeInto(survivorId, victimId);
+        Database.MergeResult merged = HouseholdMergeWriter.mergeInto(
+            new MergeAuthorization(survivorId, victimId)
+        );
         if (!merged.isSuccess()) {
             for (Database.Error problem : merged.getErrors()) {
                 reasons.add(problem.getMessage());

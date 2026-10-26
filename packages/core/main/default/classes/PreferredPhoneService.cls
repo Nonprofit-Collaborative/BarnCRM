@@ -35,15 +35,38 @@ public with sharing class PreferredPhoneService {
                 continue;
             }
             String chosen = (String) person.get(fieldName);
-            if (String.isBlank(chosen)) {
+            if (String.isNotBlank(chosen)) {
+                person.Phone = chosen;
+            } else if (!canChoose()) {
+                // Someone who cannot edit the choice could not act on the refusal, so the
+                // choice is cleared and the standard phone keeps the last number copied.
+                person.Preferred_Phone__c = null;
+            } else {
                 // Blanking the standard phone would take the person off every call list and
                 // nobody would notice, so the save is refused instead.
                 person.addError(
-                    String.format(Label.Core_Phones_PreferredEmpty, new List<String>{ preference })
+                    String.format(
+                        Label.Core_Phones_PreferredEmpty,
+                        new List<String>{ labelOf(preference) }
+                    )
                 );
-            } else {
-                person.Phone = chosen;
             }
         }
+    }
+
+    private static Boolean canChoose() {
+        return Schema.SObjectType.Contact.fields.Preferred_Phone__c.isUpdateable();
+    }
+
+    /** The choice as the picklist shows it, which may differ from its stored value. */
+    private static String labelOf(String preference) {
+        for (
+            Schema.PicklistEntry entry : Schema.SObjectType.Contact.fields.Preferred_Phone__c.getPicklistValues()
+        ) {
+            if (entry.getValue() == preference) {
+                return entry.getLabel();
+            }
+        }
+        return preference;
     }
 }

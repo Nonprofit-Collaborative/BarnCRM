@@ -19,7 +19,9 @@
  * - Both records have already been read in user mode and confirmed as two different BarnCRM
  *   households that are not Nonprofit Cloud households, so an organization or any other
  *   account cannot be folded in through here.
- * - Nothing a person typed reaches it: it takes two record ids the service has validated.
+ * - Nothing a person typed reaches it: it takes only a `HouseholdMergeService.MergeAuthorization`,
+ *   which only that service can construct, carrying the two ids it validated. Any other
+ *   caller has no way to make one, and a missing one is refused.
  * - Everything else in the merge (moving the people, writing the chosen values, every read a
  *   screen shows) stays in user mode.
  */
@@ -28,12 +30,17 @@ public without sharing class HouseholdMergeWriter {
      * Folds the second household into the first with the platform's own merge, so that
      * activities, files, notes and every lookup any package points at it follow it. Answers
      * with the platform's result rather than throwing, so the caller can roll back and say
-     * why.
+     * why. Throws when there is no authorization.
      */
-    public static Database.MergeResult mergeInto(Id survivorId, Id victimId) {
+    public static Database.MergeResult mergeInto(
+        HouseholdMergeService.MergeAuthorization authorization
+    ) {
+        if (authorization == null) {
+            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+        }
         return Database.merge(
-            new Account(Id = survivorId),
-            victimId,
+            new Account(Id = authorization.survivorId),
+            authorization.victimId,
             false,
             AccessLevel.SYSTEM_MODE
         );

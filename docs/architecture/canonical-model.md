@@ -577,6 +577,16 @@ Account gets one created (R-H1). In junction mode a Contact inserted with no mem
 gets a household and the membership record that joins them to it (R-H2). A Contact is
 never left without a household unless automatic creation is turned off.
 
+**R-C1a A person in a household is not pointed at an organization.** In contact mode, an
+update that changes a Contact's Account from a BarnCRM household to an Account that is not
+one (an organization) is refused before it is saved, with a message pointing to an
+affiliation (to connect the person to the organization) or Move to another household. Only
+that change is refused: a Contact already at an organization or at no Account may be pointed
+at any Account, a move between households is untouched, an Account carrying a native
+Nonprofit Cloud household counts as a household, and inserts are not checked (R-H1 leaves a
+Contact inserted at an organization alone). Junction mode is not checked, since there the
+Contact's Account is an employer.
+
 **R-C2 Naming inputs.** Preferred Name, when present, replaces First Name in the
 informal greeting and in any pattern that uses a personal name. Salutation feeds the
 formal greeting.
@@ -605,7 +615,9 @@ it is kept in step with the choice the same way. When Preferred Phone names Home
 Work or Other, Phone is copied from Home Phone, Mobile Phone, Work Phone or Other Phone on every save of the
 contact, before the record is written. When Preferred Phone is empty nothing is copied and
 Phone is left as entered. When the chosen number is empty the save is refused with a message
-that names the number to fill in. Contact only: a person held as an account has its phone
+that names the number to fill in, by its picklist label; for a user who cannot edit Preferred
+Phone, who could not act on that message, the choice is cleared instead and Phone keeps the
+number last copied. Contact only: a person held as an account has its phone
 numbers on person fields that exist only in some orgs, so Core does not touch them.
 
 ### Salesforce implementation
