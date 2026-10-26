@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Other products the Settings, Integrations page lists: what each is, who maintains it, what BarnCRM knows about using the two together, and which of its objects show it is installed. A new product needs only a new record. BarnCRM never depends on any of them.</description>
+  <label>Integration App</label>
+  <pluralLabel>Integration Apps</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Detection_Objects__c</fullName>
+  <description>Optional. The product's own objects, separated by semicolons, that show it is installed: a packaged object is written namespace.Object__c with a dot for the platform's two underscores; an object with no namespace is written Object__c.</description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Detection Objects</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

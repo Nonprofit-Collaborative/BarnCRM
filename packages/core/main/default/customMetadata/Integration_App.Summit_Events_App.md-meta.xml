@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Summit Events App</label>
+  <protected>false</protected>
+  <values>
+    <field>Category__c</field>
+    <value xsi:type="xsd:string">Complement</value>
+  </values>
+  <values>
+    <field>Status__c</field>
+    <value xsi:type="xsd:string">InProgress</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Event registration for Salesforce, with public registration pages. The planned integration would link its registrants to the people in BarnCRM.</value>
+  </values>
+  <values>
+    <field>Maintainer__c</field>
+    <value xsi:type="xsd:string">University of St. Thomas, Open Source Commons</value>
+  </values>
+  <values>
+    <field>License_Cost__c</field>
+    <value xsi:type="xsd:string">Free, BSD-3-Clause license</value>
+  </values>
+  <values>
+    <field>Link_Url__c</field>
+    <value xsi:type="xsd:string">https://sfdo-community-sprints.github.io/summit-events-app-documentation/</value>
+  </values>
+  <values>
+    <field>Install_Url__c</field>
+    <value xsi:type="xsd:string">https://install.salesforce.org/products/SummitEventsApp/latest</value>
+  </values>
+  <values>
+    <field>Detection_Objects__c</field>
+    <value xsi:type="xsd:string">summit.Summit_Events__c</value>
+  </values>
+  <values>
+    <field>Related_Module__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Compatibility__c</field>
+    <value xsi:type="xsd:string">Planned, not built, and not yet tested by BarnCRM. It looks compatible in principle. Its public registration pages need a Salesforce Site, which runs as a guest user. Its contact matching does not support Person Accounts. Event donations stay on its own payment objects, not in BarnCRM Gifts.</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">10</value>
+  </values>
+</CustomMetadata>

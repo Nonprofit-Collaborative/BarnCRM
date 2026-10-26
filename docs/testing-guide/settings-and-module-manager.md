@@ -225,3 +225,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
 **Cleanup:** None.
+
+## T-SET-14: Integrations page
+
+**Purpose:** confirm the Integrations roadmap page, that alternatives to a BarnCRM module appear only when installed, and the request links.
+**Prerequisites:** admin user. No Volunteers for Salesforce, Program Management Module or Outbound Funds Module installed in the test org (the usual case).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | An introduction says the page is a roadmap, In Progress means planned and not built, and nothing listed is integrated with BarnCRM yet. |
+| 2 | Read the headings. | **Complementary Apps** and **In Development**. There is no **Alternatives to BarnCRM Modules** heading, and no empty group. |
+| 3 | Read one product's row. | Its name, **In Progress**, **Not installed**, a description, who maintains it, **Cost and license**, **Compatibility with BarnCRM** with a note, and **Learn more**. The Summit Events App row also has **Install**, and its note says it is not yet tested and mentions the Salesforce Site and guest user. |
+| 4 | Click **Learn more** on any row. | The product's page opens in a new tab. A screen reader reads "(opens in a new tab)" after the link name. |
+| 5 | Read the last section, **Request an Integration**. | "Tell us what you need; requests shape the roadmap," says nothing is promised, and has **Request an integration**, **Propose an integration for your product** and **How an integration is built**. |
+| 6 | Click **Request an integration**. | The GitHub form **Integration request** opens in a new tab with product name, link, what it does and how you use it. Close it without submitting. |
+| 7 | Click **Propose an integration for your product**. | The GitHub form **Integration proposal from a solution provider** opens in a new tab and asks for a role only, not a name or email. Close it without submitting. |
+| 8 | In Setup, open **Custom Metadata Types**, **Integration App**, **Manage Integration App**, and edit **Volunteers for Salesforce (V4S)**: set **Show Only When Installed** off. Save, then click **Check again** on the page. | **Alternatives to BarnCRM Modules** appears with **Volunteers for Salesforce (V4S)**, **Not installed**, and its note says to use one or the other, not both, and that BarnCRM may offer a migration path in a future release. |
+| 9 | Set **Show Only When Installed** back on, save and click **Check again**. | The **Alternatives to BarnCRM Modules** heading is gone again. |
+| 10 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
+
+**Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.

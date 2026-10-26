@@ -99,6 +99,8 @@ function importCoreComponent(name) {
       return import('c/editionSetting');
     case 'featureSettings':
       return import('c/featureSettings');
+    case 'integrationsPanel':
+      return import('c/integrationsPanel');
     default:
       return null;
   }

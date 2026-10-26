@@ -62,7 +62,7 @@ npm test
 
 Other scratch org shapes: `sales-cloud`, `npsp`, `person-accounts`.
 
-Start with [docs/contributor-guide/environment.md](docs/contributor-guide/environment.md), then [docs/contributor-guide/scratch-orgs.md](docs/contributor-guide/scratch-orgs.md) and [docs/contributor-guide/ci.md](docs/contributor-guide/ci.md). Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request; it covers the definition of done, the code rules, and the DCO sign-off every commit needs.
+Start with [docs/contributor-guide/environment.md](docs/contributor-guide/environment.md), then [docs/contributor-guide/scratch-orgs.md](docs/contributor-guide/scratch-orgs.md) and [docs/contributor-guide/ci.md](docs/contributor-guide/ci.md). Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request; it covers the definition of done, the code rules, and the DCO sign-off every commit needs. To propose that BarnCRM work with another product, see [docs/contributor-guide/integrations.md](docs/contributor-guide/integrations.md).
 
 ## Documentation
 
