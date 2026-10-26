@@ -300,8 +300,7 @@ public with sharing class FieldUtilizationController {
             requirePermission();
             Schema.DescribeSObjectResult described = requireObject(objectName);
             History listed = new History();
-            listed.canDelete = Field_Utilization_Snapshot__c.SObjectType.getDescribe()
-                .isDeletable();
+            listed.canDelete = canDeleteSnapshots();
             List<FieldUtilizationHistory.Run> runs = FieldUtilizationHistory.latest(
                 described.getName()
             );
@@ -359,7 +358,7 @@ public with sharing class FieldUtilizationController {
         try {
             requirePermission();
             Schema.DescribeSObjectResult described = requireObject(objectName);
-            if (!Field_Utilization_Snapshot__c.SObjectType.getDescribe().isDeletable()) {
+            if (!canDeleteSnapshots()) {
                 throw new FieldUtilizationException(
                     System.Label.Core_FieldUtilization_DeleteNoAccess
                 );
@@ -420,6 +419,13 @@ public with sharing class FieldUtilizationController {
             : (Decimal.valueOf(row.filled) * 100).divide(row.total, 1);
         row.sampled = snapshot.Sampled__c == true;
         return row;
+    }
+
+    private static Boolean canDeleteSnapshots() {
+        return Field_Utilization_Snapshot__c.SObjectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .isDeletable();
     }
 
     private static Schema.DescribeSObjectResult requireObject(String objectName) {
