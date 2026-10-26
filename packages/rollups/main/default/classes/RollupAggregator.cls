@@ -33,6 +33,10 @@ public without sharing class RollupAggregator {
         public Object order;
         public String recordId;
         public String value;
+        /** The value as read, for a row limited SUM, AVG, MIN or MAX (ADR-0136). */
+        public Object raw;
+        /** True when the list is ordered descending (`Order_Direction__c`). */
+        public Boolean descending = false;
 
         public Listed(Object order, String recordId, String value) {
             this.order = order;
@@ -40,7 +44,10 @@ public without sharing class RollupAggregator {
             this.value = value;
         }
 
-        /** By order, a blank order last, then by record Id, so every run lists the same way. */
+        /**
+         * By order in its direction, a blank order last either way, then by record Id, so every
+         * run lists the same way.
+         */
         public Integer compareTo(Object other) {
             Listed that = (Listed) other;
             if (this.order == null || that.order == null) {
@@ -53,7 +60,7 @@ public without sharing class RollupAggregator {
             } else {
                 Integer byOrder = compare(this.order, that.order);
                 if (byOrder != 0) {
-                    return byOrder;
+                    return this.descending ? -byOrder : byOrder;
                 }
             }
             return this.recordId.compareTo(that.recordId);
@@ -74,6 +81,8 @@ public without sharing class RollupAggregator {
          * large parent's answer is then as large as its distinct values, not its rows (R-RQ6).
          */
         public Map<String, Integer> indexByValue = new Map<String, Integer>();
+        /** Only the first this many entries count (ADR-0136); null for every entry. */
+        public Integer rowLimit;
 
         /** Lists a value; a distinct aggregate keeps only the earliest entry for each value. */
         public void add(Listed entry, Boolean distinct) {
@@ -88,13 +97,56 @@ public without sharing class RollupAggregator {
                 this.indexByValue.put(entry.value, this.listed.size());
             }
             this.listed.add(entry);
+            // A limited answer keeps only its first entries, so a large parent's tally stays as
+            // small as its limit. An entry dropped here ranks behind as many better ones, so it
+            // could never be among the first: the answer stays exact.
+            if (this.rowLimit != null && this.listed.size() > 2 * this.rowLimit) {
+                keepFirst();
+            }
+        }
+
+        /** Sorts the entries and keeps the first `rowLimit`, each distinct value's place kept. */
+        private void keepFirst() {
+            this.listed.sort();
+            while (this.listed.size() > this.rowLimit) {
+                this.listed.remove(this.listed.size() - 1);
+            }
+            if (!this.indexByValue.isEmpty()) {
+                this.indexByValue.clear();
+                for (Integer i = 0; i < this.listed.size(); i++) {
+                    this.indexByValue.put(this.listed[i].value, i);
+                }
+            }
+        }
+
+        /** A row limited SUM, AVG, MIN or MAX, folded from the first entries only. */
+        private void foldFirst(String aggregate) {
+            keepFirst();
+            this.total = null;
+            this.counted = 0;
+            this.best = null;
+            for (Listed entry : this.listed) {
+                if (aggregate == 'SUM' || aggregate == 'AVG') {
+                    this.total = (this.total == null ? 0 : this.total) + toDecimal(entry.raw);
+                    this.counted++;
+                } else if (
+                    this.best == null ||
+                    compare(entry.raw, this.best) * (aggregate == 'MIN' ? -1 : 1) > 0
+                ) {
+                    this.best = entry.raw;
+                }
+            }
         }
 
         /**
          * The value to write, a text list joined by this separator (canonical model R-R15):
-         * ordered, each value once for TEXT_LIST_DISTINCT, blank when nothing was listed.
+         * ordered, each value once for TEXT_LIST_DISTINCT, blank when nothing was listed, and
+         * no more than the row limit's values.
          */
         public Object result(String aggregate, String separator) {
+            if (this.rowLimit != null && !aggregate.startsWith('TEXT_LIST')) {
+                foldFirst(aggregate);
+            }
             switch on aggregate {
                 when 'TEXT_LIST', 'TEXT_LIST_DISTINCT' {
                     if (this.listed.isEmpty()) {
@@ -104,6 +156,9 @@ public without sharing class RollupAggregator {
                     List<String> values = new List<String>();
                     Set<String> seen = new Set<String>();
                     for (Listed entry : this.listed) {
+                        if (this.rowLimit != null && values.size() == this.rowLimit) {
+                            break;
+                        }
                         if (seen.add(entry.value) || aggregate == 'TEXT_LIST') {
                             values.add(entry.value);
                         }
@@ -525,19 +580,7 @@ public without sharing class RollupAggregator {
         Answer answer
     ) {
         Set<String> columns = new Set<String>{ 'Id', query.keyExpression, query.orderBy };
-        Map<String, Boolean> isCurrencyByField = new Map<String, Boolean>();
-        for (RollupPlanner.Measure measure : query.measures) {
-            columns.add(measure.field);
-            isCurrencyByField.put(
-                measure.field,
-                RollupCurrency.isMultiCurrency() &&
-                RollupCurrency.isCurrencyPath(query.sourceObject, measure.field)
-            );
-        }
-        Boolean readsCurrency = isCurrencyByField.values().contains(true);
-        if (readsCurrency) {
-            columns.add(RollupCurrency.ISO_FIELD);
-        }
+        Map<String, Boolean> isCurrencyByField = currencyColumns(query, columns);
         String soql =
             'SELECT ' +
             String.join(new List<String>(columns), ', ') +
@@ -556,14 +599,7 @@ public without sharing class RollupAggregator {
             Object order = valueAt(row, query.orderBy);
             String rowId = String.valueOf(row.Id);
             for (RollupPlanner.Measure measure : query.measures) {
-                Object value = valueAt(row, measure.field);
-                // A value copied into text is copied as entered (R-R15), never converted.
-                if (!measure.asText && isCurrencyByField.get(measure.field) && value != null) {
-                    value = RollupCurrency.toCorporate(
-                        toDecimal(value),
-                        (String) row.get(RollupCurrency.ISO_FIELD)
-                    );
-                }
+                Object value = asRead(row, measure, isCurrencyByField, valueAt(row, measure.field));
                 for (Id targetId : targets) {
                     Tally tally = tallyFor(answer, measure.definitionIndex, targetId);
                     Integer direction = query.descending ? 1 : -1;
@@ -579,6 +615,48 @@ public without sharing class RollupAggregator {
                 }
             }
         }
+    }
+
+    /**
+     * Which measured attributes are money in a multi-currency org, the currency column added to
+     * `columns` when any is, so a row's value can be brought to the corporate currency.
+     */
+    private static Map<String, Boolean> currencyColumns(
+        RollupPlanner.SourceQuery query,
+        Set<String> columns
+    ) {
+        Map<String, Boolean> isCurrencyByField = new Map<String, Boolean>();
+        for (RollupPlanner.Measure measure : query.measures) {
+            columns.add(measure.field);
+            isCurrencyByField.put(
+                measure.field,
+                RollupCurrency.isMultiCurrency() &&
+                RollupCurrency.isCurrencyPath(query.sourceObject, measure.field)
+            );
+        }
+        if (isCurrencyByField.values().contains(true)) {
+            columns.add(RollupCurrency.ISO_FIELD);
+        }
+        return isCurrencyByField;
+    }
+
+    /**
+     * A row's value in the corporate currency, the unit grouped answers arrive in. A value
+     * copied into text is copied as entered (R-R15), never converted.
+     */
+    private static Object asRead(
+        SObject row,
+        RollupPlanner.Measure measure,
+        Map<String, Boolean> isCurrencyByField,
+        Object value
+    ) {
+        if (!measure.asText && isCurrencyByField.get(measure.field) && value != null) {
+            return RollupCurrency.toCorporate(
+                toDecimal(value),
+                (String) row.get(RollupCurrency.ISO_FIELD)
+            );
+        }
+        return value;
     }
 
     /**
@@ -619,9 +697,7 @@ public without sharing class RollupAggregator {
         if (query.orderBy != null) {
             columns.add(query.orderBy);
         }
-        for (RollupPlanner.Measure measure : query.measures) {
-            columns.add(measure.field);
-        }
+        Map<String, Boolean> isCurrencyByField = currencyColumns(query, columns);
         String soql =
             'SELECT ' +
             String.join(new List<String>(columns), ', ') +
@@ -636,7 +712,8 @@ public without sharing class RollupAggregator {
             }
             String rowId = String.valueOf(row.Id);
             for (RollupPlanner.Measure measure : query.measures) {
-                String value = toText(valueAt(row, measure.field));
+                Object read = valueAt(row, measure.field);
+                String value = toText(read);
                 if (String.isBlank(value)) {
                     continue;
                 }
@@ -646,9 +723,13 @@ public without sharing class RollupAggregator {
                 Boolean distinct =
                     measure.aggregate == 'COUNT_DISTINCT' ||
                     measure.aggregate == 'TEXT_LIST_DISTINCT';
+                Listed entry = new Listed(order, rowId, value);
+                entry.raw = asRead(row, measure, isCurrencyByField, read);
+                entry.descending = query.descending;
                 for (Id targetId : targets) {
-                    tallyFor(answer, measure.definitionIndex, targetId)
-                        .add(new Listed(order, rowId, value), distinct);
+                    Tally tally = tallyFor(answer, measure.definitionIndex, targetId);
+                    tally.rowLimit = measure.rowLimit;
+                    tally.add(entry, distinct);
                 }
             }
         }

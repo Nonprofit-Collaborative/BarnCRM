@@ -69,6 +69,19 @@
                 onchange={handleInput}
             ></lightning-combobox>
         </template>
+        <template lwc:if={takesRowLimit}>
+            <lightning-input
+                type="number"
+                name="rowLimit"
+                data-id="row-limit"
+                label={labels.rowLimit}
+                field-level-help={labels.rowLimitHelp}
+                min="1"
+                step="1"
+                value={draft.rowLimit}
+                onchange={handleInput}
+            ></lightning-input>
+        </template>
         <template lwc:if={needsOrderBy}>
             <lightning-combobox
                 name="orderByField"
@@ -76,6 +89,16 @@
                 label={labels.orderBy}
                 value={draft.orderByField}
                 options={sourceFieldOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
+        <template lwc:if={takesDirection}>
+            <lightning-combobox
+                name="orderDirection"
+                data-id="order-direction"
+                label={labels.orderDirection}
+                value={orderDirection}
+                options={directionOptions}
                 onchange={handleInput}
             ></lightning-combobox>
         </template>

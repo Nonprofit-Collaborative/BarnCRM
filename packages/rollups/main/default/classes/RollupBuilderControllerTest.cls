@@ -387,6 +387,36 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /** ADR-0136: the sum of the 5 largest, saved and read back for editing. */
+    @IsTest
+    static void aRowLimitAndItsDirectionAreSavedAndReadBack() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.Draft largest = childCount();
+            largest.aggregate = 'SUM';
+            largest.sourceField = 'NumberOfEmployees';
+            largest.orderByField = 'NumberOfEmployees';
+            largest.orderDirection = 'Descending';
+            largest.rowLimit = 5;
+            RollupBuilderController.SaveResult result;
+
+            Test.startTest();
+            System.runAs(maria()) {
+                result = RollupBuilderController.save(largest, false);
+            }
+            Test.stopTest();
+
+            RollupBuilderController.Draft reread = RollupBuilderController.getDraft(
+                result.recordId
+            );
+            System.Assert.areEqual(5, reread.rowLimit, 'The limit');
+            System.Assert.areEqual('Descending', reread.orderDirection, 'And its direction');
+            largest.orderDirection = null;
+            largest.rowLimit = null;
+            largest.active = false; // the saved one fills the same field
+            System.Assert.isNull(RollupBuilderController.problemWith(largest), 'Both optional');
+        }
+    }
+
     @IsTest
     static void saveAndCalculateNowStartsItsRecalculation() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
@@ -454,6 +484,17 @@ private class RollupBuilderControllerTest {
             unordered.aggregate = 'LAST';
             unordered.sourceField = 'NumberOfEmployees';
             drafts.put(Label.Core_RollupBuilder_ErrorOrderByNeeded, unordered);
+
+            RollupBuilderController.Draft limitedCount = childCount();
+            limitedCount.rowLimit = 3;
+            limitedCount.orderByField = 'NumberOfEmployees';
+            drafts.put(Label.Core_Rollups_ErrorRowLimitAggregate, limitedCount);
+
+            RollupBuilderController.Draft limitedUnordered = childCount();
+            limitedUnordered.aggregate = 'SUM';
+            limitedUnordered.sourceField = 'NumberOfEmployees';
+            limitedUnordered.rowLimit = 3;
+            drafts.put(Label.Core_Rollups_ErrorRowLimitNeedsOrder, limitedUnordered);
 
             RollupBuilderController.Draft noDate = childCount();
             noDate.fiscalYearAware = true;

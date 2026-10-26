@@ -1518,7 +1518,9 @@ Core (`decisions/0125-rollup-builder-module.md`).
 | Relationship Path | text | yes | How a source record reaches its target, written in the path notation below; supports the household membership abstraction. |
 | Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT) | yes | The calculation applied to the matching source records (R-R15). |
 | Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT, ANY and NONE. |
-| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. For a text list, optional: the order the values are listed in. |
+| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST and when a Row Limit is set. For a text list, optional: the order the values are listed in. |
+| Order Direction | picklist(Ascending, Descending) | no (defaults Ascending) | The direction of the Order By Attribute for a text list and a row limited aggregate (R-R15); FIRST and LAST ignore it. |
+| Row Limit | integer | no | Only the first N matching records, in the order of the Order By Attribute, are calculated (R-R15); for SUM, AVG, MIN, MAX and the text lists. Blank means every record. |
 | Delimiter | picklist(Comma, Semicolon, New line) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
 | Target Attribute | text | yes | The attribute on the target entity that receives the result; its type must suit the aggregate (R-R15). |
 | Filter | long text | no | Which source records count, held as a filter document (see R-R2); empty means all of them. |
@@ -1715,8 +1717,9 @@ Attribute. A definition that fails validation is not saved, and the message name
 problem in plain language. The checks sit in two places:
 
 - **Every save** (the "Check rollups before saving" automation) refuses a target attribute
-  whose type does not suit the aggregate (R-R15) and a COUNT_DISTINCT or text list with no
-  Source Attribute. It leaves an entity or attribute the org does not have to the planner, so
+  whose type does not suit the aggregate (R-R15), a COUNT_DISTINCT or text list with no
+  Source Attribute, and a Row Limit below 1, on an aggregate that does not take one, or with no
+  Order By Attribute. It leaves an entity or attribute the org does not have to the planner, so
   a definition for a module that is not installed can still be saved.
 - **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
   target entity or attribute the org does not have, or that the administrator saving it
@@ -1822,10 +1825,24 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   the filter `Amount__c greater than 1000`.
 - **Ties.** When two records have the same Order By Attribute, FIRST and LAST take the one
   with the lower record Id, so the answer is the same on every run (R-R9).
-- **Order of a text list.** By the Order By Attribute when there is one, ascending, records
-  with a blank one last; otherwise alphabetically by value, ignoring case. Ties go to the lower
-  record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared exactly
-  (letter case counts), and so does COUNT_DISTINCT.
+- **Order of a text list.** By the Order By Attribute when there is one, in the Order
+  Direction (ascending when blank), records with a blank one last in either direction;
+  otherwise alphabetically by value, ignoring case, A to Z or, descending, Z to A. Ties go to
+  the lower record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared
+  exactly (letter case counts), and so does COUNT_DISTINCT.
+- **Order Direction and FIRST and LAST.** FIRST is always the record with the lowest Order By
+  Attribute and LAST the one with the highest; the direction does not apply to them, so a
+  saved definition means what it always meant. "Largest first" is LAST, or a row limited
+  aggregate in Descending order.
+- **Row Limit (ADR-0136).** SUM, AVG, MIN, MAX, TEXT_LIST and TEXT_LIST_DISTINCT may take a
+  Row Limit N: only the first N matching records that have a value, in the order of the Order
+  By Attribute and the Order Direction, are calculated, for example the sum of the 5 largest
+  gifts (Amount, Descending) or the last 3 gift amounts as a text list (Gift Date,
+  Descending). TEXT_LIST_DISTINCT lists the first N different values. A Row Limit needs an
+  Order By Attribute and is at least 1. COUNT, COUNT_DISTINCT, ANY, NONE, FIRST and LAST take
+  none: a limit would only cap a count, or FIRST and LAST already take one record. A grouped
+  query cannot limit rows per target, so a row limited aggregate reads the matching rows, as
+  a text list does, and keeps the first N per target record.
 - **Delimiter.** Comma joins with a comma and a space, Semicolon with a semicolon and a space,
   New line with a line break. A value that contains the delimiter is written as it is, not
   escaped, so a list of names that contain commas reads best with Semicolon or New line.
@@ -1864,6 +1881,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line (default Comma) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |
+| Order Direction | `Order_Direction__c` | Picklist: Ascending, Descending (default Ascending) |
+| Row Limit | `Row_Limit__c` | Number (4, 0 decimals) |
 | Target Attribute | `Target_Field__c` | Text |
 | Filter | `Filter_JSON__c` | Long Text Area |
 | Target Filter | `Target_Filter_JSON__c` | Long Text Area |
@@ -1879,7 +1898,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
-  target or the source attribute, so switching a definition on or off never re-checks it. It
+  target, the source attribute, the Order By Attribute or the Row Limit, so switching a definition on or off never re-checks it. It
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
@@ -8815,6 +8834,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: row limit and order direction (ADR-0136). `Rollup_Definition__c` gains `Row_Limit__c` (only the first N records, for SUM, AVG, MIN, MAX and the text lists; needs an Order By Attribute) and `Order_Direction__c` (Ascending, Descending, for text lists and row limited aggregates), both with field history. R-R15 says how they combine with FIRST and LAST (not at all: FIRST stays lowest, LAST highest) and that blanks come last in either direction; R-R10 adds the row limit to the every-save check. A blank direction or limit calculates as before. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 | v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 | v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |

@@ -156,6 +156,36 @@ private class RollupDefinitionValidationTest {
     }
 
     @IsTest
+    static void aRowLimitAddedWithoutAnOrderIsRefused() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c before = definition(
+                'Test_Limit',
+                'TEXT_LIST',
+                'LastName',
+                'Description'
+            );
+            before.Id = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getKeyPrefix() + '000000000002'
+            );
+            Rollup_Definition__c unordered = before.clone(true);
+            unordered.Row_Limit__c = 3;
+
+            TriggerHandler.setTestRecords(
+                new List<SObject>{ unordered },
+                new Map<Id, SObject>{ before.Id => before }
+            );
+            new RollupDefinitionValidationHandler().beforeUpdate();
+
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorRowLimitNeedsOrder,
+                unordered.getErrors()[0].getMessage(),
+                'A limit with no order cannot say which records come first'
+            );
+        }
+    }
+
+    @IsTest
     static void theRollupsPageNamesTheCalculationAndATextListSeparator() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Rollup_Definition__c programs = definition(

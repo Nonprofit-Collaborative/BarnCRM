@@ -210,4 +210,104 @@ private class RollupPlannerTest {
             Assert.isTrue(systemPlan.definitions.isEmpty(), 'And not planned');
         }
     }
+
+    private static Rollup_Definition__c ordered(
+        String aggregate,
+        String sourceField,
+        String targetField,
+        String direction
+    ) {
+        Rollup_Definition__c definition = fromChildren(aggregate, sourceField, targetField);
+        definition.Order_By_Field__c = 'NumberOfEmployees';
+        definition.Order_Direction__c = direction;
+        return definition;
+    }
+
+    /** ADR-0136: a limited sum reads rows per parent; First stays the lowest whatever the direction. */
+    @IsTest
+    static void aRowLimitKeepsTheFirstRowsOfEachParentAndFirstIgnoresTheDirection() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Account parent = new Account(Name = 'Parent');
+            insert parent;
+            List<Account> children = new List<Account>{ new Account(Name = 'Kid blank') };
+            for (Integer size : new List<Integer>{ 10, 50, 30, 40 }) {
+                children.add(new Account(Name = 'Kid ' + size, NumberOfEmployees = size));
+            }
+            for (Account child : children) {
+                child.ParentId = parent.Id;
+            }
+            insert children;
+            Rollup_Definition__c largestTwo = ordered(
+                'SUM',
+                'NumberOfEmployees',
+                'NumberOfEmployees',
+                'Descending'
+            );
+            largestTwo.Row_Limit__c = 2;
+
+            RollupPlanner.Plan plan = RollupPlanner.plan(
+                Account.SObjectType,
+                new List<Rollup_Definition__c>{
+                    largestTwo,
+                    ordered('TEXT_LIST', 'Name', 'Description', 'Descending'),
+                    ordered('FIRST', 'Name', 'Site', 'Descending')
+                }
+            );
+            RollupAggregator.Answer answer = RollupAggregator.calculate(
+                plan,
+                new Set<Id>{ parent.Id }
+            );
+
+            Assert.areEqual(2, plan.queries.size(), 'The limited sum shares the list rows');
+            Assert.areEqual(RollupPlanner.KIND_LISTED, plan.queries[0].kind, 'Read as rows');
+            Assert.isTrue(
+                (Decimal) answer.tallies.get(0).get(parent.Id).result('SUM', null) == 90,
+                'The two largest'
+            );
+            Assert.areEqual(
+                'Kid 50, Kid 40, Kid 30, Kid 10, Kid blank',
+                answer.tallies.get(1).get(parent.Id).result('TEXT_LIST', ', '),
+                'Largest first, a blank order last'
+            );
+            Assert.areEqual(
+                'Kid 10',
+                answer.tallies.get(2).get(parent.Id).result('FIRST', null),
+                'First is still the lowest'
+            );
+        }
+    }
+
+    @IsTest
+    static void aRowLimitNeedsAnOrderACalculationThatTakesItAndOneOrMore() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Assert.isNull(RollupPlanner.rowLimitProblem('COUNT', null, null), 'No limit, no check');
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorRowLimitInvalid,
+                RollupPlanner.rowLimitProblem('SUM', 0, 'Name'),
+                'At least 1'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorRowLimitAggregate,
+                RollupPlanner.rowLimitProblem('COUNT', 3, 'Name'),
+                'A count takes no limit'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorRowLimitNeedsOrder,
+                RollupPlanner.rowLimitProblem('TEXT_LIST', 3, null),
+                'A limit needs an order'
+            );
+            Rollup_Definition__c unordered = fromChildren(
+                'SUM',
+                'NumberOfEmployees',
+                'AnnualRevenue'
+            );
+            unordered.Row_Limit__c = 2;
+            Assert.areEqual(
+                1,
+                RollupPlanner.plan(Account.SObjectType, new List<Rollup_Definition__c>{ unordered })
+                    .refused.size(),
+                'The planner refuses it too'
+            );
+        }
+    }
 }

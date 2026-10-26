@@ -233,3 +233,29 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Open the **Error Log**. | A Warning from `RollupWriter` reads "A rollup could not put "Garcia" in Test Last Role, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup." (with that person's last name). |
 
 **Cleanup:** switch **Test last role** off and delete the **Test Last Role** field in Setup.
+## T-RB-12: Only the First N Records, in Descending Order
+
+**Purpose:** confirm a text list keeps only its first values in the order chosen (ADR-0136).
+**Prerequisites:** admin user; sample data loaded. In Setup, on **Account**, create a Text field labelled **Test Names** (API name `Test_Names__c`, length 255), visible to your profile.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **New rollup**. Choose **Account** and **Test Names**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The heading reads **How should it be calculated?** |
+| 2 | In **Calculation**, choose **Text list**. In **Field to calculate**, choose **First Name**. | **Only the first N records**, **Which record comes first, by**, **Order** (showing **Ascending**) and **Separate the values with** appear. |
+| 3 | In **Only the first N records**, enter `2`. Leave **Which record comes first, by** empty and click **Next**. | The step does not move on and says "Only the first N records needs a field to order by, so BarnCRM knows which records come first. Choose one, or clear the limit." |
+| 4 | In **Which record comes first, by**, choose **First Name**. In **Order**, choose **Descending**. Click **Next** twice. | The heading reads **Check and save**. |
+| 5 | In **See it on a record**, pick **The Garcia Family**. | "Calculated: Luis, Harper. On the record now: (empty)." The two names last in the alphabet, Diego left out. |
+| 6 | Click **Back** twice, clear **Only the first N records**, click **Next** twice and pick **The Garcia Family** again. | "Calculated: Luis, Harper, Diego. On the record now: (empty)." |
+| 7 | Click **Cancel**. | Nothing is saved. |
+
+## T-RB-13: First and Last Take No Limit or Order, Count Takes No Limit
+
+**Purpose:** confirm the Builder offers a row limit and a direction only where they mean something.
+**Prerequisites:** admin user; the **Test Names** field from T-RB-12.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Start a new rollup on **Account**, **Test Names**, **Contact, by Account ID**, and go to step 3. | The heading reads **How should it be calculated?** |
+| 2 | In **Calculation**, choose **First**. | **Which record comes first, by** appears; **Only the first N records** and **Order** do not. |
+| 3 | Click **Cancel**. Start a new rollup on **Account** and **Test Children Count** (from T-RB-02), **Contact, by Account ID**, and go to step 3. Choose **Count**. | **Only the first N records** and **Order** do not appear. |
+| 4 | Click **Cancel**. | Nothing is saved. |

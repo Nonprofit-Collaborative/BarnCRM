@@ -147,6 +147,8 @@ public with sharing class RollupBuilderController {
         @AuraEnabled
         public List<Option> delimiters { get; set; }
         @AuraEnabled
+        public List<Option> directions { get; set; }
+        @AuraEnabled
         public List<Option> modes { get; set; }
     }
 
@@ -172,6 +174,10 @@ public with sharing class RollupBuilderController {
         public String sourceField { get; set; }
         @AuraEnabled
         public String orderByField { get; set; }
+        @AuraEnabled
+        public String orderDirection { get; set; }
+        @AuraEnabled
+        public Integer rowLimit { get; set; }
         @AuraEnabled
         public String delimiter { get; set; }
         @AuraEnabled
@@ -202,6 +208,7 @@ public with sharing class RollupBuilderController {
             model.targets = targetEntities();
             model.aggregates = picklist(Rollup_Definition__c.Aggregate__c);
             model.delimiters = picklist(Rollup_Definition__c.Delimiter__c);
+            model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
             return model;
         } catch (Exception caught) {
@@ -600,6 +607,14 @@ public with sharing class RollupBuilderController {
         if (String.isNotBlank(draft.orderByField) && typeOf(fields, draft.orderByField) == null) {
             return Label.Core_RollupBuilder_ErrorFieldUnknown;
         }
+        String limitProblem = RollupPlanner.rowLimitProblem(
+            aggregate,
+            draft.rowLimit,
+            draft.orderByField
+        );
+        if (limitProblem != null) {
+            return limitProblem;
+        }
         if (draft.fiscalYearAware == true) {
             if (!FISCAL_OFFSETS.contains(draft.fiscalYearOffset)) {
                 return Label.Core_RollupBuilder_ErrorWindowInvalid;
@@ -937,6 +952,10 @@ public with sharing class RollupBuilderController {
         draft.aggregate = definition.Aggregate__c;
         draft.sourceField = definition.Source_Field__c;
         draft.orderByField = definition.Order_By_Field__c;
+        draft.orderDirection = definition.Order_Direction__c;
+        draft.rowLimit = definition.Row_Limit__c == null
+            ? null
+            : definition.Row_Limit__c.intValue();
         draft.delimiter = definition.Delimiter__c;
         draft.filterJson = definition.Filter_JSON__c;
         draft.targetFilterJson = definition.Target_Filter_JSON__c;
@@ -961,6 +980,8 @@ public with sharing class RollupBuilderController {
             Aggregate__c = draft.aggregate.toUpperCase(),
             Source_Field__c = String.isBlank(draft.sourceField) ? null : draft.sourceField,
             Order_By_Field__c = String.isBlank(draft.orderByField) ? null : draft.orderByField,
+            Order_Direction__c = draft.orderDirection == 'Descending' ? 'Descending' : 'Ascending',
+            Row_Limit__c = draft.rowLimit,
             Delimiter__c = String.isBlank(draft.delimiter) ? null : draft.delimiter,
             Filter_JSON__c = String.isBlank(draft.filterJson) ? null : draft.filterJson,
             Target_Filter_JSON__c = String.isBlank(draft.targetFilterJson)

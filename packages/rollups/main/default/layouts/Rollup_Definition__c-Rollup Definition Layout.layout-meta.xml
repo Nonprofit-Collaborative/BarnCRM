@@ -63,6 +63,14 @@
       </layoutItems>
       <layoutItems>
         <behavior>Edit</behavior>
+        <field>Order_Direction__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Row_Limit__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
         <field>Delimiter__c</field>
       </layoutItems>
     </layoutColumns>

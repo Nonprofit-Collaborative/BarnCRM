@@ -81,7 +81,17 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Rollup_Definition__c.Order_Direction__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Rollup_Definition__c.Relationship_Path__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Rollup_Definition__c.Row_Limit__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

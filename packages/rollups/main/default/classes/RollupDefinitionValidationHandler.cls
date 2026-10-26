@@ -6,7 +6,7 @@
  * page lets through is one the engine can run.
  *
  * Only a save that could change the answer is checked: an insert, or an edit of the calculation,
- * the target or the source attribute. Switching a rollup on or off or changing its mode never
+ * the target, the source attribute, the order or the row limit (ADR-0136). Switching a rollup on or off or changing its mode never
  * trips over an older definition.
  */
 @NamespaceAccessible
@@ -49,7 +49,9 @@ public with sharing class RollupDefinitionValidationHandler extends TriggerHandl
                 Rollup_Definition__c.Aggregate__c,
                 Rollup_Definition__c.Target_Object__c,
                 Rollup_Definition__c.Target_Field__c,
-                Rollup_Definition__c.Source_Field__c
+                Rollup_Definition__c.Source_Field__c,
+                Rollup_Definition__c.Order_By_Field__c,
+                Rollup_Definition__c.Row_Limit__c
             }
         ) {
             if (record.get(field) != previous.get(field)) {
