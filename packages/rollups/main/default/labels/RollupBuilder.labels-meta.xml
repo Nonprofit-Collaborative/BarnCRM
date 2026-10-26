@@ -942,7 +942,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Delete confirmation: heading</shortDescription>
-        <value>Delete rollup</value>
+        <value>Delete Rollup</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DeleteConfirm</fullName>

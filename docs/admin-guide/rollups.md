@@ -312,7 +312,7 @@ in both. **Fiscal year start month** is a BarnCRM setting and stays in the **Gen
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a
 shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
-rollup you made, see [Deleting a rollup](#deleting-a-rollup).
+rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
@@ -430,7 +430,7 @@ When it is scheduled, **Run tonight** adds nothing: the nightly run already reca
 **Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
 only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
-### Deleting a rollup
+### Deleting a Rollup
 
 **Delete** on a row removes a rollup you made, after a confirmation that says what happens:
 
@@ -605,10 +605,10 @@ stops it being recalculated; it does not erase the values already on the records
 deliberate, so that turning something off never destroys data. If you want the field
 empty, clear it after you make the rollup inactive.
 
-**Deleting a rollup you do not want.** Deleting it works until the next upgrade, which
-creates it again, because a rollup that is gone is indistinguishable from one that was
-never created. Clear its **Active** box instead. That is remembered, and it leaves the
-numbers already calculated on the records.
+**Deleting a shipped rollup you do not want.** **Delete** refuses a rollup that came with
+BarnCRM, because a shipped rollup that is gone would be created again (an upgrade or
+**Restore shipped rollups** cannot tell it from one never created). Clear its **Active** box
+instead. That is remembered, and it leaves the numbers already calculated on the records.
 
 **Never starting the nightly schedule.** If nobody clicks **Schedule nightly
 recalculation**, nothing recalculates overnight and the home page tile stays in warning. Nothing
