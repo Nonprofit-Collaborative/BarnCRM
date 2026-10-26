@@ -57,10 +57,10 @@ yet.
 
 1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
-2. The first card is **What we found in your org**. It says Person Accounts are enabled.
+2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:
    **Standalone**.
-3. Below the card, the findings are grouped: **Your org**, **Licenses**, **Access**, and
+3. Below the card, the findings are grouped: **Your Org**, **Licenses**, **Access**, and
    **Settings**. Each finding has an icon: a red circle for something that needs fixing, an
    amber triangle for something to be aware of, a blue dot for information.
 4. The first finding is blue, **Your org at a glance**, and it repeats what was found in a
@@ -97,10 +97,10 @@ Nothing is broken today.
 
 | Group | What it checks |
 |---|---|
-| Your org | What else is installed: Person Accounts, Nonprofit Cloud objects, the Nonprofit Success Pack, standard Sales and Service Cloud objects. |
-| Your org | Whether your coexistence mode matches what was found. |
-| Your org | Whether household membership is still set to the person's account while Person Accounts are on, which does not work. |
-| Your org | Only with Nonprofit Cloud: whether your org has Nonprofit Cloud gift objects while the Mirror module is not installed. |
+| Your Org | What else is installed: Person Accounts, Nonprofit Cloud objects, the Nonprofit Success Pack, standard Sales and Service Cloud objects. |
+| Your Org | Whether your coexistence mode matches what was found. |
+| Your Org | Whether household membership is still set to the person's account while Person Accounts are on, which does not work. |
+| Your Org | Only with Nonprofit Cloud: whether your org has Nonprofit Cloud gift objects while the Mirror module is not installed. |
 | Settings | Whether household membership uses membership records while automatic household creation is off, which means no new person gets a household. |
 | Licenses | Whether the org uses more than one currency, which BarnCRM does not support yet. |
 | Access | Whether anyone holds the BarnCRM Admin role. |
@@ -117,7 +117,7 @@ Nothing is broken today.
 | Settings | With the Rollup Builder module: whether any of the totals BarnCRM ships are missing from the Rollup Builder. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
-| Settings | Whether any BarnCRM nightly job is not scheduled: the seasonal address swap, the error digest and the empty household tidy-up, plus the nightly jobs of any module that registers them. With the Rollup Builder module that is the rollup recalculation. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Mirror it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether any BarnCRM nightly job is not scheduled: the seasonal address swap (only while **Seasonal Addresses** is on), the error digest and the empty household tidy-up, plus the nightly jobs of any module that registers them. With the Rollup Builder module that is the rollup recalculation. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Mirror it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
 | Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | With the Rollup Builder module: whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start now** put them through again. |
@@ -160,7 +160,7 @@ The fix creates exactly what the box showed you. If something changed since Heal
 ran, for example a colleague restored the same totals a minute ago, the fix does nothing, says
 so, and Health Check runs again so you can read the finding as it is now.
 
-Every fix that runs is recorded under **Recent changes** in BarnCRM Settings, as
+Every fix that runs is recorded under **Recent Changes** at the bottom of the **General** section of BarnCRM Settings, as
 **Health Check:** followed by the button's name, with what it created, your name and the time.
 
 Every fix only creates something that is missing or switches on something that is off. No

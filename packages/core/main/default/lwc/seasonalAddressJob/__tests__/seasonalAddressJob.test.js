@@ -1,8 +1,8 @@
 import { createElement } from 'lwc';
 import SeasonalAddressJob from 'c/seasonalAddressJob';
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
-import setSchedule from '@salesforce/apex/SeasonalAddressController.setSchedule';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
+import { refreshApex } from '@salesforce/apex';
 
 jest.mock(
   '@salesforce/apex/SeasonalAddressController.getSwap',
@@ -13,13 +13,11 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock(
-  '@salesforce/apex/SeasonalAddressController.setSchedule',
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-
 jest.mock('@salesforce/apex/SeasonalAddressController.runNow', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 
@@ -42,14 +40,10 @@ jest.mock(
 );
 
 jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_ScheduleButton',
-  () => ({ default: 'Schedule the nightly swap' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_StopButton',
-  () => ({ default: 'Stop the nightly swap' }),
+  '@salesforce/label/c.Core_SeasonalAddress_SwitchedOff',
+  () => ({
+    default: 'Seasonal Addresses is off, so seasonal addresses will not move on their own.'
+  }),
   { virtual: true }
 );
 
@@ -73,6 +67,7 @@ jest.mock(
 
 const RAN_LAST_NIGHT = {
   canManage: true,
+  enabled: true,
   scheduled: true,
   nextRunAt: '2027-01-16T06:30:00.000Z',
   lastRun: '2027-01-15T06:30:00.000Z',
@@ -82,6 +77,7 @@ const RAN_LAST_NIGHT = {
 
 const NEVER_RUN = {
   canManage: true,
+  enabled: false,
   scheduled: false,
   nextRunAt: null,
   lastRun: null,
@@ -134,18 +130,34 @@ describe('c-seasonal-address-job', () => {
     );
   });
 
-  it('says the swap is not scheduled and offers to schedule it', async () => {
+  it('says Seasonal Addresses is off and points to the switch', async () => {
     const element = createComponent();
     getSwap.emit(NEVER_RUN);
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
-      'The nightly swap is not scheduled, so seasonal addresses will not move on their own.'
-    );
-    expect(element.shadowRoot.querySelector('[data-id="schedule-button"]').label).toBe(
-      'Schedule the nightly swap'
+      'Seasonal Addresses is off, so seasonal addresses will not move on their own.'
     );
     expect(element.shadowRoot.querySelector('[data-id="next-run"]')).toBeNull();
+  });
+
+  it('says the swap is not scheduled when the switch is on but the job is missing', async () => {
+    const element = createComponent();
+    getSwap.emit({ ...NEVER_RUN, enabled: true });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
+      'The nightly swap is not scheduled, so seasonal addresses will not move on their own.'
+    );
+  });
+
+  it('has no schedule or stop button, since the switch schedules the job', async () => {
+    const element = createComponent();
+    getSwap.emit(RAN_LAST_NIGHT);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="schedule-button"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="run-now"]')).not.toBeNull();
   });
 
   it('says when the next run is due once the swap is scheduled', async () => {
@@ -155,9 +167,6 @@ describe('c-seasonal-address-job', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
       'The swap runs every night at 12:30 AM.'
-    );
-    expect(element.shadowRoot.querySelector('[data-id="schedule-button"]').label).toBe(
-      'Stop the nightly swap'
     );
     expect(
       element.shadowRoot.querySelector('[data-id="next-run"] lightning-formatted-date-time').value
@@ -174,28 +183,22 @@ describe('c-seasonal-address-job', () => {
     );
   });
 
-  it('schedules the nightly swap from the console', async () => {
-    setSchedule.mockResolvedValue(RAN_LAST_NIGHT);
+  // The settings console calls refresh() after a save, so saving the Seasonal Addresses switch
+  // updates the status line without reloading the page.
+  it('re-reads the swap when the console asks it to refresh', async () => {
     const element = createComponent();
     getSwap.emit(NEVER_RUN);
     await flush();
+    expect(refreshApex).not.toHaveBeenCalled();
 
-    element.shadowRoot.querySelector('[data-id="schedule-button"]').click();
-    await flush();
+    await element.refresh();
+    expect(refreshApex).toHaveBeenCalledTimes(1);
 
-    expect(setSchedule).toHaveBeenCalledWith({ scheduled: true });
-  });
-
-  it('stops the nightly swap when it is already scheduled', async () => {
-    setSchedule.mockResolvedValue(NEVER_RUN);
-    const element = createComponent();
     getSwap.emit(RAN_LAST_NIGHT);
     await flush();
-
-    element.shadowRoot.querySelector('[data-id="schedule-button"]').click();
-    await flush();
-
-    expect(setSchedule).toHaveBeenCalledWith({ scheduled: false });
+    expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
+      'The swap runs every night at 12:30 AM.'
+    );
   });
 
   it('runs the swap now and says it has started', async () => {

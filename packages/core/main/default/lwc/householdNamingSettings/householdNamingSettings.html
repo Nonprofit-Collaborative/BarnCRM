@@ -38,22 +38,25 @@
 
             <h2 class="slds-text-heading_small slds-var-m-top_medium">{label.previewHeading}</h2>
             <template if:true={hasSamples}>
-                <table class="slds-table slds-table_bordered slds-var-m-top_x-small" aria-label={label.previewHeading}>
+                <table
+                    class="slds-table slds-table_bordered slds-table_fixed-layout slds-var-m-top_x-small"
+                    aria-label={label.previewHeading}
+                >
                     <thead>
                         <tr class="slds-line-height_reset">
-                            <th scope="col">{label.columnMembers}</th>
-                            <th scope="col">{label.columnName}</th>
-                            <th scope="col">{label.columnFormal}</th>
-                            <th scope="col">{label.columnInformal}</th>
+                            <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{label.columnMembers}</th>
+                            <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{label.columnName}</th>
+                            <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{label.columnFormal}</th>
+                            <th scope="col" class="slds-cell-wrap slds-size_3-of-12">{label.columnInformal}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template for:each={samples} for:item="sample">
                             <tr key={sample.key} class="sample-row">
-                                <td>{sample.members}</td>
-                                <td>{sample.name}</td>
-                                <td>{sample.formalGreeting}</td>
-                                <td>{sample.informalGreeting}</td>
+                                <td class="slds-cell-wrap">{sample.members}</td>
+                                <td class="slds-cell-wrap">{sample.name}</td>
+                                <td class="slds-cell-wrap">{sample.formalGreeting}</td>
+                                <td class="slds-cell-wrap">{sample.informalGreeting}</td>
                             </tr>
                         </template>
                     </tbody>

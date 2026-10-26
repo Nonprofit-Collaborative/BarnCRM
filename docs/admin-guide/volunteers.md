@@ -299,7 +299,7 @@ made:
 
 | Token | Filled with |
 |---|---|
-| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings |
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas) |
 | `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
 | `{Hours}` | Their approved hours in the period |
 | `{JobList}` | A list of each job with its hours in the period |

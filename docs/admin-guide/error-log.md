@@ -68,7 +68,7 @@ If nothing new has arrived, no email is sent at all.
    the email address of an active user of your Salesforce: the digest is never sent to
    anyone outside it, and an address that is not a user's is refused when you save.
 3. In **Digest frequency**, choose **Every day** or **Once a week**, then click **Save**.
-4. In the **Error digest** panel, click **Schedule daily run**. The panel now says the digest is
+4. In the **Error Digest** panel, click **Schedule daily run**. The panel now says the digest is
    scheduled and when it runs next: every morning at 7:00 AM in your organization's time zone, after the nightly jobs, so their
    problems are in it. A weekly digest checks every morning and sends once seven days have
    passed since the last one.
@@ -94,7 +94,7 @@ sends the digest).
 2. In **Days to keep Error Log entries**, type how many days to keep them, from 1 to
    3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
    anything older; nothing is deleted when you save.
-3. Make sure the daily run is scheduled: the **Error digest** panel says so, and Health
+3. Make sure the daily run is scheduled: the **Error Digest** panel says so, and Health
    Check lists it under **Nightly jobs are not scheduled** when it is not. Old entries are
    deleted only while it runs, whether or not anyone receives the digest.
 

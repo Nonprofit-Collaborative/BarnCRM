@@ -46,7 +46,8 @@
  *
  * Alongside these (ADR-0124): a new install starts with every feature off, an upgrade with no
  * edition saved gets the recommended one, and every run schedules the nightly tab access check
- * unless it is already scheduled.
+ * unless it is already scheduled. When Seasonal Addresses is on and its nightly job is missing,
+ * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
  *
  * An org built by deploying the source runs no install handler, so `runAsSourceDeploy` runs the
  * same steps there, called by `scripts/org/deploy-packages.sh` once Core is in.
@@ -65,10 +66,19 @@ public with sharing class CorePostInstall implements InstallHandler {
     private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
     private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
     private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
+    private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
 
     /** Test seam: true lets a test see the nightly tab access check scheduled. */
     @TestVisible
     private static Boolean scheduleTabCheckInTests = false;
+
+    /**
+     * Test seam: true lets a test see an existing seasonal swap schedule adopted on an upgrade.
+     * Off in tests otherwise, because what the org the tests run in has scheduled is not the
+     * test's to depend on.
+     */
+    @TestVisible
+    private static Boolean adoptSeasonalScheduleInTests = false;
 
     /**
      * What every Error Log entry written by an install or upgrade starts with, including the
@@ -146,6 +156,7 @@ public with sharing class CorePostInstall implements InstallHandler {
         // never throws.
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
+        alignSeasonalAddresses(isUpgrade);
         if (installerId == null) {
             return;
         }
@@ -201,6 +212,23 @@ public with sharing class CorePostInstall implements InstallHandler {
             TabAccessScheduler.start();
         } catch (Exception e) {
             ErrorLogger.log(e, TAB_CHECK_CONTEXT);
+        }
+    }
+
+    /**
+     * Makes the seasonal swap schedule match the Seasonal Addresses switch. An upgrade first
+     * turns the switch on for an org that already runs the job, then the job is scheduled when
+     * the switch is on and it is missing. A new install has the switch off, so nothing is
+     * scheduled for it. Never throws.
+     */
+    private void alignSeasonalAddresses(Boolean isUpgrade) {
+        try {
+            if (isUpgrade && (!Test.isRunningTest() || adoptSeasonalScheduleInTests)) {
+                SeasonalAddressScheduler.adoptExistingSchedule();
+            }
+            SeasonalAddressScheduler.scheduleIfEnabled();
+        } catch (Exception e) {
+            ErrorLogger.log(e, SEASONAL_CONTEXT);
         }
     }
 

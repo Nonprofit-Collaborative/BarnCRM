@@ -15,7 +15,7 @@ Salesforce's rules only compare fields on the person or household itself. The sc
 at **match sources**: related records such as contact point emails, phones and addresses, and
 BarnCRM addresses. Two people who share an email held only on a contact point email record are
 listed too, with a line saying why, for example "Same email on Contact Point Email". Match
-sources are listed, added and archived on the **Custom metadata** page; see
+sources are listed, added and archived on the **Custom Metadata** page; see
 [Custom metadata](custom-metadata.md#match-sources).
 
 ## How to turn it on
@@ -31,7 +31,7 @@ step, because of a Salesforce licensing rule:
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
 license**. No other license can have it, Salesforce Platform included. So BarnCRM puts that
 access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
-Settings, open **Access** and, under **Extra permissions**, give **BarnCRM Duplicate Review** to
+Settings, open **Access** and, under **Extra Permissions**, give **BarnCRM Duplicate Review** to
 each person who will review duplicates. Salesforce refuses the assignment for a user
 without one of those licenses. A holder who is not an administrator also gets the **Org
 Optimizer** tab with its **Duplicates** section, which they can read; scanning, dismissing and
@@ -42,7 +42,7 @@ Platform user nothing usable.
 
 1. Open the **BarnCRM Admin** app and choose the **Org Optimizer** tab.
 2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
-   **Open this page** button brings you here too.)
+   **Open Org Optimizer** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -185,7 +185,7 @@ which the BarnCRM Duplicate Review permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
-Give them the permission set in BarnCRM Settings, **Access**, under **Extra permissions** (see
+Give them the permission set in BarnCRM Settings, **Access**, under **Extra Permissions** (see
 How to turn it on). A Salesforce Platform user cannot
 be given it at all; ask a colleague with a Sales Cloud or Service Cloud license to review.
 

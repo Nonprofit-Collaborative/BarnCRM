@@ -34,7 +34,7 @@ BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
 | Setting | What it does | Ships as |
 |---|---|---|
-| How people belong to a household | The simple way (one household per person) or the flexible way (a person can belong to more than one household, and you keep the history of who belonged when) | The simple way |
+| How people belong to a household | The simple way (one household per person) or the flexible way (a person can belong to more than one household, and you keep the history of who belonged when) | The simple way: one household per person. Until somebody chooses, the console shows **One household per person (simple)** as selected, and saving other settings leaves it that way |
 | Create a household automatically | When you save a new person with no household, one is created for them. This works the same way in both ways of belonging, and for people stored as contacts and for people stored as accounts | On |
 | Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside BarnCRM still depends on its account record, so this never removes a household another product built. A household that still has gifts or other records credited to it, such as volunteer hours, is kept too, so they never lose their household | Off, switch it on if you want it |
 | Keep the households of deleted people | When you delete the last person in a household, the household stays at first, so you can still restore the people from the Recycle Bin. Once nobody from it is left in the Recycle Bin, a nightly tidy-up moves the household to the Recycle Bin too, unless anything else is still linked to it. Switch this on to keep those households instead | Off, so the tidy-up runs |

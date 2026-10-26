@@ -97,22 +97,22 @@
         <template lwc:if={hasSamples}>
             <h4 class="slds-text-title slds-var-m-top_small">{labels.previewHeading}</h4>
             <table
-                class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_xx-small"
+                class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer slds-var-m-top_xx-small"
                 aria-label={labels.previewHeading}
             >
                 <thead>
                     <tr class="slds-line-height_reset">
-                        <th scope="col">{labels.rowNumberHeader}</th>
-                        <th scope="col">{labels.beforeHeader}</th>
-                        <th scope="col">{labels.afterHeader}</th>
+                        <th scope="col" class="slds-cell-wrap slds-size_2-of-12">{labels.rowNumberHeader}</th>
+                        <th scope="col" class="slds-cell-wrap slds-size_5-of-12">{labels.beforeHeader}</th>
+                        <th scope="col" class="slds-cell-wrap slds-size_5-of-12">{labels.afterHeader}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template for:each={samples} for:item="sample">
                         <tr key={sample.key} data-id="sample">
-                            <td>{sample.rowNumber}</td>
-                            <td>{sample.before}</td>
-                            <td>{sample.after}</td>
+                            <td class="slds-cell-wrap">{sample.rowNumber}</td>
+                            <td class="slds-cell-wrap">{sample.before}</td>
+                            <td class="slds-cell-wrap">{sample.after}</td>
                         </tr>
                     </template>
                 </tbody>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_OrganizationAddress_City</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: city box</shortDescription>
+        <value>City</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Country</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: country box</shortDescription>
+        <value>Country</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_FillRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: message when required parts are blank on save</shortDescription>
+        <value>Fill in the address parts marked required, or clear the whole address.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Heading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: heading of the grouped address block</shortDescription>
+        <value>Organization address</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Hint</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: what may be left blank</shortDescription>
+        <value>Leave the whole address blank, or fill in Street, City, State and Zip Code. Street 2 and Country are optional.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_IncompleteError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: refusal naming the missing parts in {0}</shortDescription>
+        <value>The organization address is incomplete. Add {0}, or clear every part of the address.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_LoadError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: error when the saved address cannot be read</shortDescription>
+        <value>The organization address could not be loaded just now. Refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_PostalCode</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: Zip code box</shortDescription>
+        <value>Zip Code</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Save</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: save button in the settings console</shortDescription>
+        <value>Save address</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: confirmation after saving</shortDescription>
+        <value>Organization address saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_State</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: state box</shortDescription>
+        <value>State</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Street</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: street box</shortDescription>
+        <value>Street</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_Street2</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: second street line box</shortDescription>
+        <value>Street 2</value>
+    </labels>
+</CustomLabels>

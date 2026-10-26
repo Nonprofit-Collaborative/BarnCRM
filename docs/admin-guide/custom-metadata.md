@@ -3,7 +3,7 @@
 ## What it does
 
 Some of the lists BarnCRM works from are kept as custom metadata, the part of Salesforce
-that travels with the app. The **Custom metadata** page in BarnCRM Settings lets you add
+that travels with the app. The **Custom Metadata** page in BarnCRM Settings lets you add
 your own entries to the lists that are meant to be extended, change them, and archive them,
 without opening Salesforce Setup.
 
@@ -30,7 +30,7 @@ The page is for administrators who can already change the org in Setup, because 
 entry changes the org's metadata.
 
 1. Give yourself the **BarnCRM Metadata Admin** permission set (BarnCRM Settings, Access,
-   Extra permissions). It is in no role on purpose: give it only to people who
+   Extra Permissions). It is in no role on purpose: give it only to people who
    administer the org. Without it you do not see the page at all.
 2. If BarnCRM was installed as a package, Salesforce asks once whether the app may change
    metadata. In Setup, open **Apex Settings** and turn on **Deploy Metadata from
@@ -38,7 +38,7 @@ entry changes the org's metadata.
    cannot turn it on for you: it is Salesforce's own safeguard. If it is off, saving an
    entry says so.
 3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
-   **Custom metadata**.
+   **Custom Metadata**.
 
 A relationship type also has to be a choice in the **Type** list on a relationship, and
 adding a choice to that list is done in Setup (Object Manager, Relationship, Fields, Type).
@@ -54,8 +54,8 @@ them.
 
 1. In Setup, open **Object Manager**, **Relationship**, **Fields & Relationships**,
    **Type**, and add two values: `Mentor` and `Mentee`. Save.
-2. Open **BarnCRM Settings**, **General**, **Custom metadata**. Under **Relationship
-   types** you see two tables. **Added by your organization** is empty. **Shipped with
+2. Open **BarnCRM Settings**, **General**, **Custom Metadata**. Under **Relationship
+   types** you see two tables. **Added by Your Organization** is empty. **Shipped with
    BarnCRM** lists the eleven types, with no actions on them.
 3. Click **Add**. Fill in:
    - **Name**: Mentor
@@ -64,18 +64,18 @@ them.
    - **Description**: Someone who mentors this person through the program.
    Click **Save**. The page says "Saving. Salesforce applies the change in the
    background, usually within a minute." When it is done it says "Saved. Mentor is in the
-   list." and the row appears under **Added by your organization**, with the status
+   list." and the row appears under **Added by Your Organization**, with the status
    **In use**.
 4. Click **Add** again and add the other side: **Name** Mentee, **Type** Mentee,
    **Reciprocal Type** Mentor. Save and wait for "Saved".
 5. Open a person, add a relationship of type **Mentor** to someone else, and save. Open
    the other person: their card reads **Mentee**. Before step 3 it would have read
    **Other**.
-6. Back on the Custom metadata page, open the menu at the end of the Mentee row and choose
+6. Back on the Custom Metadata page, open the menu at the end of the Mentee row and choose
    **Archive**. Once it says "Saved", the row's status is **Archived** and BarnCRM stops
    using it: a new Mentee relationship gets **Other** on the other side. Choose
    **Restore** from the same menu to bring it back.
-7. Scroll to **Recent changes** at the bottom of the page. Each save is listed with your name and the
+7. Scroll to **Recent Changes** at the bottom of the page. Each save is listed with your name and the
    values before and after.
 
 ## Common mistakes
