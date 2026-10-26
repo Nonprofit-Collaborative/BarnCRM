@@ -1,13 +1,13 @@
-# Apps and navigation
+# Apps and Navigation
 
 Scripts for the four BarnCRM apps and the **App Navigation Style** setting. Setup detail:
-[The BarnCRM apps and navigation](../admin-guide/barncrm-app.md).
+[The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with the staff user from
 [Test users](before-you-test.md#test-users). After a role or setting change, BarnCRM gives and
 takes the apps in a queued job: wait a minute and reload before checking the App Launcher.
 
-## T-APP-01: Each app shows the right tabs to the right people
+## T-APP-01: Each App Shows the Right Tabs to the Right People
 
 **Purpose:** confirm the everyday apps go to every BarnCRM role, the admin apps to admins only, and each app holds its own tabs.
 **Prerequisites:** admin user and staff user. **App Navigation Style** is **Both (each person chooses)**.
@@ -26,7 +26,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 
 **Cleanup:** give the staff user its role back on the Access page.
 
-## T-APP-02: App Navigation Style hides the other style for everyone
+## T-APP-02: App Navigation Style Hides the Other Style for Everyone
 
 **Purpose:** confirm the setting shows only one style's apps, defaults to Both, and records the change.
 **Prerequisites:** admin user and staff user.
