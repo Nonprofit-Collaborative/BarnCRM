@@ -141,6 +141,11 @@ public with sharing class RollupController {
                     Label.Core_RollupBuilder_ErrorInstantMovesWithDate
                 );
             }
+            definition.Mode__c = mode;
+            String instantProblem = RollupBuilderController.instantProblem(definition);
+            if (instantProblem != null) {
+                throw new RollupService.RollupServiceException(instantProblem);
+            }
             RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Mode__c = mode));
             return currentPage();
         } catch (Exception caught) {

@@ -47,6 +47,13 @@ import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByN
 import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
+import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
+import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
+import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
+
+/** The stored modes (canonical model R-R4): Instantly alone, and Both. */
+const MODE_REAL_TIME = 'Real-time';
+const MODE_BOTH = 'Both';
 
 const NUMBERS = new Set(['double', 'integer', 'long']);
 const MONEY = new Set(['currency', 'percent']);
@@ -111,8 +118,13 @@ export default class RollupWizard extends LightningElement {
     cancel: CANCEL,
     save: SAVE,
     saveAndCalculate: SAVE_AND_CALCULATE,
-    previewRecord: PREVIEW_RECORD
+    previewRecord: PREVIEW_RECORD,
+    targetSearch: TARGET_SEARCH,
+    targetSearchHelp: TARGET_SEARCH_HELP
   };
+
+  /** Step 1: what the administrator typed to find an object off the common list (ADR-0136). */
+  targetSearch = '';
 
   step = 1;
   current = { active: true, fiscalYearAware: false };
@@ -184,8 +196,50 @@ export default class RollupWizard extends LightningElement {
 
   // ------------------------------------------------------------------------------- options
 
+  get allTargets() {
+    return this.model && this.model.targets ? this.model.targets : [];
+  }
+
+  /**
+   * The common objects, or every object whose name or API name holds what was typed, and the
+   * chosen one always, so an edited rollup on another object still shows it (ADR-0136).
+   */
   get targetOptions() {
-    return this.model ? this.model.targets : [];
+    const term = (this.targetSearch || '').trim().toLowerCase();
+    const matches = (option) => {
+      if (!term) {
+        return option.common !== false;
+      }
+      return option.label.toLowerCase().includes(term) || option.value.toLowerCase().includes(term);
+    };
+    const shown = this.allTargets
+      .filter(matches)
+      .map((option) => ({ value: option.value, label: option.label }));
+    const chosen = this.current.targetObject;
+    if (chosen && !shown.some((option) => option.value === chosen)) {
+      const found = this.allTargets.find((option) => option.value === chosen);
+      shown.unshift({ value: chosen, label: found ? found.label : chosen });
+    }
+    return shown;
+  }
+
+  handleTargetSearch(event) {
+    this.targetSearch = event.detail.value;
+  }
+
+  get chosenSource() {
+    return this.sources.find((entry) => entry.value === this.sourceValue);
+  }
+
+  /** False when the counted records have no rollup trigger (R-R12); unknown counts as instant. */
+  get sourceIsInstant() {
+    const source = this.chosenSource;
+    return !source || source.instant !== false;
+  }
+
+  /** Step 5: says plainly that this total is not instant, and why (ADR-0136). */
+  get noInstantNotice() {
+    return this.sourceIsInstant ? undefined : format(NO_INSTANT, this.recordsLabel);
   }
 
   get targetFieldOptions() {
@@ -247,8 +301,10 @@ export default class RollupWizard extends LightningElement {
     return this.model ? this.model.delimiters : [];
   }
 
+  /** Instantly alone is not offered for records with no rollup trigger. */
   get modeOptions() {
-    return this.model ? this.model.modes : [];
+    const modes = this.model ? this.model.modes : [];
+    return this.sourceIsInstant ? modes : modes.filter((mode) => mode.value !== MODE_REAL_TIME);
   }
 
   get windowOptions() {
@@ -274,7 +330,7 @@ export default class RollupWizard extends LightningElement {
   }
 
   get targetLabel() {
-    const target = this.targetOptions.find((entry) => entry.value === this.current.targetObject);
+    const target = this.allTargets.find((entry) => entry.value === this.current.targetObject);
     return target ? target.label : this.current.targetObject;
   }
 
@@ -372,14 +428,18 @@ export default class RollupWizard extends LightningElement {
     if (!source) {
       return;
     }
-    this.change({
+    const changes = {
       sourceObject: source.sourceObject,
       relationshipPath: source.relationshipPath,
       sourceField: undefined,
       orderByField: undefined,
       fiscalDateField: undefined,
       filterJson: undefined
-    });
+    };
+    if (source.instant === false && this.current.mode === MODE_REAL_TIME) {
+      changes.mode = MODE_BOTH;
+    }
+    this.change(changes);
     this.loadSource();
   }
 

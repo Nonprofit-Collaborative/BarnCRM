@@ -1677,7 +1677,15 @@ definition sets Active to false; packaged code never deletes an admin's records.
 **R-R7 No cross-package reference.** Source Entity, Target Entity, Source Attribute,
 Target Attribute, and Order By Attribute are text. Core therefore drives rollups over
 Giving objects without holding a reference to them, which the package dependency
-direction forbids (ADR-0014).
+direction forbids (ADR-0014). The same holds for standard objects: a definition that names
+Opportunity or Case names it as data, resolved through describe, so it is not a dependency on
+the object and a Platform-only org simply never offers it (ADR-0013, ADR-0136). The Rollup
+Builder offers every entity the administrator can read and query (and, as a target, update):
+Account, Contact, the org's own objects and standard objects, leaving out custom settings, the
+platform's sharing, history, feed and change event objects, retired objects and BarnCRM's own
+bookkeeping. A short list of common standard objects is shown first; a standard object off it
+must also be one people create and search for. A source is offered only through a reference
+attribute that can be filtered and grouped on, as the engine's query needs.
 
 **R-R8 Disjoint targets.** Two active definitions may write the same Target Attribute on
 the same Target Entity only when their Target Filters make their target record sets
@@ -1760,6 +1768,13 @@ When the last active definition on that entity is removed, the Builder offers to
 generated trigger, and Health Check reports a generated trigger that no active definition
 uses. A generated trigger is switched off like any other automation, through an Automation
 Setting row (Section 10) the Builder creates with Is Package Default false.
+
+Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it
+today), the Builder says plainly, when that source is chosen, that its totals are updated by
+the nightly run and Recalculate and not instantly, does not offer Instantly alone, and refuses
+a save or a mode change on the rollup list that would make such a rollup Instantly alone
+(ADR-0136). Both and Every night are allowed; a Flow built from the template still makes Both
+instant, which the engine cannot see.
 
 **R-R13 Freshness stamps are written when the work is done.** A calculation writes
 `Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section
@@ -8793,6 +8808,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-0139). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. Match Source (Section 13) is managed on the tab's Matching Logic area and no longer listed on the Custom metadata page (R-D2). |
 | v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
 | v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-0140). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
+| v0.8 | 2026-10-26 | Rollup Builder offers standard objects (`decisions/0136-rollup-builder-dlrs-parity.md`). No object or field added. R-R7 says a standard object named in a definition is data offered through describe, not a dependency (ADR-0013), and which objects the Builder offers. R-R12 says what the Builder does for a source entity with no rollup trigger: it says so, does not offer Instantly alone, and a save or mode change to Instantly alone is refused. |
 
 ---
 ## 32. Entity ownership by package

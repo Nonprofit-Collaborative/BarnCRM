@@ -324,14 +324,18 @@ The Builder walks you through five steps. **Next** checks the step you are on, a
 to change, before it lets you go on.
 
 1. **Where should the number appear?** The kind of record and the field that show the total.
-   Only fields BarnCRM can write are offered: numbers, amounts, percents, dates, checkboxes
-   and text. A field another active rollup already fills is marked with that rollup's name. If
-   the field does not exist yet, create it in Setup (a Number or Currency field is right for
-   most totals) and come back.
+   The list starts with the objects most often used: Account, Contact, BarnCRM's objects,
+   your organization's own objects, and the common Salesforce objects your org has
+   (Opportunity, Opportunity Product, Case, Campaign, Campaign Member, Lead, Task, Event,
+   Asset, Order, Order Product and Contract). To use any other object you can see, type part
+   of its name in **Find another object** and pick it from the list. Only fields BarnCRM can
+   write are offered: numbers, amounts, percents, dates, checkboxes and text. A field another
+   active rollup already fills is marked with that rollup's name. If the field does not exist
+   yet, create it in Setup (a Number or Currency field is right for most totals) and come back.
 2. **What should be counted?** The records that feed the total and the field that links them
-   to the record from step 1, in plain words: "Gift, by Donor". When the total lands on an
-   account and the records point at a person, you can also choose that person's household,
-   for example "Gift, by Donor (their household)".
+   to the record from step 1, in plain words: "Gift, by Donor" or "Opportunity, by Account
+   ID". When the total lands on an account and the records point at a person, you can also
+   choose that person's household, for example "Gift, by Donor (their household)".
 3. **How should it be calculated?** Any calculation in
    [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
    hold, the field it reads, for First and Last the field that decides which record comes
@@ -350,7 +354,10 @@ to change, before it lets you go on.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
-   and calculate now** to start its recalculation straight away.
+   and calculate now** to start its recalculation straight away. When the records you count
+   have no instant updates yet, for example Opportunities or your own objects, this step says
+   "Instant totals are not available yet for ..." and offers only **Every night** and **Both
+   (recommended)**: see [Instant totals on your own objects](#instant-totals-on-your-own-objects).
 
 ### What the Builder will not save
 
@@ -369,6 +376,12 @@ It says what to change instead of saving:
   **is in the last N days** condition. Such a total changes when the date moves on, with no record
   saved, so only the nightly run can keep it right. Choose **Both (recommended)** or **Every
   night**. Changing the mode on the Rollups list refuses it too.
+- An **Instantly** total of records that have no instant updates yet (records of a Salesforce
+  object such as Opportunity or Task, or of your own object): "Instant totals are not
+  available yet for Opportunities, so this total cannot be Instantly only." Choose **Both
+  (recommended)** or **Every night**. Changing the mode on the Rollups list refuses it too. A
+  rollup you saved as **Instantly** before keeps working; the next time you edit it, choose
+  **Both (recommended)**, which stays instant if you use the Flow template.
 - Conditions that name a field the records do not have.
 - A field another active rollup already fills for some of the same records. Two rollups may
   fill one field only when their **Only for some records** conditions never pick the same
@@ -439,9 +452,14 @@ only be turned away. To rebuild the **Instantly** totals as well, choose **Start
 ## Instant totals on your own objects
 
 BarnCRM can only ship automation for its own records. A rollup that counts records from an
-object your organization created (for example volunteer hours on a custom Shift object) is
-calculated every night and when you click **Recalculate**, until you make it instant. Today
-the way to do that is the **Recalculate rollups** Flow template, which needs no code.
+object your organization created (for example volunteer hours on a custom Shift object), or
+from a Salesforce object such as Opportunity, Case, Campaign Member, Task or Event, is
+calculated every night and when you click **Recalculate**, until you make it instant. The
+Builder says so on its last step, and such a rollup is **Every night** or **Both
+(recommended)**, never **Instantly** alone. Today the way to make it instant is the
+**Recalculate rollups** Flow template, which needs no code and works on these objects too.
+Keep the rollup in **Both (recommended)**: the flow makes it instant and the nightly run
+checks it.
 
 ### With the Flow template
 
@@ -502,8 +520,8 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 
 - **One-click instant totals on your own objects** are coming. Until then, use the
   [Flow template](#with-the-flow-template); without it, a rollup that counts records from an
-  object your organization created is calculated every night and when you click
-  **Recalculate**.
+  object your organization created, or from a Salesforce object such as Opportunity, is
+  calculated every night and when you click **Recalculate**.
 - **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
 - **BarnCRM is checked against its previous rollup engine** before that engine is removed
   from the package. A developer runs the comparison on a test org; it changes nothing in your

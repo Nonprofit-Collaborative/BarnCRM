@@ -3,6 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-09-06
 **Source:** builder decision under plan Section 9.3 ("when a platform limitation blocks the plan, record an ADR with the workaround and continue")
+**Applied by:** ADR-0136 (`0136-rollup-builder-dlrs-parity.md`): a rollup definition naming a
+standard object as data, offered through describe, is not a dependency on that object.
 
 ## Context
 
