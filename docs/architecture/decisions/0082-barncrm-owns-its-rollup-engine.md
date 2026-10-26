@@ -6,6 +6,9 @@ rule does not apply to the rollup aggregation core.
 **Amended by:** ADR-0125 (`0125-rollup-builder-module.md`): the engine this ADR describes, with
 the Rollup Builder, is the BarnCRM Rollup Builder module (`packages/rollups`), not Core; Core
 reaches it only through `RollupEngineExtension` and the Health Check and nightly job seams.
+**Amended by:** ADR-0137 (`0137-instant-totals-generated-trigger-deployed-by-the-admin.md`):
+for decision 8, the Builder generates the trigger and its test for any object that can carry
+one, and the admin deploys them; the one-click Metadata API deploy is deferred.
 **Date:** 2026-10-12
 **Source:** owner decision 2026-10-12; plan Section 4.10; builds on ADR-0011, ADR-0015,
 ADR-0021, ADR-0022 and ADR-0040
