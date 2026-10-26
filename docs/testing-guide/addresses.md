@@ -183,7 +183,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the 27 Billing Test Ave address, and Luis's second membership if you added one.
 
-## T-ADDR-13: Nobody moves until you choose
+## T-ADDR-13: Nobody Moves Until You Choose
 
 **Purpose:** with **Address Updates** set to **Nobody moves until you choose**, a person's edit stays theirs, a household change moves the household only, and the seasonal swap still moves everyone without an address of their own.
 **Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists), the Garcia household on Sunset Ln and no member with an address of their own.
