@@ -135,6 +135,9 @@
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <template lwc:if={instantObject}>
+            <c-rollup-instant-totals object-api-name={instantObject} can-manage={canManageInstant}></c-rollup-instant-totals>
+        </template>
         <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
     </template>
 

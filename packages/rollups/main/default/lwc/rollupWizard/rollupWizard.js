@@ -178,6 +178,13 @@ export default class RollupWizard extends LightningElement {
   get isStep5() {
     return this.step === 5;
   }
+  /** Step 5: the counted object, whose instant totals state is shown (ADR-0138). */
+  get instantObject() {
+    return this.current.sourceObject;
+  }
+  get canManageInstant() {
+    return Boolean(this.model && this.model.canManage);
+  }
   get showBack() {
     return this.step > 1;
   }

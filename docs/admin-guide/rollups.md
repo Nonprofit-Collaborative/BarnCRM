@@ -157,9 +157,10 @@ Every rollup has a mode.
 | **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
 
 "Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
-other BarnCRM records. For a total that counts records from one of your own objects, see
-[Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
-without that, such a total is calculated every night and on demand only.
+other BarnCRM records. For a total that counts records from any other object (a standard
+object such as opportunities, another app's object, or one your organization created), see
+[Instant Totals on Other Objects](#instant-totals-on-other-objects) below; without that,
+such a total is calculated every night and on demand only.
 
 A save recalculates only the totals its change can move. Saving a soft credit recalculates the
 soft credit totals on that person and household, not their gift or pledge totals, and an
@@ -429,14 +430,84 @@ When it is scheduled, **Run tonight** adds nothing: the nightly run already reca
 **Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
 only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
-## Instant totals on your own objects
+## Instant Totals on Other Objects
 
-BarnCRM can only ship automation for its own records. A rollup that counts records from an
-object your organization created (for example volunteer hours on a custom Shift object) is
-calculated every night and when you click **Recalculate**, until you make it instant. Today
-the way to do that is the **Recalculate rollups** Flow template, which needs no code.
+BarnCRM can only ship automation for its own records. A rollup that counts records from any
+other object (a standard object such as opportunities or tasks, another app's object, or one
+your organization created, for example volunteer hours on a custom Shift object) is
+calculated every night and when you click **Recalculate**, until you make it instant. There
+are two ways: a small trigger the Rollup Builder writes for you (below), or the
+**Recalculate rollups** Flow template, which needs no code.
 
-### With the Flow template
+### With a Generated Trigger
+
+The **Instant Totals** section at the bottom of the Rollup Builder lists every object an
+**Instantly** or **Both (recommended)** rollup counts, and every object that still has a
+BarnCRM trigger, with what each one does today:
+
+| Shown | What it means |
+|---|---|
+| **Instant: BarnCRM updates these totals by itself.** | A BarnCRM object, or a person: nothing to do. |
+| **Not set up** | Totals update every night and when you click **Recalculate**. **Turn on instant totals** shows how to add the trigger. |
+| **On** | The trigger is in this org and running. |
+| **Turned off** | The trigger is there but its switch is off: totals update every night until you click **Turn on instant totals**. |
+| **Inactive** | The trigger is there but was deactivated in Setup. Activate it in a sandbox and deploy it again, or remove it. |
+| **Salesforce allows no trigger on this object** | Its totals stay nightly. |
+
+Step 5 of the Builder shows the same line for the object the rollup counts, with the same
+buttons.
+
+**Turn it on.** Click **Turn on instant totals**. The Builder shows a one-line trigger and its
+test, named from the object (for opportunities, `BarnRollup_Opportunity` and
+`BarnRollup_Opportunity_Test`), with a **Copy** button for each. Then:
+
+1. In a sandbox (or a Developer Edition org) where BarnCRM is installed, open the Developer
+   Console. Choose **File**, **New**, **Apex Trigger**, give it the trigger's name, pick the
+   object, replace the code with the trigger from the Builder and save.
+2. Choose **File**, **New**, **Apex Class**, give it the test's name, replace the code with
+   the test from the Builder and save. Run it from **Test**, **New Run**: it passes.
+3. In the sandbox's Setup, open **Outbound Change Sets**, add the trigger and the class, and
+   upload the change set to production.
+4. In production's Setup, open **Inbound Change Sets**, click **Deploy**, choose **Run
+   specified tests** and enter the test's name. Only that test runs, so tests elsewhere in
+   your org that already fail do not block it.
+5. Back in the Rollup Builder, the object shows **On** as soon as the trigger is in the org.
+
+If you use the Salesforce CLI, **Download deploy package** saves a zip with the trigger and
+its test, and the Builder shows the command that deploys it, to a sandbox or straight to
+production, running only the generated test.
+
+What to know:
+
+- **The trigger never needs changing.** It only tells BarnCRM which records changed; how each
+  total is worked out stays in the rollup, so you can add, edit and remove rollups on that
+  object without touching code. One trigger serves every rollup that counts the object.
+- **The code is the same in every org.** The names come from the object's API name, so a
+  sandbox's change set lands exactly what production's Builder looks for.
+- **The test never depends on your data.** It saves one empty record, which your required
+  fields or validation rules may refuse; the trigger has run by then, and that is all the
+  test checks.
+- **Deletes and restores are seen too**, unlike the Flow template, and pausing all automation
+  or turning the Rollup Builder module off stops the trigger like any other BarnCRM automation.
+- **Who can do it.** Creating Apex in a sandbox and deploying a change set use your
+  Salesforce permissions (an administrator has them). BarnCRM needs no extra permission and
+  deploys nothing itself.
+
+**Turn it off.** Click **Turn off instant totals**. Nothing is deployed: the trigger's switch
+goes off at once, in production too, and the object's totals update every night and when you
+click **Recalculate**. **Turn on instant totals** turns it back on. The switch is also on the
+**Automation** page as **Instant rollups on** and the object's name.
+
+**Remove it.** A switched-off trigger costs almost nothing, so you only need to remove it to
+tidy up, and before uninstalling BarnCRM (the trigger refers to BarnCRM, so Salesforce will
+not uninstall BarnCRM while it is there). Click **Remove the trigger**:
+
+1. In a sandbox, delete the trigger and its test class in Setup (**Apex Triggers**, **Apex
+   Classes**).
+2. Production does not allow deleting Apex in Setup. **Download removal package** saves a zip
+   that deletes both, and the Builder shows the Salesforce CLI command that deploys it.
+
+### With the Flow Template
 
 1. In Setup, open **Flows** and find **Recalculate rollups (template)**. Open it and click
    **Save As**, choosing **A New Flow**, so you have a copy of your own. The template itself
@@ -465,27 +536,7 @@ What to know:
   **Both (recommended)**.
 - **Pausing all automation** stops the action as well; the nightly run catches up.
 
-### One click (coming)
-
-The Rollup Builder will offer to make such a total instant by adding a small piece of
-automation for you:
-
-- One click deploys a one-line trigger on your object and a test for it. The trigger only
-  tells BarnCRM which records changed; how the total is calculated stays in the rollup, so
-  editing the rollup later never changes the code.
-- It runs only its own test while deploying, so tests elsewhere in your org that already
-  fail do not block it. If the deploy does fail, the Builder says why in plain words and what
-  to do next.
-- You need the **Customize Application** and **Modify All Data** permissions and the
-  BarnCRM permission to deploy rollup triggers, and you authorize the connection once. If you
-  do not have them, the Builder says "Ask a Salesforce admin, or use the Flow template."
-- Try it in a sandbox first. The trigger has the same name in every org, so moving it to
-  production with a change set gives the same result as deploying it from the Builder there.
-- When you remove the last rollup on that object, the Builder offers to remove the trigger
-  too. Health Check reports a BarnCRM trigger that no rollup uses any more. Remove these
-  triggers before uninstalling BarnCRM.
-
-If you prefer no code in your org, the Flow template above does the same job.
+If you prefer no code in your org, the Flow template does the same job, except for restores.
 
 ## Current limits
 
@@ -493,10 +544,9 @@ Fund totals and soft credit totals, including a household's soft credit totals, 
 instantly like every other giving total: saving a gift allocation or a soft credit moves them,
 and so does changing a gift's status or deleting a gift. What is not here yet:
 
-- **One-click instant totals on your own objects** are coming. Until then, use the
-  [Flow template](#with-the-flow-template); without it, a rollup that counts records from an
-  object your organization created is calculated every night and when you click
-  **Recalculate**.
+- **The Builder does not deploy the instant-totals trigger for you.** You add it in a sandbox
+  and move it with a change set (or the Salesforce CLI), as in
+  [With a Generated Trigger](#with-a-generated-trigger). A one-click deploy may come later.
 - **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
 - **BarnCRM is checked against its previous rollup engine** before that engine is removed
   from the package. A developer runs the comparison on a test org; it changes nothing in your

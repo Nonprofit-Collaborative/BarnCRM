@@ -172,3 +172,36 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
+
+## T-RB-30: Turn On Instant Totals for an Object BarnCRM Does Not Own
+
+**Purpose:** confirm the Builder generates a trigger and test for another object, that the steps deploy them, and that its state is read from the org.
+**Prerequisites:** admin user with Manage BarnCRM Settings, in a sandbox, scratch or Developer Edition org (the steps create Apex there). In Setup, create a custom object **Shift** (`Shift__c`) with a lookup **Volunteer** to Contact and a number field **Hours**, and a number field **Test shift hours** on Contact.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
+| 2 | Save. Scroll to **Instant Totals** below the rollups. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn on instant totals**. |
+| 3 | Click **Turn on instant totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download deploy package**. |
+| 4 | Click **Download deploy package**. | `BarnRollup_Shift_c.zip` downloads, holding `package.xml`, `triggers/BarnRollup_Shift_c.trigger` and `classes/BarnRollup_Shift_c_Test.cls` with their `-meta.xml` files. |
+| 5 | Follow steps 1 and 2 of the panel in this org's Developer Console (use **Copy** for each piece of code), and run the test. | The test passes. |
+| 6 | Reload the **Rollup Builder** tab. | **Shift** shows **On: the trigger BarnRollup_Shift_c updates these totals at once.** with **Turn off instant totals** and **Remove the trigger**. |
+| 7 | Open a contact, add a **Shift** with **Hours** 3, wait a few seconds and reload the contact. | **Test shift hours** is 3 without clicking **Recalculate**. |
+
+**Cleanup:** keep the rollup and trigger for T-RB-31.
+
+## T-RB-31: Turn Instant Totals Off and Back On, and Remove the Trigger
+
+**Purpose:** confirm instant totals turn off with no deploy, turn back on, and that removal gives the right package and steps.
+**Prerequisites:** T-RB-30 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Instant Totals**, click **Turn off instant totals** for **Shift**. | **Instant totals on Shift are turned off.** The line reads **Turned off: these totals update every night and when you click Recalculate.** |
+| 2 | Add another **Shift** with **Hours** 2 to the same contact, wait a few seconds and reload. | **Test shift hours** is still 3. |
+| 3 | In BarnCRM Settings, open the **Automation** page. | **Instant rollups on Shift** is listed and off. |
+| 4 | Back on **Instant Totals**, click **Turn on instant totals**, then click **Recalculate** on the rollup. | **Instant totals on Shift are turned back on.**, and after the recalculation **Test shift hours** is 5. |
+| 5 | Click **Remove the trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download removal package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
+| 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the trigger** but no **Turn off instant totals** button. |
+
+**Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
