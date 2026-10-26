@@ -13,6 +13,8 @@ import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
+import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
+import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
 
 import TITLE from '@salesforce/label/c.Core_Rollups_PageTitle';
 import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
@@ -45,6 +47,44 @@ import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkin
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
+import EXPORT_ROLLUPS from '@salesforce/label/c.Core_RollupBuilder_Export';
+import EXPORT_SELECT from '@salesforce/label/c.Core_RollupBuilder_ExportSelect';
+import IMPORT_FILE from '@salesforce/label/c.Core_RollupBuilder_ImportFile';
+import IMPORT_COLUMN from '@salesforce/label/c.Core_RollupBuilder_ImportColumn';
+import IMPORT_APPLY from '@salesforce/label/c.Core_RollupBuilder_ImportApply';
+import IMPORT_DONE from '@salesforce/label/c.Core_RollupBuilder_ImportDone';
+import IMPORT_WILL_CREATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillCreate';
+import IMPORT_WILL_UPDATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillUpdate';
+import IMPORT_CREATED from '@salesforce/label/c.Core_RollupBuilder_ImportCreated';
+import IMPORT_UPDATED from '@salesforce/label/c.Core_RollupBuilder_ImportUpdated';
+import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
+import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
+
+/** The words for each import outcome, before saving and after (ADR-0136). */
+const OUTCOMES = {
+  preview: {
+    created: IMPORT_WILL_CREATE,
+    updated: IMPORT_WILL_UPDATE,
+    refused: IMPORT_REFUSED,
+    notReached: IMPORT_NOT_REACHED
+  },
+  saved: {
+    created: IMPORT_CREATED,
+    updated: IMPORT_UPDATED,
+    refused: IMPORT_REFUSED,
+    notReached: IMPORT_NOT_REACHED
+  }
+};
+
+/** A chosen file's text, read in the browser. */
+function readText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
 
 /**
  * The Rollups page of the BarnCRM Settings console.
@@ -70,6 +110,11 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     startNow: START_NOW,
     runTonight: RUN_TONIGHT,
     cancel: CANCEL,
+    exportRollups: EXPORT_ROLLUPS,
+    exportSelect: EXPORT_SELECT,
+    importFile: IMPORT_FILE,
+    importColumn: IMPORT_COLUMN,
+    importApply: IMPORT_APPLY,
     title: TITLE,
     intro: INTRO,
     columnRollup: COLUMN_ROLLUP,
@@ -101,6 +146,12 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   wiredPageResult;
   /** What Recalculate all will go through, shown before it starts (S12). */
   estimate;
+  /** The admin-made rollups ticked for Export; none ticked exports all of them. */
+  selectedIds = [];
+  /** The file being imported, kept until Import these rollups or Cancel. */
+  importText;
+  /** What the import will do, or did, to each rollup in the file. */
+  importRows;
 
   @wire(getPage)
   wiredPage(result) {
@@ -141,7 +192,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       ...rollup,
       counts: this.countsText(rollup),
       target: `${rollup.targetObject}.${rollup.targetField}`,
-      hasLastCalculated: !!rollup.lastCalculated
+      hasLastCalculated: !!rollup.lastCalculated,
+      exportable: this.builder && !rollup.packageDefault,
+      selected: this.selectedIds.includes(rollup.recordId)
     }));
   }
 
@@ -280,6 +333,91 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
 
   handleCopy(event) {
     this.dispatchEvent(new CustomEvent('copy', { detail: { recordId: event.target.dataset.id } }));
+  }
+
+  handleSelect(event) {
+    const definitionId = event.target.dataset.id;
+    const others = this.selectedIds.filter((id) => id !== definitionId);
+    this.selectedIds = event.target.checked ? [...others, definitionId] : others;
+  }
+
+  /** Downloads the ticked rollups, or every one an administrator made, as a file (ADR-0136). */
+  handleExport() {
+    this.busy = true;
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    return exportDefinitions({ definitionIds: this.selectedIds })
+      .then((text) => {
+        const link = document.createElement('a');
+        link.href = `data:application/json;charset=utf-8,${encodeURIComponent(text)}`;
+        link.download = 'barncrm-rollups.json';
+        link.click();
+      })
+      .catch((error) => {
+        this.errorMessage = this.messageFrom(error);
+      })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
+
+  /** Reads the chosen file here and asks the server what importing it would do. */
+  handleImportFile(event) {
+    const file = event.detail.files && event.detail.files[0];
+    if (!file) {
+      return undefined;
+    }
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    this.importRows = undefined;
+    return readText(file).then((text) => {
+      this.importText = text;
+      return this.runImport(false);
+    });
+  }
+
+  handleApplyImport() {
+    return this.runImport(true);
+  }
+
+  handleCancelImport() {
+    this.importText = undefined;
+    this.importRows = undefined;
+  }
+
+  get importApplyDisabled() {
+    return (
+      this.controlsDisabled ||
+      !(this.importRows || []).some((row) => row.outcome === 'created' || row.outcome === 'updated')
+    );
+  }
+
+  runImport(save) {
+    this.busy = true;
+    const words = save ? OUTCOMES.saved : OUTCOMES.preview;
+    return importDefinitions({ fileText: this.importText, save })
+      .then((rows) => {
+        this.importRows = rows.map((row, index) => ({
+          ...row,
+          key: `${index}-${row.definitionKey}`,
+          name: row.name || row.definitionKey,
+          text: row.reason ? `${words[row.outcome]}: ${row.reason}` : words[row.outcome]
+        }));
+        if (save) {
+          this.importText = undefined;
+          this.noticeMessage = IMPORT_DONE;
+        }
+      })
+      .catch((error) => {
+        this.errorMessage = this.messageFrom(error);
+        this.importText = undefined;
+      })
+      .finally(() => {
+        this.busy = false;
+        if (save) {
+          this.refreshPage();
+        }
+      });
   }
 
   handleOpenBuilder() {

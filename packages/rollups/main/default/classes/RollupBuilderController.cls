@@ -378,20 +378,7 @@ public with sharing class RollupBuilderController {
                     Label.Core_Rollups_ErrorNoPermission
                 );
             }
-            String problem = problemWith(draft);
-            if (problem != null) {
-                throw new RollupService.RollupServiceException(problem);
-            }
-            Rollup_Definition__c definition = toRecord(draft);
-            // Checked on save only: the preview runs before the mode is chosen (ROLLUPS-8).
-            if (
-                RollupService.MODE_REAL_TIME.equals(definition.Mode__c) &&
-                RollupDateWindow.movesWithTheDate(definition)
-            ) {
-                throw new RollupService.RollupServiceException(
-                    Label.Core_RollupBuilder_ErrorInstantMovesWithDate
-                );
-            }
+            Rollup_Definition__c definition = checkedRecord(draft);
             RollupWriter.saveAsUser(definition);
             SaveResult result = new SaveResult();
             result.recordId = definition.Id;
@@ -412,6 +399,29 @@ public with sharing class RollupBuilderController {
         } catch (Exception caught) {
             throw asUserError(caught);
         }
+    }
+
+    /**
+     * Every check of the Builder's save (R-R10, R-R8), then the record the draft becomes, unsaved.
+     * Shared with import (`RollupDefinitionTransfer`, ADR-0136), so an imported rollup passes the
+     * same checks. Throws `RollupServiceException` with the reason in plain words.
+     */
+    public static Rollup_Definition__c checkedRecord(Draft draft) {
+        String problem = problemWith(draft);
+        if (problem != null) {
+            throw new RollupService.RollupServiceException(problem);
+        }
+        Rollup_Definition__c definition = toRecord(draft);
+        // Checked on save only: the preview runs before the mode is chosen (ROLLUPS-8).
+        if (
+            RollupService.MODE_REAL_TIME.equals(definition.Mode__c) &&
+            RollupDateWindow.movesWithTheDate(definition)
+        ) {
+            throw new RollupService.RollupServiceException(
+                Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+            );
+        }
+        return definition;
     }
 
     /**
@@ -695,7 +705,8 @@ public with sharing class RollupBuilderController {
         return option;
     }
 
-    private static Draft toDraft(Rollup_Definition__c definition) {
+    /** A saved rollup as the Builder edits it; also what Export writes (ADR-0136). */
+    public static Draft toDraft(Rollup_Definition__c definition) {
         Draft draft = new Draft();
         draft.recordId = definition.Id;
         draft.name = definition.Name;

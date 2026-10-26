@@ -928,4 +928,156 @@
         <shortDescription>Needs attention: the waiting records were started</shortDescription>
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Export</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: download the ticked rollups, or all admin-made ones, as a file</shortDescription>
+        <value>Export to a file</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ExportSelect</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row checkbox: include this rollup in the export</shortDescription>
+        <value>Include in the export</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ExportNothing</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export refused: no admin-made rollup to export</shortDescription>
+        <value>There is no rollup you made to export. Rollups that came with BarnCRM are in every org already.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportFile</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>File input: a rollups file made by Export</shortDescription>
+        <value>Import from a file</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportColumn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import table column: what happens to each rollup</shortDescription>
+        <value>What happens</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportApply</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: save the rollups the file holds</shortDescription>
+        <value>Import these rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportDone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after an import</shortDescription>
+        <value>Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportWillCreate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: the rollup is new here</shortDescription>
+        <value>New: will be created</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportWillUpdate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: the rollup replaces the one with the same key</shortDescription>
+        <value>Will replace the rollup here with the same Definition Key</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportCreated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: created</shortDescription>
+        <value>Created</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUpdated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: updated</shortDescription>
+        <value>Updated</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportRefused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: the rollup is not saved; the reason follows</shortDescription>
+        <value>Not saved</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNotReached</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: stopped before this rollup</shortDescription>
+        <value>Not imported yet: import the same file again to finish</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNotAFile</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import refused: not a rollups file</shortDescription>
+        <value>This is not a BarnCRM rollups file. Choose a file made by Export to a file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNewer</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import refused: the file comes from a newer BarnCRM</shortDescription>
+        <value>This file was made by a newer BarnCRM. Upgrade BarnCRM in this org, then import it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUnreadable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: one rollup in the file cannot be read</shortDescription>
+        <value>This rollup cannot be read from the file. Export it again from the org it came from.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportTwice</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a Definition Key appears twice in the file</shortDescription>
+        <value>This rollup is in the file twice. Only the first one is used.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportShipped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: the rollup comes with BarnCRM</shortDescription>
+        <value>This rollup comes with BarnCRM, so it is not imported. Use Restore shipped rollups here instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUnknown</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: attributes this org does not know; {0} lists them</shortDescription>
+        <value>This rollup uses settings that BarnCRM in this org does not have ({0}). Upgrade BarnCRM in this org, then import it again.</value>
+    </labels>
 </CustomLabels>

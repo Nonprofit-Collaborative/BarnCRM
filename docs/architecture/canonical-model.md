@@ -1828,6 +1828,24 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   how the last full run ended); its Retry, for the selected records' entries or all, goes
   through `RollupQueue.retry`, which sets them Pending with Attempts 0 and no Next Attempt in
   system mode (R-RQ4, R-RQ5).
+- **Moving rollups between orgs (ADR-0136; lifts ADR-0082's deferral):**
+  `RollupDefinitionTransfer`, from the Builder's list. Export writes a JSON file
+  `{"format": "BarnCRM rollups", "version": 1, "rollups": [...]}` of the ticked rollups, or
+  every one with Is Package Default false; each entry is the definition as the Builder edits it
+  (its `Draft`) with its Definition Key and without its record Id, Last Calculated or Is
+  Package Default. Shipped definitions are never exported or imported: each org has them from
+  the package (R-R6). **Keying rule:** an import matches an entry to an existing definition by
+  Definition Key, ignoring case; a match is updated in place, no match is created with the
+  file's key, so importing the same file twice changes nothing more. Import first says what it
+  would do to each entry, then saves each entry on its own through the Builder's save checks
+  (`RollupBuilderController.checkedRecord`: R-R10, R-R8), in user mode, so each is checked
+  against those saved before it. An entry keeps the file's Active value only by passing every
+  check; one that fails is not saved, and the reason is reported. Also refused per entry: a key
+  that is blank or appears twice, a shipped key, and an attribute this version's Builder does
+  not know (a file from a newer version is never saved as a different rollup). A file with
+  another format name or a higher version is refused whole. An import recalculates nothing;
+  the next run does. It stops before the transaction's query or DML limit and reports the
+  remaining entries as not imported yet, which a second import of the same file finishes.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
   the vendored apex-rollup tree, `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` were
@@ -8700,6 +8718,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 | v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
+| v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
 
 ---
 ## 32. Entity ownership by package
