@@ -227,7 +227,7 @@ public with sharing class SettingsService {
             Database.insert(changes, AccessLevel.USER_MODE);
         }
         clearCaches();
-        // Which apps people see follows this setting through the app sets (ADR-NEXT).
+        // Which apps people see follows this setting through the app sets (ADR-0136).
         if (changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c)) {
             TabAccessService.requestSync();
         }

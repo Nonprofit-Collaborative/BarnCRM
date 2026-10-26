@@ -1076,7 +1076,7 @@ a BarnCRM record.
 
 ### App navigation key
 
-Added with the four BarnCRM apps (ADR-NEXT, `NEXT-barncrm-apps-standard-and-console.md`).
+Added with the four BarnCRM apps (ADR-0136).
 Shown in the console's General section as **App Navigation Style**.
 
 | Key | Type | Default | Definition |
@@ -8678,7 +8678,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
-| v0.8 | 2026-10-26 | The four BarnCRM apps (ADR-NEXT, `NEXT-barncrm-apps-standard-and-console.md`). `BarnCRM_Settings__c` gains `App_Navigation_Style__c` (Section 12, app navigation key): Standard, Console or Both, default Both. |
+| v0.8 | 2026-10-26 | The four BarnCRM apps (ADR-0136). `BarnCRM_Settings__c` gains `App_Navigation_Style__c` (Section 12, app navigation key): Standard, Console or Both, default Both. |
 
 ---
 ## 32. Entity ownership by package
