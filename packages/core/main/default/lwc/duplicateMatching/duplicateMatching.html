@@ -11,6 +11,18 @@
               </template>
             </lightning-tab>
           </template>
+          <template lwc:if={canSeeMatchingLogic}>
+            <lightning-tab
+              label={labels.matchingLogic}
+              value="matchingLogic"
+              onactive={handleActive}
+              data-id="tab-matchingLogic"
+            >
+              <template lwc:if={matchingLogicOpened}>
+                <c-match-source-manager></c-match-source-manager>
+              </template>
+            </lightning-tab>
+          </template>
         </lightning-tabset>
       </template>
       <template lwc:else>

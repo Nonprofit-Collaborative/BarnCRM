@@ -1,0 +1,234 @@
+<template>
+  <div class="slds-var-p-around_medium">
+    <p class="slds-var-m-bottom_x-small">{labels.intro}</p>
+    <p class="slds-text-body_small slds-var-m-bottom_small">{labels.rulesNote}</p>
+
+    <template lwc:if={errorMessage}>
+      <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
+        {errorMessage}
+      </p>
+    </template>
+    <template lwc:if={statusMessage}>
+      <p class="slds-var-m-vertical_small" data-id="status" role="status" aria-live="polite">
+        {statusMessage}
+      </p>
+    </template>
+    <template lwc:if={showCheckAgain}>
+      <lightning-button
+        data-id="check-again"
+        label={labels.checkAgain}
+        onclick={handleCheckAgain}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={showReadOnly}>
+      <p class="slds-text-body_small slds-var-m-bottom_small" data-id="read-only">
+        {labels.readOnly}
+      </p>
+    </template>
+    <template lwc:if={canEdit}>
+      <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.shippedNote}</p>
+      <lightning-button
+        data-id="add"
+        label={labels.add}
+        disabled={busy}
+        onclick={handleAdd}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={form}>
+      <!-- An inline box, not a modal, as on the review list. -->
+      <section role="region" aria-label={formTitle} class="slds-box slds-var-m-vertical_small" data-id="form">
+        <h3 class="slds-text-heading_x-small">{formTitle}</h3>
+        <lightning-input
+          data-id="form-name"
+          label={labels.name}
+          value={form.label}
+          max-length="40"
+          required
+          onchange={handleNameChange}
+        ></lightning-input>
+        <div class="slds-grid slds-grid_vertical-align-end">
+          <lightning-input
+            class="slds-col"
+            data-id="form-object"
+            data-field="Object_Name__c"
+            label={labels.object}
+            value={form.values.Object_Name__c}
+            required
+            onchange={handleFieldChange}
+          ></lightning-input>
+          <lightning-button
+            class="slds-var-m-left_x-small"
+            data-id="find-fields"
+            label={labels.findFields}
+            onclick={handleFindFields}
+          ></lightning-button>
+        </div>
+        <lightning-combobox
+          data-id="form-value"
+          data-field="Value_Field__c"
+          label={labels.valueField}
+          value={form.values.Value_Field__c}
+          options={valueFieldOptions}
+          required
+          onchange={handleFieldChange}
+        ></lightning-combobox>
+        <lightning-combobox
+          data-id="form-parent"
+          data-field="Parent_Field__c"
+          label={labels.parentField}
+          value={form.values.Parent_Field__c}
+          options={parentFieldOptions}
+          required
+          onchange={handleFieldChange}
+        ></lightning-combobox>
+        <lightning-combobox
+          data-id="form-normalization"
+          data-field="Normalization__c"
+          label={labels.compare}
+          value={form.values.Normalization__c}
+          options={normalizationOptions}
+          required
+          onchange={handleFieldChange}
+        ></lightning-combobox>
+        <template lwc:if={formIsAddress}>
+          <lightning-combobox
+            data-id="form-postal"
+            data-field="Postal_Code_Field__c"
+            label={labels.postalField}
+            value={form.values.Postal_Code_Field__c}
+            options={postalFieldOptions}
+            required
+            onchange={handleFieldChange}
+          ></lightning-combobox>
+        </template>
+        <div class="slds-var-m-top_x-small">
+          <lightning-button
+            data-id="form-save"
+            variant="brand"
+            label={labels.save}
+            disabled={busy}
+            onclick={handleSave}
+          ></lightning-button>
+          <lightning-button
+            class="slds-var-m-left_x-small"
+            label={labels.cancel}
+            onclick={handleCancel}
+          ></lightning-button>
+        </div>
+      </section>
+    </template>
+
+    <ul class="slds-var-m-top_small">
+      <template for:each={sources} for:item="source">
+        <li key={source.developerName} data-id="source" class="slds-box slds-box_x-small slds-var-m-bottom_x-small">
+          <h3 class="slds-text-heading_x-small">
+            {source.label}
+            <span class="slds-text-body_small slds-var-m-left_x-small" data-id="status-text">{source.statusText}</span>
+            <template lwc:if={source.shipped}>
+              <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small">{labels.shipped}</span>
+            </template>
+          </h3>
+          <dl class="slds-dl_horizontal slds-text-body_small">
+            <dt class="slds-dl_horizontal__label">{labels.object}</dt>
+            <dd class="slds-dl_horizontal__detail" data-id="object">{source.objectText}</dd>
+            <dt class="slds-dl_horizontal__label">{labels.valueField}</dt>
+            <dd class="slds-dl_horizontal__detail">{source.valueText}</dd>
+            <template lwc:if={source.isAddress}>
+              <dt class="slds-dl_horizontal__label">{labels.postalField}</dt>
+              <dd class="slds-dl_horizontal__detail">{source.postalText}</dd>
+            </template>
+            <dt class="slds-dl_horizontal__label">{labels.linksTo}</dt>
+            <dd class="slds-dl_horizontal__detail" data-id="links-to">{source.linksTo}</dd>
+            <dt class="slds-dl_horizontal__label">{labels.parentField}</dt>
+            <dd class="slds-dl_horizontal__detail">{source.parentText}</dd>
+            <dt class="slds-dl_horizontal__label">{labels.compare}</dt>
+            <dd class="slds-dl_horizontal__detail" data-id="compare">{source.compareText}</dd>
+          </dl>
+          <template lwc:if={source.notUsable}>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="not-usable">{labels.notUsable}</p>
+          </template>
+          <div class="slds-var-m-top_x-small">
+            <template lwc:if={source.canChange}>
+              <lightning-button
+                data-id="edit"
+                data-name={source.developerName}
+                label={labels.edit}
+                disabled={busy}
+                onclick={handleEdit}
+              ></lightning-button>
+            </template>
+            <template lwc:if={canEdit}>
+              <lightning-button
+                class="slds-var-m-left_x-small"
+                data-id="toggle"
+                data-name={source.developerName}
+                label={source.toggleLabel}
+                disabled={busy}
+                onclick={handleToggle}
+              ></lightning-button>
+            </template>
+            <lightning-button
+              class="slds-var-m-left_x-small"
+              data-id="try"
+              data-name={source.developerName}
+              label={source.tryLabel}
+              aria-label={source.tryOpenLabel}
+              onclick={handleTryOpen}
+            ></lightning-button>
+          </div>
+          <template lwc:if={source.isTrying}>
+            <div class="slds-var-m-top_x-small" data-id="try-box">
+              <lightning-input
+                data-id="try-value"
+                data-input="value"
+                label={labels.tryValue}
+                value={tryInput.value}
+                onchange={handleTryInput}
+              ></lightning-input>
+              <template lwc:if={tryIsAddress}>
+                <lightning-input
+                  data-id="try-postal"
+                  data-input="postal"
+                  label={labels.tryPostal}
+                  value={tryInput.postal}
+                  onchange={handleTryInput}
+                ></lightning-input>
+              </template>
+              <div class="slds-var-m-top_x-small">
+                <lightning-button
+                  data-id="try-run"
+                  variant="brand"
+                  label={labels.tryRun}
+                  onclick={handleTryRun}
+                ></lightning-button>
+                <lightning-button
+                  class="slds-var-m-left_x-small"
+                  label={labels.cancel}
+                  onclick={handleTryClose}
+                ></lightning-button>
+              </div>
+              <template lwc:if={tryComparedAs}>
+                <p class="slds-text-body_small slds-var-m-top_x-small" data-id="try-compared" role="status">
+                  {tryComparedAs}
+                </p>
+              </template>
+              <template lwc:if={tryFoundAny}>
+                <p class="slds-text-body_small">{labels.tryFound}</p>
+                <ul data-id="try-records">
+                  <template for:each={tryRecords} for:item="record">
+                    <li key={record.value} class="slds-text-body_small">{record.label}</li>
+                  </template>
+                </ul>
+              </template>
+              <template lwc:if={tryFoundNone}>
+                <p class="slds-text-body_small" data-id="try-none">{tryNoneText}</p>
+              </template>
+            </div>
+          </template>
+        </li>
+      </template>
+    </ul>
+  </div>
+</template>

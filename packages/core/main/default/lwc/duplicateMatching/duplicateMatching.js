@@ -1,25 +1,30 @@
 import { LightningElement } from 'lwc';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_Suggestions';
+import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
 
 import TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
 import INTRO from '@salesforce/label/c.Core_DuplicateMatching_Intro';
 import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
+import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
 import NO_ACCESS from '@salesforce/label/c.Core_DuplicateMatching_NoAccess';
 
 const REVIEW_AREA = 'review';
+const MATCHING_LOGIC_AREA = 'matchingLogic';
 
 /**
  * The Duplicate Matching tab (ADR-NEXT, admin guide duplicates.md): one tab per area, each
  * created only when first opened. Review needs Manage BarnCRM Settings or Review Duplicate
  * Suggestions (BarnCRM Duplicate Review, which reads the list but cannot scan, dismiss or
- * merge). Each embedded component keeps its own server check.
+ * merge). Matching Logic needs Manage BarnCRM Settings or Manage BarnCRM Metadata; only the
+ * latter may change a source. Each embedded component keeps its own server check.
  */
 export default class DuplicateMatching extends LightningElement {
   labels = {
     title: TITLE,
     intro: INTRO,
     review: REVIEW,
+    matchingLogic: MATCHING_LOGIC,
     noAccess: NO_ACCESS
   };
 
@@ -39,9 +44,20 @@ export default class DuplicateMatching extends LightningElement {
     return Boolean(canManageSettings || canReviewDuplicates);
   }
 
+  get canSeeMatchingLogic() {
+    return Boolean(canManageSettings || canManageMetadata);
+  }
+
   /** The areas this person may open, in the order the tabs show them. */
   get areas() {
-    return this.canSeeReview ? [REVIEW_AREA] : [];
+    const areas = [];
+    if (this.canSeeReview) {
+      areas.push(REVIEW_AREA);
+    }
+    if (this.canSeeMatchingLogic) {
+      areas.push(MATCHING_LOGIC_AREA);
+    }
+    return areas;
   }
 
   get hasAnyArea() {
@@ -50,6 +66,10 @@ export default class DuplicateMatching extends LightningElement {
 
   get reviewOpened() {
     return Boolean(this.opened[REVIEW_AREA]);
+  }
+
+  get matchingLogicOpened() {
+    return Boolean(this.opened[MATCHING_LOGIC_AREA]);
   }
 
   handleActive(event) {
