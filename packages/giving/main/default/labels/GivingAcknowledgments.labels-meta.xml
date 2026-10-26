@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: the permission a send needs</shortDescription>
-    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_UnexpectedError</fullName>

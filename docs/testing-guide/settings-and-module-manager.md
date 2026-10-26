@@ -4,7 +4,7 @@ Scripts for the BarnCRM Settings console, Access, the Module Manager, Automation
 
 Before you start: an org from [Before you test](before-you-test.md), with every module deployed, the Nonprofit Edition chosen, every feature turned on in first-run setup, and sample data loaded unless a script says otherwise. Create the staff and read-only users from [Test users](before-you-test.md#test-users) first.
 
-The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**, the role's label in Salesforce; the admin guide calls it BarnCRM Admin.
+The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**, the role's label in Salesforce; the admin guide calls the role BarnCRM Admin and names the card the same way.
 
 ## T-SET-01: Open the settings console
 
@@ -69,6 +69,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Click **Remove** beside **Staff Tester** on the **Coordinator** card. | A dialog titled **Remove access**: "Remove the Coordinator role from Staff Tester? Any other role they hold stays in place." |
 | 7 | Click **Remove**. | "Staff Tester no longer has the Coordinator role." The name leaves the card. **Staff Tester** is still on the **Team Member** card. |
 | 8 | Click **Create a user in Setup**. | Setup, Users opens in a new tab. |
+| 9 | Back on **Access**, read the **Needs a change in Setup** note. | It names **Setup, Users, the person, Permission Set Assignments** and says "Core's extra permissions, and any permission set an installed module lists here, are given on this page. A module permission set not listed here is assigned in Setup." |
 
 **Cleanup:** None.
 

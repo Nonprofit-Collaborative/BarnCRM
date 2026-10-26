@@ -13,7 +13,7 @@
 - [ ] Platform only
 - [ ] Sales or Service Cloud
 - [ ] NPSP installed
-- [ ] Agentforce Nonprofit or Person Accounts
+- [ ] Nonprofit Cloud or Person Accounts
 
 ## Definition of done (Section 7.4)
 

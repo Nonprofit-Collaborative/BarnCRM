@@ -16,7 +16,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | In **Object**, choose **Contact**. | **Columns** (with **Available fields** and **Columns, in order**), **Add fields from**, **Conditions**, **Sort by** and **Rows to show** appear. **Conditions** reads "No conditions yet, so every record matches." |
 | 3 | In **Columns**, move **First Name**, **Last Name** and **Email** to **Columns, in order**. | The three fields are listed in that order. |
 | 4 | Under **Conditions**, select **Add condition**. Choose **Last Name**, **equals**, and type `Garcia`. | The condition is complete; no message under it. |
-| 5 | Read **Query (read only)**. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. |
+| 5 | Read **Query (read only)**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
 | 6 | In **Sort by**, choose **First Name**; in **Direction**, **Ascending**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. The line above it reads "N rows shown." with N the number of rows. |
 | 7 | Change the condition value to `Nobodyzz` and select **Run**. | "No records match these conditions." |
 

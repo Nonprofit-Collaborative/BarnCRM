@@ -11,6 +11,16 @@ jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {
 });
 
 jest.mock(
+  '@salesforce/label/c.Core_Settings_FeedbackLink',
+  () => ({ default: 'Report a problem or give feedback' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_Settings_FeedbackUrl',
+  () => ({ default: 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md' }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_Settings_LearnMoreAria',
   () => ({ default: 'Learn more about {0} (opens a new tab)' }),
   { virtual: true }
@@ -294,6 +304,21 @@ describe('c-settings-console', () => {
     expect(help.getAttribute('aria-label')).toBe(
       'Learn more about Household name pattern (opens a new tab)'
     );
+  });
+
+  it('links to the feedback page in a new tab', async () => {
+    const element = build();
+    await settle();
+
+    const link = [...element.shadowRoot.querySelectorAll('a')].find(
+      (a) => a.textContent.trim() === 'Report a problem or give feedback'
+    );
+    expect(link).toBeTruthy();
+    expect(link.getAttribute('href')).toBe(
+      'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md'
+    );
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toContain('noopener');
   });
 
   it('sends only the settings Maria changed', async () => {

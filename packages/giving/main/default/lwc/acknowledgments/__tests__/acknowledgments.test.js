@@ -341,7 +341,7 @@ describe('c-acknowledgments', () => {
     sendEmailsNow.mockRejectedValue({
       body: {
         message:
-          'Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.'
+          'Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role.'
       }
     });
     const element = createComponent();

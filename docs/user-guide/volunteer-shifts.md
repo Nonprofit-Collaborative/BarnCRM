@@ -21,7 +21,7 @@ users can look at jobs, shifts and sign-ups but change nothing.
    - Shifts: **All Shifts**, **Shifts Needing Volunteers** (open shifts from today that still
      have places left) or **Past Shifts Still Open** (shifts that ended more than 7 days ago
      and were never closed).
-3. Click a name to open the record.
+3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-ups** tab, list view **All Sign-ups**.
 
 You should see: a job page with its details and the **Shifts**, **Shift Schedules** and
 **Job Skills** lists, or a shift page with the **Sign-ups** panel at the top.
