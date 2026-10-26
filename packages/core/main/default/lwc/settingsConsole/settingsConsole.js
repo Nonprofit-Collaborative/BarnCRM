@@ -386,7 +386,21 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   /** First-run setup finished (ADR-0124): the edition and features changed what shows. */
   handleSetupFinished() {
-    this.load();
+    this.reloadAndRefreshPanels();
+  }
+
+  /**
+   * Reloads the rows, then asks each panel that stayed mounted to re-read its own data. A panel
+   * fetches once when it connects and the same instance survives a reload, so without this the
+   * Edition row kept saying "Not chosen yet" until the browser page was refreshed.
+   */
+  async reloadAndRefreshPanels() {
+    await this.load();
+    this.template.querySelectorAll('[data-panel]').forEach((panel) => {
+      if (typeof panel.refresh === 'function') {
+        panel.refresh();
+      }
+    });
   }
 
   /** A feature turned on in General (ADR-0124): its settings rows now show, without a reload. */

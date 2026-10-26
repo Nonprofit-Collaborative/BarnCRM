@@ -20,7 +20,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | 4 | Look at **Finish setup** before choosing an edition. | It is disabled. |
 | 5 | Press Escape, then press Tab several times. | The window stays open and focus stays inside it. |
 | 6 | Choose **Nonprofit Edition: the core suite plus the nonprofit tools, starting with the Giving module**. | **Finish setup** is enabled. |
-| 7 | Click **Finish setup**. | The window closes and **BarnCRM Settings** opens on **General**. **Edition** reads **Nonprofit Edition**. Every row under **Features** says **On**. |
+| 7 | Click **Finish setup**. | The window closes and **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Nonprofit Edition** (never "Not chosen yet"). Every row under **Features** says **On**. |
 | 8 | Open **Home**, then reload. | The window does not come back. The **Setup checklist** shows. |
 | 9 | As staff, reload the home page. | No window. Staff sees **Welcome to BarnCRM** and **Quick links**. |
 
@@ -35,7 +35,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 |---|---|---|
 | 1 | Open the **BarnCRM** app. Choose **Standard Edition: the full core suite of BarnCRM tools**. | The **Set up BarnCRM** window shows both questions. |
 | 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Review**, **Org Optimizer and Health Check**, **Household upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred email and phone**, each with a help icon describing it. |
-| 3 | Untick **Data Manager** and **Duplicate Review**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. **Edition** reads **Standard Edition**. **Data Manager** and **Duplicate Review** show **Turn on**; the other six say **On**. |
+| 3 | Untick **Data Manager** and **Duplicate Review**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Review** show **Turn on**; the other six say **On**. |
 | 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** and **Find** are not listed. **Data Hygiene** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
 | 6 | Open **Modules**. | **Core** and **BarnCRM Rollup Builder** only (no nonprofit module is offered in the Standard Edition). |

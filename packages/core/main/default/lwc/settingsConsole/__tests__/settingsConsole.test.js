@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import SettingsConsole from 'c/settingsConsole';
+import FeatureSettings from 'c/featureSettings';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
@@ -748,6 +749,48 @@ describe('c-settings-console', () => {
       await settle();
 
       expect(getConsoleModel).toHaveBeenCalledTimes(2);
+    });
+
+    it('asks a mounted panel to refresh after first-run setup finishes', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      FeatureSettings.refreshCount = 0;
+      const element = build();
+      await settle();
+      await settle();
+      expect(FeatureSettings.refreshCount).toBe(0);
+
+      element.shadowRoot
+        .querySelector('c-first-run-setup')
+        .dispatchEvent(new CustomEvent('setupfinished'));
+      await settle();
+      await settle();
+
+      expect(getConsoleModel).toHaveBeenCalledTimes(2);
+      expect(FeatureSettings.refreshCount).toBe(1);
     });
 
     it('keeps the plain pattern rows when the section has no naming panel', async () => {
