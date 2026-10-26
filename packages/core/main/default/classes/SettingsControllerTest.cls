@@ -135,20 +135,35 @@ private class SettingsControllerTest {
 
     /** The shipped Org Optimizer thresholds sit in their own section, not under General. */
     @IsTest
+    static void orgOptimizerSectionIsHiddenWhileTheFeatureIsOff() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.newInstall();
+
+            Test.startTest();
+            Map<String, Set<String>> shown = keysBySection(SettingsController.getConsoleModel());
+            Test.stopTest();
+
+            Assert.isFalse(
+                shown.containsKey(SettingSections.ORG_OPTIMIZER),
+                'The section is hidden while the Org Optimizer feature is off'
+            );
+            Assert.isFalse(
+                shown.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),
+                'The thresholds do not fall back to General'
+            );
+        }
+    }
+
+    @IsTest
     static void orgOptimizerThresholdsHaveTheirOwnSectionWhileTheFeatureIsOn() {
         System.runAs(TestUsers.admin()) {
             TestSettings.newInstall();
-            Set<String> before = keysBySection(SettingsController.getConsoleModel()).keySet();
             FeatureSwitchService.turnOn(FeatureSwitchService.ORG_OPTIMIZER);
 
             Test.startTest();
             Map<String, Set<String>> after = keysBySection(SettingsController.getConsoleModel());
             Test.stopTest();
 
-            Assert.isFalse(
-                before.contains(SettingSections.ORG_OPTIMIZER),
-                'The section is hidden while the Org Optimizer feature is off'
-            );
             Assert.areEqual(
                 new Set<String>{
                     'Stale_Record_Years__c',
