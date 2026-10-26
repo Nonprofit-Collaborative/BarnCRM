@@ -99,7 +99,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder**, **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Funders** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Funders say **Not installed**. Every row has **What this module does**. |
+| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core** and **BarnCRM Rollup Builder** first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Funders** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Funders say **Not installed**. Every row has **What this module does**. |
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn off**. | The row says **Installed and off**. **Turn on** replaces **Turn off**. |
@@ -108,8 +108,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 7 | Click **What an uninstall deletes** on the Volunteers row. | A box starts "Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first." and lists each object with a count (a `+` means at least that many), then **Open Installed Packages**. |
 | 8 | Click **Check again**. | The report box closes and the list reloads with the same statuses. |
 | 9 | Read the line under the list. | "Turning a module off stops its automation and keeps its records. It does not hide its tabs: to hide a module from someone, change their role on the Access page." |
+| 10 | In the **Nonprofit Modules** section, look at **Show Nonprofit Modules**. | It is ticked (it is ticked on every org until someone clears it, including an org that saved its settings earlier) and the five nonprofit modules are listed under it. No "Installed nonprofit modules hidden" line shows. |
+| 11 | Clear **Show Nonprofit Modules**. | The five nonprofit rows disappear; **Core** and **BarnCRM Rollup Builder** stay, and the checkbox stays, now clear. A line under it reads "Installed nonprofit modules hidden: 3" (Giving, Volunteers and Mirror are the installed ones in a test org; the number is however many nonprofit modules are installed). No error shows. |
+| 12 | Reload the page. | The checkbox is still clear and the nonprofit rows are still hidden: the choice is saved for the whole org. |
+| 13 | Tick **Show Nonprofit Modules**. | The nonprofit rows are back in the **Nonprofit Modules** section and the "hidden" line is gone. **Recent changes** in General lists both changes. |
 
-**Cleanup:** make sure Volunteers is **Installed** (on).
+**Cleanup:** make sure Volunteers is **Installed** (on) and **Show Nonprofit Modules** is ticked.
 
 ## T-SET-07: Pause automation and switch one off
 
@@ -221,7 +225,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and there is no **Save** or **Discard changes**. **Edition** shows with no **Change edition** link. **Features** shows **On** and no **Turn on** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
-| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn off**, **Turn on** or **What an uninstall deletes**. |
+| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn off**, **Turn on** or **What an uninstall deletes**. **Show Nonprofit Modules** is greyed out. |
 | 4 | Open **Automation**. | "You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission." **Pause all automation**, **Resume automation**, **How long** and every switch are disabled. |
 | 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |

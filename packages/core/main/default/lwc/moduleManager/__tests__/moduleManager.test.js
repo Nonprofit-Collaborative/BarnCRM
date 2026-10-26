@@ -5,10 +5,22 @@ import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
 import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdminAccess';
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
+import saveShowNonprofitModules from '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules';
 
 jest.mock('@salesforce/apex/ModuleManagerController.getState', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+// The hidden-count line carries a placeholder, so this label needs its text to assert the count.
+jest.mock(
+  '@salesforce/label/c.Core_ModuleManager_NonprofitHidden',
+  () => ({ default: 'Installed nonprofit modules hidden: {0}' }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/ModuleManagerController.turnOff', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -55,6 +67,20 @@ function state(givingStatus = 'On', canEdit = true) {
         docsUrl: 'https://example.invalid/programs'
       }
     ]
+  };
+}
+
+// The same list with the catalog's nonprofit-only modules flagged: Giving installed, Volunteers
+// and Programs not.
+function nonprofitState(show = true, canEdit = true) {
+  const base = state('On', canEdit);
+  return {
+    ...base,
+    showNonprofitModules: show,
+    modules: base.modules.map((module) => ({
+      ...module,
+      nonprofitOnly: module.name !== 'Core'
+    }))
   };
 }
 
@@ -208,6 +234,128 @@ describe('c-module-manager', () => {
     expect(element.shadowRoot.querySelector('[data-id="read-only"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="turn-off"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="install"]')).toBeNull();
+  });
+
+  describe('nonprofit modules section', () => {
+    function names(group) {
+      return Array.from(group.querySelectorAll('li[data-module]')).map((li) => li.dataset.module);
+    }
+
+    it('lists the other modules first and the nonprofit ones in a section at the bottom', async () => {
+      getState.mockResolvedValue(nonprofitState());
+      const element = await build();
+
+      const groups = Array.from(element.shadowRoot.querySelectorAll('[data-group]'));
+      expect(groups.map((group) => group.dataset.group)).toEqual(['general', 'nonprofit']);
+      expect(names(groups[0])).toEqual(['Core']);
+      expect(names(groups[1])).toEqual(['Giving', 'Volunteers', 'Programs']);
+      expect(groups[1].querySelector('[data-id="nonprofit-title"]').textContent).toContain(
+        'Core_ModuleManager_NonprofitTitle'
+      );
+    });
+
+    it('has Show Nonprofit Modules checked by default', async () => {
+      getState.mockResolvedValue(nonprofitState());
+      const element = await build();
+
+      const box = element.shadowRoot.querySelector('[data-id="show-nonprofit"]');
+      expect(box.label).toContain('Core_ModuleManager_ShowNonprofit');
+      expect(box.checked).toBe(true);
+      expect(element.shadowRoot.querySelector('[data-id="nonprofit-hidden"]')).toBeNull();
+    });
+
+    it('treats a missing saved value as checked', async () => {
+      const missing = nonprofitState();
+      delete missing.showNonprofitModules;
+      getState.mockResolvedValue(missing);
+      const element = await build();
+
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]').checked).toBe(true);
+      expect(row(element, 'Giving')).not.toBeNull();
+    });
+
+    it('saves the choice through Apex and hides the nonprofit modules when cleared', async () => {
+      getState.mockResolvedValue(nonprofitState());
+      saveShowNonprofitModules.mockResolvedValue(nonprofitState(false));
+      const element = await build();
+
+      const box = element.shadowRoot.querySelector('[data-id="show-nonprofit"]');
+      box.checked = false;
+      box.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      expect(saveShowNonprofitModules).toHaveBeenCalledWith({ show: false });
+      expect(row(element, 'Core')).not.toBeNull();
+      expect(row(element, 'Giving')).toBeNull();
+      expect(row(element, 'Volunteers')).toBeNull();
+      // The checkbox stays so the choice can be undone.
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]').checked).toBe(false);
+    });
+
+    it('says how many installed nonprofit modules are hidden', async () => {
+      getState.mockResolvedValue(nonprofitState(false));
+      const element = await build();
+
+      // Giving is installed; Volunteers and Programs are not.
+      expect(
+        element.shadowRoot.querySelector('[data-id="nonprofit-hidden"]').textContent
+      ).toContain('Installed nonprofit modules hidden: 1');
+    });
+
+    it('gives no hidden cue when none of the hidden modules is installed', async () => {
+      const none = nonprofitState(false);
+      none.modules[1].status = 'NotInstalled';
+      getState.mockResolvedValue(none);
+      const element = await build();
+
+      expect(element.shadowRoot.querySelector('[data-id="nonprofit-hidden"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]')).not.toBeNull();
+    });
+
+    it('shows the rows again when ticked', async () => {
+      getState.mockResolvedValue(nonprofitState(false));
+      saveShowNonprofitModules.mockResolvedValue(nonprofitState(true));
+      const element = await build();
+
+      const box = element.shadowRoot.querySelector('[data-id="show-nonprofit"]');
+      box.checked = true;
+      box.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      expect(saveShowNonprofitModules).toHaveBeenCalledWith({ show: true });
+      expect(row(element, 'Giving')).not.toBeNull();
+    });
+
+    it('puts the checkbox back and shows the error when the save fails', async () => {
+      getState.mockResolvedValue(nonprofitState());
+      saveShowNonprofitModules.mockRejectedValue({ body: { message: 'Not allowed.' } });
+      const element = await build();
+
+      const box = element.shadowRoot.querySelector('[data-id="show-nonprofit"]');
+      box.checked = false;
+      box.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+        'Not allowed.'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]').checked).toBe(true);
+      expect(row(element, 'Giving')).not.toBeNull();
+    });
+
+    it('disables the checkbox for someone who can only read', async () => {
+      getState.mockResolvedValue(nonprofitState(true, false));
+      const element = await build();
+
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]').disabled).toBe(true);
+    });
+
+    it('shows no section when no module is nonprofit-only', async () => {
+      const element = await build();
+
+      expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-group="nonprofit"]')).toBeNull();
+    });
   });
 
   it('shows a message Maria can act on when a switch fails', async () => {

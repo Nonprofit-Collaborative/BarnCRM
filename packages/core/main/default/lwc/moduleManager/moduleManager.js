@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
+import saveShowNonprofitModules from '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules';
 import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
 import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdminAccess';
@@ -24,6 +25,9 @@ import READ_ONLY from '@salesforce/label/c.Core_ModuleManager_ReadOnlyNotice';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
+import NONPROFIT_TITLE from '@salesforce/label/c.Core_ModuleManager_NonprofitTitle';
+import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit';
+import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
@@ -34,9 +38,15 @@ const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
  * module's own app, and the one thing to do next with it. Installing and uninstalling are Salesforce's own
  * screens, opened from here; nothing is installed or removed by BarnCRM
  * (0073-module-manager-turns-automation-off-and-never-installs.md).
+ *
+ * The modules only the Nonprofit Edition offers (`nonprofitOnly`, from the catalog's editions)
+ * are listed last, in their own section with a Show Nonprofit Modules checkbox that is on until
+ * an administrator clears it. Clearing it hides those rows only, and a line counts the installed
+ * ones it hides so none disappears without a cue.
  */
 export default class ModuleManager extends LightningElement {
   state;
+  showNonprofit = true;
   reports = {};
   errorMessage;
   installedPackagesUrl = INSTALLED_PACKAGES_URL;
@@ -55,7 +65,9 @@ export default class ModuleManager extends LightningElement {
     tabsNotice: TABS_NOTICE,
     checkAgain: CHECK_AGAIN,
     readOnly: READ_ONLY,
-    openApp: OPEN_APP
+    openApp: OPEN_APP,
+    nonprofitTitle: NONPROFIT_TITLE,
+    showNonprofit: SHOW_NONPROFIT
   };
 
   connectedCallback() {
@@ -110,6 +122,45 @@ export default class ModuleManager extends LightningElement {
     });
   }
 
+  /**
+   * The rows in two groups: the modules both editions offer, then the nonprofit-only ones in a
+   * section of their own. The section exists only when the list holds a nonprofit module.
+   */
+  get groups() {
+    const rows = this.rows;
+    const groups = [
+      {
+        key: 'general',
+        isNonprofit: false,
+        showRows: true,
+        rows: rows.filter((r) => !r.nonprofitOnly)
+      }
+    ];
+    const nonprofit = rows.filter((r) => r.nonprofitOnly);
+    if (nonprofit.length) {
+      const hidden = this.showNonprofit
+        ? 0
+        : nonprofit.filter((r) => r.status !== 'NotInstalled').length;
+      groups.push({
+        key: 'nonprofit',
+        isNonprofit: true,
+        showRows: this.showNonprofit,
+        rows: nonprofit,
+        hiddenText: hidden ? NONPROFIT_HIDDEN.replace('{0}', String(hidden)) : null
+      });
+    }
+    return groups;
+  }
+
+  async handleShowNonprofitChange(event) {
+    const checked = event.target.checked;
+    this.showNonprofit = checked;
+    const saved = await this.run(saveShowNonprofitModules, { show: checked });
+    if (!saved) {
+      this.showNonprofit = !checked;
+    }
+  }
+
   handleCheckAgain() {
     this.reports = {};
     this.load();
@@ -146,6 +197,8 @@ export default class ModuleManager extends LightningElement {
   async run(action, parameters) {
     try {
       this.state = await action(parameters);
+      // A blank value counts as on, which is how the setting ships.
+      this.showNonprofit = this.state.showNonprofitModules !== false;
       this.errorMessage = undefined;
       return true;
     } catch (error) {
