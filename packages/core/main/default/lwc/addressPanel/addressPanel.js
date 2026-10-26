@@ -7,7 +7,9 @@ import LOCALE from '@salesforce/i18n/locale';
 
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
-import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
+// Not named useForWholeHousehold: a name starting with "use" reads as a React hook to Code
+// Analyzer's react-hooks rule (High), which fails the merge gate.
+import applyToWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
 import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updateEveryonesAddress';
 
 import ADDRESS_SCHEMA from '@salesforce/schema/Address__c';
@@ -436,7 +438,7 @@ export default class AddressPanel extends LightningElement {
     this.moveBusy = true;
     try {
       if (move.kind === MOVE_FOR_HOUSEHOLD) {
-        await useForWholeHousehold({
+        await applyToWholeHousehold({
           addressId: move.addressId,
           householdId: this.moveHouseholdId
         });
