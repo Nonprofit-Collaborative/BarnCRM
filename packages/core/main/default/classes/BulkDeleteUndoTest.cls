@@ -77,6 +77,7 @@ private class BulkDeleteUndoTest {
             SELECT Status__c, Run_Log__c, Rows_Deleted__c
             FROM Import_Batch__c
             WHERE Id = :jobId
+            WITH SYSTEM_MODE
         ];
     }
 

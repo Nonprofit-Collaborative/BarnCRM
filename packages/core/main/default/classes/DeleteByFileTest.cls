@@ -91,6 +91,7 @@ private class DeleteByFileTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :jobId AND Phase__c = :ImportJournalService.PHASE_COMMIT
+            WITH SYSTEM_MODE
         ]) {
             for (Map<String, Object> entry : ImportJournalService.entries(page)) {
                 if (ImportJournalService.ACTION_DELETED.equals(entry.get('action'))) {

@@ -200,7 +200,12 @@ private class PreferredEmailServiceTest {
 
     private static Integer copied(List<Contact> people) {
         Integer count = 0;
-        for (Contact person : [SELECT Email, Work_Email__c FROM Contact WHERE Id IN :people]) {
+        for (Contact person : [
+            SELECT Email, Work_Email__c
+            FROM Contact
+            WHERE Id IN :people
+            WITH SYSTEM_MODE
+        ]) {
             if (person.Email == person.Work_Email__c) {
                 count++;
             }

@@ -17,6 +17,7 @@ private class OrgSettingsSystemWriterTest {
                 Seasonal_Address_Last_Run__c
             FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(1, rows.size(), 'One org-level settings record.');
         return rows[0];

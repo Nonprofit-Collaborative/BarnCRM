@@ -113,6 +113,7 @@ private class BulkUpdateBatchTest {
                 Undo_Deadline__c
             FROM Import_Batch__c
             WHERE Id = :jobId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -122,6 +123,7 @@ private class BulkUpdateBatchTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :jobId AND Phase__c = :phase
+            WITH SYSTEM_MODE
         ]) {
             entries.addAll(ImportJournalService.entries(page));
         }

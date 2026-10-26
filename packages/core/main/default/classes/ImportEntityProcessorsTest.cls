@@ -16,6 +16,7 @@ private class ImportEntityProcessorsTest {
             SELECT COUNT()
             FROM Error_Log__c
             WHERE Context__c = 'ImportEntityProcessors.resolve'
+            WITH SYSTEM_MODE
         ];
     }
 

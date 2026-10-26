@@ -71,6 +71,7 @@ private class BulkDeleteBatchTest {
                 Started_At__c
             FROM Import_Batch__c
             WHERE Id = :jobId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -80,6 +81,7 @@ private class BulkDeleteBatchTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :jobId AND Phase__c = :ImportJournalService.PHASE_COMMIT
+            WITH SYSTEM_MODE
         ]) {
             entries.addAll(ImportJournalService.entries(page));
         }

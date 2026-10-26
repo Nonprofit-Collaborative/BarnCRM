@@ -388,6 +388,7 @@ private class ImportTemplateServiceTest {
             SELECT Name, Target_Object__c, Load_Operation__c, Load_Match_Field__c, Person_Mode__c
             FROM Import_Template__c
             WHERE Template_Key__c = 'one_object_key'
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -19,6 +19,7 @@ private class HouseholdCatchUpBatchTest {
             SELECT COUNT()
             FROM Household_Member__c
             WHERE Contact__c IN :contactIds AND End_Date__c = NULL
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -41,6 +42,7 @@ private class HouseholdCatchUpBatchTest {
             SELECT Account__c, Household__c, Household__r.Name, Is_Primary__c
             FROM Household_Member__c
             WHERE Account__c IN :accountIds AND End_Date__c = NULL
+            WITH SYSTEM_MODE
         ];
     }
 
