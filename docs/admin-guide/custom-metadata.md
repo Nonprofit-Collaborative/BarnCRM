@@ -156,4 +156,4 @@ choose **Archive**. **Restore** brings it back.
 | Match sources | Add, edit, archive; archive and restore a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
 | Automations, settings | No | These describe BarnCRM's own code and pages. An entry you added would point at nothing. |
-| Receipt templates (Giving) | No | Copied into the Receipts page, where you edit your own. |
+| Receipt templates (Giving) | No | Copied into the Receipt Letters page, where you edit your own. |

@@ -63,8 +63,10 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 6. The progress bar shows the chunks done. It checks every 3 seconds for the first minute and
    every 10 seconds after that, and tries once more if a check fails before it shows an
    error. When it finishes, the panel says how many records
-   were deleted, how many no longer matched the query and how many were refused, with the
-   reason for each refusal.
+   matched, how many were deleted and how many were refused, with the reason for each
+   refusal. The count of records that no longer matched the query (changed or removed by
+   someone else while the job ran) is in the job's run log and in its notification, not in
+   the panel.
 7. To undo it, find the job under **Data jobs** on the **Data Manager** tab, press
    **Undo**, type the number, and confirm. The records come back from the Recycle Bin. The list
    shows your own bulk deletes. Someone who manages BarnCRM Settings can tick **Show everyone's

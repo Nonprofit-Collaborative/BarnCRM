@@ -43,8 +43,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Luis, **Add relationship**: Related Person **Harper Garcia**, Type **Spouse**. Save. | Refused: **Luis Garcia already has this relationship with Harper Garcia. Open RL-** followed by the record number **to change it.** |
-| 2 | On Luis, **Add relationship**: Related Person **Luis Garcia**, any type. Save. | Refused: **A relationship needs two different people.** |
+| 1 | On Luis, **Add relationship**: Related Person **Harper Garcia**, Type **Spouse**. Submit with **Add relationship** in the form. | Refused: **Luis Garcia already has this relationship with Harper Garcia. Open RL-** followed by the record number **to change it.** |
+| 2 | On Luis, **Add relationship**: Related Person **Luis Garcia**, any type. Submit with **Add relationship** in the form. | Refused: **A relationship needs two different people.** |
 | 3 | On the **Relationships** tab select **New** and save with only a Type. | Refused: **A relationship needs a person on each side.** |
 
 **Cleanup:** None.

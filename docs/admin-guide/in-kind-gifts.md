@@ -53,11 +53,15 @@ Pending and Cancelled gifts are left out.
 
 1. Create a gift the way you record any other, from the **Gifts** tab or from **Quick Gift
    Entry**.
-2. Set **Payment Method** to **In-kind**. The amount box disappears, because an in-kind gift has none.
-3. Fill in **What was given**, written the way the donor should read it on their receipt. "A
-   used minibus in working order" is a description. "Vehicle" is not.
-4. Fill in **Fair market value**: what your organization values it at, for your own
-   reporting. Leave it empty if you do not have a figure yet, and add it later.
+2. Set the payment method to **In-kind**. The field is **Payment Method** on the Gifts tab
+   and **Payment method** on Quick Gift Entry. On Quick Gift Entry the amount box
+   disappears, because an in-kind gift has none; on the Gifts tab, leave **Amount** at zero.
+3. Describe what was given, written the way the donor should read it on their receipt. The
+   field is **In-kind Description** on the Gifts tab and **What was given** on Quick Gift
+   Entry. "A used minibus in working order" is a description. "Vehicle" is not.
+4. Fill in the fair market value: what your organization values it at, for your own
+   reporting. The field is **Fair Market Value** on the Gifts tab and **Fair market value**
+   on Quick Gift Entry. Leave it empty if you do not have a figure yet, and add it later.
 
 BarnCRM refuses the entries that would produce a wrong record or a wrong receipt:
 
