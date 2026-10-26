@@ -34,7 +34,7 @@ automatically and carries a **Primary** badge.
   household's primary address, and everyone in the household moves with it except a person
   with an address of their own.
 
-## To make an address the primary
+## To Make an Address the Primary
 
 1. On the **Addresses** card, click **Set as Primary** on the address you want to use.
 
