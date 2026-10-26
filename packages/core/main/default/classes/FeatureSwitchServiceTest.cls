@@ -27,7 +27,7 @@ private class FeatureSwitchServiceTest {
     @IsTest
     static void aNewInstallHidesEverythingUntilFirstRunSetup() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             Boolean dataManagerOn = FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER);
@@ -51,7 +51,7 @@ private class FeatureSwitchServiceTest {
     @IsTest
     static void mariaTurnsRelationshipsOnForGood() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FeatureSwitchService.turnOn(FeatureSwitchService.RELATIONSHIPS);
@@ -81,7 +81,7 @@ private class FeatureSwitchServiceTest {
     @IsTest
     static void firstRunSetupTurnsOnTheTickedFeatures() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FeatureSwitchService.turnOn(

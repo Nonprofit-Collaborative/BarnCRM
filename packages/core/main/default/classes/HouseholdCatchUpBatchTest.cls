@@ -72,7 +72,7 @@ private class HouseholdCatchUpBatchTest {
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             List<Account> people = personAccounts(251, 'Garcia');
             Set<Id> ids = new Map<Id, Account>(people).keySet();
             Assert.areEqual(
@@ -105,7 +105,7 @@ private class HouseholdCatchUpBatchTest {
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             List<Account> people = personAccounts(3, 'Adeyemi');
             Id householdType = HouseholdService.householdRecordTypeId();
             Integer before = [SELECT COUNT() FROM Account WHERE RecordTypeId = :householdType];
@@ -134,7 +134,7 @@ private class HouseholdCatchUpBatchTest {
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             List<Contact> contacts = HouseholdTestDataFactory.manyContacts(120, 'Mixed');
             insert contacts;
             List<Account> people = personAccounts(131, 'Lee');
@@ -173,7 +173,7 @@ private class HouseholdCatchUpBatchTest {
     static void aNewInstallGivesANewContactNoHousehold() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 
             Test.startTest();
@@ -202,7 +202,7 @@ private class HouseholdCatchUpBatchTest {
     static void turningHouseholdUpkeepOnCatchesUpAndThenRunsTheTrigger() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             Contact early = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert early;
 
@@ -229,7 +229,7 @@ private class HouseholdCatchUpBatchTest {
     static void theCatchUpIsBulkSafe() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             List<Contact> people = HouseholdTestDataFactory.manyContacts(250, 'Bulk');
             insert people;
             HouseholdCatchUpBatch.chunkSize = 300;
@@ -255,7 +255,7 @@ private class HouseholdCatchUpBatchTest {
     static void junctionModeGetsMembershipRows() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             List<Contact> people = HouseholdTestDataFactory.manyContacts(201, 'Junction');
             insert people;
             Set<Id> ids = new Map<Id, Contact>(people).keySet();
@@ -278,7 +278,7 @@ private class HouseholdCatchUpBatchTest {
             );
             settings.Auto_Create_Households__c = false;
             HouseholdTestDataFactory.save(settings);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert maria;
 
@@ -294,7 +294,7 @@ private class HouseholdCatchUpBatchTest {
     static void aContactThatCannotBeLinkedLeavesNoEmptyHousehold() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             // Work is preferred but empty: once preferred email is on, her save is refused.
             maria.Preferred_Email__c = 'Work';

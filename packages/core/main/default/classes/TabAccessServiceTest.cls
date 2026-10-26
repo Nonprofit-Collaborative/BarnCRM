@@ -63,7 +63,7 @@ private class TabAccessServiceTest {
     @IsTest
     static void aNewInstallShowsNoFeatureTabUntilTheFeatureIsOn() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
         }
         System.runAs(TestUsers.admin()) {
             TabAccessService.syncNow();

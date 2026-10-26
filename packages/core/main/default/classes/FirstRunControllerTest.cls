@@ -25,7 +25,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void aNewInstallNeedsSetupAndOffersEveryFeature() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.getState();
@@ -57,7 +57,7 @@ private class FirstRunControllerTest {
     static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
         System.runAs(TestUsers.admin()) {
             // An org built from source: no feature list saved, so every feature is on already.
-            SettingsService.saveSystemValue('Features_Turned_On__c', null);
+            TestSettings.neverSetUp();
             FirstRunController.startTabCheckInTests = true;
 
             Test.startTest();
@@ -76,7 +76,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void mariaFinishesWithTheFeaturesSheTicked() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.finish(
@@ -112,7 +112,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void anEditionSavedInSetupStillAsksForFeaturesAndIsPreselected() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
 
             Test.startTest();
@@ -131,7 +131,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void finishingWithEveryFeatureUntickedDoesNotLoop() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.finish(
@@ -159,6 +159,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void anUpgradedOrgWithAnEditionNeverSeesTheWindow() {
         System.runAs(TestUsers.admin()) {
+            TestSettings.neverSetUp();
             SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_COMMUNITY);
 
             Test.startTest();
@@ -172,7 +173,7 @@ private class FirstRunControllerTest {
     @IsTest
     static void anUnknownFeatureKeepsNothing() {
         System.runAs(TestUsers.admin()) {
-            FeatureSwitchService.markNewInstall();
+            TestSettings.newInstall();
             Exception refused;
 
             Test.startTest();
@@ -212,6 +213,29 @@ private class FirstRunControllerTest {
                 refused.getMessage(),
                 'Only the two editions are accepted'
             );
+        }
+    }
+
+    @IsTest
+    static void aNewInstallStillNeedsSetupInAnOrgThatSavedItsSettings() {
+        System.runAs(TestUsers.admin()) {
+            // The org already finished first-run setup and saved its settings.
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_COMMUNITY);
+            SettingsService.saveSystemValue(
+                'Features_Turned_On__c',
+                FeatureSwitchService.DATA_MANAGER
+            );
+            SettingsService.saveBookkeeping(
+                new Map<String, Object>{ 'Setup_Steps_Completed__c' => 'one' }
+            );
+            TestSettings.newInstall();
+
+            Test.startTest();
+            FirstRunController.FirstRunState state = FirstRunController.getState();
+            Test.stopTest();
+
+            Assert.isTrue(state.needsSetup, 'A reset org needs setup however the org was saved');
+            Assert.areEqual(8, state.features.size(), 'Every feature is offered');
         }
     }
 
