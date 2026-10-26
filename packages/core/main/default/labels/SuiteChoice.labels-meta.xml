@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings Edition row: no edition has been chosen yet</shortDescription>
-        <value>Not chosen yet. Choose it in the first step of the Setup Assistant.</value>
+        <value>Not chosen yet. Choose it in first-run setup, or with Change edition below.</value>
     </labels>
     <labels>
         <fullName>Core_Edition_ChangeToggle</fullName>

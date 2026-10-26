@@ -520,6 +520,19 @@ public with sharing class PersonErasure {
     }
 
     /**
+     * Why a household left empty was kept: upkeep deletes an empty household only when Delete
+     * Empty Households is on, so with it off that is the reason; with it on, records still
+     * linked to the household kept it.
+     */
+    private static String keptHouseholdNote() {
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
+        Boolean deletesEmpty = settings != null && settings.Delete_Empty_Households__c == true;
+        return deletesEmpty
+            ? Label.Core_Erase_NoteHouseholdKept
+            : Label.Core_Erase_NoteHouseholdKeptSetting;
+    }
+
+    /**
      * After upkeep: a household the person left is gone, still has members, or was left empty
      * and kept, in which case it would still carry the person's name and address and is
      * anonymized too (R-ER3). `before` holds each household's wording as it was before the
@@ -577,12 +590,7 @@ public with sharing class PersonErasure {
                     Address__c.SObjectType,
                     result
                 );
-                save(
-                    anonymous,
-                    result,
-                    Label.Core_Erase_Household,
-                    Label.Core_Erase_NoteHouseholdKept
-                );
+                save(anonymous, result, Label.Core_Erase_Household, keptHouseholdNote());
             }
         }
         deletedIds.addAll(gone);

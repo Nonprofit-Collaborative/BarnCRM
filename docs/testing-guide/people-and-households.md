@@ -161,7 +161,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-11: Preferred phone
 
 **Purpose:** Preferred Phone copies the chosen number into Phone and refuses an empty choice.
-**Prerequisites:** admin; **Copy preferred phone on a person** on (Automation page, ships on). Home Phone, Mobile and Other Phone are not on the shipped person page: add them to the **Reaching This Person** section first (gear icon, **Edit Page**).
+**Prerequisites:** admin; **Copy preferred phone on a person** on (Automation page, ships on). Home Phone, Mobile, Other Phone, Work Phone and Preferred Phone are in the person page's **Reaching This Person** section.
 
 | Step | Action | Expected result |
 |---|---|---|

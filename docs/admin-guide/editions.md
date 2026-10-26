@@ -41,6 +41,9 @@ These are the places that depend on the edition.
 
 Before anyone has chosen an edition, BarnCRM shows what the Standard Edition shows.
 
+Install links appear only once BarnCRM publishes package versions. Until then each place above
+shows "No install link is published for this module yet." in place of **Install**.
+
 A module that is installed keeps working whatever the edition: it stays listed, its own
 settings sections, Setup Assistant steps, Health Check findings, What's New notes, roles and
 tabs stay, and its automation keeps running. If a module was installed by mistake, turn it off
