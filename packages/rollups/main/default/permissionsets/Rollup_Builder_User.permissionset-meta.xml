@@ -18,6 +18,10 @@
     <apexClass>RollupController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>RollupInstantTotals</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Rollup_Definition__c.Active__c</field>
