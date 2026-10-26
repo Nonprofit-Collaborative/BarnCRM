@@ -22,7 +22,7 @@ every time a household's membership changes, every time an address is saved, and
 new person would otherwise get a household of their own. Health Check reads your org every
 time it runs.
 
-1. Open the **BarnCRM** app.
+1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation.
 4. Read the **What we found in your org** card. If your org has households built the

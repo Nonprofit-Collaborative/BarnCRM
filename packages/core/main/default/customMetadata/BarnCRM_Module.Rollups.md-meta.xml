@@ -24,7 +24,11 @@
   </values>
   <values>
     <field>App_Name__c</field>
-    <value xsi:type="xsd:string">BarnCRM_Rollup_Builder</value>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Admin_Tabs__c</field>
+    <value xsi:type="xsd:string">Rollup_Builder</value>
   </values>
   <values>
     <field>Requires__c</field>

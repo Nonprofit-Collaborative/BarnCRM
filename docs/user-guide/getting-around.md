@@ -44,6 +44,11 @@ The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **V
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer
 Requirements**, **Volunteer Settings**, **Dashboards** and **Reports**.
 
+Your admin may also have added the module pages you use most to the BarnCRM apps: **Quick Gift
+Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts** and
+**Volunteer Hours**, at the end of the navigation menu. The **Rollup Builder** is in the admin
+apps; anyone else who may view it opens it by typing its name in the App Launcher.
+
 ## To open an app
 
 1. Click the App Launcher (the grid of dots at the top left).

@@ -23,7 +23,7 @@ install is off until you turn it on: choose **Turn on** in that row in **BarnCRM
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
 
-1. Open the **BarnCRM** app.
+1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation. The report is there.
 4. Click **Re-run** whenever you want a fresh look. On this page Health Check reads your

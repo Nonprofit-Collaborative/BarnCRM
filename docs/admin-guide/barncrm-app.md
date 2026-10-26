@@ -28,10 +28,37 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Data Manager, Import, Bulk Update, Org Optimizer, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Gifts and everything around them (Giving module) | The **Fundraising** app |
-| Volunteer jobs, shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app |
+| Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
+| Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
 
-A module keeps its own app; the home page's **Modules** list names each installed module.
+The home page's **Modules** list names each installed module, with an **Open the app** link
+for a module that has an app of its own. The Rollup Builder module has no app of its own: its
+**Rollup Builder** tab is in the admin apps.
+
+### A module's pages in the BarnCRM apps
+
+Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
+so you need not switch apps:
+
+| Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
+|---|---|---|
+| Rollup Builder | | Rollup Builder |
+| Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup |
+| Volunteers | Volunteer Shifts, Volunteer Hours | Volunteer Settings |
+| Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
+
+- **Deployed from source** with `scripts/org/deploy-packages.sh`: the script adds the pages
+  of every module it deployed itself, as its last step. Nothing to do.
+- **Installed as packages**: Salesforce does not let one package add its pages to another
+  package's app, so you add them once by hand. **Home**, **Setup checklist**, **Modules**
+  lists the pages for each installed module. For each BarnCRM app you use:
+  1. In Setup, open **App Manager** and click **Edit** next to the app.
+  2. Open **Navigation Items**, move the listed pages to **Selected Items**, and click
+     **Save**. Skip any page that is already there.
+
+A page shows only to people whose access allows it, so adding a page to an everyday app does
+not show it to anyone who cannot use it.
 
 ## How to turn it on
 

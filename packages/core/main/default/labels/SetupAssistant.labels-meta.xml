@@ -217,6 +217,30 @@
         <value>To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings.</value>
     </labels>
     <labels>
+        <fullName>Core_SetupAssistant_ModuleStaffTabs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: {0} is a module's everyday tab labels, comma separated</shortDescription>
+        <value>Add to BarnCRM and BarnCRM Console: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupAssistant_ModuleAdminTabs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: {0} is a module's admin tab labels, comma separated</shortDescription>
+        <value>Add to BarnCRM Admin and BarnCRM Admin Console: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupAssistant_ModuleTabsHow</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: how to add an installed module's tabs to the BarnCRM apps</shortDescription>
+        <value>Each module also keeps its own app. To have a module's pages in the BarnCRM apps as well, add the pages listed under it: in Setup, open App Manager, click Edit next to the app, open Navigation Items, move the pages to Selected Items, and click Save. Skip any page that is already there.</value>
+    </labels>
+    <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -81,4 +81,32 @@ describe('c-setup-step-modules', () => {
 
     expect(element.shadowRoot.querySelectorAll('[data-id="install-first"]')).toHaveLength(1);
   });
+
+  it('lists an installed module pages to add to the BarnCRM apps, with how', () => {
+    const element = createElement('c-setup-step-modules', { is: SetupStepModules });
+    element.modules = [
+      MODULES[0],
+      {
+        name: 'Giving',
+        present: true,
+        staffTabs: 'Gifts, Commitments',
+        adminTabs: 'Accounting Periods'
+      },
+      { name: 'Volunteers', present: false, staffTabs: 'Ignored until here' }
+    ];
+    document.body.appendChild(element);
+
+    const staff = element.shadowRoot.querySelectorAll('[data-id="staff-tabs"]');
+    expect(staff).toHaveLength(1);
+    expect(staff[0].textContent).toContain('Core_SetupAssistant_ModuleStaffTabs');
+    expect(element.shadowRoot.querySelectorAll('[data-id="admin-tabs"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelector('[data-id="tabs-how"]')).not.toBeNull();
+  });
+
+  it('says nothing about tabs when no installed module has any', () => {
+    const element = build();
+
+    expect(element.shadowRoot.querySelector('[data-id="tabs-how"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="staff-tabs"]')).toBeNull();
+  });
 });

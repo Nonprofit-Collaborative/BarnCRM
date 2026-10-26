@@ -15,7 +15,7 @@ app do that, and you should see and approve what goes into your org.
 
 There is nothing to turn on.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
 2. Click **BarnCRM Settings**, then **Modules** in the left navigation.
 
 Everyone who can open BarnCRM Settings sees the list. You need the **Manage BarnCRM
@@ -29,8 +29,9 @@ Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
 No module is installed with Core or by first-run setup: a module is installed only when you
-install it from this section. An installed module's row links to its own app. Rollup
-Builder and Volunteers have a Settings tab there, where their settings live; Giving's
+install it from this section. An installed module's row links to its own app, where it has
+one. Rollup Builder has no app of its own: its **Rollup Builder** tab is in the **BarnCRM
+Admin** apps. Volunteers has a Settings tab in its app, where its settings live; Giving's
 Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
 still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
 features are turned on in General instead (see

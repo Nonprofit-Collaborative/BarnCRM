@@ -6,10 +6,6 @@
     For staff and read only users: read every rollup, what it counts and when it was last
     calculated. Saving records never needs this set; the engine runs in system mode.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Rollup_Builder</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>RollupAttentionController</apexClass>
     <enabled>true</enabled>

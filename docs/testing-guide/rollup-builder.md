@@ -147,14 +147,14 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Log in as the staff user. From the App Launcher, open **BarnCRM Rollup Builder**. | The app opens on the **Rollup Builder** tab. |
+| 1 | Log in as the staff user. In the App Launcher, search for "Rollup" and open the **Rollup Builder** tab. | The **Rollup Builder** tab opens. |
 | 2 | Look at the top of the list. | A grey notice reads "You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission." |
 | 3 | Look at the buttons and rows. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
 | 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last calculated** time. |
 | 5 | Look below the list. | No **Needs attention** section is shown. |
 | 6 | Log in as the read-only user and repeat steps 1 to 5. | Same results as the staff user. |
-| 7 | As admin, in Setup remove **Rollup Builder User** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | **BarnCRM Rollup Builder** and the **Rollup Builder** tab are not offered. |
-| 8 | As admin, in Setup open the **Rollup Builder Admin** and **Rollup Builder User** permission sets. | **Rollup Builder Admin** gives create, edit and delete on rollup definitions; **Rollup Builder User** gives read only. Both open the app and both tabs. |
+| 7 | As admin, in Setup remove **Rollup Builder User** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | The **Rollup Builder** tab is not offered. |
+| 8 | As admin, in Setup open the **Rollup Builder Admin** and **Rollup Builder User** permission sets. | **Rollup Builder Admin** gives create, edit and delete on rollup definitions; **Rollup Builder User** gives read only. Both open the **Rollup Builder** tab; neither names an app. |
 
 **Cleanup:** assign **Rollup Builder User** to the read-only user again.
 

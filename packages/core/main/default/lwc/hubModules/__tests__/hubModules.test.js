@@ -119,6 +119,23 @@ describe('c-hub-modules', () => {
     ]);
   });
 
+  it('links a module that has its own app to that app', async () => {
+    getState.mockResolvedValue({
+      canEdit: true,
+      modules: [
+        { name: 'Core', status: 'On', canSwitch: false },
+        { name: 'Giving', status: 'On', canSwitch: true, appUrl: '/lightning/app/06m000000000001' },
+        { name: 'Rollups', status: 'On', canSwitch: true }
+      ]
+    });
+    const element = await build();
+
+    const links = all(element, 'open-app');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('/lightning/app/06m000000000001');
+    expect(links[0].textContent).toContain('c.Core_ModuleManager_OpenApp');
+  });
+
   it('opens the Modules section of BarnCRM Settings by page reference', async () => {
     getState.mockResolvedValue({ canEdit: true, modules: [] });
     const element = await build();
