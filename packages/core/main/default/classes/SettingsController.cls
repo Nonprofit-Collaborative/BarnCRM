@@ -18,6 +18,16 @@ public with sharing class SettingsController {
     @TestVisible
     private static final String CHECK_EMAIL = 'emailDeliverability';
 
+    /**
+     * Core picklist settings whose blank means a choice, by key in lower case, with the value
+     * a blank is shown as. Every reader already treats the blank as that choice, so the console
+     * shows it rather than an empty box (Address Updates, ADR-NEXT). A blank that means
+     * "nobody has chosen yet", such as the coexistence mode, is not listed here.
+     */
+    private static final Map<String, String> BLANK_SHOWS_AS = new Map<String, String>{
+        'contact_address_change_behavior__c' => 'Update household'
+    };
+
     /** Injected by the tests: Deliverability cannot be changed from Apex. */
     @TestVisible
     private static Boolean emailAllowedOverride;
@@ -447,6 +457,17 @@ public with sharing class SettingsController {
         }
         Object value = SettingsService.getValue(settingsObject, definition.Setting_Key__c);
         setting.value = SettingsService.asText(value);
+        if (
+            String.isBlank(setting.value) &&
+            SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject)
+        ) {
+            String key = definition.Setting_Key__c == null
+                ? ''
+                : definition.Setting_Key__c.toLowerCase();
+            setting.value = BLANK_SHOWS_AS.containsKey(key)
+                ? BLANK_SHOWS_AS.get(key)
+                : setting.value;
+        }
         setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
         return setting;
     }

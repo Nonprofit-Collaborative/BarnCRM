@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>When a person's address is edited</label>
+  <label>Address Updates</label>
   <protected>true</protected>
   <values>
     <field>Data_Type__c</field>
@@ -8,7 +8,9 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Choose what happens when someone edits one person's address. Update household moves everyone in that household to the new address, which is what most organizations want because a household shares a mailbox. Create personal address gives that one person an address of their own and leaves the rest of the household where it is.</value>
+    <value
+      xsi:type="xsd:string"
+    >Choose who moves when an address changes. Everyone in the household moves together: editing one person's address moves the whole household, which is what most organizations want because a household shares a mailbox. Only that person moves: the edit gives that person an address of their own, and a change to the household still reaches everyone without one. Nobody moves until you choose: the edit stays that person's own, and a change to the household reaches its people only when you choose Update Everyone's Address on the household's address card (the seasonal swap still moves everyone without an address of their own).</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -20,7 +22,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:type="xsd:string">Update household:Everyone in the household moves together;Create personal address:Only that person moves</value>
+    <value xsi:type="xsd:string">Update household:Everyone in the household moves together;Create personal address:Only that person moves;Manual:Nobody moves until you choose</value>
   </values>
   <values>
     <field>Section__c</field>

@@ -29,6 +29,16 @@ public with sharing class AddressService {
     private static final String BEHAVIOR_UPDATE_HOUSEHOLD = 'Update household';
     @TestVisible
     private static final String BEHAVIOR_PERSONAL_ADDRESS = 'Create personal address';
+    /** "Nobody moves until you choose" (ADR-NEXT). */
+    @TestVisible
+    private static final String BEHAVIOR_MANUAL = 'Manual';
+
+    /**
+     * Raised while a household move nobody has to wait for is saved: the seasonal swap, and a
+     * move someone chose on the address card. In "Nobody moves until you choose" a household's
+     * new primary address reaches its members only then (R-AD3, ADR-NEXT).
+     */
+    private static Boolean householdMoveChosen = false;
 
     private static final String TYPE_HOME = 'Home';
     private static final String TYPE_WORK = 'Work';
@@ -343,11 +353,11 @@ public with sharing class AddressService {
     /**
      * Turns an address typed into the standard fields into an address record.
      *
-     * A household or organization account created with a billing address gets a default
+     * A household or organization account created with a billing address gets a primary
      * address record of type Home (Work for an organization), so nothing staff typed or
      * an import loaded is lost. A person whose mailing address changes either moves their
      * whole household or gains an address of their own, depending on the org's
-     * Contact_Address_Change_Behavior__c setting.
+     * Contact_Address_Change_Behavior__c setting (Address Updates).
      */
     public static void captureFromStandardFields(List<Account> accounts, List<Contact> contacts) {
         Boolean nothingToDo =
@@ -645,10 +655,12 @@ public with sharing class AddressService {
 
         // Every account this save might write person mailing fields on, asked about once,
         // before anything is built: an account that does not hold a person must be left
-        // out rather than written and refused. See personAccountIdsAmong.
-        Map<Id, Set<Id>> membersByHousehold = membersWhoTakeTheHouseholdAddress(
-            membersOf(addressByHousehold.keySet())
-        );
+        // out rather than written and refused. See personAccountIdsAmong. In "Nobody moves
+        // until you choose" a household's members are not asked about at all, unless this is
+        // a move that was chosen (R-AD3).
+        Map<Id, Set<Id>> membersByHousehold = membersMoveWithTheHousehold()
+            ? membersWhoTakeTheHouseholdAddress(membersOf(addressByHousehold.keySet()))
+            : new Map<Id, Set<Id>>();
         Set<Id> candidates = new Set<Id>(addressByPersonOwner.keySet());
         candidates.addAll(memberAccountIds(membersByHousehold));
         Set<Id> personAccountIds = personAccountIdsAmong(candidates);
@@ -1176,10 +1188,12 @@ public with sharing class AddressService {
         if (withAddress.isEmpty()) {
             return;
         }
-        if (behavior() == BEHAVIOR_PERSONAL_ADDRESS) {
-            capturePersonalAddresses(withAddress, toInsert);
-        } else {
+        // Only "Everyone in the household moves together" moves the household; the other two
+        // choices keep a person's edit as their own address (R-AD5).
+        if (behavior() == BEHAVIOR_UPDATE_HOUSEHOLD) {
             captureHouseholdAddresses(withAddress, toInsert);
+        } else {
+            capturePersonalAddresses(withAddress, toInsert);
         }
     }
 
@@ -1302,10 +1316,36 @@ public with sharing class AddressService {
         return address;
     }
 
+    /**
+     * The org's Address Updates choice (R-AD5). A blank, or anything the console never
+     * offers, reads as the shipped choice, "Everyone in the household moves together".
+     */
     private static String behavior() {
         BarnCRM_Settings__c settings = SettingsService.getSettings();
         String value = settings == null ? null : settings.Contact_Address_Change_Behavior__c;
-        return String.isBlank(value) ? BEHAVIOR_UPDATE_HOUSEHOLD : value;
+        if (value == BEHAVIOR_MANUAL) {
+            return BEHAVIOR_MANUAL;
+        }
+        return value == BEHAVIOR_PERSONAL_ADDRESS
+            ? BEHAVIOR_PERSONAL_ADDRESS
+            : BEHAVIOR_UPDATE_HOUSEHOLD;
+    }
+
+    /**
+     * Marks what is saved next as a household move that was chosen, or puts the mark back,
+     * and answers with what it was, so a caller can restore it in a finally block. The
+     * seasonal swap raises it: in "Nobody moves until you choose" a household's new primary
+     * address reaches its members only on a move that was chosen (R-AD3, ADR-NEXT).
+     */
+    public static Boolean chooseHouseholdMoves(Boolean chosen) {
+        Boolean previous = householdMoveChosen;
+        householdMoveChosen = chosen == true;
+        return previous;
+    }
+
+    /** Whether a household's new primary address reaches its members in this save (R-AD3). */
+    private static Boolean membersMoveWithTheHousehold() {
+        return householdMoveChosen || behavior() != BEHAVIOR_MANUAL;
     }
 
     private static Boolean hasAnyValue(

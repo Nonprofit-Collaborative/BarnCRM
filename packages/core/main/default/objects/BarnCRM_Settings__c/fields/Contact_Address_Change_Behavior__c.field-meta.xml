@@ -2,10 +2,11 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Contact_Address_Change_Behavior__c</fullName>
   <defaultValue>"Update household"</defaultValue>
-  <description>What happens when a person's address is edited: the household moves together, or that person gets an address of their own. Canonical model R-AD5. Held as text because a custom setting field cannot be a picklist; the settings console offers the two values.</description>
+  <description
+  >Address Updates: who moves when an address changes. Update household (everyone in the household moves together, the shipped choice, and what a blank means), Create personal address (only that person moves), or Manual (nobody moves until you choose). Canonical model R-AD3 and R-AD5. Held as text because a custom setting field cannot be a picklist; the settings console offers the three values.</description>
   <externalId>false</externalId>
-  <inlineHelpText>Choose Update household so everyone in the household moves together, or Create personal address so only that person moves.</inlineHelpText>
-  <label>When a person's address is edited</label>
+  <inlineHelpText>Update household: everyone in the household moves together. Create personal address: only that person moves. Manual: nobody moves until you choose.</inlineHelpText>
+  <label>Address Updates</label>
   <length>40</length>
   <required>false</required>
   <trackTrending>false</trackTrending>

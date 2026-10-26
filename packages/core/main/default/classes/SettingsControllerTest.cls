@@ -604,6 +604,51 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void aBlankAddressUpdatesSettingShowsTheShippedChoice() {
+        System.runAs(TestUsers.admin()) {
+            // A row name of its own, so the Addresses feature switch does not hide it.
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Address_Updates_Row',
+                    MasterLabel = 'Address Updates',
+                    Setting_Key__c = 'Contact_Address_Change_Behavior__c',
+                    Section__c = SettingSections.ADDRESSES,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Picklist',
+                    Picklist_Values__c = 'Update household:Everyone in the household moves together;Create personal address:Only that person moves;Manual:Nobody moves until you choose',
+                    Sort_Order__c = 1
+                )
+            };
+            // Saved once, then emptied by an update, which never applies a field default.
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Contact_Address_Change_Behavior__c = 'Manual';
+            upsert settings;
+            settings.Contact_Address_Change_Behavior__c = null;
+            upsert settings;
+
+            Test.startTest();
+            String shown;
+            for (
+                SettingsController.SectionModel section : SettingsController.getConsoleModel()
+                    .sections
+            ) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    if (setting.key == 'Contact_Address_Change_Behavior__c') {
+                        shown = setting.value;
+                    }
+                }
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                'Update household',
+                shown,
+                'A blank Address Updates reads as everyone moving together, so it shows that choice, never an empty box'
+            );
+        }
+    }
+
+    @IsTest
     static void aSetupCheckThatCannotBeReadIsLeftOut() {
         System.runAs(TestUsers.admin()) {
             FiscalYearSelector.orgStartMonthOverridden = true;

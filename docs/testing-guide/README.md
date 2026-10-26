@@ -37,7 +37,7 @@ page, even if that puts it out of reading order.
 |---|---|---|---|
 | [Before you test](before-you-test.md) | | | Test org, modules, sample data, test users, editions, recording and reporting results |
 | [People and households](people-and-households.md) | HH | 16 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages |
-| [Addresses](addresses.md) | ADDR | 9 | Address records, primary address, seasonal addresses and the nightly swap |
+| [Addresses](addresses.md) | ADDR | 13 | Address records, primary address, the Address Updates setting, seasonal addresses and the nightly swap |
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 9 | Two-sided relationships, affiliations, primary affiliation |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 13 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page |
 | [Setup Assistant](setup-assistant.md) | SA | 10 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |

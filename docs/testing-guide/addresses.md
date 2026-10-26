@@ -22,7 +22,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-02: Set as Primary, and back
 
 **Purpose:** Set as Primary copies the address to the household and its members, and can be moved back.
-**Prerequisites:** staff user, T-ADDR-01 done, **When a person's address is edited** set to **Everyone in the household moves together** (ships that way).
+**Prerequisites:** staff user, T-ADDR-01 done, **Address Updates** set to **Everyone in the household moves together** (ships that way).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -70,7 +70,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Addresses**, set **When a person's address is edited** to **Only that person moves** and save. | Saved. |
+| 1 | In **BarnCRM Settings**, **Addresses**, set **Address Updates** to **Only that person moves** and save. | Saved. |
 | 2 | On Diego Garcia, change Mailing Street to `9 Dorm Test Hall` and save. | Saved. |
 | 3 | Look at Diego's **Addresses** card. | A card for 9 Dorm Test Hall with **Primary**. |
 | 4 | Open The Garcia Family and Luis. | Both still show Sunset Ln. |
@@ -181,3 +181,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Flexible way of belonging only (junction mode): add Luis to a second household as a member who is not primary there, and on that household **Set as Primary** on any other address. | Luis still reads Sunset Ln: that household is not his household. |
 
 **Cleanup:** delete the 27 Billing Test Ave address, and Luis's second membership if you added one.
+
+## T-ADDR-13: Nobody moves until you choose
+
+**Purpose:** with **Address Updates** set to **Nobody moves until you choose**, a person's edit stays theirs, a household change moves the household only, and the seasonal swap still moves everyone without an address of their own.
+**Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists), the Garcia household on Sunset Ln and no member with an address of their own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, **Addresses**, look at **Address Updates**. | It shows **Everyone in the household moves together**, never an empty box. |
+| 2 | Set **Address Updates** to **Nobody moves until you choose** and save. | Saved. |
+| 3 | On Harper Garcia, change Mailing Street to `14 Manual Test Ct` and save. | Harper's **Addresses** card has a 14 Manual Test Ct card with **Primary**. The Garcia Family's primary is still Sunset Ln, and Luis still reads Sunset Ln. |
+| 4 | On The Garcia Family's **Details**, change Billing Street to `27 Manual Billing Ave` and save. | A new **Home** card, 27 Manual Billing Ave, carries **Primary**, and Billing Address shows it. Luis still reads **Sunset Ln**. |
+| 5 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3), then in **BarnCRM Settings**, **Addresses**, choose **Run the swap now** and refresh after a minute. | **Primary** is on Phoenix, and Luis reads Phoenix: the swap still moves him. Harper still reads 14 Manual Test Ct. |
+
+**Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. Put the Phoenix dates back to January 1 to March 31 and run the swap again. On the household, **Set as Primary** on the Sunset Ln card, then delete the 27 Manual Billing Ave address. Delete Harper's 14 Manual Test Ct address and set her Mailing Street back to 6830 Sunset Ln.

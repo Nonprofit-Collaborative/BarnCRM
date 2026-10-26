@@ -998,7 +998,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address) | Update household | What happens when a person's address is edited: the household moves, or that person gets an address of their own (R-AD5). |
+| `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-NEXT). A blank reads and shows as Update household. |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
@@ -6084,6 +6084,12 @@ alike:
 - in junction mode, a member for whom this household is not their household (R-M3: their
   primary membership, else their earliest current one).
 
+Where the org's Address Updates setting is "Nobody moves until you choose" (R-AD5), a
+household's or an organization's new primary is written to its own billing fields only, on
+save, on a billing edit and when a primary is deleted alike: it reaches the members above
+only on a move someone chose on the address card (R-AD9) or on the seasonal swap (R-AD4),
+which moves members in every setting (ADR-NEXT).
+
 The standard fields are not where a change is kept, but a change made there is captured
 rather than lost: a person's mailing address under R-AD5, and a household's or an
 organization's billing address, on insert and when it changes afterwards, as a new primary
@@ -6134,11 +6140,24 @@ swapping. The job reads and writes in system mode, because a nightly reconciliat
 package owned data must not depend on what the person who happened to schedule it can see
 (ADR-0027).
 
-**R-AD5 Contact address change behavior.** When a person's address is edited, the org's
-contact address change behavior setting decides what happens: update the household's
-address, so everyone in the household moves together, or create a personal address for
-that person alone. The setting is explained in those words in the settings console, not in
-terms of objects.
+**R-AD5 Address Updates.** When a person's address is edited, the org's Address Updates
+setting (`Contact_Address_Change_Behavior__c`) decides what happens, and it also decides
+whether a household's change reaches its members on its own (R-AD3). Three choices
+(ADR-NEXT):
+
+- **Everyone in the household moves together** (`Update household`, the shipped choice, and
+  what a blank or unknown value means): the edit becomes the household's new primary
+  address, so everyone in the household without an address of their own moves with it.
+- **Only that person moves** (`Create personal address`): the edit becomes a primary address
+  of that person's own. A household change still reaches every member with no address of
+  their own.
+- **Nobody moves until you choose** (`Manual`): the edit stays that person's own, as above,
+  and a household change reaches its members only when someone chooses to move them (R-AD9),
+  or through the seasonal swap, which still reaches every member with no address of their
+  own (R-AD4).
+
+The setting is explained in those words in the settings console, not in terms of objects,
+and the console shows a blank as the shipped choice, never an empty box.
 
 **R-AD6 Verification is a placeholder.** Verification Status and Latest Verified Date are
 never written by packaged code. They exist so that a third-party verification app can
@@ -6148,6 +6167,21 @@ out of scope (plan Section 4.7).
 **R-AD7 History is kept.** Moving a household creates a new address and clears the old
 one's primary flag. The old address is not deleted, so a mailing sent last year can still
 be explained.
+
+**R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
+Updates setting (ADR-NEXT). Each checks the user's own access as any address write does,
+works for many records in one save, and keeps what it replaces as history (R-AD7):
+
+- On a person's own address, **Use for Whole Household** gives the person's household a new
+  primary address copied from it (in junction mode their household under R-M3; where they
+  are a current member of more than one, the user picks which). A person stored as a Contact
+  stops having a primary address of their own, so they follow the household again; their
+  addresses stay on file. Every member who takes the household's address (R-AD3) moves.
+- On a household's primary address, **Update Everyone's Address** copies it to every member
+  who takes the household's address (R-AD3), after a confirmation that lists them and the
+  members with a primary address of their own. Those are left alone unless ticked; a ticked
+  member's own primary stops being primary, kept as history, and they take the household's
+  address from then on. A member for whom this is not their household is not listed.
 
 ### Salesforce implementation
 
@@ -8689,6 +8723,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 | v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
+| v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-NEXT). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
 
 ---
 ## 32. Entity ownership by package
