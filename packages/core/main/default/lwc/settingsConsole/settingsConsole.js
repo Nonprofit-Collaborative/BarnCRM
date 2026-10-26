@@ -24,6 +24,8 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
+import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
@@ -117,7 +119,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
-    openSection: OPEN_SECTION
+    openSection: OPEN_SECTION,
+    feedbackLink: FEEDBACK_LINK,
+    feedbackUrl: FEEDBACK_URL
   };
 
   columns = [

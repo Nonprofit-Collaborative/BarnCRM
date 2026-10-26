@@ -998,7 +998,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>These active schedules should have shifts {0} weeks ahead (Weeks ahead to create shifts, Volunteer Settings) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
+        <value>These active schedules should have shifts {0} weeks ahead (Shift horizon weeks, Volunteer Settings) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HorizonDetailOne</fullName>
@@ -1006,7 +1006,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>This active schedule should have shifts {0} weeks ahead (Weeks ahead to create shifts, Volunteer Settings) but stops more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill the schedule now, open it and save it.</value>
+        <value>This active schedule should have shifts {0} weeks ahead (Shift horizon weeks, Volunteer Settings) but stops more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill the schedule now, open it and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>

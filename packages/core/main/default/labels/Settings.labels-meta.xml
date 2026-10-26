@@ -105,6 +105,22 @@
         <value>Learn more</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_FeedbackLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: footer link to report a problem or give feedback</shortDescription>
+        <value>Report a problem or give feedback</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_FeedbackUrl</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: address the feedback link opens (GitHub support page)</shortDescription>
+        <value>https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_LearnMoreAria</fullName>
         <categories>Core</categories>
         <language>en_US</language>
