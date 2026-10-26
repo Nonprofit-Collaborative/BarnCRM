@@ -41,7 +41,7 @@ queries over everything you can read. You still cannot change records.
 | Stewardship plans and templates, donor levels | Read them | Change them |
 | Quick Gift Entry | Nothing: the tab is not given | Enter gifts |
 
-The gift panel on a record still loads for you, but every action on it fails.
+The gift panels on a record still load, so you can read them; their actions are not for you.
 
 ### Volunteers (with Volunteers Read Only)
 

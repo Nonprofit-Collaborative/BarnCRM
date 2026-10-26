@@ -78,7 +78,8 @@ and list view uses it. To switch, change **Preferred Email**; you never retype t
 
 ## To set a person's preferred phone
 
-1. Edit the person. Fill in the numbers you have, for example **Work Phone**.
+1. Edit the person. Fill in the numbers you have: **Home Phone**, **Mobile**, **Work Phone**
+   or **Other Phone**.
 2. Set **Preferred Phone** to Home, Mobile, Work or Other.
 3. Click **Save**.
 
@@ -108,9 +109,6 @@ BarnCRM's **Work Phone**.
 - Problem: you typed into **Email** or **Phone** and it changed back. Once a preferred email
   or phone is set, those fields are filled from your choice on every save. Edit the address
   or number you chose instead, or clear the preference.
-- Problem: you cannot see **Home Phone**, **Mobile** or **Other Phone** on the page. The
-  packaged person page shows **Phone**, **Work Phone** and **Preferred Phone** only. Ask your
-  admin to add the other phone fields to your page.
 - Problem: there is no **Addresses** card. The Addresses feature is off. Ask your admin.
 
 ## Related
