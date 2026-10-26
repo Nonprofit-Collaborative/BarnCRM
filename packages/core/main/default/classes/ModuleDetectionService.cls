@@ -66,6 +66,13 @@ public with sharing class ModuleDetectionService {
          */
         @AuraEnabled
         public String installFirst;
+        /**
+         * True when only the Nonprofit Edition offers this module: the catalog names editions and
+         * the Standard edition (`Community`) is not among them. False for Core and for a module
+         * both editions offer.
+         */
+        @AuraEnabled
+        public Boolean nonprofitOnly;
     }
 
     /**
@@ -239,6 +246,17 @@ public with sharing class ModuleDetectionService {
         return false;
     }
 
+    /**
+     * True when the catalog names at least one edition for the module and the Standard edition
+     * is not among them, so only the Nonprofit Edition offers it. Data driven: no module name.
+     */
+    @TestVisible
+    private static Boolean isNonprofitOnly(BarnCRM_Module__mdt row) {
+        return row != null &&
+            String.isNotBlank(row.Editions__c) &&
+            !offeredIn(row, SUITE_COMMUNITY);
+    }
+
     /** The shipped module catalog, lowest Sort Order first. */
     private static List<BarnCRM_Module__mdt> catalog() {
         List<BarnCRM_Module__mdt> rows = catalogOverride != null
@@ -296,6 +314,7 @@ public with sharing class ModuleDetectionService {
         info.name = row.DeveloperName;
         info.label = labelOf(row);
         info.present = present;
+        info.nonprofitOnly = isNonprofitOnly(row);
         info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
         info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
         info.appUrl = present && String.isNotBlank(row.App_Name__c)

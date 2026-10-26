@@ -352,6 +352,98 @@ private class RollupsPostInstallTest {
     }
 
     @IsTest
+    static void aFreshOrgGetsASettingsRowHoldingTheShippedDefaults() {
+        System.runAs(admin()) {
+            Assert.isNull(Rollup_Settings__c.getOrgDefaults().Id, 'A fresh org has no row.');
+            Assert.areEqual(
+                RollupService.MODE_BOTH,
+                SettingsService.getEffectiveValue(
+                    RollupService.SETTINGS_OBJECT,
+                    RollupService.MODE_DEFAULT_SETTING,
+                    'Picklist'
+                ),
+                'Before any row exists the console already shows Both.'
+            );
+            Assert.areEqual(
+                RollupService.PROCESSING_BACKGROUND,
+                SettingsService.getEffectiveValue(
+                    RollupService.SETTINGS_OBJECT,
+                    RollupService.PROCESSING_SETTING,
+                    'Picklist'
+                ),
+                'And After the save (Background) for when instant totals are calculated.'
+            );
+
+            RollupsPostInstall.ensureSettingsRow();
+            RollupsPostInstall.ensureSettingsRow();
+
+            Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Settings__c], 'One row, run twice.');
+            Rollup_Settings__c row = Rollup_Settings__c.getOrgDefaults();
+            Assert.areEqual(UserInfo.getOrganizationId(), row.SetupOwnerId, 'The org-level row.');
+            Assert.areEqual(RollupService.MODE_BOTH, row.Rollup_Mode_Default__c, 'Mode Both.');
+            Assert.areEqual(
+                RollupService.PROCESSING_BACKGROUND,
+                row.Rollup_Processing__c,
+                'Processing Background.'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing audited.');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = :RollupsPostInstall.SETTINGS_CONTEXT
+                ],
+                'And nothing failed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void theSettingsRowStepNeverOverwritesASavedValue() {
+        System.runAs(admin()) {
+            Rollup_Settings__c existing = Rollup_Settings__c.getOrgDefaults();
+            existing.Rollup_Mode_Default__c = RollupService.MODE_SCHEDULED;
+            existing.Rollup_Processing__c = RollupService.PROCESSING_IN_SAVE;
+            Database.upsert(existing, AccessLevel.SYSTEM_MODE);
+
+            RollupsPostInstall.ensureSettingsRow();
+
+            Rollup_Settings__c row = Rollup_Settings__c.getOrgDefaults();
+            Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                row.Rollup_Mode_Default__c,
+                'An upgrade keeps the mode the org chose.'
+            );
+            Assert.areEqual(
+                RollupService.PROCESSING_IN_SAVE,
+                row.Rollup_Processing__c,
+                'And when it chose to recalculate.'
+            );
+            Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Settings__c], 'No second row.');
+        }
+    }
+
+    @IsTest
+    static void theInstallCreatesTheSettingsRow() {
+        System.runAs(admin()) {
+            Test.startTest();
+            install(new RollupsPostInstall(), newInstaller());
+            Test.stopTest();
+
+            Assert.isNotNull(
+                Rollup_Settings__c.getOrgDefaults().Id,
+                'A new install leaves the module settings row in place.'
+            );
+            Assert.areEqual(
+                RollupService.MODE_BOTH,
+                Rollup_Settings__c.getOrgDefaults().Rollup_Mode_Default__c,
+                'Both.'
+            );
+        }
+    }
+
+    @IsTest
     static void settingsTheModuleAlreadySavedWin() {
         System.runAs(admin()) {
             Rollup_Settings__c existing = Rollup_Settings__c.getOrgDefaults();

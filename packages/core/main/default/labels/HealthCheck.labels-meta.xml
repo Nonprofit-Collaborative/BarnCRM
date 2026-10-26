@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading for the org shape findings.</shortDescription>
-        <value>Your org</value>
+        <value>Your Org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CategorySettings</fullName>
@@ -233,28 +233,20 @@
         <value>{0} errors nobody has looked at</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_FiscalYearFix</fullName>
+        <fullName>Core_HealthCheck_CustomFiscalYearDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that opens the general settings from the fiscal year finding.</shortDescription>
-        <value>Open general settings</value>
+        <shortDescription>Health Check: custom fiscal year in Setup; {0} is the start month</shortDescription>
+        <value>Reports filtered or grouped by fiscal year follow your custom fiscal year periods. BarnCRM totals for this year, last year and two years ago run in whole years from the start of {0}, so where a custom year starts on another day or is not twelve months long, the two can disagree.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_FiscalYearMismatchDetail</fullName>
+        <fullName>Core_HealthCheck_CustomFiscalYearTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check: fiscal year starts differ; {0} BarnCRM month, {1} Setup month</shortDescription>
-        <value>BarnCRM starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total BarnCRM calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_FiscalYearMismatchTitle</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Title of the fiscal year mismatch finding.</shortDescription>
-        <value>Your two fiscal years do not match</value>
+        <shortDescription>Title of the custom fiscal year finding.</shortDescription>
+        <value>Your org uses a custom fiscal year</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixCreated</fullName>
@@ -582,7 +574,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the org shape card.</shortDescription>
-        <value>What we found in your org</value>
+        <value>What We Found in Your Org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrgShapeDetail</fullName>

@@ -47,7 +47,7 @@ hidden for everyone.
    How to turn it on). Without it the Duplicates section says so.
 
 Duplicate review no longer has a panel in **BarnCRM Settings**. Under **Households**, the
-**Duplicates** row has an **Open this page** button that takes you to this page.
+**Duplicates** row has an **Open Org Optimizer** button that takes you to this page.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -93,7 +93,7 @@ Each count stops at 1,000 and then says **More than 1000**.
 | Objects near their custom field limit | Account, Contact and BarnCRM's own objects with 80% or more of the custom fields your edition allows (100 on Professional, 500 on Enterprise and Developer, 800 on Unlimited and Performance, 500 when the edition is not known). Each example says how many of how many. | Fields from installed packages, which do not count against the limit, and every other object. |
 | Record types no record uses, or inactive | Record types on Account, Contact and BarnCRM's own objects that are inactive, or that no record you can see uses. At most 50 active record types are looked at. | Record types on other objects. |
 
-Two thresholds are settings, under **General** in **BarnCRM Settings**: **Days before a user
+Two thresholds are settings, in the **Org Optimizer** section of **BarnCRM Settings**: **Days before a user
 is unused** (90 unless you change it; 30 to 365) and **Days before a report is unused** (365;
 90 to 1,095). The settings page refuses a value outside the range and saves nothing, and each
 check's name shows the number in use. The 90 days that keep new email templates and flows out are fixed.

@@ -8,18 +8,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 ## T-SET-01: Open the settings console
 
-**Purpose:** confirm the console opens with its sections, descriptions, Learn more links and Recent changes.
+**Purpose:** confirm the console opens with its sections, descriptions, Learn more links and Recent Changes.
 **Prerequisites:** admin user (see [Test users](before-you-test.md#test-users)).
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import** and **Health**, plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
-| 3 | Click **General**. | **Edition**, **Features**, **Sample data**, **Custom metadata** and the setting rows show, each with a plain description. A **Needs a change in Setup** note at the top names **Setup, Company Settings, Fiscal Year** and shows **Done** or **Not done yet**. |
+| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **Households**, **Relationships**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, and **Rollups** with Rollup Builder installed (a Core-only org has no **Rollups** section). |
+| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top names **Setup, Apex Settings**. No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
 | 4 | Click **Learn more** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
-| 5 | Scroll to the bottom of the page. | A **Recent changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |
+| 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old value**, **New value**, **Changed by**, **Changed at**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
+| 7 | Click **Households**, then scroll to the bottom of the page. | There is no **Recent Changes** heading or table on **Households**. Click **Automation**, **Access** and **Organization** in turn: none shows **Recent Changes**. |
+| 8 | Type `greeting` in **Search settings** and click **Formal greeting pattern**. | The console switches to **Households**, and **Recent Changes** is still not shown. Click **General**: **Recent Changes** shows again. |
 
 **Cleanup:** None.
 
@@ -30,14 +32,14 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**. Type `greeting` in **Search settings**. | A **Search results** list appears as you type. It includes **Formal greeting pattern (Households)** and **Informal greeting pattern (Households)**. |
-| 2 | Click **Formal greeting pattern**. | The console switches to **Households** and scrolls to the **Preview and recompute** panel. |
+| 1 | Open **BarnCRM Settings**. Type `greeting` in **Search settings**. | A **Search Results** list appears as you type. It includes **Formal greeting pattern (Households)** and **Informal greeting pattern (Households)**. |
+| 2 | Click **Formal greeting pattern**. | The console switches to **Households** and scrolls to the **Preview and Recompute** panel. |
 | 3 | Clear the box and type `pause`. | The **Automation** section's entry is listed. |
 | 4 | Clear the box and type `zzqx`. | "No settings match that search. Try a shorter word, for example greeting." |
 
 **Cleanup:** None.
 
-## T-SET-03: Save a setting, see it in Recent changes, discard and refuse a bad value
+## T-SET-03: Save a setting, see it in Recent Changes, discard and refuse a bad value
 
 **Purpose:** confirm saves are recorded, unsaved edits can be discarded, and out-of-range numbers are refused.
 **Prerequisites:** admin user. Note the current value of **Days to keep Error Log entries** (180 by default).
@@ -45,10 +47,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Error Log**. Change **Days to keep Error Log entries** to `90`. | **Save** and **Discard changes** become enabled. |
-| 2 | Click **Discard changes**. | The value returns to what it was. **Save** is disabled again. Nothing is added to **Recent changes**. |
+| 2 | Click **Discard changes**. | The value returns to what it was. **Save** is disabled again. Nothing is added to **Recent Changes** (shown on **General** only). |
 | 3 | Change the value to `5000` and click **Save**. | The box is marked as out of range and the page says "A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again." |
-| 4 | Change the value to `90` and click **Save**. | "Your settings are saved." The top row of **Recent changes** shows **Days to keep Error Log entries**, old value 180, new value 90, your name and the time. |
-| 5 | Click **Save** again without changing anything. | No new row appears in **Recent changes**. |
+| 4 | Change the value to `90` and click **Save**. | "Your settings are saved." Open **General**: the top row of **Recent Changes** shows **Days to keep Error Log entries**, old value 180, new value 90, your name and the time. |
+| 5 | Open **Error Log** and click **Save** again without changing anything, then open **General**. | No new row appears in **Recent Changes**. |
 | 6 | Reload the page and open **Error Log**. | The box shows 90. |
 
 **Cleanup:** set **Days to keep Error Log entries** back to 180 and save.
@@ -69,18 +71,18 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Click **Remove** beside **Staff Tester** on the **Coordinator** card. | A dialog titled **Remove access**: "Remove the Coordinator role from Staff Tester? Any other role they hold stays in place." |
 | 7 | Click **Remove**. | "Staff Tester no longer has the Coordinator role." The name leaves the card. **Staff Tester** is still on the **Team Member** card. |
 | 8 | Click **Create a user in Setup**. | Setup, Users opens in a new tab. |
-| 9 | Back on **Access**, read the **Needs a change in Setup** note. | It names **Setup, Users, the person, Permission Set Assignments** and says "Core's extra permissions, and any permission set an installed module lists here, are given on this page. A module permission set not listed here is assigned in Setup." |
+| 9 | Back on **Access**, read the **Needs a Change in Setup** note. | It names **Setup, Users, the person, Permission Set Assignments** and says "Core's extra permissions, and any permission set an installed module lists here, are given on this page. A module permission set not listed here is assigned in Setup." |
 
 **Cleanup:** None.
 
-## T-SET-05: Extra permissions, and the last admin is protected
+## T-SET-05: Extra Permissions, and the last admin is protected
 
 **Purpose:** confirm an extra permission is given with its warning and removed, and the last BarnCRM Admin cannot be removed.
 **Prerequisites:** admin user, the only person on the **BarnCRM Admin Group** card (if the card is empty, give yourself the role first, as in T-SET-04). The staff user does not hold **BarnCRM Bulk Delete**.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Access**. Scroll to **Extra permissions**. | One card each for **BarnCRM Find and Export**, **BarnCRM Bulk Update**, **BarnCRM Bulk Delete**, **BarnCRM Erase People**, **BarnCRM Duplicate Review** and **BarnCRM Metadata Admin**, then the Giving and Mirror sets. Bulk Delete and Erase People carry the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
+| 1 | Open **BarnCRM Settings**, **Access**. Scroll to **Extra Permissions**. | One card each for **BarnCRM Find and Export**, **BarnCRM Bulk Update**, **BarnCRM Bulk Delete**, **BarnCRM Erase People**, **BarnCRM Duplicate Review** and **BarnCRM Metadata Admin**, then the Giving and Mirror sets. Bulk Delete and Erase People carry the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 2 | Choose **Staff Tester** in **Find a person**. In **Extra permission**, choose **BarnCRM Bulk Delete**. | Under the picker: "Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export." and the remove-data warning. |
 | 3 | Click **Give permission**. | The dialog asks "Give Staff Tester the BarnCRM Bulk Delete permission?" and repeats the warning. |
 | 4 | Confirm with **Give permission**. | "Staff Tester now has the BarnCRM Bulk Delete permission." The name appears on the **BarnCRM Bulk Delete** card. |
@@ -97,7 +99,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder**, **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Funders** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Funders say **Not installed**. Every row has **What this module does**. |
+| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core** and **BarnCRM Rollup Builder** first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Funders** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Funders say **Not installed**. Every row has **What this module does**. |
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn off**. | The row says **Installed and off**. **Turn on** replaces **Turn off**. |
@@ -106,8 +108,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 7 | Click **What an uninstall deletes** on the Volunteers row. | A box starts "Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first." and lists each object with a count (a `+` means at least that many), then **Open Installed Packages**. |
 | 8 | Click **Check again**. | The report box closes and the list reloads with the same statuses. |
 | 9 | Read the line under the list. | "Turning a module off stops its automation and keeps its records. It does not hide its tabs: to hide a module from someone, change their role on the Access page." |
+| 10 | In the **Nonprofit Modules** section, look at **Show Nonprofit Modules**. | It is ticked (it is ticked on every org until someone clears it, including an org that saved its settings earlier) and the five nonprofit modules are listed under it. No "Installed nonprofit modules hidden" line shows. |
+| 11 | Clear **Show Nonprofit Modules**. | The five nonprofit rows disappear; **Core** and **BarnCRM Rollup Builder** stay, and the checkbox stays, now clear. A line under it reads "Installed nonprofit modules hidden: 3" (Giving, Volunteers and Mirror are the installed ones in a test org; the number is however many nonprofit modules are installed). No error shows. |
+| 12 | Reload the page. | The checkbox is still clear and the nonprofit rows are still hidden: the choice is saved for the whole org. |
+| 13 | Tick **Show Nonprofit Modules**. | The nonprofit rows are back in the **Nonprofit Modules** section and the "hidden" line is gone. **Recent changes** in General lists both changes. |
 
-**Cleanup:** make sure Volunteers is **Installed** (on).
+**Cleanup:** make sure Volunteers is **Installed** (on) and **Show Nonprofit Modules** is ticked.
 
 ## T-SET-07: Pause automation and switch one off
 
@@ -122,7 +128,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." |
 | 5 | Back in **Automation**, click **Resume automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
 | 6 | Switch off **Keep both sides of relationships in step**. Reload the page. | The switch is still off. |
-| 7 | Switch it back on and scroll to **Recent changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
+| 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
 
@@ -154,20 +160,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Click **Switch to the Standard Edition**. | A dialog "Change the edition?" says modules already installed stay listed and keep working, with **Change edition** and **Cancel**. |
 | 4 | Click **Change edition**. | "Edition changed. Reload open BarnCRM pages to see the new module lists." **Edition** reads **Standard Edition**. |
 | 5 | Reload and open **Modules**. | **BarnCRM Programs** and **BarnCRM Funders** (not installed) are gone. Installed modules are still listed. |
-| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Funders are listed again. **Recent changes** lists both edition changes. |
+| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Funders are listed again. **Recent Changes** lists both edition changes. |
 
 **Cleanup:** leave the Nonprofit Edition.
 
-## T-SET-10: Custom metadata: relationship types and match sources
+## T-SET-10: Custom Metadata: relationship types and match sources
 
 **Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, archive and restore a shipped match source, and that a missing picklist value is refused.
-**Prerequisites:** admin user holding **BarnCRM Metadata Admin** (the create script gives it; otherwise give it on the Access page, Extra permissions). Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
+**Prerequisites:** admin user holding **BarnCRM Metadata Admin** (the create script gives it; otherwise give it on the Access page, Extra Permissions). Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, **Custom metadata**. | Two lists: **Relationship types** and **Match sources**, each with **Added by your organization** ("Nothing added yet.") and **Shipped with BarnCRM**. Relationship types lists eleven shipped rows (Spouse, Parent, Child and so on); Match sources lists six. |
+| 1 | Open **BarnCRM Settings**, **General**, **Custom Metadata**. | Two lists: **Relationship types** and **Match sources**, each with **Added by Your Organization** ("Nothing added yet.") and **Shipped with BarnCRM**. Relationship types lists eleven shipped rows (Spouse, Parent, Child and so on); Match sources lists six. |
 | 2 | Under **Relationship types**, click **Add**. Enter **Name** `Godparent`, **Type** `Godparent`, **Reciprocal Type** `Mentee`. Click **Save**. | Refused: "Godparent is not a choice in the Type list on Relationship. Add it in Setup (Object Manager, Relationship, Fields, Type), then save again." |
-| 3 | Change **Name** and **Type** to `Mentor`, keep **Reciprocal Type** `Mentee`, and **Save**. | "Saving. Salesforce applies the change in the background, usually within a minute." then "Saved. Mentor is in the list." The row is under **Added by your organization** with **Status** **In use**. |
+| 3 | Change **Name** and **Type** to `Mentor`, keep **Reciprocal Type** `Mentee`, and **Save**. | "Saving. Salesforce applies the change in the background, usually within a minute." then "Saved. Mentor is in the list." The row is under **Added by Your Organization** with **Status** **In use**. |
 | 4 | Add `Mentee` with **Reciprocal Type** `Mentor` the same way. | "Saved. Mentee is in the list." |
 | 5 | Open the row menu on **Mentee** and choose **Archive**. Wait for "Saved". | **Status** reads **Archived**. |
 | 6 | Choose **Restore** from the same menu. Wait for "Saved". | **Status** reads **In use**. |
@@ -219,9 +225,65 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and there is no **Save** or **Discard changes**. **Edition** shows with no **Change edition** link. **Features** shows **On** and no **Turn on** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
-| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn off**, **Turn on** or **What an uninstall deletes**. |
+| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn off**, **Turn on** or **What an uninstall deletes**. **Show Nonprofit Modules** is greyed out. |
 | 4 | Open **Automation**. | "You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission." **Pause all automation**, **Resume automation**, **How long** and every switch are disabled. |
-| 5 | Open **General** and look for **Custom metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
+| 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
 **Cleanup:** None.
+
+## T-SET-14: Organization address
+
+**Purpose:** confirm the address is one grouped block laid out like a Salesforce address, that it may be blank, that four parts are required once any is filled, and that receipts and letters print it.
+**Prerequisites:** admin user; the Organization address is blank (or note what it holds).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Organization**. | After **Organization legal name**, an **Organization Address** block shows **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then **Country**. No box is marked required while the whole address is blank. There is no separate row for each part. |
+| 2 | Type `Springfield` in **City**. | **Street**, **City**, **State** and **Zip Code** are now marked required. **Street 2** and **Country** are not. |
+| 3 | Click **Save address**. | The page shows "Fill in the address parts marked required, or clear the whole address." and nothing is saved. |
+| 4 | Fill **Street** `14 Bridge Street`, **State** `IL`, **Zip Code** `62701`. Leave **Street 2** and **Country** blank. Click **Save address**, then open **General**. | "Organization address saved." On **General**, **Recent Changes** lists the four parts. |
+| 5 | Reload and open **Organization**. | The four parts you saved are in their boxes. |
+| 6 | Clear **Zip Code** and click **Save address**. | A required-part message appears and the saved address is unchanged after a reload. |
+| 7 | Search the console for `zip`, and click the **Organization zip code** result. | The console opens **Organization** and focuses the **Organization Address** block, not a separate row. |
+| 8 | As read-only (T-SET-13), open **Organization**. | The address boxes are greyed out and there is no **Save address** button. |
+| 9 | Open **BarnCRM Settings**, **Organization** and clear all six boxes. Click **Save address**. | "Organization address saved." A blank address is allowed. |
+| 10 | Enter a Street 2 `Suite 3` and the four required parts again and save. Issue a receipt (see [Giving receipts and acknowledgments](giving-receipts-and-acknowledgments.md)) or make a volunteer hours letter, and open the document. | The receipt letterhead shows the address as `14 Bridge Street`, `Suite 3`, `Springfield, IL 62701` on separate lines. A letter using `{OrganizationAddress}` shows `14 Bridge Street, Suite 3, Springfield, IL 62701` on one line. |
+
+**Cleanup:** restore the address you noted in the prerequisites (or clear it) and save.
+
+## T-SET-15: Values that come from Setup
+
+**Purpose:** confirm the organization name and the fiscal year start month are shown read only from Setup, never edited in BarnCRM, and follow a change made in Setup.
+**Prerequisites:** admin user. Note the org's name and fiscal year start month in **Setup, Company Settings, Company Information** before you start.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings** and click **Organization**. | The first row is **Organization name**, showing the org's name exactly as Company Information shows it. It cannot be typed in. Its description says to change it in **Setup, Company Settings, Company Information**. **Organization legal name** is the next row, directly below it, and can be edited. |
+| 2 | Hover over the help icon next to **Organization name**. | "Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy." |
+| 3 | Click **General**. | A **Fiscal year start month** row shows the month the fiscal year starts in Setup, by name (for example **January**). It cannot be changed here, and its description says to change it in **Setup, Company Settings, Fiscal Year**, then recalculate rollups. There is no month list to choose from. |
+| 4 | Change **Organization legal name** and click **Save**, then click **General**. | Saved. **Recent Changes** lists the legal name only; **Organization name** never appears there. |
+| 5 | In Setup, open **Company Information**, click **Edit**, add ` Test` to the end of **Organization Name** and save. Reload **BarnCRM Settings**, **Organization**. | **Organization name** shows the new name. |
+| 6 | Sign in as the staff user and open **BarnCRM Settings**, **Organization**. | **Organization name** shows the same value, read only. |
+
+**Cleanup:** In Setup, **Company Information**, set **Organization Name** back to what it was. Set **Organization legal name** back if you changed it in step 4.
+
+## T-SET-16: Integrations page
+
+**Purpose:** confirm the Integrations roadmap page, that alternatives to a BarnCRM module appear only when installed, and the request links.
+**Prerequisites:** admin user. No Volunteers for Salesforce, Program Management Module or Outbound Funds Module installed in the test org (the usual case).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | An introduction says the page is a roadmap, In Progress means planned and not built, and nothing listed is integrated with BarnCRM yet. |
+| 2 | Read the headings. | **Complementary Apps** and **In Development**. There is no **Alternatives to BarnCRM Modules** heading, and no empty group. |
+| 3 | Read one product's row. | Its name, **In Progress**, **Not installed**, a description, who maintains it, **Cost and license**, **Compatibility with BarnCRM** with a note, and **Learn more**. The Summit Events App row also has **Install**, and its note says it is not yet tested and mentions the Salesforce Site and guest user. |
+| 4 | Click **Learn more** on any row. | The product's page opens in a new tab. A screen reader reads "(opens in a new tab)" after the link name. |
+| 5 | Read the last section, **Request an Integration**. | "Tell us what you need; requests shape the roadmap," says nothing is promised, and has **Request an integration**, **Propose an integration for your product** and **How an integration is built**. |
+| 6 | Click **Request an integration**. | The GitHub form **Integration request** opens in a new tab with product name, link, what it does and how you use it. Close it without submitting. |
+| 7 | Click **Propose an integration for your product**. | The GitHub form **Integration proposal from a solution provider** opens in a new tab and asks for a role only, not a name or email. Close it without submitting. |
+| 8 | In Setup, open **Custom Metadata Types**, **Integration App**, **Manage Integration App**, and edit **Volunteers for Salesforce (V4S)**: set **Show Only When Installed** off. Save, then click **Check again** on the page. | **Alternatives to BarnCRM Modules** appears with **Volunteers for Salesforce (V4S)**, **Not installed**, and its note says to use one or the other, not both, and that BarnCRM may offer a migration path in a future release. |
+| 9 | Set **Show Only When Installed** back on, save and click **Check again**. | The **Alternatives to BarnCRM Modules** heading is gone again. |
+| 10 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
+
+**Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.

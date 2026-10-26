@@ -64,7 +64,7 @@ keeps households is installed.
 
 1. Maria opens the **BarnCRM** app, clicks the **BarnCRM Settings** tab, and chooses
    **Health** in the left navigation.
-2. Health Check runs. The first card is **What we found in your org**.
+2. Health Check runs. The first card is **What We Found in Your Org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
 4. Below the card there is a finding titled **Coexistence mode is not confirmed yet**, with
    the button **Use recommended mode**.

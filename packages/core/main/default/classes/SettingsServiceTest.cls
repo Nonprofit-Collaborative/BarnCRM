@@ -927,4 +927,258 @@ private class SettingsServiceTest {
             Assert.areEqual('', SettingsService.asText(null), 'Unset reads as empty');
         }
     }
+
+    private static final List<String> ADDRESS_KEYS = new List<String>{
+        'Organization_Street__c',
+        'Organization_Street_2__c',
+        'Organization_City__c',
+        'Organization_State__c',
+        'Organization_Postal_Code__c',
+        'Organization_Country__c'
+    };
+
+    private static void stubAddressDefinitions() {
+        List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+        for (String key : ADDRESS_KEYS) {
+            rows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = key.removeEnd('__c'),
+                    MasterLabel = key,
+                    Setting_Key__c = key,
+                    Section__c = SettingSections.ORGANIZATION,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Text'
+                )
+            );
+        }
+        SettingDefinitionSelector.stubbedRows = rows;
+    }
+
+    private static Map<String, Object> completeAddress() {
+        return new Map<String, Object>{
+            'Organization_Street__c' => '14 Bridge Street',
+            'Organization_City__c' => 'Springfield',
+            'Organization_State__c' => 'IL',
+            'Organization_Postal_Code__c' => '62701'
+        };
+    }
+
+    @IsTest
+    static void aCompleteAddressIsSavedWithStreetTwoAndCountryLeftBlank() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            SettingsService.saveValues(completeAddress());
+            Test.stopTest();
+
+            Assert.areEqual(
+                '14 Bridge Street',
+                SettingsService.getValue('Organization_Street__c'),
+                'The street is saved'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Organization_Street_2__c,
+                'Street 2 stays optional'
+            );
+            Assert.areEqual(4, SettingChangeSelector.getRecent(10).size(), 'One change per part');
+        }
+    }
+
+    @IsTest
+    static void anAddressMayBeLeftEntirelyBlank() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            Map<String, Object> blanks = new Map<String, Object>();
+            for (String key : ADDRESS_KEYS) {
+                blanks.put(key, '');
+            }
+
+            Test.startTest();
+            SettingsService.saveValues(blanks);
+            Test.stopTest();
+
+            Assert.isNull(
+                SettingsService.getValue('Organization_City__c'),
+                'A blank address is a valid answer'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPartialAddressIsRefusedNamingWhatIsMissingAndNothingIsSaved() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            String refusal = refusalOf('Organization_City__c', 'Springfield');
+            Test.stopTest();
+
+            Assert.isNotNull(refusal, 'A city alone is not an address');
+            Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_Street), 'Street');
+            Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_State), 'State');
+            Assert.isTrue(
+                refusal.contains(System.Label.Core_OrganizationAddress_PostalCode),
+                'Zip Code'
+            );
+            Assert.isNull(
+                SettingsService.getValue('Organization_City__c'),
+                'A refused save writes nothing'
+            );
+            Assert.isTrue(SettingChangeSelector.getRecent(10).isEmpty(), 'And records no change');
+        }
+    }
+
+    @IsTest
+    static void clearingARequiredPartOfASavedAddressIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            SettingsService.saveValues(completeAddress());
+
+            Test.startTest();
+            String refusal = refusalOf('Organization_Postal_Code__c', '');
+            Test.stopTest();
+
+            Assert.isNotNull(refusal, 'The rest of the address is still there, so Zip is needed');
+            Assert.areEqual(
+                '62701',
+                SettingsService.getValue('Organization_Postal_Code__c'),
+                'The saved Zip Code is unchanged'
+            );
+        }
+    }
+
+    @IsTest
+    static void aStreetTwoOrCountryAloneIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            String street2Only = refusalOf('Organization_Street_2__c', 'Suite 3');
+            String countryOnly = refusalOf('Organization_Country__c', 'USA');
+            Test.stopTest();
+
+            Assert.isNotNull(street2Only, 'Street 2 is optional but is not an address by itself');
+            Assert.isNotNull(countryOnly, 'Neither is Country');
+        }
+    }
+
+    @IsTest
+    static void savingAnotherSettingNeverChecksTheAddress() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+
+            Test.startTest();
+            String refusal = refusalOf(TEXT_KEY, 'The {LastName} Clan');
+            Test.stopTest();
+
+            Assert.isNull(refusal, 'A save that leaves the address alone is not held to the rule');
+        }
+    }
+
+    @IsTest
+    static void anUnsavedPicklistAndNumberShowTheirDeclaredDefault() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
+
+            Assert.areEqual(
+                'Daily',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'A picklist nobody has saved shows the choice the org is running on'
+            );
+            Assert.areEqual(
+                5,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Stale_Record_Years__c',
+                    'Number'
+                ),
+                'And so does a number'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Reading the default writes nothing'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'And audits nothing.');
+        }
+    }
+
+    @IsTest
+    static void aSavedValueWinsOverTheDefault() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
+            settings.Error_Digest_Frequency__c = 'Weekly';
+            TestDataFactory.saveSettings(settings);
+
+            Assert.areEqual(
+                'Weekly',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Error_Digest_Frequency__c',
+                    'Picklist'
+                ),
+                'What the administrator chose is shown, not the default'
+            );
+        }
+    }
+
+    @IsTest
+    static void coexistenceModeShowsTheRecommendedModeButStoresNothing() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    'Coexistence_Mode__c',
+                    'Picklist'
+                ),
+                'An org nobody has confirmed is shown the mode detection recommends'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Showing it stores nothing, so the mode stays unconfirmed'
+            );
+            Assert.isTrue(
+                String.isBlank(SettingsService.getSettings().Coexistence_Mode__c),
+                'The stored value stays blank'
+            );
+        }
+    }
+
+    @IsTest
+    static void theMembershipModeIsLeftAsStored() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isTrue(
+                String.isBlank(
+                    (String) SettingsService.getEffectiveValue(
+                        SettingsService.CORE_SETTINGS_OBJECT,
+                        'Household_Membership_Mode__c',
+                        'Picklist'
+                    )
+                ),
+                'Its default is decided on its own branch, so this shows what is stored'
+            );
+        }
+    }
+
+    @IsTest
+    static void aFreeTextRowShowsItsShippedPattern() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'The {LastName} Family',
+                SettingsService.getEffectiveValue(
+                    SettingsService.CORE_SETTINGS_OBJECT,
+                    TEXT_KEY,
+                    'Text'
+                ),
+                'A pattern nobody has set shows the one the household names are built from'
+            );
+        }
+    }
 }

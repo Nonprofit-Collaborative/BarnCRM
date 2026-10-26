@@ -139,6 +139,18 @@
                                 ></lightning-checkbox-group>
                             </template>
 
+                            <template lwc:elseif={row.isSetupValue}>
+                                <lightning-input
+                                    type="text"
+                                    label={row.label}
+                                    value={row.value}
+                                    read-only
+                                    field-level-help={labels.fromSetupHelp}
+                                    data-key={row.key}
+                                    data-kind="SetupValue"
+                                ></lightning-input>
+                            </template>
+
                             <template lwc:elseif={row.isComponent}>
                                 <h3
                                     class="slds-text-heading_small slds-var-m-bottom_x-small"
@@ -150,12 +162,14 @@
                                 <template lwc:if={row.ctor}>
                                     <lwc:component
                                         lwc:is={row.ctor}
+                                        data-panel
                                         onfeatureturnedon={handleFeatureTurnedOn}
+                                        onsettingssaved={handleSettingsSaved}
                                     ></lwc:component>
                                 </template>
                                 <template lwc:elseif={row.navigatesAway}>
                                     <lightning-button
-                                        label={labels.openSection}
+                                        label={row.openLabel}
                                         data-target={row.navigationTarget}
                                         onclick={handleOpenSection}
                                     ></lightning-button>
@@ -210,7 +224,7 @@
                 </div>
             </div>
 
-            <div class="slds-var-m-top_large">
+            <div lwc:if={showRecentChanges} class="slds-var-m-top_large">
                 <h2 class="slds-text-heading_small" id="settings-recent-changes">
                     {labels.recentHeading}
                 </h2>

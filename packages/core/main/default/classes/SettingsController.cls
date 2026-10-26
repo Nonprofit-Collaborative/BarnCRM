@@ -9,12 +9,12 @@ public with sharing class SettingsController {
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
+    /** A value Setup holds, shown read only and never saved (ADR-0135). */
+    private static final String TYPE_SETUP_VALUE = 'SetupValue';
     private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
     /** The module a Setting Definition row belongs to when it names none. */
     private static final String CORE_MODULE = 'Core';
     /** The Setup prerequisites the console can check, by the key settingsSetupNotes reads. */
-    @TestVisible
-    private static final String CHECK_FISCAL_YEAR = 'fiscalYear';
     @TestVisible
     private static final String CHECK_EMAIL = 'emailDeliverability';
 
@@ -64,6 +64,9 @@ public with sharing class SettingsController {
         public String component;
         @AuraEnabled
         public String navigationTarget;
+        /** The name of the page the target opens, for the button's label. */
+        @AuraEnabled
+        public String navigationLabel;
         @AuraEnabled
         public String helpUrl;
         @AuraEnabled
@@ -165,6 +168,21 @@ public with sharing class SettingsController {
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw asAuraException(System.Label.Core_Settings_SaveErrorMessage);
+        }
+    }
+
+    /**
+     * The saved organization address, one entry per part keyed by its settings field name, for
+     * the address block in the console (a Component row). Saving goes through `saveSettings`.
+     * Not cacheable, for the reason `getConsoleModel` is not.
+     */
+    @AuraEnabled
+    public static Map<String, String> getOrganizationAddress() {
+        try {
+            return OrganizationAddress.savedParts();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
         }
     }
 
@@ -411,10 +429,14 @@ public with sharing class SettingsController {
             return null;
         }
         Boolean isComponent = TYPE_COMPONENT.equalsIgnoreCase(definition.Data_Type__c);
+        Boolean isSetupValue = TYPE_SETUP_VALUE.equalsIgnoreCase(definition.Data_Type__c);
         String settingsObject = String.isBlank(definition.Settings_Object__c)
             ? SettingsService.CORE_SETTINGS_OBJECT
             : definition.Settings_Object__c.trim();
-        if (!isComponent && !SettingsService.hasKey(settingsObject, definition.Setting_Key__c)) {
+        Boolean exists = isSetupValue
+            ? SetupValueSelector.supports(settingsObject, definition.Setting_Key__c)
+            : isComponent || SettingsService.hasKey(settingsObject, definition.Setting_Key__c);
+        if (!exists) {
             return null;
         }
         SettingModel setting = new SettingModel();
@@ -431,6 +453,7 @@ public with sharing class SettingsController {
         setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;
+        setting.navigationLabel = definition.Navigation_Label__c;
         setting.helpUrl = String.isBlank(definition.Help_Path__c)
             ? null
             : HELP_BASE + definition.Help_Path__c;
@@ -445,8 +468,25 @@ public with sharing class SettingsController {
             setting.checked = false;
             return setting;
         }
-        Object value = SettingsService.getValue(settingsObject, definition.Setting_Key__c);
+        if (isSetupValue) {
+            // Shown, never saved: Setup holds it and BarnCRM keeps no copy (ADR-0135).
+            setting.value = SetupValueSelector.valueOf(settingsObject, definition.Setting_Key__c);
+            setting.checked = false;
+            return setting;
+        }
+        Object value = SettingsService.getEffectiveValue(
+            settingsObject,
+            definition.Setting_Key__c,
+            definition.Data_Type__c
+        );
         setting.value = SettingsService.asText(value);
+        if (isMembershipMode(settingsObject, definition.Setting_Key__c)) {
+            // Blank means nobody has chosen yet, and every reader treats it as the simple way,
+            // so the console shows that way as selected. Showing it is not saving it: the
+            // stored value stays blank, which is what lets detection still propose the
+            // flexible way for an org with Person Accounts or Nonprofit Cloud.
+            setting.value = SettingsService.householdMembershipMode();
+        }
         setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
         return setting;
     }
@@ -510,6 +550,11 @@ public with sharing class SettingsController {
             CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
     }
 
+    private static Boolean isMembershipMode(String settingsObject, String key) {
+        return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            CoexistenceService.KEY_MEMBERSHIP_MODE.equalsIgnoreCase(key);
+    }
+
     /**
      * The coexistence options this org is offered: a mode named after another Salesforce
      * product appears only where that product is detected, or where it is already saved
@@ -529,23 +574,12 @@ public with sharing class SettingsController {
     /**
      * Whether each Setup prerequisite a console section can check is already met: true or
      * false, and absent when it could not be read, so the note shows its instruction only.
-     * Reads only what every user can read (the org's fiscal year, whether the org may send
-     * email) and changes nothing. Not cacheable: an admin fixes Setup, then reloads.
+     * Reads only what every user can read (whether the org may send email) and changes
+     * nothing. Not cacheable: an admin fixes Setup, then reloads.
      */
     @AuraEnabled
     public static Map<String, Boolean> getSetupChecks() {
         Map<String, Boolean> checks = new Map<String, Boolean>();
-        try {
-            Integer orgMonth = FiscalYearSelector.orgFiscalYearStartMonth();
-            if (orgMonth != null) {
-                checks.put(
-                    CHECK_FISCAL_YEAR,
-                    orgMonth == FiscalYearSelector.settingsFiscalYearStartMonth()
-                );
-            }
-        } catch (Exception unreadable) {
-            checks.remove(CHECK_FISCAL_YEAR);
-        }
         Boolean emailAllowed = orgMaySendEmail();
         if (emailAllowed != null) {
             checks.put(CHECK_EMAIL, emailAllowed);

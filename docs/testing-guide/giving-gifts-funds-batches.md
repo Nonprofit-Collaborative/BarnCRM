@@ -2,7 +2,7 @@
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first. Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
 ## T-GIFT-01: Funds and the default fund
 
@@ -11,8 +11,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Funds** tab, list view **All Funds**. | The 8 sample funds show, from **General Fund** to **Memorial Fund**. |
-| 2 | Open **General Fund**, click **Edit**, tick **Is Default**, and save. | Saved. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
+| 1 | Open the **Funds** tab, list view **All Funds**. | The 8 sample funds show, from **General Fund** to **Memorial Fund**. On an org that started with no funds there is also the org's own starting **General Fund** (T-GIFT-14), so two rows are named General Fund; the sample one has accounting code 4000. |
+| 2 | Open the sample **General Fund**, click **Edit**, tick **Is Default**, and save. | Saved. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
 | 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
@@ -215,5 +215,36 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | As read-only, open the **Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft credits** panel's **Add credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
+
+**Cleanup:** none.
+
+## T-GIFT-14: A new org starts with a default fund
+
+**Purpose:** a freshly deployed Giving org already has one default fund, so the first gift works without any setup.
+**Prerequisites:** a new org deployed with `scripts/org/deploy-packages.sh` (default settings) or installed as packages, with no fund created by hand and no sample data loaded. Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Funds** tab, list view **All Funds**. | Exactly one fund: **General Fund**, **Active** ticked, **Restricted** and **Accounting Code** empty, **Is Default** ticked. |
+| 2 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows **General Fund**, not blank. |
+| 3 | Open the **Home** tab and the Setup Assistant step **Pick your default fund and appeal**. | The fund picker shows **General Fund** already chosen. |
+| 4 | Enter a gift for any person without choosing a fund. | It saves, with one allocation for the whole amount to **General Fund**. |
+| 5 | Rename the fund to `Annual Giving` and untick **Is Default**. Run the deploy script (or reinstall the package) again. | No second **General Fund** appears. **All Funds** still shows one fund, named `Annual Giving`, and the Default Fund setting is blank. |
+| 6 | On a different org that already has a fund of your own, run the deploy script (or reinstall the package). | No fund is added and the Default Fund setting is not changed. |
+
+**Cleanup:** none (or delete the gift from step 4 and the fund).
+
+## T-GIFT-13: List views for gifts, funds, appeals, donor levels and batches
+
+**Purpose:** each giving object opens with an All view and the status views an admin expects.
+**Prerequisites:** staff user, sample data loaded (the Inactive views are empty until you switch something off).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Gifts** tab and the list view menu. | **All Gifts**, **My Gifts**, **Pending Gifts**, **Gifts to Acknowledge** and **Refunds and Write-offs** are listed. |
+| 2 | Enter a gift as yourself, then choose **My Gifts**. | The new gift shows. Gifts the sample loader created do not, unless you own them. |
+| 3 | Open the **Funds** tab. | **All Funds**, **Active Funds** and **Inactive Funds** are listed. Untick **Active** on a sample fund that has no gifts: it moves to **Inactive Funds** and leaves **Active Funds**. Tick it again. |
+| 4 | Open **Appeals** and **Donor Levels** and open each list view menu. | **All Appeals**, **Active Appeals**, **Inactive Appeals**; **All Donor Levels**, **Active Donor Levels**, **Inactive Donor Levels**. |
+| 5 | Open **Gift Batches**. | **All Gift Batches**, **Open Batches** and **My Gift Batches** are listed. A batch you create shows in **My Gift Batches**. |
 
 **Cleanup:** none.

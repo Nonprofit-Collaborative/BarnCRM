@@ -252,6 +252,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings search: heading above the result list</shortDescription>
-        <value>Search results</value>
+        <value>Search Results</value>
     </labels>
 </CustomLabels>

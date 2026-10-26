@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Show_Only_When_Installed__c</fullName>
+  <description>When ticked, the product is listed only in an org where it is installed, so BarnCRM mentions a product that matches one of its own modules only to someone who already has it.</description>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Show Only When Installed</label>
+  <type>Checkbox</type>
+</CustomField>

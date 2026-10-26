@@ -95,7 +95,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Data Manager** and no **Org Optimizer** tab. |
-| 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra permissions**, give the staff user **BarnCRM Find and Export** with **Give permission**, and confirm. | A message says the staff user now has the permission. |
+| 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give permission**, and confirm. | A message says the staff user now has the permission. |
 | 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two cards: **Find and export records** and **Tidy and check your data**. |
 | 4 | Look for **Import mappings**, **Data jobs** and **Salesforce's own tools**. | None of them is shown. |
 | 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third card, **Change many records**, appears, and **Data jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
@@ -129,7 +129,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Create an Account with record type **Household**, named `Empty Test Household`, and add nobody. | The household saves. |
 | 2 | On **Org Optimizer**, **Data quality**, click **Recount**. | **Households with nobody in them** has gone up by 1. |
 | 3 | Open it in Find. | `Empty Test Household` is in the list. |
-| 4 | In **BarnCRM Settings**, **General**, set **Years before a person is not changed** to `25` and click **Save**. | Nothing is saved: the value is marked and the page says **A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.** (or the server message **Years before a person is not changed takes a number from 1 to 20, so nothing was saved. Change it and save again.**). |
+| 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Years before a person is not changed** to `25` and click **Save**. | Nothing is saved: the value is marked and the page says **A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.** (or the server message **Years before a person is not changed takes a number from 1 to 20, so nothing was saved. Change it and save again.**). |
 | 5 | Set it to `3`, save, then **Recount** on **Data quality**. | **Your settings are saved.** The last check now reads **People not changed in 3 years**. |
 
 **Cleanup:** Set the years back to `5`. Keep `Empty Test Household` if you run T-HC-05 next; otherwise delete it.

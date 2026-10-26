@@ -1,0 +1,22 @@
+<template>
+    <c-organization-address
+        values={values}
+        disabled={isReadOnly}
+        onpartchange={handlePartChange}
+    ></c-organization-address>
+
+    <template lwc:if={message}>
+        <p class={messageClass} role="status" aria-live="polite">{message}</p>
+    </template>
+
+    <template lwc:if={canEdit}>
+        <lightning-button
+            class="slds-var-m-top_small"
+            variant="brand"
+            label={labels.save}
+            data-id="save-address"
+            disabled={saveDisabled}
+            onclick={handleSave}
+        ></lightning-button>
+    </template>
+</template>

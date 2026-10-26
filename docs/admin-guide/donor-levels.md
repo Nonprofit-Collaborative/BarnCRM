@@ -55,7 +55,7 @@ announce: your fiscal year turning over, and a ladder you edited.
 
 ## A five-minute walkthrough
 
-Start with the sample data loaded (BarnCRM Settings, then Sample data).
+Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Donor levels**. The ladder is
    empty.
@@ -79,6 +79,10 @@ Start with the sample data loaded (BarnCRM Settings, then Sample data).
    once more. Total giving is back to 1200, **Donor level** reads `Sustainer` again, and
    **Previous donor level** reads `Leadership Circle`. The level always matches the total
    on the record, and the record still shows where the donor came from.
+
+## List views
+
+**Donor Levels** has **All Donor Levels**, **Active Donor Levels** and **Inactive Donor Levels**.
 
 ## Common mistakes
 

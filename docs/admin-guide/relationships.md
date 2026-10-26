@@ -117,6 +117,16 @@ from the sample data.
 
 That is the whole feature: enter one side, get both, and never clean up after yourself.
 
+## List views and what ships ready to use
+
+The **Relationships** tab opens with four list views: **All Relationships**, **Current
+Relationships**, **Former Relationships** (with the end date) and **My Relationships** (the
+ones you created). Pick one from the list view menu at the top left.
+
+The 11 relationship types in the table above ship with BarnCRM as custom metadata
+(Relationship Type), so a new org can add relationships straight away, with no sample data.
+Relationships between people are not shipped, because they describe your own people.
+
 ## Common mistakes
 
 **Reading the type from the wrong side.** The type says what the **other person** is in

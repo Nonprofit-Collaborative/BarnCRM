@@ -187,8 +187,13 @@ anything else is refused, so a default can never point at the wrong kind of reco
 install Giving after finishing setup, this step appears as **To do** the next time you open
 the home page.
 
-**What Maria sees:** her General Fund and her Unsolicited appeal in the pickers. She picks
-both and clicks **Save**.
+A new org already has a **General Fund**, created at install and set as the default, so the
+fund picker opens with **General Fund** chosen and the step counts as done once you reach
+it. Change it only if another fund should catch undesignated gifts. If the org already had
+funds or a default when Giving was installed, nothing is chosen for you.
+
+**What Maria sees:** her General Fund, already chosen, and her Unsolicited appeal in the
+pickers. She picks the appeal and clicks **Save**.
 
 **What she decides:** where a gift goes when nobody says.
 
@@ -224,7 +229,12 @@ allows: settings change how the whole org behaves.
 This is the form the "before you start" list was for. Core asks for two things:
 
 - **Legal name**, exactly as on your official filings, not your nickname.
-- **Address**, on one line, as you want it printed.
+- **Organization address**, as you want it printed, in one block laid out like a Salesforce
+  address: **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then
+  **Country**. You can leave the whole address blank. Once you fill in any part, **Street**,
+  **City**, **State** and **Zip Code** are required and are marked as required; **Street 2**
+  and **Country** are optional. If a required part is missing when you click **Save**, the
+  step tells you which and saves nothing.
 
 With the Giving module installed, the same form also asks for what your receipts print:
 

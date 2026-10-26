@@ -15,8 +15,9 @@ and the section of this page that depends on it says so at the top (see "When a 
 needs a change in Setup" below).
 
 A module with an app of its own can also show its settings there, on their own: the
-**Rollup Settings** tab of the **BarnCRM Rollup Builder** app is this page showing only the
-Rollups settings. They are the same settings, so a change in either place shows in both.
+**Volunteer Settings** tab is this page showing only the Volunteers settings. They are the
+same settings, so a change in either place shows in both. The Rollup Builder module has no
+settings tab: its settings are in the **Rollups** section of this page.
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.
@@ -109,7 +110,7 @@ to the people who should see them, shows its settings, and starts its automation
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
 | Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
-| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
+| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the default address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
@@ -140,8 +141,8 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
 - A module that is not installed shows **Not installed** with **Install**, which opens
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
-  Rollup Builder and Volunteers have a Settings tab in their app, and their settings live
-  there; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  Volunteers has a Settings tab in its app, and the Rollup Builder's settings are in the
+  **Rollups** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
@@ -159,9 +160,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    opens with the **Setup checklist**.
 2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
-   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
-   Error Log, Access, Import, and Health. You only see the ones that have something in them,
-   and a feature that is off hides its sections: Giving and
+   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Volunteers,
+   Automation, Error Log, Access, Import, Org Optimizer, Integrations, and Health. You only see
+   the ones that have something in them, and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
@@ -173,7 +174,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Every setting whose name, description, or section mentions greeting is listed, which
    includes the household formal and informal greeting settings.
 4. Click the result **Formal greeting pattern**. The console jumps to the Households
-   section and to the **Preview and recompute** panel. The three household naming
+   section and to the **Preview and Recompute** panel. The three household naming
    patterns (household name, formal greeting, informal greeting) are edited only in that
    panel, not as separate rows, so the panel is where the search result takes you. The
    panel's own text explains the patterns; the household naming page of this admin guide
@@ -184,7 +185,8 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    immediately: the next contact you add gets the new greeting, with no waiting and no
    cache to clear. The settings console's own **Save** button is for the other settings in
    the section, such as whether people who have died stay in the household name.
-6. Scroll to **Recent changes** at the bottom of the page. Your change is the first row,
+6. Open the **General** section and scroll to **Recent Changes** at the bottom of the page.
+   It shows on **General** only, whichever section the change was made in. Your change is the first row,
    showing the setting by the name you see on this page, the old value, the new value, your
    name, and the time. Nothing is ever changed silently: one row is written per setting you
    actually changed, and saving a page without changing anything writes nothing. Ticking or
@@ -195,6 +197,26 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    administrator for the Manage BarnCRM Settings permission." Every control is greyed
    out and there is no Save button. He can still read every description and follow every
    Learn more link.
+
+## Your organization's address
+
+The **Organization** section shows your mailing address as one **Organization Address**
+block, laid out like a Salesforce address: **Street**, **Street 2**, then **City**, **State**
+and **Zip Code** on one row, then **Country**. Like the household naming patterns, the block
+has its own **Save address** button, and its changes appear in **Recent Changes** on the
+**General** page.
+
+- You can leave the whole address blank.
+- Once you fill in any part, **Street**, **City**, **State** and **Zip Code** are required and
+  are marked as required. **Street 2** and **Country** stay optional.
+- If you save with a required part missing, BarnCRM keeps what was saved before and tells you
+  what is missing: "The organization address is incomplete. Add City, Zip Code, or clear every
+  part of the address."
+
+Receipts print the address as one line per part, with City, State and Zip Code together on one
+line. In a letter's body, the `{{OrganizationAddress}}` token (receipts) and
+`{OrganizationAddress}` token (volunteer letters) put the whole address on one line, with the
+parts separated by commas.
 
 ## You never type an identifier
 
@@ -207,10 +229,34 @@ at something, you choose it:
 - **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
-- **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
+- **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
+
+Every setting shows its default until you change it. A dropdown, a number or a text setting
+that has not been saved yet shows the value BarnCRM is already using (for example **Default
+rollup mode** shows **Both (recommended)** on a new org, and **Household name pattern** shows
+the shipped pattern), not an empty box. Opening the page saves nothing. **Coexistence mode**
+shows the mode BarnCRM detects as right for your org, and stays unconfirmed until you choose
+one and save. Settings that point at a record (such as a default fund), a list of record
+types, or a date have no default to show and stay empty until you choose.
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
+
+## Values that come from Setup
+
+A few things BarnCRM needs are already held by Salesforce Setup. BarnCRM shows them on this
+page, read only, and keeps no copy that could drift from Setup. Each one says where in Setup it
+is changed; after you change it there, reload this page to see the new value.
+
+| Section | Shown | Where to change it |
+|---|---|---|
+| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Setup, Company Settings, Fiscal Year |
+| Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Setup, Company Settings, Company Information |
+
+BarnCRM follows the standard fiscal year: each year starts on the first day of the start month.
+If your org uses a custom fiscal year, Health Check says so, because reports then follow your
+custom periods while BarnCRM totals stay in whole years (see
+[Health Check](health-check.md#what-health-check-looks-at)).
 
 ## When a section needs a change in Setup
 
@@ -220,8 +266,7 @@ one, a note at the top of the section says, before any setting:
 
 - **what** to change in Setup,
 - **why** BarnCRM needs it, in one sentence,
-- **where** it is, as a path in plain words, for example "Setup, Company Settings, Fiscal
-  Year".
+- **where** it is, as a path in plain words, for example "Setup, Apex Settings".
 
 Where BarnCRM can read the answer without any extra permission, the note also says whether it
 is already done: **Done** with a green tick, or **Not done yet** with a warning icon. Otherwise
@@ -230,12 +275,11 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 
 | Section | What to change in Setup | Checked by BarnCRM |
 |---|---|---|
-| General | Make the Setup fiscal year start in the same month as **Fiscal year start month** (Setup, Company Settings, Fiscal Year) | Yes |
-| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra permissions | No |
-| Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
+| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | No |
+| Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
+| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra Permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra Permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
@@ -249,7 +293,7 @@ form at the top of that page:
 | Giving, Acknowledgments | Allow the org to send email (Setup, Deliverability, Access level: All email) | Yes |
 | Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
 | Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
-| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra permissions | No |
+| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra Permissions | No |
 | Giving, Campaign sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
 | Giving, Opportunity mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
 | Giving, Accounting export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
@@ -261,11 +305,11 @@ form at the top of that page:
   exact permission to ask for: Manage BarnCRM Settings.
 - **Editing values and leaving the page without saving.** The console does not save as you
   type. Changed settings are held until you click **Save**, and leaving the page discards
-  them. If you are not sure whether a change went in, check **Recent changes**.
+  them. If you are not sure whether a change went in, check **Recent Changes** on **General**.
 - **Worrying that two people saving at once undo each other.** They do not. A save writes
   only the settings you changed, compared with what is stored at that moment, so a setting
   someone else saved after you opened the page is kept. If you both changed the same
-  setting, the later save wins, and **Recent changes** shows both, each with the value it
+  setting, the later save wins, and **Recent Changes** (on **General**) shows both, each with the value it
   replaced.
 - **Wondering whether a nightly job or another page changed your settings.** A job saves only
   its own run details (when it ran and what it did), and a page such as Accounting Periods
@@ -297,7 +341,7 @@ changes.
 | What you see | Where it is stored |
 |---|---|
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
-| A row in Recent changes | Setting Change: setting name, old value, new value, changed by, changed at |
+| A row in Recent Changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
 | Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked; empty, on an org upgraded from before features existed, means all on) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |

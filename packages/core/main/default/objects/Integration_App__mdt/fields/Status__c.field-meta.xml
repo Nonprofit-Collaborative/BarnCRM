@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <description>Where BarnCRM's integration with the product stands: InProgress (planned, not built) or Available. A blank or unknown value is shown as In Progress.</description>
+  <defaultValue>&quot;InProgress&quot;</defaultValue>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Status</label>
+  <length>40</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

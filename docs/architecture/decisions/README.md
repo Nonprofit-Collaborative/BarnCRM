@@ -33,7 +33,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0022](0022-rollup-status-filter-includes-reversed-gifts.md) | Packaged giving rollups include reversed gifts, and count gifts rather than transactions | Accepted |
 | [0023](0023-refunded-gifts-keep-their-soft-credits.md) | A refunded gift keeps its soft credits, and the negative gift reverses them | Accepted |
 | [0024](0024-receipt-lock-survives-the-automation-switch.md) | The receipt lock survives the automation switch, and lifting it is a deliberate act in Setup | Accepted |
-| [0025](0025-retention-reports-read-the-org-fiscal-year.md) | Retention reports read the org fiscal year, and the two fiscal years have to agree | Accepted |
+| [0025](0025-retention-reports-read-the-org-fiscal-year.md) | Retention reports read the org fiscal year, and the two fiscal years have to agree | Accepted; superseded in part by ADR-0135 (BarnCRM uses the org fiscal year) |
 | [0026](0026-retention-report-definitions.md) | What the retention reports count, and the one attribute they needed | Accepted |
 | [0027](0027-seasonal-address-swap-runs-in-system-mode.md) | The seasonal address swap runs in system mode, gated at the controller | Accepted |
 | [0028](0028-donor-levels-read-a-rollup-and-follow-the-total-down.md) | A donor level labels an existing rollup, and follows that total down | Accepted |
@@ -143,6 +143,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0132](0132-modules-list-their-permission-sets-on-the-access-page.md) | A module lists its permission sets on the Access page by shipping Access Add-On rows | Accepted |
 | [0133](0133-related-record-matching.md) | Duplicates are also matched through values on related records | Accepted (owner approved the feature) |
 | [0134](0134-household-merge-runs-in-system-mode.md) | A household merge runs in system mode once BarnCRM has authorized it | Accepted (owner decision) |
+| [0135](0135-barncrm-uses-the-org-fiscal-year.md) | BarnCRM uses the org fiscal year, and shows Setup values read only (supersedes ADR-0025 in part) | Accepted (owner decision, 2026-10-26) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

@@ -61,11 +61,13 @@ coordinators and admins, and **Volunteer Letter Templates** and **Volunteer Sett
 admins only.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
-**All Jobs** and **Active Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
+**All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
 from today with places left) and **Past Shifts Still Open** (shifts that ended more than 7 days ago and
 are still Open); **All Hours** and **Awaiting Approval**; **All Requirements** and
-**Not Current**; **All Skills** and **Active Skills**; and **All Sign-ups** (on the **Volunteer
-Sign-ups** tab, after Shifts). Pick one from the list view menu at the top left.
+**Not Current**; **All Skills**, **Active Skills** and **Inactive Skills**; **All Volunteer Letter
+Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates**; and
+**All Sign-ups** (on the **Volunteer Sign-ups** tab, after Shifts). Pick one from the list view
+menu at the top left.
 
 ## Roles and permission sets
 
@@ -299,7 +301,7 @@ made:
 
 | Token | Filled with |
 |---|---|
-| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings |
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas) |
 | `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
 | `{Hours}` | Their approved hours in the period |
 | `{JobList}` | A list of each job with its hours in the period |
@@ -424,7 +426,8 @@ approved again.
 | Volunteer shift | Total Hours | Approved hours on the shift. |
 | Volunteer shift | Slots Filled | Sign-ups that are not Cancelled. Slots Remaining is Volunteers Needed less this. |
 
-The fiscal year follows the fiscal year start month in **BarnCRM Settings**. A total moves when
+The fiscal year is your org's fiscal year in Setup (shown read only in **BarnCRM Settings**,
+**General**). A total moves when
 the hours or sign-up is saved, by anyone who saves it (a total is read only for every role, so
 nobody types one), and the nightly run checks every total again.
 

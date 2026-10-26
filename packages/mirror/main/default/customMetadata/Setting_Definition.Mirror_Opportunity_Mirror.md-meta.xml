@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">Opportunity_Mirror</value>
     </values>
     <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Opportunity Mirror</value>
+    </values>
+    <values>
         <field>Sort_Order__c</field>
         <value xsi:type="xsd:double">96</value>
     </values>

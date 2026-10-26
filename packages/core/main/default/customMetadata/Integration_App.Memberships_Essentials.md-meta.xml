@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Memberships Essentials</label>
+  <protected>false</protected>
+  <values>
+    <field>Category__c</field>
+    <value xsi:type="xsd:string">InDevelopment</value>
+  </values>
+  <values>
+    <field>Status__c</field>
+    <value xsi:type="xsd:string">InProgress</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Membership management from the Open Source Commons community (the Commons Project: Memberships), itself still pre-release. BarnCRM would look at an integration once the app is ready.</value>
+  </values>
+  <values>
+    <field>Maintainer__c</field>
+    <value xsi:type="xsd:string">Open Source Commons community</value>
+  </values>
+  <values>
+    <field>License_Cost__c</field>
+    <value xsi:type="xsd:string">Free, BSD-3-Clause license</value>
+  </values>
+  <values>
+    <field>Link_Url__c</field>
+    <value xsi:type="xsd:string">https://github.com/SFDO-Community-Sprints/Membership-Essentials-App</value>
+  </values>
+  <values>
+    <field>Install_Url__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Detection_Objects__c</field>
+    <value xsi:type="xsd:string">Membership__c</value>
+  </values>
+  <values>
+    <field>Related_Module__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Compatibility__c</field>
+    <value xsi:type="xsd:string">Planned, not built, and not yet tested by BarnCRM. The app is pre-release and installs from source only. It needs Opportunities and Products, so it will not run on a Platform-only org. It books dues as Opportunities, so those amounts would not be in BarnCRM Giving totals, and it adds its own Contact trigger.</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">10</value>
+  </values>
+</CustomMetadata>

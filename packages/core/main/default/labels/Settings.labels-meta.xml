@@ -49,6 +49,14 @@
         <value>This part of the settings comes with a module that is not installed here yet. Turn that module on and it appears in this section.</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_FromSetupHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: help on a read-only value that Salesforce Setup holds</shortDescription>
+        <value>Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy.</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_DiscardButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -153,6 +161,14 @@
         <value>Open this page</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_OpenNamedButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: button that opens a module's own page; {0} is the page name</shortDescription>
+        <value>Open {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_PermissionRequiredError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -182,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: heading above the audit list</shortDescription>
-        <value>Recent changes</value>
+        <value>Recent Changes</value>
     </labels>
     <labels>
         <fullName>Core_Settings_SaveButton</fullName>

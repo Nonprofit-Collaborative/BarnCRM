@@ -14,11 +14,18 @@ fund reporting stays complete even when David is entering checks quickly at an e
 
 Funds arrive with the Giving module. There is nothing to install separately.
 
+A new org arrives with one fund, **General Fund**: active, unrestricted, with no accounting
+code, and already the default, so the first gift has somewhere to go. It is created only when
+the org has no fund at all and no default fund set. An org that already has a fund, or has
+chosen a default, is left exactly as it is, and an upgrade never brings the fund back if you
+rename, deactivate or delete it. Rename it, give it an accounting code, or add your own funds
+at any time.
+
 1. Open the **Funds** tab.
-2. Create the funds your organization actually uses. Most organizations start with two or
-   three. You can add more at any time.
-3. On the fund that should catch undesignated gifts, tick **Is Default**. Only one fund can
-   be the default: ticking it on a second fund clears it on the first.
+2. Create the other funds your organization actually uses. Most organizations start with two
+   or three. You can add more at any time.
+3. To change which fund catches undesignated gifts, tick **Is Default** on that fund. Only one
+   fund can be the default: ticking it on a second fund clears it on the first.
 4. Open **BarnCRM Settings**, choose **Giving**, and confirm **Default fund** shows the
    fund you just marked. Setting it in either place keeps the other in step.
 
@@ -28,11 +35,12 @@ No Salesforce Setup step is needed.
 
 You are David, and you are setting up funds before your first gift entry session.
 
-1. Open the **Funds** tab and click **New**.
-2. Name the fund `General` and leave **Restricted** unticked, because unrestricted money is
-   money the board can spend on anything.
-3. Tick **Active** if it is not already ticked, tick **Is Default**, and save.
-4. You now see the fund's page with **Total Raised**, **Total Raised This Year**, **Gift
+1. Open the **Funds** tab. **General Fund** is already there, ticked **Active** and **Is
+   Default**, and not **Restricted**, because unrestricted money is money the board can spend
+   on anything. (If your org already had funds, it is not added: click **New**, name a fund
+   `General Fund`, tick **Active** and **Is Default**, and save.)
+2. Open **General Fund**.
+3. You see the fund's page with **Total Raised**, **Total Raised This Year**, **Gift
    Count** and **Last Gift Date** all empty. BarnCRM calculates these, so they are shown
    as read only.
 5. Click **New** again and create a second fund named `Scholarship`, this time ticking
@@ -45,6 +53,11 @@ You are David, and you are setting up funds before your first gift entry session
    Raised** shows the gift and **Rollups Last Calculated** shows when the number was worked
    out.
 
+## List views
+
+**Funds** has **All Funds**, **Active Funds** and **Inactive Funds**. Only the starting
+**General Fund** ships; every other fund, and its accounting code, is your decision.
+
 ## Common mistakes
 
 - **No fund is marked as the default.** A gift entered without a designation then fails to
@@ -56,7 +69,7 @@ You are David, and you are setting up funds before your first gift entry session
 - **Two funds that mean the same thing.** "General" and "General Fund" split your reporting
   in half. Pick one, move any allocations, then deactivate the other.
 - **Expecting an import to move Total Raised the instant it finishes.** A gift saved by a
-  person updates its funds' totals a few seconds after the save (see "Just after the save, or
+  person updates its funds' totals a few seconds after the save (see "After the save, or
   during it" in [Rollups](rollups.md)), and the totals from an import or other bulk change
   catch up within minutes. **Rollups Last Calculated** on the fund
   tells you when the number was worked out, so you always know whether you are looking at a

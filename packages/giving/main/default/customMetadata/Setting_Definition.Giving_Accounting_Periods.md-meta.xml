@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">Giving_Accounting_Periods</value>
     </values>
     <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Accounting Periods</value>
+    </values>
+    <values>
         <field>Sort_Order__c</field>
         <value xsi:type="xsd:double">58</value>
     </values>

@@ -233,10 +233,35 @@ private class SetupAssistantServiceTest {
                 stepByKey(steps, 'modules').completionRule,
                 'A step with no setting behind it finishes when Maria finishes it'
             );
+            SetupAssistantService.Step identity = stepByKey(steps, 'identity');
             Assert.areEqual(
-                2,
-                stepByKey(steps, 'identity').fields.size(),
-                'On Core alone the organization step asks for the legal name and the address'
+                7,
+                identity.fields.size(),
+                'On Core alone the organization step asks for the legal name and the six address parts'
+            );
+            Assert.areEqual(
+                SetupAssistantService.FIELD_ADDRESS,
+                identity.fields[1].fieldType,
+                'The address parts follow the legal name'
+            );
+            Assert.areEqual(
+                new List<String>{
+                    'Organization_Street__c',
+                    'Organization_Street_2__c',
+                    'Organization_City__c',
+                    'Organization_State__c',
+                    'Organization_Postal_Code__c',
+                    'Organization_Country__c'
+                },
+                new List<String>{
+                    identity.fields[1].key,
+                    identity.fields[2].key,
+                    identity.fields[3].key,
+                    identity.fields[4].key,
+                    identity.fields[5].key,
+                    identity.fields[6].key
+                },
+                'In the order a Salesforce address reads'
             );
         }
     }
@@ -289,7 +314,11 @@ private class SetupAssistantServiceTest {
                 identity.label,
                 'A contribution with no label keeps the Core one'
             );
-            Assert.areEqual(3, identity.fields.size(), 'Core\'s two fields and the module\'s one');
+            Assert.areEqual(
+                8,
+                identity.fields.size(),
+                'Core\'s legal name and six address parts, and the module\'s one'
+            );
             Assert.areEqual(
                 SetupAssistantService.FIELD_NAVIGATE,
                 identity.fields[1].fieldType,

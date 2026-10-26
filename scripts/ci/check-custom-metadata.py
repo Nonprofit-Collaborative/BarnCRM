@@ -58,6 +58,7 @@ VALUE_FOR = (
     )
 )
 CONSOLE = "packages/core/main/default/lwc/settingsConsole/settingsConsole.js"
+SETUP_VALUE_SELECTOR = "packages/core/main/default/classes/SetupValueSelector.cls"
 CONSOLE_CASE = re.compile(r"case '([A-Za-z0-9_]+)':")
 SECTIONS = "packages/core/main/default/classes/SettingSections.cls"
 SECTION_CONSTANT = re.compile(r"public static final String [A-Z_]+ = '([^']+)';")
@@ -146,6 +147,7 @@ def check_setting_rows(problems):
     """
     objects = settings_objects()
     sections = known_sections()
+    setup_values = set(re.findall(r"KEY_\w+ = '(\w+)'", open(SETUP_VALUE_SELECTOR).read()))
     for record in sorted(glob.glob(SETTING_DEFINITIONS)):
         text = open(record, encoding="utf-8").read()
         section = value_of(text, "Section__c")
@@ -155,6 +157,16 @@ def check_setting_rows(problems):
                 "name, so no setup step can send anybody to it"
             )
         if value_of(text, "Data_Type__c") == "Component":
+            continue
+        if value_of(text, "Data_Type__c") == "SetupValue":
+            # A value Setup holds, shown read only (ADR-0135). The console shows only the keys
+            # SetupValueSelector lists and silently leaves any other row out, so check it here.
+            key = value_of(text, "Setting_Key__c")
+            if value_of(text, "Settings_Object__c") != "Organization" or key not in setup_values:
+                problems.append(
+                    f"{record}: is a SetupValue row naming Organization.{key}, which "
+                    "SetupValueSelector does not show, so the console would leave it out"
+                )
             continue
         if value_of(text, "Data_Type__c") == "Number" and not (
             value_of(text, "Min_Value__c") and value_of(text, "Max_Value__c")

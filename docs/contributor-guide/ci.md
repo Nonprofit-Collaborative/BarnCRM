@@ -466,6 +466,43 @@ only, and selects nothing for a change to an object, a flow, a permission set or
 of which a Core test can fail on. Use the relevant run while a branch is moving and the full
 run on the head you intend to merge.
 
+**The light run, for screen-only changes.** `scripts/org/run-org-tests.sh <alias> --light` (or
+`ORG_TESTS_MODE=light`) is the lighter check the owner approved on 2026-10-26 for a change that
+touches only screens, labels or docs, so it does not need the full run of about 3,600 tests. It
+posts the same required status, `Org tests (local)`, but its description starts "Light gate:" and
+reads "no Apex-affecting changes; deploy and Jest passed", so a reviewer can tell it from a
+"Full run:". Before any deploy it lists the files changed since the merge base with
+`origin/main` (`RELEVANT_BASE` to change it) and refuses, with exit 1 and no status, unless every
+one is on the allow-list. It then does the same staged deploy the full run does (a real deploy,
+no Apex test, so the org ends in the same state) and runs `npx jest --silent` for the whole
+repo. It posts success only when both pass, and failure otherwise. It needs `node_modules`
+(`npm ci`).
+
+The allow-list is `LIGHT_ALLOWED_PATTERNS` in the script, in one place, with the reason for each
+entry beside it. Each is a path that cannot change an Apex test result:
+
+- `packages/*/main/default/lwc/**` and `aura/**` (browser-side bundles; Jest covers the LWC ones)
+- `packages/*/main/default/labels/**` (a test fails on a label only if it asserts the label's text)
+- `packages/*/main/default/flexipages/**` and `contentassets/**`
+- `packages/*/test/jest-mocks/**`
+- `docs/**` and any `*.md`
+- `.github/ISSUE_TEMPLATE/**`
+
+Everything else needs the full run: classes, triggers, objects and fields, permission sets and
+groups, custom metadata, flows, layouts, tabs, applications, scripts, config and
+`sfdx-project.json`. Static resources stay off the list because Apex reads `SampleData` and
+`GivingSampleData`. A mixed change is refused, and the refusal prints the paths that need the
+full run.
+
+**Every landing batch gets a full run before merge.** The light run is for a single screen-only
+branch. A combined pull request (a landing batch of several branches) is always gated with the
+full run on its head, even when each branch in it passed the light run, because the batch is
+what reaches `main`.
+
+`bash scripts/org/run-org-tests.sh --light-selfcheck` runs the allow-list against sample path
+lists with no org and no GitHub (the `Static checks` job runs it through
+`scripts/ci/tests/test_run_org_tests_light.py`). Run it after changing the list.
+
 Three rules make the status worth trusting:
 
 - **It belongs to one commit.** A new push has no status, so the pull request is blocked
@@ -663,7 +700,7 @@ stage the script runs
 post-install script and would otherwise leave the org without the rollup definitions a real
 install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
 tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
-for the nightly sync. Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
+for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs `FundDefaultsService.installDefaultFundDuringInstall()`, which creates the starting General Fund and makes it the default when the org has no fund and no default fund set. Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
 which gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125 D2). Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.

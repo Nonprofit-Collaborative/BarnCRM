@@ -144,4 +144,28 @@
         <shortDescription>Module Manager: the reader cannot switch modules</shortDescription>
         <value>You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
     </labels>
+    <labels>
+        <fullName>Core_ModuleManager_NonprofitTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: heading of the section for nonprofit modules</shortDescription>
+        <value>Nonprofit Modules</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_ShowNonprofit</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: checkbox that shows or hides the nonprofit modules</shortDescription>
+        <value>Show Nonprofit Modules</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_NonprofitHidden</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: installed nonprofit modules are hidden; {0} is how many</shortDescription>
+        <value>Installed nonprofit modules hidden: {0}</value>
+    </labels>
 </CustomLabels>

@@ -390,6 +390,47 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
+    static void aModuleIsNonprofitOnlyWhenItsEditionsLeaveOutTheStandardEdition() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = false;
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', null, 10),
+                catalogRow('Events', 'Community; Impact', null, 5),
+                catalogRow('Mailings', 'impact', null, 6),
+                catalogRow('Everywhere', 'Community', null, 7)
+            };
+            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+
+            Test.startTest();
+            Map<String, ModuleDetectionService.ModuleInfo> modules = byName();
+            // A Standard-only module is not listed while the Nonprofit Edition is chosen, so it is
+            // checked on its row.
+            Boolean standardOnly = ModuleDetectionService.isNonprofitOnly(
+                catalogRow('Everywhere', 'Community', null, 7)
+            );
+            Boolean blank = ModuleDetectionService.isNonprofitOnly(catalogRow('X', null, null, 1));
+            Boolean missing = ModuleDetectionService.isNonprofitOnly(null);
+            Test.stopTest();
+
+            Assert.isFalse(modules.get('Core').nonprofitOnly, 'Core is offered by every edition');
+            Assert.isTrue(modules.get('Giving').nonprofitOnly, 'Only the Nonprofit Edition');
+            Assert.isTrue(
+                modules.get('Mailings').nonprofitOnly,
+                'The edition value is not case sensitive'
+            );
+            Assert.isFalse(modules.get('Events').nonprofitOnly, 'Both editions offer it');
+            Assert.isFalse(
+                modules.containsKey('Everywhere'),
+                'Not offered by the Nonprofit Edition'
+            );
+            Assert.isFalse(standardOnly, 'The Standard Edition offers it');
+            Assert.isFalse(blank, 'A row that names no edition is not nonprofit only');
+            Assert.isFalse(missing, 'No row is not nonprofit only');
+        }
+    }
+
+    @IsTest
     static void aModuleBothEditionsOfferNeedsOnlyACatalogRow() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();

@@ -127,20 +127,27 @@ button. Clearing the **Active** box is the durable way to say no to a total: an 
 rollup stays inactive across every upgrade, and the values it has already calculated stay
 on the records.
 
-Three settings in **BarnCRM Settings** change how every rollup behaves: the first is in the
-**General** section, the other two in the **Rollups** section. The **Rollup Settings** tab of
-the **BarnCRM Rollup Builder** app shows the same two Rollups settings on their own.
+Two settings in the **Rollups** section of **BarnCRM Settings** change how every rollup
+behaves. The Rollup Builder module has no settings tab of its own: open **BarnCRM Settings**
+and choose **Rollups**.
 
-- **Fiscal year start month** decides where "this year", "last year", and "two years ago"
-  begin. Choose the month your fiscal year starts from the list. Changing it and clicking
-  **Recalculate all** corrects every year based total in **Every night** or **Both** mode,
-  which is every year based total the Builder saves (see
-  [What the Builder will not save](#what-the-builder-will-not-save)).
+Where "this year", "last year" and "two years ago" begin is not a BarnCRM setting: it is your
+org's fiscal year in Salesforce Setup (**Setup, Company Settings, Fiscal Year**), the same one
+every Salesforce report uses. The **General** section of **BarnCRM Settings** shows it, read
+only, as **Fiscal year start month**. After changing it in Setup, click **Recalculate all** to
+correct every year based total in **Every night** or **Both** mode, which is every year based
+total the Builder saves (see [What the Builder will not save](#what-the-builder-will-not-save)).
+BarnCRM follows the standard fiscal year: each year starts on the first day of the start
+month. If your org uses a custom fiscal year, see
+[Health Check](health-check.md#what-health-check-looks-at).
+
 - **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
   **Every night**, or **Both (recommended)**. The next section says what each one means.
 - **When instant totals are calculated** decides when a save updates the totals in
-  **Instantly** and **Both** mode. See [Just after the save, or during
-  it](#just-after-the-save-or-during-it) below.
+  **Instantly** and **Both** mode. See [After the save, or during
+  it](#after-the-save-or-during-it) below. A fresh org shows **Both (recommended)** and
+  **After the save (recommended)** here: they are the settings in use even before anyone has
+  saved this section, and the fields are never left empty.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollup Builder page still opens and still shows every total and its last calculated
@@ -165,11 +172,11 @@ A save recalculates only the totals its change can move. Saving a soft credit re
 soft credit totals on that person and household, not their gift or pledge totals, and an
 **Every night** total waits for the nightly run even when a record it counts is saved.
 
-### Just after the save, or during it
+### After the save, or during it
 
 **When instant totals are calculated** has two choices:
 
-- **Just after the save (recommended)**, the default. The save notes which households,
+- **After the save (recommended)**, the default. The save notes which households,
   people, organizations, appeals, funds and pledges it changed, and returns. BarnCRM
   recalculates them in the background a few seconds later, usually within a minute. Every
   save stays fast, and a save can never fail because the rollups ran out of room: with the
@@ -276,7 +283,8 @@ What to know about them:
 ## The Rollup Builder
 
 Rollups are their own module, **BarnCRM Rollup Builder**, with a console app of the same name
-and two tabs: **Rollup Builder** and **Rollup Settings**.
+and one tab, **Rollup Builder**. Its settings are in the **Rollups** section of **BarnCRM
+Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
@@ -304,10 +312,9 @@ Warning from `RollupQueue.announceReady`. To have them catch up within minutes, 
 user **Rollup Builder User**. People with a BarnCRM role get it at install, at each **Turn
 on** and with each nightly run; until then the same wait applies to them.
 
-The **Rollup Settings** tab shows the module's own settings and nothing else: **Default rollup
-mode**, **When instant totals are calculated**, and the link to the Builder. They are the same
-settings as the **Rollups** section of **BarnCRM Settings**, so a change in either place shows
-in both. **Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
+The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
+rollup mode**, **When instant totals are calculated**, and a button that opens the Builder.
+The fiscal year is your org's, shown read only in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a
@@ -558,7 +565,7 @@ needs to be right the moment a record is saved, set it to **Instantly** or **Bot
 Both totals are recalculated a few seconds after the save, so the donor's page you are looking
 at may still show the old total. Refresh it a moment later. If your team needs the total in
 the save itself, change **When instant totals are calculated** to **During the save** (see
-[Just after the save, or during it](#just-after-the-save-or-during-it)).
+[After the save, or during it](#after-the-save-or-during-it)).
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before
@@ -600,9 +607,9 @@ numbers already calculated on the records.
 recalculation**, nothing recalculates overnight and the home page tile stays in warning. Nothing
 schedules it for you. The tile is the only warning you get, so act on it.
 
-**Changing the fiscal year start month and stopping there.** The year based totals are
-recalculated with the new fiscal year at the next run, not the moment you save the
-setting. After changing it, click **Recalculate all**, or wait for the nightly run.
+**Changing the fiscal year in Setup and stopping there.** The year based totals are
+recalculated with the new fiscal year at the next run, not the moment you save it in Setup.
+After changing it, click **Recalculate all**, or wait for the nightly run.
 
 ## Field reference
 

@@ -2,13 +2,12 @@
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <label>Fiscal year start month</label>
     <protected>true</protected>
-    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Fiscal_Year_Start_Month__c</value></values>
-    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">BarnCRM_Settings__c</value></values>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">FiscalYearStartMonth</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Organization</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">General</value></values>
-    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
-    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">1:January;2:February;3:March;4:April;5:May;6:June;7:July;8:August;9:September;10:October;11:November;12:December</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts. Totals for this year, last year, and two years ago are calculated from it.</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">SetupValue</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts, as Salesforce Setup holds it. Totals for this year, last year and two years ago, and reports by fiscal year, all follow it. To change it, open Setup, Company Settings, Fiscal Year, then recalculate rollups.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
-    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">barncrm-settings.md</value></values>
 </CustomMetadata>

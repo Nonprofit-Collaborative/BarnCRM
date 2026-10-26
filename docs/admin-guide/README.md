@@ -106,6 +106,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
+| Integrations roadmap page | [integrations.md](integrations.md) | Core |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
 | C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Giving) |

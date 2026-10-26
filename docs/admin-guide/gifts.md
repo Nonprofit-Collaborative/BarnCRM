@@ -30,7 +30,7 @@ Then give your fundraising staff the **Fundraising Staff** role on the Access pa
 includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only
 need to see gifts get **Giving Read Only**.
 
-Those two are given on the **Access** page in BarnCRM Settings, under Extra permissions,
+Those two are given on the **Access** page in BarnCRM Settings, under Extra Permissions,
 beside the person's role: the BarnCRM Admin and Read Only roles carry what Core provides and
 do not include a module's permission sets. The Module Manager also gives you **Giving
 Admin** when you turn Giving on there.
@@ -39,8 +39,9 @@ Admin** when you turn Giving on there.
 
 You are David, and a check from Maria's neighbour arrived this morning.
 
-1. Open the **Funds** tab, click **New**, name the fund `General`, tick **Is Default**, and
-   save.
+1. Open the **Funds** tab and check that **General Fund** is there with **Is Default** ticked.
+   A new org arrives with it; if your org already had funds, tick **Is Default** on the one
+   that should catch undesignated gifts.
 2. Open the **Appeals** tab, click **New**, name the appeal `Spring appeal`, and save.
 3. Open the **Gifts** tab and click **New**.
 4. In **Donor Contact**, choose a person who belongs to a household. Leave **Donor Account**
@@ -57,7 +58,7 @@ You are David, and a check from Maria's neighbour arrived this morning.
    one. Merging two households is different: the gifts of both come with the household you
    keep.
 8. Scroll to **Gift Allocations**. There is one allocation, for the whole 250, designated to
-   `General`. You never asked for it: a gift with no designation is allocated in full to the
+   `General Fund`. You never asked for it: a gift with no designation is allocated in full to the
    default fund, so no money is missing from fund reporting.
 9. Open that allocation and change its **Amount** to 100. The save is refused with "The
    allocations of this gift total 100.00, but the gift is 250.00. The difference is 150.00."
@@ -137,6 +138,11 @@ Severity `Warning` to see every override an org has ever made.
 when money went back (see [Refunds](refunds.md)), and correcting a receipt is the right
 answer when the document itself is wrong. The override is for the case where neither
 reaches the problem.
+
+## List views
+
+**Gifts** has **All Gifts**, **My Gifts** (the gifts you entered), **Pending Gifts**, **Gifts to
+Acknowledge** and **Refunds and Write-offs**.
 
 ## Common mistakes
 

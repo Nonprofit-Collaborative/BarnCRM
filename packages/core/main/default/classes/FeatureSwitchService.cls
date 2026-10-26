@@ -152,7 +152,11 @@ public with sharing class FeatureSwitchService {
                     }
                 )
                 .rows(
-                    new List<String>{ 'Contact_Address_Change_Behavior', 'Seasonal_Address_Job' }
+                    new List<String>{
+                        'Contact_Address_Change_Behavior',
+                        'Seasonal_Addresses',
+                        'Seasonal_Address_Job'
+                    }
                 ),
             new Item(RELATIONSHIPS, KIND_FEATURE)
                 .runs(new List<String>{ 'Relationship_Reciprocal' })

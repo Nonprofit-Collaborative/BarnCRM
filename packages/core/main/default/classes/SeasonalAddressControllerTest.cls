@@ -1,6 +1,7 @@
 /**
  * SeasonalAddressController: what the Addresses page of the settings console shows about the
- * nightly swap, and the two buttons that are the only way an administrator starts it.
+ * nightly swap, and the Run now button. The schedule itself follows the Seasonal Addresses
+ * switch (SeasonalAddressSwitchTest).
  *
  * The permission is the point of most of these. The run itself reads and writes in system mode
  * (ADR-0027), so the check here is where the authorization for that actually happens.
@@ -62,30 +63,6 @@ private class SeasonalAddressControllerTest {
         }
     }
 
-    @IsTest
-    static void anAdministratorCanScheduleAndStopTheNightlySwap() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            SeasonalAddressController.SwapView started = SeasonalAddressController.setSchedule(
-                true
-            );
-            SeasonalAddressController.SwapView stopped = SeasonalAddressController.setSchedule(
-                false
-            );
-            Test.stopTest();
-
-            Assert.isTrue(
-                started.scheduled,
-                'Choosing Schedule the nightly swap must actually schedule it, with no trip to Setup.'
-            );
-            Assert.isNotNull(
-                started.nextRunAt,
-                'A scheduled job shows the administrator when it will next run.'
-            );
-            Assert.isFalse(stopped.scheduled, 'And choosing Stop must actually stop it.');
-        }
-    }
-
     /** PEOPLE-37: the view asks about the job twice, not seven times. */
     @IsTest
     static void theViewOfAScheduledSwapCostsTwoQueries() {
@@ -130,37 +107,6 @@ private class SeasonalAddressControllerTest {
                 'Phoenix',
                 [SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
                 'A season covering the whole year is in season today, so Run now must swap it now.'
-            );
-        }
-    }
-
-    @IsTest
-    static void aUserWithoutThePermissionCannotChangeTheSchedule() {
-        System.runAs(TestUsers.admin()) {
-            // The org may already run the nightly swap; the test is about this user starting it.
-            TestDataFactory.clearScheduledJobs(
-                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
-            );
-            User reader = readOnlyUser();
-
-            Test.startTest();
-            System.runAs(reader) {
-                try {
-                    SeasonalAddressController.setSchedule(true);
-                    Assert.fail('Scheduling a nightly job must require Manage BarnCRM Settings.');
-                } catch (AuraHandledException expected) {
-                    Assert.areEqual(
-                        System.Label.Core_SeasonalAddress_PermissionRequired,
-                        expected.getMessage(),
-                        'The refusal must tell the reader which permission they need.'
-                    );
-                }
-            }
-            Test.stopTest();
-
-            Assert.isFalse(
-                SeasonalAddressScheduler.isScheduled(),
-                'The job must not have been scheduled by a user who cannot schedule it.'
             );
         }
     }

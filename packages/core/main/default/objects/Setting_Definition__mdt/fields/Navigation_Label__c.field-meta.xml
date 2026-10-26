@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Navigation_Label__c</fullName>
+  <description>
+    The name of the page Navigation Target opens, as its tab shows it. The settings console names
+    its button for it ("Open Rollup Builder"); blank falls back to "Open this page".
+  </description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Navigation Label</label>
+  <length>80</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

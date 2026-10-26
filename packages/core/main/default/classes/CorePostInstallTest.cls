@@ -176,6 +176,9 @@ private class CorePostInstallTest {
     static void everyRunSchedulesTheNightlyTabCheckOnce() {
         System.runAs(TestUsers.admin()) {
             CorePostInstall.scheduleTabCheckInTests = true;
+            // The org's own check, if an install already scheduled it, would be counted too.
+            TestDataFactory.clearScheduledJobs(new List<String>{ TabAccessScheduler.JOB_NAME });
+            ScheduledJobSelector.forget();
 
             new CorePostInstall().onInstall(new InstallBy(null, null, false));
             new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
@@ -260,6 +263,135 @@ private class CorePostInstallTest {
                 CorePostInstall.hasBeenSetUp(),
                 'Households mean the org is in use, so a source deploy is an upgrade there'
             );
+        }
+    }
+
+    /**
+     * An org already in use (its settings are saved) with the Seasonal Addresses switch and the
+     * nightly swap in the state the test names. The switch is written below the console's save,
+     * which would schedule the job itself.
+     */
+    private static void orgWithSeasonalState(Boolean switchedOn, Boolean jobScheduled) {
+        SettingsService.saveBookkeeping(
+            new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => false }
+        );
+        TestDataFactory.clearScheduledJobs(new List<String>{ SeasonalAddressScheduler.JOB_NAME });
+        ScheduledJobSelector.forget();
+        OrgSettingsSystemWriter.save(
+            new Map<Schema.SObjectField, Object>{
+                BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => switchedOn
+            }
+        );
+        SettingsService.clearCaches();
+        if (jobScheduled) {
+            SeasonalAddressScheduler.start();
+        }
+    }
+
+    private static Integer swapJobs() {
+        return [
+            SELECT COUNT()
+            FROM CronTrigger
+            WHERE CronJobDetail.Name = :SeasonalAddressScheduler.JOB_NAME
+        ];
+    }
+
+    private static Integer allApexJobs() {
+        return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.JobType = '7'];
+    }
+
+    @IsTest
+    static void aSourceDeployWithSeasonalAddressesOnSchedulesTheMissingNightlyJob() {
+        System.runAs(TestUsers.admin()) {
+            orgWithSeasonalState(true, false);
+            Integer before = allApexJobs();
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            Assert.areEqual(1, swapJobs(), 'The swap is scheduled once, however often this runs');
+            Assert.areEqual(
+                before + 1,
+                allApexJobs(),
+                'And it is the only job the seasonal step added'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSourceDeployWithSeasonalAddressesOffSchedulesNothing() {
+        System.runAs(TestUsers.admin()) {
+            orgWithSeasonalState(false, false);
+            Integer before = allApexJobs();
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                swapJobs(),
+                'An org that has not turned the swap on does not get it'
+            );
+            Assert.areEqual(before, allApexJobs(), 'No job was added');
+            SettingsService.clearCaches();
+            Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'And the switch stays off');
+        }
+    }
+
+    @IsTest
+    static void aNewInstallLeavesSeasonalAddressesOffAndUnscheduled() {
+        System.runAs(TestUsers.admin()) {
+            forgetSavedSettings();
+            TestDataFactory.clearScheduledJobs(
+                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
+            );
+            ScheduledJobSelector.forget();
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            SettingsService.clearCaches();
+            Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Off until an admin turns it on');
+            Assert.areEqual(0, swapJobs(), 'So nothing is scheduled');
+        }
+    }
+
+    @IsTest
+    static void anUpgradeTurnsTheSwitchOnForAnOrgThatAlreadyRunsTheSwap() {
+        System.runAs(TestUsers.admin()) {
+            orgWithSeasonalState(false, true);
+            CorePostInstall.adoptSeasonalScheduleInTests = true;
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            SettingsService.clearCaches();
+            Assert.isTrue(
+                SeasonalAddressScheduler.isEnabled(),
+                'The page says on because the job is running'
+            );
+            Assert.areEqual(1, swapJobs(), 'And the job that was running still is, once');
+        }
+    }
+
+    @IsTest
+    static void anUpgradeDoesNotTurnTheSwitchOnForAnOrgThatStoppedTheSwap() {
+        System.runAs(TestUsers.admin()) {
+            orgWithSeasonalState(false, false);
+            CorePostInstall.adoptSeasonalScheduleInTests = true;
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            SettingsService.clearCaches();
+            Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Nothing to adopt');
+            Assert.areEqual(0, swapJobs(), 'And nothing was scheduled');
         }
     }
 

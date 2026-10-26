@@ -133,6 +133,65 @@ private class SettingsControllerTest {
         }
     }
 
+    /** The shipped Org Optimizer thresholds sit in their own section, not under General. */
+    @IsTest
+    static void orgOptimizerSectionIsHiddenWhileTheFeatureIsOff() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.newInstall();
+
+            Test.startTest();
+            Map<String, Set<String>> shown = keysBySection(SettingsController.getConsoleModel());
+            Test.stopTest();
+
+            Assert.isFalse(
+                shown.containsKey(SettingSections.ORG_OPTIMIZER),
+                'The section is hidden while the Org Optimizer feature is off'
+            );
+            Assert.isFalse(
+                shown.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),
+                'The thresholds do not fall back to General'
+            );
+        }
+    }
+
+    @IsTest
+    static void orgOptimizerThresholdsHaveTheirOwnSectionWhileTheFeatureIsOn() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.newInstall();
+            FeatureSwitchService.turnOn(FeatureSwitchService.ORG_OPTIMIZER);
+
+            Test.startTest();
+            Map<String, Set<String>> after = keysBySection(SettingsController.getConsoleModel());
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{
+                    'Stale_Record_Years__c',
+                    'Unused_Login_Days__c',
+                    'Unused_Report_Days__c'
+                },
+                after.get(SettingSections.ORG_OPTIMIZER),
+                'The three thresholds are under Org Optimizer once the feature is on'
+            );
+            Assert.isFalse(
+                after.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),
+                'The thresholds no longer show under General'
+            );
+        }
+    }
+
+    private static Map<String, Set<String>> keysBySection(SettingsController.ConsoleModel model) {
+        Map<String, Set<String>> keys = new Map<String, Set<String>>();
+        for (SettingsController.SectionModel section : model.sections) {
+            Set<String> inSection = new Set<String>();
+            for (SettingsController.SettingModel setting : section.settings) {
+                inSection.add(setting.key);
+            }
+            keys.put(section.name, inSection);
+        }
+        return keys;
+    }
+
     private static User buildDavid() {
         return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'david');
     }
@@ -193,6 +252,37 @@ private class SettingsControllerTest {
                 byName.get(SettingSections.AUTOMATION).settings[0].component,
                 'A section another feature renders arrives as a component to load'
             );
+        }
+    }
+
+    /** The button for a row that opens another page names that page, so the row carries its name. */
+    @IsTest
+    static void aRowThatOpensAnotherPageCarriesThePageName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Opens_Another_Page',
+                    MasterLabel = 'Another page',
+                    Section__c = SettingSections.HOUSEHOLDS,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Component',
+                    Navigation_Target__c = 'Data_Hygiene',
+                    Navigation_Label__c = 'Org Optimizer',
+                    Sort_Order__c = 1
+                )
+            };
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            SettingsController.SettingModel row;
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    row = setting;
+                }
+            }
+            Assert.isNotNull(row, 'The row arrives');
+            Assert.areEqual('Data_Hygiene', row.navigationTarget, 'It names the tab it opens');
+            Assert.areEqual('Org Optimizer', row.navigationLabel, 'And the name of that page');
         }
     }
 
@@ -367,6 +457,126 @@ private class SettingsControllerTest {
         }
     }
 
+    private static void stubMembershipRows() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+            new Setting_Definition__mdt(
+                DeveloperName = 'Household_Membership_Mode',
+                MasterLabel = 'How people belong to a household',
+                Setting_Key__c = CoexistenceService.KEY_MEMBERSHIP_MODE,
+                Section__c = SettingSections.HOUSEHOLDS,
+                Module__c = 'Core',
+                Data_Type__c = 'Picklist',
+                Picklist_Values__c = 'Contact:One household per person (simple);Junction:A person can belong to more than one household (flexible)',
+                Sort_Order__c = 1
+            ),
+            new Setting_Definition__mdt(
+                DeveloperName = 'Household_Name_Pattern',
+                MasterLabel = 'Household name pattern',
+                Setting_Key__c = TEXT_KEY,
+                Section__c = SettingSections.HOUSEHOLDS,
+                Module__c = 'Core',
+                Data_Type__c = 'Text',
+                Sort_Order__c = 2
+            ),
+            // Detection saves the coexistence mode with the membership mode, and a save needs
+            // a row for every key it writes.
+            new Setting_Definition__mdt(
+                DeveloperName = 'Coexistence_Mode_Choice',
+                MasterLabel = 'How BarnCRM fits your org',
+                Setting_Key__c = CoexistenceService.KEY_COEXISTENCE_MODE,
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = 'Picklist',
+                Picklist_Values__c = 'Standalone:On its own;NPSP:Alongside NPSP;NonprofitCloud:Alongside Nonprofit Cloud',
+                Sort_Order__c = 1
+            )
+        };
+    }
+
+    private static String membershipValueShown() {
+        for (
+            SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
+        ) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                if (setting.key == CoexistenceService.KEY_MEMBERSHIP_MODE) {
+                    return setting.value;
+                }
+            }
+        }
+        return 'not shown';
+    }
+
+    @IsTest
+    static void aHouseholdChoiceNobodyHasMadeShowsOneHouseholdPerPersonSelected() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+            Test.startTest();
+            String shown = membershipValueShown();
+            Test.stopTest();
+
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                shown,
+                'A blank choice is shown as the simple way, never as an empty picklist'
+            );
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'Showing the default does not save it: blank still means not chosen yet'
+            );
+        }
+    }
+
+    @IsTest
+    static void savingAnUnrelatedSettingLeavesTheHouseholdChoiceOpenForDetection() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasPersonAccounts = true;
+            OrgShapeDetector.overrideShape = shape;
+
+            Test.startTest();
+            SettingsController.saveSettings(new Map<String, Object>{ TEXT_KEY => '{LastName}' });
+            Test.stopTest();
+
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'An unrelated save must not write the household choice'
+            );
+            CoexistenceService.applyRecommendedIfUnset();
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                CoexistenceService.getMembershipMode(),
+                'Detection still proposes the flexible way for an org with Person Accounts'
+            );
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                membershipValueShown(),
+                'And the console then shows the flexible way'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSavedHouseholdChoiceIsShownAsSaved() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    CoexistenceService.KEY_MEMBERSHIP_MODE => CoexistenceService.MEMBERSHIP_JUNCTION
+                }
+            );
+
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                membershipValueShown(),
+                'A choice somebody made is never replaced by the default'
+            );
+        }
+    }
+
     @IsTest
     static void savesWhatMariaChanged() {
         System.runAs(TestUsers.admin()) {
@@ -392,6 +602,87 @@ private class SettingsControllerTest {
                 1,
                 SettingsController.getRecentChanges(10).size(),
                 'Her change is on the recent changes list'
+            );
+        }
+    }
+
+    private static final List<String> ADDRESS_KEYS = new List<String>{
+        'Organization_Street__c',
+        'Organization_Street_2__c',
+        'Organization_City__c',
+        'Organization_State__c',
+        'Organization_Postal_Code__c',
+        'Organization_Country__c'
+    };
+
+    private static void stubAddressDefinitions() {
+        List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+        for (String key : ADDRESS_KEYS) {
+            rows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = key.removeEnd('__c'),
+                    MasterLabel = key,
+                    Setting_Key__c = key,
+                    Section__c = SettingSections.ORGANIZATION,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Text'
+                )
+            );
+        }
+        SettingDefinitionSelector.stubbedRows = rows;
+    }
+
+    @IsTest
+    static void savesTheOrganizationAddressAndReadsItBackByPart() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            SettingsController.saveSettings(
+                new Map<String, Object>{
+                    'Organization_Street__c' => '14 Bridge Street',
+                    'Organization_City__c' => 'Springfield',
+                    'Organization_State__c' => 'IL',
+                    'Organization_Postal_Code__c' => '62701'
+                }
+            );
+            Map<String, String> parts = SettingsController.getOrganizationAddress();
+            Test.stopTest();
+
+            Assert.areEqual('Springfield', parts.get('Organization_City__c'), 'The city she typed');
+            Assert.areEqual('', parts.get('Organization_Country__c'), 'Country stayed optional');
+            Assert.areEqual(6, parts.size(), 'Every part is answered, saved or not');
+        }
+    }
+
+    @IsTest
+    static void refusesAHalfFilledAddressWithAFriendlyMessageAndSavesNothing() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            String message;
+
+            Test.startTest();
+            try {
+                SettingsController.saveSettings(
+                    new Map<String, Object>{
+                        'Organization_Street__c' => '14 Bridge Street',
+                        'Organization_City__c' => 'Springfield'
+                    }
+                );
+            } catch (AuraHandledException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.isNotNull(message, 'A street and city alone are not an address');
+            Assert.isTrue(
+                message.contains(System.Label.Core_OrganizationAddress_PostalCode),
+                'The message names the missing Zip Code'
+            );
+            Assert.areEqual(
+                '',
+                SettingsController.getOrganizationAddress().get('Organization_Street__c'),
+                'Nothing was saved'
             );
         }
     }
@@ -586,38 +877,112 @@ private class SettingsControllerTest {
     @IsTest
     static void setupChecksSayWhetherEachPrerequisiteIsMet() {
         System.runAs(TestUsers.admin()) {
-            Integer barnMonth = FiscalYearSelector.settingsFiscalYearStartMonth();
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = barnMonth;
             SettingsController.emailAllowedOverride = true;
             Map<String, Boolean> met = SettingsController.getSetupChecks();
 
-            FiscalYearSelector.orgStartMonthOverride = Math.mod(barnMonth, 12) + 1;
             SettingsController.emailAllowedOverride = false;
             Map<String, Boolean> unmet = SettingsController.getSetupChecks();
 
-            Assert.isTrue(met.get(SettingsController.CHECK_FISCAL_YEAR), 'Same month is done');
             Assert.isTrue(met.get(SettingsController.CHECK_EMAIL), 'Email allowed is done');
-            Assert.isFalse(unmet.get(SettingsController.CHECK_FISCAL_YEAR), 'Months differ');
             Assert.isFalse(unmet.get(SettingsController.CHECK_EMAIL), 'Email blocked');
+            Assert.isFalse(
+                met.containsKey('fiscalYear'),
+                'BarnCRM keeps no fiscal year of its own (ADR-0135), so there is nothing to ' +
+                'compare with Setup and no fiscal year check'
+            );
         }
+    }
+
+    @IsTest
+    static void theConsoleShowsSetupValuesReadOnlyWhereTheyBelong() {
+        System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.setTestStartMonth(7);
+            SetupValueSelector.organizationNameOverride = 'Barn Rescue';
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            SettingsController.SettingModel fiscal = rowWithKey(
+                model,
+                'General',
+                'FiscalYearStartMonth'
+            );
+            Assert.isNotNull(fiscal, 'General shows the fiscal year start from Setup');
+            Assert.areEqual('SetupValue', fiscal.dataType, 'Shown read only, never edited here');
+            Assert.areEqual(FiscalYearSelector.monthName(7), fiscal.value, 'The org month by name');
+            Assert.areEqual('Organization', fiscal.settingsObject, 'It names Setup, not a setting');
+
+            List<SettingsController.SettingModel> organization = rowsOf(model, 'Organization');
+            Assert.areEqual('Name', organization[0].key, 'Organization name heads its section');
+            Assert.areEqual('SetupValue', organization[0].dataType, 'Read only, from Setup');
+            Assert.areEqual('Barn Rescue', organization[0].value, 'The name Setup holds');
+            Assert.areEqual(
+                'Organization_Legal_Name__c',
+                organization[1].key,
+                'The legal name sits directly below it'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSetupValueRowNamingAnUnknownValueIsLeftOut() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Unknown_Setup_Value',
+                    MasterLabel = 'Unknown',
+                    Setting_Key__c = 'Phone',
+                    Settings_Object__c = 'Organization',
+                    Section__c = 'General',
+                    Module__c = 'Core',
+                    Data_Type__c = 'SetupValue',
+                    Sort_Order__c = 1
+                )
+            };
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            Assert.isNull(
+                rowWithKey(model, 'General', 'Phone'),
+                'Only the values SetupValueSelector lists can be shown, so a row cannot be ' +
+                'pointed at an arbitrary field'
+            );
+        }
+    }
+
+    private static List<SettingsController.SettingModel> rowsOf(
+        SettingsController.ConsoleModel model,
+        String sectionName
+    ) {
+        for (SettingsController.SectionModel section : model.sections) {
+            if (section.name == sectionName) {
+                return section.settings;
+            }
+        }
+        return new List<SettingsController.SettingModel>();
+    }
+
+    private static SettingsController.SettingModel rowWithKey(
+        SettingsController.ConsoleModel model,
+        String sectionName,
+        String key
+    ) {
+        for (SettingsController.SettingModel setting : rowsOf(model, sectionName)) {
+            if (setting.key == key) {
+                return setting;
+            }
+        }
+        return null;
     }
 
     @IsTest
     static void aSetupCheckThatCannotBeReadIsLeftOut() {
         System.runAs(TestUsers.admin()) {
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = null;
             SettingsController.emailAllowedOverride = true;
             Map<String, Boolean> checks = SettingsController.getSetupChecks();
 
-            Assert.isFalse(
-                checks.containsKey(SettingsController.CHECK_FISCAL_YEAR),
-                'An unreadable fiscal year is no answer, so the note shows its instruction only'
-            );
             Assert.isTrue(
                 checks.containsKey(SettingsController.CHECK_EMAIL),
-                'The other check still answers'
+                'The email check answers'
             );
 
             SettingsController.emailAllowedOverride = null;
@@ -626,5 +991,110 @@ private class SettingsControllerTest {
                 'Asking this org itself whether it may send email never fails the page'
             );
         }
+    }
+
+    @IsTest
+    static void aSettingNobodyHasSavedShowsItsDefaultNotAnEmptyBox() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                effectiveDefaultRow('Test_Digest', 'Error_Digest_Frequency__c', 'Picklist'),
+                effectiveDefaultRow('Test_Stale', 'Stale_Record_Years__c', 'Number'),
+                effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text'),
+                optimizerRow(),
+                setupValueRow()
+            };
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            SetupValueSelector.organizationNameOverride = 'Barn Rescue';
+            Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'The org has never saved.');
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            Map<String, String> valueByKey = new Map<String, String>();
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    valueByKey.put(setting.key, setting.value);
+                }
+            }
+            Assert.areEqual('Daily', valueByKey.get('Error_Digest_Frequency__c'), 'Default shown');
+            Assert.areEqual('5', valueByKey.get('Stale_Record_Years__c'), 'Number default shown');
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                valueByKey.get('Household_Membership_Mode__c'),
+                'A blank household choice shows one household per person selected (#570), ' +
+                'not the empty value the effective default leaves it as'
+            );
+            Assert.isTrue(
+                String.isBlank(SettingsService.getSettings().Household_Membership_Mode__c),
+                'Showing it stores nothing, so detection may still propose the flexible way'
+            );
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                valueByKey.get('Coexistence_Mode__c'),
+                'The recommended coexistence mode is selected, not an empty box'
+            );
+            Assert.areEqual(
+                'The {LastName} Family',
+                valueByKey.get('Household_Name_Pattern__c'),
+                'A text setting shows its shipped pattern'
+            );
+            Assert.areEqual(
+                '90',
+                valueByKey.get('Unused_Login_Days__c'),
+                'An Org Optimizer threshold shows its default in its own section'
+            );
+            Assert.areEqual(
+                'Barn Rescue',
+                valueByKey.get('Name'),
+                'A value from Setup is read from Setup, never given a default of BarnCRM'
+            );
+            Assert.isNull(
+                BarnCRM_Settings__c.getOrgDefaults().Id,
+                'Opening the page saved nothing'
+            );
+        }
+    }
+
+    private static Setting_Definition__mdt optimizerRow() {
+        Setting_Definition__mdt row = effectiveDefaultRow(
+            'Test_Unused_Login',
+            'Unused_Login_Days__c',
+            'Number'
+        );
+        row.Section__c = SettingSections.ORG_OPTIMIZER;
+        return row;
+    }
+
+    private static Setting_Definition__mdt setupValueRow() {
+        return new Setting_Definition__mdt(
+            DeveloperName = 'Test_Organization_Name',
+            MasterLabel = 'Organization name',
+            Setting_Key__c = 'Name',
+            Settings_Object__c = 'Organization',
+            Section__c = SettingSections.ORGANIZATION,
+            Module__c = 'Core',
+            Data_Type__c = 'SetupValue',
+            Sort_Order__c = 1
+        );
+    }
+
+    private static Setting_Definition__mdt effectiveDefaultRow(
+        String developerName,
+        String key,
+        String dataType
+    ) {
+        return new Setting_Definition__mdt(
+            DeveloperName = developerName,
+            MasterLabel = developerName,
+            Setting_Key__c = key,
+            Section__c = SettingSections.GENERAL,
+            Module__c = 'Core',
+            Data_Type__c = dataType,
+            Picklist_Values__c = dataType == 'Picklist'
+                ? 'Daily:Daily;Weekly:Weekly;Contact:Contact;Junction:Junction;Standalone:Standalone'
+                : null,
+            Sort_Order__c = 1
+        );
     }
 }

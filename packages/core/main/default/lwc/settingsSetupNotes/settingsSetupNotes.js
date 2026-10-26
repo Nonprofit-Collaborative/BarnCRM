@@ -4,9 +4,6 @@ import HEADING from '@salesforce/label/c.Core_SetupNote_Heading';
 import WHERE from '@salesforce/label/c.Core_SetupNote_Where';
 import DONE from '@salesforce/label/c.Core_SetupNote_Done';
 import NOT_DONE from '@salesforce/label/c.Core_SetupNote_NotDone';
-import FISCAL_WHAT from '@salesforce/label/c.Core_SetupNote_FiscalYear_What';
-import FISCAL_WHY from '@salesforce/label/c.Core_SetupNote_FiscalYear_Why';
-import FISCAL_WHERE from '@salesforce/label/c.Core_SetupNote_FiscalYear_Where';
 import METADATA_WHAT from '@salesforce/label/c.Core_SetupNote_Metadata_What';
 import METADATA_WHY from '@salesforce/label/c.Core_SetupNote_Metadata_Why';
 import METADATA_WHERE from '@salesforce/label/c.Core_SetupNote_Metadata_Where';
@@ -29,16 +26,7 @@ import USERS_WHERE from '@salesforce/label/c.Core_SetupNote_Users_Where';
  * sections only: a module's notes go on the module's own settings page (ADR-0020).
  */
 const NOTES = {
-  general: [
-    {
-      key: 'fiscalYear',
-      what: FISCAL_WHAT,
-      why: FISCAL_WHY,
-      where: FISCAL_WHERE,
-      check: 'fiscalYear'
-    },
-    { key: 'metadata', what: METADATA_WHAT, why: METADATA_WHY, where: METADATA_WHERE }
-  ],
+  general: [{ key: 'metadata', what: METADATA_WHAT, why: METADATA_WHY, where: METADATA_WHERE }],
   households: [
     { key: 'duplicates', what: DUPLICATES_WHAT, why: DUPLICATES_WHY, where: DUPLICATES_WHERE }
   ],

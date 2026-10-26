@@ -23,6 +23,7 @@ public with sharing class ModuleManagerService {
     private static final String CORE = 'Core';
     private static final String TURNED_OFF_KEY = 'Modules_Turned_Off__c';
     private static final Integer TURNED_OFF_LENGTH = 255;
+    private static final String HIDE_NONPROFIT_KEY = 'Hide_Nonprofit_Modules__c';
 
     /** A count stops here, so no object is ever too big to count inside the query limits. */
     @TestVisible
@@ -124,6 +125,9 @@ public with sharing class ModuleManagerService {
         /** The modules to install before this one, by name shown, or null (ADR-0125 D3). */
         @AuraEnabled
         public String installFirst;
+        /** True when only the Nonprofit Edition offers it, so the page groups it under Nonprofit Modules. */
+        @AuraEnabled
+        public Boolean nonprofitOnly;
 
         @NamespaceAccessible
         public String getName() {
@@ -165,6 +169,7 @@ public with sharing class ModuleManagerService {
             row.installUrl = info.installUrl;
             row.appUrl = info.appUrl;
             row.installFirst = info.installFirst;
+            row.nonprofitOnly = info.nonprofitOnly == true;
             row.canSwitch = info.present == true && info.name != CORE;
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED
@@ -172,6 +177,25 @@ public with sharing class ModuleManagerService {
             rows.add(row);
         }
         return rows;
+    }
+
+    /**
+     * Whether the Module Manager lists the nonprofit modules. The stored field is the opposite
+     * sense, `Hide_Nonprofit_Modules__c`, so a settings row saved before the field existed, or a
+     * blank value, shows them: only a deliberate tick hides.
+     */
+    public static Boolean showNonprofitModules() {
+        return SettingsService.getSettings().Hide_Nonprofit_Modules__c != true;
+    }
+
+    /**
+     * Saves the Show Nonprofit Modules checkbox, org wide, as its opposite `Hide_Nonprofit_Modules__c`
+     * through the settings save path, which audits the change. It hides rows only: nothing is
+     * installed, removed or turned off. The caller checks Manage BarnCRM Settings
+     * (`ModuleManagerController`).
+     */
+    public static void setShowNonprofitModules(Boolean show) {
+        SettingsService.saveSystemValue(HIDE_NONPROFIT_KEY, show == false);
     }
 
     /**
