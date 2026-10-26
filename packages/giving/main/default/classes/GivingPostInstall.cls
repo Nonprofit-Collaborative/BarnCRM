@@ -1,7 +1,7 @@
 /**
  * What BarnCRM Giving does for itself at install and at every upgrade.
  *
- * Four things, all of them shipped defaults that an org is supposed to arrive with.
+ * Five things, all of them shipped defaults that an org is supposed to arrive with.
  *
  * One: create the Rollup Definitions this package ships, so that a fresh install has
  * the giving totals on donors, funds, appeals, commitments and installments rather than a
@@ -24,6 +24,12 @@
  * these template rows existed, so it could not add them; the work is Core's
  * `ImportTemplateService.materializeDefaultsDuringInstall`.
  *
+ * Five: create one active, unrestricted fund named by the `Giving_Fund_DefaultName` label and make
+ * it the default fund, so that a new org's first gift has somewhere to go. It does so only when
+ * the org has no fund at all and no default fund set, so an upgrade, or an org that has made its
+ * own choice, is left alone (`FundDefaultsService`). A source deploy runs no install handler, so
+ * `scripts/org/deploy-packages.sh` calls the same service.
+ *
  * Core cannot do this on Giving's behalf. Core installs first, and a package that is not
  * installed yet has no objects to describe, so `RollupService.ensureDefaults` correctly
  * skips every giving row when Core's own script runs (R-R6). Giving's script is the first
@@ -44,6 +50,7 @@ public with sharing class GivingPostInstall implements InstallHandler {
     private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
     private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
     private static final String IMPORT_CONTEXT = 'GivingPostInstall.ensureImportTemplates';
+    private static final String FUND_CONTEXT = 'GivingPostInstall.ensureDefaultFund';
 
     /**
      * Called by the platform after the package is installed or upgraded.
@@ -59,5 +66,6 @@ public with sharing class GivingPostInstall implements InstallHandler {
         ReceiptTemplateService.installDefaultsDuringInstall(TEMPLATE_CONTEXT);
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
+        FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
     }
 }

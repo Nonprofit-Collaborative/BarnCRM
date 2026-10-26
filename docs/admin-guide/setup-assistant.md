@@ -187,8 +187,13 @@ anything else is refused, so a default can never point at the wrong kind of reco
 install Giving after finishing setup, this step appears as **To do** the next time you open
 the home page.
 
-**What Maria sees:** her General Fund and her Unsolicited appeal in the pickers. She picks
-both and clicks **Save**.
+A new org already has a **General Fund**, created at install and set as the default, so the
+fund picker opens with **General Fund** chosen and the step counts as done once you reach
+it. Change it only if another fund should catch undesignated gifts. If the org already had
+funds or a default when Giving was installed, nothing is chosen for you.
+
+**What Maria sees:** her General Fund, already chosen, and her Unsolicited appeal in the
+pickers. She picks the appeal and clicks **Save**.
 
 **What she decides:** where a gift goes when nobody says.
 

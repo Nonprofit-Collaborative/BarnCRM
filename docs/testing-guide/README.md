@@ -48,7 +48,7 @@ page, even if that puts it out of reading order.
 | [Duplicates](duplicates.md) | DUP | 9 | Duplicate scan, review and merge, match sources |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
-| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 13 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
+| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 14 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
 | [Giving: commitments](giving-commitments.md) | COM | 10 | Pledges, recurring gifts, payments, nightly jobs |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |

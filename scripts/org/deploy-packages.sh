@@ -517,6 +517,20 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "The rollup definitions were not created. Nothing else is affected: the Restore shipped"
     echo "rollups button in the Rollup Builder runs exactly the same step."
   fi
+
+  # The same gap for Giving's starting fund: GivingPostInstall creates one General Fund and makes
+  # it the default when the org has no fund and no default fund set, and a deployment runs no
+  # post-install. It never touches an org that already has a fund or a default. Skipped with
+  # SOURCE_POST_INSTALL=0, because the Apex tests assume an org with no funds.
+  if [[ "$SOURCE_POST_INSTALL" == "1" ]]; then
+    echo ""
+    echo "== Creating the starting fund =="
+    if ! printf '%s\n' "FundDefaultsService.installDefaultFundDuringInstall('deploy-packages.sh');" |
+      sf apex run --target-org "$ALIAS"; then
+      echo "The starting fund was not created. Nothing else is affected: create a fund on the"
+      echo "Funds tab and tick Is Default."
+    fi
+  fi
 fi
 
 # The same gap for tabs: the five tool tabs live only in the BarnCRM_Tab_* permission sets, and
