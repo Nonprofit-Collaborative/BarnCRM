@@ -12,7 +12,7 @@ Administrators are contributors too. You do not need to write Apex to make this 
 
 ## Ways to help
 
-- **Open an issue.** Describe how your organization works, what is painful today in NPSP or Agentforce Nonprofit, and which Salesforce setup you are on. Concrete stories shape the roadmap more than feature requests do.
+- **Open an issue.** Use https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose and see [SUPPORT.md](SUPPORT.md) for the templates and what to include. Never post personal or donor data. Describe how your organization works, what is painful today in NPSP or Agentforce Nonprofit, and which Salesforce setup you are on. Concrete stories shape the roadmap more than feature requests do.
 - **Improve the docs.** The admin guide (`docs/admin-guide/`) is written for Maria, an operations manager with no technical background. If a page assumes knowledge she does not have, fix it or say so.
 - **Test on an org shape.** We support four: Platform only, Sales and Service Cloud, an org with NPSP installed, and Person Accounts enabled (the Agentforce Nonprofit shape). Reports from a shape you actually run are valuable.
 - **Write code.** Look for `good first issue` labels. Every module has its own README with its objects, its services, and how to test it alone.

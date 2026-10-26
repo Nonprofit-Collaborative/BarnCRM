@@ -81,6 +81,10 @@ More documentation:
 - [docs/barncrm-features.md](docs/barncrm-features.md): the feature catalog, every feature by module with its status (shipped, built on a branch, or planned).
 - Project docs at the repository root: [architecture.md](architecture.md) (environments, orgs, layout and gotchas), [roadmap.md](roadmap.md) (planned work with status), [changelog.md](changelog.md) (every change made, newest first) and [memory.md](memory.md) (decisions, open questions and working agreements).
 
+## Report a bug or give feedback
+
+Found a bug, have a question about fit, or spotted a documentation problem? Open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](SUPPORT.md) for which template to use and what to include, and never post personal or donor data. Report security problems privately, as described in [SECURITY.md](SECURITY.md).
+
 ## Governance and license
 
 Governance is BDFL (the project owner decides) for v0.x, with a maintainers group and a documented decision process by v1.0. Contributions are accepted under the Developer Certificate of Origin: sign your commits with `git commit -s`. There is no contributor license agreement.
