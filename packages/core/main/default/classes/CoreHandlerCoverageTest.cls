@@ -114,7 +114,7 @@ private class CoreHandlerCoverageTest {
     }
 
     @IsTest
-    static void aHouseholdBillingAddressChangeIsNotCapturedAsANewAddressOnUpdate() {
+    static void aHouseholdBillingAddressChangeIsCapturedAsANewAddressOnUpdate() {
         System.runAs(TestUsers.admin()) {
             Account household = new Account(
                 Name = 'The Okafor Family',
@@ -143,9 +143,9 @@ private class CoreHandlerCoverageTest {
 
             Assert.isFalse(household.hasErrors(), 'A household save is not refused');
             Assert.areEqual(
-                keptOnInsert,
+                keptOnInsert + 1,
                 [SELECT COUNT() FROM Address__c WHERE Account__c = :household.Id],
-                'Only a person account change is captured on update, so no address was added'
+                'The changed billing address is kept as a new address'
             );
         }
     }

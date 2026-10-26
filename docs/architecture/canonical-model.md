@@ -1009,6 +1009,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
+| `Seasonal_Addresses_Enabled__c` | boolean | false | The Seasonal Addresses switch on the Addresses page. Saving it on schedules the nightly seasonal swap (nothing happens when the job is already scheduled); saving it off stops the job. An install or upgrade with it on schedules a missing job, and an upgrade whose org already runs the job turns it on (C-18, R-AD4). |
 
 The commitment keys (`Installment_Generation_Horizon_Months__c`,
 `Installment_Overdue_Grace_Days__c`, `Auto_Apply_Gifts_To_Installments__c`, and the
@@ -1207,6 +1208,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
 | `Navigation_Target__c` | text (80) | The Lightning tab a module's own settings page lives on, used when the data type is Component and no component is named, because Core cannot import a component from a package that depends on it (Decision ADR-0020). |
+| `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
 | `Description__c` | long text | The plain-language help shown under the control. |
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
@@ -6097,8 +6099,26 @@ The first address added from the address card to an owner with none is saved as 
 **R-AD3 Default propagation.** The default address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
 Account's billing address for a household or an organization, and to the Contact's mailing
-address for a person. The copy happens on save and on the seasonal swap, and the standard
-fields are never the place a change is made.
+address for a person. The copy happens on save and on the seasonal swap. A household's or
+an organization's default is also copied to the mailing address of each current member of
+the household, except two, who keep the address they have, on save and on the seasonal swap
+alike:
+
+- a member stored as a Contact who has a default address of their own (one owned through
+  Contact, R-AD1), such as the one R-AD5's personal address behavior gives them. This is how
+  one person lives apart from their household, with no field to say so. A member held as a
+  Person Account is not asked this, because every person account carries an address of its
+  own captured from its mailing fields (R-AD5).
+- in junction mode, a member for whom this household is not their household (R-M3: their
+  primary membership, else their earliest current one).
+
+The standard fields are not where a change is kept, but a change made there is captured
+rather than lost: a person's mailing address under R-AD5, and a household's or an
+organization's billing address, on insert and when it changes afterwards, as a new default
+address of type Home (Work for an organization), the old one kept as history (R-AD7). An
+emptied billing address, one the default already holds, and BarnCRM's own copy are not
+captured, and neither is a household that carries a native Nonprofit Cloud household group,
+whose standard fields this rule never writes (product-plan Section 11.2 item 9).
 
 Where people are person accounts, the person's mailing fields are written instead of a
 contact's. An account is written that way only when its record type is a person type. In a
@@ -8698,6 +8718,8 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
 | v0.8 | 2026-10-26 | Rollup Builder parity: row limit and order direction (ADR-0136). `Rollup_Definition__c` gains `Row_Limit__c` (only the first N records, for SUM, AVG, MIN, MAX and the text lists; needs an Order By Attribute) and `Order_Direction__c` (Ascending, Descending, for text lists and row limited aggregates), both with field history. R-R15 says how they combine with FIRST and LAST (not at all: FIRST stays lowest, LAST highest) and that blanks come last in either direction; R-R10 adds the row limit to the every-save check. A blank direction or limit calculates as before. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
+| v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
+| v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 
 ---
 ## 32. Entity ownership by package
