@@ -404,6 +404,11 @@ private class ModuleDetectionServiceTest {
 
             Test.startTest();
             Map<String, ModuleDetectionService.ModuleInfo> modules = byName();
+            // A Standard-only module is not listed while the Nonprofit Edition is chosen, so it is
+            // checked on its row.
+            Boolean standardOnly = ModuleDetectionService.isNonprofitOnly(
+                catalogRow('Everywhere', 'Community', null, 7)
+            );
             Boolean blank = ModuleDetectionService.isNonprofitOnly(catalogRow('X', null, null, 1));
             Boolean missing = ModuleDetectionService.isNonprofitOnly(null);
             Test.stopTest();
@@ -416,9 +421,10 @@ private class ModuleDetectionServiceTest {
             );
             Assert.isFalse(modules.get('Events').nonprofitOnly, 'Both editions offer it');
             Assert.isFalse(
-                modules.get('Everywhere').nonprofitOnly,
-                'The Standard Edition offers it'
+                modules.containsKey('Everywhere'),
+                'Not offered by the Nonprofit Edition'
             );
+            Assert.isFalse(standardOnly, 'The Standard Edition offers it');
             Assert.isFalse(blank, 'A row that names no edition is not nonprofit only');
             Assert.isFalse(missing, 'No row is not nonprofit only');
         }
