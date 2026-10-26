@@ -27,7 +27,8 @@ title of whoever signs your letters. A receipt prints these. If you completed th
 Assistant they are already filled in. If your legal name is blank, receipts will not
 generate and BarnCRM tells you which field is missing.
 
-Your legal name and address print at the top of every document, under your logo, and your
+Your legal name and address print at the top of every document, under your logo (the address
+as one line per part, with City, State and Zip Code together), and your
 tax identification number prints at the bottom. That letterhead is not part of the letter you
 edit: BarnCRM prints it from these settings, so a receipt can never go out without your
 organization on it. To change it, change the settings, not the letter.

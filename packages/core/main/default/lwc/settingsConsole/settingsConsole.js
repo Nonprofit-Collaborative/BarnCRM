@@ -24,6 +24,7 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
@@ -34,26 +35,41 @@ import { labelTab } from 'c/workspaceTabs';
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
+/** The stored name of the General section (SettingSections.GENERAL), not a display label. */
+const GENERAL_SECTION = 'General';
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
 // saves them. Their plain rows are hidden while that panel is in the section so a pattern has
 // one editor (ADMIN-11). The settings and their definitions stay; search still finds them and
-// lands on the panel.
-const NAMING_PANEL_COMPONENT = 'householdNamingSettings';
-const NAMING_PATTERN_KEYS = [
-  'Household_Name_Pattern__c',
-  'Formal_Greeting_Pattern__c',
-  'Informal_Greeting_Pattern__c'
-];
+// lands on the panel. The six organization address parts are handled the same way by the
+// address panel.
+const PANEL_SETTINGS = {
+  householdNamingSettings: [
+    'Household_Name_Pattern__c',
+    'Formal_Greeting_Pattern__c',
+    'Informal_Greeting_Pattern__c'
+  ],
+  organizationAddressSettings: [
+    'Organization_Street__c',
+    'Organization_Street_2__c',
+    'Organization_City__c',
+    'Organization_State__c',
+    'Organization_Postal_Code__c',
+    'Organization_Country__c'
+  ]
+};
 
-/** The panel row of a section, when it has one. */
-function namingPanelRow(section) {
-  return section.settings.find((setting) => setting.component === NAMING_PANEL_COMPONENT);
+/** The panel row that edits this setting, when its section shows that panel. */
+function panelRowFor(section, key) {
+  const component = Object.keys(PANEL_SETTINGS).find((name) => PANEL_SETTINGS[name].includes(key));
+  return component
+    ? section.settings.find((setting) => setting.component === component)
+    : undefined;
 }
 
-/** True for a naming pattern row whose section also shows the naming panel. */
-function isHiddenNamingPattern(section, setting) {
-  return NAMING_PATTERN_KEYS.includes(setting.key) && Boolean(namingPanelRow(section));
+/** True for a setting row whose section also shows the panel that edits it. */
+function isHiddenPanelSetting(section, setting) {
+  return Boolean(panelRowFor(section, setting.key));
 }
 const TAB_ICON = 'standard:settings';
 
@@ -99,6 +115,8 @@ function importCoreComponent(name) {
       return import('c/editionSetting');
     case 'featureSettings':
       return import('c/featureSettings');
+    case 'organizationAddressSettings':
+      return import('c/organizationAddressSettings');
     default:
       return null;
   }
@@ -120,7 +138,6 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
-    openSection: OPEN_SECTION,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
     feedbackUrl: FEEDBACK_URL
@@ -217,12 +234,17 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       return [];
     }
     return section.settings
-      .filter((setting) => !isHiddenNamingPattern(section, setting))
+      .filter((setting) => !isHiddenPanelSetting(section, setting))
       .map((setting) => this.toRow(setting));
   }
 
   get sectionIsEmpty() {
     return !this.loading && this.currentSettings.length === 0;
+  }
+
+  /** Recent Changes shows on the General section only, however the section was reached. */
+  get showRecentChanges() {
+    return this.selectedSection === GENERAL_SECTION;
   }
 
   get hasChangesToShow() {
@@ -266,6 +288,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,
+      // The button names its destination ("Open Rollup Builder"), else the generic wording.
+      openLabel: setting.navigationLabel
+        ? OPEN_NAMED.replace('{0}', setting.navigationLabel)
+        : OPEN_SECTION,
       missing:
         setting.dataType === 'Component' &&
         Boolean(setting.component) &&
@@ -386,12 +412,40 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   /** First-run setup finished (ADR-0124): the edition and features changed what shows. */
   handleSetupFinished() {
-    this.load();
+    this.reloadAndRefreshPanels();
+  }
+
+  /**
+   * Reloads the rows, then asks each panel that stayed mounted to re-read its own data. A panel
+   * fetches once when it connects and the same instance survives a reload, so without this the
+   * Edition row kept saying "Not chosen yet" until the browser page was refreshed.
+   */
+  async reloadAndRefreshPanels() {
+    await this.load();
+    this.refreshPanels();
+  }
+
+  /**
+   * Asks each mounted panel that can re-read its own data to do so. Also run after a save,
+   * since a saved setting can change what a panel shows (the Seasonal Addresses switch
+   * schedules or stops the swap the panel below it reports on).
+   */
+  refreshPanels() {
+    this.template.querySelectorAll('[data-panel]').forEach((panel) => {
+      if (typeof panel.refresh === 'function') {
+        panel.refresh();
+      }
+    });
   }
 
   /** A feature turned on in General (ADR-0124): its settings rows now show, without a reload. */
   handleFeatureTurnedOn() {
     this.load();
+  }
+
+  /** A panel saved its own settings (the organization address): Recent changes now lists them. */
+  handleSettingsSaved() {
+    this.loadChanges();
   }
 
   handleSearchSelect(event) {
@@ -406,13 +460,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** A hidden naming pattern is found on the naming panel, so a search for it lands there. */
+  /** A setting hidden behind a panel is found on that panel, so a search for it lands there. */
   visibleKeyFor(sectionName, key) {
     const section = this.sections.find((candidate) => candidate.name === sectionName);
-    if (!section || !isHiddenNamingPattern(section, { key })) {
-      return key;
-    }
-    return namingPanelRow(section).key;
+    const panel = section && panelRowFor(section, key);
+    return panel ? panel.key : key;
   }
 
   // The admin guide says a search result takes you to the setting, not just its section, so
@@ -483,6 +535,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       this.pending = {};
       this.messageIsError = false;
       this.message = this.labels.saved;
+      this.refreshPanels();
       await this.loadChanges();
     } catch (error) {
       this.messageIsError = true;
