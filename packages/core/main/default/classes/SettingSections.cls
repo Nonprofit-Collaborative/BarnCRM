@@ -21,6 +21,9 @@ public with sharing class SettingSections {
     public static final String ERROR_LOG = 'Error Log';
     @NamespaceAccessible
     public static final String ACCESS = 'Access';
+    /** The Org Optimizer thresholds (how old is stale, how long is unused): the tool's own section. */
+    @NamespaceAccessible
+    public static final String ORG_OPTIMIZER = 'Org Optimizer';
     @NamespaceAccessible
     public static final String HEALTH = 'Health';
     @NamespaceAccessible
@@ -59,6 +62,7 @@ public with sharing class SettingSections {
             ERROR_LOG,
             ACCESS,
             IMPORTING,
+            ORG_OPTIMIZER,
             HEALTH
         };
     }

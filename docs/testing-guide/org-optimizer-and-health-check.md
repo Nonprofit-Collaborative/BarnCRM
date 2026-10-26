@@ -132,7 +132,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Org Optimizer**, choose **Unused setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then eight checks, including **Active users who have not logged in for 90 days**, **Permission sets nobody is assigned**, **Reports not run for 365 days**, **Email templates never used**, **Inactive flows**, **Scheduled jobs owned by inactive users**, **Objects near their custom field limit**, **Record types no record uses, or inactive**. |
 | 2 | Read a check with a count above 0. | Up to five names and **Open in Setup**. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
-| 4 | In **BarnCRM Settings**, **General**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
+| 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
 | 5 | Set it to `60`, **Save**, then **Refresh** on **Unused setup**. | **Your settings are saved.** The first check reads **Active users who have not logged in for 60 days**. |
 
 **Cleanup:** Set **Days before a user is unused** back to `90`.
