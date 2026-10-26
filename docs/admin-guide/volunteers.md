@@ -219,7 +219,7 @@ saves as you change it.
 |---|---|---|---|
 | Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
-| Weeks ahead to create shifts | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
+| Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
 
 ## Recurring shifts
 
@@ -237,8 +237,8 @@ schedule** to the job: on the job, in the **Shift Schedules** list, click **New*
 | Location | Copied to each shift. Leave it empty to use the job's location. |
 | Active | Untick to end the schedule. |
 
-When you save, BarnCRM creates the schedule's shifts from today up to the **Weeks ahead
-to create shifts** setting (8 by default), usually within a minute. Each is an ordinary shift: people sign up,
+When you save, BarnCRM creates the schedule's shifts from today up to the **Shift horizon weeks**
+setting (8 by default), usually within a minute. Each is an ordinary shift: people sign up,
 attend and log hours on it as on any other. It appears in the job's **Shifts** list and shows the
 schedule it came from. Every night
 at 3:00 AM BarnCRM adds the next days, so the schedule always reaches the horizon. **Created
@@ -385,7 +385,7 @@ with the person, job, shift, date worked and hours of each.
   the **To** date is refused with a message on the field, and the list stays as it was.
 - Tick the entries to act on, or tick the box in the heading row to select the whole page.
 - **Approve** approves the selected entries: they count in totals from now on, and record you
-  and the time as who approved them.
+  and the time in the entry's **Reviewed By** and **Reviewed Date** fields.
 - **Reject** asks for a reason, which is required, then rejects the selected entries with it. The
   person who entered them sees the reason on the entry.
 - **Reopen**, on the Approved and Rejected lists, moves the selected entries back to Submitted, so
@@ -483,7 +483,7 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 |---|---|---|
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
-| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks ahead to create shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Shift horizon weeks** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
