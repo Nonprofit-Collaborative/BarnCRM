@@ -173,7 +173,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
 
-## T-RB-19: Skip a rollup for people with a custom permission
+## T-RB-19: Skip a Rollup for People with a Custom Permission
 
 **Purpose:** confirm saves by a holder of the rollup's bypass custom permission leave its total alone, Recalculate still corrects it, and an unknown name is refused.
 **Prerequisites:** admin user; T-RB-02 done; **Test children per household** in **Both (recommended)** and active; **The Garcia Family** shows **Test Children Count** 1.
@@ -188,7 +188,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** edit the rollup and clear **Skip for people with this custom permission (optional)**; set Diego's **Household Role** back to **Child** and check the total returns to 1; remove the **Test Data Migration** permission set assignment.
 
-## T-RB-20: Recalculate totals on this record from a Flow
+## T-RB-20: Recalculate Totals on This Record from a Flow
 
 **Purpose:** confirm the Flow action recalculates a record's totals, every rollup or the one named, and logs a name that matches nothing.
 **Prerequisites:** admin user; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
@@ -203,7 +203,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set the rollup's mode back to **Both (recommended)**; delete the **Test recalculate totals** flow.
 
-## T-RB-21: Recalculate a record's totals from Apex
+## T-RB-21: Recalculate a Record's Totals from Apex
 
 **Purpose:** confirm the global Apex entry point recalculates a record's totals.
 **Prerequisites:** admin user with permission to run anonymous Apex; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.

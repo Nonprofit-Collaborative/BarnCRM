@@ -489,7 +489,7 @@ automation for you:
 
 If you prefer no code in your org, the Flow template above does the same job.
 
-## Skipping a rollup for some people
+## Skipping a Rollup for Some People
 
 A large data load can spend most of its time updating totals that the nightly run would
 put right anyway. To have one person's saves leave a rollup alone:
@@ -515,7 +515,7 @@ What to know:
 
 ## Recalculating from a Flow or from Apex
 
-### Recalculate totals on this record (Flow)
+### Recalculate Totals on This Record (Flow)
 
 The Flow action **Recalculate totals on this record** (category **BarnCRM**) recalculates the
 totals a record shows, for example from a screen flow button on a household or from a
@@ -531,7 +531,7 @@ record's object recalculates nothing and leaves a Warning in the Error Log; the 
 on. This action is not a save, so **Skip for people with this custom permission** does not
 apply to it.
 
-### For developers: Apex
+### For Developers: Apex
 
 Code that used the DLRS Apex service can call `RollupApi` instead (prefix it with the
 package namespace in a subscriber org):
