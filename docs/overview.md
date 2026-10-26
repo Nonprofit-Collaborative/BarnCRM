@@ -1,6 +1,6 @@
 # BarnCRM overview
 
-Applies to: BarnCRM main as of 2026-10-25 (commit d57c8e5b). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM is
 
