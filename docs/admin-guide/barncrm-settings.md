@@ -25,7 +25,7 @@ BarnCRM support page on GitHub in a new tab.
 
 There is nothing to turn on, but there is one permission to give out.
 
-1. Open the **BarnCRM** app and click the **BarnCRM Settings** tab.
+1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
 2. If you can change values, you already have the **Manage BarnCRM Settings**
    permission. If you see a notice at the top of the page saying you can read but not
    change settings, you do not.
@@ -155,9 +155,9 @@ Builder ships as its own package, installed from this section like the others. S
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
-1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
-   opens with the **Setup checklist**.
-2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin** (or **BarnCRM Admin
+   Console**). It opens on the **BarnCRM Settings** tab.
+2. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
    Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
    Error Log, Access, Import, and Health. You only see the ones that have something in them,

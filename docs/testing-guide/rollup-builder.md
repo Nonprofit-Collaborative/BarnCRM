@@ -21,7 +21,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Look at the buttons above the list. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are all enabled. |
 | 4 | If the button reads **Stop the nightly recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
 | 5 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the nightly recalculation**, and the not scheduled warning under **Needs attention** is gone. |
-| 6 | Open the **BarnCRM** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
+| 6 | Open the **BarnCRM Admin** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
 
 **Cleanup:** leave the nightly run scheduled.
 

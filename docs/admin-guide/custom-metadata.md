@@ -37,7 +37,7 @@ entry changes the org's metadata.
    Non-Certified Package Versions via Apex**. This setting is in Setup only, and BarnCRM
    cannot turn it on for you: it is Salesforce's own safeguard. If it is off, saving an
    entry says so.
-3. Open the **BarnCRM** app, click **BarnCRM Settings**, choose **General**, and scroll to
+3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
    **Custom metadata**.
 
 A relationship type also has to be a choice in the **Type** list on a relationship, and

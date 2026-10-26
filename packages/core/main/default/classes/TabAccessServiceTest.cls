@@ -6,12 +6,14 @@
 private class TabAccessServiceTest {
     private static final String PRIYA = 'Nair';
     private static final String SAM = 'Okafor';
+    private static final String TEAM_MEMBER = 'Mensah';
 
     @TestSetup
     static void createTestUsers() {
         System.runAs(TestUsers.admin()) {
             TestUsers.standardUserWith(PRIYA, new List<String>{ 'BarnCRM_Find_And_Export' });
             TestUsers.standardUserWith(SAM, new List<String>{ 'BarnCRM_Tab_Import' });
+            TestUsers.standardUserWith(TEAM_MEMBER, new List<String>{ 'BarnCRM_Staff' });
         }
     }
 
@@ -336,6 +338,90 @@ private class TabAccessServiceTest {
         }
     }
 
+    @IsTest
+    static void everyRoleSeesBothStylesAndOnlyAdminsSeeTheAdminApps() {
+        System.runAs(TestUsers.admin()) {
+            Id staff = userId(TEAM_MEMBER);
+
+            Test.startTest();
+            TabAccessService.syncNow();
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.STANDARD_APP, TabAccessService.CONSOLE_APP },
+                appSetsOf(staff),
+                'Both is the default, so staff see BarnCRM and BarnCRM Console and no admin app'
+            );
+            Assert.areEqual(
+                new Set<String>{
+                    TabAccessService.STANDARD_APP,
+                    TabAccessService.CONSOLE_APP,
+                    TabAccessService.ADMIN_STANDARD_APP,
+                    TabAccessService.ADMIN_CONSOLE_APP
+                },
+                appSetsOf(UserInfo.getUserId()),
+                'An admin sees all four apps'
+            );
+            Assert.isTrue(
+                appSetsOf(userId(PRIYA)).isEmpty(),
+                'An extra permission alone is not a BarnCRM role, so it shows no app'
+            );
+        }
+    }
+
+    @IsTest
+    static void savingOneStyleHidesTheOtherAppsForEveryone() {
+        Id staff = userId(TEAM_MEMBER);
+        System.runAs(TestUsers.admin()) {
+            TabAccessService.syncNow();
+            Assert.areEqual(2, appSetsOf(staff).size(), 'Both styles before the change');
+        }
+        // A separate block: the platform does not mix the assignments with a settings write.
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    'App_Navigation_Style__c' => TabAccessService.STYLE_CONSOLE
+                }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.CONSOLE_APP },
+                appSetsOf(staff),
+                'The save queued the sync, which took the standard app away'
+            );
+            Assert.areEqual(
+                new Set<String>{ TabAccessService.CONSOLE_APP, TabAccessService.ADMIN_CONSOLE_APP },
+                appSetsOf(UserInfo.getUserId()),
+                'And the admin keeps the two console apps'
+            );
+        }
+    }
+
+    @IsTest
+    static void eachStyleTurnsOnItsOwnTwoApps() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    'App_Navigation_Style__c' => TabAccessService.STYLE_STANDARD
+                }
+            );
+            Assert.areEqual(
+                new Set<String>{
+                    TabAccessService.STANDARD_APP,
+                    TabAccessService.ADMIN_STANDARD_APP
+                },
+                TabAccessService.appSetsOn(),
+                'Standard'
+            );
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'App_Navigation_Style__c' => TabAccessService.STYLE_BOTH }
+            );
+            Assert.areEqual(4, TabAccessService.appSetsOn().size(), 'Both');
+        }
+    }
+
     private static Id userId(String lastName) {
         return [
             SELECT Id
@@ -349,11 +435,19 @@ private class TabAccessServiceTest {
     }
 
     private static Set<String> tabSetsOf(Id userId) {
+        return setsOf(userId, 'BarnCRM_Tab_%');
+    }
+
+    private static Set<String> appSetsOf(Id userId) {
+        return setsOf(userId, 'BarnCRM_App_%');
+    }
+
+    private static Set<String> setsOf(Id userId, String pattern) {
         Set<String> names = new Set<String>();
         for (PermissionSetAssignment row : [
             SELECT PermissionSet.Name
             FROM PermissionSetAssignment
-            WHERE AssigneeId = :userId AND PermissionSet.Name LIKE 'BarnCRM_Tab_%'
+            WHERE AssigneeId = :userId AND PermissionSet.Name LIKE :pattern
             WITH SYSTEM_MODE
         ]) {
             names.add(row.PermissionSet.Name);

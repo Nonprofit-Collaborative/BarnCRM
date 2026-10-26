@@ -43,7 +43,7 @@ Maria is about to load a spreadsheet of 400 people from a partner organization. 
 the records in first and the automatic housekeeping to happen afterwards, so nothing runs
 400 times while she is watching.
 
-1. Open the **BarnCRM** app and click **BarnCRM Settings**.
+1. Open the **BarnCRM Admin** app and click **BarnCRM Settings**.
 2. In the left navigation, click **Automation**. You see a list of every piece of
    automation BarnCRM ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click

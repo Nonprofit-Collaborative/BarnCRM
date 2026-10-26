@@ -62,7 +62,7 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, because that is how the org was set up for her two years ago, and nothing else that
 keeps households is installed.
 
-1. Maria opens the **BarnCRM** app, clicks the **BarnCRM Settings** tab, and chooses
+1. Maria opens the **BarnCRM Admin** app, clicks the **BarnCRM Settings** tab, and chooses
    **Health** in the left navigation.
 2. Health Check runs. The first card is **What we found in your org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.

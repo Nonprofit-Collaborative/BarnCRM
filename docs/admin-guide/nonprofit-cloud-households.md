@@ -62,7 +62,7 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
 Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two
 years. Her colleagues have been grouping families there the whole time.
 
-1. Maria opens the **BarnCRM** app, clicks **BarnCRM Settings**, and chooses
+1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
 2. The **What we found in your org** card tells her that this org already has households
    built the Nonprofit Cloud way, and how many.
