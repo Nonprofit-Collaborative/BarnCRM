@@ -140,6 +140,12 @@ lookup to a contact, an account or an Individual. The page refuses anything else
 A value shared by more than ten people or households, such as an office's main number, is
 ignored: it says nothing about whether two of them are the same.
 
+Each lookup reads at most 5,000 records. When a lookup reaches that limit, or a scan or import
+step has used most of what Salesforce allows in one go so a source is skipped, the Error Log
+gets one warning naming the source, and the values that lookup found are not used, since some
+of the records holding them were not read. Some duplicates may then be missed until the next
+scan. A source whose values are very common is a candidate to archive.
+
 To add your own source, choose **Add** under **Match sources** and fill in the object's API
 name (for example `Volunteer_Profile__c`), the field holding the value, the lookup to the
 person or household, and **Normalization**. For **Address**, also fill in **Postal Code

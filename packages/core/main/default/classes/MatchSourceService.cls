@@ -398,7 +398,9 @@ public with sharing class MatchSourceService {
     /**
      * Every record of the target object holding each of these keys on this source, found with
      * bounded queries and compared exactly after normalization: emails by equality in one
-     * query, phones and addresses by LIKE clauses, at most 100 to a query.
+     * query, phones and addresses by LIKE clauses, at most 100 to a query. A key whose lookup
+     * reached its row cap, or was skipped because the transaction had too little left, is left
+     * out: its holders were not all read, so it could be a value shared by more than ten.
      */
     public static Map<String, Set<Id>> ownersOf(
         Source source,
@@ -406,34 +408,64 @@ public with sharing class MatchSourceService {
         Set<String> keys
     ) {
         List<SObject> rows = new List<SObject>();
+        // Keys whose lookup was cut short (M5): any of them may be held by more than ten
+        // records the lookup did not read, so none of them is used.
+        Set<String> cut = new Set<String>();
         if (source.normalization == EMAIL) {
-            rows.addAll(MatchSourceSelector.rowsByValues(source, keys, null));
+            readInto(rows, cut, keys, source, keys, null);
         } else {
             Map<String, Map<String, String>> clauses = new Map<String, Map<String, String>>();
+            Map<String, Set<String>> keysByClause = new Map<String, Set<String>>();
             for (String key : keys) {
                 Map<String, String> clause = likeClause(source, key);
-                clauses.put(String.join(clause.values(), '|'), clause);
+                String clauseKey = String.join(clause.values(), '|');
+                clauses.put(clauseKey, clause);
+                if (!keysByClause.containsKey(clauseKey)) {
+                    keysByClause.put(clauseKey, new Set<String>());
+                }
+                keysByClause.get(clauseKey).add(key);
             }
             List<Map<String, String>> batch = new List<Map<String, String>>();
-            for (Map<String, String> clause : clauses.values()) {
-                batch.add(clause);
+            Set<String> batchKeys = new Set<String>();
+            for (String clauseKey : clauses.keySet()) {
+                batch.add(clauses.get(clauseKey));
+                batchKeys.addAll(keysByClause.get(clauseKey));
                 if (batch.size() == MAX_PATTERNS_PER_QUERY) {
-                    rows.addAll(MatchSourceSelector.rowsByValues(source, null, batch));
+                    readInto(rows, cut, batchKeys, source, null, batch);
                     batch = new List<Map<String, String>>();
+                    batchKeys = new Set<String>();
                 }
             }
             if (!batch.isEmpty()) {
-                rows.addAll(MatchSourceSelector.rowsByValues(source, null, batch));
+                readInto(rows, cut, batchKeys, source, null, batch);
             }
         }
+        Integer cutBefore = MatchSourceSelector.cutLookups();
         Map<String, Set<Id>> found = owners(source, target, rows, null);
+        Boolean ownersCut = MatchSourceSelector.cutLookups() > cutBefore;
         Map<String, Set<Id>> result = new Map<String, Set<Id>>();
         for (String key : keys) {
-            if (found.containsKey(key)) {
+            if (found.containsKey(key) && !ownersCut && !cut.contains(key)) {
                 result.put(key, found.get(key));
             }
         }
         return result;
+    }
+
+    /** One lookup's rows added to `rows`; its keys added to `cut` when it read less than all. */
+    private static void readInto(
+        List<SObject> rows,
+        Set<String> cut,
+        Set<String> lookedUp,
+        Source source,
+        Set<String> equalTo,
+        List<Map<String, String>> likeClauses
+    ) {
+        Integer before = MatchSourceSelector.cutLookups();
+        rows.addAll(MatchSourceSelector.rowsByValues(source, equalTo, likeClauses));
+        if (MatchSourceSelector.cutLookups() > before) {
+            cut.addAll(lookedUp);
+        }
     }
 
     /**

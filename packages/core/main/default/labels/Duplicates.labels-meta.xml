@@ -17,6 +17,14 @@
         <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates it would find may be missed. If its values are very common, consider archiving it on the Custom metadata page.</value>
     </labels>
     <labels>
+        <fullName>Core_MatchSource_BudgetSpent</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log warning: {0} is the match source not read</shortDescription>
+        <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates it would find may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
+    </labels>
+    <labels>
         <fullName>Core_Duplicates_Cancel</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>

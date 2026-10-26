@@ -537,4 +537,111 @@ private class MatchSourceServiceTest {
             Assert.isTrue(logged[0].Message__c.contains('Address_Person'), 'Names the source');
         }
     }
+
+    /** Households 0 to `count - 1`, each with one person holding this email. */
+    private static List<Account> householdsSharing(String email, Integer count) {
+        List<Account> homes = new List<Account>();
+        for (Integer index = 0; index < count; index++) {
+            homes.add(AddressTestDataFactory.newHousehold('Shared ' + index));
+        }
+        insertAllowingDuplicates(homes);
+        List<Contact> people = new List<Contact>();
+        for (Account home : homes) {
+            Contact person = AddressTestDataFactory.newContact('Front', 'Desk', home.Id);
+            person.Email = email;
+            people.add(person);
+        }
+        insertAllowingDuplicates(people);
+        return homes;
+    }
+
+    @IsTest
+    static void aValueFromACutLookupCountsAsSharedByMoreThanTen() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
+            };
+            List<Account> homes = householdsSharing(
+                'desk@shared-office.example.org',
+                MatchSourceService.MAX_OWNERS_PER_VALUE + 1
+            );
+            // The lookup reads five of the eleven holders: few enough to look usable.
+            MatchSourceSelector.maxRows = 5;
+
+            Test.startTest();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id }
+            );
+            Test.stopTest();
+
+            Assert.isTrue(pairs.isEmpty(), 'A cut lookup pairs nobody: ' + pairs.size());
+        }
+    }
+
+    @IsTest
+    static void aLookupReadsOnlyWhatTheTransactionHasLeft() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
+            };
+            List<Account> homes = householdsSharing('pair@example.org', 2);
+
+            Test.startTest();
+            // One row left above the reserve: the lookup is shrunk to it and so cut.
+            MatchSourceSelector.rowReserve = Limits.getLimitQueryRows() - Limits.getQueryRows() - 1;
+            Map<String, Set<Id>> holders = MatchSourceService.ownersOf(
+                MatchSourceService.usableSources()[0],
+                Account.SObjectType,
+                new Set<String>{ 'pair@example.org' }
+            );
+            Test.stopTest();
+
+            Assert.isTrue(holders.isEmpty(), 'A shrunk, cut lookup is not used: ' + holders);
+            Assert.areEqual(1, MatchSourceSelector.cappedLookups, 'Counted once.');
+        }
+    }
+
+    @IsTest
+    static void aSpentTransactionSkipsTheSourcesAndSaysSo() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+                row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
+            };
+            List<Account> homes = householdsSharing('pair@example.org', 2);
+            Contact incoming = new Contact(LastName = 'Desk', Email = 'pair@example.org');
+
+            Test.startTest();
+            MatchSourceSelector.queryReserve = Limits.getLimitQueries();
+            Integer queriesBefore = Limits.getQueries();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ homes[0].Id, homes[1].Id }
+            );
+            List<Set<Id>> found = MatchSourceService.holdersOfPeople(
+                Account.SObjectType,
+                new List<Map<String, String>>{
+                    new Map<String, String>{ 'Email' => incoming.Email }
+                }
+            );
+            Integer queriesRun = Limits.getQueries() - queriesBefore;
+            Test.stopTest();
+            Test.getEventBus().deliver();
+
+            Assert.isTrue(pairs.isEmpty(), 'Nothing read, nothing paired: ' + pairs);
+            Assert.isTrue(found[0].isEmpty(), 'Nothing read, nobody matched: ' + found);
+            Assert.areEqual(0, queriesRun, 'No source query runs once the budget is spent.');
+            List<Error_Log__c> logged = [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Context__c = 'Match sources'
+            ];
+            // In a person account org the Individual lookup is skipped and logged too.
+            Integer forTheSource = 0;
+            for (Error_Log__c entry : logged) {
+                if (entry.Message__c.contains('Member_Email')) {
+                    forTheSource++;
+                }
+            }
+            Assert.areEqual(1, forTheSource, 'One warning for the source: ' + logged);
+        }
+    }
 }
