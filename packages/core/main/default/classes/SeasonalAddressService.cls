@@ -14,7 +14,9 @@
  * What the job does not do: it does not copy the new address into the standard address fields.
  * Moving the default flag is enough, because the address automation copies it onward (R-AD3),
  * which means an administrator who has switched that automation off gets the same behavior from
- * the job as from a person pressing "Set as default" on the record.
+ * the job as from a person pressing "Set as Primary" on the record. The swap is a household move
+ * nobody has to choose, so it reaches the members who have no address of their own even when
+ * the org's Address Updates setting is "Nobody moves until you choose" (R-AD3, ADR-NEXT).
  */
 public with sharing class SeasonalAddressService {
     private static final String LOG_CONTEXT = 'Seasonal address swap';
@@ -203,6 +205,7 @@ public with sharing class SeasonalAddressService {
             if (plan.updates.isEmpty()) {
                 continue;
             }
+            Boolean movesWereChosen = AddressService.chooseHouseholdMoves(true);
             try {
                 SeasonalAddressWriter.save(plan.updates);
                 if (plan.movedIn) {
@@ -214,6 +217,8 @@ public with sharing class SeasonalAddressService {
             } catch (Exception saveFailed) {
                 summary.failed++;
                 ErrorLogger.log(saveFailed, LOG_CONTEXT, ownerId);
+            } finally {
+                AddressService.chooseHouseholdMoves(movesWereChosen);
             }
         }
         return summary;

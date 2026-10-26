@@ -28,11 +28,13 @@ automatically and carries a **Primary** badge.
   keeps its own address, and the person keeps theirs when the household moves later.
 - If you edit a person's mailing address in the person's own **Mailing Address** field
   (**Reaching This Person** section), what happens
-  depends on your org's setting: either the whole household moves, or the person gets an
-  address of their own. Ask your admin which yours is.
+  depends on your org's **Address Updates** setting: either the whole household moves, or
+  the person gets an address of their own. Ask your admin which yours is.
 - If you edit a household's **Billing Address** field, the new address becomes the
   household's primary address, and everyone in the household moves with it except a person
-  with an address of their own.
+  with an address of their own. If your org's setting is **Nobody moves until you choose**,
+  only the household moves until someone chooses **Update Everyone's Address** on its
+  primary address card.
 
 ## To Make an Address the Primary
 

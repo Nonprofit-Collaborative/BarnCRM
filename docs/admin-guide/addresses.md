@@ -36,14 +36,24 @@ install and no Setup step. Once it is on, two things are worth setting once.
 
 1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.
-3. Set **When a person's address is edited** to the behavior your organization wants:
+3. Set **Address Updates** to the behavior your organization wants. It always shows one of
+   these three; a new install shows the first.
    - **Everyone in the household moves together** (the default): editing one person's
      address moves the whole household, which is what most organizations want, because a
      household shares a mailbox.
    - **Only that person moves**: editing one person's address gives that person an
-     address of their own and leaves the rest of the household where it is. Choose this if
-     you often track students away at school, adult children at a parent's household, or
-     staff contacts who move without their family.
+     address of their own and leaves the rest of the household where it is. A change to the
+     household's own address still reaches everyone in it who has no address of their own.
+     Choose this if you often track students away at school, adult children at a parent's
+     household, or staff contacts who move without their family.
+   - **Nobody moves until you choose**: editing one person's address gives that person an
+     address of their own, as above, and a change to the household's address (a new primary
+     on its card, an edit to its billing address) changes the household only. Its people keep
+     their mailing address until you choose **Update Everyone's Address** on the household's
+     primary address card (see "Moving a household on purpose" below). The seasonal swap is
+     the one exception: it still moves everyone in the household who has no address of their
+     own, because the dates were chosen in advance. Choose this if your team checks every
+     move before a mailing goes out.
 4. Choose **Save**. The change applies to the next address you edit.
 
 Then turn on the seasonal address swap, which is off until you turn it on.
@@ -150,6 +160,30 @@ street on **The Garcia Family** and save: the new street becomes a new Home addr
 marked primary, the old one stays as history, and every member without an address of their
 own gets the new mailing address.
 
+## Moving a Household on Purpose
+
+Two buttons on the **Addresses** card move a household when you decide to, whatever
+**Address Updates** is set to. They need the same access as **Set as Primary**: edit on
+addresses, and on the household and its people. Nothing is deleted: the address each one
+replaces stays on the card as history.
+
+- **Use for Whole Household**, on a person's own address card. The household gets a new
+  primary address copied from this one, and everyone in it who has no address of their own
+  moves to it. The person stops having an address of their own in use (their cards stay, as
+  history), so from now on they move with the household. In the flexible way of belonging,
+  the household is the person's own one; if they are a current member of more than one, the
+  card asks which.
+- **Update Everyone's Address**, on the household's primary address card. A confirmation lists
+  who will get this address (everyone in the household with no address of their own) and who
+  has an address of their own. Those are left where they are unless you tick them; a ticked
+  person stops having an address of their own in use and gets the household's address. Choose
+  **Update Everyone's Address** in the confirmation to go ahead, or **Cancel**. In the flexible
+  way of belonging, a person whose own household is another one is not listed.
+
+With **Nobody moves until you choose**, **Update Everyone's Address** is how a household's
+new address reaches its people. In the other two settings it is how you bring someone with an
+address of their own back to the household's address.
+
 ## A five-minute walkthrough for the seasonal swap
 
 Still the Garcia household, and still five minutes. This time you are proving to yourself
@@ -189,9 +223,9 @@ truth and copies the primary into the standard address boxes, but an edit typed 
 boxes is not lost. A new billing address on a household or an organization, typed on the
 page or written by a data loader, an import or an integration, becomes a new primary address
 of type Home (Work for an organization), and the household's members move with it, the same
-as when the household was created with that address. The address it replaced stays on the
-card as history. A person's new mailing address follows the **When a person's address is
-edited** setting. Emptying the billing address changes nothing on the card, and a household
+as when the household was created with that address (unless **Address Updates** is **Nobody
+moves until you choose**). The address it replaced stays on the card as history. A person's
+new mailing address follows the **Address Updates** setting. Emptying the billing address changes nothing on the card, and a household
 that Nonprofit Cloud manages is left alone. Prefer the address card all the same: a cleanup
 that rewrites every household's billing address adds an address record to each household it
 changes. This is also why address verification apps should be pointed at the address
@@ -205,8 +239,10 @@ not their household (their household is the one they are the primary member of, 
 one they joined first). They stay put when the household's primary changes, when its billing
 address is edited, and when the seasonal swap moves it. This is how a student stays at their
 dorm, or an adult child at their own home, while the rest of the household moves. To bring a
-person back to the household's address, delete the addresses on their own card; they move
-with the household from its next address change.
+person back to the household's address, choose **Update Everyone's Address** on the
+household's primary address and tick them; see "Moving a household on purpose". With
+**Address Updates** set to **Nobody moves until you choose**, a household change reaches
+nobody until you choose that button, except the seasonal swap.
 
 **Typing a state or country as a code in an org with State and Country Picklists.** With the
 picklists on, the standard address boxes take a full name ("Illinois", "United States") as
