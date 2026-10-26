@@ -166,8 +166,11 @@ reaches the problem.
   [Automation control](automation-control.md).
 - **Splitting a gift one row at a time.** Allocations always total the gift, so a change that
   leaves the gift over-allocated or under-allocated is refused, even halfway through a split
-  you meant to finish. Enter a split in one go on the gift entry screen, which sends the whole
-  split at once. The error names the difference so you can see exactly how much is out.
+  you meant to finish. Neither the gift record nor Quick Gift Entry splits a gift: Quick Gift
+  Entry designates one fund. A split goes in as a whole, which today means the gift import
+  (**Fund 1** to **Fund 5** with **Amount** or **Percent** columns, see [Gift import](gift-import.md)),
+  or a data load or API call that sends the gift and every allocation together. The error names
+  the difference so you can see exactly how much is out.
 - **Mixing amounts and percentages in one split.** Enter a split either way, but not both ways
   at once: when every row is a percentage and they come to 100, BarnCRM works out the
   amounts and puts the odd cent on the largest row. Mix the two and you are back to making the

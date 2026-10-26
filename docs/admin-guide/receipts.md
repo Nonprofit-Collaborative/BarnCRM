@@ -135,7 +135,10 @@ Start from the sample data.
 2. Open **Receipt letters and year end statements**, and on the **Receipt templates** tab
    check that a letter of each kind is in use. If one is not, pick it and click **Use this
    letter**.
-3. Open any gift from the sample data. Click **Issue receipt** on the **Receipts** panel.
+3. Open any gift from the sample data. Click **Issue receipt** on the **Receipts** panel. A
+   Pending or Cancelled gift is refused ("A pending or cancelled gift cannot be receipted,
+   because no money has arrived"): mark it Received first. Year-end statements leave those two
+   statuses out too.
    You will see a receipt number appear on the gift, and a PDF in the Files list on the gift
    and on the receipt. Deliberately not on the donor's household: see "Give people access"
    above.
