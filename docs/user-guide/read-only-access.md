@@ -42,9 +42,6 @@ queries over everything you can read. You still cannot change records.
 | Quick Gift Entry | Nothing: the tab is not given | Enter gifts |
 
 The gift panels on a record still load, so you can read them; their actions are not for you.
-A commitment's **Payment schedule** card shows no **Pause**, **Resume**, **Mark complete** or
-**Cancel commitment**, and **Refund or Write Off** and **Start Stewardship Plan** open a window
-that says you cannot record a refund or start a plan.
 
 ### Volunteers (with Volunteers Read Only)
 

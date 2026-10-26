@@ -15,15 +15,13 @@
 
       <template lwc:if={isEmpty}>
         <p data-id="empty">{labels.empty}</p>
-        <template lwc:if={canGenerate}>
-          <lightning-button
-            label={labels.generateNow}
-            variant="brand"
-            data-id="generate"
-            class="slds-var-m-top_small"
-            onclick={handleGenerate}
-          ></lightning-button>
-        </template>
+        <lightning-button
+          label={labels.generateNow}
+          variant="brand"
+          data-id="generate"
+          class="slds-var-m-top_small"
+          onclick={handleGenerate}
+        ></lightning-button>
       </template>
 
       <template lwc:if={hasActions}>

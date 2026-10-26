@@ -36,15 +36,6 @@ public with sharing class CommitmentController {
         /** The commitment's status, so the component offers only the changes it allows. */
         @AuraEnabled
         public String commitmentStatus { get; set; }
-        /**
-         * Whether the person may pause, resume, complete or cancel this commitment, so a reader
-         * is not offered buttons that can only fail.
-         */
-        @AuraEnabled
-        public Boolean canChange { get; set; }
-        /** Whether the person may generate a missing schedule. */
-        @AuraEnabled
-        public Boolean canGenerate { get; set; }
 
         public SchedulePreview(List<InstallmentRow> rows, Boolean saved) {
             this.installments = rows;
@@ -101,9 +92,6 @@ public with sharing class CommitmentController {
                 throw badRequest(System.Label.Giving_Commitment_NotFound);
             }
             schedule.commitmentStatus = commitments[0].Status__c;
-            schedule.canChange = canChange(commitmentId);
-            schedule.canGenerate =
-                schedule.canChange && Schema.SObjectType.Installment__c.isCreateable();
             return schedule;
         } catch (AuraHandledException alreadyHandled) {
             throw alreadyHandled;
@@ -160,9 +148,6 @@ public with sharing class CommitmentController {
         if (commitmentId == null) {
             throw badRequest(System.Label.Giving_Commitment_NotFound);
         }
-        if (!canChange(commitmentId) || !Schema.SObjectType.Installment__c.isCreateable()) {
-            throw badRequest(System.Label.Giving_Commitment_NoPermission);
-        }
         try {
             CommitmentService.generateInstallments(new Set<Id>{ commitmentId });
         } catch (Exception generateFailure) {
@@ -179,11 +164,6 @@ public with sharing class CommitmentController {
     public static SchedulePreview changeStatus(Id commitmentId, String action) {
         if (commitmentId == null) {
             throw badRequest(System.Label.Giving_Commitment_NotFound);
-        }
-        // Checked first: a refused save would otherwise read as a status the change cannot
-        // be made from, which sends a reader looking for the wrong cause.
-        if (!canChange(commitmentId)) {
-            throw badRequest(System.Label.Giving_Commitment_NoPermission);
         }
         Set<Id> commitmentIds = new Set<Id>{ commitmentId };
         try {
@@ -208,24 +188,6 @@ public with sharing class CommitmentController {
             throw badRequest(System.Label.Giving_Commitment_TransitionNotAllowed);
         }
         return getSchedule(commitmentId);
-    }
-
-    /** The person may edit the commitment's status, and this commitment in particular. */
-    private static Boolean canChange(Id commitmentId) {
-        if (
-            !Schema.SObjectType.Commitment__c.isUpdateable() ||
-            !Schema.SObjectType.Commitment__c.fields.Status__c.isUpdateable()
-        ) {
-            return false;
-        }
-        Id userId = UserInfo.getUserId();
-        return ![
-                SELECT RecordId
-                FROM UserRecordAccess
-                WHERE UserId = :userId AND RecordId = :commitmentId AND HasEditAccess = TRUE
-                WITH USER_MODE
-            ]
-            .isEmpty();
     }
 
     private static InstallmentRow toRow(Installment__c installment) {

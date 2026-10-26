@@ -225,14 +225,6 @@
         <value>Why is it going back</value>
     </labels>
     <labels>
-        <fullName>Giving_RefundGift_NoPermission</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refund screen: the person may read gifts but not record a refund</shortDescription>
-        <value>You can see this gift but not record money going back. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
-    </labels>
-    <labels>
         <fullName>Giving_RefundGift_ReasonRequired</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

@@ -38,54 +38,6 @@ private class GiftControllerTest {
                 'The gift is not fully refunded yet.'
             );
             System.assertEquals(1, summary.allocations.size(), 'With its one allocation.');
-            System.assertEquals(true, summary.canRefund, 'An administrator may record a refund.');
-        }
-    }
-
-    /**
-     * A reader is told in plain words that they cannot record money going back, instead of a
-     * refused insert's raw message (testing guide finding C7).
-     */
-    @IsTest
-    static void aReaderIsToldTheyCannotRecordARefund() {
-        User reader = TestDataFactory.createUser(
-            'Jen',
-            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-        );
-        Gift__c gift;
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            gift = insertGift(250);
-        }
-
-        String refundMessage;
-        String writeOffMessage;
-        Test.startTest();
-        System.runAs(reader) {
-            try {
-                GiftController.refund(gift.Id, 100, 'Part back');
-            } catch (AuraHandledException refused) {
-                refundMessage = refused.getMessage();
-            }
-            try {
-                GiftController.writeOff(gift.Id, 'Will not be paid');
-            } catch (AuraHandledException refused) {
-                writeOffMessage = refused.getMessage();
-            }
-        }
-        Test.stopTest();
-
-        System.assertEquals(Label.Giving_RefundGift_NoPermission, refundMessage, 'Refund refused.');
-        System.assertEquals(
-            Label.Giving_RefundGift_NoPermission,
-            writeOffMessage,
-            'Write-off refused.'
-        );
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            System.assertEquals(
-                0,
-                [SELECT COUNT() FROM Gift__c WHERE Original_Gift__c = :gift.Id],
-                'No negative gift was recorded.'
-            );
         }
     }
 

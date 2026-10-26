@@ -6,49 +6,44 @@
       <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
     </template>
 
-    <template lwc:if={noAccess}>
-      <p role="status" class="slds-m-bottom_small" data-id="no-access">{labels.noAccess}</p>
-    </template>
-    <template lwc:else>
-      <lightning-radio-group
-        data-id="mode"
-        name="mode"
-        label={labels.heading}
-        variant="label-hidden"
-        options={modeOptions}
-        value={mode}
-        onchange={handleModeChange}
-      ></lightning-radio-group>
+    <lightning-radio-group
+      data-id="mode"
+      name="mode"
+      label={labels.heading}
+      variant="label-hidden"
+      options={modeOptions}
+      value={mode}
+      onchange={handleModeChange}
+    ></lightning-radio-group>
 
-      <p class="slds-m-vertical_x-small" data-id="remaining">
-        {labels.remaining}:
-        <lightning-formatted-number
-          value={remainingAmount}
-          format-style="currency"
-        ></lightning-formatted-number>
-      </p>
+    <p class="slds-m-vertical_x-small" data-id="remaining">
+      {labels.remaining}:
+      <lightning-formatted-number
+        value={remainingAmount}
+        format-style="currency"
+      ></lightning-formatted-number>
+    </p>
 
-      <template lwc:if={showAmount}>
-        <lightning-input
-          data-id="amount"
-          type="number"
-          formatter="currency"
-          step="0.01"
-          label={labels.amount}
-          value={amount}
-          onchange={handleAmountChange}
-        ></lightning-input>
-      </template>
-
+    <template lwc:if={showAmount}>
       <lightning-input
-        data-id="reason"
-        type="text"
-        max-length="255"
-        label={labels.reason}
-        value={reason}
-        onchange={handleReasonChange}
+        data-id="amount"
+        type="number"
+        formatter="currency"
+        step="0.01"
+        label={labels.amount}
+        value={amount}
+        onchange={handleAmountChange}
       ></lightning-input>
     </template>
+
+    <lightning-input
+      data-id="reason"
+      type="text"
+      max-length="255"
+      label={labels.reason}
+      value={reason}
+      onchange={handleReasonChange}
+    ></lightning-input>
 
     <div class="slds-m-top_medium slds-text-align_right">
       <lightning-button
@@ -57,15 +52,13 @@
         onclick={handleCancel}
         class="slds-m-right_x-small"
       ></lightning-button>
-      <template lwc:if={canEnter}>
-        <lightning-button
-          data-id="confirm"
-          variant="brand"
-          label={labels.confirm}
-          disabled={confirmDisabled}
-          onclick={handleConfirm}
-        ></lightning-button>
-      </template>
+      <lightning-button
+        data-id="confirm"
+        variant="brand"
+        label={labels.confirm}
+        disabled={confirmDisabled}
+        onclick={handleConfirm}
+      ></lightning-button>
     </div>
   </div>
 </template>

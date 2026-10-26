@@ -65,14 +65,6 @@
         <value>Enter an amount, a frequency, and a start date before previewing the schedule.</value>
     </labels>
     <labels>
-        <fullName>Giving_Commitment_NoPermission</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the person may read a commitment but not change it.</shortDescription>
-        <value>You can see this commitment but not change it. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
-    </labels>
-    <labels>
         <fullName>Giving_Commitment_NotFound</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

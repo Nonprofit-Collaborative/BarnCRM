@@ -10,7 +10,6 @@ public with sharing class GiftController {
      */
     @AuraEnabled
     public static Id refund(Id giftId, Decimal amount, String reason) {
-        requireRefundAccess();
         try {
             return GiftService.refund(giftId, amount, reason);
         } catch (Exception refundError) {
@@ -25,7 +24,6 @@ public with sharing class GiftController {
      */
     @AuraEnabled
     public static Id writeOff(Id giftId, String reason) {
-        requireRefundAccess();
         try {
             return GiftService.writeOff(giftId, reason);
         } catch (Exception writeOffError) {
@@ -48,34 +46,12 @@ public with sharing class GiftController {
             if (gifts.isEmpty()) {
                 throw new GiftService.GiftServiceException(Label.Giving_Gift_OriginalNotFound);
             }
-            GiftSummary summary = new GiftSummary(gifts[0]);
-            summary.canRefund = canRefund();
-            return summary;
+            return new GiftSummary(gifts[0]);
         } catch (Exception summaryError) {
             // No logging here on purpose: this method is cacheable, and the Error Log is a
             // record insert, which the platform refuses inside a cacheable call. The screen
             // still gets a sentence it can show, and the actions below do log.
             throw asUserError(summaryError);
-        }
-    }
-
-    /**
-     * Money going back is recorded as a new negative gift and its allocations, so recording it
-     * needs create access to both. A reader is told so before anything is tried, rather than
-     * after a refused insert.
-     */
-    private static Boolean canRefund() {
-        return Schema.SObjectType.Gift__c.isCreateable() &&
-            Schema.SObjectType.Gift_Allocation__c.isCreateable();
-    }
-
-    private static void requireRefundAccess() {
-        if (!canRefund()) {
-            AuraHandledException refused = new AuraHandledException(
-                Label.Giving_RefundGift_NoPermission
-            );
-            refused.setMessage(Label.Giving_RefundGift_NoPermission);
-            throw refused;
         }
     }
 
@@ -99,9 +75,6 @@ public with sharing class GiftController {
         public Decimal remainingAmount;
         @AuraEnabled
         public Boolean fullyReversed;
-        /** Whether the person may record a refund or write-off of this gift. */
-        @AuraEnabled
-        public Boolean canRefund;
 
         public GiftSummary(Gift__c source) {
             this.gift = source;

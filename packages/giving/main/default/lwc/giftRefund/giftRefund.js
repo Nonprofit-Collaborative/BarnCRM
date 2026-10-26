@@ -15,7 +15,6 @@ import CONFIRM from '@salesforce/label/c.Giving_RefundGift_Confirm';
 import CANCEL from '@salesforce/label/c.Giving_RefundGift_Cancel';
 import SUCCESS from '@salesforce/label/c.Giving_RefundGift_Success';
 import REASON_REQUIRED from '@salesforce/label/c.Giving_RefundGift_ReasonRequired';
-import NO_ACCESS from '@salesforce/label/c.Giving_RefundGift_NoPermission';
 
 const REFUND = 'refund';
 const WRITE_OFF = 'writeOff';
@@ -36,8 +35,7 @@ export default class GiftRefund extends LightningElement {
     modeRefund: MODE_REFUND,
     modeWriteOff: MODE_WRITE_OFF,
     confirm: CONFIRM,
-    cancel: CANCEL,
-    noAccess: NO_ACCESS
+    cancel: CANCEL
   };
 
   mode = REFUND;
@@ -46,19 +44,6 @@ export default class GiftRefund extends LightningElement {
   remainingAmount;
   working = false;
   loadError;
-  canRefund;
-
-  /**
-   * A person who may read the gift but not record money going back is told so, and offered
-   * nothing that could only fail. Until the summary arrives the form shows as usual.
-   */
-  get noAccess() {
-    return this.canRefund === false;
-  }
-
-  get canEnter() {
-    return !this.noAccess;
-  }
 
   get modeOptions() {
     return [
@@ -84,7 +69,6 @@ export default class GiftRefund extends LightningElement {
   loadSummary({ data, error }) {
     if (data) {
       this.remainingAmount = data.remainingAmount;
-      this.canRefund = data.canRefund !== false;
       // The amount going back is almost always the whole of what is left, so that is what
       // the field starts at and David only types when it is not.
       if (this.amount === undefined) {

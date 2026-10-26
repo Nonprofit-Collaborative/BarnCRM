@@ -39,8 +39,6 @@ export default class CommitmentSchedulePreview extends LightningElement {
   installments = [];
   expectedTotal;
   commitmentStatus;
-  canChange = false;
-  canGenerate = false;
   loading = true;
   errorMessage;
   noticeMessage;
@@ -87,9 +85,8 @@ export default class CommitmentSchedulePreview extends LightningElement {
     return this.commitmentStatus === 'Active' || this.commitmentStatus === 'Paused';
   }
 
-  /** A person who may only read the commitment is offered no change at all. */
   get hasActions() {
-    return this.canChange && (this.canPause || this.canResume || this.canEnd);
+    return this.canPause || this.canResume || this.canEnd;
   }
 
   async load() {
@@ -139,8 +136,6 @@ export default class CommitmentSchedulePreview extends LightningElement {
     this.installments = this.decorate(schedule);
     this.expectedTotal = schedule ? schedule.expectedTotal : undefined;
     this.commitmentStatus = schedule ? schedule.commitmentStatus : undefined;
-    this.canChange = Boolean(schedule && schedule.canChange);
-    this.canGenerate = Boolean(schedule && schedule.canGenerate);
   }
 
   /** Adds the badge class each status wears, so the template stays free of logic. */
