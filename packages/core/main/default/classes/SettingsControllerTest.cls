@@ -196,6 +196,37 @@ private class SettingsControllerTest {
         }
     }
 
+    /** The button for a row that opens another page names that page, so the row carries its name. */
+    @IsTest
+    static void aRowThatOpensAnotherPageCarriesThePageName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Opens_Another_Page',
+                    MasterLabel = 'Another page',
+                    Section__c = SettingSections.HOUSEHOLDS,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Component',
+                    Navigation_Target__c = 'Data_Hygiene',
+                    Navigation_Label__c = 'Org Optimizer',
+                    Sort_Order__c = 1
+                )
+            };
+
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+
+            SettingsController.SettingModel row;
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    row = setting;
+                }
+            }
+            Assert.isNotNull(row, 'The row arrives');
+            Assert.areEqual('Data_Hygiene', row.navigationTarget, 'It names the tab it opens');
+            Assert.areEqual('Org Optimizer', row.navigationLabel, 'And the name of that page');
+        }
+    }
+
     /** A module's own settings page shows only its rows, so each row says whose it is. */
     @IsTest
     static void eachRowNamesTheModuleItBelongsTo() {

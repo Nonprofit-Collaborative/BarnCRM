@@ -24,6 +24,7 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
@@ -122,7 +123,6 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
-    openSection: OPEN_SECTION,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
     feedbackUrl: FEEDBACK_URL
@@ -273,6 +273,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,
+      // The button names its destination ("Open Rollup Builder"), else the generic wording.
+      openLabel: setting.navigationLabel
+        ? OPEN_NAMED.replace('{0}', setting.navigationLabel)
+        : OPEN_SECTION,
       missing:
         setting.dataType === 'Component' &&
         Boolean(setting.component) &&

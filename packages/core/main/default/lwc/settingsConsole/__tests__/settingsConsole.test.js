@@ -32,6 +32,17 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_Settings_OpenSectionButton',
+  () => ({ default: 'Open this page' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Core_Settings_OpenNamedButton', () => ({ default: 'Open {0}' }), {
+  virtual: true
+});
+
 jest.mock('@salesforce/apex/SettingsController.getConsoleModel', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -594,6 +605,19 @@ describe('c-settings-console', () => {
     const button = element.shadowRoot.querySelector('lightning-button[data-target]');
     expect(button).not.toBeNull();
     expect(button.dataset.target).toBe('Giving_Settings');
+    expect(button.label).toBe('Open this page');
+  });
+
+  it('names the page its button opens when the row says what it is called', async () => {
+    const named = model(true);
+    named.sections.find((s) => s.name === 'Giving').settings[0].navigationLabel = 'Rollup Builder';
+    getConsoleModel.mockResolvedValue(named);
+    const element = build();
+    openSection('Giving');
+    await settle();
+
+    const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.label).toBe('Open Rollup Builder');
   });
 
   it('says so plainly when the module that brings a panel is not installed', async () => {

@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">Donor_Levels</value>
     </values>
     <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Donor Level Ladder</value>
+    </values>
+    <values>
         <field>Sort_Order__c</field>
         <value xsi:type="xsd:double">52</value>
     </values>

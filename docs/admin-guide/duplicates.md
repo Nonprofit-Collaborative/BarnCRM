@@ -42,7 +42,7 @@ Platform user nothing usable.
 
 1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
 2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
-   **Open this page** button brings you here too.)
+   **Open Org Optimizer** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you

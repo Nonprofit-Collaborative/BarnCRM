@@ -64,6 +64,9 @@ public with sharing class SettingsController {
         public String component;
         @AuraEnabled
         public String navigationTarget;
+        /** The name of the page the target opens, for the button's label. */
+        @AuraEnabled
+        public String navigationLabel;
         @AuraEnabled
         public String helpUrl;
         @AuraEnabled
@@ -431,6 +434,7 @@ public with sharing class SettingsController {
         setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;
+        setting.navigationLabel = definition.Navigation_Label__c;
         setting.helpUrl = String.isBlank(definition.Help_Path__c)
             ? null
             : HELP_BASE + definition.Help_Path__c;
