@@ -1,9 +1,9 @@
 /**
- * Tests for FiscalYearSelector (feature C-11, ADR-0025).
+ * Tests for FiscalYearSelector (feature C-11, ADR-0135).
  *
- * The fiscal year in Setup cannot be changed from Apex, so the org side is read once for
- * real and injected everywhere else. The BarnCRM side is deliberately the same call the
- * rollup engine makes, which is what the mismatch finding depends on.
+ * The fiscal year in Setup cannot be changed from Apex, so the org is read once for real, as
+ * an administrator and as a user with no BarnCRM permissions at all, and injected everywhere
+ * else.
  */
 @IsTest(testFor='ApexClass:FiscalYearSelector')
 private class FiscalYearSelectorTest {
@@ -16,63 +16,80 @@ private class FiscalYearSelectorTest {
     static void theOrgFiscalYearIsAMonthThePlatformKnows() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();
-            Integer month = FiscalYearSelector.orgFiscalYearStartMonth();
+            Integer month = FiscalYearSelector.fiscalYearStartMonth();
             Test.stopTest();
 
-            System.assertNotEquals(
-                null,
+            System.assertEquals(
+                [SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1]
+                .FiscalYearStartMonth,
                 month,
-                'Every org has a fiscal year start month in Setup, so an administrator running ' +
-                'Health Check always gets an answer to compare against.'
-            );
-            System.assert(
-                month >= 1 && month <= 12,
-                'The Setup fiscal year is a month number, and the finding prints it as a month ' +
-                    'name. Got: ' +
-                    month
+                'The month is the one Setup holds, with nothing in BarnCRM in between.'
             );
         }
     }
 
     @IsTest
-    static void theBarnCRMFiscalYearIsTheOneTheRollupsUse() {
+    static void staffOnMinimumAccessReadTheSameMonth() {
+        Integer asAdmin;
+        User staff;
         System.runAs(TestUsers.admin()) {
-            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
+            asAdmin = FiscalYearSelector.fiscalYearStartMonth();
+            staff = TestUsers.minimumAccessUserWith('Fystaff', new List<String>{ 'BarnCRM_Staff' });
+        }
+        // Read again rather than from this transaction's cache, so the staff user's own read
+        // is the one asserted.
+        FiscalYearSelector.cachedStartMonth = null;
+        System.runAs(staff) {
+            System.assertEquals(
+                asAdmin,
+                FiscalYearSelector.fiscalYearStartMonth(),
+                'Rollups run as whoever saved a record, so the month cannot depend on who reads ' +
+                'it: a staff user gets the same window an administrator does.'
+            );
+        }
+    }
 
-            // The rollup engine reads this same method (RollupDateWindowTest asserts it), so the
-            // number Health Check compares is the number the totals were computed from.
+    @IsTest
+    static void theInjectedMonthIsTheOneReturned() {
+        System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.setTestStartMonth(7);
+
             System.assertEquals(
                 7,
-                FiscalYearSelector.settingsFiscalYearStartMonth(),
-                'The setting is read back as the month it was set to.'
+                FiscalYearSelector.fiscalYearStartMonth(),
+                'A module test sets the org month through the seam and reads it back.'
+            );
+
+            FiscalYearSelector.setTestStartMonth(null);
+            System.assert(
+                FiscalYearSelector.fiscalYearStartMonth() >= 1 &&
+                    FiscalYearSelector.fiscalYearStartMonth() <= 12,
+                'Null goes back to reading the org.'
             );
         }
     }
 
     @IsTest
-    static void anUntouchedSettingReadsAsJanuaryBecauseThatIsWhatTheRollupsDid() {
+    static void aMonthThePlatformCannotMeanFallsBackToJanuary() {
         System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.startMonthOverride = 13;
+
             System.assertEquals(
                 1,
-                FiscalYearSelector.settingsFiscalYearStartMonth(),
-                'With the setting never saved, the rollup engine falls back to January, so that ' +
-                'is the boundary the totals were measured on and the month Setup has to match.'
+                FiscalYearSelector.fiscalYearStartMonth(),
+                'A value outside 1 to 12 is never used as a window boundary.'
             );
         }
     }
 
     @IsTest
-    static void anOrgFiscalYearThatCouldNotBeReadIsNull() {
+    static void customFiscalYearsAreReadWithoutFailing() {
         System.runAs(TestUsers.admin()) {
-            FiscalYearSelector.orgStartMonthOverridden = true;
-            FiscalYearSelector.orgStartMonthOverride = null;
+            Boolean custom = FiscalYearSelector.usesCustomFiscalYears();
+            System.assertNotEquals(null, custom, 'The answer is true or false, never null.');
 
-            System.assertEquals(
-                null,
-                FiscalYearSelector.orgFiscalYearStartMonth(),
-                'A value nobody could read comes back as null, which Health Check reports as no ' +
-                'finding: it is not evidence that the two fiscal years disagree.'
-            );
+            FiscalYearSelector.customFiscalYearsOverride = true;
+            System.assert(FiscalYearSelector.usesCustomFiscalYears(), 'The injected answer');
         }
     }
 
@@ -84,20 +101,18 @@ private class FiscalYearSelectorTest {
             System.assertNotEquals(
                 '7',
                 july,
-                'The finding reads "starts in July", not "starts in 7", so the number is turned ' +
-                'into a name in the running user language.'
+                'The settings page reads "starts in July", not "starts in 7", so the number is ' +
+                'turned into a name in the running user language.'
             );
             System.assertNotEquals(
                 FiscalYearSelector.monthName(1),
                 july,
-                'Two different months read as two different names, which is the whole content of ' +
-                'the finding.'
+                'Two different months read as two different names.'
             );
             System.assertEquals(
                 '13',
                 FiscalYearSelector.monthName(13),
-                'A month outside 1 to 12 is printed as it is rather than throwing, because a ' +
-                'settings value nobody validated must not take the report down.'
+                'A month outside 1 to 12 is printed as it is rather than throwing.'
             );
         }
     }

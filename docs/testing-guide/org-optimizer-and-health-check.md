@@ -48,7 +48,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
 | 3 | Find **Your org at a glance**. | An **Information** finding that ends by saying Shield Platform Encryption cannot be detected from inside the app. |
 | 4 | Find the automation finding. | **Automation is running normally**, **Information**. |
-| 5 | Click **Re-run**. | **Reading your org**, then the report again. |
+| 5 | Look for a fiscal year finding. | With a standard fiscal year in Setup (the default), there is none. An org that uses a custom fiscal year shows **Your org uses a custom fiscal year**, **Information**, naming the start month, with no button. |
+| 6 | Click **Re-run**. | **Reading your org**, then the report again. |
 
 **Cleanup:** None.
 

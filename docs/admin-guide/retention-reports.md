@@ -39,8 +39,8 @@ follow, which is why these reports read those fields instead of reading last yea
 
 **LYBUNT** means Last Year But Unfortunately Not This year. A donor is on the list when their
 most recent qualifying gift falls in the last fiscal year. The year boundary is the fiscal
-year, not the calendar year, and it is the one set in Setup, which must match the fiscal year
-start month in BarnCRM Settings (see step 1 below).
+year, not the calendar year, and it is your org's fiscal year in Setup, the same one the donor
+totals use (see step 1 below).
 
 The refund cases, spelled out because they are where other systems go wrong:
 
@@ -83,13 +83,12 @@ because they have not had the same amount of time.
 
 ## How to turn it on
 
-1. **Make the two fiscal years agree.** In BarnCRM Settings, open the **General** section
-   and read **Fiscal year start month**. Then, in Salesforce Setup, search for **Fiscal Year** and
-   check that the org's
-   fiscal year starts in the same month. Salesforce reports can only read the Setup value, and
-   the donor fields these reports rest on are calculated from the BarnCRM Settings value, so
-   if the two disagree the reports draw the year boundary in a different place from the donor
-   record. This is the one setup step, and it takes a minute.
+1. **Check the fiscal year.** In BarnCRM Settings, open the **General** section and read
+   **Fiscal year start month**, shown read only from Setup. If it is not the month your
+   fiscal year starts, change it in **Setup, Company Settings, Fiscal Year**. The reports and
+   the donor fields they rest on both read this one fiscal year, so they always draw the year
+   boundary in the same place. BarnCRM follows the standard fiscal year; with a custom fiscal
+   year, Health Check explains how the two can differ.
 2. **Run the rollups once.** On the same **Rollups** page, choose **Recalculate all**.
    These reports read First Gift Date, Last Gift Date, Gift Count and Gifts Last Year, and a
    donor whose rollups have never run is invisible to them. After the first run the rollups
@@ -145,11 +144,11 @@ run since that gift, which the Rollups Last Calculated column on their row will 
 gift is dated in the future. Last Gift Date is the date on the gift, so a gift dated next
 month counts as next month, and until then the donor looks lapsed.
 
-**The year boundary looks wrong: a December gift landed in the wrong year.** The two fiscal
-years disagree. Setup's fiscal year decides which donors the report selects, and BarnCRM
-Settings' fiscal year start month decides what Giving Last Year and Gifts Last Year hold. The
-symptom is a donor on the LYBUNT list whose Giving This Year is not zero. Fix it with step 1
-of the setup above, then recalculate the rollups.
+**The year boundary looks wrong: a December gift landed in the wrong year.** Either the
+fiscal year in Setup does not start in the month your organization uses, or it was changed and
+the rollups have not been recalculated since. The symptom of the second is a donor on the
+LYBUNT list whose Giving This Year is not zero. Fix the month with step 1 of the setup above,
+then recalculate the rollups.
 
 **The retention numbers do not add up to the number of donors.** They do, but across two
 reports. Everyone who gave last year is either on the LYBUNT report, because they have not

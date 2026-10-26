@@ -109,7 +109,7 @@ For every script on this page:
 ## T-GRD-07: Retention reports
 
 **Purpose:** Confirm the four retention reports run, count donors, and treat a refund correctly.
-**Prerequisites:** admin. T-GRD-01 done. Setup **Fiscal Year** starts in the same month as **Fiscal year start month** in **BarnCRM Settings**, **General**.
+**Prerequisites:** admin. T-GRD-01 done. The reports and the donor totals both follow the org's fiscal year in Setup, shown read only as **Fiscal year start month** in **BarnCRM Settings**, **General**.
 
 | Step | Action | Expected result |
 |---|---|---|
