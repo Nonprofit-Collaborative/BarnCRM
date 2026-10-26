@@ -32,4 +32,68 @@
         <shortDescription>Duplicate Matching: shown to someone who may open no area</shortDescription>
         <value>You do not have access to duplicate matching. Ask a BarnCRM Admin for the BarnCRM Duplicate Review permission set.</value>
     </labels>
+    <labels>
+        <fullName>Core_MatchLogic_NotUsable</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: a source the scan skips in this org</shortDescription>
+        <value>Not used in this org: its object or one of its fields is not here, or you cannot read it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_LinksPerson</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: a source tied to a contact or an Individual</shortDescription>
+        <value>A person</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_LinksHousehold</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: a source tied to an account</shortDescription>
+        <value>A household, or a person account</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_LinksEither</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: a source whose lookup can point at either</shortDescription>
+        <value>A person or a household</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_CompareEmail</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: how an email is compared</shortDescription>
+        <value>Email: spaces trimmed, capitals ignored</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_ComparePhone</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: how a phone number is compared</shortDescription>
+        <value>Phone: digits only, without a leading 1 on an 11 digit number</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_CompareAddress</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: how an address is compared</shortDescription>
+        <value>Address: street without punctuation or capitals, common words shortened (Street to St), with the postal code</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_PermissionRequired</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: refused without either permission</shortDescription>
+        <value>Matching logic needs the Manage BarnCRM Settings or Manage BarnCRM Metadata permission.</value>
+    </labels>
 </CustomLabels>
