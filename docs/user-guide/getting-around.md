@@ -70,7 +70,7 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   automatically once you add a member. You see this button only if you can create households.
 - **Quick links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
   going back to the App Launcher.
-- **Files that arrive regularly**: shown only if you can read import mappings and a file is
+- **Files that arrive regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
 If someone has paused automation (for example during a large import), a banner under the
@@ -123,17 +123,21 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 
 | Card | Opens |
 |---|---|
-| **Find and export records** | The **Find** tab |
-| **Change many records** | **Find**: run a query, then press **Bulk update** |
-| **Delete many records** | **Find**: run a query, then press **Bulk delete** |
-| **Tidy and check your data** | The **Org Optimizer** tab |
+| **Find and Export Records** | The **Find** tab |
+| **Update Many Records** | **Find**: run a query, then press **Bulk update** (no file needed) |
+| **Delete Many Records** | **Find**: run a query, then press **Bulk delete** (no file needed) |
+| **Tidy and Check Your Data** | The **Org Optimizer** tab |
+
+Deleted records go to the Recycle Bin, not away for good: the **Delete Many Records** card says
+so in a yellow warning box, and you can undo a bulk delete from **Data Jobs** for up to 15 days.
 
 1. Choose **Open** on the card you want.
-2. Under **Data jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
+2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. Import cards and Salesforce's own tools are for admins. See
+it can still be undone. **Import a File**, **Import Templates** and **Salesforce's Own Tools**
+are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common problems

@@ -10,7 +10,19 @@
                     <article class="slds-box slds-box_small">
                         <h3 class="slds-text-heading_small">{tool.title}</h3>
                         <p class="slds-var-m-vertical_x-small slds-text-body_small">{tool.text}</p>
-                        <lightning-button label={labels.open} aria-label={tool.openLabel} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
+                        <template lwc:if={tool.warning}>
+                            <div class="slds-scoped-notification slds-theme_warning slds-var-m-bottom_x-small" role="note" data-id="delete-warning">
+                                <div class="slds-media slds-media_center">
+                                    <div class="slds-media__figure">
+                                        <lightning-icon icon-name="utility:warning" size="x-small" alternative-text={labels.warningAlt}></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <p class="slds-text-body_small">{tool.warning}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <lightning-button label={labels.open} aria-label={tool.openLabel} variant={tool.buttonVariant} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
                     </article>
                 </div>
             </template>
@@ -20,6 +32,7 @@
     <template lwc:if={isAdmin}>
         <lightning-card title={labels.mappingsHeading} class="slds-var-m-top_small">
             <div class="slds-var-p-horizontal_medium">
+                <p class="slds-text-body_small slds-var-m-bottom_small" data-id="mappings-intro">{labels.mappingsIntro}</p>
                 <template lwc:if={mappingsError}>
                     <p role="alert" class="slds-text-color_error" data-id="mappings-error">{mappingsError}</p>
                 </template>

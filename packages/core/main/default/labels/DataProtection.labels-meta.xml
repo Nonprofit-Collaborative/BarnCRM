@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load one object: household members; {0} is the object plural</shortDescription>
-        <value>{0} are kept by the households they belong to and cannot be loaded from a file. Load people with a people mapping instead.</value>
+        <value>{0} are kept by the households they belong to and cannot be loaded from a file. Load people with a people template instead.</value>
     </labels>
     <labels>
         <fullName>Core_Data_ObjectNotLoadable</fullName>

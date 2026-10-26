@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: heading over the tool cards</shortDescription>
-        <value>Start a task</value>
+        <value>Start a Task</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ImportTitle</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card that opens the Import tab</shortDescription>
-        <value>Import a file</value>
+        <value>Import a File</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ImportText</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the import card does</shortDescription>
-        <value>Load people, organizations or one kind of record from a spreadsheet, with a preview first.</value>
+        <value>Needs a file. Add new records and update existing ones from a spreadsheet (CSV or Excel): people and organizations, or one kind of record. A dry run shows what would change before anything is saved.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindTitle</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card that opens Find</shortDescription>
-        <value>Find and export records</value>
+        <value>Find and Export Records</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindText</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the Find card does</shortDescription>
-        <value>Find exactly the records you need, save the query, and export them.</value>
+        <value>No file needed. Find exactly the records you need, save the query, and export them to a file.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_UpdateTitle</fullName>
@@ -62,15 +62,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card for bulk update</shortDescription>
-        <value>Change many records</value>
+        <value>Update Many Records</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_UpdateText</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: how to start a bulk update</shortDescription>
-        <value>Run a query in Find, then press Bulk update.</value>
+        <shortDescription>Data Manager: what the bulk update card does, and how to start it</shortDescription>
+        <value>No file needed. Change up to five fields on many records at once: find the records in Find, then press Bulk update. To update records from a spreadsheet, use Import a File.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
@@ -78,15 +78,31 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card for bulk delete</shortDescription>
-        <value>Delete many records</value>
+        <value>Delete Many Records</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteText</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: how to start a bulk delete</shortDescription>
-        <value>Run a query in Find, then press Bulk delete.</value>
+        <shortDescription>Data Manager: what the bulk delete card does, and how to start it</shortDescription>
+        <value>No file needed: find the records in Find, then press Bulk delete. To delete the records a spreadsheet lists by record ID, an administrator can use Import a File, Load one object, then Delete by record ID.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DeleteWarning</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: warning on the bulk delete card</shortDescription>
+        <value>Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_WarningAlt</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: screen reader text of the warning icon</shortDescription>
+        <value>Warning</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerTitle</fullName>
@@ -94,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
-        <value>Tidy and check your data</value>
+        <value>Tidy and Check Your Data</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerText</fullName>
@@ -102,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the Org Optimizer card does</shortDescription>
-        <value>Open Org Optimizer to see which records and settings need attention.</value>
+        <value>No file needed. Open Org Optimizer to see which records and settings need attention.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_Open</fullName>
@@ -125,31 +141,39 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: heading of the import mappings card</shortDescription>
-        <value>Import mappings</value>
+        <shortDescription>Data Manager: heading of the import templates card</shortDescription>
+        <value>Import Templates</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_MappingsIntro</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: what an import template is and how to make one</shortDescription>
+        <value>A template remembers how a file's columns match BarnCRM fields, so every file with the same layout (for example, a monthly donations export) opens already matched. BarnCRM ships some; create your own with Load one object, the first step of Import a File. The column matches you settle on are saved to the template each time you import with it.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_MappingsEmpty</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: no import mappings</shortDescription>
-        <value>No import mappings yet.</value>
+        <shortDescription>Data Manager: no import templates</shortDescription>
+        <value>No import templates yet.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ColumnName</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: mappings column, the mapping name</shortDescription>
-        <value>Mapping</value>
+        <shortDescription>Data Manager: templates column, the template name</shortDescription>
+        <value>Template</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ColumnLoads</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: mappings column, what it loads</shortDescription>
+        <shortDescription>Data Manager: templates column, what it loads</shortDescription>
         <value>Loads</value>
     </labels>
     <labels>
@@ -157,7 +181,7 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: mappings column, the recurring source name</shortDescription>
+        <shortDescription>Data Manager: templates column, the recurring source name</shortDescription>
         <value>Arrives regularly as</value>
     </labels>
     <labels>
@@ -165,7 +189,7 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: mappings column, the last import date</shortDescription>
+        <shortDescription>Data Manager: templates column, the last import date</shortDescription>
         <value>Last loaded</value>
     </labels>
     <labels>
@@ -173,7 +197,7 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what a people mapping loads</shortDescription>
+        <shortDescription>Data Manager: what a people template loads</shortDescription>
         <value>People and organizations</value>
     </labels>
     <labels>
@@ -182,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: heading of the Salesforce tools card</shortDescription>
-        <value>Salesforce's own tools</value>
+        <value>Salesforce's Own Tools</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_WeeklyExport</fullName>

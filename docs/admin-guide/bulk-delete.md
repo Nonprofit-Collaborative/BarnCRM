@@ -22,6 +22,14 @@ administrator changed it) or 15 days, whichever is shorter, because Salesforce e
 record from the Recycle Bin after 15 days. A record that is no longer in the Recycle Bin cannot
 be brought back, and the undo says how many.
 
+Neither a bulk delete nor a delete by file deletes anything for good: both delete the way a
+person does in Salesforce, so every record goes to the Recycle Bin. One Salesforce limit
+applies all the same: the Recycle Bin holds as many records as 25 times your org's storage in
+MB (an org with 1,000 MB holds 25,000), and when it is full Salesforce empties the oldest records
+that have been in it for at least two hours, even before 15 days. A very large delete in a small
+org can push older deleted records out; download the records first (step 4 below) when you may
+need them later.
+
 A bulk delete acts with your own access. It deletes only records you may delete, and your
 organization's automation runs on every record, as it does on any delete. A record that is
 refused is listed with the reason; the rest are still deleted.
@@ -67,7 +75,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
    refusal. The count of records that no longer matched the query (changed or removed by
    someone else while the job ran) is in the job's run log and in its notification, not in
    the panel.
-7. To undo it, find the job under **Data jobs** on the **Data Manager** tab, press
+7. To undo it, find the job under **Data Jobs** on the **Data Manager** tab, press
    **Undo**, type the number, and confirm. The records come back from the Recycle Bin. The list
    shows your own bulk deletes. Someone who manages BarnCRM Settings can tick **Show everyone's
    jobs** to see and undo anyone's.
