@@ -224,7 +224,12 @@ allows: settings change how the whole org behaves.
 This is the form the "before you start" list was for. Core asks for two things:
 
 - **Legal name**, exactly as on your official filings, not your nickname.
-- **Address**, on one line, as you want it printed.
+- **Organization address**, as you want it printed, in one block laid out like a Salesforce
+  address: **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then
+  **Country**. You can leave the whole address blank. Once you fill in any part, **Street**,
+  **City**, **State** and **Zip Code** are required and are marked as required; **Street 2**
+  and **Country** are optional. If a required part is missing when you click **Save**, the
+  step tells you which and saves nothing.
 
 With the Giving module installed, the same form also asks for what your receipts print:
 

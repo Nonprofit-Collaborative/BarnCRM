@@ -222,6 +222,7 @@ public with sharing class SettingsService {
         if (changed.isEmpty()) {
             return record;
         }
+        refuseIfAddressWouldBeIncomplete(type, record, changed);
         SettingsWriter.saveOrgDefault(type, storedRecord, changed);
         if (!changes.isEmpty()) {
             Database.insert(changes, AccessLevel.USER_MODE);
@@ -247,6 +248,33 @@ public with sharing class SettingsService {
             return;
         }
         String refusal = CoexistenceService.membershipChangeRefusal(oldText, newText);
+        if (refusal != null) {
+            throw new SettingsException(refusal);
+        }
+    }
+
+    /**
+     * The organization address is all or nothing (R-OA1): blank, or street, city, state and
+     * postal code all present. The check is made on the address as it would be stored after this
+     * save, the new values over the stored ones, so a save that touches one part cannot leave the
+     * rest incomplete. It lives here because this is the one place the parts are written, whether
+     * from the console, the Setup Assistant or a direct call. Nothing is saved when it refuses.
+     */
+    private static void refuseIfAddressWouldBeIncomplete(
+        Schema.SObjectType type,
+        SObject record,
+        Map<Schema.SObjectField, Object> changed
+    ) {
+        if (!isCoreSettings(type)) {
+            return;
+        }
+        Boolean touched = false;
+        BarnCRM_Settings__c candidate = new BarnCRM_Settings__c();
+        for (Schema.SObjectField part : OrganizationAddress.partFields()) {
+            touched = touched || changed.containsKey(part);
+            candidate.put(part, changed.containsKey(part) ? changed.get(part) : record.get(part));
+        }
+        String refusal = touched ? OrganizationAddress.refusal(candidate) : null;
         if (refusal != null) {
             throw new SettingsException(refusal);
         }
