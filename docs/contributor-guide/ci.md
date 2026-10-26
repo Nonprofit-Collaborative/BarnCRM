@@ -700,7 +700,7 @@ stage the script runs
 post-install script and would otherwise leave the org without the rollup definitions a real
 install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
 tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
-for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs `FundDefaultsService.installDefaultFundDuringInstall()`, which creates the starting General Fund and makes it the default when the org has no fund and no default fund set. Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
+for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
 which gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125 D2). Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.

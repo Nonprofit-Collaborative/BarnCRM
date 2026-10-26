@@ -14,7 +14,10 @@ duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM 
 The edition decides what BarnCRM shows and offers. It never installs, removes or changes
 anything: every module is a separate package that you install yourself through Salesforce's
 installer, and no records change when the edition changes. You install a module from the
-**Modules** section of BarnCRM Settings, which opens Salesforce's installer. Which editions
+**Modules** section of BarnCRM Settings, which opens Salesforce's installer. Install modules as
+packages: the install runs each module's setup steps. A module copied into an org by hand skips
+them, and the Modules section then offers **Finish Setup** as a recovery step (see
+[Module Manager](module-manager.md#when-a-modules-setup-never-ran)). Which editions
 offer each module ships with BarnCRM as data (BarnCRM Module records), so a module offered to
 both editions, such as BarnCRM Rollup Builder, simply appears in both. Each installed module
 has its own app with its own Settings tab; the Modules section links to it. The Core features

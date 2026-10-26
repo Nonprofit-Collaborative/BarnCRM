@@ -5,6 +5,9 @@ import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
 import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdminAccess';
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
+import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
+import FINISH_SETUP from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
+import SETUP_NOT_RUN from '@salesforce/label/c.Core_ModuleSetup_NotRunNotice';
 
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
@@ -67,7 +70,9 @@ export default class ModuleManager extends LightningElement {
     readOnly: READ_ONLY,
     openApp: OPEN_APP,
     nonprofitTitle: NONPROFIT_TITLE,
-    showNonprofit: SHOW_NONPROFIT
+    showNonprofit: SHOW_NONPROFIT,
+    finishSetup: FINISH_SETUP,
+    setupNotRun: SETUP_NOT_RUN
   };
 
   connectedCallback() {
@@ -106,6 +111,7 @@ export default class ModuleManager extends LightningElement {
             : 'slds-badge slds-var-m-left_x-small',
         isOn: module.canSwitch && module.status === 'On',
         isOff: module.canSwitch && module.status === 'Off',
+        setupPending: module.status !== 'NotInstalled' && module.setupPending === true,
         showInstall: module.status === 'NotInstalled' && Boolean(module.installUrl),
         noInstallLink: module.status === 'NotInstalled' && !module.installUrl,
         installFirstText:
@@ -164,6 +170,11 @@ export default class ModuleManager extends LightningElement {
   handleCheckAgain() {
     this.reports = {};
     this.load();
+  }
+
+  /** Finish Setup (FS1): runs the module's install steps, for source copied in by hand. */
+  handleFinishSetup(event) {
+    this.run(finishSetup, { moduleName: event.target.dataset.name });
   }
 
   handleTurnOff(event) {
