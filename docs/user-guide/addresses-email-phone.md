@@ -1,7 +1,7 @@
 # Addresses, email and phone
 
 BarnCRM keeps every address a household, organization or person uses, and marks one as the
-default. The default is copied into the standard address fields, so letters and reports always
+primary. The primary is copied into the standard address fields, so letters and reports always
 use the right one. People also get three email boxes and a choice of which one you write to,
 and a choice of which phone number to call.
 
@@ -18,8 +18,8 @@ admin has turned on the Addresses feature. Ask your admin; see
 4. Fill in **Street**, **City**, **State**, **Postal Code** and **Country**.
 5. Click **Add address** at the foot of the form.
 
-You should see: "Address saved." The first address a record gets is made the default
-automatically and carries a **Default** badge.
+You should see: "Address saved." The first address a record gets is made the primary
+automatically and carries a **Primary** badge.
 
 ## To choose household or personal
 
@@ -31,15 +31,15 @@ automatically and carries a **Default** badge.
   depends on your org's setting: either the whole household moves, or the person gets an
   address of their own. Ask your admin which yours is.
 - If you edit a household's **Billing Address** field, the new address becomes the
-  household's default address, and everyone in the household moves with it except a person
+  household's primary address, and everyone in the household moves with it except a person
   with an address of their own.
 
-## To make an address the default
+## To make an address the primary
 
-1. On the **Addresses** card, click **Set as default** on the address you want to use.
+1. On the **Addresses** card, click **Set as Primary** on the address you want to use.
 
-You should see: "This is now the default address, and it has been copied to the standard
-address fields." The **Default** badge moves, and the record's own address fields at the
+You should see: "This is now the primary address, and it has been copied to the standard
+address fields." The **Primary** badge moves, and the record's own address fields at the
 top of the page refresh. Nothing is deleted: the other addresses stay on the card.
 
 ## To add a seasonal address
@@ -53,7 +53,7 @@ Use this for a household that spends part of each year somewhere else.
 4. Click **Add address**.
 
 You should see: the address on the card with its dates, for example "Used from January 1 to
-March 31". A nightly job makes it the default when the season starts and puts the previous
+March 31". A nightly job makes it the primary when the season starts and puts the previous
 address back when it ends. You do not move it by hand.
 
 ## To change or delete an address
@@ -99,14 +99,14 @@ BarnCRM's **Work Phone**.
   day is a day its month has ..." Correct the number.
 - Problem: "An address belongs to one household, one organization, or one person. Choose only
   one." Clear one of **Household or Organization** and **Person** on the address.
-- Problem: "This is the address in use. To change that, make another address the default, or
-  delete this one." You tried to untick **Default** on the only address in use. Use **Set as
-  default** on another address instead.
+- Problem: "This is the address in use. To change that, make another address the primary, or
+  delete this one." You tried to untick **Primary** on the only address in use. Use **Set as
+  Primary** on another address instead.
 - Problem: "The address could not be saved. Check the fields marked in the form and try
   again." Fix the marked fields.
-- Problem: "We could not make that the default address. Check that you have permission to
+- Problem: "We could not make that the primary address. Check that you have permission to
   edit addresses ..." Ask your admin for edit access.
-- Problem: the **Addresses** card has no **Add address** or **Set as default** button. Your
+- Problem: the **Addresses** card has no **Add address** or **Set as Primary** button. Your
   access lets you read addresses but not change them (the Read Only role, for example). Ask
   your admin.
 - Problem: "The Work email address is empty, so there is nothing to put in the ordinary Email

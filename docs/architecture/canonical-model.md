@@ -6042,7 +6042,7 @@ history is not lost when someone moves.
 | Seasonal Start Day | integer | conditional | The day of that month; required when Type is Seasonal. |
 | Seasonal End Month | integer | conditional | The month a seasonal address stops being used; required when Type is Seasonal. |
 | Seasonal End Day | integer | conditional | The day of that month; required when Type is Seasonal. |
-| Is Default | boolean | yes (defaults false) | Marks the address currently written to the standard address fields. |
+| Primary | boolean | yes (defaults false) | Marks the address currently written to the standard address fields (API name `Is_Default__c`). |
 | Verification Status | picklist(Unverified, Verified, Failed) | yes (defaults Unverified) | Whether an address verification service has confirmed this address. |
 | Latest Verified Date | date | no | When verification last succeeded. |
 | Replaced By Seasonal | boolean | yes (defaults false) | Marks the address the seasonal swap displaced, so the job knows which address to put back when the season ends. |
@@ -6051,7 +6051,7 @@ history is not lost when someone moves.
 
 - **Address to its owner**, many to one, to exactly one of Account, Contact, or Person
   Account (R-AD1).
-- Addresses have no relationship to gifts or receipts: a receipt reads the owner's default
+- Addresses have no relationship to gifts or receipts: a receipt reads the owner's primary
   address at the time it is issued and stores the text it printed (v0.4, G-13).
 
 ### Rules
@@ -6060,23 +6060,23 @@ history is not lost when someone moves.
 owned by an account is the household's or the organization's; an address owned by a person
 is theirs alone and does not affect their household.
 
-**R-AD2 One default per owner.** At most one address per owner has Is Default true.
+**R-AD2 One primary per owner.** At most one address per owner has Primary true.
 Setting it on a second clears the first. Within one save that marks several addresses of
-one owner as default, the last of them keeps the flag. Clearing the flag on an owner's only
-default, with no other put in use in the same save, is refused (label
-`Core_Address_CannotUntickOnlyDefault`). When the default is deleted, the newest remaining
+one owner as primary, the last of them keeps the flag. Clearing the flag on an owner's only
+primary, with no other put in use in the same save, is refused (label
+`Core_Address_CannotUntickOnlyDefault`). When the primary is deleted, the newest remaining
 address that is not Seasonal is promoted, and a Seasonal one only when nothing else is left.
-The first address added from the address card to an owner with none is saved as default.
+The first address added from the address card to an owner with none is saved as primary.
 
-**R-AD3 Default propagation.** The default address is copied to the standard address
+**R-AD3 Primary propagation.** The primary address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
 Account's billing address for a household or an organization, and to the Contact's mailing
 address for a person. The copy happens on save and on the seasonal swap. A household's or
-an organization's default is also copied to the mailing address of each current member of
+an organization's primary is also copied to the mailing address of each current member of
 the household, except two, who keep the address they have, on save and on the seasonal swap
 alike:
 
-- a member stored as a Contact who has a default address of their own (one owned through
+- a member stored as a Contact who has a primary address of their own (one owned through
   Contact, R-AD1), such as the one R-AD5's personal address behavior gives them. This is how
   one person lives apart from their household, with no field to say so. A member held as a
   Person Account is not asked this, because every person account carries an address of its
@@ -6086,9 +6086,9 @@ alike:
 
 The standard fields are not where a change is kept, but a change made there is captured
 rather than lost: a person's mailing address under R-AD5, and a household's or an
-organization's billing address, on insert and when it changes afterwards, as a new default
+organization's billing address, on insert and when it changes afterwards, as a new primary
 address of type Home (Work for an organization), the old one kept as history (R-AD7). An
-emptied billing address, one the default already holds, and BarnCRM's own copy are not
+emptied billing address, one the primary already holds, and BarnCRM's own copy are not
 captured, and neither is a household that carries a native Nonprofit Cloud household group,
 whose standard fields this rule never writes (product-plan Section 11.2 item 9).
 
@@ -6100,26 +6100,26 @@ is. A household member, or an owner named in Person Account, that turns out to b
 household or an organization is left out of the copy rather than written and refused, which
 would refuse the address the user was saving along with it.
 
-**R-AD4 Seasonal swap.** A daily scheduled job makes the seasonal address the default
-while today falls inside its range, and restores the previous default when the range ends.
+**R-AD4 Seasonal swap.** A daily scheduled job makes the seasonal address the primary
+while today falls inside its range, and restores the previous primary when the range ends.
 Ranges may wrap the end of the year, so a November to March range is one range and not two.
 A range is inclusive at both ends: an address used from November 1 to March 31 is in use on
 November 1 and on March 31, and out of use on April 1.
 
 The job works one owner at a time and does exactly one of four things for each:
 
-1. A seasonal address is in season and is not the default: the current default is marked
-   Replaced By Seasonal, its default flag is cleared, and the seasonal address becomes the
-   default.
-2. The default is a seasonal address whose season has ended: the address marked Replaced By
-   Seasonal becomes the default again and that mark is cleared. If no address carries the
+1. A seasonal address is in season and is not the primary: the current primary is marked
+   Replaced By Seasonal, its primary flag is cleared, and the seasonal address becomes the
+   primary.
+2. The primary is a seasonal address whose season has ended: the address marked Replaced By
+   Seasonal becomes the primary again and that mark is cleared. If no address carries the
    mark, the most recently created address that is not seasonal is promoted instead, and if
    the owner has no other address the seasonal one stays in place rather than leaving the
    owner with no address at all.
 3. Two seasonal addresses are in season on the same day, which is a data entry mistake: the
    oldest wins so the outcome does not change from night to night, and the run records the
    collision in the Error Log rather than choosing silently.
-4. Nothing to do: the right address is already the default.
+4. Nothing to do: the right address is already the primary.
 
 Nothing else on the address is touched, and the propagation to the standard address fields
 (R-AD3) is the address automation's work rather than the job's, so switching that automation
@@ -6146,7 +6146,7 @@ write them and so that a report can find unverified addresses. Third-party verif
 out of scope (plan Section 4.7).
 
 **R-AD7 History is kept.** Moving a household creates a new address and clears the old
-one's default flag. The old address is not deleted, so a mailing sent last year can still
+one's primary flag. The old address is not deleted, so a mailing sent last year can still
 be explained.
 
 ### Salesforce implementation
@@ -6168,7 +6168,7 @@ be explained.
 | Seasonal Start Day | `Seasonal_Start_Day__c` | Number (0 decimals) |
 | Seasonal End Month | `Seasonal_End_Month__c` | Number (0 decimals) |
 | Seasonal End Day | `Seasonal_End_Day__c` | Number (0 decimals) |
-| Is Default | `Is_Default__c` | Checkbox |
+| Primary | `Is_Default__c` | Checkbox |
 | Verification Status | `Verification_Status__c` | Picklist: Unverified, Verified, Failed |
 | Latest Verified Date | `Latest_Verified_Date__c` | Date |
 | Replaced By Seasonal | `Replaced_By_Seasonal__c` | Checkbox |
@@ -6322,7 +6322,7 @@ logged and counted as a failure.
   household's real-time rollups the same way.
 - **Merge settlement** (PEOPLE-15) runs just after any Salesforce merge, in a queued job
   (`MergeSettlement`): a person in both merged households keeps one membership, a household
-  that took in members is recounted and renamed, a survivor keeps one default address (the one
+  that took in members is recounted and renamed, a survivor keeps one primary address (the one
   matching its standard address fields: billing for a household or organization, mailing for a
   contact or a person account, read by name so Core runs without person accounts; otherwise
   the newest), and a person loses relationships with themselves and second copies and has
@@ -8688,6 +8688,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
+| v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
 
 ---
 ## 32. Entity ownership by package

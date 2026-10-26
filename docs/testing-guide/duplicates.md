@@ -77,7 +77,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Create an Account, record type **Household**, named `Sunset Test Household` (a name no rule would match). | The household saves. |
-| 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Default** ticked. | The address saves. |
+| 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Primary** ticked. | The address saves. |
 | 3 | On **Duplicates**, scan and refresh. | A pair of `Sunset Test Household` and **The Garcia Family**, both **Household:**, with the grey line **Same address on Address (household)**. Capitals and the full stop did not stop the match. |
 | 4 | Click **Not a duplicate**, give the reason `Test: match source`, confirm. | **Noted. This pair will not be suggested again.** |
 | 5 | Scan again and refresh. | The pair does not come back. |
@@ -93,7 +93,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **General**, scroll to **Custom metadata**, then **Match sources**. | **Shipped with BarnCRM** lists six rows: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**, each **In use**. |
 | 2 | Open the menu on **Address (household)** and choose **Archive**. | **Saving. Salesforce applies the change in the background, usually within a minute.**, then **Saved.** The row reads **Archived**. |
-| 3 | Create a household `Pine Test Household` with a default address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
+| 3 | Create a household `Pine Test Household` with a primary address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 4 | Scan and refresh **Duplicates**. | No pair with `Pine Test Household`. |
 | 5 | Back on **Match sources**, choose **Restore** on **Address (household)**. | **Saved.** The row reads **In use**. |
 | 6 | Scan and refresh. | A pair of `Pine Test Household` and **Staff Household**, reason **Same address on Address (household)**. |

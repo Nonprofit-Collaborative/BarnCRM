@@ -230,6 +230,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Merge tidy-up could not start; {0} kept records, {1} platform message</shortDescription>
-        <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because Salesforce refused the request to run it ({1}). These kept records may have a stale member count or name, two default addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
+        <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because Salesforce refused the request to run it ({1}). These kept records may have a stale member count or name, two primary addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
     </labels>
 </CustomLabels>

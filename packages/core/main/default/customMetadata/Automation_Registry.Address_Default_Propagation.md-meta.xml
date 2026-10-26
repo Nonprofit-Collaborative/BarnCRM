@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <label>Copy default address to standard fields</label>
+    <label>Copy primary address to standard fields</label>
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Keeps the standard address fields on a household, an organization, and its people equal to the address marked default, so mail merges, reports, and other apps keep working. Also makes sure only one address per owner is the default, and promotes the most recent remaining address when a default is deleted.</value>
+        <value xsi:type="xsd:string">Keeps the standard address fields on a household, an organization, and its people equal to the address marked primary, so mail merges, reports, and other apps keep working. Also makes sure only one address per owner is the primary, and promotes the most recent remaining address when a primary is deleted.</value>
     </values>
     <values>
         <field>Enabled_By_Default__c</field>

@@ -111,7 +111,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
 | Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
-| Addresses | Address capture and the default address | Its three automations and the Addresses section |
+| Addresses | Address capture and the primary address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |

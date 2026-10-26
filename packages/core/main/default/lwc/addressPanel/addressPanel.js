@@ -207,7 +207,7 @@ export default class AddressPanel extends LightningElement {
     return Boolean(this.addressInfo && this.addressInfo.createable);
   }
 
-  /** Set as default writes Is Default, so it needs edit on addresses and on that field. */
+  /** Set as Primary writes Is Default (labelled Primary), so it needs edit on addresses and on that field. */
   get canSetDefault() {
     const info = this.addressInfo;
     const field = info && info.fields && info.fields[IS_DEFAULT_FIELD.fieldApiName];

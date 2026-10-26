@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address: refusal to untick the only address in use</shortDescription>
-        <value>This is the address in use. To change that, make another address the default, or delete this one.</value>
+        <value>This is the address in use. To change that, make another address the primary, or delete this one.</value>
     </labels>
     <labels>
         <fullName>Core_Address_DefaultBadge</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: badge on the address currently in use</shortDescription>
-        <value>Default</value>
+        <value>Primary</value>
     </labels>
     <labels>
         <fullName>Core_Address_Empty</fullName>
@@ -77,7 +77,7 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address automation: default address could not be copied to standard fields</shortDescription>
+        <shortDescription>Address automation: primary address could not be copied to standard fields</shortDescription>
         <value>We could not copy this address to the standard address fields, so nothing was saved. Check that you can edit the household and its people, then try again. If it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
@@ -118,22 +118,22 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: button that makes an address the one in use</shortDescription>
-        <value>Set as default</value>
+        <value>Set as Primary</value>
     </labels>
     <labels>
         <fullName>Core_Address_SetDefaultFailed</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address panel: message shown when the default could not be changed</shortDescription>
-        <value>We could not make that the default address. Check that you have permission to edit addresses, and if it happens again ask your administrator to check the Error Log.</value>
+        <shortDescription>Address panel: message shown when the primary could not be changed</shortDescription>
+        <value>We could not make that the primary address. Check that you have permission to edit addresses, and if it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Address_SetDefaultSuccess</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address panel: confirmation after the default address changes</shortDescription>
-        <value>This is now the default address, and it has been copied to the standard address fields.</value>
+        <shortDescription>Address panel: confirmation after the primary address changes</shortDescription>
+        <value>This is now the primary address, and it has been copied to the standard address fields.</value>
     </labels>
 </CustomLabels>

@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Addresses feature covers.</shortDescription>
-        <value>Records address changes and keeps each household's default address in step.</value>
+        <value>Records address changes and keeps each household's primary address in step.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_Relationships_Name</fullName>

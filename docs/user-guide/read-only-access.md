@@ -16,7 +16,7 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Area | You can | You cannot |
 |---|---|---|
 | People, households, organizations | Open and read them, their list views and global search | Create, edit or delete |
-| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set default, make primary, remove (the cards do not show these buttons) |
+| Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set as primary, make primary, remove (the cards do not show these buttons) |
 | Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
 | Household merge and split | Open **Merge or split** and read it | Merge or split |
 | Home tab | **What's new in BarnCRM**, the welcome and **Quick links** | Use **New household** (it is hidden) |
@@ -73,7 +73,7 @@ not offered, or say you do not have access.
 - On **Merge or split**: "You can see this household but not change it, so merging and
   splitting are switched off. Ask whoever manages access for edit access to both households."
 - On the **Addresses**, **Relationships**, **Affiliations** and **Members** cards: nothing to
-  try. **Add address**, **Set as default**, **Add relationship**, **Remove**, **Add
+  try. **Add address**, **Set as Primary**, **Add relationship**, **Remove**, **Add
   affiliation**, **Make primary**, **Add member** and **Move to another household** are not
   shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.
