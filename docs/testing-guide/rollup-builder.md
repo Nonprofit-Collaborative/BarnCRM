@@ -287,3 +287,44 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 4 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** delete Zed Garcia from the Recycle Bin.
+## T-RB-19: Skip a Rollup for People with a Custom Permission
+
+**Purpose:** confirm saves by a holder of the rollup's bypass custom permission leave its total alone, Recalculate still corrects it, and an unknown name is refused.
+**Prerequisites:** admin user; T-RB-02 done; **Test children per household** in **Both (recommended)** and active; **The Garcia Family** shows **Test Children Count** 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, **Custom Permissions**, click **New**. Label **Test Data Migration**, name `Test_Data_Migration`. Save. Create a permission set **Test Data Migration**, add that custom permission under **Custom Permissions**, and assign the permission set to yourself. | The permission set is assigned to you. |
+| 2 | On the **Rollup Builder** tab, edit **Test children per household**, go to **Check and save** and enter `No_Such_Permission` in **Skip for people with this custom permission (optional)**. Click **Save**. | The save is refused: "No custom permission named No_Such_Permission exists in this org. ..." |
+| 3 | Replace it with `Test_Data_Migration` and click **Save**. | The rollup saves. |
+| 4 | Open Diego Garcia. Edit **Household Role** from **Child** to **Other** and save. Wait a minute, then open **The Garcia Family** and refresh. | **Test Children Count** still shows 1: your save skipped this rollup. |
+| 5 | On the **Rollup Builder** tab, click **Recalculate** on **Test children per household**. When it finishes, refresh **The Garcia Family**. | **Test Children Count** shows 0. |
+
+**Cleanup:** edit the rollup and clear **Skip for people with this custom permission (optional)**; set Diego's **Household Role** back to **Child** and check the total returns to 1; remove the **Test Data Migration** permission set assignment.
+
+## T-RB-20: Recalculate Totals on This Record from a Flow
+
+**Purpose:** confirm the Flow action recalculates a record's totals, every rollup or the one named, and logs a name that matches nothing.
+**Prerequisites:** admin user; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Edit **Test children per household** and set its mode to **Every night**. Save. Open Diego Garcia, change **Household Role** to **Other** and save. Refresh **The Garcia Family** after a minute. | **Test Children Count** still shows 1 (nightly only). |
+| 2 | In Setup, **Flows**, click **New Flow**, choose **Autolaunched Flow (No Trigger)**. Create a Text variable `recordId`, **Available for input**. Add an **Action**, search **Recalculate totals on this record** (category **BarnCRM**), set **Record ID** to `{!recordId}`. Save as **Test recalculate totals**. | The action is listed and the flow saves. |
+| 3 | Click **Debug**, enter the Id of **The Garcia Family** in `recordId` and run. Refresh **The Garcia Family**. | The debug run succeeds. **Test Children Count** shows 0. |
+| 4 | Set Diego's **Household Role** back to **Child**. In the flow, set the action's **Rollup (optional)** to `No such rollup`, save, and debug again with the same Id. | The run succeeds. **Test Children Count** still shows 0. The Error Log has a Warning beginning "Recalculate totals on this record: no active rollup ..." naming `No such rollup`. |
+| 5 | Set **Rollup (optional)** to `Test children per household`, save, and debug again. | **Test Children Count** shows 1. |
+
+**Cleanup:** set the rollup's mode back to **Both (recommended)**; delete the **Test recalculate totals** flow.
+
+## T-RB-21: Recalculate a Record's Totals from Apex
+
+**Purpose:** confirm the global Apex entry point recalculates a record's totals.
+**Prerequisites:** admin user with permission to run anonymous Apex; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set **Test children per household** to **Every night**. Change Diego's **Household Role** to **Other** and save. | After a minute **Test Children Count** still shows 1. |
+| 2 | Open the Developer Console, **Debug**, **Open Execute Anonymous Window**, and run `RollupApi.recalculate(new Set<Id>{ 'GARCIA_ID' });` with the household's Id (in an org where BarnCRM is installed from a package, put the package prefix and a dot before `RollupApi`). | The run succeeds. Refreshing **The Garcia Family** shows **Test Children Count** 0. |
+
+**Cleanup:** set Diego's **Household Role** back to **Child**, set the rollup back to **Both (recommended)**, and click **Recalculate** on it; the total returns to 1.

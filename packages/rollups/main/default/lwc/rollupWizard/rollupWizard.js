@@ -41,6 +41,8 @@ import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
 import PARENT_FIELD_NOTE from '@salesforce/label/c.Core_RollupBuilder_ParentFieldNote';
 import NAME from '@salesforce/label/c.Core_RollupBuilder_Name';
 import DESCRIPTION from '@salesforce/label/c.Core_RollupBuilder_Description';
+import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPermission';
+import BYPASS_PERMISSION_HELP from '@salesforce/label/c.Core_RollupBuilder_BypassPermissionHelp';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import ACTIVE from '@salesforce/label/c.Core_Rollups_ColumnActive';
 import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
@@ -135,6 +137,8 @@ export default class RollupWizard extends LightningElement {
     parentFieldNote: PARENT_FIELD_NOTE,
     name: NAME,
     description: DESCRIPTION,
+    bypassPermission: BYPASS_PERMISSION,
+    bypassPermissionHelp: BYPASS_PERMISSION_HELP,
     mode: MODE,
     active: ACTIVE,
     back: BACK,
