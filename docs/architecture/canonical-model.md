@@ -1798,7 +1798,8 @@ comes from one of two places: a trigger the Rollup Builder generates and the adm
 deploys (one line, `RollupInstantTrigger.run()`, that hands the changed records to the
 engine, plus its test; named `BarnRollup_` and the entity's API name so the same code is
 produced in every org), or a record-triggered Flow built from the shipped template. The
-Builder offers the trigger only for an entity that can carry an Apex trigger, and shows its
+Builder offers the trigger only for an entity it offers as a source (R-R7) that can carry an
+Apex trigger, and shows its
 state from the org: built in, on, turned off, inactive
 in Setup, not set up, or not available (ADR-0138,
 `0138-instant-totals-generated-trigger-deployed-by-the-admin.md`). Editing a rollup never
@@ -1809,8 +1810,8 @@ false the first time it is turned off; removing the trigger is a deploy the admi
 makes from the Builder's removal package. Health Check findings for generated triggers are
 deferred (ADR-0138).
 
-Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it
-today), the Builder says plainly, when that source is chosen, that its totals are updated by
+Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it,
+or its generated trigger active in Setup with its switch on), the Builder says plainly, when that source is chosen, that its totals are updated by
 the nightly run and Recalculate and not instantly, does not offer Instantly alone, and refuses
 a save or a mode change on the rollup list that would make such a rollup Instantly alone
 (ADR-0136). Both and Every night are allowed; a Flow built from the template still makes Both
@@ -8940,6 +8941,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Nightly rollup run hour (ADR-0136, DLRS parity P10). `Rollup_Settings__c` gains `Nightly_Run_Hour__c` (Number, default 2, Section 14B), shown as a picklist of hours. The nightly job and Run tonight start at it, and saving a new hour moves the scheduled nightly run through a third rollup engine seam, `RollupEngineExtensionV3`, that Core's settings service calls after every settings save. |
 | v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
 | v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
+| v0.8 | 2026-10-26 | Rollup Builder parity and generated triggers together (ADR-0136, ADR-0138, landing batch 11). No object or field added. R-R12: a source entity whose generated trigger is active in Setup with its switch on has instant updates, so the Builder offers Instantly for it and the save no longer refuses it; the generator offers code only for an entity the Builder offers as a source (R-R7). |
 
 ---
 ## 32. Entity ownership by package

@@ -47,9 +47,10 @@ generated trigger's entry point).
    resolved through describe, and skipped when the org lacks the object. No Apex, metadata,
    label or test in a package outside Mirror names one of these objects as a reference.
 3. **Instant only where a trigger exists.** A total is instant only when its source object has a
-   rollup trigger: a packaged registration of `RollupTriggerHandler` in the Automation Registry
-   today, a generated trigger later (ADR-0082 amendment A2, slice S16). Until then, a rollup that
-   counts any other object is recalculated in the background: the Builder says so plainly when
+   rollup trigger: a packaged registration of `RollupTriggerHandler` in the Automation Registry,
+   or the object's generated trigger (ADR-0138) active in Setup with its switch on
+   (`RollupInstantTotals.isOn`, asked by `RollupService.hasInstantUpdates`). Until then, a
+   rollup that counts any other object is recalculated in the background: the Builder says so plainly when
    such a source is chosen ("Instant totals are not available yet for ..."), does not offer
    **Instantly** on its own for it, and its save and the rollup list's mode change refuse
    **Instantly** alone with what to choose instead. **Both** and **Every night** are allowed;
@@ -83,6 +84,41 @@ generated trigger's entry point).
    regenerating a trigger per rollup, definitions as custom metadata, a separate scheduled
    items object, and Developer as a distinct mode.
 
+8. **As built (recorded at landing, batch 11).**
+   - **The `global` members added** (each permanent once a managed version is released):
+     `RollupRecalcRecordAction` (the Flow action "Recalculate totals on this record"), its
+     inner class `Request` with `recordId` (Id) and `rollup` (String), and
+     `recalculate(List<Request>)`; `RollupApi` with `recalculate(Set<Id> recordIds)` and
+     `recalculateChanges(List<SObject> records, Map<Id, SObject> oldRecords, Boolean
+     deleting)`. Nothing else in the parity work is `global`; the generated trigger's entry
+     point `RollupInstantTrigger` (`run()`, `hasRun()`) is ADR-0138's.
+   - **A new Core seam, `RollupEngineExtensionV3`** (`@NamespaceAccessible`, one method
+     `afterSettingsSaved(String settingsObject, Set<String> changedKeys)`): Core's settings
+     service tells the engine which settings a save changed, so saving a new **Time of the
+     nightly run** moves the scheduled nightly run at once. Core still names no module class
+     (ADR-0125); the nightly run hour defaults to 2 (2:00 AM) and is never blank.
+   - **The bypass permission applies to saves only.** A user holding a rollup's Bypass
+     Permission neither recalculates nor queues it when saving records, whether the save
+     reaches the engine through a trigger, the Recalculate rollups Flow action or
+     `RollupApi.recalculateChanges`; the nightly run, Recalculate, "Recalculate totals on this
+     record" and `RollupApi.recalculate` still cover it. A Bypass Permission that
+     names no custom permission in the org is refused on save.
+   - **Deferrals lifted** from ADR-0082: top N (a row limit with an order and an order
+     direction) and moving definitions between orgs (export and import as a file, keyed on
+     Definition Key), besides Task or Event sources.
+   - **Include deleted and archived records** reads the source with `ALL ROWS`. A query locator
+     cannot read `ALL ROWS`, so for a parent too large for one query the rollup is refused for
+     that parent and logged, never written without the deleted rows.
+   - **Delete is for admin-made rollups only.** A shipped rollup (Is Package Default) is
+     switched off instead; **Restore shipped rollups** would only bring it back. The values a
+     deleted rollup wrote stay on the records.
+   - **Import keeps a rollup Active only if its checks pass.** Each rollup in the file is saved
+     through the Builder's own checks (`checkedRecord`), the instant check of decision 3
+     included; one that fails a check is not saved at all and the import says why.
+   - **One object rule for both features.** The instant-totals generator produces code only
+     for an object the Builder can count (`RollupBuilderController.offersAsSource`, decision
+     1) that the platform lets carry an Apex trigger.
+
 ## Alternatives considered
 
 - **Keep the Builder to Account, Contact and custom objects.** Fails the owner's parity goal and
@@ -99,8 +135,8 @@ generated trigger's entry point).
 ## Consequences
 
 - An org with Sales or Service Cloud objects can build, preview and recalculate rollups on them
-  today, nightly or on demand; instant needs the Flow template until the generated trigger
-  ships. A Platform-only org sees none of these objects and behaves as before.
+  today, nightly or on demand; instant needs the object's generated trigger (ADR-0138) or the
+  Flow template. A Platform-only org sees none of these objects and behaves as before.
 - A rollup on an administrator's own object that was set to **Instantly** alone keeps working
   as saved; the next time it is edited in the Builder it has to be **Both** or **Every night**.
 - `check-standard-objects.sh` lists the new detection-only line on every run, so a reviewer

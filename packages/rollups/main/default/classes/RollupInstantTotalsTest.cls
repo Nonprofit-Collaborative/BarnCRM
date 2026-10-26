@@ -130,10 +130,16 @@ private class RollupInstantTotalsTest {
     static void codeIsRefusedWhereItCannotOrNeedNotRun() {
         System.runAs(admin()) {
             orgHas(null);
-            RollupInstantTotals.triggerableOverride = new Set<String>{ 'Contact' };
+            // AccountHistory is put in front as triggerable: the Builder never counts a history
+            // object, so no code is generated for it either (ADR-0136 and ADR-0138 agree).
+            RollupInstantTotals.triggerableOverride = new Set<String>{
+                'Contact',
+                'AccountHistory'
+            };
             Map<String, String> refusals = new Map<String, String>{
                 'Contact' => Label.Core_RollupBuilder_InstantBuiltInError,
                 'Account' => Label.Core_RollupBuilder_InstantNotAvailableError,
+                'AccountHistory' => Label.Core_RollupBuilder_InstantNotAvailableError,
                 'Not_An_Object__c' => Label.Core_Rollups_ErrorUnknownObject
             };
             for (String objectName : refusals.keySet()) {
@@ -258,6 +264,49 @@ private class RollupInstantTotalsTest {
                     );
                 }
             }
+        }
+    }
+
+    /**
+     * An object whose generated trigger is on has instant updates, so the Builder offers it
+     * Instantly and the save does not refuse it (R-R12, ADR-0136 with ADR-0138); one with no
+     * trigger, an inactive one or one switched off does not.
+     */
+    @IsTest
+    static void aGeneratedTriggerThatIsOnMakesInstantlyAvailable() {
+        System.runAs(admin()) {
+            Rollup_Definition__c instantOnly = new Rollup_Definition__c(
+                Source_Object__c = 'Account',
+                Mode__c = RollupService.MODE_REAL_TIME
+            );
+
+            orgHas(null);
+            System.Assert.isFalse(RollupService.hasInstantUpdates('Account'), 'No trigger yet.');
+            System.Assert.isNotNull(
+                RollupBuilderController.instantProblem(instantOnly),
+                'Instantly alone is refused without a trigger.'
+            );
+
+            orgHas('Inactive');
+            System.Assert.isFalse(
+                RollupService.hasInstantUpdates('Account'),
+                'Deployed but deactivated in Setup.'
+            );
+
+            orgHas('Active');
+            System.Assert.isTrue(RollupService.hasInstantUpdates('Account'), 'Deployed and on.');
+            System.Assert.isNull(
+                RollupBuilderController.instantProblem(instantOnly),
+                'Instantly alone is allowed once the trigger is on.'
+            );
+
+            Test.startTest();
+            RollupInstantTotals.setTurnedOn('Account', false);
+            Test.stopTest();
+            System.Assert.isFalse(
+                RollupService.hasInstantUpdates('Account'),
+                'Switched off: its totals are not instant.'
+            );
         }
     }
 }

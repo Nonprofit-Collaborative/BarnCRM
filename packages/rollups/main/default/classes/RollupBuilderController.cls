@@ -845,6 +845,19 @@ public with sharing class RollupBuilderController {
     }
 
     /**
+     * Whether the Builder offers this entity as records a rollup counts (ADR-0136). The
+     * instant-totals generator (`RollupInstantTotals.getCode`, ADR-0138) asks the same rule, so
+     * code is generated only for an object a rollup can count.
+     */
+    public static Boolean offersAsSource(Schema.SObjectType type) {
+        if (type == null) {
+            return false;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        return plausible(described.getName().toLowerCase()) && offered(described, commonStandard());
+    }
+
+    /**
      * Whether a name can be an entity the Builder offers, before paying for its describe: an
      * object of the org's own (`__c`) or a standard one, and not a companion object.
      */

@@ -39,6 +39,9 @@ public with sharing class RollupInstantTotals {
     @TestVisible
     private static Set<String> triggerableOverride;
 
+    /** The generated triggers read once per transaction for `isOn`, which the Builder asks per object. */
+    private static Map<String, GeneratedTrigger> triggersRead;
+
     /** One object an instant rollup counts, or that has a generated trigger, as the Builder shows it. */
     public class ObjectState {
         @AuraEnabled
@@ -131,6 +134,33 @@ public with sharing class RollupInstantTotals {
         }
     }
 
+    /**
+     * True when this object's generated trigger is active in Setup and its switch is on (the
+     * state On), so saving one of its records recalculates its totals at once. The Builder's
+     * instant check (`RollupService.hasInstantUpdates`, R-R12) asks this besides BarnCRM's own
+     * registry rows, so such an object is offered Instantly like a shipped one (ADR-0136,
+     * ADR-0138). False for a type the org does not have.
+     */
+    public static Boolean isOn(Schema.SObjectType type) {
+        if (type == null) {
+            return false;
+        }
+        Map<String, GeneratedTrigger> triggers;
+        if (triggersOverride != null) {
+            triggers = triggersByName();
+        } else {
+            if (triggersRead == null) {
+                triggersRead = triggersByName();
+            }
+            triggers = triggersRead;
+        }
+        String triggerName = triggerNameFor(apiNameOf(type));
+        GeneratedTrigger found = triggers.get(triggerName.toLowerCase());
+        return found != null &&
+            TRIGGER_ACTIVE.equalsIgnoreCase(found.status) &&
+            AutomationControl.isEnabled(triggerName);
+    }
+
     /** The trigger, its test, and the deploy and removal packages for one object. */
     @AuraEnabled
     public static GeneratedCode getCode(String objectApiName) {
@@ -142,7 +172,11 @@ public with sharing class RollupInstantTotals {
                     Label.Core_RollupBuilder_InstantBuiltInError
                 );
             }
-            if (!triggerableAmong(new Set<String>{ name }).contains(name)) {
+            // Only an object the Builder counts (ADR-0136), and one that can carry a trigger.
+            if (
+                !RollupBuilderController.offersAsSource(type) ||
+                !triggerableAmong(new Set<String>{ name }).contains(name)
+            ) {
                 throw new RollupService.RollupServiceException(
                     Label.Core_RollupBuilder_InstantNotAvailableError
                 );

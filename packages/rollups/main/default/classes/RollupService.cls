@@ -116,10 +116,12 @@ public with sharing class RollupService {
 
     /**
      * Whether saving a record of this entity recalculates the totals that count it at once: a
-     * package registers `RollupTriggerHandler` for it in the Automation Registry (R-R12,
-     * ADR-0136). Any other entity's totals are recalculated in the background, by the nightly
-     * run and Recalculate, unless an administrator's own Flow calls `RollupRecalcAction`, which
-     * the engine cannot see. False for an entity the org does not have.
+     * package registers `RollupTriggerHandler` for it in the Automation Registry, or the
+     * administrator deployed its generated trigger and it is on (`RollupInstantTotals.isOn`,
+     * R-R12, ADR-0136, ADR-0138). Any other entity's totals are recalculated in the background,
+     * by the nightly run and Recalculate, unless an administrator's own Flow calls
+     * `RollupRecalcAction`, which the engine cannot see. False for an entity the org does not
+     * have.
      */
     @NamespaceAccessible
     public static Boolean hasInstantUpdates(String entity) {
@@ -139,7 +141,7 @@ public with sharing class RollupService {
                 return true;
             }
         }
-        return false;
+        return RollupInstantTotals.isOn(type);
     }
 
     /**

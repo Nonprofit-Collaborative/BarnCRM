@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 5 notice: counted records have no rollup trigger. {0} plural name.</shortDescription>
-        <value>Instant totals are not available yet for {0}. This total is updated by the nightly run and when you click Recalculate. To make it instant now, use the Recalculate rollups Flow template and choose Both (recommended).</value>
+        <value>Instant totals are not available yet for {0}. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended).</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ErrorNoInstant</fullName>

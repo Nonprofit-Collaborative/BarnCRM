@@ -183,7 +183,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 1 | On the **Rollup Builder** tab, click **New rollup** and open **Record that shows the total**. | The list starts with Account, Contact, BarnCRM's objects and the common standard objects this org has, for example Task, Event and Asset, and in an org with Sales Cloud also Opportunity, Case and Campaign. No sharing or history objects (such as Account Share) are listed. |
 | 2 | In **Find another object**, type `work`. Open **Record that shows the total** again. | Only objects whose name contains "work" are listed (for example Work Order, if the org has it). Clearing the box shows the common list again. |
 | 3 | Clear **Find another object**. Choose **Account** and **Test Task Count**. Click **Next**. | Step 2 lists, among the others, **Task, by Related To ID** (and in an org with Sales Cloud, **Opportunity, by Account ID**). |
-| 4 | Choose **Task, by Related To ID**. Click **Next**. Choose **Calculation** = **Count**. Click **Next**. Add the condition **Status** **is not** **Completed**. Click **Next**. | Step 5 shows the sentence, and the notice "Instant totals are not available yet for Tasks. This total is updated by the nightly run and when you click Recalculate. To make it instant now, use the Recalculate rollups Flow template and choose Both (recommended)." |
+| 4 | Choose **Task, by Related To ID**. Click **Next**. Choose **Calculation** = **Count**. Click **Next**. Add the condition **Status** **is not** **Completed**. Click **Next**. | Step 5 shows the sentence, and the notice "Instant totals are not available yet for Tasks. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended)." Below the mode, the Task line reads **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
 | 5 | In **See it on a record**, choose **The Garcia Family**. | The preview shows 2 as the calculated total. |
 | 6 | Name it **Test open tasks**, leave the mode, click **Save and calculate now**. | Saved. After the recalculation finishes, **The Garcia Family** shows **Test Task Count** 2. |
 
@@ -201,38 +201,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Click **Edit** on **Test children per household** and go to **Check and save**. | **Instantly** is offered and no notice is shown: people (Contact) have instant updates. Click **Cancel**. |
 
 **Cleanup:** delete **Test open tasks** (or set it inactive) if T-RB-10's cleanup has not.
-## T-RB-16: A Condition on a Field One Lookup Away
 
-**Purpose:** confirm a condition can read a field of the record the counted records point to, one lookup away, and that the Builder says when such a total may not update at once.
-**Prerequisites:** admin user; T-RB-02 done.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | Click **New rollup**. Choose **Account** and **Test Children Count**, then **Contact, by Account ID**, then **Calculation** = **Count**, and click **Next** until **Which records count?** | Step 4 shows the **Conditions** builder. No note about another record is shown. |
-| 2 | Under **Conditions**, click **Add condition** and open **Field**. | After the contact's own fields, the list offers fields of the records a contact points to, written as the lookup and the field, for example **Account > Account Name** and **Reports To > Last Name**. No **Created By > ...** or **Last Modified By > ...** fields are offered, and nothing two lookups away (such as **Account > Parent Account > ...**). |
-| 3 | Choose **Account > Account Name**, **Comparison** = **is**, **Value** = `The Garcia Family`. | The sentence reads about contacts whose Account > Account Name is The Garcia Family. Below the conditions a grey note reads "This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right." |
-| 4 | Click **Next**. In **See it on a record**, pick **The Garcia Family**. | The preview starts "Calculated: 3." (Harper, Luis and Diego). No error. |
-| 5 | Pick any other household. | The preview starts "Calculated: 0." |
-| 6 | Click **Back**, remove the condition. | The note about another record disappears. Click **Cancel**; nothing is saved. |
-
-**Cleanup:** None.
-
-## T-RB-17: A Picklist Filled by Last, and a Value It Does Not Have
-
-**Purpose:** confirm First and Last can fill a picklist, the save refuses a source picklist with values the target lacks, and a text value the picklist lacks is left out and logged.
-**Prerequisites:** admin user; T-RB-02 done. In Setup, on **Account**, create a Picklist field labelled **Test Last Role** (API name `Test_Last_Role__c`) with the values **Head**, **Child** and **Other** only (no **Spouse or Partner**), visible to your profile and on the household page layout.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | Click **New rollup**. Choose **Account** and, in **Field that shows the total**, **Test Last Role**. Choose **Contact, by Account ID** and click **Next**. | **Test Last Role** was offered in step 1. **Calculation** offers only **First** and **Last**. |
-| 2 | Choose **Last**. Open **Field to calculate**. | Only picklist and text fields are offered (for example **Household Role**, **Last Name**), no number or date fields. |
-| 3 | Choose **Household Role** and **Which record comes first, by** = **Created Date**. Click **Next** twice, name it `Test last role`, and click **Save**. | Nothing is saved. A red message reads "The picklist you fill does not have these values of the field you copy: Spouse or Partner. Add them to that picklist, or choose another field." |
-| 4 | Keep the Builder open. In Setup, add the value **Spouse or Partner** to **Test Last Role**. Back in the Builder, click **Save and calculate now**. | "Rollup saved, and its recalculation has started." |
-| 5 | Wait a minute and open **The Garcia Family**. | **Test Last Role** shows the Household Role of the Garcia person created last (Head, Spouse or Partner, or Child). |
-| 6 | Click **Edit** on **Test last role**. On step 3 change **Field to calculate** to **Last Name**. Save and calculate now, wait a minute, and refresh **The Garcia Family**. | **Test Last Role** still shows the role from step 5: a last name is not a value of the picklist. |
-| 7 | Open the **Error Log**. | A Warning from `RollupWriter` reads "A rollup could not put "Garcia" in Test Last Role, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup." (with that person's last name). |
-
-**Cleanup:** switch **Test last role** off and delete the **Test Last Role** field in Setup.
 ## T-RB-12: Only the First N Records, in Descending Order
 
 **Purpose:** confirm a text list keeps only its first values in the order chosen (ADR-0136).
@@ -287,6 +256,40 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 4 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** delete Zed Garcia from the Recycle Bin.
+
+## T-RB-16: A Condition on a Field One Lookup Away
+
+**Purpose:** confirm a condition can read a field of the record the counted records point to, one lookup away, and that the Builder says when such a total may not update at once.
+**Prerequisites:** admin user; T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. Choose **Account** and **Test Children Count**, then **Contact, by Account ID**, then **Calculation** = **Count**, and click **Next** until **Which records count?** | Step 4 shows the **Conditions** builder. No note about another record is shown. |
+| 2 | Under **Conditions**, click **Add condition** and open **Field**. | After the contact's own fields, the list offers fields of the records a contact points to, written as the lookup and the field, for example **Account > Account Name** and **Reports To > Last Name**. No **Created By > ...** or **Last Modified By > ...** fields are offered, and nothing two lookups away (such as **Account > Parent Account > ...**). |
+| 3 | Choose **Account > Account Name**, **Comparison** = **is**, **Value** = `The Garcia Family`. | The sentence reads about contacts whose Account > Account Name is The Garcia Family. Below the conditions a grey note reads "This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right." |
+| 4 | Click **Next**. In **See it on a record**, pick **The Garcia Family**. | The preview starts "Calculated: 3." (Harper, Luis and Diego). No error. |
+| 5 | Pick any other household. | The preview starts "Calculated: 0." |
+| 6 | Click **Back**, remove the condition. | The note about another record disappears. Click **Cancel**; nothing is saved. |
+
+**Cleanup:** None.
+
+## T-RB-17: A Picklist Filled by Last, and a Value It Does Not Have
+
+**Purpose:** confirm First and Last can fill a picklist, the save refuses a source picklist with values the target lacks, and a text value the picklist lacks is left out and logged.
+**Prerequisites:** admin user; T-RB-02 done. In Setup, on **Account**, create a Picklist field labelled **Test Last Role** (API name `Test_Last_Role__c`) with the values **Head**, **Child** and **Other** only (no **Spouse or Partner**), visible to your profile and on the household page layout.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. Choose **Account** and, in **Field that shows the total**, **Test Last Role**. Choose **Contact, by Account ID** and click **Next**. | **Test Last Role** was offered in step 1. **Calculation** offers only **First** and **Last**. |
+| 2 | Choose **Last**. Open **Field to calculate**. | Only picklist and text fields are offered (for example **Household Role**, **Last Name**), no number or date fields. |
+| 3 | Choose **Household Role** and **Which record comes first, by** = **Created Date**. Click **Next** twice, name it `Test last role`, and click **Save**. | Nothing is saved. A red message reads "The picklist you fill does not have these values of the field you copy: Spouse or Partner. Add them to that picklist, or choose another field." |
+| 4 | Keep the Builder open. In Setup, add the value **Spouse or Partner** to **Test Last Role**. Back in the Builder, click **Save and calculate now**. | "Rollup saved, and its recalculation has started." |
+| 5 | Wait a minute and open **The Garcia Family**. | **Test Last Role** shows the Household Role of the Garcia person created last (Head, Spouse or Partner, or Child). |
+| 6 | Click **Edit** on **Test last role**. On step 3 change **Field to calculate** to **Last Name**. Save and calculate now, wait a minute, and refresh **The Garcia Family**. | **Test Last Role** still shows the role from step 5: a last name is not a value of the picklist. |
+| 7 | Open the **Error Log**. | A Warning from `RollupWriter` reads "A rollup could not put "Garcia" in Test Last Role, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup." (with that person's last name). |
+
+**Cleanup:** switch **Test last role** off and delete the **Test Last Role** field in Setup.
+
 ## T-RB-19: Skip a Rollup for People with a Custom Permission
 
 **Purpose:** confirm saves by a holder of the rollup's bypass custom permission leave its total alone, Recalculate still corrects it, and an unknown name is refused.
@@ -328,6 +331,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Open the Developer Console, **Debug**, **Open Execute Anonymous Window**, and run `RollupApi.recalculate(new Set<Id>{ 'GARCIA_ID' });` with the household's Id (in an org where BarnCRM is installed from a package, put the package prefix and a dot before `RollupApi`). | The run succeeds. Refreshing **The Garcia Family** shows **Test Children Count** 0. |
 
 **Cleanup:** set Diego's **Household Role** back to **Child**, set the rollup back to **Both (recommended)**, and click **Recalculate** on it; the total returns to 1.
+
 ## T-RB-22: Change the Time of the Nightly Run
 
 **Purpose:** confirm the nightly run's hour is a setting with a default, and saving a new hour moves the scheduled run.
@@ -343,6 +347,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 11:00 PM." |
 
 **Cleanup:** set **Time of the nightly run** back to **2:00 AM** and check the Rollup Builder tab says 2:00 AM; in Setup, **Scheduled Jobs**, delete the one-off **BarnCRM Rollups** job with a date in its name.
+
 ## T-RB-24: Delete a Rollup You Made, and Not a Shipped One
 
 **Purpose:** confirm Delete says what happens, removes an admin-made rollup and leaves its values, and refuses a shipped rollup with the reason.
@@ -359,6 +364,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Log in as the staff user and open the **Rollup Builder** tab. | **Delete** is disabled on every row, as **Edit** and **Copy** are. |
 
 **Cleanup:** None.
+
 ## T-RB-25: Export Rollups to a File and Import Them Again
 
 **Purpose:** confirm Export writes only the rollups you made, keyed by Definition Key, and Import says what it will do, matches by key and reports each rollup.
@@ -387,6 +393,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a file**, **Import from a file** and the tick boxes are disabled or not shown. |
 
 **Cleanup:** delete `not-rollups.json`.
+
 ## T-RB-30: Turn On Instant Totals for an Object BarnCRM Does Not Own
 
 **Purpose:** confirm the Builder generates a trigger and test for another object, that the steps deploy them, and that its state is read from the org.
@@ -394,13 +401,14 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
+| 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | The notice "Instant totals are not available yet for Shifts..." is shown and **Mode** offers **Every night** and **Both (recommended)** only. Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
 | 2 | Save. Scroll to **Instant Totals** below the rollups. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn on instant totals**. |
 | 3 | Click **Turn on instant totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download deploy package**. |
 | 4 | Click **Download deploy package**. | `BarnRollup_Shift_c.zip` downloads, holding `package.xml`, `triggers/BarnRollup_Shift_c.trigger` and `classes/BarnRollup_Shift_c_Test.cls` with their `-meta.xml` files. |
 | 5 | Follow steps 1 and 2 of the panel in this org's Developer Console (use **Copy** for each piece of code), and run the test. | The test passes. |
 | 6 | Reload the **Rollup Builder** tab. | **Shift** shows **On: the trigger BarnRollup_Shift_c updates these totals at once.** with **Turn off instant totals** and **Remove the trigger**. |
 | 7 | Open a contact, add a **Shift** with **Hours** 3, wait a few seconds and reload the contact. | **Test shift hours** is 3 without clicking **Recalculate**. |
+| 8 | On the **Rollup Builder** tab, click **Edit** on the rollup and go to **Check and save**. | No "Instant totals are not available yet" notice. **Mode** offers **Instantly** too, and the Shift line reads **On**. Click **Cancel**. |
 
 **Cleanup:** keep the rollup and trigger for T-RB-31.
 
