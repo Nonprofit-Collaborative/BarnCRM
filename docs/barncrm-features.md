@@ -379,7 +379,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 |---|---|---|---|---|
 | Acknowledgments | Major | Ordered rules put each gift in the right thank-you queue (email, letter or none); emails send in a batch or overnight, letters export as a merge file, and every send is recorded. | Shipped | G-12, ADR-0032 |
 | Donor levels | Major | Places every donor on your own giving ladder from an existing total, keeping their previous level and the date they moved. | Shipped | G-14, ADR-0028 |
-| Stewardship plans | Major | Templates of follow-up steps that create real tasks with due dates when a gift or pledge arrives, or when started by hand. | Shipped | G-15 |
+| Stewardship plans | Major | Templates of follow-up steps that create real tasks with due dates when a gift or pledge arrives, or when started by hand with the Start Stewardship Plan action on a person, household or organization. | Shipped | G-15 |
 | Membership tracking | Major | Membership levels with expiry and renewal reminders, likely as its own package. | Planned (1.x) | G-22 |
 | Rule criteria | Minor | Acknowledgment rules match on amount range, gift type, appeal and first gift only. | Shipped | G-12 |
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |
@@ -389,7 +389,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Shipped | G-12, G-15 (UX pass) |
 | Which total a ladder measures | Minor | Setting chooses total giving, this fiscal year, last fiscal year or largest gift. | Shipped | G-14 |
 | Levels follow refunds down | Minor | A refund can move a donor down a level. | Shipped | G-14 |
-| Level movement list views | Minor | Shows who joined or left a level, placed on save, nightly and by "Recalculate now". | Shipped | G-14 |
+| Level movement list views | Minor | "Donor Level Changed This Month" on Contacts and on Accounts (households and organizations) shows who joined or left a level, with the level before; levels are placed on save, nightly and by "Recalculate now". | Shipped | G-14 |
 | Plan triggers | Minor | Start on first gift, any gift, a gift over an amount, a pledge or recurring gift becoming active, or by hand. | Shipped | G-15 |
 | Task assignment choices | Minor | Tasks go to the donor's owner, the person who started the plan, or one named person. | Shipped | G-15 |
 | One running plan per donor | Minor | The same plan will not start twice on a donor while it is running. | Shipped | G-15 |

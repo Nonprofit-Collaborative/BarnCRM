@@ -171,7 +171,7 @@ For every script on this page:
 | 4 | In **BarnCRM Settings**, **Giving**, turn on **Donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
 | 5 | Open Susan Ortiz's household. | **Donor Level** reads `Leadership Circle` (total giving 7777). |
 | 6 | Open the 7777 gift and select **Refund or Write Off**. Refund 5000 with reason `Level test`. Open the household again after a few seconds. | **Total Giving** 2777, **Donor Level** `Sustainer`. |
-| 7 | On the **Households** list, choose to display **Previous Donor Level** and **Donor Level Changed** and find the household. | **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. |
+| 7 | On the **Households** tab choose the list view **Donor Level Changed This Month** and find the household. | **Donor Level** `Sustainer`, **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. The **Contacts** tab has a list view of the same name for people. |
 | 8 | As read-only, open the Donor levels page. | The ladder shows; **Recalculate now** is disabled. |
 
 **Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Donor levels** off. Clear **Active** on the three test levels.
@@ -196,3 +196,20 @@ For every script on this page:
 | 11 | Edit the plan again and set **Status** back to **Running**. **Save**. | Saved. **Completed Date** is empty. |
 
 **Cleanup:** Set the plan's **Status** to Cancelled (its tasks stay). Select **Turn off** on `First gift welcome`.
+
+## T-RCPT-12: Start a stewardship plan by hand
+
+**Purpose:** Confirm staff can start a plan on a person or organization, the same plan does not start twice, and a read-only user cannot start one.
+**Prerequisites:** admin for step 1; staff for steps 2 to 6; read-only for step 7.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship plans** select **Open this page**. **New plan**: `After a meeting`, **What starts it** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn on**. | The plan is listed with **On** On. |
+| 2 | As staff, open **Harper Garcia** in the Fundraising app and select **Start Stewardship Plan**. | The **Start a stewardship plan** window lists the plans that are on, including `After a meeting`. |
+| 3 | Select **Start plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
+| 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
+| 5 | Refresh Harper Garcia. | Her **Stewardship Plans** list shows the plan, **Status** Running. Start the same plan again: toast says it is already running for her. |
+| 6 | Open **The Summit Foundation** and start `After a meeting` there. | Started; the organization's **Stewardship Plans** list shows it. |
+| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start plan** button. |
+
+**Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn off** on `After a meeting`.

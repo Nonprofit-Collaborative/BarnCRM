@@ -388,6 +388,9 @@
               <value>Contact.New_Gift</value>
             </valueListItems>
             <valueListItems>
+              <value>Contact.Start_Stewardship_Plan</value>
+            </valueListItems>
+            <valueListItems>
               <value>Contact.Erase_Person</value>
               <visibilityRule>
                 <criteria>

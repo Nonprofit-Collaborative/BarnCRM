@@ -66,6 +66,16 @@ The page says it where you will read it, and it is worth repeating: editing a pl
 what starts next. The number in **Running now** is how many copies of that plan are already
 laid out, and none of them changes when you edit it.
 
+## Starting a plan by hand
+
+In the Fundraising app, open the person, household or organization and choose **Start
+Stewardship Plan**. The window lists every plan that is turned on, whatever starts it, and
+shows the description of the one chosen. Choose **Start plan**. The plan is laid out at once
+and appears in the donor's **Stewardship Plans** list. A plan already running on that donor
+does not start a second time, and the window says so. Starting a plan needs create access to
+stewardship plans (Giving Staff or Giving Admin); a Giving Read Only user is told so and
+offered no **Start plan**.
+
 ## A five-minute walkthrough
 
 1. Open **BarnCRM Settings**, **Giving**, **Stewardship plans**, and choose **New plan**.

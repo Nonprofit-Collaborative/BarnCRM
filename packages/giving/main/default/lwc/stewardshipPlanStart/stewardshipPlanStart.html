@@ -1,0 +1,46 @@
+<template>
+  <div class="slds-p-around_medium">
+    <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
+
+    <template lwc:if={loadError}>
+      <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
+    </template>
+    <template lwc:elseif={noAccess}>
+      <p role="status" class="slds-m-bottom_small" data-id="no-access">{labels.noAccess}</p>
+    </template>
+    <template lwc:elseif={noPlans}>
+      <p role="status" class="slds-m-bottom_small" data-id="no-plans">{labels.none}</p>
+    </template>
+    <template lwc:elseif={loaded}>
+      <lightning-combobox
+        data-id="plan"
+        label={labels.plan}
+        placeholder={labels.choose}
+        options={planOptions}
+        value={templateId}
+        onchange={handlePlanChange}
+      ></lightning-combobox>
+      <template lwc:if={description}>
+        <p class="slds-m-top_x-small slds-text-color_weak" data-id="description">{description}</p>
+      </template>
+    </template>
+
+    <div class="slds-m-top_medium slds-text-align_right">
+      <lightning-button
+        data-id="cancel"
+        label={labels.cancel}
+        onclick={handleCancel}
+        class="slds-m-right_x-small"
+      ></lightning-button>
+      <template lwc:if={canChoose}>
+        <lightning-button
+          data-id="start"
+          variant="brand"
+          label={labels.start}
+          disabled={working}
+          onclick={handleStart}
+        ></lightning-button>
+      </template>
+    </div>
+  </div>
+</template>

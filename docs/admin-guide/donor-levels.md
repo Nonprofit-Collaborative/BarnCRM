@@ -9,7 +9,8 @@ right rung as their giving changes, without anybody running a report or updating
 
 Each donor record also keeps the level they were on before and the date they moved, so
 "who joined the Leadership Circle this month" and "who slipped out of it" are both a list
-view away.
+view away: **Donor Level Changed This Month**, on the Households and Organizations tabs and
+on Contacts, shows each donor's level, the level before and the date they moved.
 
 A level is a label on a total you already have. It reads the giving total that appears on
 the same record, the one the Rollup Builder maintains, so a donor's level and the number

@@ -384,4 +384,76 @@
     <shortDescription>Stewardship: screen reader name of the buttons column</shortDescription>
     <value>Actions</value>
   </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartHeading</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: heading</shortDescription>
+    <value>Start a stewardship plan</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartPlanLabel</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: label of the plan picker</shortDescription>
+    <value>Plan</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartChoose</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: placeholder of the plan picker</shortDescription>
+    <value>Choose a plan</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartButton</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: the button that starts the plan</shortDescription>
+    <value>Start plan</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartNone</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: no plan is turned on</shortDescription>
+    <value>No stewardship plan is turned on. An administrator writes plans and turns them on in BarnCRM Settings, Giving, Stewardship plans.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartSuccess</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: toast after a plan starts</shortDescription>
+    <value>The plan has started. Its tasks are in the task lists of the people they are assigned to.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartNoPermission</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: the person may not start a plan</shortDescription>
+    <value>You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartLoadFailed</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: the list of plans could not be read</shortDescription>
+    <value>The stewardship plans could not be read. Close this window and try again.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_StartChooseFirst</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Start plan action: Start pressed with no plan chosen</shortDescription>
+    <value>Choose the plan to start.</value>
+  </labels>
 </CustomLabels>
