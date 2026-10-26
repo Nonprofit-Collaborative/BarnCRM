@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main as of 2026-10-26 (commit d3eca4de). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
