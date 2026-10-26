@@ -90,12 +90,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Households**. | The **Household names and greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How five sample households would read**. |
+| 1 | Open **BarnCRM Settings**, **Households**. | The **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
 | 2 | Change **Household name pattern** to `{LastName} Household`. | The preview updates as you type. |
 | 3 | Select **Save**. | **Saved. New households use these patterns straight away.** |
 | 4 | Select **Update all household names**, then **Yes, recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
 | 5 | Put the pattern back to `The {LastName} Family`, save, and recompute again. | Names return to **The Garcia Family** form. |
 | 6 | As read-only, open the same panel. | **You can see these settings but not change them. Changing them needs the Manage BarnCRM Settings permission.** The patterns cannot be saved. |
+| 7 | As admin, look at the table under **How Five Sample Households Would Read** at normal desktop width. | The whole table fits inside the settings panel: long names and greetings wrap onto more lines, and there is no horizontal scroll bar on the table or the page. |
 
 **Cleanup:** pattern back to `The {LastName} Family`.
 
