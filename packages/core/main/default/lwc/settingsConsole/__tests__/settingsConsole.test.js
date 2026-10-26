@@ -32,6 +32,17 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_Settings_OpenSectionButton',
+  () => ({ default: 'Open this page' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Core_Settings_OpenNamedButton', () => ({ default: 'Open {0}' }), {
+  virtual: true
+});
+
 jest.mock('@salesforce/apex/SettingsController.getConsoleModel', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -366,6 +377,72 @@ describe('c-settings-console', () => {
     );
   });
 
+  describe('Recent Changes', () => {
+    const change = {
+      id: 'a01',
+      settingName: 'Fiscal year start month',
+      oldValue: '1',
+      newValue: '7',
+      changedBy: 'Maria',
+      changedAt: '2026-10-01T12:00:00.000Z'
+    };
+
+    function recentBlock(element) {
+      return (
+        Array.from(element.shadowRoot.querySelectorAll('h2')).find((heading) =>
+          heading.textContent.includes('Core_Settings_RecentChangesHeading')
+        ) || null
+      );
+    }
+
+    beforeEach(() => {
+      getRecentChanges.mockResolvedValue([change]);
+    });
+
+    it('shows on the General section', async () => {
+      const element = build();
+      await settle();
+      openSection('General');
+      await settle();
+
+      expect(recentBlock(element)).not.toBeNull();
+      expect(element.shadowRoot.querySelector('lightning-datatable')).not.toBeNull();
+    });
+
+    it('does not show on any other section', async () => {
+      const element = build();
+      await settle();
+
+      // The console opens on the first section, which is not General.
+      expect(recentBlock(element)).toBeNull();
+      expect(element.shadowRoot.querySelector('lightning-datatable')).toBeNull();
+
+      openSection('General');
+      await settle();
+      expect(recentBlock(element)).not.toBeNull();
+
+      openSection('Households');
+      await settle();
+      expect(recentBlock(element)).toBeNull();
+    });
+
+    it('does not show when a search result jumps to another section', async () => {
+      const element = build();
+      await settle();
+      openSection('General');
+      await settle();
+
+      element.shadowRoot.querySelector('c-settings-search').dispatchEvent(
+        new CustomEvent('settingselect', {
+          detail: { section: 'Households', key: 'Include_Deceased_In_Name__c' }
+        })
+      );
+      await settle();
+
+      expect(recentBlock(element)).toBeNull();
+    });
+  });
+
   it('links to the feedback page in a new tab', async () => {
     const element = build();
     await settle();
@@ -574,6 +651,62 @@ describe('c-settings-console', () => {
     expect(element.shadowRoot.querySelector('c-settings-search')).toBeNull();
   });
 
+  // The Rollup Builder module has no settings tab of its own: BarnCRM Settings, opened on the
+  // Rollups section, shows both its settings and the link to the Builder (no module filter).
+  it('shows every Rollups row in the main console when a link opens that section', async () => {
+    const pick = (key) => ({
+      key,
+      label: key,
+      description: null,
+      dataType: 'Picklist',
+      section: 'Rollups',
+      module: 'Rollups',
+      component: null,
+      helpUrl: null,
+      value: 'Both',
+      checked: false,
+      options: [{ label: 'Both', value: 'Both' }]
+    });
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        { name: 'General', settings: [] },
+        {
+          name: 'Rollups',
+          settings: [
+            pick('Rollup_Mode_Default__c'),
+            pick('Rollup_Processing__c'),
+            {
+              key: 'Rollup_Definitions',
+              label: 'Rollups',
+              description: null,
+              dataType: 'Component',
+              section: 'Rollups',
+              module: 'Rollups',
+              component: null,
+              navigationTarget: 'Rollup_Builder',
+              navigationLabel: 'Rollup Builder',
+              helpUrl: null,
+              value: null,
+              checked: false,
+              options: []
+            }
+          ]
+        }
+      ]
+    });
+    const element = createElement('c-settings-console', { is: SettingsConsole });
+    document.body.appendChild(element);
+    openSection('Rollups');
+    await settle();
+
+    expect(element.shadowRoot.querySelectorAll('[data-kind="Picklist"]')).toHaveLength(2);
+    const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.label).toBe('Open Rollup Builder');
+    expect(button.dataset.target).toBe('Rollup_Builder');
+    expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
+  });
+
   it('offers a module its own page instead of trying to render it', async () => {
     const element = build();
     openSection('Giving');
@@ -582,6 +715,19 @@ describe('c-settings-console', () => {
     const button = element.shadowRoot.querySelector('lightning-button[data-target]');
     expect(button).not.toBeNull();
     expect(button.dataset.target).toBe('Giving_Settings');
+    expect(button.label).toBe('Open this page');
+  });
+
+  it('names the page its button opens when the row says what it is called', async () => {
+    const named = model(true);
+    named.sections.find((s) => s.name === 'Giving').settings[0].navigationLabel = 'Rollup Builder';
+    getConsoleModel.mockResolvedValue(named);
+    const element = build();
+    openSection('Giving');
+    await settle();
+
+    const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.label).toBe('Open Rollup Builder');
   });
 
   it('says so plainly when the module that brings a panel is not installed', async () => {
@@ -845,6 +991,132 @@ describe('c-settings-console', () => {
 
       expect(getConsoleModel).toHaveBeenCalledTimes(2);
       expect(FeatureSettings.refreshCount).toBe(1);
+    });
+
+    // A saved switch can change what a panel shows (Seasonal Addresses schedules the swap the
+    // panel below it reports on), so a successful save asks each mounted panel to re-read.
+    it('asks a mounted panel to refresh after a save', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Fiscal_Year_Start_Month__c',
+                label: 'Fiscal year start month',
+                description: null,
+                dataType: 'Text',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: null,
+                navigationTarget: null,
+                helpUrl: null,
+                value: '1',
+                checked: false,
+                options: []
+              },
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      saveSettings.mockResolvedValue(general);
+      FeatureSettings.refreshCount = 0;
+      const element = build();
+      await settle();
+      await settle();
+
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = '7';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+      expect(FeatureSettings.refreshCount).toBe(0);
+
+      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
+        (button) => button.variant === 'brand'
+      );
+      save.click();
+      await settle();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Fiscal_Year_Start_Month__c: '7' } });
+      expect(FeatureSettings.refreshCount).toBe(1);
+    });
+
+    it('does not refresh the panels when a save fails', async () => {
+      const general = {
+        canEdit: true,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              {
+                key: 'Fiscal_Year_Start_Month__c',
+                label: 'Fiscal year start month',
+                description: null,
+                dataType: 'Text',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: null,
+                navigationTarget: null,
+                helpUrl: null,
+                value: '1',
+                checked: false,
+                options: []
+              },
+              {
+                key: 'Feature_List',
+                label: 'Features',
+                description: null,
+                dataType: 'Component',
+                section: 'General',
+                settingsObject: 'BarnCRM_Settings__c',
+                component: 'featureSettings',
+                navigationTarget: null,
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          }
+        ]
+      };
+      getConsoleModel.mockResolvedValue(general);
+      saveSettings.mockRejectedValue({ body: { message: 'No access' } });
+      FeatureSettings.refreshCount = 0;
+      const element = build();
+      await settle();
+      await settle();
+
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = '7';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+
+      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
+        (button) => button.variant === 'brand'
+      );
+      save.click();
+      await settle();
+      await settle();
+
+      expect(FeatureSettings.refreshCount).toBe(0);
     });
 
     it('keeps the plain pattern rows when the section has no naming panel', async () => {

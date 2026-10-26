@@ -39,6 +39,10 @@
     <value xsi:type="xsd:string">Receipts</value>
   </values>
   <values>
+    <field>Navigation_Label__c</field>
+    <value xsi:type="xsd:string">Receipt Letters</value>
+  </values>
+  <values>
     <field>Settings_Object__c</field>
     <value xsi:type="xsd:string">Giving_Settings__c</value>
   </values>

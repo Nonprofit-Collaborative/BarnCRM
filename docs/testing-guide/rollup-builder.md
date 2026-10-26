@@ -16,7 +16,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM Rollup Builder** app. | The app opens on the **Rollup Builder** tab. The **Rollup Settings** tab is next to it. |
+| 1 | From the App Launcher, open the **BarnCRM Rollup Builder** app. | The app opens on the **Rollup Builder** tab, its only tab. |
 | 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Under it is a **Needs attention** section. No read only notice is shown. |
 | 3 | Look at the buttons above the list. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are all enabled. |
 | 4 | If the button reads **Stop the nightly recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
@@ -160,20 +160,20 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 ## T-RB-09: Default rollup mode decides how a new rollup starts
 
-**Purpose:** confirm the Rollup Settings tab changes the mode a new rollup starts with.
+**Purpose:** confirm the Rollups section of BarnCRM Settings changes the mode a new rollup starts with.
 **Prerequisites:** admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Rollup Builder**, open the **Rollup Settings** tab. | The settings console shows only the module's settings: **Default rollup mode** and **When instant totals are calculated**. **Fiscal year start month** is not here. |
+| 1 | Open **BarnCRM Settings** and choose the **Rollups** section. | **Default rollup mode**, **When instant totals are calculated** and a **Rollups** row with an **Open Rollup Builder** button are shown. **Fiscal year start month** is not here (it is in **General**). The **BarnCRM Rollup Builder** app has no Settings tab. |
 | 2 | Change **Default rollup mode** to **Every night** and save. | The setting saves and shows **Every night**. |
-| 3 | Open **BarnCRM Settings**, **Rollups** section. | **Default rollup mode** shows **Every night** there too. |
+| 3 | Reload the page and open the **Rollups** section again. | **Default rollup mode** still shows **Every night**. |
 | 4 | On the **Rollup Builder** tab, click **New rollup**, complete steps 1 to 4 (any valid choices) and go to **Check and save**. | **Mode** is preselected as **Every night**. |
 | 5 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
 
-## T-RB-12: Only the first N records, in descending order
+## T-RB-12: Only the First N Records, in Descending Order
 
 **Purpose:** confirm a text list keeps only its first values in the order chosen (ADR-0136).
 **Prerequisites:** admin user; sample data loaded. In Setup, on **Account**, create a Text field labelled **Test Names** (API name `Test_Names__c`, length 255), visible to your profile.
@@ -188,7 +188,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Back** twice, clear **Only the first N records**, click **Next** twice and pick **The Garcia Family** again. | "Calculated: Luis, Harper, Diego. On the record now: (empty)." |
 | 7 | Click **Cancel**. | Nothing is saved. |
 
-## T-RB-13: First and Last take no limit or order, Count takes no limit
+## T-RB-13: First and Last Take No Limit or Order, Count Takes No Limit
 
 **Purpose:** confirm the Builder offers a row limit and a direction only where they mean something.
 **Prerequisites:** admin user; the **Test Names** field from T-RB-12.

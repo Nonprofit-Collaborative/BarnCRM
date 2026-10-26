@@ -20,7 +20,7 @@ people in one of two ways:
   [Module Manager](module-manager.md) gives its admin set (for Giving, **Giving Admin**) only to
   you, the person who turned it on. Everyone else gets **Giving Admin**, **Giving Staff**,
   **Giving Read Only**, **Campaign Sync**, **Opportunity Mirror**, **Accounting Export** and
-  the rest under "Extra permissions" below, beside their role. The Fundraising Staff role
+  the rest under "Extra Permissions" below, beside their role. The Fundraising Staff role
   already includes Giving Staff.
 
 You never need Setup for either. If you would rather have a module set given automatically to
@@ -76,7 +76,7 @@ tax identification number, to everyone who can read a contact.
 
 So to find a donor's receipt, open the donor, then the **Receipts** related list, then the receipt,
 then the file on it. If somebody says they cannot see receipts on a donor's record, that is this,
-and the fix is a Giving permission set, which you give them under "Extra permissions" below.
+and the fix is a Giving permission set, which you give them under "Extra Permissions" below.
 
 Nobody can edit or delete a receipt PDF, whatever they hold. See
 [Receipts and year-end statements](receipts.md).
@@ -113,7 +113,7 @@ Three things control who can use the page:
    Creating users is one of the few things Salesforce does not let an app do for you, so
    that step happens in Setup. See "What still needs Setup" below.
 
-Giving the extra permissions (see "Extra permissions" below) needs the same two
+Giving the extra permissions (see "Extra Permissions" below) needs the same two
 permissions as giving a role.
 
 ## A five-minute walkthrough
@@ -136,7 +136,7 @@ Here is how she gives him access, checks it, and takes it away again.
 7. David can now sign in and see households and contacts. He does not see BarnCRM
    Settings, because that belongs to the BarnCRM Admin role. If your org has Giving, he
    does not see gifts yet either: for that he also needs **Giving Staff**, which you give him
-   on this page under "Extra permissions" below (or give him the Fundraising Staff role,
+   on this page under "Extra Permissions" below (or give him the Fundraising Staff role,
    which includes it).
 8. To take the role away, find David's name on the Team Member card and click
    **Remove**. Confirm, and a message says "David Okafor no longer has the Team Member
@@ -146,11 +146,11 @@ A person can hold more than one role. Giving David the Coordinator role as well
 does not remove Team Member, and removing one role leaves the other in place. Giving someone a
 role they already have changes nothing and reports no error.
 
-## Extra permissions
+## Extra Permissions
 
 A few BarnCRM features are in no role on purpose, because most people should not have them,
 and a module's own permission sets cannot be in a Core role. You give them to a person on this
-page too, alongside their role, under **Extra permissions**. You never need Setup for them.
+page too, alongside their role, under **Extra Permissions**. You never need Setup for them.
 
 Core's six are always listed:
 
@@ -161,7 +161,7 @@ Core's six are always listed:
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
 | BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Duplicates** list on Org Optimizer (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
-| BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
+| BarnCRM Metadata Admin | Save changes on the Custom Metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
 
 A module's sets are listed after them, only where that module is installed:
 
