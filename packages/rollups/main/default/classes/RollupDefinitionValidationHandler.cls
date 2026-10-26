@@ -6,8 +6,8 @@
  * page lets through is one the engine can run.
  *
  * Only a save that could change the answer is checked: an insert, or an edit of the calculation,
- * the target, the source attribute, the order or the row limit (ADR-0136). Switching a rollup on or off or changing its mode never
- * trips over an older definition.
+ * the target, the source attribute, the order, the row limit or the delimiters (ADR-0136).
+ * Switching a rollup on or off or changing its mode never trips over an older definition.
  */
 @NamespaceAccessible
 public with sharing class RollupDefinitionValidationHandler extends TriggerHandler {
@@ -51,7 +51,9 @@ public with sharing class RollupDefinitionValidationHandler extends TriggerHandl
                 Rollup_Definition__c.Target_Field__c,
                 Rollup_Definition__c.Source_Field__c,
                 Rollup_Definition__c.Order_By_Field__c,
-                Rollup_Definition__c.Row_Limit__c
+                Rollup_Definition__c.Row_Limit__c,
+                Rollup_Definition__c.Delimiter__c,
+                Rollup_Definition__c.Custom_Delimiter__c
             }
         ) {
             if (record.get(field) != previous.get(field)) {

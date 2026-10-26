@@ -110,6 +110,16 @@
                 options={delimiterOptions}
                 onchange={handleInput}
             ></lightning-combobox>
+            <template lwc:if={isCustomDelimiter}>
+                <lightning-input
+                    name="customDelimiter"
+                    data-id="custom-delimiter"
+                    label={labels.customDelimiter}
+                    max-length="10"
+                    value={draft.customDelimiter}
+                    onchange={handleInput}
+                ></lightning-input>
+            </template>
         </template>
         <lightning-radio-group
             data-id="window"
@@ -147,6 +157,16 @@
         <template lwc:if={readsParentField}>
             <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="parent-field-note">{labels.parentFieldNote}</p>
         </template>
+        <lightning-input
+            type="checkbox"
+            class="slds-var-m-top_small"
+            name="includeDeleted"
+            data-id="include-deleted"
+            label={labels.includeDeleted}
+            field-level-help={labels.includeDeletedHelp}
+            checked={draft.includeDeleted}
+            onchange={handleInput}
+        ></lightning-input>
         <div class="slds-var-m-top_medium">
             <c-rollup-filter-builder
                 data-name="targetFilterJson"

@@ -181,6 +181,10 @@ public with sharing class RollupBuilderController {
         @AuraEnabled
         public String delimiter { get; set; }
         @AuraEnabled
+        public String customDelimiter { get; set; }
+        @AuraEnabled
+        public Boolean includeDeleted { get; set; }
+        @AuraEnabled
         public String filterJson { get; set; }
         @AuraEnabled
         public String targetFilterJson { get; set; }
@@ -612,6 +616,9 @@ public with sharing class RollupBuilderController {
             draft.rowLimit,
             draft.orderByField
         );
+        if (limitProblem == null) {
+            limitProblem = RollupPlanner.delimiterProblem(draft.delimiter, draft.customDelimiter);
+        }
         if (limitProblem != null) {
             return limitProblem;
         }
@@ -957,6 +964,8 @@ public with sharing class RollupBuilderController {
             ? null
             : definition.Row_Limit__c.intValue();
         draft.delimiter = definition.Delimiter__c;
+        draft.customDelimiter = definition.Custom_Delimiter__c;
+        draft.includeDeleted = definition.Include_Deleted__c;
         draft.filterJson = definition.Filter_JSON__c;
         draft.targetFilterJson = definition.Target_Filter_JSON__c;
         draft.fiscalYearAware = definition.Fiscal_Year_Aware__c;
@@ -983,6 +992,10 @@ public with sharing class RollupBuilderController {
             Order_Direction__c = draft.orderDirection == 'Descending' ? 'Descending' : 'Ascending',
             Row_Limit__c = draft.rowLimit,
             Delimiter__c = String.isBlank(draft.delimiter) ? null : draft.delimiter,
+            Custom_Delimiter__c = draft.delimiter == RollupPlanner.CUSTOM_DELIMITER
+                ? draft.customDelimiter
+                : null,
+            Include_Deleted__c = draft.includeDeleted == true,
             Filter_JSON__c = String.isBlank(draft.filterJson) ? null : draft.filterJson,
             Target_Filter_JSON__c = String.isBlank(draft.targetFilterJson)
                 ? null

@@ -375,7 +375,17 @@ public without sharing class RollupAggregator {
         Answer answer
     ) {
         RollupPlanner.SourceQuery query = plan.queries[queryIndex];
+        if (query.includeDeleted && answer.failed.contains(query.measures[0].definitionIndex)) {
+            return; // refused and logged on its first chunk
+        }
         try {
+            // A query locator cannot read ALL ROWS, so the chunks would miss the deleted rows:
+            // the definition is left out of the write rather than written without them (R-R15).
+            if (query.includeDeleted) {
+                throw new RollupPlanner.RollupPlanException(
+                    System.Label.Core_Rollups_ErrorDeletedLargeParent
+                );
+            }
             run(query, fanoutFor(query.token, targetIds), answer, rowIds);
         } catch (Exception failedQuery) {
             for (RollupPlanner.Measure measure : query.measures) {
@@ -456,6 +466,15 @@ public without sharing class RollupAggregator {
         return whereFor(query) + (binds.containsKey('rows') ? ' AND Id IN :rows' : '');
     }
 
+    /**
+     * What ends a query of a definition that includes deleted records: Recycle Bin rows and
+     * archived activities are read only with ALL ROWS (ADR-0136).
+     */
+    @TestVisible
+    private static String allRows(RollupPlanner.SourceQuery query) {
+        return query.includeDeleted ? ' ALL ROWS' : '';
+    }
+
     /** One grouped query for every grouped measure, each distinct expression selected once. */
     private static void foldGroups(
         RollupPlanner.SourceQuery query,
@@ -482,7 +501,8 @@ public without sharing class RollupAggregator {
             query.sourceObject +
             whereFor(query, binds) +
             ' GROUP BY ' +
-            query.keyExpression;
+            query.keyExpression +
+            allRows(query);
         for (
             AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(
                 soql,
@@ -590,7 +610,8 @@ public without sharing class RollupAggregator {
             ' ORDER BY ' +
             query.orderBy +
             (query.descending ? ' DESC' : ' ASC') +
-            ', Id';
+            ', Id' +
+            allRows(query);
         for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
             Set<Id> targets = fanout.targetsByKey.get((Id) valueAt(row, query.keyExpression));
             if (targets == null) {
@@ -704,7 +725,8 @@ public without sharing class RollupAggregator {
             ' FROM ' +
             query.sourceObject +
             whereFor(query, binds) +
-            ' ORDER BY Id';
+            ' ORDER BY Id' +
+            allRows(query);
         for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
             Set<Id> targets = fanout.targetsByKey.get((Id) valueAt(row, query.keyExpression));
             if (targets == null) {

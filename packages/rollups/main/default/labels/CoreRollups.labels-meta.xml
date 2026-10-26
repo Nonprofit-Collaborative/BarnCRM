@@ -249,6 +249,22 @@
         <value>Only the first N records must be 1 or more. Leave it blank to count every record.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorCustomDelimiterNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the delimiter is Custom and no custom delimiter is given.</shortDescription>
+        <value>Type the characters that go between the values in Custom delimiter, or choose another delimiter.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorDeletedLargeParent</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error: a rollup with deleted records reaches the large parent route.</shortDescription>
+        <value>This rollup includes deleted records, which cannot be read in parts for a record with this many source records. Its total on this record was left as it was.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_Recalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

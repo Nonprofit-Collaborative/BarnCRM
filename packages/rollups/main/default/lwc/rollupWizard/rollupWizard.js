@@ -24,6 +24,10 @@ import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
 import ROW_LIMIT_HELP from '@salesforce/label/c.Core_RollupBuilder_RowLimitHelp';
 import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
+import CUSTOM_DELIMITER from '@salesforce/label/c.Core_RollupBuilder_CustomDelimiter';
+import ERROR_CUSTOM_DELIMITER from '@salesforce/label/c.Core_Rollups_ErrorCustomDelimiterNeeded';
+import INCLUDE_DELETED from '@salesforce/label/c.Core_RollupBuilder_IncludeDeleted';
+import INCLUDE_DELETED_HELP from '@salesforce/label/c.Core_RollupBuilder_IncludeDeletedHelp';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
 import WINDOW_THIS from '@salesforce/label/c.Core_RollupBuilder_WindowThisYear';
@@ -121,6 +125,9 @@ export default class RollupWizard extends LightningElement {
     rowLimit: ROW_LIMIT,
     rowLimitHelp: ROW_LIMIT_HELP,
     delimiter: DELIMITER,
+    customDelimiter: CUSTOM_DELIMITER,
+    includeDeleted: INCLUDE_DELETED,
+    includeDeletedHelp: INCLUDE_DELETED_HELP,
     window: WINDOW,
     windowDate: WINDOW_DATE,
     filter: FILTER,
@@ -327,6 +334,10 @@ export default class RollupWizard extends LightningElement {
 
   get isTextList() {
     return LISTS.has(this.current.aggregate);
+  }
+
+  get isCustomDelimiter() {
+    return this.isTextList && this.current.delimiter === 'Custom';
   }
 
   get sourceFieldOptions() {
@@ -555,6 +566,9 @@ export default class RollupWizard extends LightningElement {
       if (this.hasRowLimit && !draft.orderByField) {
         return ERROR_ROW_LIMIT_ORDER;
       }
+      if (this.isCustomDelimiter && !draft.customDelimiter) {
+        return ERROR_CUSTOM_DELIMITER;
+      }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
         return ERROR_WINDOW_DATE;
       }
@@ -614,6 +628,8 @@ export default class RollupWizard extends LightningElement {
     // A limit or a direction the calculation does not take is not saved with it.
     draft.rowLimit = this.hasRowLimit ? Number(draft.rowLimit) : null;
     draft.orderDirection = this.takesDirection ? this.orderDirection : 'Ascending';
+    draft.customDelimiter = this.isCustomDelimiter ? draft.customDelimiter : null;
+    draft.includeDeleted = draft.includeDeleted === true;
     return draft;
   }
 

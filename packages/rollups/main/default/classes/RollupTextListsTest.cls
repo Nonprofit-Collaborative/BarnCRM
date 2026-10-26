@@ -431,4 +431,89 @@ private class RollupTextListsTest {
             Assert.areEqual('\n', RollupPlanner.separatorFor('New line'), 'A line break');
         }
     }
+
+    /** ADR-0136: Pipe, and Custom written exactly as stored, refused on save when empty. */
+    @IsTest
+    static void aPipeAndACustomDelimiterJoinTheValues() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c custom = definition(
+                'TEXT_LIST',
+                'LastName',
+                'Description',
+                RollupService.MODE_BOTH
+            );
+            custom.Delimiter__c = 'Custom';
+            custom.Custom_Delimiter__c = ' / ';
+
+            Assert.areEqual(' | ', RollupPlanner.separatorFor('Pipe'), 'A pipe between spaces');
+            Assert.areEqual(' / ', RollupPlanner.separatorOf(custom), 'As typed, spaces kept');
+            Assert.isNull(RollupPlanner.saveProblem(custom), 'A custom delimiter saves');
+            custom.Custom_Delimiter__c = null;
+            Assert.areEqual(', ', RollupPlanner.separatorOf(custom), 'Comma if it went missing');
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorCustomDelimiterNeeded,
+                RollupPlanner.saveProblem(custom),
+                'Custom with nothing to write is refused'
+            );
+            Assert.isNull(RollupPlanner.delimiterProblem('Pipe', null), 'Pipe needs nothing');
+        }
+    }
+
+    /** ADR-0136: Include Deleted reads the Recycle Bin (ALL ROWS); without it a delete is gone. */
+    @IsTest
+    static void aDeletedPersonCountsOnlyWhenTheRollupIncludesDeletedRecords() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            List<Account> organizations = organizations(1);
+            Id organizationId = organizations[0].Id;
+            List<Contact> people = new List<Contact>{
+                new Contact(LastName = 'Kept', AccountId = organizationId),
+                new Contact(LastName = 'Gone', AccountId = organizationId)
+            };
+            insert people;
+            delete people[1];
+            Rollup_Definition__c withDeleted = definition(
+                'TEXT_LIST',
+                'LastName',
+                'Description',
+                RollupService.MODE_SCHEDULED
+            );
+            withDeleted.Include_Deleted__c = true;
+
+            Test.startTest();
+            RollupEngine.recalculate(
+                new Set<Id>{ organizationId },
+                new List<Rollup_Definition__c>{
+                    withDeleted,
+                    definition(
+                        'TEXT_LIST',
+                        'LastName',
+                        'Preferred_Name__c',
+                        RollupService.MODE_SCHEDULED
+                    )
+                }
+            );
+            Test.stopTest();
+
+            Account stored = reread(organizations).get(organizationId);
+            Assert.areEqual('Gone, Kept', stored.Description, 'The deleted person still counts');
+            Assert.areEqual('Kept', stored.Preferred_Name__c, 'Not without Include Deleted');
+
+            RollupPlanner.Plan plan = RollupPlanner.plan(
+                Account.SObjectType,
+                new List<Rollup_Definition__c>{ withDeleted }
+            );
+            RollupAggregator.Answer answer = new RollupAggregator.Answer();
+            RollupAggregator.calculateRows(
+                plan,
+                0,
+                new Set<Id>{ organizationId },
+                new Set<Id>{ people[0].Id },
+                answer
+            );
+            Assert.isTrue(
+                answer.failed.contains(0),
+                'The large parent route leaves it out rather than miss the deleted rows'
+            );
+        }
+    }
 }

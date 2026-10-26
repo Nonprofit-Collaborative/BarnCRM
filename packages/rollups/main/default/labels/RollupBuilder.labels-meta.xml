@@ -585,6 +585,30 @@
         <value>Optional. For the sum of the 5 largest gifts, enter 5 and order by Amount, Descending. Leave blank for every record.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_CustomDelimiter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the characters a Custom delimiter writes.</shortDescription>
+        <value>Custom delimiter</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_IncludeDeleted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 label: count deleted and archived records too.</shortDescription>
+        <value>Include deleted and archived records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_IncludeDeletedHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 help for including deleted and archived records.</shortDescription>
+        <value>Counts records in the Recycle Bin and archived tasks and events. Deleting a record does not lower the total; emptying the Recycle Bin does, at the next full recalculation.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_Delimiter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

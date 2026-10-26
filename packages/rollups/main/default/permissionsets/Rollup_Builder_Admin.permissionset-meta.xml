@@ -31,6 +31,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Rollup_Definition__c.Custom_Delimiter__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Rollup_Definition__c.Description__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -57,6 +62,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Rollup_Definition__c.Fiscal_Year_Offset__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Rollup_Definition__c.Include_Deleted__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

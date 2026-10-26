@@ -395,4 +395,32 @@ describe('c-rollup-wizard', () => {
       calculateNow: false
     });
   });
+
+  it('asks a Custom delimiter for its characters', async () => {
+    const element = await build({ ...DRAFT, aggregate: 'TEXT_LIST', delimiter: 'Custom' });
+    await next(element);
+    await next(element);
+    expect(query(element, 'custom-delimiter')).not.toBeNull();
+    await next(element);
+    expect(query(element, 'error-message')).not.toBeNull();
+    expect(query(element, 'custom-delimiter')).not.toBeNull();
+  });
+
+  it('saves Include deleted, and no custom delimiter unless Custom is chosen', async () => {
+    save.mockResolvedValue({ recordId: DRAFT.recordId, notice: 'Rollup saved.' });
+    const element = await build({ ...DRAFT, delimiter: 'Pipe', customDelimiter: ' / ' });
+    await next(element);
+    await next(element);
+    await next(element);
+    const includeDeleted = query(element, 'include-deleted');
+    includeDeleted.checked = true;
+    includeDeleted.dispatchEvent(new CustomEvent('change'));
+    await next(element);
+    query(element, 'save').click();
+    await flush();
+    expect(save).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ includeDeleted: true, customDelimiter: null }),
+      calculateNow: false
+    });
+  });
 });

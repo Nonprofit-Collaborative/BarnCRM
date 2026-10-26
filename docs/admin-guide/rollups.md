@@ -255,11 +255,13 @@ What to know about them:
 - **Any and None count the records your conditions describe.** They do not read a field of
   their own. For "has ever given a gift over $1,000", choose **Any** and the condition
   "Amount greater than 1000".
-- **A text list is separated by a comma, a semicolon, or a new line.** Choose one with
-  **Delimiter**; a comma is used when you choose nothing. A value that contains the
-  separator is not changed, so if your values contain commas (for example "Smith, Jane"),
-  choose a semicolon or a new line so the list still reads clearly. A new line suits a long
-  text field.
+- **A text list is separated by a comma, a semicolon, a new line, a pipe, or your own
+  characters.** Choose one with **Separate the values with**; a comma is used when you choose
+  nothing. **Pipe** writes ` | ` between the values. **Custom** writes what you type in
+  **Custom delimiter** (up to 10 characters, spaces included) exactly as typed, and cannot be
+  saved empty. A value that contains the separator is not changed, so if your values contain
+  commas (for example "Smith, Jane"), choose a semicolon, a new line or a pipe so the list
+  still reads clearly. A new line suits a long text field.
 - **A text list is in order.** If you choose a field to order by, the values follow it,
   oldest or smallest first, or with **Order** set to **Descending**, newest or largest first.
   Otherwise they are listed alphabetically (Z to A when descending). Records whose order field
@@ -299,6 +301,13 @@ What to know about them:
   all the matching records each time, so a deleted record, a record moved to another parent,
   or a value changed back is reflected the next time the total is calculated, whatever its
   mode.
+- **Deleted and archived records count only if you ask.** Tick **Include deleted and archived
+  records** in step 4 to count records in the Recycle Bin and archived tasks and events, as
+  if they were not deleted. Deleting a record then does not lower the total. A record counts
+  until the Recycle Bin is emptied (or the platform removes it after its retention period);
+  that fires nothing, so the total drops at the next nightly run or **Recalculate**. For a
+  record with so many source records that BarnCRM has to read them in parts (tens of
+  thousands), a rollup with this ticked is not recalculated and the Error Log says why.
 
 ## The Rollup Builder
 
@@ -373,7 +382,9 @@ to change, before it lets you go on.
    two rollups that fill one field for different records. The comparisons **is this year** and
    **is last year** in a condition mean the calendar year (January to December); for your fiscal
    year, use the time window in step 3. **Contains** and **starts with** match what you type
-   exactly, so `%` and `_` are ordinary characters.
+   exactly, so `%` and `_` are ordinary characters. **Include deleted and archived records**
+   counts records in the Recycle Bin and archived tasks and events too (see
+   [What a rollup can calculate](#what-a-rollup-can-calculate)).
    A condition can also read a field of a record the counted records point to, one lookup
    away: after the records' own fields, the list offers each lookup's fields, such as
    **Appeal > Type** for "gifts whose appeal is a mail appeal". One lookup only: a field of
@@ -407,6 +418,7 @@ It says what to change instead of saving:
 - **Only the first N records** below 1, without a field to order by, or on a calculation that
   takes no limit (Count, Count distinct, Any, None, First, Last). Every save checks this, not
   only the Builder.
+- A **Custom** separator with nothing typed in **Custom delimiter**. Every save checks this too.
 - A fiscal year window without a date to measure it on, or measured on a date and time field.
   Choose a date field, such as the gift date.
 - An **Instantly** total with a fiscal year window, or with an **is this year**, **is last year** or
@@ -680,6 +692,7 @@ For report builders only. Nothing on this page requires you to know these.
 | Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
 | Which record comes first, by; Order; Only the first N records | `Order_By_Field__c`, `Order_Direction__c` and `Row_Limit__c` on Rollup Definition |
+| Custom delimiter; Include deleted and archived records | `Custom_Delimiter__c` and `Include_Deleted__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
 With Giving installed:

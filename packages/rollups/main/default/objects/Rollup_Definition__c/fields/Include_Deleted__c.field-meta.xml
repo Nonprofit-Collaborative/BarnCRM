@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Include_Deleted__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Whether source records in the Recycle Bin and archived tasks and events count (ALL ROWS). A deleted record counts until it is purged from the Recycle Bin (ADR-0136).</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Counts records in the Recycle Bin and archived tasks and events. Deleting a record then does not lower the total; emptying the Recycle Bin does, at the next full recalculation.</inlineHelpText>
+    <label>Include Deleted</label>
+    <trackHistory>true</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
