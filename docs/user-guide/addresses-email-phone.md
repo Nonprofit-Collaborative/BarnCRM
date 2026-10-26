@@ -102,6 +102,9 @@ BarnCRM's **Work Phone**.
   again." Fix the marked fields.
 - Problem: "We could not make that the default address. Check that you have permission to
   edit addresses ..." Ask your admin for edit access.
+- Problem: the **Addresses** card has no **Add address** or **Set as default** button. Your
+  access lets you read addresses but not change them (the Read Only role, for example). Ask
+  your admin.
 - Problem: "The Work email address is empty, so there is nothing to put in the ordinary Email
   box. Type that address in, or choose a different preferred email." Fill in the address you
   chose, or choose another. The same message appears for phones ("The Mobile phone number is

@@ -128,6 +128,9 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 
 - Problem: "This person is not in a household yet". Automatic households may be off in your
   org. Add them from a household's **Members** card, or ask your admin.
+- Problem: the **Members** card has no **Add member**, **Move to another household** or **Make
+  primary** button. Your access lets you read households but not change them (the Read Only
+  role, for example). Ask your admin.
 - Problem: "You can see this household but not change it, so merging and splitting are
   switched off. Ask whoever manages access for edit access to both households." Ask your admin.
 - Problem: "You need edit access to both households to merge them." The other household is
