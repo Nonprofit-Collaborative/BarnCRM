@@ -137,6 +137,10 @@ private class SeasonalAddressControllerTest {
     @IsTest
     static void aUserWithoutThePermissionCannotChangeTheSchedule() {
         System.runAs(TestUsers.admin()) {
+            // The org may already run the nightly swap; the test is about this user starting it.
+            TestDataFactory.clearScheduledJobs(
+                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
+            );
             User reader = readOnlyUser();
 
             Test.startTest();

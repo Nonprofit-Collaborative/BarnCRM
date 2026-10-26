@@ -14,14 +14,13 @@ private class ScheduledJobSelectorTest {
 
     /** A user who has left: inactive, so a job they own has stopped running. */
     private static Id inactiveUserId() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User gone = new User(
             FirstName = 'Former',
             LastName = 'Admin',
             Alias = 'former',
             Email = 'former.barncrm@example.com',
             Username = 'former.barncrm.' + Datetime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
+            ProfileId = TestUsers.standardProfileId(),
             TimeZoneSidKey = 'America/New_York',
             LocaleSidKey = 'en_US',
             EmailEncodingKey = 'UTF-8',

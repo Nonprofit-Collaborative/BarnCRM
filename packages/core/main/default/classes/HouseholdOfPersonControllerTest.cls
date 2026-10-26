@@ -651,24 +651,8 @@ private class HouseholdOfPersonControllerTest {
      * shared factory because only this class needs a user with no object access at all.
      */
     private static User noCreateUser() {
-        Map<String, Profile> byName = new Map<String, Profile>();
-        for (Profile candidate : [
-            SELECT Id, Name
-            FROM Profile
-            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
-        ]) {
-            byName.put(candidate.Name, candidate);
-        }
-        Profile restricted = byName.containsKey('Read Only')
-            ? byName.get('Read Only')
-            : byName.get('Minimum Access - Salesforce');
-        Assert.isNotNull(
-            restricted,
-            'This org has no standard profile without create access, so a refusal for ' +
-            'want of create access cannot be exercised at all'
-        );
         User reader = new User(
-            ProfileId = restricted.Id,
+            ProfileId = TestUsers.readOnlyProfileId(),
             LastName = 'Reader',
             Alias = 'reader',
             Email = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',

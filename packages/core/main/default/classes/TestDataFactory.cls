@@ -197,4 +197,39 @@ public class TestDataFactory {
         insert logs;
         return logs;
     }
+
+    /**
+     * Stops the org's own scheduled jobs with these names, inside the test only (a test's
+     * changes are rolled back), so a test that counts or expects no such job starts from none
+     * on an org where BarnCRM is already running them.
+     *
+     * @param jobNames the scheduled job names, such as `ErrorDigestScheduler.JOB_NAME`
+     */
+    @NamespaceAccessible
+    public static void clearScheduledJobs(List<String> jobNames) {
+        for (CronTrigger job : [
+            SELECT Id
+            FROM CronTrigger
+            WHERE CronJobDetail.Name IN :jobNames
+            WITH SYSTEM_MODE
+        ]) {
+            System.abortJob(job.Id);
+        }
+    }
+
+    /**
+     * The record, saved past the org's duplicate rules when it is inserted or updated. The
+     * tests make look-alike people and organizations on purpose, and an org with a blocking
+     * Contact or Account duplicate rule would otherwise refuse them before the test begins.
+     *
+     * @param record a record a test is about to save
+     * @return the same record
+     */
+    @NamespaceAccessible
+    public static SObject pastDuplicateRules(SObject record) {
+        Database.DMLOptions options = new Database.DMLOptions();
+        options.DuplicateRuleHeader.allowSave = true;
+        record.setOptions(options);
+        return record;
+    }
 }

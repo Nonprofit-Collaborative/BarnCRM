@@ -57,20 +57,24 @@ public class HouseholdTestDataFactory {
 
     @NamespaceAccessible
     public static Contact newContact(String firstName, String lastName) {
-        return new Contact(FirstName = firstName, LastName = lastName, Salutation = 'Ms.');
+        return newContact('Ms.', firstName, lastName);
     }
 
     public static Contact newContact(String salutation, String firstName, String lastName) {
-        return new Contact(Salutation = salutation, FirstName = firstName, LastName = lastName);
+        return (Contact) TestDataFactory.pastDuplicateRules(
+            new Contact(Salutation = salutation, FirstName = firstName, LastName = lastName)
+        );
     }
 
     @NamespaceAccessible
     public static Account newHousehold(String name) {
-        return new Account(
-            Name = name,
-            RecordTypeId = HouseholdService.householdRecordTypeId(),
-            Custom_Name__c = false,
-            Member_Count__c = 0
+        return (Account) TestDataFactory.pastDuplicateRules(
+            new Account(
+                Name = name,
+                RecordTypeId = HouseholdService.householdRecordTypeId(),
+                Custom_Name__c = false,
+                Member_Count__c = 0
+            )
         );
     }
 
@@ -182,9 +186,7 @@ public class HouseholdTestDataFactory {
     public static List<Contact> manyContacts(Integer howMany, String lastName) {
         List<Contact> result = new List<Contact>();
         for (Integer i = 0; i < howMany; i++) {
-            result.add(
-                new Contact(FirstName = 'Person' + i, LastName = lastName + i, Salutation = 'Mx.')
-            );
+            result.add(newContact('Mx.', 'Person' + i, lastName + i));
         }
         return result;
     }

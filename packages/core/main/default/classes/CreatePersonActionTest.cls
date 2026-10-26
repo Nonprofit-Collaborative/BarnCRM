@@ -248,18 +248,7 @@ private class CreatePersonActionTest {
      * standard profile, or Minimum Access where an org has no Read Only profile.
      */
     private static User readOnlyUser() {
-        Map<String, Id> byName = new Map<String, Id>();
-        for (Profile candidate : [
-            SELECT Id, Name
-            FROM Profile
-            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
-        ]) {
-            byName.put(candidate.Name, candidate.Id);
-        }
-        Id profileId = byName.containsKey('Read Only')
-            ? byName.get('Read Only')
-            : byName.get('Minimum Access - Salesforce');
-        Assert.isNotNull(profileId, 'This org has a standard profile without create access');
+        Id profileId = TestUsers.readOnlyProfileId();
         String unique = 'barnperson' + Datetime.now().getTime();
         User result = new User(
             ProfileId = profileId,

@@ -399,14 +399,8 @@ private class DuplicateControllerTest {
     @IsTest
     static void withoutAccessToSuggestionsThePanelSaysSoAndActsOnNothing() {
         System.runAs(TestUsers.admin()) {
-            Profile minimum = [
-                SELECT Id
-                FROM Profile
-                WHERE Name = 'Minimum Access - Salesforce'
-                LIMIT 1
-            ];
             User admin = new User(
-                ProfileId = minimum.Id,
+                ProfileId = TestUsers.minimumAccessProfileId(),
                 LastName = 'Dupaccess',
                 Email = 'dupaccess@barncrm.test.invalid',
                 Username = 'dupaccess' + DateTime.now().getTime() + '@barncrm.test.invalid',

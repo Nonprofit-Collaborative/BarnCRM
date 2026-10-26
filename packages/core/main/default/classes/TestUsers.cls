@@ -219,25 +219,8 @@ public class TestUsers {
      */
     @NamespaceAccessible
     public static User peopleReaderWith(String lastName, List<String> permissionSetNames) {
-        Map<String, Id> byName = new Map<String, Id>();
-        for (Profile candidate : [
-            SELECT Id, Name
-            FROM Profile
-            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
-            WITH SYSTEM_MODE
-        ]) {
-            byName.put(candidate.Name, candidate.Id);
-        }
-        Id profileId = byName.containsKey('Read Only')
-            ? byName.get('Read Only')
-            : byName.get('Minimum Access - Salesforce');
-        Assert.isNotNull(
-            profileId,
-            'This org has no standard profile without edit access, so a user who may read ' +
-            'people but not edit them cannot be built.'
-        );
         User person = insertWith(
-            newUser(lastName, profileId, usernameStart(lastName)),
+            newUser(lastName, readOnlyProfileId(), usernameStart(lastName)),
             permissionSetNames,
             false
         );
@@ -277,23 +260,110 @@ public class TestUsers {
      */
     @NamespaceAccessible
     public static User minimumAccessUserWith(String lastName, List<String> permissionSetNames) {
-        List<Profile> minimum = [
-            SELECT Id
-            FROM Profile
-            WHERE Name = 'Minimum Access - Salesforce'
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        Assert.isFalse(
-            minimum.isEmpty(),
-            'This org has no Minimum Access - Salesforce profile, so a user whose access comes ' +
-            'only from the packaged permission sets cannot be built.'
-        );
         return insertWith(
-            newUser(lastName, minimum[0].Id, usernameStart(lastName)),
+            newUser(lastName, minimumAccessProfileId(), usernameStart(lastName)),
             permissionSetNames,
             false
         );
+    }
+
+    private static final String MINIMUM_ACCESS = 'Minimum Access - Salesforce';
+    private static final String READ_ONLY = 'Read Only';
+
+    /**
+     * The profile that gives no access of its own: Minimum Access - Salesforce, or, where the
+     * org's profile names are translated or renamed, the first Salesforce licence profile that
+     * reads no account or contact and cannot see Setup. Profile names are labels, so a name
+     * alone is never relied on.
+     *
+     * @return the profile Id
+     */
+    @NamespaceAccessible
+    public static Id minimumAccessProfileId() {
+        Id named = profileNamed(MINIMUM_ACCESS);
+        if (named != null) {
+            return named;
+        }
+        Id found = firstProfileWithout(true);
+        Assert.isNotNull(
+            found,
+            'This org has no profile without access to accounts and contacts, so a user whose ' +
+            'access comes only from permission sets cannot be built.'
+        );
+        return found;
+    }
+
+    /**
+     * A profile that edits no account or contact: Read Only, then Minimum Access - Salesforce,
+     * then, where the names are translated or renamed, the first Salesforce licence profile
+     * that edits neither.
+     *
+     * @return the profile Id
+     */
+    @NamespaceAccessible
+    public static Id readOnlyProfileId() {
+        Id named = profileNamed(READ_ONLY);
+        if (named == null) {
+            named = profileNamed(MINIMUM_ACCESS);
+        }
+        if (named == null) {
+            named = firstProfileWithout(false);
+        }
+        Assert.isNotNull(
+            named,
+            'This org has no profile without edit access to accounts and contacts, so a user ' +
+            'who may read people but not edit them cannot be built.'
+        );
+        return named;
+    }
+
+    private static Id profileNamed(String name) {
+        List<Profile> named = [SELECT Id FROM Profile WHERE Name = :name WITH SYSTEM_MODE LIMIT 1];
+        return named.isEmpty() ? null : named[0].Id;
+    }
+
+    /**
+     * The first Salesforce licence profile, without Modify All Data or View Setup, whose own
+     * permissions give no edit (or, with `noReadEither`, no read) on accounts and contacts.
+     */
+    @TestVisible
+    private static Id firstProfileWithout(Boolean noReadEither) {
+        List<ObjectPermissions> grants = noReadEither
+            ? [
+                  SELECT Parent.ProfileId
+                  FROM ObjectPermissions
+                  WHERE
+                      Parent.IsOwnedByProfile = TRUE
+                      AND SobjectType IN ('Account', 'Contact')
+                      AND PermissionsRead = TRUE
+                  WITH SYSTEM_MODE
+              ]
+            : [
+                  SELECT Parent.ProfileId
+                  FROM ObjectPermissions
+                  WHERE
+                      Parent.IsOwnedByProfile = TRUE
+                      AND SobjectType IN ('Account', 'Contact')
+                      AND PermissionsEdit = TRUE
+                  WITH SYSTEM_MODE
+              ];
+        Set<Id> granting = new Set<Id>();
+        for (ObjectPermissions grant : grants) {
+            granting.add(grant.Parent.ProfileId);
+        }
+        List<Profile> candidates = [
+            SELECT Id
+            FROM Profile
+            WHERE
+                UserLicense.LicenseDefinitionKey = 'SFDC'
+                AND PermissionsModifyAllData = FALSE
+                AND PermissionsViewSetup = FALSE
+                AND Id NOT IN :granting
+            WITH SYSTEM_MODE
+            ORDER BY Name
+            LIMIT 1
+        ];
+        return candidates.isEmpty() ? null : candidates[0].Id;
     }
 
     /**
@@ -318,7 +388,7 @@ public class TestUsers {
                 named = [
                     SELECT Id
                     FROM Profile
-                    WHERE UserType = 'Standard' AND Name != 'System Administrator'
+                    WHERE UserType = 'Standard' AND PermissionsModifyAllData = FALSE
                     WITH SYSTEM_MODE
                     ORDER BY Name
                     LIMIT 1
