@@ -3,3 +3,9 @@ contact_links:
   - name: Questions and discussion
     url: https://github.com/Nonprofit-Collaborative/BarnCRM/discussions
     about: Ask questions and discuss ideas with the community before filing an issue.
+  - name: How to report a bug or give feedback
+    url: https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md
+    about: What to include, which template to use, and what never to post.
+  - name: Report a security problem privately
+    url: https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SECURITY.md
+    about: Do not open a public issue for a vulnerability. Follow the private reporting steps.

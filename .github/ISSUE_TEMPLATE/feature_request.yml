@@ -3,6 +3,11 @@ description: Propose a new feature or enhancement for BarnCRM.
 title: '[Feature]: '
 labels: ['enhancement']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include personal or donor data: this issue is public. Issues are read and may shape the roadmap.
+
   - type: textarea
     id: problem
     attributes:

@@ -109,3 +109,7 @@ The exact steps for Brandon, in a fresh org, from nothing:
   results are exact.
 - A deferred feature is always named. An iteration report that does not mention a planned
   feature is incomplete.
+
+## Report a bug or give feedback
+
+Found something wrong in a release note, or have feedback? Open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](../../SUPPORT.md) for what to include, and never post personal or donor data.
