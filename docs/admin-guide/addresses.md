@@ -37,9 +37,10 @@ install and no Setup step. Once it is on, two things are worth setting once.
 1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.
 3. Set **When a person's address is edited** to the behavior your organization wants:
-   - **Update household** (the default): editing one person's address moves the whole
-     household, which is what most organizations want, because a household shares a mailbox.
-   - **Create personal address**: editing one person's address gives that person an
+   - **Everyone in the household moves together** (the default): editing one person's
+     address moves the whole household, which is what most organizations want, because a
+     household shares a mailbox.
+   - **Only that person moves**: editing one person's address gives that person an
      address of their own and leaves the rest of the household where it is. Choose this if
      you often track students away at school, adult children at a parent's household, or
      staff contacts who move without their family.
@@ -107,7 +108,8 @@ year at home, and letters have been going to the wrong place. Start from the sam
    - **Country**: United States
    - **Seasonal Start Month**: 1, **Seasonal Start Day**: 1
    - **Seasonal End Month**: 3, **Seasonal End Day**: 31
-   Choose **Save**. The new card appears with its dates shown as "January 1 to March 31".
+   Choose **Add address** in the form (it carries the same name as the button that opened
+   it). The new card appears with its dates shown as "January 1 to March 31".
 4. Choose **Set as default** on the Arizona card. The **Default** badge moves to it, and
    the badge disappears from the home address. Scroll up: the household's address boxes at
    the top of the record now read Phoenix. Anything that reads the household's address,
@@ -118,7 +120,7 @@ year at home, and letters have been going to the wrong place. Start from the sam
    like.
 6. Open **Harper Garcia**, one of the household's members, from the household's related
    people. Change her **Mailing Street** to a new street and save.
-7. Go back to **The Garcia Family**. Because your setting says **Update household**, the
+7. Go back to **The Garcia Family**. Because your setting says **Everyone in the household moves together**, the
    household's default address now shows Harper's new street, and every other member of the
    household has the same new mailing address. One edit moved the whole household, which is
    what a household moving actually means. The new street is a new Home address card marked
@@ -126,7 +128,7 @@ year at home, and letters have been going to the wrong place. Start from the sam
    the household is away for the season when you make the edit, the seasonal address card is
    left as it is, and the new street is the one the household comes back to.
 
-If you had set **Create personal address** instead, step 7 would look different: Harper
+If you had set **Only that person moves** instead, step 7 would look different: Harper
 would have her own address card on her own record, marked default for her, and the rest of
 the
 Garcia household would still be at the old street. Both behaviors are correct; they are

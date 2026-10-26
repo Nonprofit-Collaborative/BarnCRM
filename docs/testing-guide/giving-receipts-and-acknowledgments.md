@@ -20,7 +20,7 @@ For every script on this page:
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, then the **Organization** section. | Your legal name and tax ID are filled in. If the legal name is blank, fill it in and select **Save** (receipts need it). |
 | 2 | Open the **Receipts** section. Set **Receipt number prefix** to `TEST`, leave **Receipt next counter** at 1, set **Statement year** to last year. Select **Save**. | The toast reads "Your settings are saved." |
-| 3 | On the **Receipt letters and year end statements** row, select **Open this page**. | The Receipts page opens on the **Receipt templates** tab. |
+| 3 | On the **Receipt letters and year end statements** row, select **Open this page**. | The Receipt Letters page opens on the **Receipt templates** tab. |
 | 4 | Open the **Letter** list. | Two letters are listed: the per gift receipt and the consolidated statement. Neither ends in ", not in use". |
 | 5 | Read the notes under the editor. | The tax note starts "The tax wording is not in this letter and cannot be edited." and a token list follows "Tokens you can use." |
 
@@ -97,7 +97,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Receipts page (**Receipt Letters** tab from the App Launcher), **Receipt templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
+| 1 | Open the **Receipt Letters** tab (from the App Launcher), **Receipt templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
 | 2 | Add the sentence `Testing the letter editor.` at the end. Select **Preview**. | A **Preview for a sample gift** section shows the letter filled in for a sample donor, with your sentence and the tax sentences BarnCRM adds. |
 | 3 | Select **Save**. | Toast **Letter saved**: "Your receipt letter has been saved." |
 | 4 | Remove the test sentence and select **Save**. | **Letter saved** again. |

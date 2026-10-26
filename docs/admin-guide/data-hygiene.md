@@ -38,8 +38,9 @@ cannot see says so instead of showing a number.
 3. Press **Recount** whenever you want fresh numbers. Nothing is saved between visits.
 
 There is one setting: **Years before a person is not changed**, under **General** in
-**BarnCRM Settings**. It is 5 unless you change it, and accepts 1 to 20; anything outside that
-is read as the nearest end. The check's name shows the number in use.
+**BarnCRM Settings**. It is 5 unless you change it, and accepts 1 to 20; the settings page refuses
+anything outside that and saves nothing ("... takes a number from 1 to 20, so nothing was
+saved"). The check's name shows the number in use.
 
 ## 3. A five-minute walkthrough (as Maria)
 

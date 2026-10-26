@@ -73,6 +73,7 @@ body:
       description: Which package does this affect?
       options:
         - Core
+        - Rollup Builder
         - Giving
         - Volunteers
         - Programs

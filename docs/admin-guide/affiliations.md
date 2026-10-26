@@ -74,7 +74,7 @@ among your contacts works where. Start from the sample data.
    - **Status**: leave it as Current
    - **Primary**: select it
    - **Start date**: January 1 of last year
-   Choose **Save**.
+   Choose **Add affiliation** in the form.
 4. The card shows one line: Bayview Hardware, Store Manager, with a **Primary** badge on
    it. A current affiliation carries no status badge. Look at the top of Harper's record: **Primary Affiliation** now
    reads Bayview Hardware. You did not fill that in.
@@ -84,7 +84,7 @@ among your contacts works where. Start from the sample data.
    - **Organization**: Heritage Rotary Club
    - **Role**: Club president
    - **Primary**: select it
-   Choose **Save**. The card now shows two lines, and the **Primary** badge has moved to
+   Choose **Add affiliation** in the form. The card now shows two lines, and the **Primary** badge has moved to
    Heritage Rotary Club. The Bayview Hardware line is still there, still Current, and is no
    longer primary. **Primary Affiliation** at the top of the record now reads Heritage
    Rotary Club. Only one organization can be primary at a time, and you never have to clear
