@@ -51,6 +51,11 @@ public with sharing class ReceiptService {
         if (String.isNotBlank(gift.Receipt_Number__c)) {
             throw new ReceiptServiceException(Label.Giving_Receipt_GiftAlreadyReceipted);
         }
+        // No money has arrived for a Pending or Cancelled gift, and a receipt says it has. The
+        // statement run leaves the same two statuses out (R-RC8, R-G16).
+        if ('Pending'.equals(gift.Status__c) || 'Cancelled'.equals(gift.Status__c)) {
+            throw new ReceiptServiceException(Label.Giving_Receipt_GiftNotReceived);
+        }
 
         Integer statementYear = gift.Gift_Date__c == null
             ? Date.today().year()

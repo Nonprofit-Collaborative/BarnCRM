@@ -75,7 +75,7 @@ A stewardship plan lays out follow-up tasks (a thank-you call, a welcome packet,
 1. Open the **Stewardship Plans** tab and choose **Running Plans**, or open the donor and use their **Stewardship Plans** list.
 2. Open a plan to see its **Plan Template**, the person (**Contact**) or organization (**Account**), and the **Gift** or **Commitment** that started it.
 3. Work the tasks in your task list as usual.
-4. When the work is done, click **Edit**, set **Status** to **Complete** (or **Cancelled**), fill in **Completed Date**, and click **Save**.
+4. When the work is done, click **Edit**, set **Status** to **Complete** (or **Cancelled**), and click **Save**. **Completed Date** fills in as today; type another date first if the work finished earlier.
 
 You should see: the plan leave **Running Plans**. BarnCRM does not close a plan when its last task closes, and cancelling a plan leaves its tasks alone.
 
@@ -103,8 +103,9 @@ Marking gifts posted, and unposting, need the **Post Gifts** permission, which o
 ## Common problems
 
 - **Issue receipt** is missing. The gift already has a receipt (use **Void and reissue**), or you lack **Issue Receipts**.
-- "You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set."
+- "You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role."
 - "This gift has already been receipted. To correct the receipt, void it and reissue it."
+- "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first."
 - "Say why this receipt is being voided. A void needs a reason and a date." Fill in the reason first.
 - "This receipt has already been voided. Look for the receipt that replaced it."
 - "A year end statement is reissued by voiding it and running statements again for that donor, not from this button."
