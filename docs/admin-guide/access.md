@@ -43,6 +43,14 @@ keep their original API names, `Program_Staff` and `Volunteer_Coordinator`, so t
 keep working; you only need those names for an
 [automatic access](automatic-access.md) policy.
 
+Of the roles, only BarnCRM Admin gives Delete on accounts and contacts (a person's Salesforce
+profile may give it too). The other roles leave it out on purpose, and they do not need it for
+merging households: anyone who can edit both households can merge
+them with **Merge or split**, with no Delete permission (see
+[Household merge and split](household-merge-split.md)). Merging two people uses Salesforce's
+own **Compare and merge**, which Salesforce allows only to people who can delete them, so
+staff ask an admin for that.
+
 ## Who can read a donor's receipts and tax statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
@@ -150,7 +158,7 @@ Core's six are always listed:
 | BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
-| BarnCRM Duplicate Review | Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license. |
+| BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Duplicates** list on Org Optimizer (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
 
 A module's sets are listed after them, only where that module is installed:
@@ -158,8 +166,8 @@ A module's sets are listed after them, only where that module is installed:
 | Extra permission | Module | What it lets the person do |
 |---|---|---|
 | Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
-| Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. The Fundraising Staff role already includes it. |
-| Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. |
+| Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
+| Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
 | Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
 | Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access. |
 | Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts. |
@@ -217,7 +225,7 @@ feature is on:
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export |
 | Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Data Hygiene | BarnCRM Admin, Find and Export |
+| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export, Duplicate Review |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
 by a user access policy is caught up overnight, and every upgrade catches everyone up, so an

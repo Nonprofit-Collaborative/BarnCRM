@@ -127,6 +127,7 @@ private class RollupOperationsTest {
                     Sample_Data_Key__c
                 FROM Account
                 WHERE Id IN :organizations
+                WITH SYSTEM_MODE
             ]
         );
     }

@@ -836,6 +836,192 @@ private class HouseholdMergeServiceTest {
         }
     }
 
+    /**
+     * BarnCRM Staff deliberately holds no Delete on Account, and the platform merge deletes the
+     * household that goes away. The merge runs in system mode once BarnCRM's own checks pass,
+     * so a staff member who may edit both households can combine them, even two somebody else
+     * owns (ADR-0134). The households hold nobody, so the staff member's access to people (the
+     * profile here grants no standard contact fields) is not what this measures.
+     */
+    @IsTest
+    static void staffWithoutDeleteOnAccountCanMergeHouseholdsTheyMayEdit() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User staff = TestUsers.minimumAccessUserWith(
+                'Mstaff',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
+            Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
+            insert new List<Account>{ survivor, victim };
+            Id survivorId = survivor.Id;
+            Id victimId = victim.Id;
+            shareHousehold(survivorId, staff.Id, 'Edit');
+            shareHousehold(victimId, staff.Id, 'Edit');
+
+            Boolean canDelete;
+            HouseholdMergeService.MergeResult result;
+            Test.startTest();
+            System.runAs(staff) {
+                canDelete = Schema.SObjectType.Account.isDeletable();
+                result = HouseholdMergeService.mergeHouseholds(
+                    survivorId,
+                    victimId,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            }
+            Test.stopTest();
+
+            Assert.isFalse(canDelete, 'The staff member really has no Delete on Account');
+            Assert.areEqual(survivorId, result.survivorId, 'The survivor is answered');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :survivorId],
+                'The survivor stays'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :victimId AND IsDeleted = FALSE],
+                'The other household was merged away'
+            );
+        }
+    }
+
+    /**
+     * A person who can see both households but holds no BarnCRM permission set, and so no
+     * Edit on Account, is refused with the screen's own message before anything changes.
+     */
+    @IsTest
+    static void aPersonWithoutTheStaffPermissionsIsRefusedPlainly() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
+            insert new List<Account>{ survivor, victim };
+            User reader = TestUsers.peopleReaderWith('Mreader', new List<String>());
+
+            String message = mergeAs(reader, survivor.Id, victim.Id);
+
+            Assert.areEqual(
+                Label.Core_HouseholdMerge_ErrorNoEditAccess,
+                message,
+                'The refusal is the plain one'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN (:survivor.Id, :victim.Id)],
+                'Both households are untouched'
+            );
+        }
+    }
+
+    /**
+     * System mode does not widen record access: a staff member who can read a household but
+     * not edit it cannot merge it away, whatever their permission sets.
+     */
+    @IsTest
+    static void staffWhoCannotEditOneHouseholdAreRefused() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User staff = TestUsers.minimumAccessUserWith(
+                'Mstaff2',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            System.runAs(staff) {
+                insert maria;
+            }
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert wei;
+            Id survivorId = householdOf(maria.Id);
+            Id victimId = householdOf(wei.Id);
+            if (!shareHousehold(victimId, staff.Id, 'Read')) {
+                // The org lets everyone edit every account, so no household here is one a
+                // staff member can read and not edit: there is no refusal to exercise.
+                Assert.isTrue(
+                    orgAccountAccess() == 'Edit' || orgAccountAccess() == 'ReadEditTransfer',
+                    'Only an org whose accounts are public read and write skips this'
+                );
+                return;
+            }
+
+            String message = mergeAs(staff, survivorId, victimId);
+
+            Assert.areEqual(
+                Label.Core_HouseholdMerge_ErrorNoEditAccess,
+                message,
+                'A household the person may only read is not merged'
+            );
+            Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN (:survivorId, :victimId)],
+                'Both households are untouched'
+            );
+        }
+    }
+
+    private static String mergeAs(User person, Id survivorId, Id victimId) {
+        String message;
+        Test.startTest();
+        System.runAs(person) {
+            try {
+                HouseholdMergeService.mergeHouseholds(
+                    survivorId,
+                    victimId,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            } catch (HouseholdException e) {
+                message = e.getMessage();
+            }
+        }
+        Test.stopTest();
+        return message;
+    }
+
+    private static String orgAccountAccess() {
+        return [SELECT DefaultAccountAccess FROM Organization LIMIT 1].DefaultAccountAccess;
+    }
+
+    /**
+     * Gives this user the named access to one household where the org's sharing model does
+     * not already, and answers false when the org already gives everyone more than that, so
+     * the access cannot be narrowed to it. Built through describe so the test names no
+     * sharing field of an object Core does not depend on.
+     */
+    private static Boolean shareHousehold(Id householdId, Id userId, String level) {
+        Organization org = [
+            SELECT DefaultAccountAccess, DefaultContactAccess
+            FROM Organization
+            LIMIT 1
+        ];
+        String orgDefault = org.DefaultAccountAccess;
+        if (orgDefault == 'Edit' || orgDefault == 'ReadEditTransfer') {
+            // Everyone already edits every account: Edit needs no share, Read cannot be had.
+            return level == 'Edit';
+        }
+        if (orgDefault == 'Read' && level == 'Read') {
+            return true;
+        }
+        SObject share = Schema.getGlobalDescribe().get('AccountShare').newSObject();
+        Map<String, Schema.SObjectField> shareFields = share.getSObjectType()
+            .getDescribe()
+            .fields.getMap();
+        share.put('AccountId', householdId);
+        share.put('UserOrGroupId', userId);
+        share.put('AccountAccessLevel', level);
+        for (String other : new List<String>{ 'OpportunityAccessLevel', 'CaseAccessLevel' }) {
+            if (shareFields.containsKey(other)) {
+                share.put(other, 'None');
+            }
+        }
+        if (org.DefaultContactAccess != 'ControlledByParent') {
+            share.put('ContactAccessLevel', level);
+        }
+        insert share;
+        return true;
+    }
+
     // ------------------------------------------------------------------ split
 
     @IsTest

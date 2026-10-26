@@ -1,7 +1,11 @@
+// The object info test wire adapter is emitted to on purpose, which is how a wired component
+// is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import AddressPanel from 'c/addressPanel';
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 const RECORD_ID = '0011000000000001AA';
 
@@ -48,11 +52,26 @@ const WINTER = node({
   season: [1, 1, 3, 31]
 });
 
-function build(objectApiName = 'Account') {
+/** What the platform says a user may do with addresses: Staff can, Read Only only reads. */
+const STAFF_ACCESS = {
+  createable: true,
+  updateable: true,
+  deletable: true,
+  fields: { Is_Default__c: { updateable: true } }
+};
+const READ_ONLY_ACCESS = {
+  createable: false,
+  updateable: false,
+  deletable: false,
+  fields: { Is_Default__c: { updateable: false } }
+};
+
+function build(objectApiName = 'Account', access = STAFF_ACCESS) {
   const element = createElement('c-address-panel', { is: AddressPanel });
   element.recordId = RECORD_ID;
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
+  getObjectInfo.emit(access);
   return element;
 }
 
@@ -121,6 +140,37 @@ describe('c-address-panel', () => {
     const buttons = element.shadowRoot.querySelectorAll('.set-default');
     expect(buttons.length).toBe(1);
     expect(buttons[0].dataset.id).toBe(WINTER.Id);
+  });
+
+  it('offers neither Add address nor Set as default to someone who can only read addresses', async () => {
+    const element = build('Account', READ_ONLY_ACCESS);
+    graphql.emit(response([HOME, WINTER]));
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('[data-id="address-card"]').length).toBe(2);
+    expect(element.shadowRoot.querySelector('[data-id="add-address"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.set-default').length).toBe(0);
+  });
+
+  it('offers no action until it knows what the user may do', async () => {
+    const element = createElement('c-address-panel', { is: AddressPanel });
+    element.recordId = RECORD_ID;
+    element.objectApiName = 'Account';
+    document.body.appendChild(element);
+    graphql.emit(response([HOME, WINTER]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="add-address"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.set-default').length).toBe(0);
+  });
+
+  it('hides Set as default when the default field cannot be edited', async () => {
+    const element = build('Account', { ...STAFF_ACCESS, fields: {} });
+    graphql.emit(response([HOME, WINTER]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="add-address"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.set-default').length).toBe(0);
   });
 
   it('reads the seasonal range as dates rather than numbers', async () => {

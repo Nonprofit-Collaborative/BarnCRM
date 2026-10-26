@@ -34,15 +34,19 @@ public with sharing class TabAccessService {
     private static final String FIND_AND_EXPORT = 'BarnCRM_Find_And_Export';
     private static final String BULK_UPDATE = 'BarnCRM_Bulk_Update';
     private static final String BULK_DELETE = 'BarnCRM_Bulk_Delete';
+    private static final String DUPLICATE_REVIEW = 'BarnCRM_Duplicate_Review';
 
-    /** Each tab set, and the permission sets whose holders see that tab while it is on. */
+    /**
+     * Each tab set, and the permission sets whose holders see that tab while it is on.
+     * Duplicate Review holders see Data Hygiene, where Org Optimizer lists the duplicates.
+     */
     @TestVisible
     private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
         DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
         IMPORT_TAB => new List<String>{ ADMIN },
         FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
         BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-        DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT }
+        DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, DUPLICATE_REVIEW }
     };
 
     /** How many assignments one run gives or takes, well inside the 10,000 DML rows. */

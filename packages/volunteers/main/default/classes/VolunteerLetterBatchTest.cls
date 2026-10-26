@@ -283,7 +283,12 @@ private class VolunteerLetterBatchTest {
         Assert.isTrue(body.contains(Label.Volunteers_JobNotice_LettersFailed), body);
         Assert.areEqual(
             1,
-            [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'VolunteerLetterBatch'],
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c = 'VolunteerLetterBatch'
+                WITH SYSTEM_MODE
+            ],
             'The failure is in the Error Log.'
         );
     }

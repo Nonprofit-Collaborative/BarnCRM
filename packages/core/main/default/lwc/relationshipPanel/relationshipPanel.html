@@ -1,11 +1,13 @@
 <template>
   <lightning-card title={labels.panelTitle} icon-name="standard:people">
-    <lightning-button
-      slot="actions"
-      label={labels.addButton}
-      onclick={handleAdd}
-      data-id="add-relationship"
-    ></lightning-button>
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        label={labels.addButton}
+        onclick={handleAdd}
+        data-id="add-relationship"
+      ></lightning-button>
+    </template>
 
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={isLoading}>
@@ -45,12 +47,14 @@
                   data-id="former-badge"
                 ></lightning-badge>
               </template>
-              <lightning-button
-                label={labels.removeButton}
-                data-id={relationship.id}
-                onclick={handleRemove}
-                class="remove-relationship"
-              ></lightning-button>
+              <template lwc:if={canRemove}>
+                <lightning-button
+                  label={labels.removeButton}
+                  data-id={relationship.id}
+                  onclick={handleRemove}
+                  class="remove-relationship"
+                ></lightning-button>
+              </template>
             </div>
           </div>
         </div>

@@ -2,7 +2,9 @@ import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import { gql, graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
+import AFFILIATION_SCHEMA from '@salesforce/schema/Affiliation__c';
 import ID_FIELD from '@salesforce/schema/Affiliation__c.Id';
 import IS_PRIMARY_FIELD from '@salesforce/schema/Affiliation__c.Is_Primary__c';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
@@ -200,6 +202,28 @@ export default class AffiliationPanel extends LightningElement {
       this.errorMessage = undefined;
       this.loaded = true;
     }
+  }
+
+  /** What the user may do with affiliations; nothing is offered until it is known. */
+  affiliationInfo;
+
+  @wire(getObjectInfo, { objectApiName: AFFILIATION_SCHEMA })
+  receiveAffiliationInfo({ data }) {
+    if (data) {
+      this.affiliationInfo = data;
+    }
+  }
+
+  /** Add affiliation, only for someone who can create affiliations (Read Only cannot). */
+  get canAdd() {
+    return Boolean(this.affiliationInfo && this.affiliationInfo.createable);
+  }
+
+  /** Make primary writes Is Primary, so it needs edit on affiliations and on that field. */
+  get canMakePrimary() {
+    const info = this.affiliationInfo;
+    const field = info && info.fields && info.fields[IS_PRIMARY_FIELD.fieldApiName];
+    return Boolean(info && info.updateable && field && field.updateable);
   }
 
   get isLoading() {

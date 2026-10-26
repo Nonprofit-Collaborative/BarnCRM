@@ -79,6 +79,7 @@ You should see: the household's name and greetings updated on the next save, unl
 ## To merge two households
 
 Use this when the same family is in BarnCRM twice. You need edit access to both households.
+You do not need permission to delete households.
 
 1. Open the household you want to keep and click **Merge or split** in the action bar.
 2. Stay on the **Merge** tab. In **Find the other household**, type part of its name and pick
@@ -128,6 +129,9 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 
 - Problem: "This person is not in a household yet". Automatic households may be off in your
   org. Add them from a household's **Members** card, or ask your admin.
+- Problem: the **Members** card has no **Add member**, **Move to another household** or **Make
+  primary** button. Your access lets you read households but not change them (the Read Only
+  role, for example). Ask your admin.
 - Problem: "You can see this household but not change it, so merging and splitting are
   switched off. Ask whoever manages access for edit access to both households." Ask your admin.
 - Problem: "You need edit access to both households to merge them." The other household is
@@ -135,8 +139,7 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: "Both records must be households. Choose a household, not an organization."
   Organizations are merged with Salesforce's own tools by an admin.
 - Problem: "The two households could not be combined, so nothing was changed." Salesforce
-  refused the merge (a merge deletes the other household, which needs permission to delete).
-  The reason is in the Error Log; ask your admin.
+  refused the merge. The reason is in the Error Log; ask your admin.
 - Problem: "The primary contact could not be changed. Check that you can edit this household
   and try again." Ask your admin for edit access.
 - Problem: the household name will not update. **Custom Name** is ticked. Untick it.

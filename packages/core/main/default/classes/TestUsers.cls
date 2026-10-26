@@ -266,6 +266,37 @@ public class TestUsers {
     }
 
     /**
+     * A user on Minimum Access - Salesforce holding only the packaged permission sets named
+     * here, inserted: for a test that proves what those sets grant on their own. The Standard
+     * User profile already gives create, edit and delete on accounts and contacts, so a test
+     * about a permission the packaged sets deliberately leave out needs this profile instead.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @param permissionSetNames the bare API names of the packaged permission sets
+     * @return the inserted user
+     */
+    @NamespaceAccessible
+    public static User minimumAccessUserWith(String lastName, List<String> permissionSetNames) {
+        List<Profile> minimum = [
+            SELECT Id
+            FROM Profile
+            WHERE Name = 'Minimum Access - Salesforce'
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        Assert.isFalse(
+            minimum.isEmpty(),
+            'This org has no Minimum Access - Salesforce profile, so a user whose access comes ' +
+            'only from the packaged permission sets cannot be built.'
+        );
+        return insertWith(
+            newUser(lastName, minimum[0].Id, usernameStart(lastName)),
+            permissionSetNames,
+            false
+        );
+    }
+
+    /**
      * The least privileged standard profile: Standard User, or when the org does not call it
      * that (Profile.Name is the translated label), the first standard profile that is not System
      * Administrator. Never "any standard profile", which also matches System Administrator and

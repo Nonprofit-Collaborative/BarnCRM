@@ -73,6 +73,7 @@ private class RollupEngineTest {
             SELECT Id, Member_Count__c, NumberOfEmployees, Anniversary__c, AnnualRevenue
             FROM Account
             WHERE Id = :accountId
+            WITH SYSTEM_MODE
         ];
     }
 

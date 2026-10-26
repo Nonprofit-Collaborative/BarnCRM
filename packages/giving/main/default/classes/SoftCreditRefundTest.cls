@@ -148,6 +148,7 @@ private class SoftCreditRefundTest {
                 Active__c
             FROM Rollup_Definition__c
             WHERE Definition_Key__c IN :keys
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(
             keys.size(),

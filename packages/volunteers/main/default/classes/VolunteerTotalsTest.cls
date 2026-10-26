@@ -49,6 +49,7 @@ private class VolunteerTotalsTest {
                 Last_Volunteer_Date__c
             FROM Contact
             WHERE LastName = 'Rivera'
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }
@@ -64,6 +65,7 @@ private class VolunteerTotalsTest {
                 Last_Volunteer_Date__c
             FROM Account
             WHERE Id = :accountId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -71,6 +73,7 @@ private class VolunteerTotalsTest {
         return [
             SELECT Id, Total_Hours__c, Last_Volunteer_Date__c, Rollups_Last_Calculated__c
             FROM Volunteer_Job__c
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }
@@ -85,6 +88,7 @@ private class VolunteerTotalsTest {
                 Slots_Remaining__c,
                 Rollups_Last_Calculated__c
             FROM Volunteer_Shift__c
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }
