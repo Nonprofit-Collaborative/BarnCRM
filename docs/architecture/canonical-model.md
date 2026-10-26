@@ -2357,10 +2357,11 @@ normalized by each source that can point at the person's object (Contact, or Acc
 accounts), with the lookups bounded as in R-DP6 (at most 100 patterns to a query, 5,000 rows
 to a lookup), and a value held by more than ten records is not used. A person the rules matched
 is never looked up this way. The records found are read back as above (user mode, the person
-record types for person accounts) with their last name, and a record is kept only when its last
-name (a person account's person last name) agrees with the incoming person's, trimmed and
-without regard to capitals: a shared address or phone never loads one person into another's
-record. The records kept are handled like a rule's matches: Several Matches applies and Matched
+record types for person accounts) with their first and last name, and a record is kept only
+when both its first and its last name (a person account's person first and last name) agree
+with the incoming person's, trimmed and without regard to capitals, two blank first names
+agreeing: a shared address, phone or family email never loads one person into another's
+record (Jane Smith's row is not loaded into John Smith). The records kept are handled like a rule's matches: Several Matches applies and Matched
 By Duplicate Rule is ticked; with none kept the row is handled as unmatched. Organizations are
 not looked up through sources. A source that cannot be read is written to the Error Log and
 skipped.
@@ -6238,7 +6239,10 @@ are not paired by a Phone or Address source (sharing a home phone or address is 
 household is); an Email source still pairs them. Phone and address candidates are read with at
 most 100 patterns to a query, an address by its postal code with the street's first word
 normalization leaves as written; a lookup that reaches its 5,000 row cap is logged as a
-warning, once per source per transaction. A pair a rule also found is written once, as the
+warning, once per source per transaction. A lookup leaves the transaction 20 queries and 5,000
+rows, reads at most what is left above that, and with nothing left is skipped and logged the
+same way, never failed. A value from a lookup that reached its cap or was skipped is not used,
+since it may be held by more than ten records the lookup did not read. A pair a rule also found is written once, as the
 rule's; R-DP2 to R-DP5 apply as to any pair. The set still names an active rule for the
 object, as the platform requires (any active rule stands in, so Salesforce's own Duplicate
 Record Sets tab shows the pair under that rule), and a pass with no active rule writes no

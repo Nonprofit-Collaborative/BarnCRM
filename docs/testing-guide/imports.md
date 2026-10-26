@@ -164,7 +164,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 ## T-IMP-09: Matching through match sources
 
-**Purpose:** confirm a person known only by a related address record is matched when last names agree, and not matched when they differ.
+**Purpose:** confirm a person known only by a related address record is matched when first and last names agree, and not matched when either differs (a relative at the same address is never loaded into the person).
 **Prerequisites:** admin; the shipped match source **Address (person)** active (BarnCRM Settings, **Custom metadata**, see [Custom metadata](../admin-guide/custom-metadata.md#match-sources)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
 
 Save `import-match.csv`:
@@ -173,18 +173,19 @@ Save `import-match.csv`:
 First Name,Last Name,Email,Street,City,State,Postal Code
 Mara,Stone,mara.stone.new@example.org,77 Match Lane,Springfield,IL,62702
 Lee,Brook,lee.brook@example.org,77 Match Lane,Springfield,IL,62702
+Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 ```
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab, choose **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
-| 2 | Leave **Also match with my duplicate rules** unticked and select **Preview**. | **Would create** 2: by email alone, nobody matches either row. |
-| 3 | Select **Back**, tick **Also match with my duplicate rules**, and select **Preview**. | **Would create** 1, **Would update** 1. Row 1 (Mara Stone) matches the existing Mara Stone through her address record, because the last names agree. Row 2 (Lee Brook, same address, different last name) is not matched and would be created. |
-| 4 | Select **Import these rows**. | **Created** 1, **Updated** 1. |
-| 5 | Open the existing Mara Stone. | **Email** is now `mara.stone.new@example.org`. There is still only one Mara Stone. |
-| 6 | Open the import's Data Job record and its **Import Row** for row 1. | **Matched By Duplicate Rule** is ticked. On the row for Lee Brook it is not. |
-| 7 | Search for Lee Brook. | A new contact in a household of their own, not loaded into Mara Stone. |
-| 8 | Undo the import from **Recent imports** (**Undo**, **Undo this import**, **Refresh** until **Undone**). | **Changed values to put back** was 1. Lee Brook is gone; Mara Stone remains, with no email. |
+| 2 | Leave **Also match with my duplicate rules** unticked and select **Preview**. | **Would create** 3: by email alone, nobody matches any row. |
+| 3 | Select **Back**, tick **Also match with my duplicate rules**, and select **Preview**. | **Would create** 2, **Would update** 1. Row 1 (Mara Stone) matches the existing Mara Stone through her address record, because the first and last names agree. Row 2 (Lee Brook, same address, different last name) and row 3 (Jana Stone, same address and last name, different first name) are not matched and would be created. |
+| 4 | Select **Import these rows**. | **Created** 2, **Updated** 1. |
+| 5 | Open the existing Mara Stone. | **Email** is now `mara.stone.new@example.org`; **First Name** is still Mara. There is still only one Mara Stone. |
+| 6 | Open the import's Data Job record and its **Import Row** for row 1. | **Matched By Duplicate Rule** is ticked. On the rows for Lee Brook and Jana Stone it is not. |
+| 7 | Search for Lee Brook and Jana Stone. | Each is a new contact, not loaded into Mara Stone. |
+| 8 | Undo the import from **Recent imports** (**Undo**, **Undo this import**, **Refresh** until **Undone**). | **Changed values to put back** was 1. Lee Brook and Jana Stone are gone; Mara Stone remains, with no email. |
 
 **Cleanup:** delete Mara Stone, her household and her address record.
 

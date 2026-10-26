@@ -74,7 +74,12 @@ on a Platform-only org (ADR-0013) and may not name a Nonprofit Cloud object at c
    counted and logged as a warning in the Error Log, once per source per transaction, because
    matches past the cap are missed. A value shared by more than ten people or households (an
    office switchboard, a shared mailbox) is not used, because it says nothing about whether
-   two of them are the same.
+   two of them are the same. (Amended 2026-10-26 after audit findings R2 and M5.) A lookup
+   also leaves the transaction 20 queries and 5,000 rows: it reads at most what is left above
+   that, and with nothing left it is skipped and logged once per source, never failed, since
+   a limit exception cannot be caught. A value from a lookup that reached its cap or was
+   skipped is not used either, since its holders were not all read and it may be shared by
+   more than ten.
 9. **The duplicate scan.** It adds the pairs the sources find to the same review list and
    drops a pair a duplicate rule already found (the rule's pair is written, once). Two people
    in the same household are not paired by a phone or an address source, since sharing a
@@ -95,9 +100,12 @@ on a Platform-only org (ADR-0013) and may not name a Nonprofit Cloud object at c
     pair under that stand-in rule; the reason is only on the review list.
 12. **Import.** Only a people template with "Also match with my duplicate rules" ticked asks
     the sources, and only for incoming people the rules found nobody for. A source candidate
-    is used only when its last name agrees with the incoming person's (trimmed, capitals
-    ignored; a person account's person last name), so a shared address or phone never loads
-    one person into another's record. A row with no agreeing candidate falls to the
+    is used only when both its first and its last name agree with the incoming person's
+    (trimmed, capitals ignored, two blank first names agreeing; a person account's person
+    first and last name), so a shared address, phone or family email never loads one person
+    into another's record. (Amended 2026-10-26 after audit finding R1: last name alone loaded
+    Jane Smith's row into John Smith's record when they shared an address or phone.) A row
+    with no agreeing candidate falls to the
     template's normal no-match handling. Values are the person's Email, Phone, MobilePhone,
     HomePhone and OtherPhone, and mailing and other street with postal code.
 
@@ -123,8 +131,9 @@ on a Platform-only org (ADR-0013) and may not name a Nonprofit Cloud object at c
 - Salesforce's Duplicate Record Sets tab shows a source pair under the stand-in active rule
   (decision 11), which an administrator may read as that rule's finding; the review list is
   where the true reason is shown.
-- An import may load a row into an existing person a source found only when the last names
-  agree; a person whose last name changed is created new and found by the next scan instead.
+- An import may load a row into an existing person a source found only when the first and last
+  names agree; a person whose name changed, or who goes by another first name (Bob for
+  Robert), is created new and found by the next scan instead.
 - To confirm in the first managed install: archiving a shipped source (`setShippedArchived`)
   deploys the row's developer-controlled values unchanged alongside `Active__c`. If a
   subscriber org refuses a deployment that carries developer-controlled values of a packaged

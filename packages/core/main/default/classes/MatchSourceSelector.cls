@@ -38,7 +38,18 @@ public with sharing class MatchSourceSelector {
     @TestVisible
     private static Integer maxRows = 5000;
 
-    /** How many lookups in this transaction reached `maxRows`. */
+    /**
+     * Queries and rows every lookup leaves for the rest of the transaction (the scan's chunk
+     * or the import's chunk still has its own work to do). A lookup reads at most what is left
+     * above these, and with nothing left it is skipped, never failed: a limit exception
+     * cannot be caught.
+     */
+    @TestVisible
+    private static Integer queryReserve = 20;
+    @TestVisible
+    private static Integer rowReserve = 5000;
+
+    /** How many lookups in this transaction reached their cap or were skipped. */
     @TestVisible
     private static Integer cappedLookups = 0;
 
@@ -46,6 +57,55 @@ public with sharing class MatchSourceSelector {
     private static Set<String> cappedLogged = new Set<String>();
 
     private static final String LOG_CONTEXT = 'Match sources';
+
+    /**
+     * How many lookups so far in this transaction read less than all their matches. A caller
+     * compares it before and after a lookup: a value counted from a cut lookup may be held by
+     * more records than it read (ADR-0133 decision 8).
+     */
+    public static Integer cutLookups() {
+        return cappedLookups;
+    }
+
+    /**
+     * Runs one lookup with a LIMIT of `maxRows`, or of what the transaction has left above
+     * the reserves when that is less, and skips it (no rows, counted, logged once) when
+     * nothing is left.
+     */
+    private static List<SObject> lookup(String name, String query, Map<String, Object> binds) {
+        Integer rowsLeft = Limits.getLimitQueryRows() - Limits.getQueryRows() - rowReserve;
+        Integer queriesLeft = Limits.getLimitQueries() - Limits.getQueries() - queryReserve;
+        Integer cap = Math.min(maxRows, rowsLeft);
+        if (cap <= 0 || queriesLeft <= 0) {
+            cappedLookups++;
+            warnOnce(name, System.Label.Core_MatchSource_BudgetSpent, new List<Object>{ name });
+            return new List<SObject>();
+        }
+        List<SObject> rows = Database.queryWithBinds(
+            query + ' LIMIT ' + cap,
+            binds,
+            AccessLevel.USER_MODE
+        );
+        if (rows.size() >= cap) {
+            cappedLookups++;
+            warnOnce(
+                name,
+                System.Label.Core_MatchSource_RowCapReached,
+                new List<Object>{ name, String.valueOf(cap) }
+            );
+        }
+        return rows;
+    }
+
+    private static void warnOnce(String name, String format, List<Object> values) {
+        if (cappedLogged.add(name)) {
+            ErrorLogger.logMessage(
+                String.format(format, values),
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_WARNING
+            );
+        }
+    }
 
     /**
      * A source's rows whose parent is one of these, with a value. The object and fields come
@@ -56,19 +116,15 @@ public with sharing class MatchSourceSelector {
         if (parentIds == null || parentIds.isEmpty()) {
             return new List<SObject>();
         }
-        return capped(
+        return lookup(
             source.developerName,
-            Database.queryWithBinds(
-                selectFrom(source) +
-                    ' WHERE ' +
-                    String.escapeSingleQuotes(source.parentField) +
-                    ' IN :parentIds AND ' +
-                    String.escapeSingleQuotes(source.valueField) +
-                    ' != null LIMIT ' +
-                    maxRows,
-                new Map<String, Object>{ 'parentIds' => parentIds },
-                AccessLevel.USER_MODE
-            )
+            selectFrom(source) +
+                ' WHERE ' +
+                String.escapeSingleQuotes(source.parentField) +
+                ' IN :parentIds AND ' +
+                String.escapeSingleQuotes(source.valueField) +
+                ' != null',
+            new Map<String, Object>{ 'parentIds' => parentIds }
         );
     }
 
@@ -107,19 +163,15 @@ public with sharing class MatchSourceSelector {
         } else {
             return new List<SObject>();
         }
-        return capped(
+        return lookup(
             source.developerName,
-            Database.queryWithBinds(
-                selectFrom(source) +
-                    ' WHERE ' +
-                    filter +
-                    ' AND ' +
-                    String.escapeSingleQuotes(source.parentField) +
-                    ' != null LIMIT ' +
-                    maxRows,
-                binds,
-                AccessLevel.USER_MODE
-            )
+            selectFrom(source) +
+                ' WHERE ' +
+                filter +
+                ' AND ' +
+                String.escapeSingleQuotes(source.parentField) +
+                ' != null',
+            binds
         );
     }
 
@@ -152,40 +204,18 @@ public with sharing class MatchSourceSelector {
         if (ids == null || ids.isEmpty()) {
             return new List<SObject>();
         }
-        return capped(
+        return lookup(
             individualField,
-            Database.queryWithBinds(
-                'SELECT Id, ' +
-                    field +
-                    ' FROM ' +
-                    target.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
-                    ' WHERE ' +
-                    filter +
-                    ' AND ' +
-                    field +
-                    ' != null LIMIT ' +
-                    maxRows,
-                new Map<String, Object>{ 'ids' => ids },
-                AccessLevel.USER_MODE
-            )
+            'SELECT Id, ' +
+                field +
+                ' FROM ' +
+                target.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                ' WHERE ' +
+                filter +
+                ' AND ' +
+                field +
+                ' != null',
+            new Map<String, Object>{ 'ids' => ids }
         );
-    }
-
-    /** The rows, counted and logged once per name when the lookup reached its cap. */
-    private static List<SObject> capped(String name, List<SObject> rows) {
-        if (rows.size() >= maxRows) {
-            cappedLookups++;
-            if (cappedLogged.add(name)) {
-                ErrorLogger.logMessage(
-                    String.format(
-                        System.Label.Core_MatchSource_RowCapReached,
-                        new List<Object>{ name, String.valueOf(maxRows) }
-                    ),
-                    LOG_CONTEXT,
-                    ErrorLogger.SEVERITY_WARNING
-                );
-            }
-        }
-        return rows;
     }
 }

@@ -547,10 +547,14 @@ The same box also asks your **match sources** (see
 nobody for: the row's email, its phones, and its mailing and other street with postal code are
 compared with the values on contact point records and BarnCRM addresses, in the same way the
 duplicate scan compares them. A person whose email is kept only on a contact point email record
-is found this way. A record found only through a match source is used only when its last name
-is the same as the row's (spaces at either end and capitals ignored), because a shared address
-or phone often means a relative, not the same person: a row for "Okonkwo-Bell" at the address
-of an existing "Okonkwo" is not loaded into Okonkwo, and is handled like any row with no match.
+is found this way. A record found only through a match source is used only when both its first
+name and its last name are the same as the row's (spaces at either end and capitals ignored; a
+blank first name matches only a blank one), because a shared address, phone or family email
+often means a relative, not the same person: a row for "Jane Smith" at the address or home
+phone of an existing "John Smith" is not loaded into John, nor is a row for "Okonkwo-Bell" at
+the address of an existing "Okonkwo"; each is handled like any row with no match. A person who
+goes by another first name (Bob for Robert) is created new, and the next duplicate scan offers
+the pair for review.
 These rows are ticked **Matched By Duplicate Rule** too, and follow **When more than one record
 matches** as well. Match sources are not asked about organizations, not about a person the
 duplicate rules already matched, and not when the box is unticked. The sources are asked even
