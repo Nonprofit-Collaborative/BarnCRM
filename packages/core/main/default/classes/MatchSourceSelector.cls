@@ -36,7 +36,7 @@ public with sharing class MatchSourceSelector {
     private static List<Match_Source__mdt> allSourcesOverride;
 
     /**
-     * Every match source, active or not, for the Matching Logic list (ADR-NEXT). Read as
+     * Every match source, active or not, for the Matching Logic list (ADR-0139). Read as
      * shipped, as `selectActiveSources` is.
      */
     public static List<Match_Source__mdt> selectAllSources() {

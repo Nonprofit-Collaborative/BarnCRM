@@ -6,7 +6,7 @@
  * record is never compared. A source names that related object, the field holding the value,
  * the lookup to its person or household, and how the value is made comparable. This class
  * reads the sources the org can use, normalizes values, and checks a source an administrator
- * saves in Duplicate Matching, Matching Logic (ADR-NEXT).
+ * saves in Duplicate Matching, Matching Logic (ADR-0139).
  *
  * No object a source names is referenced at compile time: a source is resolved through
  * describe and skipped when its object or fields are not in the org (ADR-0013, ADR-0110).
@@ -675,7 +675,7 @@ public with sharing class MatchSourceService {
 
     /**
      * A source as Matching Logic describes it, by local field name, resolved in this org as
-     * the scan would resolve it, or null when the scan would skip it (ADR-NEXT).
+     * the scan would resolve it, or null when the scan would skip it (ADR-0139).
      */
     public static Source sourceFrom(String label, Map<String, Object> values) {
         // A metadata row's fields cannot all be set in memory, so it is read from JSON.

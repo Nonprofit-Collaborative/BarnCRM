@@ -49,7 +49,7 @@ public with sharing class CustomMetadataManagerService {
         public RowValidator validator;
         /**
          * False for a type with a page of its own, which saves through this manager but is not
-         * listed on the Custom metadata page: Match Source, on Matching Logic (ADR-NEXT).
+         * listed on the Custom metadata page: Match Source, on Matching Logic (ADR-0139).
          */
         public Boolean listed = true;
     }

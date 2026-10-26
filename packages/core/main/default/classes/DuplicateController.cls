@@ -1,5 +1,5 @@
 /**
- * The review list on the Duplicate Matching tab (C-20, ADR-NEXT).
+ * The review list on the Duplicate Matching tab (C-20, ADR-0139).
  *
  * It answers three questions: are duplicate rules switched on, what have they found, and what
  * do I do about each pair. Everything it shows was found by the org's own rules (R-DP1), and

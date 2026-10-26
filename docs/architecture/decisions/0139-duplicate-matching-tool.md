@@ -1,4 +1,4 @@
-# ADR-NEXT: Duplicate Matching is its own tool, with a tab and a settings section
+# ADR-0139: Duplicate Matching is its own tool, with a tab and a settings section
 
 **Status:** Accepted (owner decision, 2026-10-26)
 **Date:** 2026-10-26

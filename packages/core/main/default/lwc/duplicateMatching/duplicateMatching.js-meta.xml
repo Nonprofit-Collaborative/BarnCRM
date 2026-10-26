@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Duplicate Matching tab (ADR-NEXT): the review list of possible duplicates, and the
+    The Duplicate Matching tab (ADR-0139): the review list of possible duplicates, and the
     matching logic that pairs people and households alongside the org's duplicate rules.
   </description>
   <isExposed>true</isExposed>

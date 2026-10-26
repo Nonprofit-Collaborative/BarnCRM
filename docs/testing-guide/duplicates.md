@@ -109,7 +109,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Matching Logic**, click **Add**. | A **New row** form: **Name**, **Object**, **Find fields**, **Field compared**, **Through the lookup**, **How values are compared**. |
+| 1 | On **Matching Logic**, click **Add**. | A **New Row** form: **Name**, **Object**, **Find fields**, **Field compared**, **Through the lookup**, **How values are compared**. |
 | 2 | Enter **Object** `Not_An_Object__c` and choose **Find fields**. | **Not_An_Object__c is not an object in this org. Check its API name.** |
 | 3 | Change **Object** to `Contact` and choose **Find fields**. | **Field compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Through the lookup** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
 | 4 | Choose **How values are compared** **Address**. | A **Postal code field** list appears. |

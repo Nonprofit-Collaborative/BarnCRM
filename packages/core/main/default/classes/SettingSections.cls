@@ -14,7 +14,7 @@ public with sharing class SettingSections {
     public static final String MODULES = 'Modules';
     @NamespaceAccessible
     public static final String HOUSEHOLDS = 'Households';
-    /** The Duplicate Matching tool's settings and the way into its tab (ADR-NEXT). */
+    /** The Duplicate Matching tool's settings and the way into its tab (ADR-0139). */
     @NamespaceAccessible
     public static final String DUPLICATE_MATCHING = 'Duplicate Matching';
     @NamespaceAccessible

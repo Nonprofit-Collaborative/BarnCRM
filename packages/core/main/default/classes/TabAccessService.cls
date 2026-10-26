@@ -56,7 +56,7 @@ public with sharing class TabAccessService {
 
     /**
      * Each tab set, and the permission sets whose holders see that tab while it is on.
-     * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-NEXT),
+     * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
      * and so do Metadata Admin holders, who change its matching logic.
      */
     @TestVisible

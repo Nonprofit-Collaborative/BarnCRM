@@ -2,7 +2,7 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     Duplicate Matching: review possible duplicate people and households, and manage the
-    matching logic that pairs them alongside the org's duplicate rules (ADR-NEXT).
+    matching logic that pairs them alongside the org's duplicate rules (ADR-0139).
   </description>
   <flexiPage>Duplicate_Matching</flexiPage>
   <label>Duplicate Matching</label>

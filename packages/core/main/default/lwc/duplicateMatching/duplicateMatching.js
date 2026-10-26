@@ -13,7 +13,7 @@ const REVIEW_AREA = 'review';
 const MATCHING_LOGIC_AREA = 'matchingLogic';
 
 /**
- * The Duplicate Matching tab (ADR-NEXT, admin guide duplicates.md): one tab per area, each
+ * The Duplicate Matching tab (ADR-0139, admin guide duplicates.md): one tab per area, each
  * created only when first opened. Review needs Manage BarnCRM Settings or Review Duplicate
  * Suggestions (BarnCRM Duplicate Review, which reads the list but cannot scan, dismiss or
  * merge). Matching Logic needs Manage BarnCRM Settings or Manage BarnCRM Metadata; only the

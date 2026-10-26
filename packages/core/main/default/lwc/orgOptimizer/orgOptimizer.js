@@ -30,7 +30,7 @@ const OVERVIEW_TAB = 'overview';
  * its tab is first opened, and Health Check only on Run Health Check, so opening the page runs
  * no check (core review ADMIN-7). Data quality needs Find and Export Records; the other
  * sections need Manage BarnCRM Settings. Each embedded component keeps its own server check.
- * Duplicates moved to the Duplicate Matching tab (ADR-NEXT).
+ * Duplicates moved to the Duplicate Matching tab (ADR-0139).
  */
 export default class OrgOptimizer extends LightningElement {
   labels = {

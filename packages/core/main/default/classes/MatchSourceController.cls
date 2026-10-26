@@ -1,5 +1,5 @@
 /**
- * Matching Logic on the Duplicate Matching tab (ADR-NEXT): the match sources in plain words,
+ * Matching Logic on the Duplicate Matching tab (ADR-0139): the match sources in plain words,
  * the fields an object offers a new source, and "Try a value".
  *
  * Reading needs Manage BarnCRM Settings or Manage BarnCRM Metadata. Saving is not here: the

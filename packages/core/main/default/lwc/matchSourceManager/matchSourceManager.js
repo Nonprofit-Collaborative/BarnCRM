@@ -57,7 +57,7 @@ const POLL_INTERVAL_MS = 3000;
 const POLL_ATTEMPTS = 20;
 
 /**
- * Matching Logic on the Duplicate Matching tab (ADR-NEXT, admin guide duplicates.md): the
+ * Matching Logic on the Duplicate Matching tab (ADR-0139, admin guide duplicates.md): the
  * match sources in plain words, add, edit, activate and deactivate, and "Try a value". Saving
  * goes through the custom metadata manager, which checks the source against the org, deploys
  * it and needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
