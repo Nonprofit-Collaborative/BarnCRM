@@ -20,7 +20,9 @@ Three things to hold on to, because they are the questions people ask first:
   cancelled and leaves the tasks alone, because a task is a record of somebody's work.
   Closing the leftovers is theirs to do.
 - **You close a plan yourself.** BarnCRM does not mark a plan complete when its last
-  task closes. See "What this does not do yet" at the end.
+  task closes. See "What this does not do yet" at the end. When you set **Status** to
+  Complete or Cancelled, **Completed Date** fills in as today unless you typed one, and it
+  clears if you set the plan back to Running.
 
 ## How to set one up
 

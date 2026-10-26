@@ -25,6 +25,14 @@
     <value>This gift has already been receipted. To correct the receipt, void it and reissue it.</value>
   </labels>
   <labels>
+    <fullName>Giving_Receipt_GiftNotReceived</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pending or cancelled gift cannot be receipted</shortDescription>
+    <value>A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first.</value>
+  </labels>
+  <labels>
     <fullName>Giving_Receipt_GiftNotFound</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -46,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>User cannot issue receipts</shortDescription>
-    <value>You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+    <value>You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoTemplatePermission</fullName>

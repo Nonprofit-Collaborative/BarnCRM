@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Help text of the read only SOQL box.</shortDescription>
-        <value>The query Find runs, in SOQL, for anyone who wants to check it or copy it. Find does not accept typed SOQL.</value>
+        <value>The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query.</value>
     </labels>
     <labels>
         <fullName>Core_Find_Run</fullName>

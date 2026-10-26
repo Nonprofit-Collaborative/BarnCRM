@@ -1,6 +1,6 @@
 # BarnCRM feature catalog
 
-BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-13 (main at PR #377, which landed batch 8).
+BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-25 (main at 24a4298b).
 
 **How this is kept current:** the catalog is updated in the same pull request that adds, changes, or removes a feature. A branch that builds a feature sets its row to "Built, not merged" with the branch name; the merge makes it "Shipped".
 
@@ -12,14 +12,14 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 - **Built, not merged**: built on the named branch or open pull request, waiting for review, an org test run, or the branches it is stacked on.
 - **Replaced**: shipped earlier and superseded by the feature the row names; kept in the code only where the row says.
 - **Planned**: in the product plan roadmap (iteration shown where the plan gives one). "Proposed" marks an idea recorded for consideration, not approved or scheduled.
-- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
+- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders, CH = Corporate Hub, PB = Portal Builder), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
 
 **Editions**
 
 | Edition | What it is | Packages |
 |---|---|---|
-| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events later); no nonprofit module is shown or offered |
-| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models and Funders offered as further modules |
+| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events, Corporate Hub and Portal Builder later); no nonprofit module is shown or offered |
+| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models and Funders offered as further modules (Corporate Hub and Portal Builder later, in both editions) |
 
 BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then chooses the edition once in the Setup Assistant; the Nonprofit Edition opens Salesforce's installer for Giving, and other modules are offered the same way. The Standard Edition shows no nonprofit module anywhere in Core; one already installed keeps working. A module that is never installed leaves nothing in the org. Changing the edition later: [editions.md](admin-guide/editions.md).
 
@@ -109,7 +109,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Complete import exceptions file | Minor | Download exceptions holds every rejected row (up to 100,000 per download), read through an Apex pagination cursor, written with the same Excel-safe CSV writer as Find (byte-order mark, formula guard); the rejected-rows table says when it shows only the first 200. | Shipped (#377) | Q-03, C-14 |
+| Complete import exceptions file | Minor | Download rejected rows holds every rejected row (up to 100,000 per download), read through an Apex pagination cursor, written with the same Excel-safe CSV writer as Find (byte-order mark, formula guard); the rejected-rows table says when it shows only the first 200. | Shipped (#377) | Q-03, C-14 |
 | Data Job records | Minor | Import, bulk update and bulk delete records read **Data Job** (plural **Data Jobs**), since all three are data jobs; the tab stays **Import**; API names are unchanged. | Shipped (#377) | ADR-0047 |
 | Import wizard | Major | Uploads a spreadsheet, suggests column mappings, runs a dry run showing what would be created, updated, matched or rejected, then commits with per-row results; the single quote a Find export puts before = + - or @ is taken off, so an exported phone number loads as it was. | Shipped (fixes #377) | C-14 |
 | Import results file | Minor | Download results gives every row of a finished import (people or Load one object) with its outcome, the record IDs it created, updated or matched, and the reason for a rejected row, beside the row's own columns, to reconcile against the source system or load the next file by record ID. | Shipped (#377) | Data tools parity rank 3, C-14 |
@@ -590,7 +590,53 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ---
 
-## 7. Cross-module platform capabilities
+## 7. Corporate Hub
+
+**Edition:** Both editions. Depends on Core only; board giving participation appears only when Giving is installed. No package directory exists yet. Planned after the Core quality pass and after Contact Point Sync (C-45) and Address Verification (C-46); not scheduled to an iteration (plan 5.8, D-118). Documents are Salesforce Files and count against the org's file storage; standard reports and dashboards only.
+
+### 7.1 Documents, Policies and Compliance
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Document and policy library | Major | Policies and documents on Salesforce Files with versions, owner, review date, status and retire. | Planned (1.x) | CH-01 |
+| Compliance calendar | Major | Obligations with due dates, recurrence, owner, reminders, attached evidence, status and history of each completed cycle. | Planned (1.x) | CH-03 |
+| Shipped compliance templates | Major | Country-neutral templates shipped as custom metadata rows the admin turns on and adapts: corporate or state annual report filing, annual tax return (US: IRS Form 990 series; other countries' equivalents can be added). | Planned (1.x) | CH-04 |
+| GDPR template set | Major | Records of processing, data subject requests (linked to Core's Erase a person), DPIA review and a breach log. | Planned (1.x) | CH-05 |
+| Policy acknowledgments | Minor | Staff and board members attest to a specific policy version, with who is still outstanding. | Planned (1.x) | CH-02 |
+| Recommended extra templates | Minor | Charitable solicitation registrations by state, insurance renewals, annual financial audit or review, registered agent. A recommendation, to confirm when the module starts. | Planned (1.x, recommendation) | CH-06 |
+| Recommended required-policies set | Minor | Starter policy records for conflict of interest, whistleblower, document retention and destruction, and gift acceptance. A recommendation. | Planned (1.x, recommendation) | CH-07 |
+| Contracts and renewals | Minor | Parties, terms, renewal and notice dates, reminders and documents. A recommendation. | Planned (1.x, recommendation) | CH-08 |
+
+### 7.2 Board Governance
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Board and committee roster | Major | Members, roles, terms with start and end dates, term limits and alerts for expiring terms. | Planned (1.x) | CH-09 |
+| Board meetings | Major | Agendas, board packets on Salesforce Files, attendance, quorum check and minutes with an approval step. | Planned (1.x) | CH-10 |
+| Motions, votes and resolutions | Minor | A log of motions, votes and resolutions, linked to the meeting where each was taken. | Planned (1.x) | CH-11 |
+| Conflict-of-interest disclosures | Minor | Annual disclosures and board policy acknowledgments. | Planned (1.x) | CH-12 |
+| Board giving participation | Minor | Share of board members who gave this year, shown only when Giving is installed. | Planned (1.x) | CH-13 |
+| Governance board dashboard | Minor | Roster, expiring terms, attendance, open disclosures and, with Giving, giving participation; complements the Funders financial board dashboard (F-07). | Planned (1.x) | CH-14 |
+
+---
+
+## 8. Portal Builder
+
+**Edition:** Both editions. Depends on Core only; each template needs only its own module and is offered only when that module is installed. No package directory exists yet. Portal users log in without Salesforce user licenses; the architecture (off-platform portal, recommended, or on-platform Salesforce Site) is still open (plan 11.2 item 30). No Experience Cloud dependency. Planned after the Core quality pass and after C-45 and C-46; not scheduled to an iteration (plan 5.9, D-118). Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
+
+### 8.1 Portals
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Portal Builder | Major | Builds logged-in portals from templates, for people verified against their BarnCRM record, with no Salesforce user license per login. | Planned (1.x) | PB-01 |
+| Board portal template | Major | Board members see meetings, agendas, packets and minutes, approve minutes, record votes, and complete disclosures and policy acknowledgments. Needs Corporate Hub. | Planned (1.x) | PB-02 |
+| Volunteer portal template | Major | Volunteers see shifts, sign up, log hours and keep their profile current. Needs Volunteers. | Planned (1.x) | PB-03 |
+| Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |
+| Partner portal template | Major | Partner organizations see shared records and referrals, and grant reports where Funders is installed. | Planned (1.x) | PB-05 |
+
+---
+
+## 9. Cross-module platform capabilities
 
 | Capability | What it means | Status | Source |
 |---|---|---|---|

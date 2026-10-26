@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refuses a membership that would give a household a second current primary</shortDescription>
-        <value>This household already has a primary member. To change who it is, click Make primary on the right person in the household's Household Members panel.</value>
+        <value>This household already has a primary member. To change who it is, click Make primary on the right person in the household's Members panel.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorUnexpected</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refuses a hand edit of a household Primary Contact in junction mode</shortDescription>
-        <value>In this org a household's Primary Contact follows the member marked primary. To change it, click Make primary on the right person in the household's Household Members panel.</value>
+        <value>In this org a household's Primary Contact follows the member marked primary. To change it, click Make primary on the right person in the household's Members panel.</value>
     </labels>
     <labels>
         <fullName>Core_Households_PrimaryContactMustBeMember</fullName>

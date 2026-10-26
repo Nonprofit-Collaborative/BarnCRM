@@ -169,6 +169,41 @@ private class PersonErasureTest {
     }
 
     @IsTest
+    static void aHouseholdKeptForCreditedRecordsSaysSo() {
+        System.runAs(eraser()) {
+            isolate();
+            Contact jordan = coupleInContactMode(true);
+            HouseholdDependentsExtensions.overrides.put(
+                HouseholdDependentsExtensions.EXTENSION_CLASSES[0],
+                new HouseholdDependentsExtensions.EveryHouseholdDependent()
+            );
+
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, null);
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :jordan.AccountId],
+                'Kept for the records credited to it, though the setting is on'
+            );
+            PersonErasure.Change householdRow;
+            for (PersonErasure.Change change : result.changes) {
+                if (
+                    change.action == PersonErasure.CLEARED &&
+                    change.objectLabel == Label.Core_Erase_Household
+                ) {
+                    householdRow = change;
+                }
+            }
+            Assert.isNotNull(householdRow, 'The kept household is reported');
+            Assert.areEqual(
+                Label.Core_Erase_NoteHouseholdKept,
+                householdRow.note,
+                'Says it was kept for credited records'
+            );
+        }
+    }
+
+    @IsTest
     static void theOnlyMembersHouseholdIsAnonymizedWhenKept() {
         System.runAs(eraser()) {
             isolate();
@@ -213,7 +248,11 @@ private class PersonErasureTest {
                 }
             }
             Assert.isNotNull(householdRow, 'Reported as a household, not as an account');
-            Assert.areEqual(Label.Core_Erase_NoteHouseholdKept, householdRow.note, 'Says why');
+            Assert.areEqual(
+                Label.Core_Erase_NoteHouseholdKeptSetting,
+                householdRow.note,
+                'Says it was kept because the setting is off, not for credited records'
+            );
             Assert.isTrue(
                 householdRow.fields.contains(Account.Name.getDescribe().getLabel()),
                 'Lists the name it replaced: ' + householdRow.fields
