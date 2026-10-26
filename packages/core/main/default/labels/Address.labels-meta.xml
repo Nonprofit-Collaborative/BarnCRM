@@ -65,6 +65,14 @@
         <value>Loading addresses</value>
     </labels>
     <labels>
+        <fullName>Core_Address_MoveFailed</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: a household move could not be saved</shortDescription>
+        <value>We could not change these addresses, so nothing was changed. Check that you can edit addresses, the household and its people, and if it happens again ask your administrator to check the Error Log.</value>
+    </labels>
+    <labels>
         <fullName>Core_Address_MoveNoPrimary</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>

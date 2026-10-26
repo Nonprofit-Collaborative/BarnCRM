@@ -170,4 +170,37 @@ public with sharing class AddressSelector {
             LIMIT 10000
         ];
     }
+
+    /**
+     * The name of each of these people and households, as the user may read them, for a
+     * screen that lists them (R-AD9). A record the user cannot read is left out.
+     */
+    public static Map<Id, String> selectNames(Set<Id> contactIds, Set<Id> accountIds) {
+        Map<Id, String> names = new Map<Id, String>();
+        if (contactIds != null && !contactIds.isEmpty()) {
+            for (Contact person : [
+                SELECT Id, Name
+                FROM Contact
+                WHERE Id IN :contactIds
+                WITH USER_MODE
+                ORDER BY Name
+                LIMIT 10000
+            ]) {
+                names.put(person.Id, person.Name);
+            }
+        }
+        if (accountIds != null && !accountIds.isEmpty()) {
+            for (Account record : [
+                SELECT Id, Name
+                FROM Account
+                WHERE Id IN :accountIds
+                WITH USER_MODE
+                ORDER BY Name
+                LIMIT 10000
+            ]) {
+                names.put(record.Id, record.Name);
+            }
+        }
+        return names;
+    }
 }
