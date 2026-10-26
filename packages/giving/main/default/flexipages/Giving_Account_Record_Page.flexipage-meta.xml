@@ -320,6 +320,9 @@
               <value>Account.New_Gift</value>
             </valueListItems>
             <valueListItems>
+              <value>Account.Start_Stewardship_Plan</value>
+            </valueListItems>
+            <valueListItems>
               <value>Account.Erase_Person</value>
               <visibilityRule>
                 <booleanFilter>1 AND 2 AND 3</booleanFilter>

@@ -161,6 +161,59 @@ private class CommitmentControllerTest {
         }
     }
 
+    /**
+     * A reader is offered no status change, and one forced through anyway is refused with a
+     * sentence about access rather than about the commitment's status (testing guide C7).
+     */
+    @IsTest
+    static void aReaderIsOfferedNoChangeAndIsToldWhy() {
+        User reader = TestDataFactory.createUser(
+            'Jen',
+            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
+        );
+        Commitment__c commitment;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            commitment = pledge(donor().Id);
+            CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
+            CommitmentController.SchedulePreview own = CommitmentController.getSchedule(
+                commitment.Id
+            );
+            Assert.isTrue(own.canChange, 'An administrator may change the commitment.');
+            Assert.isTrue(own.canGenerate, 'An administrator may generate a schedule.');
+            // Commitments are private: the reader sees this one through a read share.
+            insert new Commitment__Share(
+                ParentId = commitment.Id,
+                UserOrGroupId = reader.Id,
+                AccessLevel = 'Read',
+                RowCause = Schema.Commitment__Share.RowCause.Manual
+            );
+        }
+
+        CommitmentController.SchedulePreview seen;
+        String message;
+        Test.startTest();
+        System.runAs(reader) {
+            seen = CommitmentController.getSchedule(commitment.Id);
+            try {
+                CommitmentController.changeStatus(commitment.Id, 'pause');
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+        }
+        Test.stopTest();
+
+        Assert.isFalse(seen.canChange, 'A reader is offered no status change.');
+        Assert.isFalse(seen.canGenerate, 'A reader is offered no schedule to generate.');
+        Assert.areEqual(Label.Giving_Commitment_NoPermission, message, 'Told why.');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Assert.areEqual(
+                'Active',
+                [SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
+                'Nothing changed.'
+            );
+        }
+    }
+
     @IsTest
     static void refusesAnActionItDoesNotKnow() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

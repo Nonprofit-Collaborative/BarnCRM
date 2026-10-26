@@ -271,6 +271,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>StewardshipStartController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>TributeController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

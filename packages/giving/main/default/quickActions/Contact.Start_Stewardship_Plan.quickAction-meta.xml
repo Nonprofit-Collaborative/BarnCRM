@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>Starts a stewardship plan by hand on this person.</description>
+  <height>400</height>
+  <label>Start Stewardship Plan</label>
+  <lightningWebComponent>stewardshipPlanStart</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

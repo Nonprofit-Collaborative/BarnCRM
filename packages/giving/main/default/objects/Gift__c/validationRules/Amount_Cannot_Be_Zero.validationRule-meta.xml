@@ -8,8 +8,8 @@
   </errorConditionFormula>
   <errorDisplayField>Amount__c</errorDisplayField>
   <errorMessage>
-    A gift amount cannot be zero. Enter what was received, or enter a negative amount to record a
-    refund. If you are recording goods or services, set Type to In-kind: an in-kind gift has no
-    amount and its worth goes in Fair Market Value.
+    A gift amount cannot be zero. Enter what was received; money going back is recorded with
+    Refund or Write Off on the original gift. For goods or services, set Payment Method to In-kind
+    and put their worth in Fair Market Value.
   </errorMessage>
 </ValidationRule>

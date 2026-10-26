@@ -142,6 +142,5 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | As staff, open any sample pledge. | **Edit** shows; **Delete** does not. |
 | 2 | As read-only, open the **Commitments** tab. | No **New** button. The list views **Active Pledges** and **Active Recurring Gifts** show. |
 | 3 | As read-only, open an Active recurring gift. | No **Edit** or **Delete**. The **Payment schedule** card lists the payments. |
-| 4 | Click **Pause** on the card. | Refused with a message ("That change is not allowed from the commitment's current status..."); **Status** stays Active. Refresh to confirm. |
-
+| 4 | Look at the card's buttons. | No **Pause**, **Resume**, **Mark complete** or **Cancel commitment**. On a commitment with no payments yet, the card has no **Generate now**. |
 **Cleanup:** none.
