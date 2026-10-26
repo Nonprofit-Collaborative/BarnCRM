@@ -5,12 +5,14 @@
  * round in a circle:
  *
  * 1. syncDefaultToStandardFields: the address marked default is copied into the standard
- *    address fields on its owner, and on every current household member, so mail merges,
- *    reports, and other apps keep reading the address they have always read (R-AD3).
+ *    address fields on its owner, and on every current household member who does not keep
+ *    an address of their own, so mail merges, reports, and other apps keep reading the
+ *    address they have always read (R-AD3).
  * 2. captureFromStandardFields: an address typed into the standard fields, or changed
  *    there, becomes or updates an address record, so the records stay the truth (R-AD5).
  *    A person account's mailing address is captured the same way, on insert and on update
- *    (capturePersonMailingChanges).
+ *    (capturePersonMailingChanges), and so is a household's or organization's billing
+ *    address changed after it was created (captureBillingChanges).
  *
  * No Person Account field is referenced statically anywhere in this class. Where people
  * are person accounts their mailing fields are written dynamically, by name, only in an
@@ -408,6 +410,87 @@ public with sharing class AddressService {
         }
     }
 
+    /**
+     * A household or organization whose billing address was changed after it was created gets
+     * the new address as its default address record, exactly as one created with it does, so
+     * an edit made in the billing fields (on the page, by an import, by another app) is kept
+     * and reaches the household's members instead of being put back by the next default saved
+     * (R-AD3). The address it replaces stays on file as history (R-AD7).
+     *
+     * Only an account whose billing address differs from the one before the save is looked
+     * at, so an ordinary account save runs no query. A billing address emptied is not an
+     * address and is not captured, and one the account's default already holds is not added a
+     * second time. BarnCRM's own billing writes are made with the propagation flag raised and
+     * never come back here. A household that carries a native Nonprofit Cloud household group
+     * is left alone, as the propagation leaves it alone (product-plan Section 11.2 item 9).
+     * A person account is capturePersonMailingChanges' to capture, not this method's.
+     */
+    public static void captureBillingChanges(
+        List<Account> accounts,
+        Map<Id, SObject> previousById
+    ) {
+        if (accounts == null || accounts.isEmpty() || previousById == null || isPropagating) {
+            return;
+        }
+        List<Account> changed = new List<Account>();
+        for (Account account : accounts) {
+            Account before = (Account) previousById.get(account.Id);
+            if (before != null && billingChanged(account, before)) {
+                changed.add(account);
+            }
+        }
+        if (changed.isEmpty()) {
+            return;
+        }
+        Map<Id, Address__c> typedByAccount = new Map<Id, Address__c>();
+        for (Address__c typed : billingAddressesOf(changed, new List<Account>())) {
+            typedByAccount.put(typed.Account__c, typed);
+        }
+        if (typedByAccount.isEmpty()) {
+            return;
+        }
+        for (
+            Id nativeHousehold : HouseholdSelector.nativeHouseholdAccountsAmong(
+                typedByAccount.keySet()
+            )
+        ) {
+            typedByAccount.remove(nativeHousehold);
+        }
+        if (typedByAccount.isEmpty()) {
+            return;
+        }
+        for (
+            Address__c existing : AddressSelector.selectDefaultsByOwnerIds(
+                typedByAccount.keySet(),
+                null
+            )
+        ) {
+            if (
+                existing.Account__c != null &&
+                sameAddress(existing, typedByAccount.get(existing.Account__c))
+            ) {
+                typedByAccount.remove(existing.Account__c);
+            }
+        }
+        if (typedByAccount.isEmpty()) {
+            return;
+        }
+        isPropagating = true;
+        try {
+            insertCaptured(typedByAccount.values());
+        } finally {
+            isPropagating = false;
+        }
+    }
+
+    private static Boolean billingChanged(Account account, Account before) {
+        return !sameText(account.BillingStreet, before.BillingStreet) ||
+            !sameText(account.BillingCity, before.BillingCity) ||
+            !sameText(account.BillingState, before.BillingState) ||
+            !sameText(account.BillingPostalCode, before.BillingPostalCode) ||
+            !sameText(account.BillingCountry, before.BillingCountry);
+    }
+
     private static void insertCaptured(List<Address__c> toInsert) {
         if (toInsert.isEmpty()) {
             return;
@@ -563,7 +646,9 @@ public with sharing class AddressService {
         // Every account this save might write person mailing fields on, asked about once,
         // before anything is built: an account that does not hold a person must be left
         // out rather than written and refused. See personAccountIdsAmong.
-        Map<Id, Set<Id>> membersByHousehold = membersOf(addressByHousehold.keySet());
+        Map<Id, Set<Id>> membersByHousehold = membersWhoTakeTheHouseholdAddress(
+            membersOf(addressByHousehold.keySet())
+        );
         Set<Id> candidates = new Set<Id>(addressByPersonOwner.keySet());
         candidates.addAll(memberAccountIds(membersByHousehold));
         Set<Id> personAccountIds = personAccountIdsAmong(candidates);
@@ -610,6 +695,72 @@ public with sharing class AddressService {
             ? membersByHouseholdOverride
             : HouseholdService.getMemberPersonIds(householdIds);
         return members == null ? new Map<Id, Set<Id>>() : members;
+    }
+
+    /**
+     * The members a household's default address is copied to (R-AD3). Left out, keeping the
+     * address they have:
+     *
+     * - a person stored as a contact who has a default address of their own (R-AD1), such as
+     *   the one "Only that person moves" gives them, so one person can live apart from their
+     *   household with no field to say so, and the seasonal swap does not move them either;
+     * - in junction mode, a person for whom this household is not their household (R-M3):
+     *   belonging to a second household does not move them to its address.
+     *
+     * A member held as a person account is not asked about an address of its own: every
+     * person account carries one, captured from its mailing fields (R-AD5), so the first rule
+     * would stop every household move reaching people held as accounts.
+     *
+     * One query for the personal addresses, and in junction mode one for the households,
+     * whatever the number of households. Returns new sets: the map given is not changed.
+     */
+    private static Map<Id, Set<Id>> membersWhoTakeTheHouseholdAddress(
+        Map<Id, Set<Id>> membersByHousehold
+    ) {
+        Set<Id> personIds = new Set<Id>();
+        Set<Id> contactIds = new Set<Id>();
+        Schema.SObjectType contactType = Contact.SObjectType;
+        for (Id householdId : membersByHousehold.keySet()) {
+            Set<Id> memberIds = membersByHousehold.get(householdId);
+            if (memberIds == null) {
+                continue;
+            }
+            for (Id memberId : memberIds) {
+                if (memberId == null || memberId == householdId) {
+                    continue;
+                }
+                personIds.add(memberId);
+                if (memberId.getSObjectType() == contactType) {
+                    contactIds.add(memberId);
+                }
+            }
+        }
+        if (personIds.isEmpty()) {
+            return membersByHousehold;
+        }
+        Set<Id> withAnAddressOfTheirOwn = new Set<Id>();
+        for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(contactIds, null)) {
+            if (address.Contact__c != null) {
+                withAnAddressOfTheirOwn.add(address.Contact__c);
+            }
+        }
+        Map<Id, Id> ownHouseholdByPerson = HouseholdService.isJunctionMode()
+            ? HouseholdService.getHouseholdIdsFor(personIds)
+            : new Map<Id, Id>();
+        Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
+        for (Id householdId : membersByHousehold.keySet()) {
+            Set<Id> taking = new Set<Id>();
+            Set<Id> memberIds = membersByHousehold.get(householdId);
+            for (Id memberId : memberIds == null ? new Set<Id>() : memberIds) {
+                Id ownHousehold = ownHouseholdByPerson.get(memberId);
+                Boolean livesElsewhere = ownHousehold != null && ownHousehold != householdId;
+                if (!withAnAddressOfTheirOwn.contains(memberId) && !livesElsewhere) {
+                    taking.add(memberId);
+                }
+            }
+            result.put(householdId, taking);
+        }
+        return result;
     }
 
     /** The members that are account records rather than contacts, households excluded. */
@@ -861,12 +1012,27 @@ public with sharing class AddressService {
         if (accounts == null || accounts.isEmpty()) {
             return;
         }
+        List<Account> people = new List<Account>();
+        toInsert.addAll(billingAddressesOf(accounts, people));
+        capturePersonAccounts(people, toInsert);
+    }
+
+    /**
+     * The billing address of each household or organization among these accounts, as a
+     * default address record of type Home (Work for an organization), not yet saved. An
+     * account with an empty billing address, or of any other record type, gives none. The
+     * people held as accounts are added to `people` instead, for the person capture.
+     */
+    private static List<Address__c> billingAddressesOf(
+        List<Account> accounts,
+        List<Account> people
+    ) {
+        List<Address__c> typed = new List<Address__c>();
         Map<Id, Schema.RecordTypeInfo> recordTypes = Account.SObjectType.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             )
             .getRecordTypeInfosById();
         Set<Id> personRecordTypeIds = OrgShapeDetector.personRecordTypeIds();
-        List<Account> people = new List<Account>();
         for (Account account : accounts) {
             if (personRecordTypeIds.contains(account.RecordTypeId)) {
                 people.add(account);
@@ -893,7 +1059,7 @@ public with sharing class AddressService {
             ) {
                 continue;
             }
-            toInsert.add(
+            typed.add(
                 new Address__c(
                     Account__c = account.Id,
                     Type__c = developerName == RECORD_TYPE_ORGANIZATION ? TYPE_WORK : TYPE_HOME,
@@ -906,7 +1072,7 @@ public with sharing class AddressService {
                 )
             );
         }
-        capturePersonAccounts(people, toInsert);
+        return typed;
     }
 
     /**

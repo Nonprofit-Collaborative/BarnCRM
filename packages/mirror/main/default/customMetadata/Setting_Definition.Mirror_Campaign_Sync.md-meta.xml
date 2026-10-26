@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">Campaign_Sync</value>
     </values>
     <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Campaign Sync</value>
+    </values>
+    <values>
         <field>Sort_Order__c</field>
         <value xsi:type="xsd:double">92</value>
     </values>

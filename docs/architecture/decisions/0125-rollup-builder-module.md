@@ -109,6 +109,12 @@ subscriber migration.
    `settingsConsole` with a new `module` property set to `Rollups`, which shows only that module's
    rows; the same rows stay in BarnCRM Settings (plan Section 4.8, one console). Core's
    BarnCRM app loses the Rollup Builder tab; the Hub's Modules card links the app (ADR-0018).
+   **Amended 2026-10-26 (owner request RS1):** the Rollup Settings tab and app page are removed.
+   The module's settings are only the Rollups section of BarnCRM Settings (Default rollup mode,
+   When instant totals are calculated, and a Rollups row that opens the Rollup Builder tab).
+   The console's `module` property stays, for the Volunteers settings tab. A source deploy does
+   not delete the old tab from an org that has it; remove `Rollup_Settings` (tab and flexipage)
+   with a destructive deploy.
 8. **Permission sets.** The rollup grants leave `BarnCRM_Admin`, `BarnCRM_Staff` and
    `BarnCRM_Read_Only` for `Rollup_Builder_Admin` (build, recalculate, retry, the queue) and
    `Rollup_Builder_User` (read the Builder and definitions, as Staff and Read Only can today).
@@ -208,7 +214,7 @@ subscriber migration.
 
 ## Owner decisions (decided 2026-10-14, each as recommended)
 
-- **D1.** The Rollup Settings tab hosts Core's console filtered by module (decision 7), not a
+- **D1.** (Superseded 2026-10-26, see decision 7.) The Rollup Settings tab hosts Core's console filtered by module (decision 7), not a
   module-owned settings component.
 - **D2.** Staff and Read Only keep a read-only Builder through `Rollup_Builder_User`, assigned
   to holders of `BarnCRM_Staff` or `BarnCRM_Read_Only` when the module is turned on, as Giving

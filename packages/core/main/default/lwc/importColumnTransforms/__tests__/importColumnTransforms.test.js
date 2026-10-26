@@ -88,6 +88,17 @@ describe('the changes to one column', () => {
     );
   });
 
+  it('lays the preview table out fixed with wrapping cells so long values wrap inside the panel', async () => {
+    // Jest cannot measure layout; this proves the classes that make the browser wrap, not the pixels.
+    const element = render([{ op: 'proper' }]);
+    await flush();
+    const table = element.shadowRoot.querySelector('table');
+    expect(table.classList.contains('slds-table_fixed-layout')).toBe(true);
+    const cells = table.querySelectorAll('th, td');
+    expect(cells.length).toBeGreaterThan(0);
+    cells.forEach((cell) => expect(cell.classList.contains('slds-cell-wrap')).toBe(true));
+  });
+
   it('offers every kind of change, and the other columns to add', async () => {
     const element = render([{ op: 'append', columns: ['Last'] }]);
     await flush();

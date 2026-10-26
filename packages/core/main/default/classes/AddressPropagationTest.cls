@@ -21,6 +21,9 @@ private class AddressPropagationTest {
     private static final String WINTER_CITY = 'Phoenix';
     private static final String MEMBER_OWN_STREET = '1912 North Third Street';
     private static final String MEMBER_OWN_CITY = 'Tucson';
+    private static final String HOME_STREET = '6830 Sunset Lane';
+    private static final String HOME_CITY = 'Springfield';
+    private static final Integer TWO_HUNDRED = 200;
 
     @IsTest
     static void contactModeMembersGetTheHouseholdAddress() {
@@ -321,6 +324,331 @@ private class AddressPropagationTest {
                 'One household address, created once, from the one person who moved.'
             );
         }
+    }
+
+    // ------------------------------------------------- a billing address edited later (R-AD3)
+
+    @IsTest
+    static void aHouseholdBillingEditBecomesItsDefaultAndMovesTheMembers() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            List<Contact> members = new List<Contact>{
+                AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
+                AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
+            };
+            insert members;
+
+            Test.startTest();
+            update new Account(
+                Id = garcia.Id,
+                BillingStreet = WINTER_STREET,
+                BillingCity = WINTER_CITY
+            );
+            Test.stopTest();
+
+            List<Address__c> addresses = [
+                SELECT Street__c, Type__c, Is_Default__c
+                FROM Address__c
+                WHERE Account__c = :garcia.Id
+                ORDER BY CreatedDate, Id
+            ];
+            Assert.areEqual(2, addresses.size(), 'The edit is kept as a new address record.');
+            for (Address__c address : addresses) {
+                Assert.areEqual(
+                    address.Street__c == WINTER_STREET,
+                    address.Is_Default__c,
+                    'The new street is the default and the old one is kept as history.'
+                );
+                Assert.areEqual('Home', address.Type__c, 'A household address is a Home.');
+            }
+            for (Contact member : [SELECT MailingStreet FROM Contact WHERE Id IN :members]) {
+                Assert.areEqual(
+                    WINTER_STREET,
+                    member.MailingStreet,
+                    'Every member moves with the edited billing address.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void barnCrmsOwnBillingWriteIsNotCapturedAgain() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            update new Account(Id = garcia.Id, BillingStreet = WINTER_STREET);
+
+            Test.startTest();
+            // Writes the billing address from the address record, which fires the account
+            // trigger again: that write must not come back as a capture.
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = MEMBER_OWN_STREET,
+                City__c = MEMBER_OWN_CITY,
+                Is_Default__c = true
+            );
+            // A save that leaves the billing address as it is adds nothing either.
+            update new Account(Id = garcia.Id, Description = 'Moved in May');
+            Test.stopTest();
+
+            Assert.areEqual(
+                3,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
+                'One address on insert, one for the edit, one added on the card: no echo of either.'
+            );
+            Account household = [SELECT BillingStreet FROM Account WHERE Id = :garcia.Id];
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                household.BillingStreet,
+                'The default added on the card is the billing address.'
+            );
+        }
+    }
+
+    @IsTest
+    static void twoHundredHouseholdBillingEditsAreCapturedInOneSave() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < TWO_HUNDRED; i++) {
+                Account household = householdAt(i + ' Sunset Lane');
+                household.Name = 'The Bulk Family ' + i;
+                households.add(household);
+            }
+            insert households;
+            List<Contact> members = new List<Contact>();
+            for (Integer i = 0; i < TWO_HUNDRED; i++) {
+                members.add(AddressTestDataFactory.newContact('Ana', 'Bulk' + i, households[i].Id));
+            }
+            insert members;
+            List<Account> edits = new List<Account>();
+            for (Integer i = 0; i < TWO_HUNDRED; i++) {
+                edits.add(new Account(Id = households[i].Id, BillingStreet = i + ' Winter Road'));
+            }
+
+            Test.startTest();
+            update edits;
+            Test.stopTest();
+
+            Assert.areEqual(
+                TWO_HUNDRED * 2,
+                [SELECT COUNT() FROM Address__c WHERE Account__c IN :households],
+                'Each household keeps its first address and gains one for the edit.'
+            );
+            Integer movedDefaults = 0;
+            for (Address__c address : [
+                SELECT Street__c
+                FROM Address__c
+                WHERE Account__c IN :households AND Is_Default__c = TRUE
+            ]) {
+                movedDefaults += address.Street__c.endsWith(' Winter Road') ? 1 : 0;
+            }
+            Assert.areEqual(
+                TWO_HUNDRED,
+                movedDefaults,
+                'Every household has the edit as its default.'
+            );
+            Integer movedMembers = 0;
+            for (Contact member : [SELECT MailingStreet FROM Contact WHERE Id IN :members]) {
+                movedMembers += member.MailingStreet?.endsWith(' Winter Road') == true ? 1 : 0;
+            }
+            Assert.areEqual(TWO_HUNDRED, movedMembers, 'Every member moved with their household.');
+        }
+    }
+
+    @IsTest
+    static void aBillingEditOnAHouseholdWithANativeGroupIsLeftAlone() {
+        System.runAs(TestUsers.admin()) {
+            Account nativeHousehold = householdAt(HOME_STREET);
+            insert nativeHousehold;
+            Contact member = AddressTestDataFactory.newContact(
+                'Maria',
+                'Garcia',
+                nativeHousehold.Id
+            );
+            insert member;
+            Account before = [
+                SELECT
+                    Id,
+                    RecordTypeId,
+                    BillingStreet,
+                    BillingCity,
+                    BillingState,
+                    BillingPostalCode,
+                    BillingCountry
+                FROM Account
+                WHERE Id = :nativeHousehold.Id
+            ];
+            Account edited = before.clone(true);
+            edited.BillingStreet = WINTER_STREET;
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasNativeHouseholdGroups = true;
+            OrgShapeDetector.overrideShape = shape;
+            HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{
+                nativeHousehold.Id
+            };
+
+            Test.startTest();
+            driveAfterUpdate(
+                new AccountAddressHandler(),
+                new List<SObject>{ edited },
+                new Map<Id, SObject>{ before.Id => before }
+            );
+            Test.stopTest();
+
+            Assert.isFalse(edited.hasErrors(), 'The save is not refused.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :nativeHousehold.Id],
+                'Nonprofit Cloud manages this household, so its billing edit is not captured.'
+            );
+            Assert.isNull(
+                [SELECT MailingStreet FROM Contact WHERE Id = :member.Id].MailingStreet,
+                'And its members are not moved.'
+            );
+        }
+    }
+
+    // ------------------------------------------- members who keep their own address (R-AD3)
+
+    @IsTest
+    static void aMemberWithAnAddressOfTheirOwnStaysWhenTheHouseholdMoves() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert new List<Contact>{ ana, luis };
+            insert personalAddress(ana.Id);
+
+            Test.startTest();
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Is_Default__c = true
+            );
+            update new Account(Id = garcia.Id, BillingCity = 'Mesa');
+            Test.stopTest();
+
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
+                'Ana has an address of her own, so neither household move reaches her.'
+            );
+            Contact moved = [SELECT MailingStreet, MailingCity FROM Contact WHERE Id = :luis.Id];
+            Assert.areEqual(WINTER_STREET, moved.MailingStreet, 'Luis moves with the household.');
+            Assert.areEqual('Mesa', moved.MailingCity, 'Including the billing edit.');
+        }
+    }
+
+    @IsTest
+    static void theSeasonalSwapLeavesAMemberWithAnAddressOfTheirOwn() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdAt(HOME_STREET);
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert new List<Contact>{ ana, luis };
+            insert personalAddress(ana.Id);
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = AddressService.TYPE_SEASONAL,
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Seasonal_Start_Month__c = 1,
+                Seasonal_Start_Day__c = 1,
+                Seasonal_End_Month__c = 3,
+                Seasonal_End_Day__c = 31
+            );
+
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.Id },
+                Date.newInstance(2027, 2, 14)
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, summary.movedIn, 'The household moved to its winter address.');
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'Luis goes south with the household.'
+            );
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
+                'Ana keeps the address of her own.'
+            );
+        }
+    }
+
+    @IsTest
+    static void inJunctionModeAHouseholdThatIsNotAPersonsOwnDoesNotMoveThem() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            Account nowak = AddressTestDataFactory.newHousehold('The Nowak Family');
+            insert new List<Account>{ garcia, nowak };
+            Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nowak');
+            Contact luis = HouseholdTestDataFactory.newContact('Luis', 'Garcia');
+            insert new List<Contact>{ ana, luis };
+            // Ana's household is the Nowaks', where she is the primary member; she also
+            // belongs to the Garcias'. Luis's only household is the Garcias'.
+            insert new List<Household_Member__c>{
+                new Household_Member__c(
+                    Household__c = nowak.Id,
+                    Contact__c = ana.Id,
+                    Is_Primary__c = true
+                ),
+                new Household_Member__c(Household__c = garcia.Id, Contact__c = ana.Id),
+                new Household_Member__c(
+                    Household__c = garcia.Id,
+                    Contact__c = luis.Id,
+                    Is_Primary__c = true
+                )
+            };
+
+            Test.startTest();
+            insert new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Is_Default__c = true
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :luis.Id].MailingStreet,
+                'Luis moves with his household.'
+            );
+            Assert.isNull(
+                [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id].MailingStreet,
+                'The Garcias are not Ana\'s household, so their address does not move her.'
+            );
+        }
+    }
+
+    private static Account householdAt(String street) {
+        Account household = AddressTestDataFactory.newHousehold('The Garcia Family');
+        household.BillingStreet = street;
+        household.BillingCity = HOME_CITY;
+        return household;
+    }
+
+    /** A default address owned by one person, as "Only that person moves" makes one. */
+    private static Address__c personalAddress(Id contactId) {
+        return new Address__c(
+            Contact__c = contactId,
+            Type__c = 'Home',
+            Street__c = MEMBER_OWN_STREET,
+            City__c = MEMBER_OWN_CITY,
+            Is_Default__c = true
+        );
     }
 
     /**

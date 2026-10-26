@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">Accounting_Export</value>
     </values>
     <values>
+        <field>Navigation_Label__c</field>
+        <value xsi:type="xsd:string">Accounting Export</value>
+    </values>
+    <values>
         <field>Sort_Order__c</field>
         <value xsi:type="xsd:double">90</value>
     </values>

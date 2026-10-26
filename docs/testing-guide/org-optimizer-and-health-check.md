@@ -17,7 +17,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Look at the vertical tabs. | **Overview**, **Data quality**, **Duplicates**, **Field utilization**, **Health Check**, **Errors**, **Storage and limits**, **Unused setup**. |
 | 4 | Click **Open** on **Errors**. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
 | 5 | Choose **Health Check**. | **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
-| 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What we found in your org** and grouped findings. |
+| 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
 | 7 | Choose **Overview**, then **Health Check** again. | The same report shows without running again. |
 
 **Cleanup:** None.
@@ -30,7 +30,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Org Optimizer** tab. |
-| 2 | As admin, give the staff user **BarnCRM Find and Export** in **BarnCRM Settings**, **Access**, **Extra permissions**. | A message says the staff user now has it. |
+| 2 | As admin, give the staff user **BarnCRM Find and Export** in **BarnCRM Settings**, **Access**, **Extra Permissions**. | A message says the staff user now has it. |
 | 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Data quality**. **Overview** lists one section. |
 | 4 | Choose **Data quality**. | The checks count with the staff user's own access. |
 
@@ -44,8 +44,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings** and choose **Health**. | **Health Check**, **What BarnCRM found in your org, and what to do about it.** The card **What we found in your org** shows what was detected (for example **Person Accounts enabled**), **Coexistence mode** and **Recommended**. |
-| 2 | Read the findings. | Grouped under **Your org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
+| 1 | Open **BarnCRM Settings** and choose **Health**. | **Health Check**, **What BarnCRM found in your org, and what to do about it.** The card **What We Found in Your Org** shows what was detected (for example **Person Accounts enabled**), **Coexistence mode** and **Recommended**. |
+| 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
 | 3 | Find **Your org at a glance**. | An **Information** finding that ends by saying Shield Platform Encryption cannot be detected from inside the app. |
 | 4 | Find the automation finding. | **Automation is running normally**, **Information**. |
 | 5 | Click **Re-run**. | **Reading your org**, then the report again. |
@@ -59,12 +59,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **BarnCRM Settings**, **Health**, find **Nightly jobs are not scheduled**. | It names the jobs, for example **Seasonal address swap**, **Error digest email**, **Empty household tidy-up**, and has **Schedule all nightly jobs**. |
+| 1 | On **BarnCRM Settings**, **Health**, find **Nightly jobs are not scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule all nightly jobs**. |
 | 2 | Click **Schedule all nightly jobs**. | A dialog **Before this fix runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
 | 4 | Click **Schedule all nightly jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly jobs are not scheduled** is gone. |
-| 5 | In **BarnCRM Settings**, scroll to **Recent changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
-| 6 | Open **BarnCRM Settings**, **Addresses**. | The seasonal address swap shows as scheduled, so the job can be stopped on its own page. |
+| 5 | In **BarnCRM Settings**, open **General** and scroll to **Recent Changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
 
 **Cleanup:** None. Leave the jobs scheduled.
 
@@ -85,7 +85,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-06: Health Check as the read-only user
 
 **Purpose:** Confirm someone without Manage BarnCRM Settings can read the report but not fix anything, and access checks are skipped.
-**Prerequisites:** read-only; admin to make a finding with a button (stop one nightly job on its page, for example the seasonal address swap on **BarnCRM Settings**, **Addresses**).
+**Prerequisites:** read-only; admin to make a finding with a button (stop one nightly job on its page, for example the error digest on **BarnCRM Settings**, **Error Log**).
 
 | Step | Action | Expected result |
 |---|---|---|

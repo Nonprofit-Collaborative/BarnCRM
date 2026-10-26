@@ -39,6 +39,7 @@ public with sharing class SettingDefinitionSelector {
                 Record_Object__c,
                 Component__c,
                 Navigation_Target__c,
+                Navigation_Label__c,
                 Description__c,
                 Help_Path__c,
                 Required_Permission__c,
