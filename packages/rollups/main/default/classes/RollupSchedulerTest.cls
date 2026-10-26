@@ -4,7 +4,7 @@
  * Core holds no giving objects, so the run here counts organizations up to their parent account
  * (`ParentId`), as `RollupEngineTest` does.
  */
-@IsTest(testFor='ApexClass:RollupScheduler')
+@IsTest(testFor='ApexClass:RollupScheduler, ApexClass:RollupsEngineExtension')
 private class RollupSchedulerTest {
     @TestSetup
     static void createTestUser() {
@@ -230,6 +230,105 @@ private class RollupSchedulerTest {
                 second,
                 'The same job, so a second click changes nothing'
             );
+        }
+    }
+
+    private static void saveHour(Integer hour) {
+        SettingsService.saveValues(
+            RollupService.SETTINGS_OBJECT,
+            new Map<String, Object>{ RollupScheduler.HOUR_SETTING => hour }
+        );
+    }
+
+    private static String cronOf(String jobName) {
+        return [
+            SELECT CronExpression
+            FROM CronTrigger
+            WHERE CronJobDetail.Name = :jobName
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]
+        .CronExpression;
+    }
+
+    private static void useJobNameOfItsOwn() {
+        RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
+    }
+
+    @IsTest
+    static void theNightlyRunStartsAtTwoUntilTheSettingSaysOtherwise() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            useJobNameOfItsOwn();
+            Assert.areEqual(2, RollupScheduler.nightlyHour(), 'Blank means 2:00 AM');
+            Assert.isTrue(RollupScheduler.nightlyTime().contains('2:00'), 'Read as a time');
+
+            saveHour(22);
+            Test.startTest();
+            RollupScheduler.start();
+            Test.stopTest();
+
+            Assert.areEqual(22, RollupScheduler.nightlyHour(), 'The saved hour');
+            Assert.areEqual('0 0 22 * * ?', cronOf(RollupScheduler.jobName()), 'Every day at 22');
+        }
+    }
+
+    @IsTest
+    static void savingANewHourMovesTheScheduledRun() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            useJobNameOfItsOwn();
+            RollupScheduler.start();
+            Assert.areEqual('0 0 2 * * ?', cronOf(RollupScheduler.jobName()), 'At 2 first');
+
+            Test.startTest();
+            saveHour(5);
+            Test.stopTest();
+
+            Assert.areEqual(
+                '0 0 5 * * ?',
+                cronOf(RollupScheduler.jobName()),
+                'Saving the hour moved it'
+            );
+            String name = RollupScheduler.jobName();
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :name WITH SYSTEM_MODE],
+                'Still one nightly run'
+            );
+        }
+    }
+
+    @IsTest
+    static void savingANewHourSchedulesNothingWhenTheRunIsOff() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            useJobNameOfItsOwn();
+
+            Test.startTest();
+            saveHour(5);
+            Test.stopTest();
+
+            Assert.isFalse(RollupScheduler.isScheduled(), 'The hour alone starts nothing');
+        }
+    }
+
+    @IsTest
+    static void theTonightRunIsSetForTheNightlyHour() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            useJobNameOfItsOwn();
+            saveHour(23);
+
+            Test.startTest();
+            RollupScheduler.scheduleTonight();
+            Test.stopTest();
+
+            String pattern = RollupScheduler.jobName() + ' %';
+            CronTrigger tonight = [
+                SELECT CronExpression
+                FROM CronTrigger
+                WHERE CronJobDetail.Name LIKE :pattern
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ];
+            Assert.isTrue(tonight.CronExpression.startsWith('0 0 23 '), 'At 23 that night');
         }
     }
 }

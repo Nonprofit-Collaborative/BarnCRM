@@ -93,8 +93,8 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Status shown when the nightly schedule exists.</shortDescription>
-        <value>Nightly recalculation is scheduled for 2:00 AM.</value>
+        <shortDescription>Status when the nightly run is scheduled: {0} is its time</shortDescription>
+        <value>Nightly recalculation is scheduled for {0}.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ScheduleMissing</fullName>

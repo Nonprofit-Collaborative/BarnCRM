@@ -979,7 +979,8 @@ Setup Assistant (C-12) keys arrived early and are listed in the table above, whe
 assistant that wrote them (they are Giving keys from v0.6, Section 21A). The two rollup keys
 published here, `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved with the engine to
 the BarnCRM Rollup Builder module's own `Rollup_Settings__c` (Section 14B, ADR-0125), with
-their API names and definitions unchanged.
+their API names and definitions unchanged. A third rollup key, `Nightly_Run_Hour__c`, was
+added there directly (Section 14B, ADR-0136).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -1952,7 +1953,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   unsaved definition for one record through `RollupEngine.preview`, which writes nothing, and
   counts the target records it would maintain in user mode. `RollupController.estimateFullRun`
   counts the records Recalculate all goes through at a fixed rough rate (1,650 records a
-  minute, to be measured on an org), and `runTonight` sets up one 2:00 AM run through
+  minute, to be measured on an org), and `runTonight` sets up one run at the nightly hour (Section 14B) through
   `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled. Needs
   attention (S13), `rollupNeedsAttention` under the list, reads the Rollup Queue in user mode
   through `RollupAttentionController` (records waiting and the oldest's age, one row per record
@@ -2185,14 +2186,23 @@ sets it again. Their Setting Definition rows name this object in `Settings_Objec
 settings console shows them in its Rollups section as before.
 
 - **Custom setting:** `Rollup_Settings__c`, hierarchy, protected.
-- **Defaults (ADR-0035):** both keys are text, so the field default only fills a record the
-  platform creates; the readers in `RollupService` treat blank, and anything outside the
+- **Defaults (ADR-0035):** the field default only fills a record the platform creates; the
+  readers in `RollupService` and `RollupScheduler` treat blank, and anything outside the
   allowed values, as the shipped value.
+- **Nightly run hour (ADR-0136):** the settings console shows `Nightly_Run_Hour__c` as a
+  picklist of the 24 hours (values 0 to 23, labels 12:00 AM (midnight) to 11:00 PM) from its Setting Definition
+  row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
+  Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
+  nightly run at once: Core's settings service hands every changed key to the engine through
+  the third engine seam (`RollupEngineExtensionV3.afterSettingsSaved`, ADR-0125 decision 4),
+  and `RollupScheduler.reschedule` replaces the job when one is scheduled and starts nothing
+  when none is.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
+| `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
 
 ---
 
@@ -8897,6 +8907,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup Builder offers standard objects (`decisions/0136-rollup-builder-dlrs-parity.md`). No object or field added. R-R7 says a standard object named in a definition is data offered through describe, not a dependency (ADR-0013), and which objects the Builder offers. R-R12 says what the Builder does for a source entity with no rollup trigger: it says so, does not offer Instantly alone, and a save or mode change to Instantly alone is refused. |
 | v0.8 | 2026-10-26 | Rollup Builder parity: parent-field criteria and picklist targets (ADR-0136, gap report rows P5 and P7). No object or field added. R-R2: the Rollup Builder's source filter offers the fields of a record each lookup of the counted records points to, one lookup deep. R-R10: the Builder's save refuses a filter path of more than one lookup, through a lookup to more than one object, or to a field the administrator cannot read, and a picklist target filled from anything but a picklist or text, or from a picklist with a value the target lacks. R-R11: a parent's change marks the totals when the parent has the rollup trigger, otherwise the nightly run or Recalculate catches it. R-R15: FIRST and LAST fill picklist targets; a value the target does not have is left out and logged. |
 | v0.8 | 2026-10-26 | Rollup Builder parity operations (ADR-0136). Rollup Definition gains `Bypass_Permission__c` (Section 14) with rule R-R4a: holders of the named custom permission skip the rollup on their saves, and a name with no custom permission in the org is refused on save. Section 14 records two new `global` surfaces: the Flow action `RollupRecalcRecordAction` ("Recalculate totals on this record") and the Apex class `RollupApi`. |
+| v0.8 | 2026-10-26 | Nightly rollup run hour (ADR-0136, DLRS parity P10). `Rollup_Settings__c` gains `Nightly_Run_Hour__c` (Number, default 2, Section 14B), shown as a picklist of hours. The nightly job and Run tonight start at it, and saving a new hour moves the scheduled nightly run through a third rollup engine seam, `RollupEngineExtensionV3`, that Core's settings service calls after every settings save. |
 
 ---
 ## 32. Entity ownership by package

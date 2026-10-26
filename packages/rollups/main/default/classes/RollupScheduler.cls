@@ -21,8 +21,32 @@ public with sharing class RollupScheduler implements Schedulable {
         return jobNameInUse;
     }
 
-    /** Two in the morning, which is after the day's data entry and before the day's reporting. */
-    private static final String NIGHTLY_CRON = '0 0 2 * * ?';
+    /** The setting that holds the hour the nightly run starts (Section 14B, ADR-0136). */
+    public static final String HOUR_SETTING = 'Nightly_Run_Hour__c';
+
+    /**
+     * Two in the morning, after the day's data entry and before the day's reporting: the hour
+     * when the setting is blank or out of range.
+     */
+    public static final Integer DEFAULT_HOUR = 2;
+
+    /** The hour the nightly run starts, 0 to 23, in the scheduling user's time zone. */
+    public static Integer nightlyHour() {
+        Object stored = SettingsService.getValue(RollupService.SETTINGS_OBJECT, HOUR_SETTING);
+        Integer hour = stored == null ? null : Decimal.valueOf(String.valueOf(stored)).intValue();
+        return hour == null || hour < 0 || hour > 23 ? DEFAULT_HOUR : hour;
+    }
+
+    /** The nightly run's hour as the person reading it writes a time, for example 2:00 AM. */
+    public static String nightlyTime() {
+        return Datetime.newInstance(Date.today(), Time.newInstance(nightlyHour(), 0, 0, 0))
+            .format('h:mm a');
+    }
+
+    /** Every day at the nightly hour. */
+    private static String nightlyCron() {
+        return '0 0 ' + nightlyHour() + ' * * ?';
+    }
 
     /**
      * True for the one run Recalculate all sets up for tonight, which covers every definition;
@@ -72,7 +96,21 @@ public with sharing class RollupScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return ScheduledJobSelector.schedule(jobNameInUse, NIGHTLY_CRON, new RollupScheduler());
+        return ScheduledJobSelector.schedule(jobNameInUse, nightlyCron(), new RollupScheduler());
+    }
+
+    /**
+     * Moves the nightly run to the hour the setting now holds, when it is scheduled; does
+     * nothing when it is not, so changing the hour never starts a run nobody asked for. The
+     * settings service calls this through the engine seam when the hour is saved.
+     */
+    public static void reschedule() {
+        Id existing = scheduledJobId();
+        if (existing == null) {
+            return;
+        }
+        ScheduledJobSelector.abort(existing);
+        ScheduledJobSelector.schedule(jobNameInUse, nightlyCron(), new RollupScheduler());
     }
 
     /** Stops the nightly run. */
@@ -89,13 +127,14 @@ public with sharing class RollupScheduler implements Schedulable {
     }
 
     /**
-     * Sets up one run for the coming 2:00 AM in the running user's time zone, for Recalculate
-     * all when the nightly run is not scheduled (slice S12). Like Recalculate all, it covers
-     * every active definition. The job carries the night's date in its name, so asking twice
-     * sets up one run.
+     * Sets up one run for the coming nightly hour (2:00 AM unless the setting says otherwise)
+     * in the running user's time zone, for Recalculate all when the nightly run is not
+     * scheduled (slice S12). Like Recalculate all, it covers every active definition. The job
+     * carries the night's date in its name, so asking twice sets up one run.
      */
     public static Id scheduleTonight() {
-        Date night = Integer.valueOf(Datetime.now().format('H')) < 2
+        Integer hour = nightlyHour();
+        Date night = Integer.valueOf(Datetime.now().format('H')) < hour
             ? Date.today()
             : Date.today().addDays(1);
         String name = jobNameInUse + ' ' + String.valueOf(night);
@@ -103,7 +142,10 @@ public with sharing class RollupScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        String cron = '0 0 2 ' + night.day() + ' ' + night.month() + ' ? ' + night.year();
+        String cron = String.join(
+            new List<Object>{ '0 0', hour, night.day(), night.month(), '?', night.year() },
+            ' '
+        );
         return ScheduledJobSelector.schedule(name, cron, new RollupScheduler(true));
     }
 

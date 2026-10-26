@@ -62,6 +62,9 @@ public with sharing class RollupController {
         public Boolean scheduled { get; set; }
         @AuraEnabled
         public Datetime nextRunAt { get; set; }
+        /** The nightly run's time as the reader writes it, for example 2:00 AM. */
+        @AuraEnabled
+        public String nightlyTime { get; set; }
         @AuraEnabled
         public Datetime lastCalculated { get; set; }
         @AuraEnabled
@@ -263,9 +266,9 @@ public with sharing class RollupController {
 
     /**
      * Recalculate all, tonight: nothing extra when the nightly run is scheduled, since it
-     * recalculates every Every night and Both total at 2:00 AM and each save keeps the Instantly
-     * ones (a second run at the same moment would only be refused as one already running);
-     * otherwise one run of every definition at 2:00 AM tonight.
+     * recalculates every Every night and Both total at the nightly hour and each save keeps the
+     * Instantly ones (a second run at the same moment would only be refused as one already
+     * running); otherwise one run of every definition at the next nightly hour.
      *
      * @return what to tell the administrator
      */
@@ -274,11 +277,12 @@ public with sharing class RollupController {
         try {
             requirePermission();
             refuseWhileTurnedOff();
+            List<String> nightly = new List<String>{ RollupScheduler.nightlyTime() };
             if (RollupScheduler.isScheduled()) {
-                return Label.Core_RollupBuilder_TonightAlreadyScheduled;
+                return String.format(Label.Core_RollupBuilder_TonightAlreadyScheduled, nightly);
             }
             RollupScheduler.scheduleTonight();
-            return Label.Core_RollupBuilder_TonightScheduled;
+            return String.format(Label.Core_RollupBuilder_TonightScheduled, nightly);
         } catch (Exception caught) {
             throw asUserError(caught, 'Recalculate all rollups tonight');
         }
@@ -289,6 +293,7 @@ public with sharing class RollupController {
         page.canManage = canManage();
         page.scheduled = RollupScheduler.isScheduled();
         page.nextRunAt = RollupScheduler.nextRunAt();
+        page.nightlyTime = RollupScheduler.nightlyTime();
         page.lastCalculated = RollupService.lastCalculated();
         page.stale = RollupService.isStale();
         page.defaultMode = RollupService.defaultMode();

@@ -2,7 +2,7 @@
  * Core finds the Rollup Builder module's engine by name, or works without it (ADR-0125): the
  * resolver's own answers, and each Core caller with an engine present and absent.
  */
-@IsTest(testFor='ApexClass:RollupEngineExtensions')
+@IsTest(testFor='ApexClass:RollupEngineExtensions, ApexClass:SettingsService')
 private class RollupEngineExtensionsTest {
     @TestSetup
     static void createTheAdmin() {
@@ -10,7 +10,7 @@ private class RollupEngineExtensionsTest {
     }
 
     /** Records what Core asked of the engine. */
-    private class RecordingEngine implements RollupEngineExtension {
+    private virtual class RecordingEngine implements RollupEngineExtension {
         public List<String> calls = new List<String>();
         public void afterMerge(String targetObject, List<SObject> mergedRecords) {
             calls.add('afterMerge ' + targetObject);
@@ -33,6 +33,74 @@ private class RollupEngineExtensionsTest {
         public Map<String, Set<String>> targetFieldsByObject() {
             calls.add('targetFieldsByObject');
             return new Map<String, Set<String>>{ 'Contact' => new Set<String>{ 'Description' } };
+        }
+    }
+
+    /** An engine with the settings seam (V3), which can be told to fail. */
+    private class SettingsListeningEngine extends RecordingEngine implements RollupEngineExtensionV3 {
+        public Boolean fail = false;
+        public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+            calls.add('afterSettingsSaved ' + settingsObject + ' ' + changedKeys);
+            if (fail) {
+                throw new System.IllegalArgumentException('The engine failed');
+            }
+        }
+    }
+
+    @IsTest
+    static void aSettingsSaveTellsTheEngineWhatChanged() {
+        System.runAs(TestUsers.admin()) {
+            SettingsListeningEngine engine = new SettingsListeningEngine();
+            RollupEngineExtensions.extensionOverride = engine;
+
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 7 }
+            );
+
+            Assert.areEqual(
+                new List<String>{
+                    'afterSettingsSaved BarnCRM_Settings__c {Fiscal_Year_Start_Month__c}'
+                },
+                engine.calls,
+                'Told the settings object and the changed field, without a prefix'
+            );
+        }
+    }
+
+    @IsTest
+    static void aFailingEngineDoesNotUndoTheSettingsSave() {
+        System.runAs(TestUsers.admin()) {
+            SettingsListeningEngine engine = new SettingsListeningEngine();
+            engine.fail = true;
+            RollupEngineExtensions.extensionOverride = engine;
+
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 4 }
+            );
+
+            Assert.areEqual(1, engine.calls.size(), 'The engine was asked');
+            Assert.areEqual(
+                4,
+                Integer.valueOf(
+                    String.valueOf(SettingsService.getValue('Fiscal_Year_Start_Month__c'))
+                ),
+                'The setting is saved all the same'
+            );
+        }
+    }
+
+    @IsTest
+    static void anEngineWithoutTheSettingsSeamIsNotAsked() {
+        System.runAs(TestUsers.admin()) {
+            RecordingEngine engine = new RecordingEngine();
+            RollupEngineExtensions.extensionOverride = engine;
+
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 7 }
+            );
+
+            Assert.isNull(RollupEngineExtensions.findV3(), 'No third seam');
+            Assert.isTrue(engine.calls.isEmpty(), 'Nothing asked');
         }
     }
 
