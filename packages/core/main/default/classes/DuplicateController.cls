@@ -52,6 +52,9 @@ public with sharing class DuplicateController {
         public Datetime foundAt;
         @AuraEnabled
         public String ruleLabel;
+        /** Why it is proposed: the match source's reason (R-DP6), else the rule's name. */
+        @AuraEnabled
+        public String reason;
         @AuraEnabled
         public List<RecordView> records = new List<RecordView>();
         @AuraEnabled
@@ -288,6 +291,10 @@ public with sharing class DuplicateController {
             allKeys.addAll(keys);
         }
         Set<String> dismissed = DuplicateSelector.dismissedKeys(allKeys);
+        Map<String, String> reasons = new Map<String, String>();
+        for (Duplicate_Reason__c reason : DuplicateSelector.reasonRows(keysBySet.keySet())) {
+            reasons.put(reason.Set_Id__c, reason.Reason__c);
+        }
         Map<Id, RecordView> byRecord = describeRecords(recordIds);
         List<SuggestionView> result = new List<SuggestionView>();
         for (DuplicateRecordSet found : sets) {
@@ -299,6 +306,8 @@ public with sharing class DuplicateController {
             view.setId = found.Id;
             view.foundAt = found.CreatedDate;
             view.ruleLabel = found.DuplicateRule == null ? null : found.DuplicateRule.MasterLabel;
+            String sourceReason = reasons.get(String.valueOf(found.Id));
+            view.reason = sourceReason != null ? sourceReason : view.ruleLabel;
             Boolean complete = found.DuplicateRecordItems.size() > 1;
             for (DuplicateRecordItem item : found.DuplicateRecordItems) {
                 RecordView record = byRecord.get(item.RecordId);

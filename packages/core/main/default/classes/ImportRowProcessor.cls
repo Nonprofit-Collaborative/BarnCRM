@@ -2598,10 +2598,11 @@ public with sharing class ImportRowProcessor {
     // -------------------------------------------------------------------------------------
 
     /**
-     * Asks the org's duplicate rules about each person the rule found nobody for: not given by
-     * record ID, not created by an earlier chunk, on a row not already rejected. A person they
-     * match is loaded into that record; several follow Several Matches (R-IT9). A row whose two
-     * people they match to one record is rejected, since one record cannot be both.
+     * Asks the org's duplicate rules, then the match sources, about each person the rule found
+     * nobody for: not given by record ID, not created by an earlier chunk, on a row not already
+     * rejected. A person they match is loaded into that record; several follow Several Matches
+     * (R-IT9). A row whose two people they match to one record is rejected, since one record
+     * cannot be both.
      */
     private static void matchPeopleByDuplicateRules(
         List<Working> working,
@@ -2611,6 +2612,7 @@ public with sharing class ImportRowProcessor {
         Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
         Id recordTypeId = personAccounts ? anyPersonRecordTypeId() : null;
         List<SObject> probes = new List<SObject>();
+        List<Map<String, String>> values = new List<Map<String, String>>();
         List<Working> owners = new List<Working>();
         List<Boolean> isFirst = new List<Boolean>();
         for (Working item : working) {
@@ -2631,6 +2633,7 @@ public with sharing class ImportRowProcessor {
                         recordTypeId
                     )
                 );
+                values.add(item.byEntity.get(entity));
                 owners.add(item);
                 isFirst.add(which == 1);
             }
@@ -2638,17 +2641,30 @@ public with sharing class ImportRowProcessor {
         if (probes.isEmpty()) {
             return;
         }
-        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
-            probes,
-            personAccounts ? OrgShapeDetector.personRecordTypeIds() : null
-        );
+        Set<Id> allowedTypes = personAccounts ? OrgShapeDetector.personRecordTypeIds() : null;
+        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, allowedTypes);
         if (found == null) {
             outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
-            return;
         }
+        // The match sources answer for a person the rules found nobody for, or could not ask
+        // about: values on related records the rules cannot see (ADR-0133). A person the rules
+        // matched is not looked up (null), and a source candidate counts only when its last
+        // name agrees with the person's.
+        List<Map<String, String>> unmatched = new List<Map<String, String>>();
+        for (Integer i = 0; i < probes.size(); i++) {
+            unmatched.add(found != null && !found[i].isEmpty() ? null : values[i]);
+        }
+        List<List<SObject>> bySource = ImportDuplicateRuleMatcher.matchesBySources(
+            type,
+            unmatched,
+            allowedTypes
+        );
         for (Integer i = 0; i < probes.size(); i++) {
             Working item = owners[i];
-            Id matched = chosenByRule(item, found[i], Label.Core_Import_ErrorSeveralPeopleMatch);
+            List<SObject> candidates = found != null && !found[i].isEmpty()
+                ? found[i]
+                : bySource[i];
+            Id matched = chosenByRule(item, candidates, Label.Core_Import_ErrorSeveralPeopleMatch);
             if (matched == null) {
                 continue;
             }

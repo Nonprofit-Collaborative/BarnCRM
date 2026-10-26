@@ -9,6 +9,14 @@
         <value>Open Duplicate Rules in Setup</value>
     </labels>
     <labels>
+        <fullName>Core_MatchSource_RowCapReached</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log warning: {0} is the match source, {1} the row cap</shortDescription>
+        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates it would find may be missed. If its values are very common, consider archiving it on the Custom metadata page.</value>
+    </labels>
+    <labels>
         <fullName>Core_Duplicates_Cancel</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -375,5 +383,29 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: view dismissed pairs link</shortDescription>
         <value>View</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonEmail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same email on {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonPhone</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same phone on {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ReasonAddress</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Why a pair is proposed; {0} is the match source name</shortDescription>
+        <value>Same address on {0}</value>
     </labels>
 </CustomLabels>

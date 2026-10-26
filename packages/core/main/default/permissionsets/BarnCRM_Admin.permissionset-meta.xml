@@ -777,6 +777,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>true</editable>
+    <field>Duplicate_Reason__c.Reason__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>false</editable>
     <field>Erasure__c.Contact__c</field>
     <readable>true</readable>
@@ -1438,6 +1443,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Duplicate_Dismissal__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Duplicate_Reason__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

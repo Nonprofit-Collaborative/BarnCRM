@@ -537,4 +537,195 @@ private class ImportDuplicateRuleMatchTest {
             );
         }
     }
+
+    // ------------------------------------------------------------------ match sources
+
+    /** The one source in use: addresses held on Address records, by person. */
+    private static void addressSourceOnly() {
+        MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+            (Match_Source__mdt) JSON.deserialize(
+                JSON.serialize(
+                    new Map<String, Object>{
+                        'DeveloperName' => 'Address_Person',
+                        'MasterLabel' => 'Address (person)',
+                        NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+                        NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
+                        NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
+                        NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+                        NamespaceUtil.qualify('Normalization__c') => 'Address'
+                    }
+                ),
+                Match_Source__mdt.class
+            )
+        };
+    }
+
+    /** A people template matching by email, its rows giving a name and an address. */
+    private static void givenAddresses(List<Map<String, String>> values, Boolean useRules) {
+        ImportMapping mapping = new ImportMapping();
+        mapping.columns.add(new ImportMapping.Column('Last', 'Contact1.LastName'));
+        mapping.columns.add(new ImportMapping.Column('Street', 'Contact1.MailingStreet'));
+        mapping.columns.add(new ImportMapping.Column('Zip', 'Contact1.MailingPostalCode'));
+        template = ImportTestDataFactory.template(
+            mapping.serialize(),
+            ImportTemplateService.RULE_EMAIL
+        );
+        template.Use_Duplicate_Rules__c = useRules;
+        update template;
+        template = ImportTemplateSelector.selectById(template.Id);
+        batch = ImportTestDataFactory.batch(template);
+        ImportTestDataFactory.rows(batch, values);
+    }
+
+    /** One existing person, Okonkwo, whose address is held only on an Address record. */
+    private static Contact okonkwoAtHarborRoad() {
+        addressSourceOnly();
+        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+        Contact existing = new Contact(LastName = 'Okonkwo');
+        insert existing;
+        insert new Address__c(
+            Contact__c = existing.Id,
+            Street__c = '7 Harbor Road',
+            Postal_Code__c = '04101'
+        );
+        return existing;
+    }
+
+    @IsTest
+    static void aPersonTheRulesMissIsMatchedThroughARelatedRecord() {
+        System.runAs(TestUsers.admin()) {
+            Contact existing = okonkwoAtHarborRoad();
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => ' OKONKWO ',
+                        'Street' => '7 harbor rd.',
+                        'Zip' => '04101-2200'
+                    }
+                },
+                true
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Import_Row__c loaded = rows()[0];
+            Assert.areEqual(existing.Id, loaded.Contact_1__c, 'Loaded into the person: ' + loaded);
+            Assert.isTrue(loaded.Duplicate_Rule_Match__c, 'Ticked as a looser match.');
+            Assert.areEqual(0, committed.created, 'Nobody created.');
+            Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Still one person.');
+        }
+    }
+
+    @IsTest
+    static void aRelatedRecordMatchWithAnotherLastNameIsNotUsed() {
+        System.runAs(TestUsers.admin()) {
+            Contact existing = okonkwoAtHarborRoad();
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => 'Okonkwo-Bell',
+                        'Street' => '7 harbor rd.',
+                        'Zip' => '04101-2200'
+                    }
+                },
+                true
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Import_Row__c loaded = rows()[0];
+            Assert.areNotEqual(
+                existing.Id,
+                loaded.Contact_1__c,
+                'Same address, another last name: not loaded into Okonkwo: ' + loaded
+            );
+            Assert.isFalse(loaded.Duplicate_Rule_Match__c, 'No looser match.');
+            Assert.areEqual(1, committed.created, 'Handled as unmatched: a new person.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Okonkwo is untouched.');
+        }
+    }
+
+    @IsTest
+    static void twoHundredPeopleAreMatchedThroughRelatedRecordsInOneChunk() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+            Integer count = 200;
+            List<Contact> existing = new List<Contact>();
+            for (Integer index = 0; index < count; index++) {
+                existing.add(new Contact(LastName = 'Bulkperson' + index));
+            }
+            insert existing;
+            List<Address__c> addresses = new List<Address__c>();
+            List<Map<String, String>> incoming = new List<Map<String, String>>();
+            for (Integer index = 0; index < count; index++) {
+                String zip = String.valueOf(10000 + index);
+                addresses.add(
+                    new Address__c(
+                        Contact__c = existing[index].Id,
+                        Street__c = (index + 1) + ' Harbor Road',
+                        Postal_Code__c = zip
+                    )
+                );
+                incoming.add(
+                    new Map<String, String>{
+                        'Last' => 'Bulkperson' + index,
+                        'Street' => (index + 1) + ' harbor rd',
+                        'Zip' => zip
+                    }
+                );
+            }
+            insert addresses;
+            givenAddresses(incoming, true);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            List<Import_Row__c> loaded = rows();
+            Assert.areEqual(count, loaded.size());
+            for (Integer index = 0; index < count; index++) {
+                Assert.areEqual(
+                    existing[index].Id,
+                    loaded[index].Contact_1__c,
+                    'Row ' + index + ' loaded into its person: ' + loaded[index]
+                );
+            }
+            Assert.areEqual(0, committed.created, 'Nobody created.');
+        }
+    }
+
+    @IsTest
+    static void withoutLooserMatchingTheSourcesAreNotAsked() {
+        System.runAs(TestUsers.admin()) {
+            addressSourceOnly();
+            Contact existing = new Contact(LastName = 'Okonkwo');
+            insert existing;
+            insert new Address__c(
+                Contact__c = existing.Id,
+                Street__c = '7 Harbor Road',
+                Postal_Code__c = '04101'
+            );
+            givenAddresses(
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'Last' => 'Okonkwo-Bell',
+                        'Street' => '7 Harbor Road',
+                        'Zip' => '04101'
+                    }
+                },
+                false
+            );
+
+            Test.startTest();
+            run(false);
+            Test.stopTest();
+
+            Assert.areNotEqual(existing.Id, rows()[0].Contact_1__c, 'A new person, as before.');
+        }
+    }
 }

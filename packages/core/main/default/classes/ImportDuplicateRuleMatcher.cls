@@ -149,6 +149,91 @@ public with sharing class ImportDuplicateRuleMatcher {
     }
 
     /**
+     * What the match sources match for each incoming person (R-IT16, ADR-0133
+     * `0133-related-record-matching.md`), in the same shape as `matchesFor`: the records of the
+     * object that hold one of the person's email, phone or address values on an active source,
+     * read back in the user's mode with the allowed record types, and kept only when their last
+     * name agrees with the person's (trimmed, capitals ignored). A shared address or phone
+     * says two records belong together, not that they are one person, so without the name
+     * check one person's row would load into a relative's record. Values are keyed by Contact
+     * attribute name; a null entry (a person already matched) is not looked up.
+     *
+     * @param type Contact, or Account for person accounts
+     * @param people each person's values, or null to skip that person
+     * @param allowedRecordTypes the record types a match may have, or null for any
+     */
+    @NamespaceAccessible
+    public static List<List<SObject>> matchesBySources(
+        Schema.SObjectType type,
+        List<Map<String, String>> people,
+        Set<Id> allowedRecordTypes
+    ) {
+        List<List<SObject>> result = new List<List<SObject>>();
+        if (people == null || people.isEmpty()) {
+            return result;
+        }
+        List<Set<Id>> holders = MatchSourceService.holdersOfPeople(type, people);
+        Set<Id> all = new Set<Id>();
+        for (Set<Id> ids : holders) {
+            all.addAll(ids);
+        }
+        Map<Id, SObject> visible = visible(type, all, allowedRecordTypes);
+        Map<Id, String> lastNames = lastNamesOf(type, visible.keySet());
+        for (Integer index = 0; index < holders.size(); index++) {
+            String lastName = comparableName(
+                people[index] == null ? null : people[index].get(LAST_NAME)
+            );
+            List<SObject> kept = new List<SObject>();
+            for (Id matched : holders[index]) {
+                if (
+                    lastName != null &&
+                    visible.containsKey(matched) &&
+                    lastName == lastNames.get(matched)
+                ) {
+                    kept.add(visible.get(matched));
+                }
+            }
+            result.add(kept);
+        }
+        return result;
+    }
+
+    private static final String LAST_NAME = 'LastName';
+
+    private static String comparableName(String value) {
+        return String.isBlank(value) ? null : value.trim().toLowerCase();
+    }
+
+    /**
+     * The last name of each record, trimmed and in lower case: a contact's, or a person
+     * account's person last name, read by name since only a person account org has it on
+     * Account. User mode; a record whose name the user may not read is left out.
+     */
+    private static Map<Id, String> lastNamesOf(Schema.SObjectType type, Set<Id> ids) {
+        Map<Id, String> result = new Map<Id, String>();
+        if (
+            ids.isEmpty() ||
+            !type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .fields.getMap()
+                .containsKey(LAST_NAME.toLowerCase())
+        ) {
+            return result;
+        }
+        for (
+            SObject record : Database.queryWithBinds(
+                'SELECT Id, LastName FROM ' +
+                    type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                    ' WHERE Id IN :ids',
+                new Map<String, Object>{ 'ids' => ids },
+                AccessLevel.USER_MODE
+            )
+        ) {
+            result.put(record.Id, comparableName((String) record.get(LAST_NAME)));
+        }
+        return result;
+    }
+
+    /**
      * Whether the last `matchesFor` answered null because the matcher failed, with a rule
      * active or the rules unreadable, rather than because the object has no active rule. A
      * caller that must not create a duplicate rejects instead of creating then.
