@@ -46,13 +46,15 @@ public with sharing class NightlyJobs {
         if (jobsOverride != null) {
             return jobsOverride;
         }
-        List<NightlyJob> jobs = new List<NightlyJob>{
-            new SeasonalAddressJob(),
-            new ErrorDigestJob(),
-            new ImportRowPurgeJob(),
-            new EmptyHouseholdTidyJob(),
-            new TabAccessJob()
-        };
+        List<NightlyJob> jobs = new List<NightlyJob>();
+        // A job the administrator has switched off is not one Health Check may schedule.
+        if (SeasonalAddressScheduler.isEnabled()) {
+            jobs.add(new SeasonalAddressJob());
+        }
+        jobs.add(new ErrorDigestJob());
+        jobs.add(new ImportRowPurgeJob());
+        jobs.add(new EmptyHouseholdTidyJob());
+        jobs.add(new TabAccessJob());
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
         }
@@ -147,7 +149,7 @@ public with sharing class NightlyJobs {
         return null;
     }
 
-    /** The seasonal address swap, started and stopped in the Addresses section. */
+    /** The seasonal address swap, listed while Seasonal Addresses is on in the Addresses section. */
     public class SeasonalAddressJob implements NightlyJob {
         public String label() {
             return System.Label.Core_HealthCheck_JobSeasonalAddresses;

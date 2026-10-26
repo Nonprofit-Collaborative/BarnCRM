@@ -40,7 +40,7 @@ Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform license
 Campaigns, and the Campaign sync page says so.
 
 1. Give yourself the **Campaign Sync** permission set on the Access page, under Extra
-   permissions: the roles there do not include it.
+   Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
 3. Still in **Giving**, open **Campaign sync**. It shows how many appeals have a Campaign.

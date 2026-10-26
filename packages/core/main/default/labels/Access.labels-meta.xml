@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading of the extra permissions section</shortDescription>
-        <value>Extra permissions</value>
+        <value>Extra Permissions</value>
     </labels>
     <labels>
         <fullName>Core_Access_NoOneHasAddOn</fullName>
@@ -446,7 +446,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading above the list of people who hold a role</shortDescription>
-        <value>People in this role</value>
+        <value>People in This Role</value>
     </labels>
     <labels>
         <fullName>Core_PostInstall_AdminRoleNotGiven</fullName>

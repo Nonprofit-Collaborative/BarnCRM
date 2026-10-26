@@ -56,9 +56,23 @@ private class NightlyJobsTest {
         }
     }
 
+    /**
+     * Seasonal Addresses on, written below the console's save so that no job is scheduled: the
+     * swap is listed only while the switch is on.
+     */
+    private static void seasonalAddressesOn() {
+        OrgSettingsSystemWriter.save(
+            new Map<Schema.SObjectField, Object>{
+                BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => true
+            }
+        );
+        SettingsService.clearCaches();
+    }
+
     @IsTest
     static void coreListsItsOwnJobsThenThoseAModuleRegisters() {
         System.runAs(TestUsers.admin()) {
+            seasonalAddressesOn();
             FakeJob moduleJob = new FakeJob('Module nightly job', false);
             // Every registered provider is stood in for, so the modules deployed in the test
             // org do not change the count.
@@ -98,6 +112,7 @@ private class NightlyJobsTest {
     @IsTest
     static void aModuleWhoseProviderFailsCostsOnlyItsOwnJobs() {
         System.runAs(TestUsers.admin()) {
+            seasonalAddressesOn();
             for (String className : NightlyJobs.PROVIDER_CLASSES) {
                 NightlyJobs.providerOverrides.put(
                     className,
