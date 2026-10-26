@@ -7208,8 +7208,8 @@ move (R-H11, R-H12). A household left empty and kept is anonymized as in R-ER1, 
 household", with Custom Name on, its greetings emptied and its addresses deleted. Where the org
 stores people as accounts, the person account fields a household (a business account) cannot
 carry are left alone. The preview and the Erasure record list such a household under the label
-Household, with its name and greetings among the fields emptied and the note that it was kept
-because records are credited to it. The contact's account is listed among the person's fields as
+Household, with its name and greetings among the fields emptied and a note saying why it was
+kept: Delete Empty Households is off, or (with it on) records are credited to it. The contact's account is listed among the person's fields as
 Household. A household left with other members whose name was typed by hand (Custom Name on,
 R-H8) has Custom Name turned off, as the user, and its name and greetings made again from the
 remaining members, because a typed name can name the person in any words. A household Nonprofit

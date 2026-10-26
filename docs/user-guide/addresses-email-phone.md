@@ -26,7 +26,8 @@ automatically and carries a **Default** badge.
 - An address you add on a **household** belongs to the whole household.
 - An address you add on a **person** belongs to that person only. The rest of the household
   keeps its own address.
-- If you edit a person's mailing address in the person's own address fields, what happens
+- If you edit a person's mailing address in the person's own **Mailing Address** field
+  (**Reaching This Person** section), what happens
   depends on your org's setting: either the whole household moves, or the person gets an
   address of their own. Ask your admin which yours is.
 
@@ -78,8 +79,8 @@ and list view uses it. To switch, change **Preferred Email**; you never retype t
 
 ## To set a person's preferred phone
 
-1. Edit the person. Fill in the numbers you have: **Home Phone**, **Mobile**, **Work Phone**
-   or **Other Phone**.
+1. Edit the person. In the **Reaching This Person** section, fill in the numbers you have:
+   **Home Phone**, **Mobile**, **Work Phone** or **Other Phone**.
 2. Set **Preferred Phone** to Home, Mobile, Work or Other.
 3. Click **Save**.
 
