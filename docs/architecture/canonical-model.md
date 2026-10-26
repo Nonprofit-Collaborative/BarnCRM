@@ -6072,8 +6072,26 @@ The first address added from the address card to an owner with none is saved as 
 **R-AD3 Default propagation.** The default address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
 Account's billing address for a household or an organization, and to the Contact's mailing
-address for a person. The copy happens on save and on the seasonal swap, and the standard
-fields are never the place a change is made.
+address for a person. The copy happens on save and on the seasonal swap. A household's or
+an organization's default is also copied to the mailing address of each current member of
+the household, except two, who keep the address they have, on save and on the seasonal swap
+alike:
+
+- a member stored as a Contact who has a default address of their own (one owned through
+  Contact, R-AD1), such as the one R-AD5's personal address behavior gives them. This is how
+  one person lives apart from their household, with no field to say so. A member held as a
+  Person Account is not asked this, because every person account carries an address of its
+  own captured from its mailing fields (R-AD5).
+- in junction mode, a member for whom this household is not their household (R-M3: their
+  primary membership, else their earliest current one).
+
+The standard fields are not where a change is kept, but a change made there is captured
+rather than lost: a person's mailing address under R-AD5, and a household's or an
+organization's billing address, on insert and when it changes afterwards, as a new default
+address of type Home (Work for an organization), the old one kept as history (R-AD7). An
+emptied billing address, one the default already holds, and BarnCRM's own copy are not
+captured, and neither is a household that carries a native Nonprofit Cloud household group,
+whose standard fields this rule never writes (product-plan Section 11.2 item 9).
 
 Where people are person accounts, the person's mailing fields are written instead of a
 contact's. An account is written that way only when its record type is a person type. In a
@@ -8670,6 +8688,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching, settings and sources (ADR-0133, `0133-related-record-matching.md`). Custom metadata type `Match_Source__mdt` added (Section 13) with six shipped rows; registered with the custom metadata manager, which may archive and restore a shipped row of this type (R-D2). |
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
+| v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 
 ---
 ## 32. Entity ownership by package

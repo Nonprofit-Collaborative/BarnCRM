@@ -133,7 +133,14 @@ If you had set **Only that person moves** instead, step 7 would look different: 
 would have her own address card on her own record, marked default for her, and the rest of
 the
 Garcia household would still be at the old street. Both behaviors are correct; they are
-just different organizations.
+just different organizations. From then on Harper keeps her own address when the household
+moves, by any route: a new default on the household's card, an edit to its billing address,
+or the seasonal swap.
+
+Editing the household's own **Billing Address** works the same way as step 6. Change the
+street on **The Garcia Family** and save: the new street becomes a new Home address card
+marked default, the old one stays as history, and every member without an address of their
+own gets the new mailing address.
 
 ## A five-minute walkthrough for the seasonal swap
 
@@ -153,7 +160,9 @@ that the nightly job really works, before the winter mailing goes out.
    minute ago and reads "1 moved to a seasonal address, 0 moved back, 0 could not be changed."
 6. Open **The Garcia Family** again. The **Default** badge is on the Arizona address, the
    household's address boxes at the top of the record read Phoenix, and every member of the
-   household has Phoenix as their mailing address. Nobody typed any of that.
+   household has Phoenix as their mailing address (except anyone with an address of their
+   own: see "Expecting everyone in a household to move with it" below). Nobody typed any of
+   that.
 7. Now set the Arizona address's end date to yesterday, save, and choose **Run the swap now**
    again. The summary reads "0 moved to a seasonal address, 1 moved back", the badge is back
    on the home address, and the household's address boxes read Springfield again.
@@ -167,13 +176,29 @@ and back home on April 1. Do not split it into two addresses.
 
 ## Common mistakes
 
-**Editing the standard address boxes directly in a third party app.** BarnCRM treats
-the address records as the truth and copies the default into the standard address boxes. If
-a third party app, a data loader, or an integration writes straight into the standard
-boxes, BarnCRM will put the default address back the next time that address record is
-saved, and the edit will look like it vanished. Make the change
-on the address card instead, or mark a new address as the default. This is also why address
-verification apps should be pointed at the address records.
+**Editing the standard address boxes directly.** BarnCRM treats the address records as the
+truth and copies the default into the standard address boxes, but an edit typed into the
+boxes is not lost. A new billing address on a household or an organization, typed on the
+page or written by a data loader, an import or an integration, becomes a new default address
+of type Home (Work for an organization), and the household's members move with it, the same
+as when the household was created with that address. The address it replaced stays on the
+card as history. A person's new mailing address follows the **When a person's address is
+edited** setting. Emptying the billing address changes nothing on the card, and a household
+that Nonprofit Cloud manages is left alone. Prefer the address card all the same: a cleanup
+that rewrites every household's billing address adds an address record to each household it
+changes. This is also why address verification apps should be pointed at the address
+records.
+
+**Expecting everyone in a household to move with it.** A household's address reaches every
+current member except two kinds of person, who keep the address they have: a person who has
+a default address of their own (one on their own **Addresses** card, such as **Only that
+person moves** gives them), and, in the flexible way of belonging, a person for whom this is
+not their household (their household is the one they are the primary member of, else the
+one they joined first). They stay put when the household's default changes, when its billing
+address is edited, and when the seasonal swap moves it. This is how a student stays at their
+dorm, or an adult child at their own home, while the rest of the household moves. To bring a
+person back to the household's address, delete the addresses on their own card; they move
+with the household from its next address change.
 
 **Typing a state or country as a code in an org with State and Country Picklists.** With the
 picklists on, the standard address boxes take a full name ("Illinois", "United States") as

@@ -150,3 +150,34 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Open Harper Garcia. | Her mailing address reads Chicago, Illinois, United States. |
 
 **Cleanup:** set the previous address as the default again and delete the Chicago address.
+
+## T-ADDR-11: Editing a household's billing address moves the household
+
+**Purpose:** a billing address typed on the household after it was created becomes its default address and reaches its members.
+**Prerequisites:** staff user, The Garcia Family on its Sunset Ln Home address.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On The Garcia Family, **Details**, change Billing Street to `27 Billing Test Ave` and save. | Saved. |
+| 2 | Look at the **Addresses** card. | A new **Home** card, 27 Billing Test Ave, carries **Default**. The Sunset Ln card is still there without the badge. |
+| 3 | Open Luis Garcia. | His mailing street is **27 Billing Test Ave**. |
+| 4 | Back on the household, save the record again without changing the address. | No third card is added. |
+| 5 | Undo: **Set as default** on the Sunset Ln card. | Billing Address and members are back on Sunset Ln. |
+
+**Cleanup:** delete the 27 Billing Test Ave address.
+
+## T-ADDR-12: A person with an address of their own stays put when the household moves
+
+**Purpose:** a household's address change, by any route, leaves a member who has their own default address where they are, and still moves everyone else.
+**Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | It is his first address, so it carries **Default**. His mailing street reads 9 Dorm Test Hall. |
+| 2 | On The Garcia Family, **Set as default** on the Phoenix card. | Harper and Luis read Phoenix. Diego still reads **9 Dorm Test Hall**. |
+| 3 | **Set as default** on the Sunset Ln card. | Harper and Luis read Sunset Ln. Diego still reads 9 Dorm Test Hall. |
+| 4 | On the household's **Details**, change Billing Street to `27 Billing Test Ave` and save. | Harper and Luis read 27 Billing Test Ave. Diego still reads 9 Dorm Test Hall. |
+| 5 | Delete Diego's 9 Dorm Test Hall address, then on the household **Set as default** on the Sunset Ln card. | Everyone, Diego included, reads Sunset Ln. |
+| 6 | Flexible way of belonging only (junction mode): add Luis to a second household as a member who is not primary there, and on that household **Set as default** on any other address. | Luis still reads Sunset Ln: that household is not his household. |
+
+**Cleanup:** delete the 27 Billing Test Ave address, and Luis's second membership if you added one.
