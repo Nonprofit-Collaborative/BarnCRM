@@ -86,8 +86,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open Harper Garcia. | The **Relationships** card lists Luis and Diego. |
-| 2 | Select **Remove** on a line. | **BarnCRM could not remove that relationship. Check that you can delete relationships, and if it happens again ask your administrator to check the Error Log.** The line stays. |
-| 3 | Select **Add relationship**, fill it in, and save. | The save is refused with an error; nothing is added. |
+| 2 | Look at each line. | No line shows a **Remove** button. |
+| 3 | Look at the card header. | There is no **Add relationship** button. |
 
 **Cleanup:** as admin, remove Harper's relationships to Luis and Diego.
 
@@ -131,7 +131,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | As staff, open **Bayview Hardware** and select **Add affiliation**. | The form asks for the person (Person) instead of the organization. |
 | 2 | Choose **Luis Garcia**, Role `Customer`, and save. | The line shows Luis Garcia. Luis's own **Affiliations** card shows Bayview Hardware. |
-| 3 | As read-only, open Luis and select **Make primary** on the Bayview Hardware line (it shows because Primary was not ticked). | **BarnCRM could not make that the primary affiliation. Check that you can edit affiliations, and if it happens again ask your administrator to check the Error Log.** |
-| 4 | As read-only, select **Add affiliation**, fill it in, and save. | The save is refused with an error; nothing is added. |
+| 3 | As read-only, open Luis and look at the Bayview Hardware line (Primary was not ticked). | The line shows, with no **Make primary** button. |
+| 4 | As read-only, look at the **Affiliations** card header. | There is no **Add affiliation** button. |
 
 **Cleanup:** as admin, delete Luis's Bayview Hardware affiliation.

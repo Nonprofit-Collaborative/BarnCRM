@@ -241,6 +241,7 @@ private class ReceiptNumberSequenceTest {
             SELECT Next_Counter__c
             FROM Receipt_Number_Sequence__c
             WHERE Series_Key__c = :key
+            WITH SYSTEM_MODE
             LIMIT 1
         ]
         .Next_Counter__c;

@@ -33,7 +33,9 @@ license**. No other license can have it, Salesforce Platform included. So BarnCR
 access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
 Settings, open **Access** and, under **Extra permissions**, give **BarnCRM Duplicate Review** to
 each person who will review duplicates. Salesforce refuses the assignment for a user
-without one of those licenses. If nobody in your org has one, duplicate rules still warn people
+without one of those licenses. A holder who is not an administrator also gets the **Org
+Optimizer** tab with its **Duplicates** section, which they can read; scanning, dismissing and
+merging there stay with BarnCRM Admin. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
@@ -67,7 +69,11 @@ choose to save anyway.
    each person with their email address.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
-   merge**, pick the values to keep, and confirm. This is Salesforce's own merge, and it keeps
+   merge**, pick the values to keep, and confirm. Salesforce allows this only to people with
+   Delete on contacts (on accounts, for person accounts): BarnCRM Admin has it, and the staff
+   roles deliberately do not, so staff ask an admin to merge two people. Merging two
+   households needs no Delete permission (see
+   [Household merge and split](household-merge-split.md)). This is Salesforce's own merge, and it keeps
    the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because

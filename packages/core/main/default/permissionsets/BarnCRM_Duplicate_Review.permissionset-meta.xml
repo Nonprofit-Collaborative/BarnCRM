@@ -7,6 +7,10 @@
     only. Salesforce gives no other license, Salesforce Platform included, access to duplicate
     record sets. In no role on purpose.
   </description>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Review_Duplicate_Suggestions</name>
+  </customPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>

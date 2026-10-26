@@ -21,6 +21,7 @@ private class VolunteerHoursTriggerHandlerTest {
             SELECT Id, Contact__c, Account__c, Household__c, Volunteer_Job__c, Status__c
             FROM Volunteer_Hours__c
             WHERE Id = :hoursId
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -2,8 +2,10 @@ import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import { gql, graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
 
+import ADDRESS_SCHEMA from '@salesforce/schema/Address__c';
 import ID_FIELD from '@salesforce/schema/Address__c.Id';
 import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
 
@@ -188,6 +190,28 @@ export default class AddressPanel extends LightningElement {
       this.errorMessage = undefined;
       this.loaded = true;
     }
+  }
+
+  /** What the user may do with addresses; nothing is offered until it is known. */
+  addressInfo;
+
+  @wire(getObjectInfo, { objectApiName: ADDRESS_SCHEMA })
+  receiveAddressInfo({ data }) {
+    if (data) {
+      this.addressInfo = data;
+    }
+  }
+
+  /** Add address, only for someone who can create addresses (Read Only cannot). */
+  get canAdd() {
+    return Boolean(this.addressInfo && this.addressInfo.createable);
+  }
+
+  /** Set as default writes Is Default, so it needs edit on addresses and on that field. */
+  get canSetDefault() {
+    const info = this.addressInfo;
+    const field = info && info.fields && info.fields[IS_DEFAULT_FIELD.fieldApiName];
+    return Boolean(info && info.updateable && field && field.updateable);
   }
 
   get isLoading() {

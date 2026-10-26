@@ -1,7 +1,11 @@
+// The object info test wire adapter is emitted to on purpose, which is how a wired component
+// is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import RelationshipPanel from 'c/relationshipPanel';
 import { graphql } from 'lightning/graphql';
 import { deleteRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 const HARPER = '0031000000000001AA';
 
@@ -36,11 +40,16 @@ const FORMER_COLLEAGUE = node({
   description: 'Worked together at the food bank'
 });
 
-function build(objectApiName = 'Contact') {
+/** What the platform says a user may do with relationships: Staff can, Read Only only reads. */
+const STAFF_ACCESS = { createable: true, updateable: true, deletable: true, fields: {} };
+const READ_ONLY_ACCESS = { createable: false, updateable: false, deletable: false, fields: {} };
+
+function build(objectApiName = 'Contact', access = STAFF_ACCESS) {
   const element = createElement('c-relationship-panel', { is: RelationshipPanel });
   element.recordId = HARPER;
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
+  getObjectInfo.emit(access);
   return element;
 }
 
@@ -60,6 +69,25 @@ describe('c-relationship-panel', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('offers neither Add relationship nor Remove to someone who can only read relationships', async () => {
+    const element = build('Contact', READ_ONLY_ACCESS);
+    graphql.emit(response([SPOUSE, FORMER_COLLEAGUE]));
+    await flush();
+
+    expect(names(element)).toEqual(['Luis Garcia', 'Jordan Reyes']);
+    expect(element.shadowRoot.querySelector('[data-id="add-relationship"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.remove-relationship').length).toBe(0);
+  });
+
+  it('offers Remove only to someone who can delete relationships', async () => {
+    const element = build('Contact', { ...STAFF_ACCESS, deletable: false });
+    graphql.emit(response([SPOUSE]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="add-relationship"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.remove-relationship').length).toBe(0);
   });
 
   it('asks for the relationships of the person it sits on', async () => {

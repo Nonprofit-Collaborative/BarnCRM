@@ -70,7 +70,12 @@ private class RollupFullRecalcBatchTest {
     }
 
     private static Datetime lastCalculated(Rollup_Definition__c definition) {
-        return [SELECT Last_Calculated__c FROM Rollup_Definition__c WHERE Id = :definition.Id]
+        return [
+            SELECT Last_Calculated__c
+            FROM Rollup_Definition__c
+            WHERE Id = :definition.Id
+            WITH SYSTEM_MODE
+        ]
         .Last_Calculated__c;
     }
 
@@ -136,6 +141,7 @@ private class RollupFullRecalcBatchTest {
                 Next_Attempt__c,
                 Last_Error__c
             FROM Rollup_Queue__c
+            WITH SYSTEM_MODE
         ]) {
             if (RollupQueue.idsOf(entry).contains(recordId)) {
                 found.add(entry);

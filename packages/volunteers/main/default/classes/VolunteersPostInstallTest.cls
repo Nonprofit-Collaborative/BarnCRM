@@ -81,6 +81,7 @@ private class VolunteersPostInstallTest {
             SELECT Definition_Key__c
             FROM Rollup_Definition_Default__mdt
             WHERE Package__c = 'Volunteers'
+            WITH SYSTEM_MODE
         ]) {
             keys.add(shipped.Definition_Key__c);
         }

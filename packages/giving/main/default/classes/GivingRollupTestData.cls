@@ -84,6 +84,7 @@ public class GivingRollupTestData {
                 Last_Calculated__c
             FROM Rollup_Definition__c
             WHERE Definition_Key__c IN :keys
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(
             keys.size(),
@@ -150,6 +151,7 @@ public class GivingRollupTestData {
                 Rollups_Last_Calculated__c
             FROM Contact
             WHERE Id = :contactId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -168,6 +170,7 @@ public class GivingRollupTestData {
                 Rollups_Last_Calculated__c
             FROM Account
             WHERE Id = :accountId
+            WITH SYSTEM_MODE
         ];
     }
 
@@ -177,6 +180,7 @@ public class GivingRollupTestData {
             SELECT Id, Total_Raised__c, Gift_Count__c, Rollups_Last_Calculated__c
             FROM Fund__c
             WHERE Id = :fundId
+            WITH SYSTEM_MODE
         ];
     }
 

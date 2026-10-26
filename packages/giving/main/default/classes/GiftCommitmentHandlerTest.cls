@@ -195,8 +195,9 @@ private class GiftCommitmentHandlerTest {
 
     private static String statusOf(Id recordId) {
         return recordId.getSObjectType() == Commitment__c.SObjectType
-            ? [SELECT Status__c FROM Commitment__c WHERE Id = :recordId].Status__c
-            : [SELECT Status__c FROM Installment__c WHERE Id = :recordId].Status__c;
+            ? [SELECT Status__c FROM Commitment__c WHERE Id = :recordId WITH SYSTEM_MODE].Status__c
+            : [SELECT Status__c FROM Installment__c WHERE Id = :recordId WITH SYSTEM_MODE]
+              .Status__c;
     }
 
     @IsTest

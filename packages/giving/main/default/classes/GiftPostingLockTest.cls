@@ -52,6 +52,7 @@ private class GiftPostingLockTest {
                 (SELECT Id, Fund__c, Amount__c FROM Gift_Allocations__r)
             FROM Gift__c
             WHERE Amount__c = :amount
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }

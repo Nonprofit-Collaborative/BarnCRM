@@ -33,7 +33,7 @@ private class RollupRegressionAmountsTest {
     }
 
     private static Fund__c general() {
-        return [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+        return [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE WITH SYSTEM_MODE LIMIT 1];
     }
 
     // --------------------------------------------------------------------------------- refunds
@@ -222,7 +222,12 @@ private class RollupRegressionAmountsTest {
             GivingRollupTestData.account(ana.AccountId).Giving_This_Year__c,
             'The household\'s year is the same year'
         );
-        Fund__c fund = [SELECT Total_Raised_This_Year__c FROM Fund__c WHERE Id = :general().Id];
+        Fund__c fund = [
+            SELECT Total_Raised_This_Year__c
+            FROM Fund__c
+            WHERE Id = :general().Id
+            WITH SYSTEM_MODE
+        ];
         Assert.areEqual(
             3,
             fund.Total_Raised_This_Year__c,

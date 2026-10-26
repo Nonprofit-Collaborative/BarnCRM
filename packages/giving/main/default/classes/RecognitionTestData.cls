@@ -132,6 +132,7 @@ public class RecognitionTestData {
             SELECT Id, Contact__c, Account__c, Role__c, Amount__c, Percent__c, Is_Automatic__c
             FROM Soft_Credit__c
             WHERE Gift__c = :giftId
+            WITH SYSTEM_MODE
             ORDER BY Name
         ];
     }

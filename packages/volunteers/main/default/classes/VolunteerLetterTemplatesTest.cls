@@ -25,6 +25,7 @@ private class VolunteerLetterTemplatesTest {
             SELECT Id, Body__c, Active__c
             FROM Volunteer_Letter_Template__c
             WHERE Template_Key__c = :key
+            WITH SYSTEM_MODE
         ];
     }
 
