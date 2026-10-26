@@ -49,7 +49,7 @@ You should see: the gift page shows an **In-kind Gift** section with **In-kind D
 
 1. Open the person, household or organization in the Fundraising app.
 2. Click **New Gift** in the action bar. The donor is already filled in.
-3. Fill in **Amount**, **Gift Date**, **Payment Method**, **Status** and **Acknowledgment Status**, and choose an **Appeal** if there is one.
+3. Fill in **Amount**, **Payment Method**, **Status** and **Acknowledgment Status**, and choose an **Appeal** if there is one. **Gift Date** defaults to today; change it if the gift arrived on another day.
 4. Click **Save**.
 
 You should see: the gift in the record's **Gifts** list. The gift goes to your default fund. Use **Status** `Pending` for money that is promised but has not arrived.
@@ -92,8 +92,8 @@ Credits marked **Automatic** are made by BarnCRM. When a household member gives,
 
 The **Tribute** panel on the gift shows the tribute and whether the family has been told. The tribute itself is a separate record.
 
-1. Open the App Launcher, search for **Tributes**, and click **New**.
-2. Choose the **Gift**, and the **Type**: **In honor of** or **In memory of**.
+1. Open the gift. In its **Tributes** list, click **New**. The gift is filled in for you.
+2. Choose the **Type**: **In honor of** or **In memory of**.
 3. Type the **Honoree Name**, or choose **Honoree Contact** if the person is already in BarnCRM.
 4. Fill in who should be told: **Notification Recipient Contact**, or type **Notification Recipient Name** if they are not in BarnCRM.
 5. Type any **Message** from the donor and click **Save**.
@@ -105,9 +105,10 @@ You should see: the panel reads "In memory of ..., Notify ..." and then **Notifi
 
 When an employer matches an employee's gift, the employer is the donor of its own gift, and the employee gets a soft credit for causing it.
 
-1. Enter the employee's gift, and then the employer's gift (donor: the organization), as usual.
-2. Open the employer's gift and click **Edit**.
-3. In **Matched Gift**, choose the employee's gift. Click **Save**.
+1. Open the employee's person page and check that **Employer** names the company. If it is blank, click **Edit**, fill it in and click **Save**.
+2. Enter the employee's gift, and then the employer's gift (donor: the organization), as usual.
+3. Open the employer's gift and click **Edit**.
+4. In **Matched Gift**, choose the employee's gift. Click **Save**.
 
 You should see: on the employer's gift, the employee in **Soft credits** as **Matched Donor**, marked **Automatic**. The employee's gift shows the link in its own **Matched Gift**. You enter the link once, from the employer's side. To undo it, clear **Matched Gift**.
 

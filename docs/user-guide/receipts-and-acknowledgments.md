@@ -29,14 +29,14 @@ To change the gift's amount itself, void and reissue is not enough: record a ref
 
 Receipt PDFs are attached to the **Receipt** record and, for a single gift receipt, to the gift. They are not in the donor's or household's Files list.
 
-1. Open the gift and use its **Receipts** panel, or
-2. Open the App Launcher, search for **Receipts**, and use the list views **All Receipts**, **Year End Statements** or **Voided Receipts**.
+1. Open the donor and use their **Receipts** list, or open the gift and use its **Receipts** panel, or
+2. Open the **Receipts** tab and use the list views **All Receipts**, **Year End Statements** or **Voided Receipts**.
 
 ## To run year-end statements
 
 A year-end statement lists a donor's gifts for the year in one document. With the **Issue Receipts** permission you can start a run.
 
-1. Open the App Launcher, search for **Receipt Letters**, and open it.
+1. Open the **Receipt Letters** tab.
 2. Click the **Year end statements** tab.
 3. Check the **Statement year**.
 4. Click **Generate**.
@@ -50,7 +50,7 @@ Enter all the year's gifts first. A donor who already has a statement for the ye
 
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
-1. Open the App Launcher, search for **Acknowledgment Queue**, and open it.
+1. Open the **Acknowledgment Queue** tab.
 2. Read **Waiting to go**: **Emails ready to send**, **Letters ready to merge**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**.
 3. Click **Send emails now** to send the email queue.
 4. Click **Download letters to merge** to get the letter queue as a spreadsheet. Under **Recent runs**, click **Download the file**, merge it with your letter, and print.
@@ -72,14 +72,22 @@ You should see: the gift back in the queue, or out of it. BarnCRM never re-queue
 
 A stewardship plan lays out follow-up tasks (a thank-you call, a welcome packet, a check-in) when a gift or pledge arrives. Your admin writes the plans and switches them on; the tasks land in your ordinary task list.
 
-1. Open the **Stewardship Plans** tab and choose **Running Plans**.
+1. Open the **Stewardship Plans** tab and choose **Running Plans**, or open the donor and use their **Stewardship Plans** list.
 2. Open a plan to see its **Plan Template**, the person (**Contact**) or organization (**Account**), and the **Gift** or **Commitment** that started it.
 3. Work the tasks in your task list as usual.
 4. When the work is done, click **Edit**, set **Status** to **Complete** (or **Cancelled**), fill in **Completed Date**, and click **Save**.
 
 You should see: the plan leave **Running Plans**. BarnCRM does not close a plan when its last task closes, and cancelling a plan leaves its tasks alone.
 
-Starting a plan by hand on a donor has no button in BarnCRM yet. Ask your admin ([Stewardship plans](../admin-guide/stewardship-plans.md)).
+## To start a stewardship plan by hand
+
+Use this for a donor who should get a plan that no gift started, for example after a meeting. Your admin chooses which plans can be started by hand ([Stewardship plans](../admin-guide/stewardship-plans.md)).
+
+1. Open the person or organization.
+2. Use the action that starts a stewardship plan, and choose the plan.
+3. Confirm.
+
+You should see: the plan in the donor's **Stewardship Plans** list with **Status** Running, and its tasks in the task lists of the people they are assigned to. The same plan does not start twice on a donor while it is running.
 
 ## To read the Posting panel
 
