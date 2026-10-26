@@ -2,12 +2,12 @@
 
 Scripts for the duplicate scan, the review list, merges, dismissals, match sources and the permissions behind them. Setup detail: [Duplicates](../admin-guide/duplicates.md); match sources: [Custom metadata](../admin-guide/custom-metadata.md#match-sources).
 
-Before you start: an org from [Before you test](before-you-test.md) on the Person Accounts shape (duplicate review needs a Sales Cloud or Service Cloud license), with Core deployed and sample data loaded unless a script says otherwise. In **BarnCRM Settings**, **General**, the **Duplicate Review**, **Addresses** and **Org Optimizer and Health Check** features are **On** (Addresses before the sample data loads, so each household has its address record). In Setup, **Duplicate Rules**, the **Standard Contact Duplicate Rule** and **Standard Account Duplicate Rule** are active.
+Before you start: an org from [Before you test](before-you-test.md) on the Person Accounts shape (duplicate review needs a Sales Cloud or Service Cloud license), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. A scan reads every contact and household in the org and writes duplicate suggestion records for pairs among real people (it does not change the people); never merge or dismiss a pair that is not a fixture pair. In **BarnCRM Settings**, **General**, the **Duplicate Review**, **Addresses** and **Org Optimizer and Health Check** features are **On** (Addresses before the sample data loads, so each household has its address record). In Setup, **Duplicate Rules**, the **Standard Contact Duplicate Rule** and **Standard Account Duplicate Rule** are active.
 
 ## T-DUP-01: The Duplicates section and a scan
 
 **Purpose:** Confirm the section lists the rules and a scan runs in the background and reports what it did.
-**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)), holding **BarnCRM Duplicate Review** (the create script gives it).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)), holding **BarnCRM Duplicate Review** (the create script gives it; in a real-org sandbox give it on the **Access** page) and **Manage BarnCRM Settings** (the BarnCRM Admin role has it). Both are needed: the **Scan for duplicates** button works only with Manage BarnCRM Settings, and the suggestion list needs Duplicate Review. A holder of Duplicate Review without Manage BarnCRM Settings can read the section but not scan. At least the **Standard Contact Duplicate Rule** must be active in Setup, **Duplicate Rules**; a real org may have its own rules instead, so read the rule list in step 1 as it is.
 **Smoke:** yes
 
 | Step | Action | Expected result |

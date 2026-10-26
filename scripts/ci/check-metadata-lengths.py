@@ -13,6 +13,7 @@ that way, was refused; duplicateReview's, 251, deployed):
   bundle (js-meta), custom tab, custom application
 - field label 40, field inline help 510, field and object description 1000
 - custom label value 1000
+- validation rule errorMessage 255
 - Apex class, interface and enum names that are reserved Apex type names (a class named
   Page or an enum named Type compiles locally and fails in an org, or shadows the system type)
 - layout action lists: no two actions with the same sort order or the same name
@@ -43,6 +44,7 @@ FIELDS = "packages/*/main/default/objects/*/fields/*.field-meta.xml"
 OBJECTS = "packages/*/main/default/objects/*/*.object-meta.xml"
 LABELS = "packages/*/main/default/labels/*.labels-meta.xml"
 LAYOUTS = "packages/*/main/default/layouts/*.layout-meta.xml"
+VALIDATION_RULES = "packages/*/main/default/objects/*/validationRules/*.validationRule-meta.xml"
 APEX = "packages/**/*.cls"
 PROMPTS = "packages/*/main/default/prompts/*.prompt-meta.xml"
 PROMPT_VERSION_LIMITS = {
@@ -223,6 +225,10 @@ def main():
             if value and len(html.unescape(value.group(1))) > 1000:
                 label = name.group(1) if name else "(no fullName)"
                 problems.append(f"{path}: label {label} value is over 1000 characters")
+
+    for path in sorted(glob.glob(VALIDATION_RULES)):
+        checked += 1
+        check_length(problems, path, read(path), "errorMessage", 255)
 
     for path in sorted(glob.glob(LAYOUTS)):
         checked += 1

@@ -28,8 +28,85 @@ run the same command with `--replace`, which deletes the old org first.
 `--no-sample-data` is deliberate: the sample data must be loaded after the modules are
 deployed, or it loads without gifts or volunteer records (see [Load sample data](#load-sample-data)).
 
-A sandbox works too: deploy into it with the next step, skip anything that says "scratch org",
-and never load sample data into a sandbox that holds real people.
+A sandbox of a real organization is different: it holds real people, so it never gets sample
+data and never gets every module. Follow
+[Core-only real-org sandbox](#core-only-real-org-sandbox) below instead of the scratch org
+steps.
+
+## Core-only real-org sandbox
+
+For testing Core in a sandbox copy of a real nonprofit org (for example `mwdbdevsb`): Core
+only, people stored as regular Contacts and Accounts (no Person Accounts), no sample data, and
+real records that must not be erased or bulk-changed. The testers are System Administrators.
+Do these in order.
+
+1. **Deploy Core only.** `scripts/org/deploy-packages.sh <alias> --core-only`. Never run it
+   without `--core-only`, and never run `create-scratch-org.sh`, `seed-sample-data.sh` or script
+   T-SA-08. Skip the "Deploy the modules", "Load sample data" and "Test users" steps below.
+   Core alone runs on Contacts and Accounts.
+2. **Work in the BarnCRM app.** The BarnCRM Contact and Account record pages apply only in the
+   **BarnCRM** app (App Launcher, **BarnCRM**). In any other app a record opens on the org's own
+   page and steps that name a panel or action will not match. Open every record, **Contacts**
+   and **Accounts** included, from the BarnCRM app. The new page layouts ship unassigned, and
+   the shipped list views show everything the user can see (no "my records" filter), so expect
+   the org's own layouts elsewhere and the full list in the BarnCRM list views.
+3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open
+   **BarnCRM Settings**, **Access**, find yourself in **Find a person**, choose **BarnCRM
+   Admin Group** and select **Give access** (see [Access](../admin-guide/access.md)). That role
+   already carries Find and Export and Bulk Update. Add these under **Extra permissions** only
+   while a script needs them, and remove them afterwards:
+
+   | Extra permission | Give it for | Remove it |
+   |---|---|---|
+   | BarnCRM Duplicate Review | T-DUP scripts, smoke item 13 | When the duplicate scripts are done |
+   | BarnCRM Erase People | T-ERASE-01 and T-ERASE-02, smoke item 15, on fixture records only | Straight after that script |
+   | BarnCRM Metadata Admin | The T-DUP and T-SET scripts that edit custom metadata | When those are done |
+   | BarnCRM Bulk Delete | The delete scripts in [Bulk update and delete](bulk-update-and-delete.md), on `Bulkdeltest` contacts only | Straight after |
+
+4. **First-run setup and the household catch-up.** The setup window (T-SA-01) shows to every
+   user until someone with **Manage BarnCRM Settings** finishes it, and only that person gets
+   **Finish setup**; everyone else sees "An administrator needs to finish setting up
+   BarnCRM." Core was deployed to `mwdbdevsb` once before, so open **BarnCRM Settings**,
+   **General** first: if no window shows, setup is finished and T-SA-01 is Skipped.
+   **Warning:** turning **Household Upkeep** on (in first-run setup or in **General**) queues a
+   background catch-up that gives a household to existing contacts that have none, on real
+   records. That is a bulk change to real data. Decide before you finish setup or switch it on;
+   the household scripts need it on, so run them only in a sandbox you can refresh.
+5. **Create the fixture records first.** Scripts that say Garcia use records that exist only
+   in sample data. Create these instead, all with the test prefix **Zztest**, so nothing
+   touches a real person and a search for the prefix finds only them:
+
+   | Record | Create |
+   |---|---|
+   | Contact | **Harper Zztest**, email `harper.zztest1@example.org`, no account (this makes the household **The Zztest Family**) |
+   | Contact | **Luis Zztest**, added with **Add member** on The Zztest Family's **Members** panel; then edit the contact and set email `luis.zztest2@example.org` |
+   | Contact | **Diego Zztest**, added with **Add member** the same way |
+   | Address | On The Zztest Family, **Add address** on the **Addresses** card: Type **Home**, `6830 Sunset Ln`, Springfield, IL, 62756, United States |
+
+   The household then reads **3** members. **Wherever a
+   script says Garcia, read Zztest**: The Garcia Family is The Zztest Family,
+   `harper.garcia1@example.org` is `harper.zztest1@example.org`, and a Find or bulk update
+   condition **Last Name equals Garcia** is **Last Name equals Zztest**. With the fixture in
+   place, T-IMP-01 gives the counts it states (3 created, 0 updated, 1 matched, 1 rejected);
+   without Harper they would be 4, 0, 0, 1. Test emails use `example.org`, so none matches a
+   real person.
+6. **Check the count before anything bulk.** Before a bulk update, a bulk delete, an import
+   or an erase, the preview must name only fixture records: a bulk update on `Zztest` shows 3
+   records, a bulk delete on `Bulkdeltest` shows 3, an import shows only the rows in the
+   test file. If it shows more, cancel and fix the condition. Never use a condition that can
+   match a real person, and never choose a real record in a merge, move, erase or relationship
+   step.
+7. **Scripts to skip** (record Skipped, "Core-only real-org sandbox"): every script on the
+   Giving, Mirror, Volunteers and Rollup Builder pages; T-SA-02 (needs a fresh org) and T-SA-07
+   to T-SA-09 (sample data); T-HH-14 (needs a person account); and the whole smoke list from
+   item 16 on. Run smoke items 1 to 15 ([Smoke list](README.md#smoke-list-every-build-about-one-hour)).
+   On the full list, skip any other step that names sample data or a module; do not change real
+   records to make it work.
+8. **Clean up at the end.** Delete only what you created, one record at a time: search for
+   `Zztest`, `Testwell`, `Bulkdeltest`, `Erasetest`, and the import people (Testa Rivera, Ben
+   Okoro, Cara Lind, Dee Nolast; undoing the import in T-IMP-03 removes them). Remove every
+   extra permission you gave and put back any setting you changed. If a record that is not
+   yours changed, record it in the issue and refresh the sandbox.
 
 ## Deploy the modules
 
@@ -47,9 +124,13 @@ sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Gi
 ```
 
 To test Core alone (the Standard Edition with nothing else installed), skip this step and use a
-separate org.
+separate org. In a real-org sandbox, never run it: follow
+[Core-only real-org sandbox](#core-only-real-org-sandbox).
 
 ## Load sample data
+
+Scratch orgs only. Never in a real-org sandbox: use the fixture in
+[Core-only real-org sandbox](#core-only-real-org-sandbox).
 
 ```bash
 scripts/org/seed-sample-data.sh <alias>
@@ -78,9 +159,17 @@ Run each script as the user its **Prerequisites** line names. Your login user is
 | staff | **Team Member** role, plus the **Giving Staff** extra permission (or the **Fundraising Staff** role instead) | BarnCRM Staff, Giving Staff, Volunteers Staff (follows the role) |
 | read-only | **Read Only** role, plus the **Giving Read Only** extra permission | BarnCRM Read Only, Giving Read Only, Volunteers Read Only (follows the role) |
 
+In a real-org sandbox, skip this section: the testers are the two System Administrators, who
+run the scripts as themselves ([Core-only real-org sandbox](#core-only-real-org-sandbox)).
+Scripts that need a staff or read-only user are Skipped there, unless you create the user in
+Setup as step 1 describes and the owner agrees.
+
 Steps:
 
-1. Create the two users from the CLI. Give staff the **Standard User** profile (on the
+1. Create the two users. On a scratch org use the CLI commands below. In a sandbox, which the
+   CLI cannot create users in, go to Setup, **Users**, **New User**, with the same profiles and
+   an email you control, then give the **Team Member** role (staff) or **Read Only** role
+   (read-only) on the **Access** page in step 2. Give staff the **Standard User** profile (on the
    platform-only shape, **Standard Platform User**). Give read-only the Salesforce **Read Only**
    profile: a profile that can edit accounts and contacts would override the BarnCRM Read Only
    set, and the read-only negative scripts would wrongly pass.
@@ -182,6 +271,7 @@ says what to include. Fill the bug report in like this:
 - **Error Log message**: if the app showed an error, open **BarnCRM Settings**, **Error Log**,
   and copy the newest entry. See [Error log](../admin-guide/error-log.md).
 
-Never put donor or other personal data in an issue, a screenshot or an attachment: test orgs
-hold sample data only, so copy from those. Report a security problem privately, as
+Never put donor or other personal data in an issue, a screenshot or an attachment: scratch
+orgs hold sample data only, so copy from those. In a real-org sandbox quote only your `Zztest`
+fixture records, never a real person. Report a security problem privately, as
 [SECURITY.md](../../SECURITY.md) describes, never in a public issue.

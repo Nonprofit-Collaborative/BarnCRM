@@ -2,7 +2,7 @@
 
 Scripts for the Org Optimizer page (its sections, Storage and limits, Unused setup) and Health Check (findings, fix buttons, read-only view, the Home tile). Setup detail: [Org Optimizer](../admin-guide/org-optimizer.md), [Health Check](../admin-guide/health-check.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In **BarnCRM Settings**, **General**, the **Org Optimizer and Health Check** feature is **On**. Data quality, Duplicates and Field utilization have their own scripts in [Data Manager and job history](data-manager-and-job-history.md) and [Duplicates](duplicates.md).
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data, and the read-only reports (Health Check, storage, limits, field utilization) read the real org. Do not select a fix button that changes an org-wide setting. In **BarnCRM Settings**, **General**, the **Org Optimizer and Health Check** feature is **On**. Data quality, Duplicates and Field utilization have their own scripts in [Data Manager and job history](data-manager-and-job-history.md) and [Duplicates](duplicates.md).
 
 ## T-HC-01: Org Optimizer sections for an admin
 
@@ -39,7 +39,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-03: Health Check report and Re-run
 
 **Purpose:** Confirm the full report reads the org, groups findings and re-runs.
-**Prerequisites:** admin.
+**Prerequisites:** admin. Setup Assistant steps you skipped (for example the module and access steps) add findings beyond the ones named here: read them, they are expected, and they do not fail this script.
 **Smoke:** yes
 
 | Step | Action | Expected result |

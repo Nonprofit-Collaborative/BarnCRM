@@ -43,12 +43,12 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 
 ## Runs on
 
-Every release is tested by CI against four org shapes:
+Supported org shapes. Today CI's Apex gate runs on one long-lived test org (Person Accounts shape, `oi-test`); the others are tested by hand from the [Testing Guide](docs/testing-guide/README.md) in scratch orgs and sandboxes, so treat them as supported, not as a CI matrix:
 
 - Platform only (Salesforce Platform or Lightning Platform Plus licenses, no Opportunity, Campaign, Case, or Lead objects). This is the floor: Core, Giving, Volunteers, Programs, and Funders all work here.
 - Sales and Service Cloud (Enterprise Edition via Power of Us).
 - An org with NPSP installed (coexistence mode: adopt existing NPSP household accounts, optionally mirror gifts to Opportunities).
-- Agentforce Nonprofit (Person Accounts likely enabled; household junction mode, optional Gift Transaction mirror).
+- Agentforce Nonprofit (Person Accounts likely enabled; household junction mode; the Gift Transaction mirror, X-07, is planned and not built).
 
 ## For contributors
 

@@ -2,7 +2,7 @@
 
 Scripts for people, households, the Members and Household panels, names and greetings, merge and split, preferred phone, interaction notes and the record pages. Setup detail: [Households](../admin-guide/households.md), [Household members](../admin-guide/household-members.md), [Household names and greetings](../admin-guide/household-naming.md), [Merging and splitting households](../admin-guide/household-merge-split.md), [Preferred phone](../admin-guide/preferred-phone.md), [Interaction notes](../admin-guide/interaction-notes.md), [Record pages](../admin-guide/record-pages.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. The **Household upkeep** and **Preferred email and phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household upkeep** and **Preferred email and phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
 
 ## T-HH-01: A new person gets a household
 
@@ -102,7 +102,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-07: Merge two households (with cancel)
 
 **Purpose:** merge combines two households after a warning, and cancel leaves both untouched.
-**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben.
+**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (Organization record type).
 **Smoke:** yes
 
 | Step | Action | Expected result |

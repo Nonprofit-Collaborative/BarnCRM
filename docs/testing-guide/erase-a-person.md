@@ -2,9 +2,9 @@
 
 Scripts for the **Erase person** action: the preview, the erasure itself, what is kept and what is removed, the confirmation, and the permission behind it. Setup detail: [Erase a person](../admin-guide/erase-a-person.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. Erasing cannot be undone: use a scratch org, never one with real people.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. Erasing cannot be undone: use a scratch org, never one with real people. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) erase only records you created for the test (Luis Zztest and `Erin Erasetest`), never a real person, and read Garcia as Zztest.
 
-The admin user holds **BarnCRM Erase People** from the create script. It is in no role, not even BarnCRM Admin; the staff and read-only users do not have it.
+The admin user holds **BarnCRM Erase People** from the create script. It is in no role, not even BarnCRM Admin; the staff and read-only users do not have it. **Erase person** shows on the contact page only to someone who holds it, so in a real-org sandbox give it to yourself (BarnCRM Settings, **Access**, **Extra permissions**) for these scripts only and remove it straight after.
 
 ## T-ERASE-01: Preview lists the changes and changes nothing
 

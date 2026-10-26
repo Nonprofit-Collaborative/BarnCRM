@@ -83,7 +83,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Seasons that cross New Year | Minor | A season such as November to March is handled as one range. | Shipped | C-17, C-18 |
 | Overlapping season report | Minor | Two seasonal addresses covering the same day are reported rather than silently chosen. | Shipped | C-18 |
 | Swap scheduling in the app | Minor | Schedule, unschedule and "Run the swap now" from settings, with a "not run in 36 hours" warning. | Shipped | C-18 |
-| Verification-ready fields | Minor | Verification status and date fields that BarnCRM never writes, so an address verification app can own them. | Shipped | C-17 |
+| Verification-ready fields | Minor | Verification status and date fields that Core never writes, so an address verification app can own them; the optional Address Verification module (C-46) will. | Shipped | C-17 |
 
 ### 1.4 Data Quality
 
@@ -587,6 +587,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Events package | Major | Simple event registration and attendance for non-fundraising events (both editions). | Planned (post-1.0) | plan 6.1 item 2 |
+| Contact Point Sync | Major | Optional module, not Core: keeps the standard Contact Point Email, Contact Point Phone and Contact Point Address records in step with a person's email and phone fields and the address record. A separate package so Core stays free of those objects. | Planned (1.x, not scheduled) | C-45 (D-111) |
+| Address Verification | Major | Optional module, not Core: verifies address records with a provider key the organization brings and sets in the BarnCRM Settings console, and writes Verification Status and Latest Verified Date. No provider is bundled and BarnCRM adds no paid service. | Planned (1.x, not scheduled) | C-46 (D-112) |
 
 ---
 

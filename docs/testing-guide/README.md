@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main as of 2026-10-25 (commit 63edc50e). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-26 (commit d3eca4de). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -65,13 +65,22 @@ Run these in this order on one Person Accounts org set up as in
 [Before you test](before-you-test.md), all modules deployed and sample data loaded. Some later
 scripts use what an earlier one created, so keep the order.
 
+**Core-only real-org sandbox (for example `mwdbdevsb`).** Run items 1 to 15 only; skip 16 to 25
+(Giving, Volunteers and Rollup Builder are not deployed). Set up as in
+[Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox): Core deployed
+with `--core-only`, no sample data, work in the **BarnCRM** app, hold **BarnCRM Admin Group**,
+and create the **Zztest** fixture first. Read Garcia as Zztest in every script. Extra
+permissions: **BarnCRM Duplicate Review** for item 13 and **BarnCRM Erase People** for item
+15 only, removed straight after. Item 15 erases a fixture contact you created (Luis Zztest),
+never a real person. For item 3, give and remove the role on the other tester, never a real staff member. Item 1 (T-SA-01) is Skipped if setup was finished already, and its
+steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 | # | Script | Checks |
 |---|---|---|
 | 1 | [T-SA-01](setup-assistant.md#t-sa-01-first-run-setup-every-feature-on), steps 3 to 8 | First-run setup, Nonprofit Edition. Run it on the test org the first time you open it, instead of a separate org; ignore the sentence about modules in step 3. |
 | 2 | [T-SET-01](settings-and-module-manager.md) | Settings console opens |
 | 3 | [T-SET-04](settings-and-module-manager.md) | Give and remove a role on the Access page |
 | 4 | [T-HH-01](people-and-households.md) | A new person gets a household |
-| 5 | [T-HH-07](people-and-households.md) | Merge two households |
+| 5 | [T-HH-02](people-and-households.md) steps 1 to 3, then [T-HH-07](people-and-households.md) | Add Ben to the Testwell household (T-HH-07 needs him), then merge two households |
 | 6 | [T-ADDR-01](addresses.md) | Add a seasonal address |
 | 7 | [T-REL-01](relationships-and-affiliations.md) | Two-sided relationship |
 | 8 | [T-IMP-01](imports.md) | Import a contact list |
@@ -80,8 +89,8 @@ scripts use what an earlier one created, so keep the order.
 | 11 | [T-BULK-01](bulk-update-and-delete.md) | Bulk update |
 | 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a bulk update |
 | 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
-| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report |
-| 15 | [T-ERASE-02](erase-a-person.md) | Erase a person |
+| 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script) |
+| 15 | [T-ERASE-02](erase-a-person.md) | Erase a person (in a real-org sandbox: only Luis Zztest, with **BarnCRM Erase People** given for this script only) |
 | 16 | [T-GIFT-01](giving-gifts-funds-batches.md) | Default fund (later Giving scripts need it) |
 | 17 | [T-GIFT-04](giving-gifts-funds-batches.md) | Quick Gift Entry |
 | 18 | [T-GIFT-08](giving-gifts-funds-batches.md) | Gift batch: enter, balance, post |
