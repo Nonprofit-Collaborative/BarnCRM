@@ -128,15 +128,6 @@ private class CustomPermissionSelectorTest {
 
     @IsTest
     static void aReaderWhoCannotSeeSetupIsToldTheAnswerIsUnknown() {
-        List<Profile> minimum = [
-            SELECT Id
-            FROM Profile
-            WHERE Name = 'Minimum Access - Salesforce'
-            LIMIT 1
-        ];
-        if (minimum.isEmpty()) {
-            return; // An org without the profile has no reader who lacks View Setup to test.
-        }
         User setupless = new User(
             Alias = 'nosetup',
             Email = 'nosetup@barncrm.example.invalid',
@@ -144,7 +135,7 @@ private class CustomPermissionSelectorTest {
             LastName = 'Setupless',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
-            ProfileId = minimum[0].Id,
+            ProfileId = TestUsers.minimumAccessProfileId(),
             TimeZoneSidKey = 'GMT',
             Username = 'nosetup.' + System.now().getTime() + '@barncrm.example.invalid'
         );

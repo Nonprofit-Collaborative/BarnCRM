@@ -20,6 +20,7 @@ private class ErrorDigestControllerTest {
     @IsTest
     static void mariaSchedulesSendsNowAndStops() {
         System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
             TestDataFactory.defaultSettings();
             User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
@@ -80,6 +81,7 @@ private class ErrorDigestControllerTest {
     @IsTest
     static void davidCanReadThePanelButNotScheduleOrSend() {
         System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
             TestDataFactory.defaultSettings();
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
@@ -112,6 +114,18 @@ private class ErrorDigestControllerTest {
                 BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
                 'And nothing was sent.'
             );
+        }
+    }
+
+    @IsTest
+    static void aDigestTheOrgAlreadyRunsIsSetAsideForTheTest() {
+        System.runAs(TestUsers.admin()) {
+            // Stands in for the job an org running BarnCRM already has.
+            ErrorDigestScheduler.start();
+
+            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
+
+            Assert.isTrue(digestJobs().isEmpty(), 'A test about scheduling starts from none');
         }
     }
 }

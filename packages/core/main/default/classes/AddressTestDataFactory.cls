@@ -32,17 +32,16 @@ public class AddressTestDataFactory {
 
     /** An organization account, not yet inserted. */
     public static Account newOrganization(String name) {
-        return new Account(Name = name, RecordTypeId = recordTypeId('Organization'));
+        return (Account) TestDataFactory.pastDuplicateRules(
+            new Account(Name = name, RecordTypeId = recordTypeId('Organization'))
+        );
     }
 
     /** A person in the given household, not yet inserted. */
     public static Contact newContact(String firstName, String lastName, Id accountId) {
-        return new Contact(
-            Salutation = 'Ms.',
-            FirstName = firstName,
-            LastName = lastName,
-            AccountId = accountId
-        );
+        Contact person = HouseholdTestDataFactory.newContact('Ms.', firstName, lastName);
+        person.AccountId = accountId;
+        return person;
     }
 
     private static Id recordTypeId(String developerName) {

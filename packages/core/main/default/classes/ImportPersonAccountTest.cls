@@ -364,13 +364,7 @@ private class ImportPersonAccountTest {
                 return;
             }
             User reader = new User(
-                ProfileId = [
-                    SELECT Id
-                    FROM Profile
-                    WHERE Name = 'Minimum Access - Salesforce'
-                    LIMIT 1
-                ]
-                .Id,
+                ProfileId = TestUsers.minimumAccessProfileId(),
                 LastName = 'Mailonly',
                 Email = 'mailonly@barncrm.test.invalid',
                 Username = 'mailonly' + DateTime.now().getTime() + '@barncrm.test.invalid',

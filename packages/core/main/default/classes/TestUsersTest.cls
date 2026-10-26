@@ -87,4 +87,40 @@ private class TestUsersTest {
             'The reader was not given BarnCRM Admin.'
         );
     }
+
+    /** Whether the profile's own permissions give this access on accounts or contacts. */
+    private static Boolean profileGrants(Id profileId, Boolean editOnly) {
+        for (ObjectPermissions grant : [
+            SELECT PermissionsRead, PermissionsEdit
+            FROM ObjectPermissions
+            WHERE
+                Parent.IsOwnedByProfile = TRUE
+                AND Parent.ProfileId = :profileId
+                AND SobjectType IN ('Account', 'Contact')
+            WITH SYSTEM_MODE
+        ]) {
+            if (grant.PermissionsEdit || (!editOnly && grant.PermissionsRead)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @IsTest
+    static void restrictedProfilesAreFoundByWhatTheyGrantNotOnlyByName() {
+        Id byPermissions = TestUsers.firstProfileWithout(true);
+        Id readOnlyByPermissions = TestUsers.firstProfileWithout(false);
+
+        Assert.isNotNull(byPermissions, 'Every org has a profile with no account access');
+        Assert.isFalse(profileGrants(byPermissions, false), 'It reads no account or contact');
+        Assert.isFalse(profileGrants(readOnlyByPermissions, true), 'The read only one edits none');
+        Assert.isFalse(
+            profileGrants(TestUsers.minimumAccessProfileId(), false),
+            'Minimum access, by name or not, reads nothing'
+        );
+        Assert.isFalse(
+            profileGrants(TestUsers.readOnlyProfileId(), true),
+            'Read only, by name or not, edits nothing'
+        );
+    }
 }

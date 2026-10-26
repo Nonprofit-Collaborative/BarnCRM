@@ -195,16 +195,9 @@ private class FindPeopleActionTest {
 
     /** A user on the profile with no object access at all, so reading contacts is refused. */
     private static User minimumAccessUser() {
-        List<Profile> minimal = [
-            SELECT Id
-            FROM Profile
-            WHERE Name = 'Minimum Access - Salesforce'
-            LIMIT 1
-        ];
-        Assert.isFalse(minimal.isEmpty(), 'Every org has the Minimum Access profile');
         String unique = 'barnfind' + Datetime.now().getTime();
         User result = new User(
-            ProfileId = minimal[0].Id,
+            ProfileId = TestUsers.minimumAccessProfileId(),
             LastName = 'Restricted',
             Alias = 'restrict',
             Email = unique + '@barncrm.test.invalid',
