@@ -1,6 +1,6 @@
 # Addresses
 
-Scripts for address records, the primary address, the person address setting and the seasonal address swap. Setup detail: [Addresses](../admin-guide/addresses.md).
+Scripts for address records, the primary address, the Address Updates setting, the two household moves and the seasonal address swap. Setup detail: [Addresses](../admin-guide/addresses.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. The **Addresses** feature must be on (BarnCRM Settings, **General**). The Garcia Family's sample address is 6830 Sunset Ln, Springfield, IL 62756.
 
@@ -197,3 +197,38 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3), then in **BarnCRM Settings**, **Addresses**, choose **Run the swap now** and refresh after a minute. | **Primary** is on Phoenix, and Luis reads Phoenix: the swap still moves him. Harper still reads 14 Manual Test Ct. |
 
 **Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. Put the Phoenix dates back to January 1 to March 31 and run the swap again. On the household, **Set as Primary** on the Sunset Ln card, then delete the 27 Manual Billing Ave address. Delete Harper's 14 Manual Test Ct address and set her Mailing Street back to 6830 Sunset Ln.
+
+## T-ADDR-14: Use for Whole Household
+
+**Purpose:** **Use for Whole Household** on a person's own address makes it the household's primary address, moves everyone without an address of their own, and returns the person to the household's address from then on. With several households, the card asks which.
+**Prerequisites:** staff user, the Garcia household on Sunset Ln, **Address Updates** set to **Everyone in the household moves together**, no member with an address of their own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | His card carries **Primary** and a **Use for Whole Household** button. A seasonal address of his own would show no such button. |
+| 2 | Select **Use for Whole Household**. | A confirmation opens: **Make This the Household's Primary Address?**, with **Cancel** and **Use for Whole Household**. With one household there is no **Which household?** choice. |
+| 3 | Select **Cancel**. | The confirmation closes; nothing changed. |
+| 4 | Select **Use for Whole Household** again, then **Use for Whole Household** in the confirmation. | Toast **The household now uses this address.** |
+| 5 | Open The Garcia Family. | A new **Home** card, 9 Dorm Test Hall, carries **Primary**; Sunset Ln is still on the card. Billing Address reads 9 Dorm Test Hall. Harper and Luis read 9 Dorm Test Hall. |
+| 6 | Open Diego Garcia. | His own 9 Dorm Test Hall card is still there, without **Primary**. On the household, **Set as Primary** on the Sunset Ln card: Diego moves back to Sunset Ln with everyone. |
+| 7 | Flexible way of belonging only (junction mode): add Diego as a member (not primary) of another household, add him an address of his own again, and select **Use for Whole Household**. | The confirmation shows **Which household?** with The Garcia Family first. Pick the other household and confirm: that household moves to his address, and Diego keeps his own address. |
+
+**Cleanup:** on The Garcia Family, **Set as Primary** on Sunset Ln if it is not already, then delete the 9 Dorm Test Hall addresses (household and Diego's). Remove Diego's second membership and that household's new address if you made them.
+
+## T-ADDR-15: Update Everyone's Address
+
+**Purpose:** **Update Everyone's Address** on a household's primary address lists who will move and who has an address of their own, and moves only the people ticked among the latter.
+**Prerequisites:** staff user, the Garcia household on Sunset Ln, **Address Updates** set to **Nobody moves until you choose**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On Diego Garcia, add a **Home** address `9 Dorm Test Hall`, City `Urbana`. On Harper Garcia, add a **Home** address `14 Manual Test Ct`. | Each carries **Primary** on their own card. |
+| 2 | On The Garcia Family's **Details**, change Billing Street to `27 Manual Billing Ave` and save. | The new card carries **Primary**. Luis still reads Sunset Ln: nobody moved. |
+| 3 | On the household's 27 Manual Billing Ave card, look at the buttons. | It shows **Update Everyone's Address**. The other household cards do not. |
+| 4 | Select **Update Everyone's Address**. | The confirmation lists **These people will get this address:** Luis Garcia, and under **These people have an address of their own and stay where they are unless you tick them:** a tick box for Diego Garcia and one for Harper Garcia, both unticked. |
+| 5 | Tick Harper only, then select **Update Everyone's Address** in the confirmation. | Toast **Everyone's address has been updated.** |
+| 6 | Open Luis, Harper and Diego. | Luis and Harper read 27 Manual Billing Ave; Harper's own card is still there without **Primary**. Diego still reads 9 Dorm Test Hall. |
+| 7 | On the household, select **Update Everyone's Address** again. | Luis and Harper are listed as getting the address, and only Diego has a tick box. Select **Cancel**: nothing changes. |
+| 8 | As a read-only user, open The Garcia Family and Diego Garcia. | Neither **Update Everyone's Address** nor **Use for Whole Household** shows. |
+
+**Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. On the household, **Set as Primary** on the Sunset Ln card and delete the 27 Manual Billing Ave address. Delete Diego's 9 Dorm Test Hall and Harper's 14 Manual Test Ct addresses, then **Set as Primary** on Sunset Ln once more so everyone reads it.

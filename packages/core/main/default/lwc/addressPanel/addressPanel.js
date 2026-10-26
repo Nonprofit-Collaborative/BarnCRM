@@ -5,6 +5,11 @@ import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
 
+import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
+import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
+import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
+import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updateEveryonesAddress';
+
 import ADDRESS_SCHEMA from '@salesforce/schema/Address__c';
 import ID_FIELD from '@salesforce/schema/Address__c.Id';
 import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
@@ -17,6 +22,7 @@ import DEFAULT_BADGE from '@salesforce/label/c.Core_Address_DefaultBadge';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
 import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Address_Loading';
+import MOVE_FAILED from '@salesforce/label/c.Core_Address_MoveFailed';
 import SAVE_FAILED from '@salesforce/label/c.Core_Address_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Address_SaveSuccess';
 import SEASONAL_RANGE from '@salesforce/label/c.Core_Address_SeasonalRange';
@@ -24,6 +30,17 @@ import SEASONAL_RANGE_TO from '@salesforce/label/c.Core_Address_SeasonalRangeTo'
 import SET_DEFAULT_BUTTON from '@salesforce/label/c.Core_Address_SetDefaultButton';
 import SET_DEFAULT_FAILED from '@salesforce/label/c.Core_Address_SetDefaultFailed';
 import SET_DEFAULT_SUCCESS from '@salesforce/label/c.Core_Address_SetDefaultSuccess';
+import UPDATE_EVERYONE_BUTTON from '@salesforce/label/c.Core_Address_UpdateEveryoneButton';
+import UPDATE_EVERYONE_MOVING from '@salesforce/label/c.Core_Address_UpdateEveryoneMoving';
+import UPDATE_EVERYONE_NOBODY from '@salesforce/label/c.Core_Address_UpdateEveryoneNobody';
+import UPDATE_EVERYONE_OWN from '@salesforce/label/c.Core_Address_UpdateEveryoneOwn';
+import UPDATE_EVERYONE_SUCCESS from '@salesforce/label/c.Core_Address_UpdateEveryoneSuccess';
+import UPDATE_EVERYONE_TITLE from '@salesforce/label/c.Core_Address_UpdateEveryoneTitle';
+import USE_FOR_HOUSEHOLD_BUTTON from '@salesforce/label/c.Core_Address_UseForHouseholdButton';
+import USE_FOR_HOUSEHOLD_HELP from '@salesforce/label/c.Core_Address_UseForHouseholdHelp';
+import USE_FOR_HOUSEHOLD_PICK from '@salesforce/label/c.Core_Address_UseForHouseholdPick';
+import USE_FOR_HOUSEHOLD_SUCCESS from '@salesforce/label/c.Core_Address_UseForHouseholdSuccess';
+import USE_FOR_HOUSEHOLD_TITLE from '@salesforce/label/c.Core_Address_UseForHouseholdTitle';
 
 const ADDRESS_OBJECT = 'Address__c';
 const FORM_FIELDS = [
@@ -39,6 +56,8 @@ const FORM_FIELDS = [
   'Seasonal_End_Day__c'
 ];
 const SEASONAL_TYPE = 'Seasonal';
+const MOVE_FOR_HOUSEHOLD = 'household';
+const MOVE_FOR_EVERYONE = 'everyone';
 
 /**
  * The record's addresses, read as the user through the platform, so field security and
@@ -65,6 +84,9 @@ const ADDRESSES_QUERY = gql`
           edges {
             node {
               Id
+              Account__c {
+                value
+              }
               Type__c {
                 value
                 displayValue
@@ -135,6 +157,8 @@ function toView(node) {
     country: read(node.Country__c),
     isDefault: read(node.Is_Default__c) === true,
     isSeasonal: type.value === SEASONAL_TYPE,
+    // An address with no household or organization is a person's own (R-AD1).
+    isPersonal: !read(node.Account__c),
     seasonalStart: monthAndDay(
       read(node.Seasonal_Start_Month__c),
       read(node.Seasonal_Start_Day__c)
@@ -143,9 +167,16 @@ function toView(node) {
   };
 }
 
+/** The message an Apex refusal carries, or the card's own when it carries none. */
+function messageOf(error) {
+  return (error && error.body && error.body.message) || MOVE_FAILED;
+}
+
 /**
  * Every address a household, an organization, or a person has on file, with the one in use
- * badged, a way to move that badge, and a form to add another.
+ * badged, a way to move that badge, a form to add another, and the two household moves
+ * (R-AD9): Use for Whole Household on a person's own address, and Update Everyone's Address
+ * on a household's primary address.
  */
 export default class AddressPanel extends LightningElement {
   @api recordId;
@@ -159,7 +190,16 @@ export default class AddressPanel extends LightningElement {
     defaultBadge: DEFAULT_BADGE,
     emptyMessage: EMPTY_MESSAGE,
     loading: LOADING,
-    setDefaultButton: SET_DEFAULT_BUTTON
+    setDefaultButton: SET_DEFAULT_BUTTON,
+    updateEveryoneButton: UPDATE_EVERYONE_BUTTON,
+    updateEveryoneMoving: UPDATE_EVERYONE_MOVING,
+    updateEveryoneNobody: UPDATE_EVERYONE_NOBODY,
+    updateEveryoneOwn: UPDATE_EVERYONE_OWN,
+    updateEveryoneTitle: UPDATE_EVERYONE_TITLE,
+    useForHouseholdButton: USE_FOR_HOUSEHOLD_BUTTON,
+    useForHouseholdHelp: USE_FOR_HOUSEHOLD_HELP,
+    useForHouseholdPick: USE_FOR_HOUSEHOLD_PICK,
+    useForHouseholdTitle: USE_FOR_HOUSEHOLD_TITLE
   };
 
   addressObject = ADDRESS_OBJECT;
@@ -202,6 +242,19 @@ export default class AddressPanel extends LightningElement {
     }
   }
 
+  /**
+   * Whether this record is a household, and on a person the households they belong to, their
+   * own first. No move is offered until it is known.
+   */
+  cardContext;
+
+  @wire(getCardContext, { recordId: '$recordId' })
+  receiveCardContext({ data }) {
+    if (data) {
+      this.cardContext = data;
+    }
+  }
+
   /** Add address, only for someone who can create addresses (Read Only cannot). */
   get canAdd() {
     return Boolean(this.addressInfo && this.addressInfo.createable);
@@ -237,6 +290,23 @@ export default class AddressPanel extends LightningElement {
   /** The lookup that ties a new address to the record the panel is sitting on. */
   get ownerFieldName() {
     return this.objectApiName === 'Contact' ? 'Contact__c' : 'Account__c';
+  }
+
+  /**
+   * The addresses as the template draws them, with the moves this user may make on each.
+   * The moves are added here rather than in decorate, because what the record is arrives on
+   * its own wire, after or before the addresses.
+   */
+  get cards() {
+    const context = this.cardContext;
+    const canMove = this.canSetDefault && Boolean(context);
+    const households = context && context.households ? context.households : [];
+    return this.addresses.map((address) => ({
+      ...address,
+      showUseForHousehold:
+        canMove && address.isPersonal && !address.isSeasonal && households.length > 0,
+      showUpdateEveryone: canMove && context.isHousehold && !address.isPersonal && address.isDefault
+    }));
   }
 
   decorate(address) {
@@ -291,6 +361,103 @@ export default class AddressPanel extends LightningElement {
       this.errorMessage = SET_DEFAULT_FAILED;
       this.notify(SET_DEFAULT_FAILED, 'error');
     }
+  }
+
+  // ------------------------------------------------------------ household moves (R-AD9)
+
+  /** The move being confirmed: which, on which address, and what the confirmation shows. */
+  move;
+  moveHouseholdId;
+  moveTicked = [];
+  moveBusy = false;
+
+  get isMovingForHousehold() {
+    return Boolean(this.move && this.move.kind === MOVE_FOR_HOUSEHOLD);
+  }
+
+  get isMovingEveryone() {
+    return Boolean(this.move && this.move.kind === MOVE_FOR_EVERYONE);
+  }
+
+  /** The household picker, only when the person belongs to more than one. */
+  get householdOptions() {
+    const households = this.cardContext ? this.cardContext.households || [] : [];
+    return households.map((household) => ({ label: household.name, value: household.id }));
+  }
+
+  get showHouseholdPicker() {
+    return this.householdOptions.length > 1;
+  }
+
+  get hasMoving() {
+    return Boolean(this.move && this.move.moving && this.move.moving.length);
+  }
+
+  get hasWithTheirOwn() {
+    return Boolean(this.move && this.move.withTheirOwn && this.move.withTheirOwn.length);
+  }
+
+  handleUseForHousehold(event) {
+    const options = this.householdOptions;
+    this.moveHouseholdId = options.length ? options[0].value : undefined;
+    this.move = { kind: MOVE_FOR_HOUSEHOLD, addressId: event.target.dataset.id };
+  }
+
+  handlePickHousehold(event) {
+    this.moveHouseholdId = event.detail.value;
+  }
+
+  async handleUpdateEveryone() {
+    try {
+      const preview = await getMovePreview({ householdId: this.recordId });
+      this.moveTicked = [];
+      this.move = {
+        kind: MOVE_FOR_EVERYONE,
+        moving: preview.moving || [],
+        withTheirOwn: preview.withTheirOwn || []
+      };
+    } catch (error) {
+      this.failMove(error);
+    }
+  }
+
+  handleTick(event) {
+    const personId = event.target.dataset.id;
+    const others = this.moveTicked.filter((id) => id !== personId);
+    this.moveTicked = event.target.checked ? [...others, personId] : others;
+  }
+
+  handleCancelMove() {
+    this.move = undefined;
+  }
+
+  async handleConfirmMove() {
+    const move = this.move;
+    this.moveBusy = true;
+    try {
+      if (move.kind === MOVE_FOR_HOUSEHOLD) {
+        await useForWholeHousehold({
+          addressId: move.addressId,
+          householdId: this.moveHouseholdId
+        });
+        this.notify(USE_FOR_HOUSEHOLD_SUCCESS, 'success');
+      } else {
+        await updateEveryonesAddress({ householdId: this.recordId, alsoMove: this.moveTicked });
+        this.notify(UPDATE_EVERYONE_SUCCESS, 'success');
+      }
+      this.move = undefined;
+      this.errorMessage = undefined;
+      this.refresh();
+    } catch (error) {
+      this.failMove(error);
+    }
+    this.moveBusy = false;
+  }
+
+  failMove(error) {
+    this.move = undefined;
+    this.errorMessage = messageOf(error);
+    this.notify(this.errorMessage, 'error');
   }
 
   /**

@@ -6,13 +6,40 @@ import AddressPanel from 'c/addressPanel';
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
+import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
+import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
+import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updateEveryonesAddress';
+
+jest.mock(
+  '@salesforce/apex/AddressMoveController.getCardContext',
+  () => {
+    const { createApexTestWireAdapter } = jest.requireActual('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/AddressMoveController.getMovePreview', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/AddressMoveController.useForWholeHousehold',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/AddressMoveController.updateEveryonesAddress',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const RECORD_ID = '0011000000000001AA';
 
-/** One address as the GraphQL query returns it. */
-function node({ id, type, street, city, state, postalCode, isDefault, season }) {
+/** One address as the GraphQL query returns it; a household's unless `personal`. */
+function node({ id, type, street, city, state, postalCode, isDefault, season, personal }) {
   return {
     Id: id,
+    Account__c: { value: personal ? null : RECORD_ID },
     Type__c: { value: type, displayValue: type },
     Street__c: { value: street },
     City__c: { value: city },
@@ -339,5 +366,200 @@ describe('c-address-panel', () => {
     expect(element.shadowRoot.querySelector('[data-id="add-form"]')).toBeNull();
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: RECORD_ID }]);
+  });
+
+  describe('household moves', () => {
+    const GARCIA = { id: '0011000000000002AA', name: 'The Garcia Family' };
+    const NOWAK = { id: '0011000000000003AA', name: 'The Nowak Family' };
+    const OWN = node({
+      id: 'a0100000000000CCCC',
+      type: 'Home',
+      street: '9 Dorm Hall',
+      city: 'Urbana',
+      isDefault: true,
+      personal: true
+    });
+    const OWN_SEASONAL = node({
+      id: 'a0100000000000DDDD',
+      type: 'Seasonal',
+      street: '1 Beach Road',
+      isDefault: false,
+      season: [6, 1, 8, 31],
+      personal: true
+    });
+
+    function personWith(households) {
+      const element = build('Contact');
+      graphql.emit(response([OWN, OWN_SEASONAL]));
+      getCardContext.emit({ isHousehold: false, households });
+      return element;
+    }
+
+    function household() {
+      const element = build('Account');
+      graphql.emit(response([HOME, WINTER]));
+      getCardContext.emit({ isHousehold: true, households: [] });
+      return element;
+    }
+
+    function click(element, selector) {
+      element.shadowRoot.querySelector(selector).click();
+    }
+
+    it('offers Use for Whole Household on an address of the person, not a seasonal one', async () => {
+      const element = personWith([GARCIA]);
+      await flush();
+
+      const buttons = element.shadowRoot.querySelectorAll('.use-for-household');
+      expect(buttons.length).toBe(1);
+      expect(buttons[0].dataset.id).toBe(OWN.Id);
+      expect(element.shadowRoot.querySelector('.update-everyone')).toBeNull();
+    });
+
+    it('offers no move to a person with no household, or to someone who only reads', async () => {
+      const lonely = personWith([]);
+      await flush();
+      expect(lonely.shadowRoot.querySelector('.use-for-household')).toBeNull();
+
+      const reader = build('Account', READ_ONLY_ACCESS);
+      graphql.emit(response([HOME]));
+      getCardContext.emit({ isHousehold: true, households: [] });
+      await flush();
+      expect(reader.shadowRoot.querySelector('.update-everyone')).toBeNull();
+    });
+
+    it('moves the household to the address, without asking which, when there is one', async () => {
+      const refresh = jest.fn().mockResolvedValue();
+      const element = build('Contact');
+      graphql.emit(response([OWN]), undefined, refresh);
+      getCardContext.emit({ isHousehold: false, households: [GARCIA] });
+      useForWholeHousehold.mockResolvedValue();
+      await flush();
+
+      click(element, '.use-for-household');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="household-picker"]')).toBeNull();
+      click(element, '[data-id="confirm-move"]');
+      await flush();
+
+      expect(useForWholeHousehold).toHaveBeenCalledWith({
+        addressId: OWN.Id,
+        householdId: GARCIA.id
+      });
+      expect(refresh).toHaveBeenCalledTimes(1);
+      expect(element.shadowRoot.querySelector('[data-id="use-for-household-confirm"]')).toBeNull();
+    });
+
+    it('asks which household when the person belongs to several, their own first', async () => {
+      const element = personWith([NOWAK, GARCIA]);
+      useForWholeHousehold.mockResolvedValue();
+      await flush();
+
+      click(element, '.use-for-household');
+      await flush();
+      const picker = element.shadowRoot.querySelector('[data-id="household-picker"]');
+      expect(picker.options.map((option) => option.label)).toEqual([
+        'The Nowak Family',
+        'The Garcia Family'
+      ]);
+      expect(picker.value).toBe(NOWAK.id);
+
+      picker.dispatchEvent(new CustomEvent('change', { detail: { value: GARCIA.id } }));
+      click(element, '[data-id="confirm-move"]');
+      await flush();
+
+      expect(useForWholeHousehold).toHaveBeenCalledWith({
+        addressId: OWN.Id,
+        householdId: GARCIA.id
+      });
+    });
+
+    it('offers Update Everyone on the primary address of the household only', async () => {
+      const element = household();
+      await flush();
+
+      const buttons = element.shadowRoot.querySelectorAll('.update-everyone');
+      expect(buttons.length).toBe(1);
+      expect(buttons[0].dataset.id).toBe(HOME.Id);
+      expect(element.shadowRoot.querySelector('.use-for-household')).toBeNull();
+    });
+
+    it('lists who moves and who has their own, and moves only those ticked', async () => {
+      getMovePreview.mockResolvedValue({
+        hasPrimary: true,
+        moving: [{ id: '0031000000000001AA', name: 'Luis Garcia' }],
+        withTheirOwn: [
+          { id: '0031000000000002AA', name: 'Ana Garcia' },
+          { id: '0031000000000003AA', name: 'Sofia Garcia' }
+        ]
+      });
+      updateEveryonesAddress.mockResolvedValue();
+      const element = household();
+      await flush();
+
+      click(element, '.update-everyone');
+      await flush();
+      expect(getMovePreview).toHaveBeenCalledWith({ householdId: RECORD_ID });
+      const moving = element.shadowRoot.querySelectorAll('[data-id="moving-person"]');
+      expect(Array.from(moving).map((item) => item.textContent)).toEqual(['Luis Garcia']);
+      const owners = element.shadowRoot.querySelectorAll('.own-address-person');
+      expect(owners.length).toBe(2);
+
+      owners[0].checked = true;
+      owners[0].dispatchEvent(new CustomEvent('change'));
+      click(element, '[data-id="confirm-move"]');
+      await flush();
+
+      expect(updateEveryonesAddress).toHaveBeenCalledWith({
+        householdId: RECORD_ID,
+        alsoMove: ['0031000000000002AA']
+      });
+      expect(element.shadowRoot.querySelector('[data-id="update-everyone-confirm"]')).toBeNull();
+    });
+
+    it('says so when everyone has an address of their own, and cancels', async () => {
+      getMovePreview.mockResolvedValue({ hasPrimary: true, moving: [], withTheirOwn: [] });
+      const element = household();
+      await flush();
+
+      click(element, '.update-everyone');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="nobody-moving"]')).not.toBeNull();
+
+      click(element, '[data-id="cancel-move"]');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="update-everyone-confirm"]')).toBeNull();
+      expect(updateEveryonesAddress).not.toHaveBeenCalled();
+    });
+
+    it('shows the reason when a move is refused', async () => {
+      getMovePreview.mockResolvedValue({ hasPrimary: true, moving: [], withTheirOwn: [] });
+      updateEveryonesAddress.mockRejectedValue({ body: { message: 'Not allowed.' } });
+      const element = household();
+      await flush();
+
+      click(element, '.update-everyone');
+      await flush();
+      click(element, '[data-id="confirm-move"]');
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+        'Not allowed.'
+      );
+      expect(notifyRecordUpdateAvailable).not.toHaveBeenCalled();
+    });
+
+    it('shows its own message when the preview fails without one', async () => {
+      getMovePreview.mockRejectedValue(new Error('offline'));
+      const element = household();
+      await flush();
+
+      click(element, '.update-everyone');
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+        'c.Core_Address_MoveFailed'
+      );
+    });
   });
 });

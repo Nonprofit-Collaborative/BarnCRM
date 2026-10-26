@@ -176,4 +176,92 @@
         <shortDescription>Address panel: confirmation after the primary address changes</shortDescription>
         <value>This is now the primary address, and it has been copied to the standard address fields.</value>
     </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneButton</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: button on a household's primary address</shortDescription>
+        <value>Update Everyone's Address</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneMoving</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: heads the list of people who will get the address</shortDescription>
+        <value>These people will get this address:</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneNobody</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: every member has an address of their own</shortDescription>
+        <value>Everyone in this household has an address of their own, so only the people you tick will get this address.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneOwn</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: heads the people with an address of their own</shortDescription>
+        <value>These people have an address of their own and stay where they are unless you tick them:</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneSuccess</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: confirmation after Update Everyone's Address</shortDescription>
+        <value>Everyone's address has been updated.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UpdateEveryoneTitle</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: heading of the Update Everyone's Address confirmation</shortDescription>
+        <value>Give the Household's People This Address?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdButton</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: button on a person's own address</shortDescription>
+        <value>Use for Whole Household</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdHelp</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: what Use for Whole Household does</shortDescription>
+        <value>The household gets this address as its primary address, and everyone in it without an address of their own moves to it. If it is this person's own household, they move with it from now on; their own addresses stay on file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdPick</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: label of the household picker</shortDescription>
+        <value>Which household?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdSuccess</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: confirmation after Use for Whole Household</shortDescription>
+        <value>The household now uses this address.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdTitle</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: heading of the Use for Whole Household confirmation</shortDescription>
+        <value>Make This the Household's Primary Address?</value>
+    </labels>
 </CustomLabels>
