@@ -150,6 +150,7 @@
                                 <template lwc:if={row.ctor}>
                                     <lwc:component
                                         lwc:is={row.ctor}
+                                        data-panel
                                         onfeatureturnedon={handleFeatureTurnedOn}
                                     ></lwc:component>
                                 </template>
