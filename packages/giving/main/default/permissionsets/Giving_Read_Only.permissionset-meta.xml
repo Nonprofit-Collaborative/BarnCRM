@@ -1401,4 +1401,16 @@
     <tab>Tribute__c</tab>
     <visibility>Available</visibility>
   </tabSettings>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>RunReports</name>
+  </userPermissions>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ViewPublicDashboards</name>
+  </userPermissions>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ViewPublicReports</name>
+  </userPermissions>
 </PermissionSet>

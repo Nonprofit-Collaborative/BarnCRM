@@ -6273,6 +6273,10 @@ logged and counted as a failure.
   shown a pair containing a record they cannot see. Salesforce licenses them only to Sales
   Cloud and Service Cloud users, so no Core role grants them: the optional permission set
   `BarnCRM_Duplicate_Review` does, and the panel says so to anyone without it (ADR-0050).
+  That set also carries the custom permission `Review_Duplicate_Suggestions`, which grants
+  no record access and only shows the Duplicates section of Org Optimizer to a holder who is
+  not an administrator; its holders are in the Data Hygiene tab's audience
+  (`TabAccessService`). Scanning, dismissing and merging still need Manage BarnCRM Settings.
 - **People merges** are the platform's. When a contact, or a person stored as an account, is
   deleted by a merge (`MasterRecordId` filled in `after delete`), its memberships are
   recreated on the survivor in junction mode (all or none; only current rows count as already

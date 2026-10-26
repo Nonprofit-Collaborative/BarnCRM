@@ -40,7 +40,8 @@ affiliation, or finds the one they already have (see [Importing](importing.md), 
 
 To let your team see and manage affiliations, make sure they have one of the packaged access
 levels (BarnCRM Admin, Team Member, Coordinator, or, with Giving installed, Fundraising Staff) on the **Access** page in
-BarnCRM Settings. Read Only users see affiliations and cannot change them.
+BarnCRM Settings. Read Only users see affiliations and cannot change them: the Affiliations
+card shows them no **Add affiliation** or **Make primary** button.
 
 The upkeep does not depend on what the person saving can see or edit. Someone who may add an
 affiliation but cannot edit the person it belongs to, or cannot see that person's other

@@ -132,8 +132,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
-| 2 | Select **Set as default** on a non-default address. | **We could not make that the default address. Check that you have permission to edit addresses, and if it happens again ask your administrator to check the Error Log.** The badge does not move. |
-| 3 | Select **Add address**, fill Street, and save. | The save is refused with an error; no new card appears. |
+| 2 | Look at a non-default address. | It shows no **Set as default** button. The **Default** badge still shows on the default one. |
+| 3 | Look at the card header. | There is no **Add address** button. |
 | 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Schedule nightly run** (or **Stop nightly run**) and **Run the swap now** are disabled, with **You can see when the swap last ran. Changing the schedule needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.

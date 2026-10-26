@@ -20,11 +20,14 @@ contact sends its mail to the wrong person.
 Both panels are there as soon as Core is installed and the BarnCRM app is in use.
 There is nothing to switch on.
 
-**Who can do what.** Anyone who can see a household sees its members. Making somebody the
-primary contact edits the household, so you need edit access on the household to do it.
-Without it the button is still there, and the product tells you that the change was refused
-rather than pretending it worked. Moving a person out of the household needs edit access on
-that person as well.
+**Who can do what.** Anyone who can see a household sees its members. The Members panel offers
+each action only to someone whose access allows it, so a Read Only user sees the list with no
+**Add member**, **Move to another household** or **Make primary** button. In the simple way of
+belonging, **Make primary** needs edit access on households, **Move to another household** edit
+access on contacts, and **Add member** create access on contacts; in the flexible way, all three
+need access to household memberships (create to add, edit to move or make primary). Someone
+who has that access but cannot edit this particular household (sharing) still sees the button,
+and the product tells them the change was refused rather than pretending it worked.
 
 **Where the panels are.** Core ships the placement: the Members panel sits on the packaged
 Household record page, and the Household panel sits on the packaged Contact record page,

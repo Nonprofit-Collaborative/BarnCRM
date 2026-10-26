@@ -77,7 +77,8 @@ Two things to know about the schedule.
 To let your team see and manage addresses, make sure they have one of the packaged access
 levels (BarnCRM Admin, Team Member, or Coordinator, or Fundraising Staff with
 Giving) on the **Access** page in
-BarnCRM Settings. Read Only users can see addresses and cannot change them.
+BarnCRM Settings. Read Only users can see addresses and cannot change them: the Addresses
+card shows them no **Add address** or **Set as default** button.
 
 Addresses appear in two places once you are set up: an **Addresses** card on every
 household, organization, and person record, and an **Addresses** tab in the BarnCRM

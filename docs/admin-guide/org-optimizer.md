@@ -37,9 +37,11 @@ hidden for everyone.
 
 1. Open the **BarnCRM** app and choose the **Org Optimizer** tab. (It is the tab that used to
    be called **Data Hygiene**; bookmarks to it still work.)
-2. The **BarnCRM Admin** role and the **BarnCRM Find and Export** permission set both give
-   the tab. Staff with Find and Export see **Overview** and **Data quality**; administrators
-   see every section.
+2. The **BarnCRM Admin** role, the **BarnCRM Find and Export** permission set and the
+   **BarnCRM Duplicate Review** permission set each give the tab. Staff with Find and Export
+   see **Overview** and **Data quality**; staff with Duplicate Review see **Overview** and
+   **Duplicates**, which they can read but not scan, dismiss or merge from; administrators see
+   every section.
 3. Duplicate review also needs the **BarnCRM Duplicate Review** permission set, which only
    users with a Sales Cloud or Service Cloud license can have (see [Duplicates](duplicates.md),
    How to turn it on). Without it the Duplicates section says so.
