@@ -23,7 +23,9 @@ You see only the tabs your access allows, so your menu may be shorter.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
-**Stewardship Plans**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility
+**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Receipt
+Letters**, **Dashboards** and **Reports** (an admin also sees **Donor Level Ladder** and
+**Stewardship Plan Setup**), plus **Quick Gift Entry** in the utility
 bar at the bottom of the screen.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer

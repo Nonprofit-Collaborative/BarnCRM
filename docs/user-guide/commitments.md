@@ -51,6 +51,8 @@ When a payment arrives, enter it as a gift and link it to the payment.
 
 You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-pledge-payment-pays).
 
+On the **Gifts** tab's **New** form, set **Commitment** to the pledge and **Installment** to the payment instead. Leave **Installment** empty and BarnCRM links the gift to the oldest unpaid payment, if your admin left that setting on.
+
 ## To pause or resume a recurring gift
 
 1. Open the commitment.
