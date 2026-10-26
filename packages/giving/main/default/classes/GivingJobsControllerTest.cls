@@ -25,6 +25,7 @@ private class GivingJobsControllerTest {
     @IsTest
     static void anOrgThatNeverSwitchedTheJobsOnIsToldThatRatherThanWarned() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingJobsController.JobsView view = GivingJobsController.getJobs();
             Test.stopTest();
@@ -57,6 +58,7 @@ private class GivingJobsControllerTest {
     @IsTest
     static void schedulingFromThePageStartsAllThreeJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingJobsController.JobsView view = GivingJobsController.setSchedule(true);
             Test.stopTest();
@@ -84,6 +86,7 @@ private class GivingJobsControllerTest {
     @IsTest
     static void schedulingTwiceFromThePageLeavesThreeJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingJobsController.setSchedule(true);
             GivingJobsController.JobsView view = GivingJobsController.setSchedule(true);
@@ -101,6 +104,7 @@ private class GivingJobsControllerTest {
     @IsTest
     static void stoppingFromThePageUnschedulesEveryJob() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingJobsController.setSchedule(true);
             GivingJobsController.JobsView view = GivingJobsController.setSchedule(false);
@@ -206,6 +210,7 @@ private class GivingJobsControllerTest {
     @IsTest
     static void aUserWhoMayNotManageSettingsCannotScheduleTheJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             User reader = readOnlyUser();
             Exception refused = null;
 

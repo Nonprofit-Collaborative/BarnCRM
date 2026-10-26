@@ -17,6 +17,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void listsTheThreeNightlyJobsAndNotTheAcknowledgmentSend() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
 
             Assert.areEqual(
@@ -43,6 +44,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void schedulingEachJobTwiceSchedulesItOnce() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
 
             Test.startTest();
@@ -67,6 +69,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void schedulingOneJobLeavesTheOthersAlone() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
 
             Test.startTest();
@@ -83,6 +86,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void anUnknownJobNameSchedulesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             Test.startTest();
             GivingScheduler.scheduleJobNamed('BarnCRM Giving: not a job');
             Test.stopTest();
@@ -95,6 +99,7 @@ private class GivingNightlyJobProviderTest {
     @IsTest
     static void healthCheckSeesTheJobsAsWaitingUntilTheyAreScheduled() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.clearOrgGivingJobs();
             // No override is set: Core resolves the installed provider by name.
             List<String> before = NightlyJobs.unscheduledLabels();
             Assert.isTrue(
