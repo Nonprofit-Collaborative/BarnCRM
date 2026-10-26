@@ -310,7 +310,7 @@ public with sharing class SettingsService {
         }
         Set<String> keys = new Set<String>();
         for (Schema.SObjectField token : changed.keySet()) {
-            keys.add(token.getDescribe(SObjectDescribeOptions.DEFERRED).getLocalName());
+            keys.add(token.getDescribe().getLocalName());
         }
         try {
             engine.afterSettingsSaved(objectName, keys);
