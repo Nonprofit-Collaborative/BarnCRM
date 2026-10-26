@@ -396,6 +396,87 @@ private class SettingsControllerTest {
         }
     }
 
+    private static final List<String> ADDRESS_KEYS = new List<String>{
+        'Organization_Street__c',
+        'Organization_Street_2__c',
+        'Organization_City__c',
+        'Organization_State__c',
+        'Organization_Postal_Code__c',
+        'Organization_Country__c'
+    };
+
+    private static void stubAddressDefinitions() {
+        List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
+        for (String key : ADDRESS_KEYS) {
+            rows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = key.removeEnd('__c'),
+                    MasterLabel = key,
+                    Setting_Key__c = key,
+                    Section__c = SettingSections.ORGANIZATION,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Text'
+                )
+            );
+        }
+        SettingDefinitionSelector.stubbedRows = rows;
+    }
+
+    @IsTest
+    static void savesTheOrganizationAddressAndReadsItBackByPart() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+
+            Test.startTest();
+            SettingsController.saveSettings(
+                new Map<String, Object>{
+                    'Organization_Street__c' => '14 Bridge Street',
+                    'Organization_City__c' => 'Springfield',
+                    'Organization_State__c' => 'IL',
+                    'Organization_Postal_Code__c' => '62701'
+                }
+            );
+            Map<String, String> parts = SettingsController.getOrganizationAddress();
+            Test.stopTest();
+
+            Assert.areEqual('Springfield', parts.get('Organization_City__c'), 'The city she typed');
+            Assert.areEqual('', parts.get('Organization_Country__c'), 'Country stayed optional');
+            Assert.areEqual(6, parts.size(), 'Every part is answered, saved or not');
+        }
+    }
+
+    @IsTest
+    static void refusesAHalfFilledAddressWithAFriendlyMessageAndSavesNothing() {
+        System.runAs(TestUsers.admin()) {
+            stubAddressDefinitions();
+            String message;
+
+            Test.startTest();
+            try {
+                SettingsController.saveSettings(
+                    new Map<String, Object>{
+                        'Organization_Street__c' => '14 Bridge Street',
+                        'Organization_City__c' => 'Springfield'
+                    }
+                );
+            } catch (AuraHandledException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.isNotNull(message, 'A street and city alone are not an address');
+            Assert.isTrue(
+                message.contains(System.Label.Core_OrganizationAddress_PostalCode),
+                'The message names the missing Zip Code'
+            );
+            Assert.areEqual(
+                '',
+                SettingsController.getOrganizationAddress().get('Organization_Street__c'),
+                'Nothing was saved'
+            );
+        }
+    }
+
     @IsTest
     static void letsAStandardUserWithThePermissionSave() {
         System.runAs(TestUsers.admin()) {

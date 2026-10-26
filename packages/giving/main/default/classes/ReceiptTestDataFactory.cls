@@ -101,7 +101,11 @@ public class ReceiptTestDataFactory {
         BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
         core.SetupOwnerId = UserInfo.getOrganizationId();
         core.Organization_Legal_Name__c = 'Hope For Homes';
-        core.Organization_Address__c = '14 Bridge Street, Springfield';
+        core.Organization_Street__c = '14 Bridge Street';
+        core.Organization_Street_2__c = 'Suite 3';
+        core.Organization_City__c = 'Springfield';
+        core.Organization_State__c = 'IL';
+        core.Organization_Postal_Code__c = '62701';
         upsert core;
 
         Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-  <fullName>Organization_Address__c</fullName>
+  <fullName>Organization_State__c</fullName>
   <description>
-    The organization's mailing address as one line, as it is printed on letters and documents.
+    The state or province of the organization's mailing address. Required once any part of the
+    address is filled in.
   </description>
   <externalId>false</externalId>
-  <label>Organization Address</label>
-  <length>255</length>
+  <label>Organization State</label>
+  <length>80</length>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>Text</type>

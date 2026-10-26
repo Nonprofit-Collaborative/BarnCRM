@@ -73,9 +73,10 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 1 | Go to step 5, **Give your colleagues access**. | **Person** and **Role** pickers, **Give access**, a **Create a user in Setup** link and a **Set up automatic access** link. |
 | 2 | Choose **Read Only Tester** in **Person** and **Read Only** in **Role**. Click **Give access**. | "Access given. Add another person, or continue." |
 | 3 | Open **BarnCRM Settings**, **Access** in another tab. | **Read Only Tester** is on the **Read Only** card. |
-| 4 | Back in the assistant, click **Next**, to step 6, **Set your organization's identity**. | **Legal name, as registered** and **Address, as you want it printed**; with Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
-| 5 | Enter `Riverside Test Trust` and `1 Main St, Springfield, IL 62701`. Click **Save**. | The step finishes and the assistant moves on. |
-| 6 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; **Organization address** reads the address. **Recent changes** lists both. |
+| 4 | Back in the assistant, click **Next**, to step 6, **Set your organization's identity**. | **Legal name, as registered** and an **Organization address** block: **Street**, **Street 2**, **City**, **State** and **Zip Code** on one row, **Country**. No address box is marked required while the address is blank. With Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
+| 5 | Enter `Riverside Test Trust` as the legal name and `1 Main St` in **Street**. **Street**, **City**, **State** and **Zip Code** become marked required. Click **Save**. | Nothing is saved: the required boxes are marked. |
+| 6 | Enter `Springfield` in **City**, `IL` in **State** and `62701` in **Zip Code**, leave **Street 2** and **Country** blank, and click **Save**. | The step finishes and the assistant moves on. |
+| 7 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; the **Organization address** block shows 1 Main St, Springfield, IL, 62701. **Recent changes** lists the name and the four address parts. |
 
 **Cleanup:** None.
 

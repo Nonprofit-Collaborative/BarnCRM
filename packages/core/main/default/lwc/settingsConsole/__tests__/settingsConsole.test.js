@@ -55,6 +55,60 @@ jest.mock('c/householdNamingSettings', () =>
 jest.mock('c/featureSettings', () =>
   require('../../../../../test/jest-mocks/settingsConsole/featureSettings')
 );
+jest.mock('c/organizationAddressSettings', () =>
+  require('../../../../../test/jest-mocks/settingsConsole/organizationAddressSettings')
+);
+
+const ADDRESS_KEYS = [
+  'Organization_Street__c',
+  'Organization_Street_2__c',
+  'Organization_City__c',
+  'Organization_State__c',
+  'Organization_Postal_Code__c',
+  'Organization_Country__c'
+];
+
+/** An Organization section as the package ships it: the legal name, six part rows, the panel. */
+function organizationWithAddressPanelModel() {
+  const text = (key, label) => ({
+    key,
+    label,
+    description: null,
+    dataType: 'Text',
+    section: 'Organization',
+    component: null,
+    helpUrl: null,
+    value: 'x',
+    checked: false,
+    options: []
+  });
+  return {
+    canEdit: true,
+    sections: [
+      {
+        name: 'Organization',
+        settings: [
+          text('Organization_Legal_Name__c', 'Organization legal name'),
+          {
+            key: 'Core_Organization_Address',
+            label: 'Organization address',
+            description: 'Your mailing address.',
+            dataType: 'Component',
+            section: 'Organization',
+            settingsObject: 'BarnCRM_Settings__c',
+            component: 'organizationAddressSettings',
+            navigationTarget: null,
+            helpUrl: null,
+            value: null,
+            checked: false,
+            options: []
+          },
+          ...ADDRESS_KEYS.map((key) => text(key, key))
+        ]
+      }
+    ]
+  };
+}
 
 const NAMING_KEYS = [
   'Household_Name_Pattern__c',
@@ -762,6 +816,65 @@ describe('c-settings-console', () => {
       NAMING_KEYS.forEach((key) => {
         expect(element.shadowRoot.querySelector(`[data-key="${key}"]`)).not.toBeNull();
       });
+    });
+  });
+
+  describe('Organization address', () => {
+    beforeEach(() => {
+      getConsoleModel.mockResolvedValue(organizationWithAddressPanelModel());
+    });
+
+    it('shows one address panel in place of the six part rows', async () => {
+      const element = build();
+      await settle();
+
+      const labels = Array.from(element.shadowRoot.querySelectorAll('div[role="group"]')).map(
+        (group) => group.getAttribute('aria-label')
+      );
+      expect(labels).toEqual(['Organization legal name', 'Organization address']);
+      ADDRESS_KEYS.forEach((key) => {
+        expect(element.shadowRoot.querySelector(`[data-key="${key}"]`)).toBeNull();
+      });
+      expect(
+        element.shadowRoot.querySelector('h3[data-key="Core_Organization_Address"]')
+      ).not.toBeNull();
+    });
+
+    it('lands a search for an address part on the address panel', async () => {
+      const element = build();
+      await settle();
+      const focus = jest.fn();
+      const originalFocus = HTMLElement.prototype.focus;
+      const originalScroll = HTMLElement.prototype.scrollIntoView;
+      HTMLElement.prototype.focus = focus;
+      HTMLElement.prototype.scrollIntoView = jest.fn();
+      try {
+        element.shadowRoot.querySelector('c-settings-search').dispatchEvent(
+          new CustomEvent('settingselect', {
+            detail: { section: 'Organization', key: 'Organization_City__c' }
+          })
+        );
+        await settle();
+      } finally {
+        HTMLElement.prototype.focus = originalFocus;
+        HTMLElement.prototype.scrollIntoView = originalScroll;
+      }
+
+      expect(focus.mock.instances[0].dataset.key).toBe('Core_Organization_Address');
+    });
+
+    it('refreshes Recent changes when the address panel saves', async () => {
+      const element = build();
+      await settle();
+      getRecentChanges.mockClear();
+
+      const panel = element.shadowRoot.querySelector(
+        'h3[data-key="Core_Organization_Address"]'
+      ).nextElementSibling;
+      panel.dispatchEvent(new CustomEvent('settingssaved'));
+      await settle();
+
+      expect(getRecentChanges).toHaveBeenCalledTimes(1);
     });
   });
 });
