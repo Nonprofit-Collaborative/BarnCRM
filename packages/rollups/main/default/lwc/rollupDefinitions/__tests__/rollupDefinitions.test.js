@@ -77,6 +77,12 @@ jest.mock(
 );
 
 jest.mock(
+  '@salesforce/label/c.Core_Rollups_ScheduleActive',
+  () => ({ default: 'Nightly recalculation is scheduled for {0}.' }),
+  { virtual: true }
+);
+
+jest.mock(
   '@salesforce/label/c.Core_Rollups_CountsSeparatedBy',
   () => ({ default: 'separated by {0}' }),
   { virtual: true }
@@ -107,6 +113,7 @@ const PAGE = {
   canManage: true,
   scheduled: true,
   nextRunAt: '2026-09-09T02:00:00.000Z',
+  nightlyTime: '10:00 PM',
   lastCalculated: '2026-09-08T02:00:00.000Z',
   stale: false,
   defaultMode: 'Both',
@@ -222,6 +229,16 @@ describe('c-rollup-definitions', () => {
     expect(recalculate).toHaveBeenCalledWith({ definitionId: ROLLUP.recordId });
     expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
       'Recalculation started.'
+    );
+  });
+
+  it('says the hour the nightly run is scheduled for', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
+      'Nightly recalculation is scheduled for 10:00 PM.'
     );
   });
 

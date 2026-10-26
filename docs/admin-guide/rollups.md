@@ -106,7 +106,7 @@ One step is left for you, and nothing in the app does it on your behalf:
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
-   is scheduled for 2:00 AM."
+   is scheduled for 2:00 AM." (or the hour you chose in **Time of the nightly run**).
 
 Do that on the day you install. The Setup Assistant has no rollup step, so until you click
 it nothing recalculates overnight and the home page tile stays in warning.
@@ -153,7 +153,7 @@ Every rollup has a mode.
 | Mode | What happens |
 |---|---|
 | **Instantly** | A gift saved by a person updates the totals a few seconds after the save: refresh the household a moment later and its total giving already includes it. A bulk change (an import, a data loader run, a big update) goes through the same queue and catches up within minutes, also when many batches or people save at the same moment. A change made by a background job is also queued, and the queue run starts as soon as that job's step is saved, so those totals catch up within minutes too. If that start fails, the next queue run or the nightly run picks them up. |
-| **Every night** | Recalculated in the nightly run at 2:00 AM, and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
+| **Every night** | Recalculated in the nightly run (2:00 AM unless you change **Time of the nightly run**), and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
 | **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
 
 "Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
@@ -185,6 +185,13 @@ never added to. Choose **During the save** only if your team relies on seeing a 
 the moment a gift is saved and your org has little automation of its own on gifts.
 
 ### How the nightly run works
+
+The nightly run starts at 2:00 AM by default, in the time zone of the person who scheduled
+it. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
+**Time of the nightly run** (any hour from 12:00 AM (midnight) to 11:00 PM). Saving a new
+hour moves the scheduled run straight away; if the nightly run is not scheduled, the new hour
+is used when you schedule it. Pick a quiet hour after the day's data entry and before the
+morning's reports.
 
 The nightly run, **Recalculate** and **Recalculate all** work
 through every record a rollup writes, one kind of record at a time (all accounts, then all
@@ -306,7 +313,8 @@ user **Rollup Builder User**. People with a BarnCRM role get it at install, at e
 on** and with each nightly run; until then the same wait applies to them.
 
 The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
-rollup mode**, **When instant totals are calculated**, and a button that opens the Builder.
+rollup mode**, **When instant totals are calculated**, **Time of the nightly run**, and a
+button that opens the Builder.
 **Fiscal year start month** is a BarnCRM setting and stays in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
@@ -424,9 +432,11 @@ roughly how long that takes, for example "About 41,200 records, roughly 25 minut
 includes the records of every active rollup, **Instantly** ones too. During working hours
 (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it tonight instead,
 because a long run competes with people saving records. When the nightly run is not
-scheduled, **Run tonight** sets up a single run of every active rollup for 2:00 AM tonight.
-When it is scheduled, **Run tonight** adds nothing: the nightly run already recalculates the
-**Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
+scheduled, **Run tonight** sets up a single run of every active rollup at the next
+**Time of the nightly run** (2:00 AM unless you changed it), and says "One recalculation of
+every total is set for the next 2:00 AM." When it is scheduled, **Run tonight** adds nothing:
+the nightly run already recalculates the **Every night** and **Both** totals at that hour,
+and a second run at the same moment would
 only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
 ## Instant totals on your own objects

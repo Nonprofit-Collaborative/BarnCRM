@@ -57,6 +57,16 @@ public with sharing class RollupEngineExtensions {
         return engine instanceof RollupEngineExtensionV2 ? (RollupEngineExtensionV2) engine : null;
     }
 
+    /**
+     * The installed engine's third seam (`RollupEngineExtensionV3`), or null when there is no
+     * engine or it predates that seam.
+     */
+    @NamespaceAccessible
+    public static RollupEngineExtensionV3 findV3() {
+        RollupEngineExtension engine = find();
+        return engine instanceof RollupEngineExtensionV3 ? (RollupEngineExtensionV3) engine : null;
+    }
+
     @TestVisible
     private static RollupEngineExtension resolve(String className) {
         Type extensionType = NamespaceUtil.resolveType(className);

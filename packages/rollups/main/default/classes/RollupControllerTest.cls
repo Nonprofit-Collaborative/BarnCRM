@@ -317,17 +317,23 @@ private class RollupControllerTest {
             RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
             String first;
             String second;
+            String expected;
 
             Test.startTest();
             System.runAs(maria()) {
                 first = RollupController.runTonight();
                 second = RollupController.runTonight();
+                expected = String.format(
+                    Label.Core_RollupBuilder_TonightScheduled,
+                    new List<String>{ RollupScheduler.nightlyTime() }
+                );
             }
             Test.stopTest();
 
             String pattern = RollupScheduler.jobNameInUse + ' %';
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightScheduled, first);
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightScheduled, second);
+            System.Assert.areEqual(expected, first);
+            System.Assert.areEqual(expected, second);
+            System.Assert.isTrue(first.contains('2:00'), 'At the default hour');
             System.Assert.areEqual(
                 1,
                 [SELECT COUNT() FROM CronJobDetail WHERE Name LIKE :pattern],
@@ -346,15 +352,20 @@ private class RollupControllerTest {
             RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
             RollupScheduler.start();
             String notice;
+            String expected;
 
             Test.startTest();
             System.runAs(maria()) {
                 notice = RollupController.runTonight();
+                expected = String.format(
+                    Label.Core_RollupBuilder_TonightAlreadyScheduled,
+                    new List<String>{ RollupScheduler.nightlyTime() }
+                );
             }
             Test.stopTest();
 
             String pattern = RollupScheduler.jobNameInUse + ' %';
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightAlreadyScheduled, notice);
+            System.Assert.areEqual(expected, notice);
             System.Assert.areEqual(0, [SELECT COUNT() FROM CronJobDetail WHERE Name LIKE :pattern]);
         }
     }

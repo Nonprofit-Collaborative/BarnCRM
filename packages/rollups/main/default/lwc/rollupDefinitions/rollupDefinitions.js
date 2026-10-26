@@ -158,7 +158,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   }
 
   get scheduleMessage() {
-    return this.isScheduled ? this.labels.scheduleActive : this.labels.scheduleMissing;
+    return this.isScheduled
+      ? this.labels.scheduleActive.replace('{0}', this.page.nightlyTime || '')
+      : this.labels.scheduleMissing;
   }
 
   get scheduleButtonLabel() {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Time of the nightly run</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Nightly_Run_Hour__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Rollup_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">0:12:00 AM (midnight);1:1:00 AM;2:2:00 AM;3:3:00 AM;4:4:00 AM;5:5:00 AM;6:6:00 AM;7:7:00 AM;8:8:00 AM;9:9:00 AM;10:10:00 AM;11:11:00 AM;12:12:00 PM (noon);13:1:00 PM;14:2:00 PM;15:3:00 PM;16:4:00 PM;17:5:00 PM;18:6:00 PM;19:7:00 PM;20:8:00 PM;21:9:00 PM;22:10:00 PM;23:11:00 PM</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">When the nightly run recalculates every Every night and Both total, in the time zone of the person who scheduled it. Pick a quiet hour after the day's data entry. Changing it moves the scheduled run straight away.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+</CustomMetadata>

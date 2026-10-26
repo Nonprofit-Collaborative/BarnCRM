@@ -17,7 +17,10 @@ needs a change in Setup" below).
 A module with an app of its own can also show its settings there, on their own: the
 **Volunteer Settings** tab is this page showing only the Volunteers settings. They are the
 same settings, so a change in either place shows in both. The Rollup Builder module has no
-settings tab: its settings are in the **Rollups** section of this page.
+settings tab: its settings are in the **Rollups** section of this page (**Default rollup
+mode**, **When instant totals are calculated** and **Time of the nightly run**). Saving a new
+**Time of the nightly run** moves the scheduled nightly rollup run at once (see
+[Rollups](rollups.md#how-the-nightly-run-works)).
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.

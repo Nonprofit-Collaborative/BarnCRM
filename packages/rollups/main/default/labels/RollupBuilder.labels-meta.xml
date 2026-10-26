@@ -773,16 +773,16 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run tonight: the nightly run already covers it</shortDescription>
-        <value>The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
+        <shortDescription>Run tonight, already covered: {0} is the nightly time</shortDescription>
+        <value>The nightly run already recalculates every Every night and Both total at {0}. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_TonightScheduled</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run tonight: one run set for 2:00 AM</shortDescription>
-        <value>One recalculation of every total is set for 2:00 AM tonight.</value>
+        <shortDescription>Run tonight: one run set; {0} is the nightly time</shortDescription>
+        <value>One recalculation of every total is set for the next {0}.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_AttentionTitle</fullName>
