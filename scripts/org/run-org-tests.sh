@@ -101,7 +101,8 @@ post_status() {
 echo "== Testing ${SHA:0:7} on ${ALIAS} =="
 bash scripts/org/check-org-expiry.sh "$ALIAS"
 
-if ! bash scripts/org/deploy-packages.sh "$ALIAS"; then
+# No post-install steps: the tests assume an org that has never saved BarnCRM Settings.
+if ! SOURCE_POST_INSTALL=0 bash scripts/org/deploy-packages.sh "$ALIAS"; then
   post_status failure "Deploy to ${ALIAS} failed, so no test ran"
   exit 1
 fi

@@ -54,6 +54,26 @@ private class FirstRunControllerTest {
     }
 
     @IsTest
+    static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
+        System.runAs(TestUsers.admin()) {
+            // An org built from source: no feature list saved, so every feature is on already.
+            SettingsService.saveSystemValue('Features_Turned_On__c', null);
+            FirstRunController.startTabCheckInTests = true;
+
+            Test.startTest();
+            FirstRunController.finish(
+                ModuleDetectionService.SUITE_COMMUNITY,
+                new List<String>{ FeatureSwitchService.DATA_MANAGER }
+            );
+            Integer queued = Limits.getQueueableJobs();
+            Test.stopTest();
+
+            Assert.isTrue(queued > 0, 'The tab access sync is queued though nothing was newly on');
+            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the nightly check is running');
+        }
+    }
+
+    @IsTest
     static void mariaFinishesWithTheFeaturesSheTicked() {
         System.runAs(TestUsers.admin()) {
             FeatureSwitchService.markNewInstall();

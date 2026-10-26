@@ -192,6 +192,77 @@ private class CorePostInstallTest {
         }
     }
 
+    /**
+     * Removes the org's saved settings inside the test, so a test about an org that has never
+     * saved them runs the same on an org that has (custom settings are visible to tests).
+     */
+    private static void forgetSavedSettings() {
+        delete [SELECT Id FROM BarnCRM_Settings__c];
+        SettingsService.clearCaches();
+    }
+
+    @IsTest
+    static void aSourceDeployOnAFreshOrgStartsLikeANewInstall() {
+        System.runAs(TestUsers.admin()) {
+            forgetSavedSettings();
+
+            Test.startTest();
+            CorePostInstall.runAsSourceDeploy();
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            SettingsService.clearCaches();
+            Assert.areEqual(
+                FeatureSwitchService.NONE_ON,
+                SettingsService.getSettings().Features_Turned_On__c,
+                'A fresh org waits for first-run setup, as after a package install'
+            );
+            Assert.isTrue(
+                [SELECT COUNT() FROM Automation_Setting__c] > 0,
+                'The Automation page lists its switches'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSourceDeployOnAnOrgWithSavedSettingsChangesNothingChosen() {
+        System.runAs(TestUsers.admin()) {
+            forgetSavedSettings();
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+            SettingsService.clearCaches();
+
+            CorePostInstall.runAsSourceDeploy();
+
+            SettingsService.clearCaches();
+            Assert.isNull(
+                SettingsService.getSettings().Features_Turned_On__c,
+                'An org already in use is never marked as a new install'
+            );
+            Assert.isTrue(
+                FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),
+                'So every feature it used stays on'
+            );
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.chosenSuite(),
+                'And its edition is kept'
+            );
+        }
+    }
+
+    @IsTest
+    static void anOrgHoldingAHouseholdCountsAsSetUpEvenWithoutSettings() {
+        System.runAs(TestUsers.admin()) {
+            insert HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            forgetSavedSettings();
+
+            Assert.isTrue(
+                CorePostInstall.hasBeenSetUp(),
+                'Households mean the org is in use, so a source deploy is an upgrade there'
+            );
+        }
+    }
+
     @IsTest
     static void installAlwaysGivesTheInstallerTheAdminPermissionSet() {
         System.runAs(TestUsers.admin()) {

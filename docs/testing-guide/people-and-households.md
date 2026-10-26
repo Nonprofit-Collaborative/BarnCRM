@@ -226,3 +226,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | On the kept household, select **Merge or split** and pick The Otherowner Family, then **Merge**, **Merge households**. | Refused with **You need edit access to both households to merge them.** Both households are unchanged. |
 
 **Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
+
+## T-HH-16: A blocking Account duplicate rule does not stop a new person
+
+**Purpose:** households BarnCRM creates are saved past the org's Account duplicate rules, so adding a person never fails over a look-alike household.
+**Prerequisites:** admin; in Setup, an active Account duplicate rule on the standard account matching rule with **Action On Create** set to **Block**. Contact `Ana Duptest` already saved, with her household **The Duptest Family**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a contact `Luis` `Duptest`, leaving the account empty. | Saved. Luis has a household of his own, also named **The Duptest Family**. |
+| 2 | In Setup, try to create an account named **The Duptest Family** by hand. | Your duplicate rule blocks it, as before. |
+
+**Cleanup:** delete both contacts and their households, then deactivate the duplicate rule.

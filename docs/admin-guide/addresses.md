@@ -175,6 +175,14 @@ saved, and the edit will look like it vanished. Make the change
 on the address card instead, or mark a new address as the default. This is also why address
 verification apps should be pointed at the address records.
 
+**Typing a state or country as a code in an org with State and Country Picklists.** With the
+picklists on, the standard address boxes take a full name ("Illinois", "United States") as
+text. BarnCRM copies a code typed on an address card ("IL", "US") into the code fields instead,
+so the copy is saved and the boxes show the full names. A state code is used only when the
+country is filled in too, because the same code means different states in different countries:
+an address with a state code and no country is refused by Salesforce. Fill in the country, or
+type the state's full name.
+
 **Marking two addresses as default.** You cannot end up with two. Marking a second address
 as the default clears the first one automatically, and when one save (an import, say) marks
 two addresses of the same household or person as default, the last of them is kept and the

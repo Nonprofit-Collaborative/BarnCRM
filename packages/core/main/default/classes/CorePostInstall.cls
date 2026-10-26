@@ -48,6 +48,9 @@
  * edition saved gets the recommended one, and every run schedules the nightly tab access check
  * unless it is already scheduled.
  *
+ * An org built by deploying the source runs no install handler, so `runAsSourceDeploy` runs the
+ * same steps there, called by `scripts/org/deploy-packages.sh` once Core is in.
+ *
  * The whole thing runs twice safely: a person who already holds a permission set or a role
  * is left alone, and a switch or an import template that already exists is left exactly as the
  * administrator left it, so an upgrade is a no-op for an org that is already set up. Nothing here throws: an
@@ -82,8 +85,59 @@ public with sharing class CorePostInstall implements InstallHandler {
         if (context == null) {
             return;
         }
-        markFeaturesOffOnANewInstall(context);
-        saveEditionOnAnUpgrade(context);
+        Boolean isUpgrade = context.previousVersion() != null;
+        run(!isUpgrade, isUpgrade, context.installerId());
+    }
+
+    /**
+     * The same steps for an org built by deploying the source rather than installing a package,
+     * which runs no install handler: `scripts/org/deploy-packages.sh` calls this once Core is
+     * deployed, and a developer can run it as anonymous Apex. The person running it stands in
+     * for the installer.
+     *
+     * Safe on an org that already has BarnCRM: one that has saved its settings or holds a
+     * household is treated as an upgrade, so its feature list, a saved edition, its coexistence
+     * mode, switches and templates stay exactly as the administrator left them. Only an org with
+     * neither is marked as a new install, so first-run setup comes up there as it does after a
+     * package install. Running it again changes nothing. Never throws.
+     */
+    public static void runAsSourceDeploy() {
+        Boolean alreadySetUp = true;
+        try {
+            alreadySetUp = hasBeenSetUp();
+        } catch (Exception e) {
+            // Unsure means existing: marking a working org as new would turn its features off.
+            ErrorLogger.log(e, FEATURE_CONTEXT);
+        }
+        new CorePostInstall().run(!alreadySetUp, alreadySetUp, UserInfo.getUserId());
+    }
+
+    /**
+     * Whether the org already uses BarnCRM: its settings have been saved, or a household exists.
+     * Either makes a source deploy an upgrade rather than a new install.
+     */
+    @TestVisible
+    private static Boolean hasBeenSetUp() {
+        if (BarnCRM_Settings__c.getOrgDefaults().Id != null) {
+            return true;
+        }
+        Id householdType = HouseholdService.householdRecordTypeId();
+        if (householdType == null) {
+            return false;
+        }
+        Integer households = [
+            SELECT COUNT()
+            FROM Account
+            WHERE RecordTypeId = :householdType
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return households > 0;
+    }
+
+    private void run(Boolean isNewInstall, Boolean isUpgrade, Id installerId) {
+        markFeaturesOffOnANewInstall(isNewInstall);
+        saveEditionOnAnUpgrade(isUpgrade);
         applyRecommendedMode();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
@@ -92,7 +146,6 @@ public with sharing class CorePostInstall implements InstallHandler {
         // never throws.
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
-        Id installerId = context.installerId();
         if (installerId == null) {
             return;
         }
@@ -104,9 +157,9 @@ public with sharing class CorePostInstall implements InstallHandler {
      * upgrade leaves the list empty, which means every feature is on, so an existing org loses
      * nothing it used.
      */
-    private void markFeaturesOffOnANewInstall(InstallContext context) {
+    private void markFeaturesOffOnANewInstall(Boolean isNewInstall) {
         try {
-            if (context.previousVersion() == null) {
+            if (isNewInstall) {
                 FeatureSwitchService.markNewInstall();
             }
         } catch (Exception e) {
@@ -120,12 +173,9 @@ public with sharing class CorePostInstall implements InstallHandler {
      * no edition). Its features are all on, so without this the first-run window would stand in
      * front of an org that is already working (ADR-0124).
      */
-    private void saveEditionOnAnUpgrade(InstallContext context) {
+    private void saveEditionOnAnUpgrade(Boolean isUpgrade) {
         try {
-            if (
-                context.previousVersion() != null &&
-                String.isBlank(SettingsService.getSettings().Suite__c)
-            ) {
+            if (isUpgrade && String.isBlank(SettingsService.getSettings().Suite__c)) {
                 String suite = SetupAssistantService.recommendedSuite();
                 SettingsService.saveSystemValue(
                     'Suite__c',
