@@ -6361,9 +6361,10 @@ logged and counted as a failure.
   Cloud and Service Cloud users, so no Core role grants them: the optional permission set
   `BarnCRM_Duplicate_Review` does, and the panel says so to anyone without it (ADR-0050).
   That set also carries the custom permission `Review_Duplicate_Suggestions`, which grants
-  no record access and only shows the Duplicates section of Org Optimizer to a holder who is
-  not an administrator; its holders are in the Data Hygiene tab's audience
-  (`TabAccessService`). Scanning, dismissing and merging still need Manage BarnCRM Settings.
+  no record access and only shows the Review area of the Duplicate Matching tab to a holder
+  who is not an administrator; its holders are in that tab's audience (`TabAccessService`,
+  `BarnCRM_Tab_Duplicate_Matching`, ADR-NEXT). Scanning, dismissing and merging still need
+  Manage BarnCRM Settings.
 - **People merges** are the platform's. When a contact, or a person stored as an account, is
   deleted by a merge (`MasterRecordId` filled in `after delete`), its memberships are
   recreated on the survivor in junction mode (all or none; only current rows count as already
@@ -6401,8 +6402,9 @@ logged and counted as a failure.
   which is where the platform's own person merge starts. The Account record page does not
   carry it, so a household is never merged past R-H13.
 - **Service:** `DuplicateService`, `DuplicateSelector`, `DuplicateScanBatch`,
-  `DuplicateController`. The review page is the `duplicateReview` panel on the Households page
-  of BarnCRM Settings.
+  `DuplicateController`. The review list is the `duplicateReview` component, the Review area
+  of the Duplicate Matching tab (app page `Duplicate_Matching`, shell `duplicateMatching`,
+  ADR-NEXT). BarnCRM Settings has a Duplicate Matching section whose row opens that tab.
 
 ---
 
@@ -8749,6 +8751,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Settings, Integrations page. New shipped type `Integration_App__mdt` (`Category__c`, `Status__c`, `Description__c`, `Maintainer__c`, `License_Cost__c`, `Link_Url__c`, `Install_Url__c`, `Detection_Objects__c`, `Related_Module__c`, `Compatibility__c`, `Show_Only_When_Installed__c`, `Migration_Path__c`, `Sort_Order__c`) in Section 13: the other products the page lists, detected by describe, never a dependency. |
 | v0.8 | 2026-10-26 | The four BarnCRM apps (ADR-0137). `BarnCRM_Settings__c` gains `App_Navigation_Style__c` (Section 12, app navigation key): Standard, Console or Both, default Both. |
 | v0.8 | 2026-10-26 | Module tabs in the BarnCRM apps (ADR-0137). `BarnCRM_Module__mdt` gains `Staff_Tabs__c` and `Admin_Tabs__c`. The Rollups record's `App_Name__c` is empty: the BarnCRM Rollup Builder app is retired and its tab is in the admin apps. |
+| v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-NEXT). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. |
 
 ---
 ## 32. Entity ownership by package

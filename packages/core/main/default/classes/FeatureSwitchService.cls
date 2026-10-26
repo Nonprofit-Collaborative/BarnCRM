@@ -10,7 +10,7 @@
  * finished (every feature was unticked).
  *
  * Two kinds of feature:
- * - a tool (Data Manager, Duplicate Review, Org Optimizer), whose tabs `TabAccessService` gives
+ * - a tool (Data Manager, Duplicate Matching, Org Optimizer), whose tabs `TabAccessService` gives
  *   once it is on;
  * - a Core feature group, whose Automation Registry switches are turned on with it and whose
  *   automations do not run while it is off (`automationsOff`, read by `AutomationControl`).
@@ -106,7 +106,9 @@ public with sharing class FeatureSwitchService {
                         'Find_Export_Row_Limit'
                     }
                 ),
-            new Item(DUPLICATE_REVIEW, KIND_TOOL).rows(new List<String>{ 'Duplicate_Review' }),
+            new Item(DUPLICATE_REVIEW, KIND_TOOL)
+                .tabs(new List<String>{ TabAccessService.DUPLICATE_MATCHING_TAB })
+                .rows(new List<String>{ 'Duplicate_Review' }),
             new Item(ORG_OPTIMIZER, KIND_TOOL)
                 .tabs(new List<String>{ TabAccessService.DATA_HYGIENE_TAB })
                 .rows(

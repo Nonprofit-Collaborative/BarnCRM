@@ -18,7 +18,11 @@ private class FeatureSwitchServiceTest {
             Set<String> stopped = FeatureSwitchService.automationsOff();
             Test.stopTest();
 
-            Assert.areEqual(5, tabSets.size(), 'Every feature tab is on');
+            Assert.areEqual(6, tabSets.size(), 'Every feature tab is on');
+            Assert.isTrue(
+                tabSets.contains(TabAccessService.DUPLICATE_MATCHING_TAB),
+                'Duplicate Matching is among them'
+            );
             Assert.isTrue(hidden.isEmpty(), 'No settings row is hidden');
             Assert.isTrue(stopped.isEmpty(), 'And no automation is stopped');
         }

@@ -30,7 +30,7 @@ describe('c-settings-setup-notes', () => {
   });
 
   it('shows what, why and where for a section that needs Setup, without asking Apex', async () => {
-    const element = await render('Households');
+    const element = await render('Duplicate Matching');
 
     const shown = note(element, 'duplicates');
     expect(shown).not.toBeNull();
@@ -46,6 +46,12 @@ describe('c-settings-setup-notes', () => {
     const element = await render('Addresses');
 
     expect(element.shadowRoot.querySelectorAll('[data-key]')).toHaveLength(0);
+  });
+
+  it('no longer shows the duplicates note on Households, which moved to Duplicate Matching', async () => {
+    const element = await render('Households');
+
+    expect(note(element, 'duplicates')).toBeNull();
   });
 
   it('says Done when the check is met and Not done yet when it is not', async () => {
