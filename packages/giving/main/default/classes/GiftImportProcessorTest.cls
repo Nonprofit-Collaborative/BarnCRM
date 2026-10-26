@@ -89,6 +89,7 @@ private class GiftImportProcessorTest {
             SELECT Row_Number__c, Status__c, Error_Message__c, Gift_Id__c, Contact_1__c
             FROM Import_Row__c
             WHERE Import_Batch__c = :batch.Id
+            WITH SYSTEM_MODE
             ORDER BY Row_Number__c
         ];
     }

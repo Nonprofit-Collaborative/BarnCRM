@@ -73,6 +73,7 @@ private class RollupQueueTest {
                 Next_Attempt__c,
                 Last_Error__c
             FROM Rollup_Queue__c
+            WITH SYSTEM_MODE
             ORDER BY Record_Count__c DESC
         ];
     }
@@ -461,6 +462,7 @@ private class RollupQueueTest {
             SELECT Message__c
             FROM Error_Log__c
             WHERE Context__c = 'RollupQueue' AND Severity__c = :ErrorLogger.SEVERITY_INFO
+            WITH SYSTEM_MODE
         ];
     }
 

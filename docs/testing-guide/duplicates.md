@@ -131,13 +131,16 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 ## T-DUP-09: Who sees the Duplicates section
 
-**Purpose:** Confirm the section is for administrators only, and BarnCRM Settings links to it.
-**Prerequisites:** admin; staff given **BarnCRM Find and Export** on the **Access** page.
+**Purpose:** Confirm the section is for administrators and BarnCRM Duplicate Review holders only, a holder who is not an admin can read it but not act, and BarnCRM Settings links to it.
+**Prerequisites:** admin; staff given **BarnCRM Find and Export** on the **Access** page; T-DUP-01 done (at least one pair waiting).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open **Org Optimizer**. | Only **Overview** and **Data quality**. No **Duplicates**. |
-| 2 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open this page**. |
-| 3 | Click **Open this page**. | The **Org Optimizer** tab opens. |
+| 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
+| 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Duplicates**. **Overview** lists one section. |
+| 4 | Choose **Duplicates**. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
+| 5 | As admin, open **BarnCRM Settings**, **Households**, find the **Duplicates** row. | It describes duplicate review in Org Optimizer and has **Open this page**. |
+| 6 | Click **Open this page**. | The **Org Optimizer** tab opens. |
 
-**Cleanup:** Remove **BarnCRM Find and Export** from the staff user.
+**Cleanup:** Remove **BarnCRM Duplicate Review** from the staff user.

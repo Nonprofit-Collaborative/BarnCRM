@@ -812,6 +812,10 @@
     <visibility>Available</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Household_Member__c</tab>
+    <visibility>Available</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Households</tab>
     <visibility>Visible</visibility>
   </tabSettings>

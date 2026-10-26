@@ -64,6 +64,7 @@ private class GiftImportCreditsTest {
             SELECT Status__c, Error_Message__c, Gift_Id__c, Soft_Credit_Id__c, Contact_2__c
             FROM Import_Row__c
             WHERE Import_Batch__c = :batch.Id
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -47,6 +47,7 @@ private class RollupRecalcErrorHandlerTest {
             SELECT Target_Object__c, Record_Ids__c
             FROM Rollup_Queue__c
             WHERE Target_Object__c = :targetObject
+            WITH SYSTEM_MODE
         ]) {
             ids.addAll(RollupQueue.idsOf(entry));
         }

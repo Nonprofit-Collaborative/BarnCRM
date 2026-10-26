@@ -101,6 +101,9 @@ An affiliation never moves a person between households.
 - Problem: "BarnCRM could not remove that relationship. Check that you can delete
   relationships ..." or "BarnCRM could not make that the primary affiliation ..." Ask your admin
   for access.
+- Problem: the card has no **Add relationship**, **Remove**, **Add affiliation** or **Make
+  primary** button. Your access lets you read these records but not change them (the Read Only
+  role, for example). Ask your admin.
 - Problem: **Primary Affiliation** went empty. The primary affiliation was ended. Make another
   one primary.
 

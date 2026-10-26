@@ -1,8 +1,12 @@
+// The object info test wire adapter is emitted to on purpose, which is how a wired component
+// is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import AffiliationPanel from 'c/affiliationPanel';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 const HARPER = '0031000000000001AA';
 const FOUNDATION_ID = '0011000000000009AA';
@@ -55,11 +59,26 @@ const CONGREGATION = node({
   isPrimary: false
 });
 
-function build(objectApiName = 'Contact', recordId = HARPER) {
+/** What the platform says a user may do with affiliations: Staff can, Read Only only reads. */
+const STAFF_ACCESS = {
+  createable: true,
+  updateable: true,
+  deletable: true,
+  fields: { Is_Primary__c: { updateable: true } }
+};
+const READ_ONLY_ACCESS = {
+  createable: false,
+  updateable: false,
+  deletable: false,
+  fields: { Is_Primary__c: { updateable: false } }
+};
+
+function build(objectApiName = 'Contact', recordId = HARPER, access = STAFF_ACCESS) {
   const element = createElement('c-affiliation-panel', { is: AffiliationPanel });
   element.recordId = recordId;
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
+  getObjectInfo.emit(access);
   return element;
 }
 
@@ -155,6 +174,25 @@ describe('c-affiliation-panel', () => {
     const buttons = element.shadowRoot.querySelectorAll('.make-primary');
     expect(buttons.length).toBe(1);
     expect(buttons[0].dataset.id).toBe(CONGREGATION.Id);
+  });
+
+  it('offers neither Add affiliation nor Make primary to someone who can only read affiliations', async () => {
+    const element = build('Contact', HARPER, READ_ONLY_ACCESS);
+    graphql.emit(response([FOUNDATION, CONGREGATION]));
+    await flush();
+
+    expect(headlines(element)).toEqual(['The Union Foundation', 'Summit Congregation']);
+    expect(element.shadowRoot.querySelector('[data-id="add-affiliation"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.make-primary').length).toBe(0);
+  });
+
+  it('hides Make primary when the primary field cannot be edited', async () => {
+    const element = build('Contact', HARPER, { ...STAFF_ACCESS, fields: {} });
+    graphql.emit(response([FOUNDATION, CONGREGATION]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="add-affiliation"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelectorAll('.make-primary').length).toBe(0);
   });
 
   it('never offers to make a former affiliation the primary one', async () => {

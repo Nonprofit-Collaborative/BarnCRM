@@ -33,7 +33,9 @@ license**. No other license can have it, Salesforce Platform included. So BarnCR
 access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
 Settings, open **Access** and, under **Extra permissions**, give **BarnCRM Duplicate Review** to
 each person who will review duplicates. Salesforce refuses the assignment for a user
-without one of those licenses. If nobody in your org has one, duplicate rules still warn people
+without one of those licenses. A holder who is not an administrator also gets the **Org
+Optimizer** tab with its **Duplicates** section, which they can read; scanning, dismissing and
+merging there stay with BarnCRM Admin. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.

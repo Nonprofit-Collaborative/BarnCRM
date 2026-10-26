@@ -6,10 +6,10 @@ records you already have, a list of possible pairs, and the tidy-up after a merg
 ever merged for you: every merge is a pair someone looked at and confirmed.
 
 Before you start: reviewing suggestions needs the **BarnCRM Duplicate Review** add-on, which
-Salesforce allows only for users with a Sales Cloud or Service Cloud license. The
-**Duplicates** list on the **Org Optimizer** tab, and dismissing and merging from it, also need
-the admin role (**BarnCRM Admin Group** on the Access page). Running the scan is admin work. Ask your admin; see
-[Duplicates](../admin-guide/duplicates.md).
+Salesforce allows only for users with a Sales Cloud or Service Cloud license. With it you see
+the **Org Optimizer** tab and its **Duplicates** list. Dismissing and merging from that list,
+and running the scan, also need the admin role (**BarnCRM Admin Group** on the Access page).
+Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 
 ## To review a possible duplicate person
 
@@ -98,7 +98,8 @@ any real duplicates in it first.
   BarnCRM Settings permission." Only admins act from the list. Merge people from their own
   page and households with **Merge or split**.
 - Problem: there is no **Duplicates** section on **Org Optimizer**, or no **Org Optimizer** tab.
-  The list is for admins. Use the **Potential Duplicates** card on the person.
+  The list is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or
+  use the **Potential Duplicates** card on the person.
 - Problem: "No possible duplicates are waiting. Scan again after a large import." Nothing to
   review. Ask your admin to scan after an import.
 - Problem: a pair of organizations never appears. The list shows people and households only.

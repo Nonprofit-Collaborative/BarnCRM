@@ -56,6 +56,7 @@ private class StewardshipWriterTest {
                 )
             FROM Stewardship_Plan_Template__c
             WHERE Plan_Key__c = 'every_gift_thanks_writer'
+            WITH SYSTEM_MODE
         ];
     }
 

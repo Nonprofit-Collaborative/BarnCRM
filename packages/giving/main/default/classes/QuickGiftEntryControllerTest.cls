@@ -382,7 +382,7 @@ private class QuickGiftEntryControllerTest {
             Installments_Planned__c = 1
         );
         insert pledge;
-        delete [SELECT Id FROM Installment__c WHERE Commitment__c = :pledge.Id];
+        delete [SELECT Id FROM Installment__c WHERE Commitment__c = :pledge.Id WITH SYSTEM_MODE];
         Installment__c payment = new Installment__c(
             Commitment__c = pledge.Id,
             Sequence__c = 1,

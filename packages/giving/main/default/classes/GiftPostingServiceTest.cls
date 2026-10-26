@@ -48,6 +48,7 @@ private class GiftPostingServiceTest {
         for (Gift__c gift : [
             SELECT Id, Amount__c, Accounting_Posted_At__c, Accounting_Posted_By__c
             FROM Gift__c
+            WITH SYSTEM_MODE
         ]) {
             byAmount.put(gift.Amount__c.intValue(), gift);
         }
@@ -59,6 +60,7 @@ private class GiftPostingServiceTest {
             SELECT Id, Amount__c, Accounting_Posted_At__c, Accounting_Posted_By__c
             FROM Gift__c
             WHERE Id = :giftId
+            WITH SYSTEM_MODE
         ];
     }
 

@@ -37,6 +37,7 @@ private class GiftImportRunStateTest {
             SELECT Status__c, Error_Message__c
             FROM Import_Row__c
             WHERE Import_Batch__c = :batch.Id
+            WITH SYSTEM_MODE
             ORDER BY Row_Number__c
         ];
     }

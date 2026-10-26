@@ -94,13 +94,29 @@ public class GiftImportUndoTest {
 
     /** The batch the setup imported. */
     public static Import_Batch__c batch() {
-        return [SELECT Id FROM Import_Batch__c WHERE Committed_By__c != NULL LIMIT 1];
+        return [
+            SELECT Id
+            FROM Import_Batch__c
+            WHERE Committed_By__c != NULL
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
     }
 
     /** The people and accounts the batch created that are still there. */
     public static Integer taggedLeft(Id batchId) {
-        return [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batchId] +
-            [SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batchId];
+        return [
+                SELECT COUNT()
+                FROM Contact
+                WHERE Created_By_Import_Batch__c = :batchId
+                WITH SYSTEM_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Account
+                WHERE Created_By_Import_Batch__c = :batchId
+                WITH SYSTEM_MODE
+            ];
     }
 
     private static String undoJournal(Id batchId) {
@@ -109,6 +125,7 @@ public class GiftImportUndoTest {
             SELECT Entries_JSON__c
             FROM Import_Journal__c
             WHERE Import_Batch__c = :batchId AND Phase__c = :ImportJournalService.PHASE_UNDO
+            WITH SYSTEM_MODE
         ]) {
             text += page.Entries_JSON__c;
         }
@@ -124,7 +141,12 @@ public class GiftImportUndoTest {
     public static void undo(Id batchId) {
         Assert.areEqual(
             DONORS,
-            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batchId],
+            [
+                SELECT COUNT()
+                FROM Gift__c
+                WHERE Created_By_Import_Batch__c = :batchId
+                WITH SYSTEM_MODE
+            ],
             'One gift a donor was imported.'
         );
         GivingRollupTestData.nextSave();
@@ -142,7 +164,12 @@ public class GiftImportUndoTest {
         }
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batchId],
+            [
+                SELECT COUNT()
+                FROM Gift__c
+                WHERE Created_By_Import_Batch__c = :batchId
+                WITH SYSTEM_MODE
+            ],
             'The gifts are gone first. ' + undoJournal(batchId)
         );
         run.queueRest();
