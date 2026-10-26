@@ -78,23 +78,24 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Diego's personal address and set his Mailing Street back to 6830 Sunset Ln.
 
-## T-ADDR-06: Schedule and run the seasonal swap
+## T-ADDR-06: Turn on Seasonal Addresses and run the seasonal swap
 
-**Purpose:** the swap can be scheduled and run from settings, and swaps a seasonal address in.
-**Prerequisites:** admin, T-ADDR-01 done.
+**Purpose:** turning on Seasonal Addresses schedules the nightly swap with no other step, and the swap runs and swaps a seasonal address in.
+**Prerequisites:** admin, T-ADDR-01 done, **Seasonal Addresses** not ticked and the swap not scheduled.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | The **Seasonal address swap** section reads **The nightly swap is not scheduled, so seasonal addresses will not move on their own.** |
-| 2 | Select **Schedule nightly run**. | It reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. The button now reads **Stop nightly run**. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the swap now** and no **Schedule nightly run** or **Stop nightly run** button. |
+| 2 | Tick **Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
+| 2a | Untick **Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
 | 4 | Select **Run the swap now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
 | 5 | Wait a minute and refresh. | **Seasonal addresses last swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
 | 6 | Open The Garcia Family. | **Default** is on Phoenix; Billing Address reads Phoenix; the Home address record has **Replaced By Seasonal** ticked. |
 | 7 | Open **Home**. | The **Seasonal addresses last swapped** tile shows the same time and sentence. |
 
-**Cleanup:** keep the schedule for T-ADDR-07.
+**Cleanup:** keep **Seasonal Addresses** on for T-ADDR-07.
 
 ## T-ADDR-07: The season ends and the address moves back
 
@@ -106,7 +107,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Set the Phoenix address's end month and day to yesterday and save. | Saved. |
 | 2 | **BarnCRM Settings**, **Addresses**, **Run the swap now**, wait a minute, refresh. | **0 moved to a seasonal address, 1 moved back, 0 could not be changed.** |
 | 3 | Open The Garcia Family. | **Default** is back on the Home address; Billing Address reads Springfield. |
-| 4 | Select **Stop nightly run**. | The page reads **The nightly swap is not scheduled, so seasonal addresses will not move on their own.** |
+| 4 | Untick **Seasonal Addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
 
 **Cleanup:** delete the Phoenix address.
 
@@ -134,7 +135,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
 | 2 | Look at a non-default address. | It shows no **Set as default** button. The **Default** badge still shows on the default one. |
 | 3 | Look at the card header. | There is no **Add address** button. |
-| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Schedule nightly run** (or **Stop nightly run**) and **Run the swap now** are disabled, with **You can see when the swap last ran. Changing the schedule needs the Manage BarnCRM Settings permission.** |
+| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Seasonal Addresses** and **Run the swap now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
 
@@ -150,3 +151,34 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Open Harper Garcia. | Her mailing address reads Chicago, Illinois, United States. |
 
 **Cleanup:** set the previous address as the default again and delete the Chicago address.
+
+## T-ADDR-11: Editing a household's billing address moves the household
+
+**Purpose:** a billing address typed on the household after it was created becomes its default address and reaches its members.
+**Prerequisites:** staff user, The Garcia Family on its Sunset Ln Home address.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On The Garcia Family, **Details**, change Billing Street to `27 Billing Test Ave` and save. | Saved. |
+| 2 | Look at the **Addresses** card. | A new **Home** card, 27 Billing Test Ave, carries **Default**. The Sunset Ln card is still there without the badge. |
+| 3 | Open Luis Garcia. | His mailing street is **27 Billing Test Ave**. |
+| 4 | Back on the household, save the record again without changing the address. | No third card is added. |
+| 5 | Undo: **Set as default** on the Sunset Ln card. | Billing Address and members are back on Sunset Ln. |
+
+**Cleanup:** delete the 27 Billing Test Ave address.
+
+## T-ADDR-12: A person with an address of their own stays put when the household moves
+
+**Purpose:** a household's address change, by any route, leaves a member who has their own default address where they are, and still moves everyone else.
+**Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | It is his first address, so it carries **Default**. His mailing street reads 9 Dorm Test Hall. |
+| 2 | On The Garcia Family, **Set as default** on the Phoenix card. | Harper and Luis read Phoenix. Diego still reads **9 Dorm Test Hall**. |
+| 3 | **Set as default** on the Sunset Ln card. | Harper and Luis read Sunset Ln. Diego still reads 9 Dorm Test Hall. |
+| 4 | On the household's **Details**, change Billing Street to `27 Billing Test Ave` and save. | Harper and Luis read 27 Billing Test Ave. Diego still reads 9 Dorm Test Hall. |
+| 5 | Delete Diego's 9 Dorm Test Hall address, then on the household **Set as default** on the Sunset Ln card. | Everyone, Diego included, reads Sunset Ln. |
+| 6 | Flexible way of belonging only (junction mode): add Luis to a second household as a member who is not primary there, and on that household **Set as default** on any other address. | Luis still reads Sunset Ln: that household is not his household. |
+
+**Cleanup:** delete the 27 Billing Test Ave address, and Luis's second membership if you added one.

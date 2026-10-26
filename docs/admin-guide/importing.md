@@ -45,7 +45,7 @@ A few things are worth knowing before your first large file:
    2,000, and the wizard lets you change it for one file.
 4. **Days the rows of an import are kept** is 90 unless you change it, from 1 to 3650, or 0
    to keep them for ever. See [How long the rows are kept](#how-long-the-rows-are-kept).
-5. **Import** on the same page has an **Open this page** link, which is the same
+5. **Import** on the same page has an **Open Import** button, which is the same
    place the **Import** tab takes you.
 6. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).

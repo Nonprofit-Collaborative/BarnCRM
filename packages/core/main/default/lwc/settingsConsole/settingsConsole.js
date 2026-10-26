@@ -24,6 +24,7 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
@@ -34,6 +35,8 @@ import { labelTab } from 'c/workspaceTabs';
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
+/** The stored name of the General section (SettingSections.GENERAL), not a display label. */
+const GENERAL_SECTION = 'General';
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
 // saves them. Their plain rows are hidden while that panel is in the section so a pattern has
@@ -135,7 +138,6 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
-    openSection: OPEN_SECTION,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
     feedbackUrl: FEEDBACK_URL
@@ -240,6 +242,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return !this.loading && this.currentSettings.length === 0;
   }
 
+  /** Recent Changes shows on the General section only, however the section was reached. */
+  get showRecentChanges() {
+    return this.selectedSection === GENERAL_SECTION;
+  }
+
   get hasChangesToShow() {
     return this.changes.length > 0;
   }
@@ -281,6 +288,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,
+      // The button names its destination ("Open Rollup Builder"), else the generic wording.
+      openLabel: setting.navigationLabel
+        ? OPEN_NAMED.replace('{0}', setting.navigationLabel)
+        : OPEN_SECTION,
       missing:
         setting.dataType === 'Component' &&
         Boolean(setting.component) &&
@@ -411,6 +422,15 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
    */
   async reloadAndRefreshPanels() {
     await this.load();
+    this.refreshPanels();
+  }
+
+  /**
+   * Asks each mounted panel that can re-read its own data to do so. Also run after a save,
+   * since a saved setting can change what a panel shows (the Seasonal Addresses switch
+   * schedules or stops the swap the panel below it reports on).
+   */
+  refreshPanels() {
     this.template.querySelectorAll('[data-panel]').forEach((panel) => {
       if (typeof panel.refresh === 'function') {
         panel.refresh();
@@ -515,6 +535,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       this.pending = {};
       this.messageIsError = false;
       this.message = this.labels.saved;
+      this.refreshPanels();
       await this.loadChanges();
     } catch (error) {
       this.messageIsError = true;

@@ -19,6 +19,10 @@
     <value xsi:type="xsd:string">Data_Hygiene</value>
   </values>
   <values>
+    <field>Navigation_Label__c</field>
+    <value xsi:type="xsd:string">Org Optimizer</value>
+  </values>
+  <values>
     <field>Help_Path__c</field>
     <value xsi:type="xsd:string">duplicates.md</value>
   </values>
