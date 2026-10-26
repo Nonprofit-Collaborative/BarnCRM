@@ -99,6 +99,56 @@
             <template lwc:if={notCountedMessage}>
                 <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
             </template>
+
+            <template lwc:if={showHistory}>
+                <div class="slds-var-m-top_large" data-id="history">
+                    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
+                        {historyLabels.title}
+                    </h3>
+                    <template lwc:if={hasHistory}>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small">
+                            {historyLabels.intro}
+                        </p>
+                        <lightning-datatable
+                            data-id="history-table"
+                            key-field="key"
+                            data={historyRows}
+                            columns={historyColumns}
+                            hide-checkbox-column
+                            onrowaction={handleHistoryAction}
+                        ></lightning-datatable>
+                        <template lwc:if={historyLimitMessage}>
+                            <p class="slds-text-body_small slds-var-m-top_x-small" data-id="history-limit">
+                                {historyLimitMessage}
+                            </p>
+                        </template>
+                    </template>
+                    <template lwc:else>
+                        <p data-id="history-empty">{historyLabels.empty}</p>
+                    </template>
+
+                    <template lwc:if={viewTitle}>
+                        <div class="slds-var-m-top_medium" data-id="snapshot-view">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                                <h4 class="slds-text-heading_small slds-col">{viewTitle}</h4>
+                                <lightning-button
+                                    data-id="view-close"
+                                    label={historyLabels.viewClose}
+                                    variant="neutral"
+                                    onclick={handleViewClose}
+                                ></lightning-button>
+                            </div>
+                            <lightning-datatable
+                                data-id="snapshot-rows"
+                                key-field="key"
+                                data={viewRows}
+                                columns={viewColumns}
+                                hide-checkbox-column
+                            ></lightning-datatable>
+                        </div>
+                    </template>
+                </div>
+            </template>
         </div>
     </lightning-card>
 </template>
