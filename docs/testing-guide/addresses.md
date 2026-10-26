@@ -206,7 +206,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | His card carries **Primary** and a **Use for Whole Household** button. A seasonal address of his own would show no such button. |
-| 2 | Select **Use for Whole Household**. | A confirmation opens: **Make this the household's primary address?**, with **Cancel** and **Use for Whole Household**. With one household there is no **Which household?** choice. |
+| 2 | Select **Use for Whole Household**. | A confirmation opens: **Make This the Household's Primary Address?**, with **Cancel** and **Use for Whole Household**. With one household there is no **Which household?** choice. |
 | 3 | Select **Cancel**. | The confirmation closes; nothing changed. |
 | 4 | Select **Use for Whole Household** again, then **Use for Whole Household** in the confirmation. | Toast **The household now uses this address.** |
 | 5 | Open The Garcia Family. | A new **Home** card, 9 Dorm Test Hall, carries **Primary**; Sunset Ln is still on the card. Billing Address reads 9 Dorm Test Hall. Harper and Luis read 9 Dorm Test Hall. |

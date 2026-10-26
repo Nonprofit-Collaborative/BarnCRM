@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: heading of the Update Everyone's Address confirmation</shortDescription>
-        <value>Give the household's people this address?</value>
+        <value>Give the Household's People This Address?</value>
     </labels>
     <labels>
         <fullName>Core_Address_UseForHouseholdButton</fullName>
@@ -262,6 +262,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: heading of the Use for Whole Household confirmation</shortDescription>
-        <value>Make this the household's primary address?</value>
+        <value>Make This the Household's Primary Address?</value>
     </labels>
 </CustomLabels>

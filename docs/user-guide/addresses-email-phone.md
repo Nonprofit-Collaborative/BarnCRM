@@ -44,7 +44,7 @@ You should see: "This is now the primary address, and it has been copied to the 
 address fields." The **Primary** badge moves, and the record's own address fields at the
 top of the page refresh. Nothing is deleted: the other addresses stay on the card.
 
-## To move the whole household to a person's address
+## To Move the Whole Household to a Person's Address
 
 Use this when a person's own address becomes the household's, for example when the family
 moves into the home one of them already had.
@@ -60,7 +60,7 @@ its primary, and everyone in it without an address of their own moves to it. If 
 person's own household, they move with the household from now on; their own address stays
 on their card without the **Primary** badge.
 
-## To give everyone in the household its address
+## To Give Everyone in the Household Its Address
 
 Use this to bring people back to the household's address, or, if your org's **Address
 Updates** setting is **Nobody moves until you choose**, to move them after the household's
