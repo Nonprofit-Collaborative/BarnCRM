@@ -67,7 +67,11 @@ choose to save anyway.
    each person with their email address.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
-   merge**, pick the values to keep, and confirm. This is Salesforce's own merge, and it keeps
+   merge**, pick the values to keep, and confirm. Salesforce allows this only to people with
+   Delete on contacts (on accounts, for person accounts): BarnCRM Admin has it, and the staff
+   roles deliberately do not, so staff ask an admin to merge two people. Merging two
+   households needs no Delete permission (see
+   [Household merge and split](household-merge-split.md)). This is Salesforce's own merge, and it keeps
    the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because

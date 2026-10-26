@@ -43,6 +43,14 @@ keep their original API names, `Program_Staff` and `Volunteer_Coordinator`, so t
 keep working; you only need those names for an
 [automatic access](automatic-access.md) policy.
 
+Of the roles, only BarnCRM Admin gives Delete on accounts and contacts (a person's Salesforce
+profile may give it too). The other roles leave it out on purpose, and they do not need it for
+merging households: anyone who can edit both households can merge
+them with **Merge or split**, with no Delete permission (see
+[Household merge and split](household-merge-split.md)). Merging two people uses Salesforce's
+own **Compare and merge**, which Salesforce allows only to people who can delete them, so
+staff ask an admin for that.
+
 ## Who can read a donor's receipts and tax statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is

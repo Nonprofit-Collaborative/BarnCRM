@@ -6,7 +6,9 @@
  * person trusted to edit two household records is trusted to combine them. The check is a
  * record level one, so sharing is honored and not merely object access. Nothing here is
  * gated on Manage_BarnCRM_Settings, which is about configuring the org rather than about
- * fixing a duplicate.
+ * fixing a duplicate. Nor is Delete on Account needed: HouseholdMergeService checks Edit on
+ * Account and edit access to both records, then runs the platform merge in system mode
+ * (ADR-NEXT).
  */
 public with sharing class HouseholdMergeController {
     /**

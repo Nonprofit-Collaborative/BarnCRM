@@ -220,7 +220,14 @@ public with sharing class HouseholdMergeService {
         Map<Id, Account> households = loadPair(survivorId, victimId);
         Account survivor = households.get(survivorId);
         Account victim = households.get(victimId);
-        if (HouseholdSelector.getEditableIds(new Set<Id>{ survivorId, victimId }).size() != 2) {
+        // BarnCRM's own authorization, checked here because the platform merge below runs in
+        // system mode (ADR-NEXT): Edit on Account, which the BarnCRM Staff and Admin
+        // permission sets grant, and edit access to both households as the platform's record
+        // access view reports it, so sharing is honored. Delete on Account is not needed.
+        if (
+            !Schema.SObjectType.Account.isUpdateable() ||
+            HouseholdSelector.getEditableIds(new Set<Id>{ survivorId, victimId }).size() != 2
+        ) {
             throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNoEditAccess);
         }
 
@@ -257,13 +264,10 @@ public with sharing class HouseholdMergeService {
         }
 
         // The platform's own merge, so that activities, files, notes, and every lookup
-        // another package points at this household follow the record that goes away.
-        Database.MergeResult merged = Database.merge(
-            new Account(Id = survivorId),
-            victimId,
-            false,
-            AccessLevel.USER_MODE
-        );
+        // another package points at this household follow the record that goes away. It runs
+        // in system mode through HouseholdMergeWriter, only after the checks at the top of this
+        // method passed, so staff need no Delete on Account (ADR-NEXT).
+        Database.MergeResult merged = HouseholdMergeWriter.mergeInto(survivorId, victimId);
         if (!merged.isSuccess()) {
             for (Database.Error problem : merged.getErrors()) {
                 reasons.add(problem.getMessage());
