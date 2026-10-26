@@ -840,7 +840,7 @@ private class HouseholdMergeServiceTest {
      * BarnCRM Staff deliberately holds no Delete on Account, and the platform merge deletes the
      * household that goes away. The merge runs in system mode once BarnCRM's own checks pass,
      * so a staff member who may edit both households can combine them, even two somebody else
-     * owns (ADR-NEXT). The households hold nobody, so the staff member's access to people (the
+     * owns (ADR-0134). The households hold nobody, so the staff member's access to people (the
      * profile here grants no standard contact fields) is not what this measures.
      */
     @IsTest

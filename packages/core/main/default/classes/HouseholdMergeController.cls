@@ -8,7 +8,7 @@
  * gated on Manage_BarnCRM_Settings, which is about configuring the org rather than about
  * fixing a duplicate. Nor is Delete on Account needed: HouseholdMergeService checks Edit on
  * Account and edit access to both records, then runs the platform merge in system mode
- * (ADR-NEXT).
+ * (ADR-0134).
  */
 public with sharing class HouseholdMergeController {
     /**

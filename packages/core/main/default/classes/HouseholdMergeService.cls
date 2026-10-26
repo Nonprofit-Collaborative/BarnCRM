@@ -221,7 +221,7 @@ public with sharing class HouseholdMergeService {
         Account survivor = households.get(survivorId);
         Account victim = households.get(victimId);
         // BarnCRM's own authorization, checked here because the platform merge below runs in
-        // system mode (ADR-NEXT): Edit on Account, which the BarnCRM Staff and Admin
+        // system mode (ADR-0134): Edit on Account, which the BarnCRM Staff and Admin
         // permission sets grant, and edit access to both households as the platform's record
         // access view reports it, so sharing is honored. Delete on Account is not needed.
         if (
@@ -266,7 +266,7 @@ public with sharing class HouseholdMergeService {
         // The platform's own merge, so that activities, files, notes, and every lookup
         // another package points at this household follow the record that goes away. It runs
         // in system mode through HouseholdMergeWriter, only after the checks at the top of this
-        // method passed, so staff need no Delete on Account (ADR-NEXT).
+        // method passed, so staff need no Delete on Account (ADR-0134).
         Database.MergeResult merged = HouseholdMergeWriter.mergeInto(survivorId, victimId);
         if (!merged.isSuccess()) {
             for (Database.Error problem : merged.getErrors()) {

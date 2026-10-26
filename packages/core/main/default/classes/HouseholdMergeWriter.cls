@@ -2,7 +2,7 @@
  * The platform account merge behind a household merge, and nothing else.
  *
  * ADR-0021 (system mode writes for package owned data) is the authority for this class, as
- * extended by ADR-NEXT (a household merge runs in system mode once BarnCRM has authorized
+ * extended by ADR-0134 (a household merge runs in system mode once BarnCRM has authorized
  * it). The platform's account merge deletes the household that goes away, so in user mode it
  * needs Delete on Account, and under sharing it needs delete access to that one record, which
  * only its owner and the owner's managers hold. BarnCRM staff are deliberately not given
