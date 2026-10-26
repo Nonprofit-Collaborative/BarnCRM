@@ -1,6 +1,6 @@
 # BarnCRM feature catalog
 
-BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-13 (main at PR #377, which landed batch 8).
+BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-25 (main at 24a4298b).
 
 **How this is kept current:** the catalog is updated in the same pull request that adds, changes, or removes a feature. A branch that builds a feature sets its row to "Built, not merged" with the branch name; the merge makes it "Shipped".
 

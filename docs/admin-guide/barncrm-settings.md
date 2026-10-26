@@ -18,6 +18,9 @@ A module with an app of its own can also show its settings there, on their own: 
 **Rollup Settings** tab of the **BarnCRM Rollup Builder** app is this page showing only the
 Rollups settings. They are the same settings, so a change in either place shows in both.
 
+The footer of the page has a **Report a problem or give feedback** link. It opens the
+BarnCRM support page on GitHub in a new tab.
+
 ## How to turn it on
 
 There is nothing to turn on, but there is one permission to give out.
