@@ -51,6 +51,11 @@ person accounts are not touched, because their phone numbers live on fields only
 **"It will not let me save."** You chose a number that is empty. Fill that number in, or choose
 another. BarnCRM will not empty the ordinary Phone box for you.
 
+**"Preferred Phone was cleared when someone emptied a number."** A user who cannot change
+Preferred Phone (for example, one without a BarnCRM permission set) could not act on the
+refusal, so when they empty the chosen number the choice is cleared instead and the ordinary
+Phone box keeps the number last copied into it. Choose a preferred phone again if you need one.
+
 **"I typed a new number into the ordinary Phone box and it went back."** Once a person has a
 preferred phone, the Phone box is filled from the number you chose on every save. Edit Home
 Phone, Mobile or Other Phone instead, or clear Preferred Phone to type into Phone by hand.

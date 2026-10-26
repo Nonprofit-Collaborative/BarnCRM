@@ -1361,6 +1361,71 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * In contact mode a person's account is their household, so pointing someone who is in a
+     * household at an organization instead (from the standard edit page or a data load)
+     * takes them out of it, usually by mistake: an affiliation is how a person is connected
+     * to an organization. That one change is refused, with a message saying what to do
+     * (R-C1a). Everything else is left alone: a person already at an organization or at no
+     * account may be pointed anywhere, a move between households is untouched, a native
+     * Nonprofit Cloud household counts as a household, and in junction mode the account is
+     * an employer, so nothing is checked. Runs before update.
+     */
+    public static void refuseLeavingHouseholdsForOrganizations(
+        List<Contact> records,
+        Map<Id, Contact> previousById
+    ) {
+        if (records == null || previousById == null || isJunctionMode()) {
+            return;
+        }
+        Id householdType = householdRecordTypeId();
+        List<Contact> moving = new List<Contact>();
+        Set<Id> accountIds = new Set<Id>();
+        for (Contact record : records) {
+            Contact previous = previousById.get(record.Id);
+            if (
+                householdType != null &&
+                previous != null &&
+                previous.AccountId != null &&
+                record.AccountId != null &&
+                record.AccountId != previous.AccountId
+            ) {
+                moving.add(record);
+                accountIds.add(previous.AccountId);
+                accountIds.add(record.AccountId);
+            }
+        }
+        if (moving.isEmpty()) {
+            return;
+        }
+        Map<Id, Id> typeByAccount = new Map<Id, Id>();
+        for (Account account : HouseholdSelector.getAccountRecordTypes(accountIds)) {
+            typeByAccount.put(account.Id, account.RecordTypeId);
+        }
+        List<Contact> leaving = new List<Contact>();
+        Set<Id> targets = new Set<Id>();
+        for (Contact record : moving) {
+            Id household = previousById.get(record.Id).AccountId;
+            if (
+                typeByAccount.get(household) == householdType &&
+                typeByAccount.containsKey(record.AccountId) &&
+                typeByAccount.get(record.AccountId) != householdType
+            ) {
+                leaving.add(record);
+                targets.add(record.AccountId);
+            }
+        }
+        if (leaving.isEmpty()) {
+            return;
+        }
+        Set<Id> nativeHouseholds = HouseholdSelector.nativeHouseholdAccountsAmong(targets);
+        for (Contact record : leaving) {
+            if (!nativeHouseholds.contains(record.AccountId)) {
+                record.addError(Contact.AccountId, Label.Core_Households_ErrorPersonToOrganization);
+            }
+        }
+    }
+
+    /**
      * Gives every contact that arrives without a household one of its own, named from the
      * org's pattern. Runs before insert, so the new household id is simply assigned to the
      * contact and no second pass over contacts is needed. R-H1.

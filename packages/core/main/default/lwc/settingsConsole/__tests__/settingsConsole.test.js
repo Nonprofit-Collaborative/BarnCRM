@@ -16,6 +16,11 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  '@salesforce/label/c.Core_Settings_FeedbackAria',
+  () => ({ default: 'Report a problem or give feedback (opens a new tab)' }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_Settings_FeedbackUrl',
   () => ({ default: 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md' }),
   { virtual: true }
@@ -319,6 +324,9 @@ describe('c-settings-console', () => {
     );
     expect(link.getAttribute('target')).toBe('_blank');
     expect(link.getAttribute('rel')).toContain('noopener');
+    expect(link.getAttribute('aria-label')).toBe(
+      'Report a problem or give feedback (opens a new tab)'
+    );
   });
 
   it('sends only the settings Maria changed', async () => {

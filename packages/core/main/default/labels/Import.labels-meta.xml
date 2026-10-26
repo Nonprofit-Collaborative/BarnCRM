@@ -733,8 +733,8 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import exceptions file capped; {0} rows in the file, {1} rows rejected</shortDescription>
-        <value>The exceptions file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again to get the rest.</value>
+        <shortDescription>Import rejected rows file capped; {0} rows in the file, {1} rows rejected</shortDescription>
+        <value>The rejected rows file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again to get the rest.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ReadOnlyMessage</fullName>

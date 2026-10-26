@@ -166,6 +166,57 @@ private class PreferredPhoneServiceTest {
         }
     }
 
+    @IsTest
+    static void theRefusalNamesTheChoiceAsThePicklistShowsIt() {
+        System.runAs(TestUsers.admin()) {
+            Contact maria = mariaWithTwoNumbers();
+            maria.Preferred_Phone__c = 'Mobile';
+            maria.MobilePhone = null;
+            String shown = 'Mobile';
+            for (
+                Schema.PicklistEntry entry : Schema.SObjectType.Contact.fields.Preferred_Phone__c.getPicklistValues()
+            ) {
+                if (entry.getValue() == 'Mobile') {
+                    shown = entry.getLabel();
+                }
+            }
+
+            Test.startTest();
+            PreferredPhoneService.apply(new List<Contact>{ maria });
+            Test.stopTest();
+
+            Assert.areEqual(1, maria.getErrors().size(), 'Refused: ' + maria.getErrors());
+            Assert.areEqual(
+                String.format(Label.Core_Phones_PreferredEmpty, new List<String>{ shown }),
+                maria.getErrors()[0].getMessage(),
+                'Names the choice by its label'
+            );
+        }
+    }
+
+    @IsTest
+    static void someoneWhoCannotEditTheChoiceHasItClearedNotRefused() {
+        User clerk = TestUsers.standardUser('Clerk');
+        System.runAs(clerk) {
+            Assert.isFalse(
+                Schema.SObjectType.Contact.fields.Preferred_Phone__c.isUpdateable(),
+                'Precondition: this user cannot edit Preferred Phone'
+            );
+            Contact maria = mariaWithTwoNumbers();
+            maria.Phone = MOBILE;
+            maria.Preferred_Phone__c = 'Mobile';
+            maria.MobilePhone = null;
+
+            Test.startTest();
+            PreferredPhoneService.apply(new List<Contact>{ maria });
+            Test.stopTest();
+
+            Assert.isTrue(maria.getErrors().isEmpty(), 'Not refused: ' + maria.getErrors());
+            Assert.isNull(maria.Preferred_Phone__c, 'The choice is cleared');
+            Assert.areEqual(MOBILE, maria.Phone, 'The phone keeps the last number copied');
+        }
+    }
+
     private static List<Contact> manyWhoPreferMobile(Integer count) {
         List<Contact> people = HouseholdTestDataFactory.manyContacts(count, 'Phoner');
         for (Integer i = 0; i < people.size(); i++) {

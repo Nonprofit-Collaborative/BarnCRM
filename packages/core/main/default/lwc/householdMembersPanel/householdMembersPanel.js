@@ -162,9 +162,13 @@ export default class HouseholdMembersPanel extends LightningElement {
   }
 
   get canMoveMembers() {
-    return this.isJunctionMode
-      ? this.membershipAccess.updateable === true
-      : this.contactAccess.updateable === true;
+    if (this.isJunctionMode) {
+      return this.membershipAccess.updateable === true;
+    }
+    // Moving a person in the simple mode changes their Account Name (AccountId), so the user
+    // needs edit access to that field as well as to contacts.
+    const accountField = this.contactAccess.fields && this.contactAccess.fields.AccountId;
+    return this.contactAccess.updateable === true && accountField?.updateable === true;
   }
 
   get canChangePrimary() {

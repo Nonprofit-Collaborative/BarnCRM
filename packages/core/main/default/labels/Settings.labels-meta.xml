@@ -113,6 +113,14 @@
         <value>Report a problem or give feedback</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_FeedbackAria</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: screen reader name of the feedback link</shortDescription>
+        <value>Report a problem or give feedback (opens a new tab)</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_FeedbackUrl</fullName>
         <categories>Core</categories>
         <language>en_US</language>

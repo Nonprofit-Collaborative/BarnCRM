@@ -129,18 +129,24 @@ function flush() {
 }
 
 /** Contact and Household Member access as the platform reports it, in that order. */
-function accessInfos(createable, updateable) {
-  const entry = { statusCode: 200, result: { createable, updateable } };
+function accessInfos(createable, updateable, accountIdUpdateable = updateable) {
+  const fields = { AccountId: { updateable: accountIdUpdateable } };
+  const entry = { statusCode: 200, result: { createable, updateable, fields } };
   return { results: [entry, entry] };
 }
 
 /** A Staff user by default: may add, move and make primary. */
-function build({ accountUpdateable = true, createable = true, updateable = true } = {}) {
+function build({
+  accountUpdateable = true,
+  createable = true,
+  updateable = true,
+  accountIdUpdateable = updateable
+} = {}) {
   const element = createElement('c-household-members-panel', { is: HouseholdMembersPanel });
   element.recordId = HOUSEHOLD_ID;
   document.body.appendChild(element);
   getObjectInfo.emit({ ...ACCOUNT_INFO, updateable: accountUpdateable });
-  getObjectInfos.emit(accessInfos(createable, updateable));
+  getObjectInfos.emit(accessInfos(createable, updateable, accountIdUpdateable));
   return element;
 }
 
@@ -347,6 +353,17 @@ describe('c-household-members-panel', () => {
     expect(element.shadowRoot.querySelector('.add-button')).toBeNull();
     expect(element.shadowRoot.querySelector('.move-button')).toBeNull();
     expect(element.shadowRoot.querySelector('.make-primary-button')).toBeNull();
+  });
+
+  it('offers no Move in the simple mode to someone who cannot edit Account Name', async () => {
+    const element = build({ accountIdUpdateable: false });
+    getRecord.emit(recordOfType('Household', PERSON_ID));
+    getMembershipMode.emit('Contact');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.move-button')).toBeNull();
+    expect(element.shadowRoot.querySelector('.add-button')).not.toBeNull();
   });
 
   it('offers Make primary in the simple mode only to someone who can edit the household', async () => {

@@ -1534,4 +1534,25 @@ private class HouseholdMergeServiceTest {
         }
         return reader;
     }
+
+    @IsTest
+    static void theSystemModeWriterRefusesAMergeTheServiceDidNotAuthorize() {
+        System.runAs(TestUsers.admin()) {
+            String refused;
+
+            Test.startTest();
+            try {
+                HouseholdMergeWriter.mergeInto(null);
+            } catch (HouseholdException thrown) {
+                refused = thrown.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_HouseholdMerge_ErrorMergeFailed,
+                refused,
+                'Only HouseholdMergeService can make the authorization the writer needs'
+            );
+        }
+    }
 }

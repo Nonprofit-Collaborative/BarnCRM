@@ -145,6 +145,11 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: the household name will not update. **Custom Name** is ticked. Untick it.
 - Problem: there is no **Merge or split** button. You are on an organization, or outside the
   **BarnCRM** app.
+- Problem: "This person is in a household, so Account Name must stay a household, not an
+  organization. To connect them to an organization, add an affiliation. To move them, use
+  Move to another household." You put an organization in the person's **Account Name**. Put
+  their household back, then add an affiliation for where they work, or use **Move to another
+  household** on the **Members** card.
 
 ## Related
 

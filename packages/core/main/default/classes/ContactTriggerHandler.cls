@@ -44,6 +44,13 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         HouseholdService.ensureHouseholds((List<Contact>) Trigger.new);
     }
 
+    public override void beforeUpdate() {
+        HouseholdService.refuseLeavingHouseholdsForOrganizations(
+            (List<Contact>) Trigger.new,
+            (Map<Id, Contact>) Trigger.oldMap
+        );
+    }
+
     public override void afterInsert() {
         // Junction mode first: a person saved into it with no household gets one here,
         // because the membership row that joins them to it needs an id the contact did not

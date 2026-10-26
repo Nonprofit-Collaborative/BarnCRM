@@ -178,7 +178,19 @@ can choose with **Make primary** afterward.
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
 while the org uses the simple way of belonging, because that move cannot be carried out.
-Switch to the flexible way in BarnCRM Settings, Households, if you need it.
+Switch to the flexible way in BarnCRM Settings, Households, if you need it. In the simple way
+the button also needs edit access to the person's **Account Name** field, since that is what
+a move changes; the BarnCRM Admin and Staff permission sets grant it.
+
+**"Saving a person with an organization in Account Name was refused."**
+In the simple way of belonging, a person's **Account Name** is their household, so changing it
+from a household to an organization would take them out of their household. The save is
+refused with "This person is in a household, so Account Name must stay a household, not an
+organization. To connect them to an organization, add an affiliation. To move them, use Move
+to another household." Add an affiliation (see [Affiliations](affiliations.md)) to record
+where they work, or use **Move to another household**. A person who is already at an
+organization, or has no account, can still be pointed at any account, and the flexible way
+of belonging is not affected.
 
 **"The Household panel on a person says they are not in a household yet, but they are."**
 In the simple way, check that the household field on the person is filled in and points at
