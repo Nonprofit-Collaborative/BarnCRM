@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: heading above the audit list</shortDescription>
-        <value>Recent changes</value>
+        <value>Recent Changes</value>
     </labels>
     <labels>
         <fullName>Core_Settings_SaveButton</fullName>

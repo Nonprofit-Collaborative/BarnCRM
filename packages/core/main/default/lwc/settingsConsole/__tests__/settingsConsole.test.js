@@ -311,6 +311,72 @@ describe('c-settings-console', () => {
     );
   });
 
+  describe('Recent Changes', () => {
+    const change = {
+      id: 'a01',
+      settingName: 'Fiscal year start month',
+      oldValue: '1',
+      newValue: '7',
+      changedBy: 'Maria',
+      changedAt: '2026-10-01T12:00:00.000Z'
+    };
+
+    function recentBlock(element) {
+      return (
+        Array.from(element.shadowRoot.querySelectorAll('h2')).find((heading) =>
+          heading.textContent.includes('Core_Settings_RecentChangesHeading')
+        ) || null
+      );
+    }
+
+    beforeEach(() => {
+      getRecentChanges.mockResolvedValue([change]);
+    });
+
+    it('shows on the General section', async () => {
+      const element = build();
+      await settle();
+      openSection('General');
+      await settle();
+
+      expect(recentBlock(element)).not.toBeNull();
+      expect(element.shadowRoot.querySelector('lightning-datatable')).not.toBeNull();
+    });
+
+    it('does not show on any other section', async () => {
+      const element = build();
+      await settle();
+
+      // The console opens on the first section, which is not General.
+      expect(recentBlock(element)).toBeNull();
+      expect(element.shadowRoot.querySelector('lightning-datatable')).toBeNull();
+
+      openSection('General');
+      await settle();
+      expect(recentBlock(element)).not.toBeNull();
+
+      openSection('Households');
+      await settle();
+      expect(recentBlock(element)).toBeNull();
+    });
+
+    it('does not show when a search result jumps to another section', async () => {
+      const element = build();
+      await settle();
+      openSection('General');
+      await settle();
+
+      element.shadowRoot.querySelector('c-settings-search').dispatchEvent(
+        new CustomEvent('settingselect', {
+          detail: { section: 'Households', key: 'Include_Deceased_In_Name__c' }
+        })
+      );
+      await settle();
+
+      expect(recentBlock(element)).toBeNull();
+    });
+  });
+
   it('links to the feedback page in a new tab', async () => {
     const element = build();
     await settle();

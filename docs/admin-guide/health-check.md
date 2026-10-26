@@ -57,10 +57,10 @@ yet.
 
 1. Maria opens the **BarnCRM** app, clicks **BarnCRM Settings**, and chooses
    **Health**.
-2. The first card is **What we found in your org**. It says Person Accounts are enabled.
+2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:
    **Standalone**.
-3. Below the card, the findings are grouped: **Your org**, **Licenses**, **Access**, and
+3. Below the card, the findings are grouped: **Your Org**, **Licenses**, **Access**, and
    **Settings**. Each finding has an icon: a red circle for something that needs fixing, an
    amber triangle for something to be aware of, a blue dot for information.
 4. The first finding is blue, **Your org at a glance**, and it repeats what was found in a
@@ -97,10 +97,10 @@ Nothing is broken today.
 
 | Group | What it checks |
 |---|---|
-| Your org | What else is installed: Person Accounts, Nonprofit Cloud objects, the Nonprofit Success Pack, standard Sales and Service Cloud objects. |
-| Your org | Whether your coexistence mode matches what was found. |
-| Your org | Whether household membership is still set to the person's account while Person Accounts are on, which does not work. |
-| Your org | Only with Nonprofit Cloud: whether your org has Nonprofit Cloud gift objects while the Mirror module is not installed. |
+| Your Org | What else is installed: Person Accounts, Nonprofit Cloud objects, the Nonprofit Success Pack, standard Sales and Service Cloud objects. |
+| Your Org | Whether your coexistence mode matches what was found. |
+| Your Org | Whether household membership is still set to the person's account while Person Accounts are on, which does not work. |
+| Your Org | Only with Nonprofit Cloud: whether your org has Nonprofit Cloud gift objects while the Mirror module is not installed. |
 | Settings | Whether household membership uses membership records while automatic household creation is off, which means no new person gets a household. |
 | Licenses | Whether the org uses more than one currency, which BarnCRM does not support yet. |
 | Access | Whether anyone holds the BarnCRM Admin role. |
@@ -160,7 +160,7 @@ The fix creates exactly what the box showed you. If something changed since Heal
 ran, for example a colleague restored the same totals a minute ago, the fix does nothing, says
 so, and Health Check runs again so you can read the finding as it is now.
 
-Every fix that runs is recorded under **Recent changes** in BarnCRM Settings, as
+Every fix that runs is recorded under **Recent Changes** at the bottom of the **General** section of BarnCRM Settings, as
 **Health Check:** followed by the button's name, with what it created, your name and the time.
 
 Every fix only creates something that is missing or switches on something that is off. No

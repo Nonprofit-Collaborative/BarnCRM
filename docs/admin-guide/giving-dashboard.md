@@ -25,7 +25,7 @@ else sees.
 3. Give people access. In BarnCRM Settings, open **Access** and assign the
    **Fundraising Staff** role, which includes the Giving module's **Giving Staff**
    permission set. Someone who should only look gets the **Read Only** role and, in
-   the Access page's Extra permissions, the **Giving Read Only** permission set. Without one of the Giving
+   the Access page's Extra Permissions, the **Giving Read Only** permission set. Without one of the Giving
    permission sets a person cannot read gifts, so the dashboard has nothing to show them.
    The report and dashboard folders themselves ship as
    public read only, so nothing has to be shared by hand.
@@ -68,7 +68,7 @@ Do this as Tom, from the sample data, after at least a few gifts exist.
 this dashboard doesn't have permission to run reports." The dashboard reads as whoever is
 looking at it, so this is a permission problem, not a dashboard problem: that person cannot
 run reports or cannot read gifts. Assign them the Fundraising Staff or Read Only role in
-BarnCRM Settings under Access, and the Giving module's permission set under Extra permissions on the same page. See
+BarnCRM Settings under Access, and the Giving module's permission set under Extra Permissions on the same page. See
 step 3 above.
 
 **The numbers look too small.** The money charts count gifts with the status **Received**,

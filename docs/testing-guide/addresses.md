@@ -86,7 +86,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | The **Seasonal address swap** section reads **The nightly swap is not scheduled, so seasonal addresses will not move on their own.** |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | The **Seasonal Address Swap** section reads **The nightly swap is not scheduled, so seasonal addresses will not move on their own.** |
 | 2 | Select **Schedule nightly run**. | It reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. The button now reads **Stop nightly run**. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
 | 4 | Select **Run the swap now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
