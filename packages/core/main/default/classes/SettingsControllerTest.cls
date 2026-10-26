@@ -387,6 +387,18 @@ private class SettingsControllerTest {
                 Module__c = 'Core',
                 Data_Type__c = 'Text',
                 Sort_Order__c = 2
+            ),
+            // Detection saves the coexistence mode with the membership mode, and a save needs
+            // a row for every key it writes.
+            new Setting_Definition__mdt(
+                DeveloperName = 'Coexistence_Mode_Choice',
+                MasterLabel = 'How BarnCRM fits your org',
+                Setting_Key__c = CoexistenceService.KEY_COEXISTENCE_MODE,
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = 'Picklist',
+                Picklist_Values__c = 'Standalone:On its own;NPSP:Alongside NPSP;NonprofitCloud:Alongside Nonprofit Cloud',
+                Sort_Order__c = 1
             )
         };
     }
