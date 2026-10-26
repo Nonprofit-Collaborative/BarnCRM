@@ -47,7 +47,7 @@ hidden for everyone.
    How to turn it on). Without it the Duplicates section says so.
 
 Duplicate review no longer has a panel in **BarnCRM Settings**. Under **Households**, the
-**Duplicates** row has an **Open** button that takes you to this page.
+**Duplicates** row has an **Open this page** button that takes you to this page.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -95,8 +95,8 @@ Each count stops at 1,000 and then says **More than 1000**.
 
 Two thresholds are settings, under **General** in **BarnCRM Settings**: **Days before a user
 is unused** (90 unless you change it; 30 to 365) and **Days before a report is unused** (365;
-90 to 1,095). A value outside the range is read as the nearest end, and each check's name
-shows the number in use. The 90 days that keep new email templates and flows out are fixed.
+90 to 1,095). The settings page refuses a value outside the range and saves nothing, and each
+check's name shows the number in use. The 90 days that keep new email templates and flows out are fixed.
 Nothing here is deleted or changed for you:
 **Open in Setup** opens the Setup page where you can review and remove each item.
 

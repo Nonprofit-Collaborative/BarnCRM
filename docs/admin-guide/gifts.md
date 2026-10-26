@@ -30,10 +30,10 @@ Then give your fundraising staff the **Fundraising Staff** role on the Access pa
 includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only
 need to see gifts get **Giving Read Only**.
 
-Those two are assigned in Salesforce Setup, which is the one step here that BarnCRM cannot
-yet do for you: the BarnCRM Admin and Read Only roles carry what Core provides and do not
-include a module's permission sets. The one exception is **Giving Admin**, which the Module
-Manager gives you when you turn Giving on there.
+Those two are given on the **Access** page in BarnCRM Settings, under Extra permissions,
+beside the person's role: the BarnCRM Admin and Read Only roles carry what Core provides and
+do not include a module's permission sets. The Module Manager also gives you **Giving
+Admin** when you turn Giving on there.
 
 ## A five-minute walkthrough
 

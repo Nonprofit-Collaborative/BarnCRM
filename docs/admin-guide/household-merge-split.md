@@ -63,7 +63,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
    The sample data ships one Garcia household, so to follow the merge make a second one
    first: a household named Garcia with a member or two in it, standing in for the
    duplicate an import would have left.
-3. Click **Merge or split households**, then stay on the **Merge** tab.
+3. Click **Merge or split**, then stay on the **Merge** tab.
 4. In the search box, type `Garcia`. Pick **Garcia Household**, the duplicate the import
    created. Two columns appear side by side: the household you started from on the left, the
    one you picked on the right.
@@ -89,7 +89,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
 
 ### Splitting a member out
 
-9. Still on the Garcia household, click **Merge or split households** again and choose the
+9. Still on the Garcia household, click **Merge or split** again and choose the
    **Split** tab.
 10. Tick **Diego Garcia** in the member list.
 11. Leave **A new household** selected and click **Split**. A dialog headed **Split this

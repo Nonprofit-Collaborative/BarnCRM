@@ -10,27 +10,25 @@ of entries that say what went wrong, which record it happened on, and what to do
 You can work through the list, mark the ones you have looked at, and mark the ones you
 have fixed, so the list stays short and honest.
 
-## What you will see in v0.1
-
-This page describes the finished feature. The BarnCRM app and its home page, where
-the tile lives, are built by feature C-03. Until then the Error Log tab is the way in, and
-the tile can be placed on any Lightning page. Everything else on this page works today.
-
 ## How to turn it on
 
 The Error Log is on as soon as BarnCRM is installed. Nothing is recorded unless
 something actually fails, so on a healthy organization the list is empty.
 
-You will find it in two places:
+You will find it in three places:
 
-- **The BarnCRM home page.** A tile shows how many new errors are waiting and the
-  five most recent, with the message and where it came from. Click any of them to open it,
-  or click the tile heading to see the whole list.
+- **The BarnCRM home page.** The **Errors to review** tile shows a count of the new
+  errors waiting, and an **Open the Error Log** link that opens the list of new entries.
+  The tile shows the count only, not the entries.
+- **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
+  entries and the five most recent, each with its message and where it came from, an
+  **Open this entry** button and a **Mark acknowledged** button. The Errors section needs
+  the Manage BarnCRM Settings permission (the BarnCRM Admin role).
 - **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
   it, filter it, and build reports on it like any other list in Salesforce.
 
-Everyone with the BarnCRM Staff or BarnCRM Admin role can read the Error Log. Only the
-BarnCRM Admin role can change an entry's status, and only the BarnCRM Admin role sees an
+Everyone with the BarnCRM Staff, BarnCRM Admin or BarnCRM Read Only role can read the
+Error Log entries. Only the BarnCRM Admin role can change an entry's status, and only the BarnCRM Admin role sees an
 entry's **Technical detail**: the error Salesforce raised can repeat values from a record
 that a colleague's own access would not show them.
 
@@ -107,11 +105,12 @@ an entry for longer, export the Error Log list or build a report on it before it
 
 Maria has heard from a colleague that "something did not save this morning."
 
-1. Open the **BarnCRM** app. On the home page, look at the **Error Log** tile. It
-   says how many new errors there are, for example "3 new".
-2. Read the five most recent entries in the tile. Each line shows the message and where it
-   came from, for example "Household naming".
-3. Click the entry your colleague described. The record opens.
+1. Open the **BarnCRM** app. On the home page, look at the **Errors to review** tile. It
+   shows how many new errors there are, for example "3".
+2. Open the **Org Optimizer** tab and choose **Errors**. The **Error Log** card shows
+   "3 new" and the five most recent entries. Each shows the message and where it came
+   from, for example "Household naming".
+3. Click **Open this entry** on the entry your colleague described. The record opens.
 4. Read the **Message**. It is written for you, not for a developer: it says what went
    wrong and what to do about it, for example "This household could not be renamed because
    every member is marked deceased. Add a living member, or set a custom name on the
@@ -125,13 +124,13 @@ Maria has heard from a colleague that "something did not save this morning."
 7. If you cannot fix an entry yourself, set **Status** to **Acknowledged** instead, so
    your colleagues know someone has seen it, and send the **Technical detail** to whoever
    supports your Salesforce. That section is the part written for a developer.
-8. Go back to the home page. The tile count has gone down by one.
+8. Go back to the home page. The **Errors to review** count has gone down by one.
 
 ## Common mistakes
 
 - **Treating the Error Log as a to-do list that someone else owns.** Unless you switch on
-  the error digest, nobody is emailed about these. If you do not look at the tile, nobody
-  looks at it.
+  the error digest, nobody is emailed about these. If you do not look at the home page count or the Org Optimizer's Errors section, nobody
+  looks at them.
 - **Expecting the digest to arrive when your organization blocks email.** If your
   Salesforce is set to send system email only (Setup, Deliverability), no digest can be
   sent. The panel's last run says so, and an entry appears in the Error Log (once, not

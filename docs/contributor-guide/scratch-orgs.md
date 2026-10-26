@@ -81,7 +81,8 @@ scripts/org/create-scratch-org.sh person-accounts dev --days 30 --replace
 closest an ordinary Dev Hub can get to the Agentforce Nonprofit shape the first customers
 run.
 
-That deploys Core, assigns the permission sets, and seeds the sample data, so the org is
+That deploys Core only (modules come from `scripts/org/deploy-packages.sh`), assigns the
+permission sets, and seeds Core's sample data, so the org is
 usable rather than empty.
 
 **Two settings make it behave like an Agentforce Nonprofit org**, and both are set in the app
@@ -134,7 +135,8 @@ Example:
 scripts/org/create-scratch-org.sh platform-only my-dev --days 14
 ```
 
-This creates the scratch org, deploys `packages/core`, assigns every Core permission set it
+This creates the scratch org, deploys `packages/core` only (deploy the modules afterwards
+with `scripts/org/deploy-packages.sh <alias>`), assigns every Core permission set it
 finds, and (platform-only shape only) runs the license check described below. It then loads
 sample data unless `--no-sample-data` is passed, and prints an `sf org open` hint. Target: under
 ten minutes from a clean checkout, per the contributor experience target in Section 8.2 of the
@@ -197,6 +199,16 @@ install NPSP and its dependencies. Once real, verified 04t ids are available, po
 
 ## Sample data
 
-`scripts/org/seed-sample-data.sh` loads `data/sample/plan.json` via `sf data import tree` if it
-exists. It does not exist yet (tracked as C-10 in the product plan: 200 realistic households),
-so until then the script prints `sample data not yet available (C-10)` and exits successfully.
+`scripts/org/seed-sample-data.sh <alias>` runs `scripts/org/load-sample-data.apex`, which
+starts the sample data loader (200 households, 440 contacts, 25 organizations, their
+connections and affiliations, plus the sample records of each installed module), then waits
+until the contact count and the background load jobs (`SampleDataStageBatch`) show the load
+has finished. The data comes from the `SampleData` static resource that
+`scripts/data/generate-sample-data.py` generates (see `data/sample/README.md`). The
+create script calls it unless `--no-sample-data` is passed.
+
+The create script deploys Core only, so the sample data it loads is Core's. A module's
+sample records load only for a module installed at the time of the load. To get them,
+deploy the module with `scripts/org/deploy-packages.sh <alias>` (which deploys the modules as
+well), then remove the sample data and load it again from **BarnCRM Settings**, **Sample
+data** (see the [Sample data](../admin-guide/sample-data.md) page).

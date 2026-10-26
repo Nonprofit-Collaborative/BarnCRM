@@ -6,7 +6,7 @@
 
 ## What it does
 
-Every household record carries a **Household Members** panel that lists the people in it,
+Every household record carries a **Members** panel that lists the people in it,
 says which one is the primary contact, and lets you change that with one click. A person's
 record carries a **Household** panel that names the household they belong to and links to
 it, so you can get from a person to their household and back without searching.
@@ -127,7 +127,7 @@ means no current membership record names them.
 Maria does this from the sample data.
 
 1. Open the **BarnCRM** app and click the **Households** tab, then open **The Garcia
-   Family**. The **Household Members** panel lists Harper, Luis and Diego Garcia, with a
+   Family**. The **Members** panel lists Harper, Luis and Diego Garcia, with a
    **Primary** badge on one of them.
 2. On Luis's row, click **Make primary**. The badge moves to Luis and the message "Luis
    Garcia is now the primary contact." appears. The **Make primary** button disappears from
@@ -157,7 +157,7 @@ manages access, or ask them to make the change.
 
 **"The household will not let me change its Primary Contact."**
 Your org uses the flexible way of belonging, where the field follows whoever is marked
-primary on the household's members. Use **Make primary** on the **Household Members** panel
+primary on the household's members. Use **Make primary** on the **Members** panel
 instead; the field updates on its own.
 
 **"A membership record I made by hand, or loaded, was refused."**
@@ -167,10 +167,10 @@ in a household, so a second one for the same person and household is refused wit
 person is already a current member of this household." Edit the membership they already
 have instead. An ended membership beside a current one is history and is kept.
 
-**"Ticking Is Primary on a membership was refused."**
+**"Ticking Primary Member on a membership was refused."**
 A household has one primary member. Saving a membership record that would give it a second
 one is refused with "This household already has a primary member." Use **Make primary** on
-the **Household Members** panel, which moves the mark in one step. A load of many records
+the **Members** panel, which moves the mark in one step. A load of many records
 (Data Loader, an import) is not refused: if it leaves a household with two primaries, the
 first in member order is used as the Primary Contact and nothing else is changed, so you
 can choose with **Make primary** afterward.
@@ -195,5 +195,5 @@ For report builders only.
 | Household | Primary Contact | The primary contact. In the simple way of belonging, written by Make primary. In the flexible way, kept in step with the member marked primary (a person account appears as its person contact) |
 | Household | Member Count | The number shown on the Household panel of a person |
 | Household | Formal Greeting | The greeting shown on the Household panel of a person |
-| Household Member | Is Primary | The primary contact in the flexible way of belonging. Written by Make primary |
+| Household Member | Primary Member | The primary contact in the flexible way of belonging. Written by Make primary |
 | Household Member | End Date | A membership with an end date in the past no longer counts |
