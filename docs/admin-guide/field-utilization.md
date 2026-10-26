@@ -72,9 +72,41 @@ records. A useful first report: Field Utilization Snapshots grouped by **Field L
 
 Saved counts are kept until you delete them; nothing deletes them on a schedule. Account and
 Contact with three record types between them come to about 300 rows per save, roughly 600 KB of
-data storage. To clear old saves, use [Bulk delete](bulk-delete.md): in Find, choose Field
-Utilization Snapshots, filter **Taken At** before the date you want to keep from, and delete the
-results. Any other way you delete records works too.
+data storage. To clear old saves one at a time, use **Delete** in Snapshot History (below). To
+clear many at once, use [Bulk delete](bulk-delete.md): in Find, choose Field Utilization
+Snapshots, filter **Taken At** before the date you want to keep from, and delete the results.
+Any other way you delete records works too.
+
+## Snapshot History
+
+At the bottom of the section, below the table, **Snapshot History** lists the saved counts for
+the kind of record you chose, newest first. Each row is one save, and shows:
+
+- **Taken**: the date and time the count was saved.
+- **Saved by**: who saved it.
+- **Fields**: how many different fields it holds.
+- **Average fill rate**: the filled values as a percentage of the records counted, across every
+  field and record type in that save.
+
+The list shows the newest 50 saves, and says so when older ones exist. Older saves are still in
+the Field Utilization Snapshot records, so reports see them.
+
+Each row has three actions:
+
+- **Compare with this one.** Until you choose, the page compares with the latest save. Choose
+  this on an older save and the **Saved** and **Change (points)** columns, and the line above the
+  table, follow that save instead. It is a choice for what you are looking at: counting again,
+  saving, deleting a save or choosing another kind of record puts the comparison back on the
+  latest save.
+- **View.** Opens that save's rows under the list, with **Kind of record**, **Record type**,
+  **Field** and **Fill rate**. Choose **Close** to hide them.
+- **Delete.** Deletes every row of that save, after you confirm. It cannot be undone from the
+  page. **Delete** appears only for people who can delete Field Utilization Snapshot records (the
+  BarnCRM Admin permission set does). The list refreshes, and if you deleted the latest save, the
+  next older one becomes the one the page compares with.
+
+If the kind of record has no saved counts, the list reads "No snapshots have been saved for this
+kind of record yet."
 
 ## Common mistakes
 

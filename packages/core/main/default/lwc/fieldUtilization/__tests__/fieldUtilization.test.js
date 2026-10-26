@@ -4,7 +4,36 @@ import listObjects from '@salesforce/apex/FieldUtilizationController.listObjects
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
 import saveCounts from '@salesforce/apex/FieldUtilizationController.saveCounts';
+import getHistory from '@salesforce/apex/FieldUtilizationController.getHistory';
+import getSnapshotRows from '@salesforce/apex/FieldUtilizationController.getSnapshotRows';
+import deleteSnapshot from '@salesforce/apex/FieldUtilizationController.deleteSnapshot';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
+jest.mock(
+  '@salesforce/label/c.Core_FieldUtilization_HistoryLimit',
+  () => ({ default: 'Showing the newest {0} snapshots.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_FieldUtilization_DeleteConfirm',
+  () => ({ default: 'Deletes the {1} counts taken on {0}.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/FieldUtilizationController.getHistory',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/FieldUtilizationController.getSnapshotRows',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/FieldUtilizationController.deleteSnapshot',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.listObjects',
   () => {
@@ -204,5 +233,175 @@ describe('c-field-utilization', () => {
     await choose(element, 'Account');
 
     expect(find(element, 'error').textContent).toContain('You need the permission.');
+  });
+});
+
+describe('c-field-utilization snapshot history', () => {
+  const LATEST = '2026-10-04T08:00:00.000Z';
+  const OLDER = '2026-09-20T08:00:00.000Z';
+  const HISTORY = {
+    snapshots: [
+      {
+        takenAt: LATEST,
+        savedBy: 'Maria Lopez',
+        rowCount: 112,
+        fieldCount: 56,
+        averagePercent: 42.5
+      },
+      { takenAt: OLDER, savedBy: 'Sam Rivera', rowCount: 100, fieldCount: 50, averagePercent: 30 }
+    ],
+    maxSnapshots: 50,
+    canDelete: true
+  };
+  const COUNTED = { rows: [row('Phone', 80, 80.0)], failed: [] };
+
+  const act = async (element, name, takenAt, extra = {}) => {
+    find(element, 'history-table').dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name }, row: { takenAt, rowCount: 112, ...extra } }
+      })
+    );
+    await flush();
+  };
+
+  beforeEach(() => {
+    getPlan.mockResolvedValue({ ...PLAN, chunkSize: 40, previousTakenAt: LATEST });
+    countFields.mockResolvedValue(COUNTED);
+    getHistory.mockResolvedValue(HISTORY);
+    BarnConfirmModal.open.mockResolvedValue(true);
+  });
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+    getHistory.mockReset();
+  });
+
+  it('shows the empty state when nothing has been saved', async () => {
+    getHistory.mockResolvedValue({ snapshots: [], maxSnapshots: 50, canDelete: true });
+    const element = render();
+    await choose(element, 'Account');
+
+    expect(getHistory).toHaveBeenCalledWith({ objectName: 'Account' });
+    expect(find(element, 'history-empty').textContent).toContain('HistoryEmpty');
+    expect(find(element, 'history-table')).toBeNull();
+  });
+
+  it('shows no history before an object is chosen', async () => {
+    const element = render();
+    await flush();
+
+    expect(find(element, 'history')).toBeNull();
+  });
+
+  it('lists one row per snapshot with who saved it, its fields and its average fill rate', async () => {
+    const element = render();
+    await choose(element, 'Account');
+
+    expect(find(element, 'history').textContent).toContain('HistoryTitle');
+    const table = find(element, 'history-table');
+    expect(table.data).toHaveLength(2);
+    expect(table.data[0]).toMatchObject({
+      savedBy: 'Maria Lopez',
+      fieldCount: 56,
+      isCompared: true
+    });
+    expect(table.data[0].averageShare).toBeCloseTo(0.425);
+    expect(table.data[1].isCompared).toBe(false);
+    expect(table.columns.map((c) => c.typeAttributes && c.typeAttributes.name)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'compare',
+      'view',
+      'delete'
+    ]);
+    expect(find(element, 'history-limit')).toBeNull();
+  });
+
+  it('offers no Delete without delete access, and says when the list is cut off', async () => {
+    getHistory.mockResolvedValue({ ...HISTORY, canDelete: false, maxSnapshots: 2 });
+    const element = render();
+    await choose(element, 'Account');
+
+    const names = find(element, 'history-table').columns.map(
+      (c) => c.typeAttributes && c.typeAttributes.name
+    );
+    expect(names).not.toContain('delete');
+    expect(find(element, 'history-limit').textContent).toContain('2');
+  });
+
+  it('compares with the chosen snapshot: the Saved and Change columns follow it', async () => {
+    getSnapshotRows.mockResolvedValue([row('Phone', 50, 50.0)]);
+    const element = render();
+    await choose(element, 'Account');
+    expect(find(element, 'results').data[0].previousShare).toBeCloseTo(0.75);
+
+    await act(element, 'compare', OLDER);
+
+    expect(getSnapshotRows).toHaveBeenCalledWith({ objectName: 'Account', takenAt: OLDER });
+    const first = find(element, 'results').data[0];
+    expect(first.previousShare).toBeCloseTo(0.5);
+    expect(first.change).toBe(30);
+    const flags = find(element, 'history-table').data.map((r) => r.isCompared);
+    expect(flags).toEqual([false, true]);
+  });
+
+  it('shows the fields of a snapshot and closes the view', async () => {
+    getSnapshotRows.mockResolvedValue([row('Phone', 50, 50.0), row('Website', 10, 10.0)]);
+    const element = render();
+    await choose(element, 'Account');
+    expect(find(element, 'snapshot-view')).toBeNull();
+
+    await act(element, 'view', OLDER);
+
+    expect(getSnapshotRows).toHaveBeenCalledWith({ objectName: 'Account', takenAt: OLDER });
+    const rows = find(element, 'snapshot-rows').data;
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toMatchObject({
+      objectLabel: 'Account',
+      recordTypeLabel: 'Organization',
+      fieldLabel: 'Phone'
+    });
+    expect(rows[0].share).toBeCloseTo(0.5);
+
+    find(element, 'view-close').click();
+    await flush();
+    expect(find(element, 'snapshot-view')).toBeNull();
+  });
+
+  it('deletes a snapshot only after the person confirms, then refreshes', async () => {
+    deleteSnapshot.mockResolvedValue(100);
+    const element = render();
+    await choose(element, 'Account');
+    getPlan.mockClear();
+    getHistory.mockClear();
+
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    await act(element, 'delete', OLDER);
+    expect(deleteSnapshot).not.toHaveBeenCalled();
+
+    await act(element, 'delete', OLDER, { rowCount: 100 });
+
+    const dialog = BarnConfirmModal.open.mock.calls[1][0];
+    expect(dialog.confirmVariant).toBe('destructive');
+    expect(dialog.message).toContain('100');
+    expect(deleteSnapshot).toHaveBeenCalledWith({ objectName: 'Account', takenAt: OLDER });
+    expect(getPlan).toHaveBeenCalledWith({ objectName: 'Account' });
+    expect(getHistory).toHaveBeenCalledWith({ objectName: 'Account' });
+    expect(find(element, 'notice').textContent).toContain('Deleted');
+  });
+
+  it('shows the server message when a delete is refused', async () => {
+    deleteSnapshot.mockRejectedValue({ body: { message: 'No delete access.' } });
+    const element = render();
+    await choose(element, 'Account');
+
+    await act(element, 'delete', OLDER);
+
+    expect(find(element, 'error').textContent).toContain('No delete access.');
   });
 });

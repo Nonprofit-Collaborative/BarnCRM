@@ -86,6 +86,35 @@ public with sharing class FieldUtilizationController {
         public List<String> failed = new List<String>();
     }
 
+    /** One saved count in the Snapshot History list. */
+    public class SnapshotInfo {
+        @AuraEnabled
+        public Datetime takenAt;
+        @AuraEnabled
+        public String savedBy;
+        /** How many saved rows (a field once per record type) the save holds. */
+        @AuraEnabled
+        public Integer rowCount;
+        /** How many different fields the save holds. */
+        @AuraEnabled
+        public Integer fieldCount;
+        /** Filled values as a percentage of the records looked at, across the whole save. */
+        @AuraEnabled
+        public Decimal averagePercent;
+    }
+
+    /** The Snapshot History list for one object. */
+    public class History {
+        @AuraEnabled
+        public List<SnapshotInfo> snapshots = new List<SnapshotInfo>();
+        /** The most snapshots listed; when the list is this long, older ones are not shown. */
+        @AuraEnabled
+        public Integer maxSnapshots = FieldUtilizationHistory.MAX_RUNS;
+        /** Whether the person may delete snapshots (delete access on the snapshot object). */
+        @AuraEnabled
+        public Boolean canDelete = false;
+    }
+
     /** Every object the person may count, by label (R-FU1). */
     @AuraEnabled(cacheable=true)
     public static List<Option> listObjects() {
@@ -261,6 +290,97 @@ public with sharing class FieldUtilizationController {
             return snapshots.size();
         } catch (Exception caught) {
             throw asUserError(caught, 'Save field utilization counts');
+        }
+    }
+
+    /** The object's newest saved counts, one entry per save, newest first (Snapshot History). */
+    @AuraEnabled
+    public static History getHistory(String objectName) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            History listed = new History();
+            listed.canDelete = Field_Utilization_Snapshot__c.SObjectType.getDescribe()
+                .isDeletable();
+            List<FieldUtilizationHistory.Run> runs = FieldUtilizationHistory.latest(
+                described.getName()
+            );
+            Map<Id, String> names = FieldUtilizationHistory.namesOf(runs);
+            for (FieldUtilizationHistory.Run run : runs) {
+                SnapshotInfo info = new SnapshotInfo();
+                info.takenAt = run.takenAt;
+                info.savedBy = names.get(run.savedById);
+                info.rowCount = run.rowCount;
+                info.fieldCount = run.fieldCount;
+                info.averagePercent = run.averagePercent();
+                listed.snapshots.add(info);
+            }
+            return listed;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Field utilization history');
+        }
+    }
+
+    /**
+     * The rows of one saved count: to compare the page's count with it, or to show it. Rows
+     * come back in the shape of a count row, ordered by field label and record type.
+     */
+    @AuraEnabled
+    public static List<CountRow> getSnapshotRows(String objectName, Datetime takenAt) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            List<CountRow> rows = new List<CountRow>();
+            if (takenAt == null) {
+                return rows;
+            }
+            RecordTypeLabels labels = new RecordTypeLabels(described);
+            for (
+                Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsAt(
+                    described.getName(),
+                    takenAt
+                )
+            ) {
+                rows.add(toRow(row, labels));
+            }
+            return rows;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Field utilization snapshot rows');
+        }
+    }
+
+    /**
+     * Deletes one saved count: every row of the object that carries the given Taken At. Needs
+     * delete access on the snapshot object, and the delete runs in user mode. Returns how many
+     * rows were deleted.
+     */
+    @AuraEnabled
+    public static Integer deleteSnapshot(String objectName, Datetime takenAt) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            if (!Field_Utilization_Snapshot__c.SObjectType.getDescribe().isDeletable()) {
+                throw new FieldUtilizationException(
+                    System.Label.Core_FieldUtilization_DeleteNoAccess
+                );
+            }
+            if (takenAt == null) {
+                return 0;
+            }
+            List<Field_Utilization_Snapshot__c> rows = FieldUtilizationSelector.idsAt(
+                described.getName(),
+                takenAt
+            );
+            try {
+                Database.delete(rows, AccessLevel.USER_MODE);
+            } catch (DmlException notAllowed) {
+                throw new FieldUtilizationException(
+                    System.Label.Core_FieldUtilization_DeleteFailed
+                );
+            }
+            return rows.size();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Delete field utilization snapshot');
         }
     }
 

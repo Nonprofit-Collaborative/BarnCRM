@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history section heading</shortDescription>
+        <value>Snapshot History</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryIntro</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history section intro</shortDescription>
+        <value>Each saved count is a snapshot. Compare the count above with any of them, look at its fields, or delete it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryEmpty</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history empty state</shortDescription>
+        <value>No snapshots have been saved for this kind of record yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryLimit</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history limit note; {0} is the number of snapshots shown</shortDescription>
+        <value>Showing the newest {0} snapshots.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryColTakenAt</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history taken column</shortDescription>
+        <value>Taken</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryColSavedBy</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history saved by column</shortDescription>
+        <value>Saved by</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryColFields</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history fields column</shortDescription>
+        <value>Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryColAverage</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history average column</shortDescription>
+        <value>Average fill rate</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryCompare</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history compare button</shortDescription>
+        <value>Compare with this one</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryView</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history view button</shortDescription>
+        <value>View</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_HistoryDelete</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: history delete button</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ViewTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: snapshot rows heading; {0} is the date and time taken</shortDescription>
+        <value>Snapshot Taken {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ViewClose</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: snapshot rows close button</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ViewColObject</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: snapshot rows kind of record column</shortDescription>
+        <value>Kind of record</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ViewColFillRate</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: snapshot rows fill rate column</shortDescription>
+        <value>Fill rate</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete confirm heading</shortDescription>
+        <value>Delete This Snapshot?</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteConfirm</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete confirm; {0} is the date, {1} is the row count</shortDescription>
+        <value>This deletes the {1} saved counts taken on {0}. This cannot be undone from this page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteButton</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete confirm button</shortDescription>
+        <value>Delete snapshot</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteCancel</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete confirm cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_Deleted</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: snapshot deleted notice</shortDescription>
+        <value>Snapshot deleted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteNoAccess</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete without access</shortDescription>
+        <value>You do not have permission to delete saved counts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_DeleteFailed</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: delete refused</shortDescription>
+        <value>The snapshot could not be deleted. You may not have access to every row in it.</value>
+    </labels>
+</CustomLabels>
