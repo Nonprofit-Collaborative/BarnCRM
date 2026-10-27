@@ -259,14 +259,14 @@ private class JobNotificationPathsTest {
     }
 
     @IsTest
-    static void duplicateScanOpensThePeopleBox() {
+    static void duplicateScanOpensTheDuplicateMatchingBox() {
         System.runAs(TestUsers.admin()) {
             notifications(true);
 
             new DuplicateScanBatch('Contact', new List<String>()).finish(null);
 
             assertOneAboutSection(
-                SettingSections.PEOPLE,
+                SettingSections.DUPLICATE_MATCHING,
                 title(
                     System.Label.Core_JobNotice_Finished,
                     System.Label.Core_JobNotice_DuplicateScan

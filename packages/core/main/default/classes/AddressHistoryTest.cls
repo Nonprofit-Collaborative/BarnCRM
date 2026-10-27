@@ -466,7 +466,10 @@ private class AddressHistoryTest {
         Test.startTest();
         Boolean canReadStatus;
         Address__c endedOnMove;
+        Date moveDay;
         System.runAs(pat) {
+            // Today in Pat's time zone, the day BarnCRM stamps on the move Pat makes.
+            moveDay = Date.today();
             canReadStatus = Schema.SObjectType.Address__c.fields.Status__c.isAccessible();
             insert garcia;
             Address__c moved = newPrimary(garcia.Id, NEW_STREET);
@@ -480,7 +483,7 @@ private class AddressHistoryTest {
         Assert.isFalse(canReadStatus, 'The person cannot read the status: the case under test.');
         Assert.isFalse(endedOnMove.Is_Default__c, 'The move took the old primary out of use.');
         Assert.areEqual('Former', endedOnMove.Status__c, 'BarnCRM still ended the old address.');
-        Assert.areEqual(Date.today(), endedOnMove.End_Date__c, 'It ended on the day of the move.');
+        Assert.areEqual(moveDay, endedOnMove.End_Date__c, 'It ended on the day of the move.');
         System.runAs(TestUsers.admin()) {
             Address__c home = addressAt(garcia.Id, HOME_STREET);
             Assert.isTrue(home.Is_Default__c, 'Deleting the new primary put the old one back.');
@@ -597,11 +600,16 @@ private class AddressHistoryTest {
         );
     }
 
+    /**
+     * The address at this street, history fields included, read in system mode: the test checks
+     * what BarnCRM saved, whoever runs it, including someone who cannot read those fields.
+     */
     private static Address__c addressAt(Id householdId, String street) {
         return [
             SELECT Id, Is_Default__c, Status__c, Start_Date__c, End_Date__c
             FROM Address__c
             WHERE Account__c = :householdId AND Street__c = :street
+            WITH SYSTEM_MODE
             LIMIT 1
         ];
     }
