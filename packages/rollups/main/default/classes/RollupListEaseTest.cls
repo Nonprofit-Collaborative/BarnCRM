@@ -16,10 +16,15 @@ private class RollupListEaseTest {
 
     private static Integer fakeIds = 0;
 
+    /** The object's describe without its child relationships. */
+    private static Schema.DescribeSObjectResult describe(Schema.SObjectType objectType) {
+        return objectType.getDescribe(SObjectDescribeOptions.DEFERRED);
+    }
+
     /** An unsaved definition with an Id, so pairs can be compared without the save's checks. */
     private static Rollup_Definition__c rollup(String name, String targetField, Boolean active) {
         fakeIds++;
-        String prefix = Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix();
+        String prefix = describe(Rollup_Definition__c.SObjectType).getKeyPrefix();
         return new Rollup_Definition__c(
             Id = Id.valueOf(prefix + String.valueOf(fakeIds).leftPad(12, '0')),
             Name = name,
@@ -65,10 +70,10 @@ private class RollupListEaseTest {
                     Label.Core_RollupEase_SentenceRecords,
                     new List<String>{
                         Label.Core_RollupEase_CalcCount,
-                        Account.SObjectType.getDescribe().getLabelPlural(),
+                        describe(Account.SObjectType).getLabelPlural(),
                         label(Account.ParentId).removeEndIgnoreCase(' ID'),
                         label(Account.Member_Count__c),
-                        Account.SObjectType.getDescribe().getLabel()
+                        describe(Account.SObjectType).getLabel()
                     }
                 ),
                 sentence,
@@ -322,7 +327,7 @@ private class RollupListEaseTest {
 
             System.Assert.areEqual(RollupSentence.of(saved), view.sentence);
             System.Assert.areEqual(
-                Account.SObjectType.getDescribe().getLabel(),
+                describe(Account.SObjectType).getLabel(),
                 view.targetObjectLabel
             );
             System.Assert.areEqual(RollupStatus.LEVEL_OFF, view.statusLevel);
