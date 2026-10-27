@@ -302,6 +302,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** leave **Keep the households of deleted people** unticked (the default).
 
+## T-SET-18: Keep a shown default as a saved choice
+
+**Purpose:** confirm a setting that shows a default nobody saved can be kept as a saved choice in one click, through the normal save.
+**Prerequisites:** admin user, then read-only user. **Digest frequency** (Error Log), **Years before a person is not changed** and **Days before a user is unused** (Org Optimizer) never saved in this org.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Error Log**. | **Digest frequency** shows **Daily**, with "Default, not yet saved." under it and a **Keep this setting** button beside the note, inside the **Error Digest** box. A setting already saved shows no note. |
+| 2 | Click **Keep this setting** under **Digest frequency**. | "Your settings are saved." The note and the button are gone, and **Digest frequency** still shows **Daily**. |
+| 3 | Open **General** and read **Recent Changes**. | The top row is **Digest frequency**, old value empty, new value **Daily**, with your name. |
+| 4 | Open **Org Optimizer**. Change **Days before a user is unused** to `120` without saving. | Its note and button are gone; **Years before a person is not changed** still shows **5** with its note and button. |
+| 5 | Click **Keep this setting** under **Years before a person is not changed**. | "Your settings are saved." Its note is gone, **Days before a user is unused** still shows `120` and **Save** is still available. Click **Discard changes**: it shows **90** again, with its note. |
+| 6 | Sign in as the read-only user and open **Org Optimizer**. | **Days before a user is unused** says "Default, not yet saved." with no **Keep this setting** button. |
+| 7 | As an admin in an org with Person Accounts where **How people belong to a household** was never saved, open **People and Households**. | In the **People** box it shows **One household per person (simple)** with "Default, not yet saved." under it and no **Keep this setting** button, because BarnCRM would choose the flexible way for this org. In an org without Person Accounts or Nonprofit Cloud the same row has the button. |
+
+**Cleanup:** none. The values kept are the defaults BarnCRM was already using, so nothing behaves differently.
+
 ## T-SET-19: Finish Setup for a module whose setup never ran
 
 **Purpose:** confirm Health Check and the Modules page flag a module whose setup steps never ran (source copied in by hand), Finish Setup runs them, and the flag clears.

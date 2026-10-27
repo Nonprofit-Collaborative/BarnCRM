@@ -97,9 +97,7 @@ function peopleAndHouseholdsModel() {
       },
       {
         name: 'Duplicate Matching',
-        settings: [
-          row('Duplicate_Review', 'Duplicate Matching', 'Duplicate Matching', 'Component')
-        ]
+        settings: [row('Duplicate_Review', 'Duplicate Matching', 'Duplicate Matching', 'Component')]
       }
     ]
   };
@@ -202,6 +200,21 @@ describe('c-settings-console boxed sub-sections (P1)', () => {
     // A panel alone in a box of the same name keeps its heading for focus, hidden from view.
     const panelHeading = element.shadowRoot.querySelector('h3[data-key="Duplicate_Review"]');
     expect(panelHeading.className).toContain('slds-assistive-text');
+  });
+
+  it('shows the unsaved default note and Keep this setting inside the box (RM1 with P1)', async () => {
+    const model = peopleAndHouseholdsModel();
+    const kept = model.sections[0].settings.find((one) => one.key === 'Delete_Empty_Households__c');
+    kept.unsavedDefault = true;
+    getConsoleModel.mockResolvedValue(model);
+    const element = build();
+    await settle();
+
+    const box = element.shadowRoot.querySelector('section[data-box="Households"]');
+    expect(
+      box.querySelector('lightning-button[data-keep="Delete_Empty_Households__c"]')
+    ).not.toBeNull();
+    expect(element.shadowRoot.querySelectorAll('lightning-button[data-keep]')).toHaveLength(1);
   });
 
   it('keeps a panel heading visible when the box holds more than the panel', async () => {

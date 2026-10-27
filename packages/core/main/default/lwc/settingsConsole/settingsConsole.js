@@ -29,6 +29,9 @@ import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
+import DEFAULT_NOT_SAVED from '@salesforce/label/c.Core_Settings_DefaultNotSaved';
+import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
+import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
@@ -145,7 +148,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     fromSetupHelp: FROM_SETUP_HELP,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
-    feedbackUrl: FEEDBACK_URL
+    feedbackUrl: FEEDBACK_URL,
+    defaultNotSaved: DEFAULT_NOT_SAVED,
+    keepDefault: KEEP_DEFAULT
   };
 
   columns = [
@@ -303,6 +308,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const pendingValue = this.pending[setting.key];
     const hasPending = pendingValue !== undefined;
     const isCheckbox = setting.dataType === 'Checkbox';
+    // A default nobody saved, still on screen: the admin can keep it as a saved choice (RM1).
+    const showsUnsavedDefault = Boolean(setting.unsavedDefault) && !hasPending;
     return {
       ...setting,
       isCheckbox,
@@ -331,6 +338,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       checked: isCheckbox ? (hasPending ? pendingValue === true : setting.checked) : false,
       value: hasPending ? pendingValue : setting.value,
       selected: splitList(hasPending ? pendingValue : setting.value),
+      showsUnsavedDefault,
+      // No one-click keep for a default BarnCRM's detection would replace (a Person Account org's
+      // household membership): the admin chooses it by hand instead.
+      canKeepDefault: showsUnsavedDefault && this.canEdit && !setting.detectionMayChange,
+      keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label),
       // Ties the description to the control for a screen reader; ids are scoped to this template.
       descriptionId: setting.description ? `description-${setting.key}` : undefined
     };
@@ -576,11 +588,32 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       this.message = this.labels.outOfRange;
       return;
     }
-    const values = { ...this.pending };
+    await this.send({ ...this.pending });
+  }
+
+  /**
+   * Keeps the default a row shows as a saved choice (RM1): the shown value goes through the
+   * same save as a value chosen by hand, so the permission, validation, change history and
+   * any follow-on work are the same. Other unsaved edits stay on the page.
+   */
+  async handleKeepDefault(event) {
+    const key = event.currentTarget.dataset.keep;
+    const section = this.currentSection;
+    const setting = section && section.settings.find((candidate) => candidate.key === key);
+    if (!this.canEdit || !setting || !setting.unsavedDefault || setting.detectionMayChange) {
+      return;
+    }
+    await this.send({ [key]: setting.value });
+  }
+
+  /** Saves the given values, then leaves on the page only the edits that were not sent. */
+  async send(values) {
     try {
       const model = await saveSettings({ values });
       this.applyModel(model);
-      this.pending = {};
+      const remaining = { ...this.pending };
+      Object.keys(values).forEach((key) => delete remaining[key]);
+      this.pending = remaining;
       this.messageIsError = false;
       this.message = this.labels.saved;
       this.refreshPanels();
