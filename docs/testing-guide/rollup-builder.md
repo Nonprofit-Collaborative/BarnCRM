@@ -475,3 +475,24 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 4 | In DLRS, deactivate **Test child count**. Run Health Check again. | The warning is gone. |
 
 **Cleanup:** delete the BarnCRM rollup, the DLRS rollup (and its trigger, as DLRS describes) and the **Test child count** field.
+
+## T-RB-35: Import from DLRS Copies Switched Off, Compares, and Finishes Only When Every Copy Is On
+
+**Purpose:** confirm the Import from DLRS wizard copies what BarnCRM can hold, says why for the rest, compares values, asks before turning each copy on, and never changes DLRS.
+**Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** and a text field **Test child names** (255) on Account. In DLRS, create and activate three rollups on Account, child object Account, relationship field `ParentId`, calculation mode Realtime: **Test child count** (Count into **Test child count**); **Test child names** (Concatenate of Name into **Test child names**, delimiter `; `); **Test unreadable** (Count into **Test child count** with Relationship Criteria `CALENDAR_YEAR(CreatedDate) = 2024`, kept inactive until step 1, then active). Run DLRS's Calculate once so the fields hold DLRS's values. Create a parent account with two child accounts.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | **Other Rollup Tools** has an **Import from DLRS** button. |
+| 2 | Click **Import from DLRS**. | The list is hidden. **Choose** lists **Test child count** and **Test child names** under **Can Be Copied**, both ticked, each with "Fills Account.... DLRS operation: ...". **Test unreadable** is under **Stays in DLRS** with "BarnCRM cannot read this part of the Relationship Criteria: CALENDAR_YEAR ( CreatedDate ) = 2024...". |
+| 3 | Untick both. Tick them again. Click **Next**. | **Next** is unavailable with nothing ticked. **Review** says "Becomes a BarnCRM Count, filling Account.Test_child_count__c, switched off." and "Becomes a BarnCRM Text list, filling Account.Test_child_names__c, switched off." |
+| 4 | Click **Copy Switched Off**. | **Compare** shows **Copied, switched off.** for both. In another tab, the rollup list shows both copies switched off, each described "Imported from the DLRS rollup ...". |
+| 5 | Click **Compare** on **Test child count**. | Up to five accounts: the parent shows 2 under **Value Now (DLRS)** and **BarnCRM Value**, **Result** **Same**. Nothing on the accounts changes. |
+| 6 | Click **Next**. | **Turn On** lists both copies with **Turn On** buttons; **Finish** is unavailable. |
+| 7 | Click **Turn On** on **Test child count**, then **Cancel**. | **Switch Off the DLRS Rollup** opened naming the DLRS rollup and the field; after **Cancel** the copy is still off and **Finish** is still unavailable. |
+| 8 | Click **Turn On** on each copy and **OK** each time. | Each reads **Turned on.** **Finish** becomes available. **Recent Changes** has one row per copy. |
+| 9 | Click **Finish**. | The list is back with the notice "Import from DLRS finished: 2 copies turned on. Switch their DLRS rollups off in DLRS." |
+| 10 | In DLRS, open the three rollups. | Each is exactly as before: BarnCRM changed nothing. |
+| 11 | Click **Import from DLRS** again. | Both copies are under **Stays in DLRS** with "Already copied and turned on in BarnCRM." |
+
+**Cleanup:** delete both BarnCRM copies; deactivate and delete the three DLRS rollups (and their triggers, as DLRS describes); delete the two fields and the test accounts.

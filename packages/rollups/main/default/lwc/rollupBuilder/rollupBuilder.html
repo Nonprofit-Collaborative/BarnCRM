@@ -7,6 +7,14 @@
                     <template for:each={otherToolNotices} for:item="otherTool">
                         <p key={otherTool} class="slds-text-body_small">{otherTool}</p>
                     </template>
+                    <template lwc:if={showImport}>
+                        <lightning-button
+                            class="slds-var-m-top_x-small"
+                            data-id="import-from-dlrs"
+                            label={labels.importFromDlrs}
+                            onclick={handleImport}
+                        ></lightning-button>
+                    </template>
                 </div>
             </template>
             <template lwc:if={notice}>
@@ -21,6 +29,9 @@
             </template>
             <template lwc:if={editing}>
                 <c-rollup-wizard model={model} draft={draft} onsaved={handleSaved} oncancel={handleCancel}></c-rollup-wizard>
+            </template>
+            <template lwc:if={importing}>
+                <c-rollup-dlrs-import model={model} onclose={handleImportClosed}></c-rollup-dlrs-import>
             </template>
         </div>
         <div class={listClass}>

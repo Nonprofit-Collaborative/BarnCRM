@@ -90,6 +90,9 @@ public with sharing class RollupDlrsImport {
         public String reason { get; set; }
         @AuraEnabled
         public Id recordId { get; set; }
+        /** For a copy: what to ask before turning it on, naming the DLRS rollup and field. */
+        @AuraEnabled
+        public String confirmation { get; set; }
     }
 
     /** One sample record: the value DLRS wrote beside the value BarnCRM calculates. */
@@ -528,6 +531,7 @@ public with sharing class RollupDlrsImport {
             RollupWriter.saveAsUser(record);
             row.recordId = record.Id;
             row.outcome = candidate.existingId == null ? CREATED : UPDATED;
+            row.confirmation = RollupDlrs.conflict(record.Target_Object__c, record.Target_Field__c);
         } catch (RollupService.RollupServiceException checkFailed) {
             row.outcome = REFUSED;
             row.reason = checkFailed.getMessage();

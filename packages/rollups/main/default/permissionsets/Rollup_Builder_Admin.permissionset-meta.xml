@@ -24,6 +24,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RollupDlrsImport</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RollupInstantTotals</apexClass>
     <enabled>true</enabled>
   </classAccesses>

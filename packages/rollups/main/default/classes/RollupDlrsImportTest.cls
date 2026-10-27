@@ -74,6 +74,10 @@ private class RollupDlrsImportTest {
                 RollupDlrsImport.importRollups(new List<String>{ 'Anything' }).isEmpty(),
                 'Nothing copied'
             );
+            Assert.isFalse(
+                RollupBuilderController.getModel().canImportFromDlrs,
+                'The Builder offers no import'
+            );
         }
     }
 
@@ -512,6 +516,15 @@ private class RollupDlrsImportTest {
             Assert.areEqual(RollupDlrsImport.CREATED, first[0].outcome, String.valueOf(first[0]));
             Assert.areEqual(RollupDlrsImport.UPDATED, again[0].outcome, 'The same copy');
             Assert.areEqual(first[0].recordId, again[0].recordId, 'Not a second one');
+            Assert.areEqual(
+                RollupDlrs.conflict('Account', COUNT_FIELD),
+                first[0].confirmation,
+                'What to ask before turning it on'
+            );
+            Assert.isTrue(
+                RollupBuilderController.getModel().canImportFromDlrs,
+                'The Builder offers the import'
+            );
             Rollup_Definition__c copy = [
                 SELECT Name, Definition_Key__c, Active__c, Aggregate__c
                 FROM Rollup_Definition__c

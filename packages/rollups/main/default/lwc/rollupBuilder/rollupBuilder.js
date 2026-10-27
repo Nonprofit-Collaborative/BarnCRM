@@ -7,6 +7,7 @@ import COPY_OF from '@salesforce/label/c.Core_RollupBuilder_CopyOf';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
+import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportButton';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 
@@ -18,11 +19,12 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
-  labels = { title: TITLE, otherTools: OTHER_TOOLS };
+  labels = { title: TITLE, otherTools: OTHER_TOOLS, importFromDlrs: IMPORT_FROM_DLRS };
 
   model;
   draft;
   editing = false;
+  importing = false;
   notice;
   error;
   enclosingTabId;
@@ -63,7 +65,24 @@ export default class RollupBuilder extends LightningElement {
   }
 
   get listClass() {
-    return this.editing ? 'slds-hide' : '';
+    return this.editing || this.importing ? 'slds-hide' : '';
+  }
+
+  /** Import from DLRS, offered when DLRS has an active rollup and the viewer may manage (R-R16). */
+  get showImport() {
+    return Boolean(this.model && this.model.canImportFromDlrs) && !this.editing && !this.importing;
+  }
+
+  handleImport() {
+    this.notice = undefined;
+    this.error = undefined;
+    this.importing = true;
+  }
+
+  /** The wizard closed: finished (with its notice) or left, the copies kept either way. */
+  handleImportClosed(event) {
+    this.importing = false;
+    this.handleSaved({ detail: { notice: event.detail && event.detail.notice } });
   }
 
   /** Whether the viewer may switch instant totals off and on (Manage BarnCRM Settings). */

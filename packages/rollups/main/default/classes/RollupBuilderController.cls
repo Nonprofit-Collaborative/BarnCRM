@@ -153,6 +153,9 @@ public with sharing class RollupBuilderController {
         /** A plain notice for each other rollup tool in the org, DLRS or Rollup Helper (R-R16). */
         @AuraEnabled
         public List<String> otherToolNotices { get; set; }
+        /** Whether to offer Import from DLRS: an active DLRS rollup, and the right to manage. */
+        @AuraEnabled
+        public Boolean canImportFromDlrs { get; set; }
     }
 
     /** One rollup as the Builder edits it. */
@@ -207,6 +210,18 @@ public with sharing class RollupBuilderController {
 
     // ----------------------------------------------------------------------------------- reads
 
+    /**
+     * Whether DLRS has an active rollup to import (R-R16). The model is cacheable, where a
+     * failure log cannot be written, so a failure here only hides the button.
+     */
+    private static Boolean canImportFromDlrs() {
+        try {
+            return RollupDlrs.hasActive();
+        } catch (Exception unreadable) {
+            return false;
+        }
+    }
+
     @AuraEnabled(cacheable=true)
     public static BuilderModel getModel() {
         try {
@@ -220,6 +235,7 @@ public with sharing class RollupBuilderController {
             model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
             model.otherToolNotices = OtherRollupTools.notices();
+            model.canImportFromDlrs = model.canManage && canImportFromDlrs();
             return model;
         } catch (Exception caught) {
             throw asUserError(caught);

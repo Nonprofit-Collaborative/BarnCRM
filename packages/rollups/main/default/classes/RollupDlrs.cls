@@ -112,6 +112,16 @@ public with sharing class RollupDlrs {
         cached = null;
     }
 
+    /** Whether DLRS has an active rollup, so Import from DLRS has something to offer. */
+    public static Boolean hasActive() {
+        for (Definition other : definitions()) {
+            if (other.active == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The active DLRS rollup that fills this field, or null. */
     public static Definition activeOn(String targetObject, String targetField) {
         if (String.isBlank(targetObject) || String.isBlank(targetField)) {
