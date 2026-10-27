@@ -177,6 +177,78 @@
         <value>{0}'s household members</value>
     </labels>
     <labels>
+        <fullName>Core_RollupEase_StatusOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: the rollup is switched off.</shortDescription>
+        <value>Switched off</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: {0} is how many records failed to save.</shortDescription>
+        <value>{0} records could not be saved: see Needs Attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusRunning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: a full recalculation is going now.</shortDescription>
+        <value>A full recalculation is running</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusWaiting</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: {0} is how many records wait in the queue.</shortDescription>
+        <value>{0} records waiting</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusClear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: no record waits for this rollup.</shortDescription>
+        <value>Nothing waiting</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictOverwrites</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the other rollup writing this field.</shortDescription>
+        <value>Writes the same field as {0} for the same records, so each overwrites the other: switch one off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictBlocked</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the active rollup filling this field.</shortDescription>
+        <value>Cannot be switched on while {0} fills the same field for the same records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictDuplicate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the rollup that calculates the same.</shortDescription>
+        <value>Calculates the same total as {0}, into another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ColumnStatus</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list column: how each rollup's recalculation stands.</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupEase_Search</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

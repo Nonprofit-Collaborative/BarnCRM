@@ -370,6 +370,23 @@ rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
   object (Account, Contact, Fund and so on), with how many each has, in alphabetical order.
 - **Search rollups** finds a rollup by any word of its name, description or sentence, or by
   an object or field API name (`Total_Giving__c`). Clear the box to see them all.
+- **Status** says how each rollup's recalculation stands right now: **Switched off**;
+  "2 records could not be saved: see Needs Attention"; **A full recalculation is running**
+  (a run is going, which may or may not include this rollup); "12 records waiting" (saved
+  records whose totals are queued and catch up within a minute); or **Nothing waiting**.
+  Only someone with **Manage BarnCRM Settings** sees it.
+- **Conflicts** are shown in red under a rollup's name:
+  - "Writes the same field as ... for the same records": two active rollups keep
+    overwriting each other's total. Switch one off, or give each **Only for some records**
+    conditions that never meet. Saving in the Builder already refuses this; it can still
+    arrive by **Restore shipped rollups** or an edit outside the Builder.
+  - "Cannot be switched on while ... fills the same field for the same records": the rollup
+    is off, and switching it on would be refused until the other one is off.
+  - "Calculates the same total as ..., into another field": two active rollups do the same
+    work. That is allowed, but usually one of them is left over.
+
+  Two rollups that fill one field for different records (the household and the organization
+  giving totals) are fine and are not listed.
 
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.

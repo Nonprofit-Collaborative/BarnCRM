@@ -214,6 +214,7 @@
                             <tr class="slds-line-height_reset">
                                 <th scope="col">{labels.columnRollup}</th>
                                 <th scope="col">{labels.columnCounts}</th>
+                                <th scope="col">{labels.columnStatus}</th>
                                 <th scope="col">{labels.columnMode}</th>
                                 <th scope="col">{labels.columnLastCalculated}</th>
                                 <th scope="col">{labels.columnActive}</th>
@@ -225,7 +226,7 @@
                         <tbody>
                             <template for:each={groups} for:item="group">
                                 <tr key={group.key} class="slds-theme_shade" data-id="group-row">
-                                    <th scope="colgroup" colspan="6">
+                                    <th scope="colgroup" colspan="7">
                                         <strong>{group.heading}</strong>
                                     </th>
                                 </tr>
@@ -246,6 +247,15 @@
                                         </template>
                                         <div>{row.name}</div>
                                         <div class="slds-text-body_small">{row.description}</div>
+                                        <template for:each={row.conflicts} for:item="conflict">
+                                            <div
+                                                key={conflict.key}
+                                                class="slds-text-body_small slds-text-color_error"
+                                                data-id="conflict"
+                                            >
+                                                {conflict.text}
+                                            </div>
+                                        </template>
                                     </th>
                                     <td class="slds-cell-wrap">
                                         <div data-id="sentence">{row.sentence}</div>
@@ -253,6 +263,7 @@
                                             {row.counts}: {row.target}
                                         </div>
                                     </td>
+                                    <td class={row.statusClass} data-id="status">{row.status}</td>
                                     <td>
                                         <lightning-combobox
                                             data-id={row.recordId}

@@ -234,11 +234,14 @@ describe('c-rollup-definitions', () => {
     expect(rows[0].textContent).not.toContain('separated by');
   });
 
-  describe('Plain sentences, search and groups', () => {
+  describe('Plain sentences, status, conflicts, search and groups', () => {
     const giving = {
       ...ROLLUP,
       sentence: 'Total of Amount from Gifts by Household, shown in Total Giving on each Account.',
-      targetObjectLabel: 'Account'
+      targetObjectLabel: 'Account',
+      statusLevel: 'failed',
+      status: '2 records could not be saved: see Needs Attention',
+      conflicts: ['Writes the same field as Old total for the same records.']
     };
     const hours = {
       ...ROLLUP,
@@ -248,7 +251,10 @@ describe('c-rollup-definitions', () => {
       targetObject: 'Contact',
       targetObjectLabel: 'Contact',
       targetField: 'Hours__c',
-      sentence: 'Total of Hours from Volunteer Hours by Contact, shown in Hours on each Contact.'
+      sentence: 'Total of Hours from Volunteer Hours by Contact, shown in Hours on each Contact.',
+      statusLevel: 'clear',
+      status: 'Nothing waiting',
+      conflicts: []
     };
 
     async function listed() {
@@ -258,10 +264,16 @@ describe('c-rollup-definitions', () => {
       return element;
     }
 
-    it('describes each rollup in a sentence (U1)', async () => {
+    it('describes each rollup in a sentence with its status and conflicts (U1, U6, U7)', async () => {
       const element = await listed();
       const sentences = [...element.shadowRoot.querySelectorAll('[data-id="sentence"]')];
       expect(sentences.map((node) => node.textContent)).toEqual([giving.sentence, hours.sentence]);
+      const status = element.shadowRoot.querySelector('[data-id="status"]');
+      expect(status.textContent).toBe(giving.status);
+      expect(status.className).toContain('slds-text-color_error');
+      const conflicts = element.shadowRoot.querySelectorAll('[data-id="conflict"]');
+      expect(conflicts.length).toBe(1);
+      expect(conflicts[0].textContent).toContain('Old total');
     });
 
     it('groups the rollups by the object that shows the total (U12)', async () => {

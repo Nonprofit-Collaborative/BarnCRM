@@ -66,10 +66,20 @@ import IMPORT_CREATED from '@salesforce/label/c.Core_RollupBuilder_ImportCreated
 import IMPORT_UPDATED from '@salesforce/label/c.Core_RollupBuilder_ImportUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
 import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
+import COLUMN_STATUS from '@salesforce/label/c.Core_RollupEase_ColumnStatus';
 import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
 import SEARCH_HELP from '@salesforce/label/c.Core_RollupEase_SearchHelp';
 import GROUP from '@salesforce/label/c.Core_RollupEase_Group';
 import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
+
+/** How each recalculation state is styled in the Status column (U6). */
+const STATUS_CLASS = {
+  failed: 'slds-text-color_error',
+  waiting: 'slds-text-color_default',
+  running: 'slds-text-color_default',
+  off: 'slds-text-color_weak',
+  clear: 'slds-text-color_weak'
+};
 
 /** The words for each import outcome, before saving and after (ADR-0136). */
 const OUTCOMES = {
@@ -153,6 +163,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     freshnessTitle: FRESHNESS_TITLE,
     freshnessStale: FRESHNESS_STALE,
     readOnly: READ_ONLY,
+    columnStatus: COLUMN_STATUS,
     search: SEARCH,
     searchHelp: SEARCH_HELP,
     noMatches: NO_MATCHES
@@ -216,7 +227,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       target: `${rollup.targetObject}.${rollup.targetField}`,
       hasLastCalculated: !!rollup.lastCalculated,
       exportable: this.builder && !rollup.packageDefault,
-      selected: this.selectedIds.includes(rollup.recordId)
+      selected: this.selectedIds.includes(rollup.recordId),
+      statusClass: STATUS_CLASS[rollup.statusLevel] || 'slds-text-color_weak',
+      conflicts: (rollup.conflicts || []).map((text, index) => ({ key: String(index), text }))
     }));
   }
 

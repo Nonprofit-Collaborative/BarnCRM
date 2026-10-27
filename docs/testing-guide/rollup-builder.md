@@ -440,3 +440,18 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Type `Test_Children_Count__c`. | The same rollup is listed. Type `zzz`: "No rollup matches your search." Clear the box: every rollup is back. |
 
 **Cleanup:** none.
+
+## T-RB-41: Recalculation Status and Conflicts in the Rollup List
+
+**Purpose:** confirm each row says how its recalculation stands, and that conflicts between rollups are shown and the Active switch refuses one.
+**Prerequisites:** T-RB-02 done (**Test children per household** exists and is active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab and look at the **Status** column of **Test children per household**. | **Nothing waiting** (or "N records waiting" for a moment after a save). |
+| 2 | Click **Copy** on **Test children per household**, change only the name to `Test children copy`, switch **Active** off and save. | The copy shows **Switched off** in **Status** and, in red under its name, "Cannot be switched on while Test children per household fills the same field for the same records." |
+| 3 | Switch the copy's **Active** toggle on. | It is refused with that reason, and the toggle goes back off. |
+| 4 | In Setup, on **Account**, create a Number field **Test Children Count 2** (`Test_Children_Count_2__c`). Edit the copy, choose **Test Children Count 2** in step 1, switch **Active** on and save. | Both rollups show, in red, "Calculates the same total as ..., into another field." |
+| 5 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the tab. | The **Status** column is empty. |
+
+**Cleanup:** delete **Test children copy** and the field **Test Children Count 2**.

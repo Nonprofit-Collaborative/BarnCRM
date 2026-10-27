@@ -1,11 +1,13 @@
 /**
- * The rollup list's plain sentence (U1) and its grouping by object (U12), from the
+ * The rollup list's plain sentence (U1), recalculation status (U6) and conflicts (U7), from the
  * Apex side. Core holds no giving objects, so organizations count their child organizations
  * (`ParentId`) into Account fields, as the Builder's own tests do.
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest(testFor='ApexClass:RollupSentence, ApexClass:RollupController')
+@IsTest(
+    testFor='ApexClass:RollupSentence, ApexClass:RollupStatus, ApexClass:RollupConflicts, ApexClass:RollupController'
+)
 private class RollupListEaseTest {
     @TestSetup
     static void createTestUser() {
@@ -134,10 +136,182 @@ private class RollupListEaseTest {
         }
     }
 
+    // ---------------------------------------------------------------------------------- status
+
+    @IsTest
+    static void eachStateSaysWhereTheRecalculationStands() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c active = rollup('On', 'Member_Count__c', true);
+            System.Assert.areEqual(
+                RollupStatus.LEVEL_OFF,
+                RollupStatus.stateOf(rollup('Off', 'Member_Count__c', false), true, 5, 5).level
+            );
+            RollupStatus.State failed = RollupStatus.stateOf(active, true, 5, 2);
+            System.Assert.areEqual(RollupStatus.LEVEL_FAILED, failed.level, 'Failures come first');
+            System.Assert.areEqual(
+                String.format(Label.Core_RollupEase_StatusFailed, new List<String>{ (2).format() }),
+                failed.text
+            );
+            System.Assert.areEqual(
+                RollupStatus.LEVEL_RUNNING,
+                RollupStatus.stateOf(active, true, 5, null).level
+            );
+            System.Assert.areEqual(
+                RollupStatus.LEVEL_WAITING,
+                RollupStatus.stateOf(active, false, 5, 0).level
+            );
+            System.Assert.areEqual(
+                RollupStatus.LEVEL_CLEAR,
+                RollupStatus.stateOf(active, false, null, null).level
+            );
+        }
+    }
+
+    @IsTest
+    static void queuedRecordsCountForTheRollupsTheyAreFor() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c named = rollup('Named', 'Member_Count__c', true);
+            Rollup_Definition__c other = rollup('Other', 'NumberOfEmployees', true);
+            Rollup_Definition__c elsewhere = rollup('Elsewhere', 'Member_Count__c', true);
+            elsewhere.Target_Object__c = 'Contact';
+            insert new List<Rollup_Queue__c>{
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = 'x',
+                    Record_Count__c = 4,
+                    Status__c = RollupQueue.STATUS_PENDING,
+                    Definition_Ids__c = String.valueOf(named.Id) + ', not an id'
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = 'y',
+                    Record_Count__c = 3,
+                    Status__c = RollupQueue.STATUS_PENDING
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = 'z',
+                    Record_Count__c = 2,
+                    Status__c = RollupQueue.STATUS_FAILED,
+                    Definition_Ids__c = String.valueOf(other.Id)
+                )
+            };
+
+            Map<Id, RollupStatus.State> states = RollupStatus.of(
+                new List<Rollup_Definition__c>{ named, other, elsewhere }
+            );
+
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupEase_StatusWaiting,
+                    new List<String>{ (7).format() }
+                ),
+                states.get(named.Id).text,
+                'Its own entry and the one for every rollup on Account'
+            );
+            System.Assert.areEqual(RollupStatus.LEVEL_FAILED, states.get(other.Id).level);
+            System.Assert.areEqual(
+                RollupStatus.LEVEL_CLEAR,
+                states.get(elsewhere.Id).level,
+                'Nothing waits for a rollup on another object'
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------------------- conflicts
+
+    @IsTest
+    static void twoActiveRollupsOnOneFieldOverwriteEachOther() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c one = rollup('One', 'Member_Count__c', true);
+            Rollup_Definition__c two = rollup('Two', 'member_count__c', true);
+            Rollup_Definition__c off = rollup('Off', 'Member_Count__c', false);
+
+            Map<Id, List<String>> found = RollupConflicts.of(
+                new List<Rollup_Definition__c>{ one, two, off }
+            );
+
+            System.Assert.areEqual(
+                String.format(Label.Core_RollupEase_ConflictOverwrites, new List<String>{ 'Two' }),
+                found.get(one.Id)[0]
+            );
+            System.Assert.isTrue(
+                found.get(off.Id)
+                    .contains(
+                        String.format(
+                            Label.Core_RollupEase_ConflictBlocked,
+                            new List<String>{ 'One' }
+                        )
+                    ),
+                'A rollup switched off says what blocks it'
+            );
+        }
+    }
+
+    @IsTest
+    static void differentRecordsAreFineAndTheSameCalculationIsADuplicate() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            insert new Account(Name = 'Only A');
+            Rollup_Definition__c forA = rollup('For A', 'Member_Count__c', true);
+            forA.Target_Filter_JSON__c = nameIs('Only A');
+            Rollup_Definition__c forB = rollup('For B', 'Member_Count__c', true);
+            forB.Target_Filter_JSON__c = nameIs('Only B');
+            Rollup_Definition__c copy = rollup('Copy', 'NumberOfEmployees', true);
+            copy.Target_Filter_JSON__c = nameIs('Only A');
+
+            Map<Id, List<String>> found = RollupConflicts.of(
+                new List<Rollup_Definition__c>{ forA, forB, copy }
+            );
+
+            System.Assert.isFalse(found.containsKey(forB.Id), 'No record is both A and B');
+            System.Assert.areEqual(
+                String.format(Label.Core_RollupEase_ConflictDuplicate, new List<String>{ 'For A' }),
+                found.get(copy.Id)[0]
+            );
+        }
+    }
+
+    @IsTest
+    static void theActiveSwitchRefusesASecondRollupForTheSameRecords() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c active = rollup('Children', 'Member_Count__c', true);
+            Rollup_Definition__c off = rollup('Children again', 'Member_Count__c', false);
+            active.Id = null;
+            off.Id = null;
+            active.Definition_Key__c = 'Test_On';
+            off.Definition_Key__c = 'Test_Off';
+            insert new List<Rollup_Definition__c>{ active, off };
+
+            String refusal;
+            try {
+                RollupController.setActive(off.Id, true);
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupEase_ConflictBlocked,
+                    new List<String>{ 'Children' }
+                ),
+                refusal
+            );
+            System.Assert.isFalse(
+                [SELECT Active__c FROM Rollup_Definition__c WHERE Id = :off.Id].Active__c
+            );
+            RollupController.setActive(active.Id, false);
+            RollupController.setActive(off.Id, true);
+            System.Assert.isTrue(
+                [SELECT Active__c FROM Rollup_Definition__c WHERE Id = :off.Id].Active__c,
+                'Once the other is off it switches on'
+            );
+        }
+    }
+
     // ------------------------------------------------------------------------------------ page
 
     @IsTest
-    static void thePageCarriesTheSentenceAndGroup() {
+    static void thePageCarriesTheSentenceStatusAndGroup() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Rollup_Definition__c saved = rollup('Children', 'Member_Count__c', false);
             saved.Id = null;
@@ -151,6 +325,8 @@ private class RollupListEaseTest {
                 Account.SObjectType.getDescribe().getLabel(),
                 view.targetObjectLabel
             );
+            System.Assert.areEqual(RollupStatus.LEVEL_OFF, view.statusLevel);
+            System.Assert.isTrue(view.conflicts.isEmpty());
         }
     }
 }

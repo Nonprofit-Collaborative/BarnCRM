@@ -58,6 +58,14 @@ public with sharing class RollupController {
         /** The target entity's label, which the list groups by (U12). */
         @AuraEnabled
         public String targetObjectLabel { get; set; }
+        /** How its recalculation stands (U6, `RollupStatus`): off, failed, running, waiting, clear. */
+        @AuraEnabled
+        public String statusLevel { get; set; }
+        @AuraEnabled
+        public String status { get; set; }
+        /** Conflicts with other BarnCRM rollups (U7, `RollupConflicts`), empty when none. */
+        @AuraEnabled
+        public List<String> conflicts { get; set; }
     }
 
     /** The whole page: the schedule, the freshness, the permission, and the list. */
@@ -124,6 +132,11 @@ public with sharing class RollupController {
         try {
             requirePermission();
             Rollup_Definition__c definition = require(definitionId);
+            // R-R8 on the switch too: never two active rollups writing one field for one record.
+            String blocker = active == true ? RollupConflicts.blockerOf(definition) : null;
+            if (blocker != null) {
+                throw new RollupService.RollupServiceException(blocker);
+            }
             RollupWriter.saveAsUser(
                 new Rollup_Definition__c(Id = definition.Id, Active__c = active == true)
             );
@@ -338,13 +351,27 @@ public with sharing class RollupController {
         page.rollups = new List<RollupView>();
         Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
         Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);
-        for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
+        List<Rollup_Definition__c> definitions = RollupSelector.selectAllAsUser();
+        // The queue is read only for someone who can act on it, as Needs Attention does.
+        Map<Id, RollupStatus.State> states = page.canManage
+            ? RollupStatus.of(definitions)
+            : new Map<Id, RollupStatus.State>();
+        Map<Id, List<String>> conflicts = RollupConflicts.of(definitions);
+        for (Rollup_Definition__c definition : definitions) {
             RollupView view = toView(definition);
             view.sentence = RollupSentence.of(definition);
             Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
             view.targetObjectLabel = target == null
                 ? definition.Target_Object__c
                 : target.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+            RollupStatus.State state = states.get(definition.Id);
+            if (state != null) {
+                view.statusLevel = state.level;
+                view.status = state.text;
+            }
+            view.conflicts = conflicts.containsKey(definition.Id)
+                ? conflicts.get(definition.Id)
+                : new List<String>();
             String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
             view.aggregateLabel = aggregateLabels.containsKey(aggregate)
                 ? aggregateLabels.get(aggregate)

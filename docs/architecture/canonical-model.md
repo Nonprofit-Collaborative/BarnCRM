@@ -1724,6 +1724,11 @@ Disjointness by construction cannot be decided from two arbitrary filters, so tw
 current record meets together are allowed; the engine then writes each record from the
 definition whose filter admits it.
 
+The rollup list's Active switch applies the same refusal when a definition is switched on
+(ADR-0136, ease of use U7), and the list names on each definition any active pair that still
+overlaps (from a restore or an edit outside the Builder), an inactive one that an active one
+blocks, and two active definitions that calculate the same value into different attributes.
+
 **R-R9 Idempotency and negative amounts.** Recalculating any set of records produces the
 same result as calculating it the first time, and every aggregate is correct in the
 presence of the negative gifts that refunds and write-offs create (ADR-0010, ADR-0011). A
