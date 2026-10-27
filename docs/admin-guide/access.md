@@ -274,8 +274,9 @@ owned by someone else, which is a sharing setting rather than a role.
 again."** Salesforce rebuilds a role in the background whenever it changes, for example
 just after the package is installed or upgraded, and it cannot hand the role out while that
 rebuild is running. It usually finishes in under a minute. If you still see the message
-after ten minutes, open the Error Log tile on the Hub home page and send what it says with
-your support request.
+after ten minutes, open the Error Log tile on the Hub home page and include what it says in a
+bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md); remove names, emails and amounts
+first).
 
 **The Error Log says the BarnCRM Admin role was still being prepared at install.** The
 entry reads "Warning: the BarnCRM Admin role was still being prepared after {0} attempts,

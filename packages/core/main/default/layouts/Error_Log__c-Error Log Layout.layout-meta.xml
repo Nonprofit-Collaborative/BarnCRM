@@ -58,7 +58,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>For a support request</label>
+    <label>For a bug report</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>

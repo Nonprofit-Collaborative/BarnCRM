@@ -145,7 +145,8 @@ Maria has heard from a colleague that "something did not save this morning."
   Resolved keeps the history, which is what you want the next time the same thing happens,
   and it keeps the tile count accurate either way.
 - **Reading the technical detail first.** The message at the top is the one written for
-  you. The technical detail underneath is for a support request, and it will not tell you
+  you. The technical detail underneath is for a bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md); remove names,
+  emails and amounts first), and it will not tell you
   anything about your data that the message does not already say.
 - **Expecting an entry for a mistake you made in a spreadsheet.** The Error Log records
   failures inside BarnCRM, not every data problem. A person imported with the wrong
