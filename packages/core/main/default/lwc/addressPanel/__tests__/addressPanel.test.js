@@ -1,6 +1,8 @@
 // The object info test wire adapter is emitted to on purpose, which is how a wired component
 // is driven from a test.
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { createElement } from 'lwc';
 import AddressPanel from 'c/addressPanel';
 import { graphql } from 'lightning/graphql';
@@ -667,6 +669,31 @@ describe('c-address-panel', () => {
 
       expect(streetsShown(element)).toEqual(['812 Willow Lane', '4120 East Camelback Road']);
       expect(element.shadowRoot.querySelector('[data-id="former-toggle"]')).toBeNull();
+    });
+
+    it('still shows the card as Current, with no dates, for a user who cannot read status or dates', async () => {
+      const element = build();
+      // Null where the platform hides a field the user cannot read, absent on the second.
+      graphql.emit(
+        response([{ ...HOME, Status__c: null, Start_Date__c: null, End_Date__c: null }, WINTER])
+      );
+      await flush();
+
+      expect(streetsShown(element)).toEqual(['812 Willow Lane', '4120 East Camelback Road']);
+      expect(element.shadowRoot.querySelector('[data-id="former-toggle"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="address-dates"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="undeliverable-badge"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="error"]')).toBeNull();
+    });
+
+    it('asks for status, start date and end date as optional fields', () => {
+      // gql is a stub here, so read the query as written: without @optional a user who lacks
+      // read on one of these fields gets an error for the whole query.
+      // eslint-disable-next-line no-undef
+      const source = readFileSync(join(__dirname, '..', 'addressPanel.js'), 'utf8');
+      ['Status__c', 'Start_Date__c', 'End_Date__c'].forEach((field) => {
+        expect(source).toContain(`${field} @optional {`);
+      });
     });
 
     it('badges an undeliverable address and flags an undeliverable primary', async () => {
