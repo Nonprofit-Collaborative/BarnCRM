@@ -6,6 +6,7 @@ import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceF
 import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
+import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -31,6 +32,11 @@ jest.mock('@salesforce/apex/RollupBuilderController.save', () => ({ default: jes
 jest.mock('@salesforce/apex/RollupBuilderController.preview', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/RollupBuilderController.previewSamples',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning',
   () => ({ default: 'More than one currency.' }),
@@ -597,6 +603,81 @@ describe('c-rollup-wizard', () => {
       expect(query(noTrigger, 'both').textContent).toBe(
         'Both: at 2:00 AM, instant once Gifts have it.'
       );
+    });
+
+    it('picks sample records and lists the records read for one (U4)', async () => {
+      previewSamples.mockResolvedValue([
+        { recordId: '001000000000001AAA', name: 'Rivera Household', result: 'Calculated: 250.' },
+        { recordId: '001000000000002AAA', name: 'Chen Household', result: 'Calculated: 0.' }
+      ]);
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      expect(previewSamples).not.toHaveBeenCalled();
+      expect(query(element, 'preview-rows')).toBeNull();
+
+      query(element, 'pick-samples').click();
+      await flush();
+      expect(previewSamples).toHaveBeenCalledWith({
+        draft: expect.objectContaining({ targetField: 'Total_Giving__c' })
+      });
+      const samples = element.shadowRoot.querySelectorAll('[data-id="sample"]');
+      expect(samples).toHaveLength(2);
+      expect(samples[0].textContent).toContain('Rivera Household');
+      expect(samples[0].textContent).toContain('Calculated: 250.');
+
+      preview.mockResolvedValue({
+        maintains: 'This rollup will maintain about 1,204 records.',
+        result: 'Calculated: 250. On the record now: 200.',
+        rows: {
+          total: 12,
+          summary: 'Showing 2 of the 12 records read for this record.',
+          rows: [
+            { recordId: 'a01000000000001AAA', name: 'G-0001', counted: true, reason: 'Counted' },
+            {
+              recordId: 'a01000000000002AAA',
+              name: 'G-0002',
+              counted: false,
+              reason: 'Left out: does not meet condition 1'
+            }
+          ]
+        }
+      });
+      element.shadowRoot.querySelectorAll('[data-id="show-rows"]')[0].click();
+      await flush();
+      expect(preview).toHaveBeenLastCalledWith({
+        draft: expect.objectContaining({ aggregate: 'SUM' }),
+        recordId: '001000000000001AAA'
+      });
+      expect(query(element, 'rows-summary').textContent).toBe(
+        'Showing 2 of the 12 records read for this record.'
+      );
+      const rows = element.shadowRoot.querySelectorAll('[data-id="preview-row"]');
+      expect(rows).toHaveLength(2);
+      expect(rows[0].querySelector('a').getAttribute('href')).toBe('/a01000000000001AAA');
+      expect(rows[1].textContent).toContain('Left out: does not meet condition 1');
+      // The samples stay, so another can be opened.
+      expect(element.shadowRoot.querySelectorAll('[data-id="sample"]')).toHaveLength(2);
+    });
+
+    it('says so when there is no record to sample, and shows a household note (U4)', async () => {
+      previewSamples.mockResolvedValue([]);
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      query(element, 'pick-samples').click();
+      await flush();
+      expect(query(element, 'samples-none')).not.toBeNull();
+
+      preview.mockResolvedValue({
+        maintains: 'This rollup will maintain about 1,204 records.',
+        result: 'Calculated: 250. On the record now: 200.',
+        rows: { total: 0, rows: [], note: 'Read through a household.' }
+      });
+      query(element, 'preview-record').dispatchEvent(
+        new CustomEvent('change', { detail: { recordId: '001000000000001AAA' } })
+      );
+      await flush();
+      expect(query(element, 'rows-note').textContent).toBe('Read through a household.');
+      expect(query(element, 'rows-summary')).toBeNull();
     });
   });
 });

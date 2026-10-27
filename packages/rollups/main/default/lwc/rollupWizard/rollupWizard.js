@@ -5,6 +5,7 @@ import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceF
 import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
+import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
 
 import STEP_1 from '@salesforce/label/c.Core_RollupBuilder_Step1';
 import STEP_2 from '@salesforce/label/c.Core_RollupBuilder_Step2';
@@ -79,6 +80,12 @@ import MODE_INSTANT_NONE from '@salesforce/label/c.Core_RollupEase_ModeInstantNo
 import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
 import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
 import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
+import PICK_SAMPLES from '@salesforce/label/c.Core_RollupEase_PickSamples';
+import PICK_SAMPLES_HELP from '@salesforce/label/c.Core_RollupEase_PickSamplesHelp';
+import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading';
+import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
+import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
+import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -181,7 +188,13 @@ export default class RollupWizard extends LightningElement {
     targetSearch: TARGET_SEARCH,
     targetSearchHelp: TARGET_SEARCH_HELP,
     sentenceHelp: SENTENCE_HELP,
-    modeHeading: MODE_HEADING
+    modeHeading: MODE_HEADING,
+    pickSamples: PICK_SAMPLES,
+    pickSamplesHelp: PICK_SAMPLES_HELP,
+    samplesHeading: SAMPLES_HEADING,
+    samplesNone: SAMPLES_NONE,
+    showRows: SHOW_ROWS,
+    rowsHeading: ROWS_HEADING
   };
 
   /** The furthest step reached, so the sentence jumps back to any step already filled (U3). */
@@ -204,6 +217,9 @@ export default class RollupWizard extends LightningElement {
   maintains;
   previewResult;
   previewRecordId;
+  /** Step 5: records the rollup would fill, picked for her, and the records read (U4). */
+  samples;
+  previewRows;
 
   /** The rollup to edit or copy, or nothing for a new one. */
   @api
@@ -217,6 +233,7 @@ export default class RollupWizard extends LightningElement {
     this.furthest = value && value.targetObject ? 5 : 1;
     this.error = undefined;
     this.previewRecordId = undefined;
+    this.samples = undefined;
     this.loadTarget();
   }
 
@@ -518,6 +535,7 @@ export default class RollupWizard extends LightningElement {
     this.error = undefined;
     this.step = step;
     if (step === 5) {
+      this.samples = undefined;
       this.loadPreview();
     }
   }
@@ -808,6 +826,8 @@ export default class RollupWizard extends LightningElement {
       this.step = Math.min(5, this.step + 1);
       this.furthest = Math.max(this.furthest, this.step);
       if (this.step === 5) {
+        // Samples calculated before a change elsewhere would show old totals.
+        this.samples = undefined;
         this.loadPreview();
       }
     }
@@ -822,12 +842,52 @@ export default class RollupWizard extends LightningElement {
   loadPreview() {
     this.maintains = undefined;
     this.previewResult = undefined;
+    this.previewRows = undefined;
     preview({ draft: this.payload(), recordId: this.previewRecordId || null })
       .then((result) => {
         this.maintains = result.maintains;
         this.previewResult = result.result;
+        this.previewRows = result.rows;
       })
       .catch((error) => this.fail(error));
+  }
+
+  /** Calculates the unsaved rollup on up to five records it would fill, picked for her (U4). */
+  handlePickSamples() {
+    this.samples = undefined;
+    previewSamples({ draft: this.payload() })
+      .then((result) => {
+        this.samples = result || [];
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  /** Previews one sample as if it were picked, listing the records read for it. */
+  handleShowRows(event) {
+    this.previewRecordId = event.currentTarget.dataset.recordId;
+    this.loadPreview();
+  }
+
+  get hasSamples() {
+    return Array.isArray(this.samples) && this.samples.length > 0;
+  }
+
+  get noSamples() {
+    return Array.isArray(this.samples) && this.samples.length === 0;
+  }
+
+  /** The records read for the previewed record, each with a link and its outcome. */
+  get rowList() {
+    const rows = (this.previewRows && this.previewRows.rows) || [];
+    return rows.map((row) => ({
+      ...row,
+      url: '/' + row.recordId,
+      outcomeClass: row.counted ? 'slds-text-color_success' : 'slds-text-color_weak'
+    }));
+  }
+
+  get hasRowDetail() {
+    return Boolean(this.previewRows);
   }
 
   /** The draft as the server reads it. */

@@ -455,7 +455,14 @@ The Builder steers you away from choices it would refuse:
    another appeal) is always picked up as usual.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
-   rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
+   rollup will maintain. Under **Records Read for This Record**, up to ten of the records it
+   reads for that record are listed, each linked, with **Counted** or why it is left out: the
+   number of each condition it does not meet, outside the year the rollup counts, a blank
+   field that orders the records, or beyond a row limit. A rollup that reads through a
+   household does not list its records; the total still includes them. Rather than pick a
+   record yourself, click **Pick Sample Records**: the Builder calculates the rollup on up to
+   five records it would fill, choosing first records that recent counted records point to,
+   and **Show Records Read** lists one sample's records. Nothing is saved. Then give it a name, choose its mode, and click **Save**, or **Save
    and calculate now** to start its recalculation straight away. When the records you count
    have no instant updates yet, for example Opportunities or your own objects, this step says
    "Instant totals are not available yet for ..." and offers only **Every night** and **Both

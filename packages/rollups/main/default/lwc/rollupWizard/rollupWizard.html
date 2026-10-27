@@ -212,6 +212,43 @@
         <template lwc:if={previewResult}>
             <p class="slds-var-m-bottom_small" data-id="preview-result">{previewResult}</p>
         </template>
+        <template lwc:if={hasRowDetail}>
+            <div class="slds-var-m-bottom_small" data-id="preview-rows">
+                <h4 class="slds-text-title_bold">{labels.rowsHeading}</h4>
+                <template lwc:if={previewRows.summary}>
+                    <p class="slds-text-body_small" data-id="rows-summary">{previewRows.summary}</p>
+                </template>
+                <ul class="slds-list_dotted">
+                    <template for:each={rowList} for:item="row">
+                        <li key={row.recordId} data-id="preview-row">
+                            <a href={row.url} target="_blank">{row.name}</a>:
+                            <span class={row.outcomeClass}> {row.reason}</span>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={previewRows.note}>
+                    <p class="slds-text-body_small" data-id="rows-note">{previewRows.note}</p>
+                </template>
+            </div>
+        </template>
+        <div class="slds-var-m-bottom_small" data-id="samples">
+            <lightning-button data-id="pick-samples" label={labels.pickSamples} onclick={handlePickSamples}></lightning-button>
+            <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.pickSamplesHelp}</p>
+            <template lwc:if={hasSamples}>
+                <h4 class="slds-text-title_bold slds-var-m-top_x-small">{labels.samplesHeading}</h4>
+                <ul class="slds-list_dotted">
+                    <template for:each={samples} for:item="sample">
+                        <li key={sample.recordId} data-id="sample">
+                            <strong>{sample.name}</strong>: {sample.result}
+                            <lightning-button variant="base" class="slds-var-m-left_x-small" data-id="show-rows" data-record-id={sample.recordId} label={labels.showRows} onclick={handleShowRows}></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template lwc:if={noSamples}>
+                <p data-id="samples-none">{labels.samplesNone}</p>
+            </template>
+        </div>
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <template lwc:if={noInstantNotice}>

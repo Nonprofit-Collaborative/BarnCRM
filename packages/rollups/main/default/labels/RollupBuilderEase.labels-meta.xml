@@ -416,4 +416,116 @@
         <shortDescription>Mode consequence: {0} is the nightly time, {1} the records counted.</shortDescription>
         <value>Both (recommended): every night at {0} for now, and instantly too once {1} have instant totals.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_PickSamples</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: button that picks sample records.</shortDescription>
+        <value>Pick Sample Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_PickSamplesHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: what picking sample records does.</shortDescription>
+        <value>Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SamplesHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: heading over the sample records.</shortDescription>
+        <value>Sample Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SamplesNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: no record to sample.</shortDescription>
+        <value>There is no record this rollup would fill yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ShowRows</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: button that lists a sample's source records.</shortDescription>
+        <value>Show Records Read</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: heading over the source records read.</shortDescription>
+        <value>Records Read for This Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsShown</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the records listed, {1} the records read.</shortDescription>
+        <value>Showing {0} of the {1} records read for this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: the record has no source records.</shortDescription>
+        <value>No records are read for this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsHousehold</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: rows are not listed through a household.</shortDescription>
+        <value>Records read through a household are not listed here; the total above includes them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowCounted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: a source record that counts.</shortDescription>
+        <value>Counted</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowFails</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the numbers of the conditions not met.</shortDescription>
+        <value>Left out: does not meet condition {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowNoOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the blank field that orders records.</shortDescription>
+        <value>Left out: {0} is blank</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowBeyondLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the row limit.</shortDescription>
+        <value>Left out: only the first {0} count</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowOutsideWindow</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: a source record outside the year counted.</shortDescription>
+        <value>Left out: outside the year this rollup counts</value>
+    </labels>
 </CustomLabels>

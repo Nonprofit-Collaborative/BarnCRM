@@ -471,3 +471,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Edit** on **Test children per household**. | Every part of the sentence can be clicked; the conditions part reads "only those that meet its conditions (1)". Click **Cancel**. |
 
 **Cleanup:** none.
+
+## T-RB-43: Preview With Sample Records and the Records Read
+
+**Purpose:** confirm step 5 picks sample records, calculates each without saving, and lists the records read for one record as counted or left out with the reason.
+**Prerequisites:** T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **Edit** on **Test children per household** and click **Next** until step 5. | **Pick Sample Records** shows, with "Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved." under it. No **Records Read for This Record** yet. |
+| 2 | In **See it on a record**, pick **The Garcia Family**. | The total line shows 1 next to what the record holds. **Records Read for This Record** reads "Showing 3 of the 3 records read for this record." and lists Harper, Luis and Diego, each linked: Diego **Counted**, Harper and Luis "Left out: does not meet condition 1". |
+| 3 | Click a name in the list. | The contact opens in a new tab. |
+| 4 | Click **Pick Sample Records**. | **Sample Records** lists up to five households, each with its calculated total next to what it holds now. |
+| 5 | Click **Show Records Read** on one sample. | **See it on a record** shows that household, and **Records Read for This Record** lists its people. The samples stay listed. |
+| 6 | Click **Cancel**, then open the Rollup Builder tab again. | **Test children per household** is unchanged: no field on any household changed. |
+
+**Cleanup:** none.

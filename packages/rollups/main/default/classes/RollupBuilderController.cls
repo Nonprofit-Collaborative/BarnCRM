@@ -366,6 +366,9 @@ public with sharing class RollupBuilderController {
         public String result { get; set; }
         @AuraEnabled
         public String maintains { get; set; }
+        /** The source records read for the picked record, counted or left out (U4). */
+        @AuraEnabled
+        public RollupPreviewRows.Detail rows { get; set; }
     }
 
     /**
@@ -379,20 +382,7 @@ public with sharing class RollupBuilderController {
     @AuraEnabled
     public static PreviewResult preview(Draft draft, Id recordId) {
         try {
-            // It calculates any field of any record in system mode, so only an admin may ask.
-            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
-                throw new RollupService.RollupServiceException(
-                    Label.Core_Rollups_ErrorNoPermission
-                );
-            }
-            if (draft != null) {
-                draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
-                draft.active = false;
-            }
-            String problem = problemWith(draft);
-            if (problem != null) {
-                throw new RollupService.RollupServiceException(problem);
-            }
+            checkPreview(draft);
             Schema.SObjectType targetType = SettingsService.typeByName(draft.targetObject);
             String condition = RollupFilterParser.toWhereClause(draft.targetFilterJson, targetType);
             Integer count = Database.countQueryWithBinds(
@@ -408,11 +398,55 @@ public with sharing class RollupBuilderController {
                 new List<String>{ count.format() }
             );
             if (recordId != null) {
-                preview.result = describe(RollupEngine.preview(toRecord(draft), recordId));
+                Rollup_Definition__c definition = toRecord(draft);
+                preview.result = describe(RollupEngine.preview(definition, recordId));
+                preview.rows = RollupPreviewRows.of(definition, recordId);
             }
             return preview;
         } catch (Exception caught) {
             throw asUserError(caught);
+        }
+    }
+
+    /**
+     * Calculates the unsaved rollup on up to five records it would fill, chosen for the
+     * administrator, and writes nothing (U4).
+     *
+     * @param draft the rollup as the Builder holds it
+     */
+    @AuraEnabled
+    public static List<RollupPreviewRows.Sample> previewSamples(Draft draft) {
+        try {
+            checkPreview(draft);
+            Rollup_Definition__c definition = toRecord(draft);
+            List<RollupPreviewRows.Sample> samples = RollupPreviewRows.samplesOf(definition);
+            for (RollupPreviewRows.Sample sample : samples) {
+                sample.result = describe(
+                    RollupEngine.preview(definition, Id.valueOf(sample.recordId))
+                );
+            }
+            return samples;
+        } catch (Exception caught) {
+            throw asUserError(caught);
+        }
+    }
+
+    /**
+     * Refuses a preview the user may not ask for, or of a rollup the save would refuse, apart
+     * from the name and the overlap with other rollups, which only a save needs.
+     */
+    private static void checkPreview(Draft draft) {
+        // It calculates any field of any record in system mode, so only an admin may ask.
+        if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+            throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+        }
+        if (draft != null) {
+            draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
+            draft.active = false;
+        }
+        String problem = problemWith(draft);
+        if (problem != null) {
+            throw new RollupService.RollupServiceException(problem);
         }
     }
 
