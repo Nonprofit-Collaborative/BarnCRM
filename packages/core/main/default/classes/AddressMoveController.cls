@@ -5,6 +5,9 @@
  * Everything is read and written as the user, as every other address write is: the moves run
  * through AddressService in user mode, so someone who cannot edit addresses, the household or
  * its people is refused, and nothing is half saved.
+ *
+ * It also hands the card the extra fields an administrator chose to show on every address
+ * (Address Card Fields, R-AD10), those this user can read.
  */
 public with sharing class AddressMoveController {
     /** What the card needs to offer the moves on this record. */
@@ -43,6 +46,68 @@ public with sharing class AddressMoveController {
         /** The members with an address of their own, left alone unless ticked. */
         @AuraEnabled
         public List<Choice> withTheirOwn = new List<Choice>();
+    }
+
+    /** An extra field the card shows on every address (R-AD10). */
+    public class CardField {
+        @AuraEnabled
+        public String apiName;
+        @AuraEnabled
+        public String label;
+    }
+
+    /** The fields the card always shows, or that name the record itself, never repeated. */
+    private static final Set<Schema.SObjectField> SHOWN_ALWAYS = new Set<Schema.SObjectField>{
+        Address__c.Account__c,
+        Address__c.Contact__c,
+        Address__c.Person_Account__c,
+        Address__c.Type__c,
+        Address__c.Street__c,
+        Address__c.City__c,
+        Address__c.State__c,
+        Address__c.Postal_Code__c,
+        Address__c.Country__c,
+        Address__c.Is_Default__c,
+        Address__c.Seasonal_Start_Month__c,
+        Address__c.Seasonal_Start_Day__c,
+        Address__c.Seasonal_End_Month__c,
+        Address__c.Seasonal_End_Day__c,
+        Address__c.Status__c,
+        Address__c.Start_Date__c,
+        Address__c.End_Date__c
+    };
+
+    /**
+     * The Address Card Fields setting (R-AD10), in the order it was saved: each field that
+     * still exists, that the card does not already show, and that this user can read.
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<CardField> getCardFields() {
+        try {
+            List<CardField> fields = new List<CardField>();
+            String chosen = SettingsService.getSettings().Address_Card_Fields__c;
+            if (String.isBlank(chosen)) {
+                return fields;
+            }
+            Map<String, Schema.SObjectField> byName = Schema.SObjectType.Address__c.fields.getMap();
+            Set<String> seen = new Set<String>();
+            for (String name : chosen.split(',')) {
+                Schema.SObjectField token = byName.get(name.trim().toLowerCase());
+                if (token == null || SHOWN_ALWAYS.contains(token)) {
+                    continue;
+                }
+                Schema.DescribeFieldResult field = token.getDescribe();
+                if (field.isAccessible() && seen.add(field.getName())) {
+                    CardField shown = new CardField();
+                    shown.apiName = field.getName();
+                    shown.label = field.getLabel();
+                    fields.add(shown);
+                }
+            }
+            return fields;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Addresses card: Address Card Fields');
+        }
     }
 
     @AuraEnabled(cacheable=true)

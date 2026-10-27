@@ -33,6 +33,12 @@ jest.mock(
 );
 
 jest.mock(
+  '@salesforce/label/c.Core_Settings_KeepDefaultAria',
+  () => ({ default: 'Keep {0} as a saved setting' }),
+  { virtual: true }
+);
+
+jest.mock(
   '@salesforce/label/c.Core_Settings_OpenSectionButton',
   () => ({ default: 'Open this page' }),
   {
@@ -853,6 +859,52 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('lets Maria tick the Address fields the card shows instead of typing API names', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        {
+          name: 'Addresses',
+          settings: [
+            {
+              key: 'Address_Card_Fields__c',
+              label: 'Address Card Fields',
+              description: 'Tick the Address fields to show on every address.',
+              dataType: 'FieldList',
+              section: 'Addresses',
+              objectApiName: 'Address__c',
+              component: null,
+              helpUrl: null,
+              value: '',
+              checked: false,
+              options: [
+                { label: 'Address Number', value: 'Name' },
+                { label: 'Verification Status', value: 'Verification_Status__c' }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+    const element = build();
+    openSection('Addresses');
+    await settle();
+
+    const boxes = element.shadowRoot.querySelector('lightning-checkbox-group');
+    expect(boxes.options).toHaveLength(2);
+    expect(boxes.value).toEqual([]);
+    boxes.dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['Verification_Status__c', 'Name'] } })
+    );
+    await settle();
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({
+      values: { Address_Card_Fields__c: 'Verification_Status__c,Name' }
+    });
+  });
+
   it('says the page could not load rather than showing nothing', async () => {
     getConsoleModel.mockRejectedValue(new Error('no'));
     const element = build();
@@ -1240,6 +1292,163 @@ describe('c-settings-console', () => {
       await settle();
 
       expect(getRecentChanges).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Keeping a shown default (RM1)', () => {
+    /** General with two defaults nobody saved (a picklist and a number) and a saved picklist. */
+    function defaultsModel(canEdit, unsaved = true) {
+      const row = (key, dataType, value, unsavedDefault) => ({
+        key,
+        label: key,
+        description: null,
+        dataType,
+        section: 'General',
+        component: null,
+        helpUrl: null,
+        value,
+        checked: false,
+        options: [
+          { label: 'On its own', value: 'Standalone' },
+          { label: 'Alongside NPSP', value: 'NPSP' }
+        ],
+        unsavedDefault
+      });
+      return {
+        canEdit,
+        sections: [
+          {
+            name: 'General',
+            settings: [
+              row('Coexistence_Mode__c', 'Picklist', 'Standalone', unsaved),
+              row('Stale_Record_Years__c', 'Number', '5', true),
+              row('Error_Digest_Frequency__c', 'Picklist', 'Weekly', false)
+            ]
+          }
+        ]
+      };
+    }
+
+    const notes = (element) =>
+      Array.from(element.shadowRoot.querySelectorAll('[data-default-note]')).map(
+        (note) => note.dataset.defaultNote
+      );
+    const keepButton = (element, key) =>
+      element.shadowRoot.querySelector(`lightning-button[data-keep="${key}"]`);
+
+    it('offers to keep only a default nobody has saved', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      const element = build();
+      await settle();
+
+      expect(notes(element)).toEqual(['Coexistence_Mode__c', 'Stale_Record_Years__c']);
+      const button = keepButton(element, 'Coexistence_Mode__c');
+      expect(button.label).toBe('c.Core_Settings_KeepDefaultButton');
+      expect(button.ariaLabel || button.getAttribute('aria-label')).toBe(
+        'Keep Coexistence_Mode__c as a saved setting'
+      );
+      expect(keepButton(element, 'Error_Digest_Frequency__c')).toBeNull();
+    });
+
+    it('saves exactly the shown value through the normal save, then stops offering it', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      saveSettings.mockResolvedValue(defaultsModel(true, false));
+      const element = build();
+      await settle();
+
+      keepButton(element, 'Coexistence_Mode__c').click();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledTimes(1);
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Coexistence_Mode__c: 'Standalone' } });
+      expect(element.shadowRoot.querySelector('p[role="status"]').textContent).toBe(
+        'c.Core_Settings_SavedMessage'
+      );
+      expect(keepButton(element, 'Coexistence_Mode__c')).toBeNull();
+      expect(notes(element)).toEqual(['Stale_Record_Years__c']);
+      expect(getRecentChanges).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps a number default as the number shown', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      const element = build();
+      await settle();
+
+      keepButton(element, 'Stale_Record_Years__c').click();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Stale_Record_Years__c: '5' } });
+    });
+
+    it('leaves other unsaved edits on the page and unsent', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      saveSettings.mockResolvedValue(defaultsModel(true, false));
+      const element = build();
+      await settle();
+
+      const digest = element.shadowRoot.querySelector(
+        'lightning-combobox[data-key="Error_Digest_Frequency__c"]'
+      );
+      digest.dispatchEvent(new CustomEvent('change', { detail: { value: 'NPSP' } }));
+      await settle();
+      keepButton(element, 'Coexistence_Mode__c').click();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Coexistence_Mode__c: 'Standalone' } });
+      expect(
+        element.shadowRoot.querySelector('lightning-combobox[data-key="Error_Digest_Frequency__c"]')
+          .value
+      ).toBe('NPSP');
+      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
+        (button) => button.variant === 'brand'
+      );
+      expect(save.disabled).toBe(false);
+    });
+
+    it('hides the offer once Maria picks a value herself', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      const element = build();
+      await settle();
+
+      element.shadowRoot
+        .querySelector('lightning-combobox[data-key="Coexistence_Mode__c"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'NPSP' } }));
+      await settle();
+
+      expect(keepButton(element, 'Coexistence_Mode__c')).toBeNull();
+      expect(notes(element)).toEqual(['Stale_Record_Years__c']);
+    });
+
+    it('offers no keep for a default detection would replace, but still says it is not saved', async () => {
+      const withDetection = defaultsModel(true);
+      withDetection.sections[0].settings.push({
+        ...withDetection.sections[0].settings[0],
+        key: 'Household_Membership_Mode__c',
+        label: 'How people belong to a household',
+        value: 'Contact',
+        options: [
+          { label: 'One household per person', value: 'Contact' },
+          { label: 'More than one household', value: 'Junction' }
+        ],
+        detectionMayChange: true
+      });
+      getConsoleModel.mockResolvedValue(withDetection);
+      const element = build();
+      await settle();
+
+      expect(notes(element)).toContain('Household_Membership_Mode__c');
+      expect(keepButton(element, 'Household_Membership_Mode__c')).toBeNull();
+      expect(keepButton(element, 'Coexistence_Mode__c')).not.toBeNull();
+    });
+
+    it('says a default is not saved but offers David no button to keep it', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(false));
+      const element = build();
+      await settle();
+
+      expect(notes(element)).toEqual(['Coexistence_Mode__c', 'Stale_Record_Years__c']);
+      expect(element.shadowRoot.querySelectorAll('lightning-button[data-keep]')).toHaveLength(0);
+      expect(saveSettings).not.toHaveBeenCalled();
     });
   });
 });

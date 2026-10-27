@@ -24,6 +24,7 @@ public with sharing class DataHygieneService {
     public static final String ADDRESSES_WITHOUT_OWNER = 'addresses_without_owner';
     public static final String DEFAULT_ADDRESSES_INCOMPLETE = 'default_addresses_incomplete';
     public static final String DEFAULT_ADDRESSES_FAILED = 'default_addresses_failed_verification';
+    public static final String DEFAULT_ADDRESSES_UNDELIVERABLE = 'default_addresses_undeliverable';
     public static final String PEOPLE_UNREACHABLE = 'people_unreachable';
     public static final String DECEASED_STILL_EMAILED = 'deceased_still_emailed';
     public static final String PEOPLE_NOT_UPDATED = 'people_not_updated';
@@ -41,6 +42,7 @@ public with sharing class DataHygieneService {
         ADDRESSES_WITHOUT_OWNER,
         DEFAULT_ADDRESSES_INCOMPLETE,
         DEFAULT_ADDRESSES_FAILED,
+        DEFAULT_ADDRESSES_UNDELIVERABLE,
         PEOPLE_UNREACHABLE,
         DECEASED_STILL_EMAILED,
         PEOPLE_NOT_UPDATED
@@ -143,6 +145,8 @@ public with sharing class DataHygieneService {
             document = defaultAddressesIncomplete();
         } else if (key == DEFAULT_ADDRESSES_FAILED) {
             document = defaultAddressesFailed();
+        } else if (key == DEFAULT_ADDRESSES_UNDELIVERABLE) {
+            document = defaultAddressesUndeliverable();
         } else if (key == PEOPLE_UNREACHABLE) {
             document = peopleUnreachable();
         } else if (key == DECEASED_STILL_EMAILED) {
@@ -351,6 +355,27 @@ public with sharing class DataHygieneService {
     }
 
     /**
+     * A primary address a person marked Undeliverable (R-AD10): a household, organization or
+     * person whose mail is coming back.
+     */
+    private static Map<String, Object> defaultAddressesUndeliverable() {
+        return document(
+            Address__c.SObjectType,
+            addressColumns(),
+            new List<Object>{
+                condition(1, name(Address__c.Is_Default__c), 'equals', true),
+                condition(
+                    2,
+                    name(Address__c.Status__c),
+                    'equals',
+                    AddressService.STATUS_UNDELIVERABLE
+                )
+            },
+            null
+        );
+    }
+
+    /**
      * A living person with no email, no phone and no mailing city or postal code: nobody can
      * reach them. The mailing fields are where the default address is written (R-AD3).
      */
@@ -509,6 +534,7 @@ public with sharing class DataHygieneService {
             ADDRESSES_WITHOUT_OWNER => System.Label.Core_DataHygiene_OwnerlessTitle,
             DEFAULT_ADDRESSES_INCOMPLETE => System.Label.Core_DataHygiene_IncompleteTitle,
             DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedTitle,
+            DEFAULT_ADDRESSES_UNDELIVERABLE => System.Label.Core_DataHygiene_UndeliverableTitle,
             PEOPLE_UNREACHABLE => System.Label.Core_DataHygiene_UnreachableTitle,
             DECEASED_STILL_EMAILED => System.Label.Core_DataHygiene_DeceasedTitle,
             PEOPLE_NOT_UPDATED => String.format(
@@ -534,6 +560,7 @@ public with sharing class DataHygieneService {
                 ADDRESSES_WITHOUT_OWNER => System.Label.Core_DataHygiene_OwnerlessDetail,
                 DEFAULT_ADDRESSES_INCOMPLETE => System.Label.Core_DataHygiene_IncompleteDetail,
                 DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedDetail,
+                DEFAULT_ADDRESSES_UNDELIVERABLE => System.Label.Core_DataHygiene_UndeliverableDetail,
                 PEOPLE_UNREACHABLE => System.Label.Core_DataHygiene_UnreachableDetail,
                 DECEASED_STILL_EMAILED => System.Label.Core_DataHygiene_DeceasedDetail,
                 PEOPLE_NOT_UPDATED => System.Label.Core_DataHygiene_NotUpdatedDetail

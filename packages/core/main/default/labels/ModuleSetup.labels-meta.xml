@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_ModuleSetup_FindingDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: packages whose setup never ran. {1} names them.</shortDescription>
+        <value>{1}: installed, but the setup steps a package install runs never ran. This happens when source is copied into an org by hand. Finish Setup runs those same steps now, and is safe to run more than once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleSetup_FindingTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title, several packages. {0} is the count.</shortDescription>
+        <value>Setup never ran for {0} BarnCRM packages</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleSetup_FindingTitleOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title, one package. {1} is its name.</shortDescription>
+        <value>Setup never ran for {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleSetup_FinishButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that runs a package's setup steps (Health Check, Modules).</shortDescription>
+        <value>Finish Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleSetup_FixOutcome</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>After Finish Setup in Health Check. {0} names the packages.</shortDescription>
+        <value>Done. Setup steps ran for: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleSetup_NotRunNotice</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modules page notice on a package whose setup never ran.</shortDescription>
+        <value>Its setup steps never ran, which happens when source is copied in by hand. Finish Setup runs the steps a package install runs.</value>
+    </labels>
+</CustomLabels>

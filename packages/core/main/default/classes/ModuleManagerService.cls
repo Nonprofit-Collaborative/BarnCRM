@@ -128,6 +128,9 @@ public with sharing class ModuleManagerService {
         /** True when only the Nonprofit Edition offers it, so the page groups it under Nonprofit Modules. */
         @AuraEnabled
         public Boolean nonprofitOnly;
+        /** True when it is here but its setup steps never ran, so the page offers Finish Setup (FS1). */
+        @AuraEnabled
+        public Boolean setupPending;
 
         @NamespaceAccessible
         public String getName() {
@@ -160,6 +163,7 @@ public with sharing class ModuleManagerService {
     @NamespaceAccessible
     public static List<ModuleStatus> getModules() {
         Set<String> off = turnedOff();
+        Set<String> setupRan = ModuleSetups.ran();
         List<ModuleStatus> rows = new List<ModuleStatus>();
         for (ModuleDetectionService.ModuleInfo info : ModuleDetectionService.getModules()) {
             ModuleStatus row = new ModuleStatus();
@@ -170,6 +174,7 @@ public with sharing class ModuleManagerService {
             row.appUrl = info.appUrl;
             row.installFirst = info.installFirst;
             row.nonprofitOnly = info.nonprofitOnly == true;
+            row.setupPending = info.present == true && ModuleSetups.isPending(info.name, setupRan);
             row.canSwitch = info.present == true && info.name != CORE;
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED

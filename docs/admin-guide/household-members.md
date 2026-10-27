@@ -178,7 +178,7 @@ can choose with **Make primary** afterward.
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
 while the org uses the simple way of belonging, because that move cannot be carried out.
-Switch to the flexible way in BarnCRM Settings, Households, if you need it. In the simple way
+Switch to the flexible way in BarnCRM Settings, People and Households, if you need it. In the simple way
 the button also needs edit access to the person's **Account Name** field, since that is what
 a move changes; the BarnCRM Admin and Staff permission sets grant it.
 

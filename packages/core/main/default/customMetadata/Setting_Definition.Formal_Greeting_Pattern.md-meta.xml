@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Section__c</field>
-    <value xsi:type="xsd:string">Households</value>
+    <value xsi:type="xsd:string">People and Households</value>
   </values>
   <values>
     <field>Setting_Key__c</field>

@@ -10,6 +10,23 @@ import getCardContext from '@salesforce/apex/AddressMoveController.getCardContex
 import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
 import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
 import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updateEveryonesAddress';
+import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
+
+jest.mock(
+  '@salesforce/apex/AddressMoveController.getCardFields',
+  () => {
+    const { createApexTestWireAdapter } = jest.requireActual('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+// The real wording, so a date range can be read back.
+jest.mock('@salesforce/label/c.Core_Address_DateRange', () => ({ default: '{0} to {1}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Address_DateSince', () => ({ default: 'Since {0}' }), {
+  virtual: true
+});
 
 jest.mock(
   '@salesforce/apex/AddressMoveController.getCardContext',
@@ -560,6 +577,222 @@ describe('c-address-panel', () => {
       expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
         'c.Core_Address_MoveFailed'
       );
+    });
+  });
+
+  describe('address history (R-AD10)', () => {
+    /** Staff, who may also change an address status and its end date. */
+    const HISTORY_ACCESS = {
+      ...STAFF_ACCESS,
+      fields: {
+        Is_Default__c: { updateable: true },
+        Status__c: { updateable: true },
+        End_Date__c: { updateable: true }
+      }
+    };
+
+    function withHistory(base, status, startDate, endDate) {
+      return {
+        ...base,
+        Status__c: { value: status },
+        Start_Date__c: { value: startDate },
+        End_Date__c: { value: endDate }
+      };
+    }
+
+    const CURRENT_HOME = withHistory(HOME, 'Current', '2026-10-01', null);
+    const OLD_HOME = withHistory(
+      node({ id: 'a0100000000000EEEE', type: 'Home', street: '3 Elm Street', isDefault: false }),
+      'Former',
+      '2020-01-05',
+      '2026-10-01'
+    );
+    const ENDED = withHistory(
+      node({ id: 'a0100000000000FFFF', type: 'Work', street: '1 Old Office', isDefault: false }),
+      'Current',
+      null,
+      '2021-03-31'
+    );
+
+    function streetsShown(element) {
+      return Array.from(element.shadowRoot.querySelectorAll('[data-id="address-street"]')).map(
+        (n) => n.textContent
+      );
+    }
+
+    it('lists the addresses in use now and keeps the former ones collapsed until opened', async () => {
+      const element = build();
+      graphql.emit(response([OLD_HOME, ENDED, CURRENT_HOME]));
+      await flush();
+
+      expect(streetsShown(element)).toEqual(['812 Willow Lane']);
+      const toggle = element.shadowRoot.querySelector('[data-id="former-toggle"]');
+      expect(toggle.getAttribute('aria-expanded')).toBe('false');
+      expect(toggle.textContent).toContain('c.Core_Address_FormerHeading');
+
+      toggle.click();
+      await flush();
+
+      expect(toggle.getAttribute('aria-expanded')).toBe('true');
+      const former = element.shadowRoot.querySelector('[data-id="former-addresses"]');
+      const formerStreets = Array.from(former.querySelectorAll('[data-id="address-street"]')).map(
+        (n) => n.textContent
+      );
+      expect(formerStreets).toEqual(['3 Elm Street', '1 Old Office']);
+      expect(former.querySelector('[data-id="address-dates"]').textContent).toBe(
+        'January 5, 2020 to October 1, 2026'
+      );
+    });
+
+    it('shows when the address in use started', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME]));
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="address-dates"]').textContent).toBe(
+        'Since October 1, 2026'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="former-toggle"]')).toBeNull();
+    });
+
+    it('reads a blank status as Current and never puts the primary among the former', async () => {
+      const element = build();
+      graphql.emit(
+        response([
+          withHistory(HOME, 'Former', null, '2020-01-01'),
+          withHistory(WINTER, null, null, null)
+        ])
+      );
+      await flush();
+
+      expect(streetsShown(element)).toEqual(['812 Willow Lane', '4120 East Camelback Road']);
+      expect(element.shadowRoot.querySelector('[data-id="former-toggle"]')).toBeNull();
+    });
+
+    it('badges an undeliverable address and flags an undeliverable primary', async () => {
+      const element = build();
+      graphql.emit(response([withHistory(HOME, 'Undeliverable', null, null)]));
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="undeliverable-badge"]')).not.toBeNull();
+      expect(
+        element.shadowRoot.querySelector('[data-id="undeliverable-primary"]').textContent
+      ).toContain('c.Core_Address_UndeliverablePrimary');
+    });
+
+    it('badges an undeliverable address that is not the primary without the warning', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME, withHistory(WINTER, 'Undeliverable', null, null)]));
+      await flush();
+
+      expect(element.shadowRoot.querySelectorAll('[data-id="undeliverable-badge"]').length).toBe(1);
+      expect(element.shadowRoot.querySelector('[data-id="undeliverable-primary"]')).toBeNull();
+    });
+
+    it('shows the fields the administrator chose on every address', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME, WINTER]));
+      getCardFields.emit([
+        { apiName: 'Verification_Status__c', label: 'Verification Status' },
+        { apiName: 'Name', label: 'Address Number' }
+      ]);
+      await flush();
+
+      const forms = element.shadowRoot.querySelectorAll('[data-id="card-fields"]');
+      expect(forms.length).toBe(2);
+      expect(forms[0].recordId).toBe(HOME.Id);
+      expect(forms[0].objectApiName).toBe('Address__c');
+      const names = Array.from(forms[0].querySelectorAll('lightning-output-field')).map(
+        (field) => field.fieldName
+      );
+      expect(names).toEqual(['Verification_Status__c', 'Name']);
+    });
+
+    it('shows no extra fields when none were chosen', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME]));
+      getCardFields.emit([]);
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="card-fields"]')).toBeNull();
+    });
+
+    it('offers no status menu to someone who cannot change the status', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME, WINTER]));
+      await flush();
+
+      expect(element.shadowRoot.querySelector('.status-menu')).toBeNull();
+    });
+
+    it('never offers Former on the primary address', async () => {
+      const element = build('Account', HISTORY_ACCESS);
+      graphql.emit(response([CURRENT_HOME]));
+      await flush();
+
+      const values = Array.from(
+        element.shadowRoot.querySelectorAll('.status-menu lightning-menu-item')
+      ).map((item) => item.value);
+      expect(values).toEqual(['Undeliverable']);
+    });
+
+    it('marks an address Former with today as its end date', async () => {
+      jest.useFakeTimers({ now: new Date(2026, 9, 26, 12) });
+      const element = build('Account', HISTORY_ACCESS);
+      graphql.emit(response([CURRENT_HOME, withHistory(WINTER, 'Current', null, null)]));
+      await Promise.resolve();
+      await Promise.resolve();
+
+      const menus = element.shadowRoot.querySelectorAll('.status-menu');
+      menus[1].dispatchEvent(new CustomEvent('select', { detail: { value: 'Former' } }));
+      await Promise.resolve();
+      jest.useRealTimers();
+
+      expect(updateRecord).toHaveBeenCalledWith({
+        fields: { Id: WINTER.Id, Status__c: 'Former', End_Date__c: '2026-10-26' }
+      });
+    });
+
+    it('marks a former address Current again and clears its end date', async () => {
+      const element = build('Account', HISTORY_ACCESS);
+      graphql.emit(response([CURRENT_HOME, OLD_HOME]));
+      await flush();
+      element.shadowRoot.querySelector('[data-id="former-toggle"]').click();
+      await flush();
+
+      const menu = element.shadowRoot.querySelector('[data-id="former-addresses"] .status-menu');
+      menu.dispatchEvent(new CustomEvent('select', { detail: { value: 'Current' } }));
+      await flush();
+
+      expect(updateRecord).toHaveBeenCalledWith({
+        fields: { Id: OLD_HOME.Id, Status__c: 'Current', End_Date__c: null }
+      });
+    });
+
+    it('marks an address Undeliverable without touching its dates', async () => {
+      const element = build('Account', HISTORY_ACCESS);
+      graphql.emit(response([CURRENT_HOME]));
+      await flush();
+
+      element.shadowRoot
+        .querySelector('.status-menu')
+        .dispatchEvent(new CustomEvent('select', { detail: { value: 'Undeliverable' } }));
+      await flush();
+
+      expect(updateRecord).toHaveBeenCalledWith({
+        fields: { Id: HOME.Id, Status__c: 'Undeliverable' }
+      });
+    });
+
+    it('lets a new address be saved as the primary, which is how a move is recorded', async () => {
+      const element = build('Account');
+      graphql.emit(response([CURRENT_HOME]));
+      await flush();
+      element.shadowRoot.querySelector('[data-id="add-address"]').click();
+      await flush();
+
+      const primary = element.shadowRoot.querySelector('[data-id="new-address-primary"]');
+      expect(primary.fieldName).toBe('Is_Default__c');
     });
   });
 });

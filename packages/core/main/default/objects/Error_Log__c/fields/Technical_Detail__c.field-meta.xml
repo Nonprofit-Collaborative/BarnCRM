@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Technical_Detail__c</fullName>
-  <description>Exception type, stack trace, and query or data detail, for a developer or a support request.</description>
+  <description>Exception type, stack trace, and query or data detail, for a developer or a bug report.</description>
   <inlineHelpText>Send this to whoever supports your Salesforce.</inlineHelpText>
   <label>Technical Detail</label>
   <length>32768</length>

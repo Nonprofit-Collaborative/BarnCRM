@@ -6,6 +6,7 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
 
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
+import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
 import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
 // Not named useForWholeHousehold: a name starting with "use" reads as a React hook to Code
 // Analyzer's react-hooks rule (High), which fails the merge gate.
@@ -15,6 +16,8 @@ import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updat
 import ADDRESS_SCHEMA from '@salesforce/schema/Address__c';
 import ID_FIELD from '@salesforce/schema/Address__c.Id';
 import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
+import STATUS_FIELD from '@salesforce/schema/Address__c.Status__c';
+import END_DATE_FIELD from '@salesforce/schema/Address__c.End_Date__c';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Address_PanelTitle';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
@@ -43,6 +46,18 @@ import USE_FOR_HOUSEHOLD_HELP from '@salesforce/label/c.Core_Address_UseForHouse
 import USE_FOR_HOUSEHOLD_PICK from '@salesforce/label/c.Core_Address_UseForHouseholdPick';
 import USE_FOR_HOUSEHOLD_SUCCESS from '@salesforce/label/c.Core_Address_UseForHouseholdSuccess';
 import USE_FOR_HOUSEHOLD_TITLE from '@salesforce/label/c.Core_Address_UseForHouseholdTitle';
+import FORMER_HEADING from '@salesforce/label/c.Core_Address_FormerHeading';
+import DATE_RANGE from '@salesforce/label/c.Core_Address_DateRange';
+import DATE_SINCE from '@salesforce/label/c.Core_Address_DateSince';
+import DATE_UNTIL from '@salesforce/label/c.Core_Address_DateUntil';
+import UNDELIVERABLE_BADGE from '@salesforce/label/c.Core_Address_UndeliverableBadge';
+import UNDELIVERABLE_PRIMARY from '@salesforce/label/c.Core_Address_UndeliverablePrimary';
+import STATUS_MENU from '@salesforce/label/c.Core_Address_StatusMenu';
+import MARK_CURRENT from '@salesforce/label/c.Core_Address_MarkCurrent';
+import MARK_FORMER from '@salesforce/label/c.Core_Address_MarkFormer';
+import MARK_UNDELIVERABLE from '@salesforce/label/c.Core_Address_MarkUndeliverable';
+import STATUS_SAVED from '@salesforce/label/c.Core_Address_StatusSaved';
+import STATUS_FAILED from '@salesforce/label/c.Core_Address_StatusFailed';
 
 const ADDRESS_OBJECT = 'Address__c';
 const FORM_FIELDS = [
@@ -58,6 +73,9 @@ const FORM_FIELDS = [
   'Seasonal_End_Day__c'
 ];
 const SEASONAL_TYPE = 'Seasonal';
+const STATUS_CURRENT = 'Current';
+const STATUS_FORMER = 'Former';
+const STATUS_UNDELIVERABLE = 'Undeliverable';
 const MOVE_FOR_HOUSEHOLD = 'household';
 const MOVE_FOR_EVERYONE = 'everyone';
 
@@ -123,6 +141,15 @@ const ADDRESSES_QUERY = gql`
               Seasonal_End_Day__c {
                 value
               }
+              Status__c {
+                value
+              }
+              Start_Date__c {
+                value
+              }
+              End_Date__c {
+                value
+              }
             }
           }
         }
@@ -165,8 +192,64 @@ function toView(node) {
       read(node.Seasonal_Start_Month__c),
       read(node.Seasonal_Start_Day__c)
     ),
-    seasonalEnd: monthAndDay(read(node.Seasonal_End_Month__c), read(node.Seasonal_End_Day__c))
+    seasonalEnd: monthAndDay(read(node.Seasonal_End_Month__c), read(node.Seasonal_End_Day__c)),
+    // A blank status, on an address saved before statuses existed, is Current (R-AD10).
+    status: read(node.Status__c) || STATUS_CURRENT,
+    startDate: read(node.Start_Date__c),
+    endDate: read(node.End_Date__c)
   };
+}
+
+/** Today as YYYY-MM-DD in the reader's own time zone, to compare with a stored date. */
+function todayText() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/** "October 26, 2026", in the reader's own language, from a stored YYYY-MM-DD. */
+function longDate(value) {
+  if (!value) {
+    return null;
+  }
+  return new Intl.DateTimeFormat(LOCALE, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
+/** "Since ...", "Until ..." or "... to ...", or nothing when neither date is known. */
+function dateText(startDate, endDate) {
+  const start = longDate(startDate);
+  const end = longDate(endDate);
+  if (start && end) {
+    return DATE_RANGE.replace('{0}', start).replace('{1}', end);
+  }
+  if (end) {
+    return DATE_UNTIL.replace('{0}', end);
+  }
+  return start ? DATE_SINCE.replace('{0}', start) : null;
+}
+
+/**
+ * The statuses a person may give an address from the card (R-AD10): any but the one it has,
+ * Current again for an address whose end date has passed, and never Former on the primary.
+ */
+function statusActions(address, isFormer) {
+  const actions = [];
+  if (address.status !== STATUS_CURRENT || isFormer) {
+    actions.push({ value: STATUS_CURRENT, label: MARK_CURRENT });
+  }
+  if (address.status !== STATUS_FORMER && !address.isDefault) {
+    actions.push({ value: STATUS_FORMER, label: MARK_FORMER });
+  }
+  if (address.status !== STATUS_UNDELIVERABLE) {
+    actions.push({ value: STATUS_UNDELIVERABLE, label: MARK_UNDELIVERABLE });
+  }
+  return actions;
 }
 
 /** The message an Apex refusal carries, or the card's own when it carries none. */
@@ -201,7 +284,10 @@ export default class AddressPanel extends LightningElement {
     useForHouseholdButton: USE_FOR_HOUSEHOLD_BUTTON,
     useForHouseholdHelp: USE_FOR_HOUSEHOLD_HELP,
     useForHouseholdPick: USE_FOR_HOUSEHOLD_PICK,
-    useForHouseholdTitle: USE_FOR_HOUSEHOLD_TITLE
+    useForHouseholdTitle: USE_FOR_HOUSEHOLD_TITLE,
+    undeliverableBadge: UNDELIVERABLE_BADGE,
+    undeliverablePrimary: UNDELIVERABLE_PRIMARY,
+    statusMenu: STATUS_MENU
   };
 
   addressObject = ADDRESS_OBJECT;
@@ -303,12 +389,69 @@ export default class AddressPanel extends LightningElement {
     const context = this.cardContext;
     const canMove = this.canSetDefault && Boolean(context);
     const households = context && context.households ? context.households : [];
+    const canSetStatus = this.canSetStatus;
+    const cardFields = this.cardFields;
     return this.addresses.map((address) => ({
       ...address,
       showUseForHousehold:
         canMove && address.isPersonal && !address.isSeasonal && households.length > 0,
-      showUpdateEveryone: canMove && context.isHousehold && !address.isPersonal && address.isDefault
+      showUpdateEveryone:
+        canMove && context.isHousehold && !address.isPersonal && address.isDefault,
+      showStatusMenu: canSetStatus,
+      cardFields,
+      hasCardFields: cardFields.length > 0
     }));
+  }
+
+  /**
+   * The card in two groups (R-AD10): the addresses in use now, primary first, then the Former
+   * Addresses, collapsed until opened.
+   */
+  get groups() {
+    const cards = this.cards;
+    const former = cards.filter((card) => card.isFormer);
+    const groups = [
+      { key: 'current', dataId: 'current-addresses', cards: cards.filter((card) => !card.isFormer) }
+    ];
+    if (former.length) {
+      groups.push({
+        key: 'former',
+        dataId: 'former-addresses',
+        isFormer: true,
+        heading: FORMER_HEADING.replace('{0}', former.length),
+        expanded: String(this.formerOpen),
+        icon: this.formerOpen ? 'utility:chevrondown' : 'utility:chevronright',
+        cards: this.formerOpen ? former : []
+      });
+    }
+    return groups;
+  }
+
+  formerOpen = false;
+
+  handleToggleFormer() {
+    this.formerOpen = !this.formerOpen;
+  }
+
+  /** The extra fields an administrator chose (Address Card Fields), those this user can read. */
+  cardFields = [];
+
+  @wire(getCardFields)
+  receiveCardFields({ data }) {
+    if (data) {
+      this.cardFields = data;
+    }
+  }
+
+  /** The status menu writes Status and End Date, so it needs edit on both. */
+  get canSetStatus() {
+    const info = this.addressInfo;
+    const fields = (info && info.fields) || {};
+    const status = fields[STATUS_FIELD.fieldApiName];
+    const endDate = fields[END_DATE_FIELD.fieldApiName];
+    return Boolean(
+      info && info.updateable && status && status.updateable && endDate && endDate.updateable
+    );
   }
 
   decorate(address) {
@@ -319,10 +462,21 @@ export default class AddressPanel extends LightningElement {
     if (address.isSeasonal && address.seasonalStart && address.seasonalEnd) {
       seasonalText = `${SEASONAL_RANGE} ${address.seasonalStart} ${SEASONAL_RANGE_TO} ${address.seasonalEnd}`;
     }
+    // The primary is never in the Former group, whatever it says (R-AD10).
+    const isFormer =
+      !address.isDefault &&
+      (address.status === STATUS_FORMER ||
+        Boolean(address.endDate && address.endDate <= todayText()));
+    const isUndeliverable = address.status === STATUS_UNDELIVERABLE;
     return {
       ...address,
       cityLine: lines,
       seasonalText,
+      dateText: dateText(address.startDate, address.endDate),
+      isFormer,
+      isUndeliverable,
+      flagUndeliverable: isUndeliverable && address.isDefault,
+      statusActions: statusActions(address, isFormer),
       showSetDefault: !address.isDefault,
       cardClass: address.isDefault
         ? 'slds-box slds-m-bottom_x-small slds-theme_shade'
@@ -362,6 +516,31 @@ export default class AddressPanel extends LightningElement {
     } catch {
       this.errorMessage = SET_DEFAULT_FAILED;
       this.notify(SET_DEFAULT_FAILED, 'error');
+    }
+  }
+
+  /**
+   * A person's status choice (R-AD10). Former keeps the end date given, else today's; Current
+   * clears it, so the address is back with the ones in use. Undeliverable changes nothing else.
+   */
+  async handleStatusSelect(event) {
+    const addressId = event.target.dataset.id;
+    const status = event.detail.value;
+    const address = this.addresses.find((candidate) => candidate.id === addressId);
+    const fields = { [ID_FIELD.fieldApiName]: addressId, [STATUS_FIELD.fieldApiName]: status };
+    if (status === STATUS_FORMER && !(address && address.endDate)) {
+      fields[END_DATE_FIELD.fieldApiName] = todayText();
+    } else if (status === STATUS_CURRENT) {
+      fields[END_DATE_FIELD.fieldApiName] = null;
+    }
+    try {
+      await updateRecord({ fields });
+      this.errorMessage = undefined;
+      this.notify(STATUS_SAVED, 'success');
+      this.refresh();
+    } catch {
+      this.errorMessage = STATUS_FAILED;
+      this.notify(STATUS_FAILED, 'error');
     }
   }
 

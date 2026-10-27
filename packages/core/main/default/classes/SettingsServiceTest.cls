@@ -908,6 +908,41 @@ private class SettingsServiceTest {
     }
 
     @IsTest
+    static void aFieldListTakesOnlyFieldsTheObjectOffersAndSavesOrgWide() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Address_Card_Fields',
+                    MasterLabel = 'Address Card Fields',
+                    Setting_Key__c = 'Address_Card_Fields__c',
+                    Section__c = 'Addresses',
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.FIELD_LIST,
+                    Record_Object__c = 'Address__c',
+                    Sort_Order__c = 1
+                )
+            };
+            String verification = Address__c.Verification_Status__c.getDescribe().getName();
+
+            Test.startTest();
+            String unknown = refusalOf('Address_Card_Fields__c', verification + ',Not_A_Field__c');
+            String accepted = refusalOf('Address_Card_Fields__c', verification + ',Name');
+            Test.stopTest();
+
+            Assert.isTrue(
+                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A field the object does not have is refused: ' + unknown
+            );
+            Assert.isNull(accepted, 'Fields the object offers are accepted');
+            Assert.areEqual(
+                verification + ',Name',
+                BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c,
+                'Saved on the org-wide settings record'
+            );
+        }
+    }
+
+    @IsTest
     static void aDateSettingReadsAsTheSameDayNotAMidnightDateTime() {
         System.runAs(TestUsers.admin()) {
             Date closedThrough = Date.newInstance(2026, 9, 30);

@@ -47,6 +47,11 @@
         <label>Record Type List</label>
       </value>
       <value>
+        <fullName>FieldList</fullName>
+        <default>false</default>
+        <label>Field List</label>
+      </value>
+      <value>
         <fullName>Component</fullName>
         <default>false</default>
         <label>Component</label>
