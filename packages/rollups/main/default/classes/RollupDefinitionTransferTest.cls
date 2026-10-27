@@ -53,7 +53,10 @@ private class RollupDefinitionTransferTest {
             Rollup_Definition__c shipped = childCount('Shipped_Children', 'Member_Count__c');
             shipped.Is_Package_Default__c = true;
             shipped.Active__c = false;
-            insert new List<Rollup_Definition__c>{ mine, shipped };
+            // The run stamp and the shipped flag are written by the engine and the installer,
+            // never by an admin (both are read only in the permission sets), so the test data
+            // is written in system mode.
+            insert as system new List<Rollup_Definition__c>{ mine, shipped };
 
             Map<String, Object> file = fileOf(RollupDefinitionTransfer.exportDefinitions(null));
 
@@ -124,7 +127,8 @@ private class RollupDefinitionTransferTest {
         System.runAs(maria()) {
             Rollup_Definition__c shipped = childCount('Shipped_Children', 'Member_Count__c');
             shipped.Is_Package_Default__c = true;
-            insert shipped;
+            // The installer writes the shipped flag, never an admin: system mode.
+            insert as system shipped;
             Map<String, Object> good = new Map<String, Object>{
                 'definitionKey' => 'Custom_Good',
                 'name' => 'Good',
@@ -206,6 +210,8 @@ private class RollupDefinitionTransferTest {
 
     @IsTest
     static void nothingToExportAndStaffAreRefusedInPlainWords() {
+        // Made by the running administrator: Maria, on a Standard User profile, cannot create users.
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
         System.runAs(maria()) {
             List<String> messages = new List<String>();
             try {
@@ -213,7 +219,6 @@ private class RollupDefinitionTransferTest {
             } catch (AuraHandledException refused) {
                 messages.add(refused.getMessage());
             }
-            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
             System.runAs(david) {
                 try {
                     RollupDefinitionTransfer.importDefinitions(fileWith(new List<Object>()), true);
