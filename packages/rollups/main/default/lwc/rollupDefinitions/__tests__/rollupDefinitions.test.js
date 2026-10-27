@@ -534,10 +534,15 @@ describe('c-rollup-definitions', () => {
       return element;
     }
 
-    function settle() {
-      // FileReader finishes on a later task, not a microtask.
-      // eslint-disable-next-line @lwc/lwc/no-async-operation
-      return new Promise((resolve) => setTimeout(resolve, 20)).then(flush);
+    async function settle() {
+      // FileReader finishes on a later task, not a microtask; a loaded CI runner can take more
+      // than one short wait, so wait a few times.
+      for (let i = 0; i < 5; i++) {
+        // eslint-disable-next-line no-await-in-loop, @lwc/lwc/no-async-operation
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
     }
 
     it('offers a tick box on admin-made rollups only, and exports the ticked ones', async () => {
