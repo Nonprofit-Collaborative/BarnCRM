@@ -425,9 +425,8 @@ public with sharing class RollupBuilderController {
         );
     }
 
-    /** A value as the administrator reads it, in her locale. */
-    @TestVisible
-    private static String display(Object value) {
+    /** A value as the administrator reads it, in her locale; also Import from DLRS's compare. */
+    public static String display(Object value) {
         if (value == null || value == '') {
             return Label.Core_RollupBuilder_PreviewEmpty;
         }

@@ -1928,6 +1928,39 @@ save check (R-R10, R-R8) has passed. Saving or switching a definition off never 
 from a file cannot ask, so it refuses such an entry (R-R10 by way of `checkedRecord`). Health
 Check warns about every active pair found later.
 
+*Import from DLRS.* Each active DLRS definition is mapped to a definition, which is saved
+switched off through the Builder's save checks (`checkedRecord`, as a file import is), with
+Definition Key `DLRS_` and the DLRS definition's name (cut to 80 characters), so importing
+again updates the same definition. Name is the DLRS label; Description says it was imported
+from the DLRS definition. The mapping:
+
+- Parent Object, Child Object and Relationship Field become Target Entity, Source Entity and
+  Relationship Path, only when the Builder offers that source and path for the target.
+- Aggregate Operation: Sum, Max, Min, Avg, Count, Count Distinct, Concatenate (TEXT_LIST),
+  Concatenate Distinct (TEXT_LIST_DISTINCT), First and Last. Any other operation is refused.
+- Field to Aggregate becomes Source Attribute; for Count, a field other than Id becomes an
+  "is not null" condition instead, since DLRS counts only records with the field filled.
+- Relationship Criteria becomes the Filter (R-R2) when it is fields compared with literals,
+  `= null`, IN, NOT IN, `LIKE 'x%'`, `LIKE '%x%'`, THIS_YEAR, LAST_YEAR and LAST_N_DAYS:n,
+  joined by AND, OR, NOT and brackets; anything else is refused naming the part.
+- Field to Order By: one field, ASC or DESC, NULLS LAST. A descending First becomes Last and
+  the other way round; a text list or row limit keeps the direction as Order Direction. More
+  than one field, or NULLS FIRST, is refused. A First or Last with none orders by the field
+  it reads.
+- Row Limit: kept for the R-R15 aggregates, dropped from First, refused on Last and the counts.
+- Concatenate Delimiter: `, `, `; `, ` | ` and `BR()` become Comma, Semicolon, Pipe and New
+  line; blank becomes Comma; anything else becomes Custom (SP() a space, TB() a tab) when it
+  fits ten characters on one line, otherwise it is refused.
+- Aggregate All Rows becomes Include Deleted; Bypass Permission is kept.
+- Calculation Mode: Realtime, Developer and Process Builder become Both; Scheduled stays
+  Scheduled. Sharing mode User is not kept: definitions run in system mode.
+
+A DLRS definition is also refused when an active definition already fills its field, or when
+its copy is already switched on. Nothing is refused silently: each refusal and each change is
+said in words. A compare step shows, for up to five target records, the value the record holds
+(DLRS wrote it) beside the value the copy calculates, writing nothing. A copy is switched on
+only with the confirmation above, recorded the same way. DLRS is read, never changed.
+
 ### Salesforce implementation
 
 - **Object:** `Rollup_Definition__c`, listed and edited in the settings console.
@@ -8966,6 +8999,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup Builder parity and generated triggers together (ADR-0136, ADR-0138, landing batch 11). No object or field added. R-R12: a source entity whose generated trigger is active in Setup with its switch on has instant updates, so the Builder offers Instantly for it and the save no longer refuses it; the generator offers code only for an entity the Builder offers as a source (R-R7). |
 | v0.8 | 2026-10-26 | DLRS and Rollup Helper detection (plan D-124 item 6, RB-C). No object or field added. New R-R16: DLRS (`dlrs`) and Rollup Helper (`rh2`) are detected by the namespace prefix of their objects, never referenced; the Rollup Builder, the Setup Assistant and the Modules page say each is a separate tool; BarnCRM never changes the other tool, and Rollup Helper's definitions are not read. |
 | v0.8 | 2026-10-26 | Same-field guard with DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "No shared target with DLRS": an active definition on a field an active DLRS definition fills is saved or switched on only after the administrator confirms the DLRS one will be switched off, recorded as a setting change; a file import refuses it; Health Check warns about pairs found later. |
+| v0.8 | 2026-10-26 | Import from DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "Import from DLRS": each active DLRS definition maps to a definition saved switched off through the Builder's checks with Definition Key `DLRS_` and its name, or is refused with the reason; the mapping of each DLRS field is listed; a compare step writes nothing; switching a copy on needs the same-field confirmation; DLRS is never changed. |
 
 ---
 ## 32. Entity ownership by package
