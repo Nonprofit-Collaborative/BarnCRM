@@ -613,10 +613,17 @@ only be turned away. To rebuild the **Instantly** totals as well, choose **Start
 
 ### Deleting a Rollup
 
-**Delete** on a row removes a rollup you made, after a confirmation that says what happens:
+**Delete** on a row opens a **Delete This Rollup** panel above the list, which asks what
+happens to the values the rollup wrote:
 
-- **The values it already wrote stay** on the records. Nothing updates them again, so clear
-  the field yourself if the old numbers would mislead anyone.
+- **Keep them on the records** (the default). Nothing updates them again, so choose this when
+  the old numbers are still worth reading.
+- **Clear them from every record it fills, in the background.** The field is blanked on every
+  record that meets the rollup's **Only for some records** conditions (all records of that
+  object when there are none). Records outside them keep their values. When it finishes, the
+  Error Log says how many records were cleared and how many could not be saved. Clearing is
+  refused while another active rollup fills the same field for the same records, since it
+  would wipe that rollup's totals too: keep the values, or switch the other rollup off first.
 - **It cannot be undone.** If you might want the rollup back, switch it off instead.
 - **Rollups that came with BarnCRM cannot be deleted.** Delete says so and does nothing, since
   **Restore shipped rollups** would only bring them back. Switch them off instead.

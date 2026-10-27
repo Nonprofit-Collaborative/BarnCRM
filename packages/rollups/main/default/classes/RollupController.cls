@@ -176,14 +176,19 @@ public with sharing class RollupController {
     }
 
     /**
-     * Deletes one rollup an administrator made (ADR-0136). The values it already wrote stay on the
-     * records; nothing updates them again. A shipped rollup is refused, since Restore defaults
-     * would only bring it back: it is turned off instead (R-R6). A queue entry that names the
-     * rollup skips it, as it skips one switched off (`RollupSelector.selectActiveByIds`). Refused
-     * while a full run is going, which would otherwise fail to stamp the run's other rollups.
+     * Deletes one rollup an administrator made (ADR-0136). By default the values it already wrote
+     * stay on the records and nothing updates them again; with `clearValues` they are cleared in
+     * the background (`RollupClearBatch`, U11), unless another active rollup fills the same field
+     * for the same records. A shipped rollup is refused, since Restore defaults would only bring
+     * it back: it is turned off instead (R-R6). A queue entry that names the rollup skips it, as
+     * it skips one switched off (`RollupSelector.selectActiveByIds`). Refused while a full run is
+     * going, which would otherwise fail to stamp the run's other rollups.
+     *
+     * @param definitionId the rollup
+     * @param clearValues true to clear the values it wrote; false or null to keep them
      */
     @AuraEnabled
-    public static RollupPageView deleteRollup(Id definitionId) {
+    public static RollupPageView deleteRollup(Id definitionId, Boolean clearValues) {
         try {
             requirePermission();
             Rollup_Definition__c definition = require(definitionId);
@@ -193,7 +198,21 @@ public with sharing class RollupController {
                 );
             }
             refuseWhileAFullRunIsGoing();
+            Rollup_Definition__c sharer = clearValues == true
+                ? RollupConflicts.sharerOf(definition)
+                : null;
+            if (sharer != null) {
+                throw new RollupService.RollupServiceException(
+                    String.format(
+                        Label.Core_RollupEase_ClearShared,
+                        new List<String>{ sharer.Name }
+                    )
+                );
+            }
             Database.delete(new Rollup_Definition__c(Id = definition.Id), AccessLevel.USER_MODE);
+            if (clearValues == true) {
+                RollupClearBatch.begin(definition);
+            }
             return currentPage();
         } catch (Exception caught) {
             throw asUserError(caught, 'Delete a rollup');

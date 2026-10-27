@@ -29,6 +29,18 @@ public with sharing class RollupConflicts {
      * the same records (R-R8). The list's Active switch asks it, as the Builder's save does.
      */
     public static String blockerOf(Rollup_Definition__c definition) {
+        Rollup_Definition__c other = sharerOf(definition);
+        return other == null
+            ? null
+            : String.format(Label.Core_RollupEase_ConflictBlocked, new List<String>{ other.Name });
+    }
+
+    /**
+     * Another active rollup that fills this rollup's field for some of the same records, or
+     * null. Deleting a rollup asks it before clearing the field, which would wipe the other's
+     * totals too (U11).
+     */
+    public static Rollup_Definition__c sharerOf(Rollup_Definition__c definition) {
         RollupConflicts checker = new RollupConflicts();
         Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
         for (Rollup_Definition__c other : RollupSelector.selectAll()) {
@@ -40,10 +52,7 @@ public with sharing class RollupConflicts {
                 sameField(definition, other) &&
                 checker.overlaps(target, definition, other)
             ) {
-                return String.format(
-                    Label.Core_RollupEase_ConflictBlocked,
-                    new List<String>{ other.Name }
-                );
+                return other;
             }
         }
         return null;

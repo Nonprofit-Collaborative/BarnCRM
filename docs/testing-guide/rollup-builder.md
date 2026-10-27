@@ -356,9 +356,9 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On the **Rollup Builder** tab, click **Copy** on **Test children per household**, click **Next** until **Check and save**, turn off **Active** and click **Save**. | A row **Copy of Test children per household** appears, switched off. |
-| 2 | Click **Delete** on **Copy of Test children per household**. | A **Delete Rollup** box reads "Delete Copy of Test children per household? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone." |
+| 2 | Click **Delete** on **Copy of Test children per household**. | A **Delete This Rollup** panel opens above the list: "Delete Copy of Test children per household? This cannot be undone.", with **What happens to the values it wrote** set to **Keep them on the records (nothing updates them again)**. |
 | 3 | Click **Cancel**. | The row is still listed. |
-| 4 | Click **Delete** on the same row again, then **OK**. | The notice reads "Rollup deleted. The values it wrote stay on the records." The row is gone; **Test children per household** is still listed. |
+| 4 | Click **Delete** on the same row again, leave **Keep them on the records** chosen, and click **Delete** in the panel. | The notice reads "Rollup deleted. The values it wrote stay on the records." The row is gone; **Test children per household** is still listed. |
 | 5 | Open **The Garcia Family**. | **Test Children Count** still shows 1. |
 | 6 | Back on the **Rollup Builder** tab, click **Delete** on **Account gift count**. | No confirmation opens. A red message reads "This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead." The row is still listed. |
 | 7 | Log in as the staff user and open the **Rollup Builder** tab. | **Delete** is disabled on every row, as **Edit** and **Copy** are. |
@@ -487,3 +487,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Click **Cancel**, then open the Rollup Builder tab again. | **Test children per household** is unchanged: no field on any household changed. |
 
 **Cleanup:** none.
+
+## T-RB-44: Delete a Rollup and Clear Its Values
+
+**Purpose:** confirm Delete can clear the values a rollup wrote, only on the records it fills, and refuses to clear a field another active rollup fills.
+**Prerequisites:** T-RB-02 done; **Test Children Count** on **The Garcia Family** shows 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **Copy** on **Test children per household**, click **Next** until **Check and save**, turn off **Active** and click **Save**. | **Copy of Test children per household** is listed, switched off. |
+| 2 | Click **Delete** on the copy, choose **Clear them from every record it fills, in the background** and click **Delete** in the panel. | A red message: "Test children per household also fills this field for the same records, so its values cannot be cleared. Keep the values, or switch Test children per household off first." The copy is still listed. |
+| 3 | Click **Delete** on the copy again, leave **Keep them on the records** chosen and click **Delete**. | "Rollup deleted. The values it wrote stay on the records." |
+| 4 | Switch **Test children per household** off. Click **Delete** on it, choose **Clear them from every record it fills, in the background** and click **Delete**. | "Rollup deleted. Its values are being cleared from the records in the background." |
+| 5 | After a minute, open **The Garcia Family**. | **Test Children Count** is blank. |
+| 6 | In the Error Log, find the entry from **RollupClearBatch**. | "Values of the deleted rollup Test children per household cleared on N records; 0 records could not be saved." |
+
+**Cleanup:** rebuild **Test children per household** with T-RB-02 if later scripts need it.

@@ -9,7 +9,6 @@ import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
 import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
-import LightningConfirm from 'lightning/confirm';
 import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
 import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
 
@@ -75,6 +74,11 @@ jest.mock('@salesforce/apex/RollupController.deleteRollup', () => ({ default: je
 jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm',
   () => ({ default: 'Delete {0}? The values stay.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_DeleteQuestion',
+  () => ({ default: 'Delete {0}? This cannot be undone.' }),
   { virtual: true }
 );
 jest.mock(
@@ -494,40 +498,76 @@ describe('c-rollup-definitions', () => {
       return element;
     }
 
-    it('says what happens, then deletes an admin-made rollup', async () => {
-      LightningConfirm.open = jest.fn().mockResolvedValue(true);
+    const panel = (element) => element.shadowRoot.querySelector('[data-id="delete-panel"]');
+
+    it('asks whether to keep the values, keeps them by default, then deletes (U11)', async () => {
+      deleteRollup.mockResolvedValue({ ...PAGE, rollups: [] });
+      const element = await builderWith([MINE]);
+      expect(panel(element)).toBeNull();
+
+      element.shadowRoot.querySelector('[data-action="delete"]').click();
+      await flush();
+
+      expect(panel(element)).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="delete-question"]').textContent).toBe(
+        'Delete Gift count? This cannot be undone.'
+      );
+      const choice = element.shadowRoot.querySelector('[data-id="delete-choice"]');
+      expect(choice.value).toBe('keep');
+      expect(choice.options.map((option) => option.value)).toEqual(['keep', 'clear']);
+      expect(deleteRollup).not.toHaveBeenCalled();
+
+      element.shadowRoot.querySelector('[data-id="delete-confirm"]').click();
+      await flush();
+
+      expect(deleteRollup).toHaveBeenCalledWith({
+        definitionId: MINE.recordId,
+        clearValues: false
+      });
+      expect(panel(element)).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
+    });
+
+    it('clears the values when the administrator chooses to (U11)', async () => {
       deleteRollup.mockResolvedValue({ ...PAGE, rollups: [] });
       const element = await builderWith([MINE]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
+      element.shadowRoot
+        .querySelector('[data-id="delete-choice"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'clear' } }));
+      element.shadowRoot.querySelector('[data-id="delete-confirm"]').click();
       await flush();
 
-      expect(LightningConfirm.open).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Delete Gift count? The values stay.' })
+      expect(deleteRollup).toHaveBeenCalledWith({
+        definitionId: MINE.recordId,
+        clearValues: true
+      });
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
+        'c.Core_RollupEase_DeletedCleared'
       );
-      expect(deleteRollup).toHaveBeenCalledWith({ definitionId: MINE.recordId });
-      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
     });
 
     it('keeps the rollup when the administrator cancels', async () => {
-      LightningConfirm.open = jest.fn().mockResolvedValue(false);
       const element = await builderWith([MINE]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
+      element.shadowRoot.querySelector('[data-id="delete-cancel"]').click();
+      await flush();
 
+      expect(panel(element)).toBeNull();
       expect(deleteRollup).not.toHaveBeenCalled();
     });
 
     it('refuses a shipped rollup with the reason and never asks the server', async () => {
-      LightningConfirm.open = jest.fn();
       const element = await builderWith([ROLLUP]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
 
-      expect(LightningConfirm.open).not.toHaveBeenCalled();
+      expect(panel(element)).toBeNull();
       expect(deleteRollup).not.toHaveBeenCalled();
       expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
         'Switch it off instead.'

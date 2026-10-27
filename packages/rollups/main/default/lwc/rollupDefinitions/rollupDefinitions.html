@@ -28,6 +28,41 @@
                 </div>
             </template>
 
+            <template lwc:if={deleting}>
+                <div
+                    class="slds-box slds-theme_warning slds-var-m-bottom_small"
+                    role="dialog"
+                    aria-labelledby="delete-heading"
+                    data-id="delete-panel"
+                >
+                    <h3 id="delete-heading" class="slds-text-heading_small">{labels.deleteHeading}</h3>
+                    <p class="slds-var-m-vertical_x-small" data-id="delete-question">{deleteQuestion}</p>
+                    <lightning-radio-group
+                        name="deleteChoice"
+                        data-id="delete-choice"
+                        label={labels.deleteChoice}
+                        options={deleteOptions}
+                        value={deleteChoice}
+                        onchange={handleDeleteChoice}
+                    ></lightning-radio-group>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button
+                            data-id="delete-cancel"
+                            label={labels.cancel}
+                            onclick={handleCancelDelete}
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="destructive"
+                            data-id="delete-confirm"
+                            label={labels.deleteRollup}
+                            disabled={controlsDisabled}
+                            onclick={handleConfirmDelete}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
             <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
                 <p>
                     <strong>{labels.freshnessTitle}:</strong>

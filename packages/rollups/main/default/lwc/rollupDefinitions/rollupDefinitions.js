@@ -1,6 +1,5 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import LightningConfirm from 'lightning/confirm';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
@@ -71,6 +70,12 @@ import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
 import SEARCH_HELP from '@salesforce/label/c.Core_RollupEase_SearchHelp';
 import GROUP from '@salesforce/label/c.Core_RollupEase_Group';
 import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
+import DELETE_HEADING from '@salesforce/label/c.Core_RollupEase_DeleteHeading';
+import DELETE_QUESTION from '@salesforce/label/c.Core_RollupEase_DeleteQuestion';
+import DELETE_CHOICE from '@salesforce/label/c.Core_RollupEase_DeleteChoice';
+import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
+import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
+import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
 
 /** How each recalculation state is styled in the Status column (U6). */
 const STATUS_CLASS = {
@@ -166,11 +171,17 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     columnStatus: COLUMN_STATUS,
     search: SEARCH,
     searchHelp: SEARCH_HELP,
-    noMatches: NO_MATCHES
+    noMatches: NO_MATCHES,
+    deleteHeading: DELETE_HEADING,
+    deleteChoice: DELETE_CHOICE
   };
 
   /** What the administrator typed to find a rollup (U12). */
   searchTerm = '';
+
+  /** The rollup the Delete panel asks about, and whether its values are cleared (U11). */
+  deleting;
+  deleteChoice = 'keep';
 
   page;
   errorMessage;
@@ -418,30 +429,55 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   }
 
   /**
-   * Deletes an admin-made rollup after saying what happens (ADR-0136). A shipped one is not sent
+   * Opens the Delete This Rollup panel for an admin-made rollup (ADR-0136, U11): it asks whether
+   * to keep the values the rollup wrote (the default) or clear them. A shipped one is not sent
    * to the server: the reason is shown here, the same words the server would use (R-R6).
    */
-  async handleDelete(event) {
+  handleDelete(event) {
     const definitionId = event.target.dataset.id;
     const rollup = (this.page.rollups || []).find((item) => item.recordId === definitionId);
     this.errorMessage = undefined;
     this.noticeMessage = undefined;
     if (!rollup) {
-      return undefined;
+      return;
     }
     if (rollup.packageDefault) {
       this.errorMessage = this.labels.deleteShipped;
-      return undefined;
+      return;
     }
-    const confirmed = await LightningConfirm.open({
-      label: this.labels.deleteTitle,
-      message: this.labels.deleteConfirm.replace('{0}', rollup.name),
-      theme: 'warning'
-    });
-    if (!confirmed) {
-      return undefined;
-    }
-    return this.runAction(deleteRollup({ definitionId }), undefined, this.labels.deleted);
+    this.deleting = { recordId: rollup.recordId, name: rollup.name };
+    this.deleteChoice = 'keep';
+  }
+
+  get deleteQuestion() {
+    return this.deleting ? DELETE_QUESTION.replace('{0}', this.deleting.name) : '';
+  }
+
+  get deleteOptions() {
+    return [
+      { label: DELETE_KEEP, value: 'keep' },
+      { label: DELETE_CLEAR, value: 'clear' }
+    ];
+  }
+
+  handleDeleteChoice(event) {
+    this.deleteChoice = event.detail.value;
+  }
+
+  handleCancelDelete() {
+    this.deleting = undefined;
+  }
+
+  /** Deletes the rollup the panel asks about, keeping or clearing its values as chosen. */
+  handleConfirmDelete() {
+    const definitionId = this.deleting.recordId;
+    const clearValues = this.deleteChoice === 'clear';
+    this.deleting = undefined;
+    return this.runAction(
+      deleteRollup({ definitionId, clearValues }),
+      undefined,
+      clearValues ? DELETED_CLEARED : this.labels.deleted
+    );
   }
 
   handleSelect(event) {

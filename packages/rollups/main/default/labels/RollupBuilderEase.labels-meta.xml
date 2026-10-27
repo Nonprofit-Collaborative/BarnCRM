@@ -528,4 +528,68 @@
         <shortDescription>Builder preview: a source record outside the year counted.</shortDescription>
         <value>Left out: outside the year this rollup counts</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list: heading of the delete panel.</shortDescription>
+        <value>Delete This Rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteQuestion</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: {0} is the rollup's name.</shortDescription>
+        <value>Delete {0}? This cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteChoice</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: label of the keep or clear choice.</shortDescription>
+        <value>What happens to the values it wrote</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteKeep</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: keep the values (default).</shortDescription>
+        <value>Keep them on the records (nothing updates them again)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteClear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: clear the values.</shortDescription>
+        <value>Clear them from every record it fills, in the background</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeletedCleared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list: notice after deleting and clearing.</shortDescription>
+        <value>Rollup deleted. Its values are being cleared from the records in the background.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ClearShared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete refused: {0} is the other rollup filling the field.</shortDescription>
+        <value>{0} also fills this field for the same records, so its values cannot be cleared. Keep the values, or switch {0} off first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ClearDone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Log: {0} is the rollup, {1} records cleared, {2} records refused.</shortDescription>
+        <value>Values of the deleted rollup {0} cleared on {1} records; {2} records could not be saved.</value>
+    </labels>
 </CustomLabels>
