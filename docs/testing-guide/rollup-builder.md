@@ -443,3 +443,35 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | If you can, repeat step 2 in an org with Rollup Helper installed. | The line reads "This org also runs Rollup Helper. It is a separate rollup tool; BarnCRM does not manage its rollups." |
 
 **Cleanup:** None.
+
+## T-RB-33: Turning On a Rollup That DLRS Also Fills Asks First, and the Answer Is Recorded
+
+**Purpose:** confirm the same-field guard in the Builder, in the list and in Import from a file, and that BarnCRM never changes DLRS.
+**Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** on Account. In DLRS, create and activate a rollup **Test child count** on Account: child object Account, relationship field `ParentId`, Count, aggregate result field **Test child count**, calculation mode Realtime (deploy its trigger as DLRS asks).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **New rollup** and build a rollup on **Account**, field **Test child count**, counting **Account, by Parent Account**, **Count**, **Active** ticked. Click **Save**. | **Switch Off the DLRS Rollup** opens: "The DLRS rollup Test child count also fills Account.Test_child_count__c. Two tools filling one field overwrite each other..." |
+| 2 | Click **Cancel**. | The dialog closes, you are still on **Check and save**, and nothing is saved (the list has no new rollup). |
+| 3 | Click **Save** again, then **OK**. | The rollup is saved and switched on. |
+| 4 | In BarnCRM Settings, open **Recent Changes**. | A row **Rollup Builder:** and the rollup's name, old value "DLRS rollup Test child count fills Account.Test_child_count__c", new value "Turned on; the admin confirmed the DLRS rollup will be switched off". |
+| 5 | In DLRS, open **Test child count**. | It is still active: BarnCRM changed nothing. |
+| 6 | Back in the list, switch **Active** off for the rollup, then on again. Click **Cancel** in the dialog. | Switching off asks nothing. Switching on opens **Switch Off the DLRS Rollup**; after **Cancel** the switch is back off. |
+| 7 | Switch **Active** on again and click **OK**. | The rollup is on, and a second **Recent Changes** row is written. |
+| 8 | Tick the rollup, click **Export to a file**, delete the rollup, and import the file under **Import from a file**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
+
+**Cleanup:** delete the BarnCRM rollup; keep the DLRS rollup and field for T-RB-34.
+
+## T-RB-34: Health Check Names a Field BarnCRM and DLRS Both Fill
+
+**Purpose:** confirm Health Check reports a field both tools fill and stops once one is switched off.
+**Prerequisites:** T-RB-33 setup (DLRS rollup **Test child count** active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Build the BarnCRM rollup of T-RB-33 step 1 again and click **OK** to turn it on. | Saved and on. |
+| 2 | Open Health Check and run it. | A warning **BarnCRM and DLRS fill the same field** names `Account.Test_child_count__c`, the BarnCRM rollup and **Test child count** (DLRS), with **Open the Rollup Builder**. |
+| 3 | Click **Open the Rollup Builder**. | The **Rollup Builder** tab opens. |
+| 4 | In DLRS, deactivate **Test child count**. Run Health Check again. | The warning is gone. |
+
+**Cleanup:** delete the BarnCRM rollup, the DLRS rollup (and its trigger, as DLRS describes) and the **Test child count** field.

@@ -140,6 +140,12 @@ later, so each is explained in full below.
 | **Gifts in a closed period are not posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
 | **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop nightly run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
 
+With Rollup Builder in an org that also runs DLRS, Health Check warns **BarnCRM and DLRS fill
+the same field** when an active BarnCRM rollup and an active DLRS rollup write the same field,
+naming each field and both rollups, with **Open the Rollup Builder**. Switch one of each pair
+off. See
+[When BarnCRM and DLRS Fill the Same Field](rollups.md#when-barncrm-and-dlrs-fill-the-same-field).
+
 ## How a fix button works
 
 Most buttons open a page. A button that changes something in your org works like this:

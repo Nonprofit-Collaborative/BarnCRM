@@ -52,6 +52,12 @@ public with sharing class RollupController {
         public String filterJson { get; set; }
         @AuraEnabled
         public String targetFilterJson { get; set; }
+        /**
+         * Why turning this rollup on needs the administrator's word: an active DLRS rollup fills
+         * the same field (R-R16). Null when none does.
+         */
+        @AuraEnabled
+        public String otherToolConflict { get; set; }
     }
 
     /** The whole page: the schedule, the freshness, the permission, and the list. */
@@ -115,12 +121,46 @@ public with sharing class RollupController {
     /** Turns one rollup on or off. Turning it off never removes the values already calculated. */
     @AuraEnabled
     public static RollupPageView setActive(Id definitionId, Boolean active) {
+        return switchOn(definitionId, active, false);
+    }
+
+    /**
+     * Turns on a rollup whose field an active DLRS rollup also fills, after the administrator
+     * confirmed she will switch the DLRS rollup off; the confirmation is recorded in the settings
+     * change history. DLRS itself is not changed (R-R16).
+     */
+    @AuraEnabled
+    public static RollupPageView turnOnSwitchingOffDlrs(Id definitionId) {
+        return switchOn(definitionId, true, true);
+    }
+
+    private static RollupPageView switchOn(
+        Id definitionId,
+        Boolean active,
+        Boolean dlrsOffConfirmed
+    ) {
         try {
             requirePermission();
             Rollup_Definition__c definition = require(definitionId);
+            if (active == true && dlrsOffConfirmed != true) {
+                String conflict = RollupDlrs.conflict(
+                    definition.Target_Object__c,
+                    definition.Target_Field__c
+                );
+                if (conflict != null) {
+                    throw new RollupService.RollupServiceException(conflict);
+                }
+            }
             RollupWriter.saveAsUser(
                 new Rollup_Definition__c(Id = definition.Id, Active__c = active == true)
             );
+            if (dlrsOffConfirmed == true) {
+                RollupDlrs.recordSwitchOff(
+                    definition.Name,
+                    definition.Target_Object__c,
+                    definition.Target_Field__c
+                );
+            }
             return currentPage();
         } catch (Exception caught) {
             throw asUserError(caught, 'Switch a rollup');
@@ -378,6 +418,10 @@ public with sharing class RollupController {
         view.lastCalculated = definition.Last_Calculated__c;
         view.filterJson = definition.Filter_JSON__c;
         view.targetFilterJson = definition.Target_Filter_JSON__c;
+        view.otherToolConflict = RollupDlrs.conflict(
+            definition.Target_Object__c,
+            definition.Target_Field__c
+        );
         return view;
     }
 

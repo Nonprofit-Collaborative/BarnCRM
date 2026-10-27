@@ -755,6 +755,31 @@ What to know:
   its rollups, rebuild them by hand: see
   [Moving Rollups from Rollup Helper](moving-from-rollup-helper.md).
 
+### When BarnCRM and DLRS Fill the Same Field
+
+BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling one field:
+
+- **Turning a rollup on asks first.** When an active DLRS rollup fills the field a rollup
+  fills, saving it switched on in the Builder, or switching **Active** on in the list, opens
+  **Switch Off the DLRS Rollup**: "The DLRS rollup ... also fills .... Two tools filling one
+  field overwrite each other. Turn this rollup on only if you will switch the DLRS rollup off in
+  DLRS." Click **OK** to turn it on, or **Cancel** to leave it off (in the Builder, nothing is
+  saved and you stay on the last step).
+- **Your answer is recorded.** **OK** writes a row to **Recent Changes** in BarnCRM Settings,
+  named **Rollup Builder:** and the rollup's name, saying you confirmed the DLRS rollup will be
+  switched off. Then switch it off in DLRS yourself; BarnCRM does not.
+- **A file import cannot ask**, so **Import from a file** does not save a rollup that is on in
+  the file when an active DLRS rollup fills its field, and says why. Import it switched off, or
+  switch the DLRS rollup off first.
+- **Switching off and saving a rollup switched off** never ask: a rollup that is off fills
+  nothing.
+- **Health Check** warns **BarnCRM and DLRS fill the same field** when such a pair appears
+  later, for example when a DLRS rollup is switched back on, and names each field and both
+  rollups.
+
+Only DLRS rollups that are active in DLRS count. Rollup Helper's rollups are not read, so
+neither the question nor the Health Check finding sees them: check those yourself.
+
 ## Current limits
 
 Fund totals and soft credit totals, including a household's soft credit totals, now update

@@ -33,6 +33,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
         addIsolated(found, 'shipped_rollups', new ShippedRollupsCheck());
         addIsolated(found, 'nightly_rollups', new NightlyRollupsCheck());
         addIsolated(found, 'rollup_queue', new RollupQueueCheck());
+        addIsolated(found, 'rollup_two_tools', new SameFieldCheck());
         return found;
     }
 
@@ -189,6 +190,59 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
                     : HealthCheckService.SEVERITY_INFO,
                 HealthCheckService.CATEGORY_SETTINGS
             );
+        }
+    }
+
+    /**
+     * Fields that an active BarnCRM rollup and an active DLRS rollup both fill (R-R16). The
+     * Builder refuses to turn such a rollup on without the administrator's word, so this finds
+     * the pairs made since: DLRS switched back on, or a DLRS rollup added later. Rollup Helper's
+     * rollups are not read, so they are never in this finding.
+     */
+    @TestVisible
+    private class SameFieldCheck implements RollupCheck {
+        public HealthCheckService.Finding run() {
+            List<String> pairs = new List<String>();
+            for (Rollup_Definition__c definition : RollupSelector.selectAll()) {
+                if (definition.Active__c != true) {
+                    continue;
+                }
+                RollupDlrs.Definition other = RollupDlrs.activeOn(
+                    definition.Target_Object__c,
+                    definition.Target_Field__c
+                );
+                if (other != null) {
+                    pairs.add(
+                        String.format(
+                            System.Label.Core_HealthCheck_TwoToolsPair,
+                            new List<Object>{
+                                definition.Target_Object__c +
+                                '.' +
+                                definition.Target_Field__c,
+                                definition.Name,
+                                other.label
+                            }
+                        )
+                    );
+                }
+            }
+            if (pairs.isEmpty()) {
+                return null;
+            }
+            return new HealthCheckService.Finding(
+                    'rollup_two_tools_same_field',
+                    System.Label.Core_HealthCheck_TwoToolsTitle,
+                    String.format(
+                        System.Label.Core_HealthCheck_TwoToolsDetail,
+                        new List<Object>{ String.join(pairs, '; ') }
+                    ),
+                    HealthCheckService.SEVERITY_WARNING,
+                    HealthCheckService.CATEGORY_SETTINGS
+                )
+                .withFix(
+                    System.Label.Core_HealthCheck_TwoToolsFix,
+                    '/lightning/n/' + NamespaceUtil.qualify('Rollup_Builder')
+                );
         }
     }
 
