@@ -21,9 +21,15 @@ public with sharing class JobNotifier {
     /** The Error Log context a refused send is written under. */
     public static final String LOG_CONTEXT = 'Job notification';
 
-    /** The settings console sections a notification can open, as the console names them. */
+    /**
+     * The settings console sections a notification can open, as the console names them. A
+     * sub-section name opens its page scrolled to that box (P1).
+     */
     public static final String SECTION_GENERAL = 'General';
-    public static final String SECTION_HOUSEHOLDS = 'Households';
+    /** Where the duplicate scan's panel is: the Duplicate Matching page (ADR-0139). */
+    public static final String SECTION_DUPLICATE_MATCHING = SettingSections.DUPLICATE_MATCHING;
+    /** The household naming panel's box on People and Households. */
+    public static final String SECTION_HOUSEHOLD_NAMES = SettingSections.HOUSEHOLD_NAMES;
     public static final String SECTION_ADDRESSES = 'Addresses';
     @NamespaceAccessible
     public static final String SECTION_ROLLUPS = 'Rollups';

@@ -24,8 +24,14 @@
  *    people is added, and none unless Volunteer Hours is in the org.
  * 6. Copy the shipped letter templates the org does not have (R-VL5,
  *    `VolunteerLetterTemplates.installDefaultsDuringInstall`), never changing one it has.
+ *
+ * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
+ * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
  */
-public with sharing class VolunteersPostInstall implements InstallHandler {
+@NamespaceAccessible
+public with sharing class VolunteersPostInstall implements InstallHandler, ModuleSetup {
+    /** The module's key in the module catalog and the setup marker. */
+    private static final String MODULE_KEY = 'Volunteers';
     private static final String SWITCH_CONTEXT = 'VolunteersPostInstall.ensureAutomationSwitches';
     private static final String IMPORT_CONTEXT = 'VolunteersPostInstall.ensureImportTemplates';
     @TestVisible
@@ -42,13 +48,29 @@ public with sharing class VolunteersPostInstall implements InstallHandler {
         if (context == null) {
             return;
         }
+        runSetup(context.installerId());
+    }
+
+    /** Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor. */
+    @NamespaceAccessible
+    public VolunteersPostInstall() {
+        // Nothing to set up: every step runs in runSetup.
+    }
+
+    /**
+     * The install's steps (see the class comment), with the given person standing in for the
+     * installer, then the module's key added to the setup marker. Never throws.
+     *
+     * @param installerId the person to give Volunteers Admin, or null for nobody
+     */
+    public void runSetup(Id installerId) {
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         // Copies only, and records its own failures: it comes before anything is queued.
         VolunteerLetterTemplates.installDefaultsDuringInstall();
         RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
-        Id installerId = context.installerId();
+        ModuleSetups.markRan(MODULE_KEY);
         if (installerId == null) {
             new VolunteersAccessSync().requestSync();
             return;

@@ -50,7 +50,9 @@
  * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
  *
  * An org built by deploying the source runs no install handler, so `runAsSourceDeploy` runs the
- * same steps there, called by `scripts/org/deploy-packages.sh` once Core is in.
+ * same steps there, called by `scripts/org/deploy-packages.sh` once Core is in. Finish Setup
+ * runs them through `runSetup` for source copied in by hand (FS1), and every run ends by adding
+ * Core to the setup marker (`ModuleSetups.markRan`).
  *
  * The whole thing runs twice safely: a person who already holds a permission set or a role
  * is left alone, and a switch or an import template that already exists is left exactly as the
@@ -58,7 +60,7 @@
  * install must never fail because of a bootstrap step, so every failure is written to the
  * Error Log instead.
  */
-public with sharing class CorePostInstall implements InstallHandler {
+public with sharing class CorePostInstall implements InstallHandler, ModuleSetup {
     private static final String ACCESS_CONTEXT = 'CorePostInstall.grantInstallerAccess';
     private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
@@ -112,6 +114,16 @@ public with sharing class CorePostInstall implements InstallHandler {
      * package install. Running it again changes nothing. Never throws.
      */
     public static void runAsSourceDeploy() {
+        new CorePostInstall().runSetup(UserInfo.getUserId());
+    }
+
+    /**
+     * The same steps as `runAsSourceDeploy`, with the given person standing in for the
+     * installer: what Finish Setup runs (FS1, `ModuleSetups`). Never throws.
+     *
+     * @param installerId the person to give BarnCRM Admin, or null for nobody
+     */
+    public void runSetup(Id installerId) {
         Boolean alreadySetUp = true;
         try {
             alreadySetUp = hasBeenSetUp();
@@ -119,7 +131,7 @@ public with sharing class CorePostInstall implements InstallHandler {
             // Unsure means existing: marking a working org as new would turn its features off.
             ErrorLogger.log(e, FEATURE_CONTEXT);
         }
-        new CorePostInstall().run(!alreadySetUp, alreadySetUp, UserInfo.getUserId());
+        run(!alreadySetUp, alreadySetUp, installerId);
     }
 
     /**
@@ -157,6 +169,7 @@ public with sharing class CorePostInstall implements InstallHandler {
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
         alignSeasonalAddresses(isUpgrade);
+        ModuleSetups.markRan(ModuleSetups.CORE);
         if (installerId == null) {
             return;
         }

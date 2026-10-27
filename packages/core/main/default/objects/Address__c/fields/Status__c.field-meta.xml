@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <description>Whether the address is in use now (Current), was used before (Former), or has mail coming back (Undeliverable). A move sets Former on the address it replaces; only a person sets Undeliverable. A blank, on an address saved before this field existed, reads as Current (R-AD10).</description>
+  <inlineHelpText>Current: in use now. Former: used before. Undeliverable: mail sent here comes back; set by a person, never automatically.</inlineHelpText>
+  <label>Status</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Current</fullName>
+        <default>true</default>
+        <label>Current</label>
+      </value>
+      <value>
+        <fullName>Former</fullName>
+        <default>false</default>
+        <label>Former</label>
+      </value>
+      <value>
+        <fullName>Undeliverable</fullName>
+        <default>false</default>
+        <label>Undeliverable</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

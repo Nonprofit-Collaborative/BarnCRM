@@ -112,7 +112,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer** and choose **Data quality**. | The card **Data quality** shows a spinner (**Counting records**), then nine checks, each with a number and **records found**, starting with **People with no household** and ending with **People not changed in 5 years**. |
+| 1 | Open **Org Optimizer** and choose **Data quality**. | The card **Data quality** shows a spinner (**Counting records**), then ten checks, each with a number and **records found**, starting with **People with no household** and ending with **People not changed in 5 years**. |
 | 2 | Read **People with no household**. | **0** on fresh sample data. |
 | 3 | Read **Deceased people who can still be emailed**. | A number above 0 (sample data has deceased people with an email, for example Sung Silva). |
 | 4 | Click **Open in Find** on that check. | A message says to choose **Data hygiene: Deceased people who can still be emailed** from Saved queries, and the **Find** tab opens with that query already run. Sung Silva is in the list. |

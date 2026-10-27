@@ -62,6 +62,26 @@ public with sharing class ModuleManagerController {
         }
     }
 
+    /**
+     * Finish Setup (FS1): runs the setup steps an install of this package runs, for one copied
+     * into the org by hand. Safe to run twice; recorded in the settings change history.
+     */
+    @AuraEnabled
+    public static ManagerState finishSetup(String moduleName) {
+        requireEdit();
+        try {
+            List<String> done = ModuleSetups.finish(new List<String>{ moduleName });
+            SettingsService.logChange(
+                System.Label.Core_ModuleSetup_FinishButton,
+                '',
+                String.join(done, ', ')
+            );
+            return buildState();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
+        }
+    }
+
     @AuraEnabled
     public static Boolean grantAdminAccess(String moduleName) {
         requireEdit();

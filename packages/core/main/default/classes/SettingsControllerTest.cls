@@ -35,7 +35,7 @@ private class SettingsControllerTest {
                 DeveloperName = 'Household_Name_Pattern',
                 MasterLabel = 'Household name pattern',
                 Setting_Key__c = TEXT_KEY,
-                Section__c = SettingSections.HOUSEHOLDS,
+                Section__c = SettingSections.PEOPLE_AND_HOUSEHOLDS,
                 Module__c = 'Core',
                 Data_Type__c = 'Text',
                 Description__c = 'How a household name and the greetings on your letters are built.',
@@ -46,6 +46,7 @@ private class SettingsControllerTest {
                 DeveloperName = 'Auto_Create_Households',
                 MasterLabel = 'Create households automatically',
                 Setting_Key__c = CHECKBOX_KEY,
+                // Still names the old Households page, as a row not yet moved would (P1).
                 Section__c = SettingSections.HOUSEHOLDS,
                 Module__c = 'Core',
                 Data_Type__c = 'Checkbox',
@@ -221,23 +222,32 @@ private class SettingsControllerTest {
                 model.sections[0].name,
                 'The console opens on General'
             );
-            Assert.areEqual(SettingSections.HOUSEHOLDS, model.sections[1].name, 'Then Households');
+            Assert.areEqual(
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
+                model.sections[1].name,
+                'Then People and Households'
+            );
             Assert.areEqual(SettingSections.AUTOMATION, model.sections[2].name, 'Then Automation');
             Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
             for (SettingsController.SectionModel section : model.sections) {
                 byName.put(section.name, section);
             }
-            Assert.isTrue(
+            Assert.isFalse(
                 byName.containsKey(SettingSections.HOUSEHOLDS),
-                'The household settings have their own section'
+                'A row still naming the old Households page makes no page of its own'
             );
             Assert.areEqual(
                 2,
-                byName.get(SettingSections.HOUSEHOLDS).settings.size(),
-                'Both household settings are in it'
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS).settings.size(),
+                'Both household settings are on People and Households'
+            );
+            Assert.areEqual(
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS).settings[1].section,
+                'The row that names the old page says the page it is on'
             );
             Assert.isTrue(
-                byName.get(SettingSections.HOUSEHOLDS)
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS)
                     .settings[0]
                     .helpUrl.endsWith('household-naming.md'),
                 'Learn more points at the admin guide page for that setting'
@@ -376,11 +386,16 @@ private class SettingsControllerTest {
                 'Searching the description finds the naming setting'
             );
             Assert.areEqual(
-                SettingSections.HOUSEHOLDS,
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
                 byDescription[0].section,
                 'The result says which section to open'
             );
             Assert.areEqual(2, bySection.size(), 'Searching a section name finds everything in it');
+            Assert.areEqual(
+                2,
+                SettingsController.search('people and').size(),
+                'Searching the page name finds a row that still names the old Households page'
+            );
             Assert.areEqual(0, nothing.size(), 'An empty search asks for nothing');
         }
     }
@@ -875,6 +890,42 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void aFieldListRowOffersTheObjectsCustomFieldsAndName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Address_Card_Fields',
+                    MasterLabel = 'Address Card Fields',
+                    Setting_Key__c = 'Address_Card_Fields__c',
+                    Section__c = 'Addresses',
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.FIELD_LIST,
+                    Record_Object__c = 'Address__c',
+                    Sort_Order__c = 1
+                )
+            };
+
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            SettingsController.SettingModel row = model.sections[0].settings[0];
+            Set<String> offered = new Set<String>();
+            for (SettingsController.Option option : row.options) {
+                offered.add(option.value);
+            }
+            String verification = Address__c.Verification_Status__c.getDescribe().getName();
+            Assert.isTrue(offered.contains(verification), 'A custom field is offered: ' + offered);
+            Assert.isTrue(offered.contains('Name'), 'The address number is offered');
+            Assert.isFalse(offered.contains('CreatedById'), 'A system field is not');
+            Assert.isTrue(String.isBlank(row.value), 'Nothing is ticked until an admin ticks it');
+            // RM1 with AH1: none ticked is not a shown default, so there is nothing to keep.
+            Assert.isFalse(row.unsavedDefault, 'No Keep this setting for a list with none ticked');
+            Assert.isFalse(row.detectionMayChange, 'Detection never writes this row');
+        }
+    }
+
+    @IsTest
     static void setupChecksSayWhetherEachPrerequisiteIsMet() {
         System.runAs(TestUsers.admin()) {
             SettingsController.emailAllowedOverride = true;
@@ -1097,6 +1148,151 @@ private class SettingsControllerTest {
             Assert.isNull(
                 BarnCRM_Settings__c.getOrgDefaults().Id,
                 'Opening the page saved nothing'
+            );
+        }
+    }
+
+    private static Map<String, SettingsController.SettingModel> rowsByKey(
+        SettingsController.ConsoleModel model
+    ) {
+        Map<String, SettingsController.SettingModel> rows = new Map<String, SettingsController.SettingModel>();
+        for (SettingsController.SectionModel section : model.sections) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                rows.put(setting.key, setting);
+            }
+        }
+        return rows;
+    }
+
+    @IsTest
+    static void anUnsavedDefaultIsMarkedAndKeepingItSavesExactlyThatValue() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                effectiveDefaultRow('Test_Digest', 'Error_Digest_Frequency__c', 'Picklist'),
+                effectiveDefaultRow('Test_Membership', 'Household_Membership_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Coexistence', 'Coexistence_Mode__c', 'Picklist'),
+                effectiveDefaultRow('Test_Auto_Create', CHECKBOX_KEY, 'Checkbox')
+            };
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            Map<String, SettingsController.SettingModel> before = rowsByKey(
+                SettingsController.getConsoleModel()
+            );
+            Assert.isTrue(before.get('Coexistence_Mode__c').unsavedDefault, 'Mode not saved');
+            Assert.isTrue(
+                before.get('Household_Membership_Mode__c').unsavedDefault,
+                'Membership not saved'
+            );
+            Assert.isTrue(before.get('Error_Digest_Frequency__c').unsavedDefault, 'Not saved');
+            Assert.isFalse(
+                before.get(CHECKBOX_KEY).unsavedDefault,
+                'A checkbox is never an unsaved default'
+            );
+            Assert.isFalse(
+                before.get('Household_Membership_Mode__c').detectionMayChange,
+                'Without Person Accounts detection keeps the simple way, so it may be kept'
+            );
+            Assert.isFalse(
+                before.get('Coexistence_Mode__c').detectionMayChange,
+                'The shown mode is the one detection would write'
+            );
+
+            Test.startTest();
+            Map<String, SettingsController.SettingModel> after = rowsByKey(
+                SettingsController.saveSettings(
+                    new Map<String, Object>{
+                        'Coexistence_Mode__c' => before.get('Coexistence_Mode__c').value,
+                        'Household_Membership_Mode__c' => before.get('Household_Membership_Mode__c')
+                            .value
+                    }
+                )
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                CoexistenceService.getCurrentMode(),
+                'Keeping the shown mode confirms exactly that mode'
+            );
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_CONTACT,
+                SettingsService.getSettings().Household_Membership_Mode__c,
+                'Keeping the shown household choice stores exactly that choice'
+            );
+            Assert.areEqual(
+                2,
+                SettingsController.getRecentChanges(10).size(),
+                'Each kept default is in the change history, as a choice by hand would be'
+            );
+            Assert.isFalse(after.get('Coexistence_Mode__c').unsavedDefault, 'Now saved');
+            Assert.isFalse(after.get('Household_Membership_Mode__c').unsavedDefault, 'Saved');
+            Assert.isTrue(
+                after.get('Error_Digest_Frequency__c').unsavedDefault,
+                'A default nobody kept is still offered'
+            );
+        }
+    }
+
+    @IsTest
+    static void aHouseholdDefaultDetectionWouldReplaceIsNotOfferedForKeeping() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasPersonAccounts = true;
+            OrgShapeDetector.overrideShape = shape;
+
+            Test.startTest();
+            Map<String, SettingsController.SettingModel> rows = rowsByKey(
+                SettingsController.getConsoleModel()
+            );
+            Test.stopTest();
+
+            SettingsController.SettingModel membership = rows.get(
+                CoexistenceService.KEY_MEMBERSHIP_MODE
+            );
+            Assert.areEqual(CoexistenceService.MEMBERSHIP_CONTACT, membership.value, 'Shown');
+            Assert.isTrue(membership.unsavedDefault, 'Still a default nobody saved');
+            Assert.isTrue(
+                membership.detectionMayChange,
+                'Detection would choose the flexible way on a Person Account org, so no keep'
+            );
+            Assert.areEqual(
+                CoexistenceService.MEMBERSHIP_JUNCTION,
+                CoexistenceService.membershipDetectionWouldChoose(),
+                'What detection would write'
+            );
+            Assert.isFalse(
+                rows.get(CoexistenceService.KEY_COEXISTENCE_MODE).detectionMayChange,
+                'The coexistence mode shown is what detection writes, so it may be kept'
+            );
+        }
+    }
+
+    @IsTest
+    static void keepingTheShownCoexistenceModeWritesNothingElse() {
+        System.runAs(TestUsers.admin()) {
+            stubMembershipRows();
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasPersonAccounts = true;
+            OrgShapeDetector.overrideShape = shape;
+            String shown = rowsByKey(SettingsController.getConsoleModel())
+                .get(CoexistenceService.KEY_COEXISTENCE_MODE)
+                .value;
+
+            Test.startTest();
+            SettingsController.saveSettings(
+                new Map<String, Object>{ CoexistenceService.KEY_COEXISTENCE_MODE => shown }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(shown, CoexistenceService.getCurrentMode(), 'The shown mode is kept');
+            Assert.isFalse(
+                CoexistenceService.membershipModeChosen(),
+                'The console save writes only the mode, as choosing it by hand does'
+            );
+            Assert.areEqual(
+                1,
+                SettingsController.getRecentChanges(10).size(),
+                'One change, one history row'
             );
         }
     }

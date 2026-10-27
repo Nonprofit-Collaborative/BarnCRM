@@ -130,7 +130,7 @@ with no template, and why.
 - **Pausing and forgetting, then wondering why names are wrong.** While automation is
   paused, new people do not get households and names are not recomputed. The records are
   fine, they are just not finished. Resume automation and then re-save the records, or run
-  the recompute action on the Households page.
+  the recompute action on the People and Households page.
 - **Expecting the pause to suspend everything.** It does not, and it never did what its
   name suggests for the rules that refuse a change. The pause stops the housekeeping:
   households, names, greetings (and, with Giving, default allocations). An automation marked

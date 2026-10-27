@@ -340,6 +340,21 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Address__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Address__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Address__c.End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Address__c.Seasonal_End_Day__c</field>
     <readable>true</readable>
   </fieldPermissions>

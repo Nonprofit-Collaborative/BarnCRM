@@ -98,7 +98,7 @@ trigger to **when a user is created or updated**.
 Then, on each policy, click **Apply Policy** once and apply it to all the users it lists.
 That is the step that reaches the people who already hold a role.
 
-### For consultants: the same policies as metadata
+### For admins who deploy with the CLI: the same policies as metadata
 
 The folder
 [`docs/admin-guide/samples/user-access-policies`](samples/user-access-policies) holds
