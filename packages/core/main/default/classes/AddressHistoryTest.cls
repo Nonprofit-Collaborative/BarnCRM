@@ -542,7 +542,9 @@ private class AddressHistoryTest {
      * the new fields. Written in its own context, apart from the records the test saves.
      */
     private static void withoutHistoryFieldAccess(String permissionSetName) {
-        String objectName = Address__c.SObjectType.getDescribe().getName();
+        String objectName = Address__c.SObjectType
+            .getDescribe(SObjectDescribeOptions.DEFERRED)
+            .getName();
         List<String> fields = new List<String>();
         for (
             Schema.SObjectField token : new List<Schema.SObjectField>{
