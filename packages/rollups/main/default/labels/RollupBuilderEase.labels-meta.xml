@@ -784,4 +784,68 @@
         <shortDescription>Builder step 1: button that reloads the fields.</shortDescription>
         <value>Refresh Fields</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page card: title of Explain These Totals.</shortDescription>
+        <value>Explain These Totals</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainEmpty</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: no rollup fills this record.</shortDescription>
+        <value>No BarnCRM rollup you can see fills a field on this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainCounts</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>{0} is records counted, {1} records read, {2} records left out.</shortDescription>
+        <value>{0} of the {1} records read count; {2} are left out.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainLast</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: {0} is when the total was last calculated.</shortDescription>
+        <value>Last calculated {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainNever</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: the total was never calculated.</shortDescription>
+        <value>Not calculated yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainAdmin</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: {0} is the admin's calculation now.</shortDescription>
+        <value>For admins, recalculated now without saving: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainSeen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: counts cover only what the viewer can see.</shortDescription>
+        <value>The counts and the list include only records you can open; the total includes them all.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainRefresh</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: button that reads the totals again.</shortDescription>
+        <value>Refresh</value>
+    </labels>
 </CustomLabels>

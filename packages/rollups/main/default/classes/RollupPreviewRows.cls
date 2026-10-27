@@ -53,6 +53,9 @@ public with sharing class RollupPreviewRows {
         public List<Row> rows { get; set; }
         @AuraEnabled
         public Integer total { get; set; }
+        /** How many of them count, within the row limit (U5). */
+        @AuraEnabled
+        public Integer counted { get; set; }
         @AuraEnabled
         public String summary { get; set; }
         @AuraEnabled
@@ -175,6 +178,7 @@ public with sharing class RollupPreviewRows {
         Detail detail = new Detail();
         detail.rows = new List<Row>();
         detail.total = 0;
+        detail.counted = 0;
         for (RollupPlanner.SourceQuery query : plan.queries) {
             if (query.token != null) {
                 detail.note = Label.Core_RollupEase_RowsHousehold;
@@ -212,6 +216,20 @@ public with sharing class RollupPreviewRows {
             binds,
             AccessLevel.USER_MODE
         );
+        String counting = linked;
+        if (String.isNotBlank(query.whereClause)) {
+            counting += ' AND (' + query.whereClause + ')';
+        }
+        if (query.kind == RollupPlanner.KIND_ORDERED) {
+            counting += ' AND ' + query.orderBy + ' != null';
+        }
+        Integer countedHere = Database.countQueryWithBinds(
+            'SELECT COUNT() FROM ' + query.sourceObject + counting + allRows,
+            binds,
+            AccessLevel.USER_MODE
+        );
+        Integer rowLimit = query.measures[0].rowLimit;
+        detail.counted += rowLimit == null ? countedHere : Math.min(countedHere, rowLimit);
         Integer room = MAX_SHOWN - detail.rows.size();
         if (room <= 0) {
             return;

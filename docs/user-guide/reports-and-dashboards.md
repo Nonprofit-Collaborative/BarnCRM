@@ -112,6 +112,25 @@ These totals are read only for everyone. They update when a gift or hours entry 
 again every night. "This year" and "last year" on a record follow your organization's fiscal
 year.
 
+## To see how a total is worked out
+
+If your admin shows you **Explain These Totals** on the record page (it starts out shown to
+admins only):
+
+1. Open the person, household or organization and find the **Explain These Totals** card.
+2. Each total is listed with its value, for example "Total Giving: 4,250", and one sentence
+   saying what it counts.
+3. Read the line under it, for example "12 of the 15 records read count; 3 are left out.", and
+   when it was last calculated.
+4. Under **Records Read for This Record**, up to ten of those records are linked, each marked
+   **Counted** or with why it is left out, for example "Left out: does not meet condition 1"
+   (a gift whose status is not one that counts). Click one to open it.
+5. Click **Refresh** after a change to read the totals again.
+
+The counts and the list include only the records you can open; the total includes them all.
+You need the **Rollup Builder User** permission set to see the card; ask your admin. If a
+total still looks wrong, tell your admin: they also see what it would be if recalculated now.
+
 ## Common problems
 
 - Problem: the dashboard shows "The running user for this dashboard doesn't have permission to

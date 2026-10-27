@@ -450,7 +450,8 @@ public with sharing class RollupBuilderController {
         }
     }
 
-    private static String describe(RollupEngine.Preview preview) {
+    /** A preview in words: the total calculated now, next to what the record holds (U5 too). */
+    public static String describe(RollupEngine.Preview preview) {
         if (!preview.planned) {
             return Label.Core_RollupBuilder_PreviewFailed;
         }
@@ -464,8 +465,7 @@ public with sharing class RollupBuilderController {
     }
 
     /** A value as the administrator reads it, in her locale. */
-    @TestVisible
-    private static String display(Object value) {
+    public static String display(Object value) {
         if (value == null || value == '') {
             return Label.Core_RollupBuilder_PreviewEmpty;
         }

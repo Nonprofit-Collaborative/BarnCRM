@@ -636,6 +636,27 @@ happens to the values the rollup wrote:
   Delete says so; try again when it finishes. Totals already waiting to be recalculated for the
   deleted rollup are skipped, as they are for a rollup that is switched off.
 
+### Explain These Totals on a Record Page
+
+When someone asks "where does this number come from?", open the record: with Giving, the
+contact and account record pages show **Explain These Totals** in the sidebar to people with
+Manage BarnCRM Settings. To show it to staff too, or on another object's page, click the
+gear, **Edit Page**, select the card (or drag **Explain These Totals** from the custom
+components onto the page), change or remove its visibility filter, and save. It works on any
+object a rollup fills. For each active rollup that fills a field on that record (and whose field the
+person can read), it shows:
+
+- the total and what it counts, in the same sentence as the Rollup List;
+- how many records count and how many are left out, and when the record was last calculated;
+- up to ten of the records read, linked, each **Counted** or why it is left out, as in the
+  Builder's preview (a rollup that reads through a household lists none);
+- for you (Manage BarnCRM Settings), what the rollup would calculate now, next to what the
+  record holds, without saving.
+
+It reads as the person looking: the counts and the list include only records they can open,
+and they need the **Rollup Builder User** (or **Rollup Builder Admin**) permission set to read
+the rollups.
+
 ## Instant Totals on Other Objects
 
 BarnCRM can only ship automation for its own records. A rollup that counts records from any

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Explain These Totals</masterLabel>
+  <description>On a record page, each total a BarnCRM rollup fills there: what it counts, how many records counted and were left out and why, when it was last calculated, and links to the records read.</description>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+</LightningComponentBundle>

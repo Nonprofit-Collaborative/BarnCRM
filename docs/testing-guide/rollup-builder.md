@@ -520,3 +520,21 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Type `Member Count` in **Field label** after opening **Create a Field** again, and click **Write the Field**. | A red message: "This object already has a field named Member_Count__c. Choose it in the list, or give the new field another label." |
 
 **Cleanup:** click **Cancel**; delete **Test Gift Count** in Setup if you created it.
+
+## T-RB-46: Explain These Totals on a Record Page
+
+**Purpose:** confirm the record-page component explains each total, counts what was read, links the records, and shows the recalculation to admins only.
+**Prerequisites:** T-RB-02 done; **Test children per household** active; a staff user with **Rollup Builder User**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Giving deployed, open **The Garcia Family** as admin. (Without Giving: click the gear, **Edit Page**, drag **Explain These Totals** onto the page and save.) | The **Explain These Totals** card shows in the sidebar. |
+| 2 | Read the entry for **Test Children Count**. | "Test Children Count: 1", the sentence "Number of Contacts ... shown in Test Children Count on each Account." (with its condition note), "1 of the 3 records read count; 2 are left out.", and "Last calculated ..." or "Not calculated yet." |
+| 3 | Read **Records Read for This Record**. | Harper, Luis and Diego linked: Diego **Counted**, Harper and Luis "Left out: does not meet condition 1". |
+| 4 | Read the admin line. | "For admins, recalculated now without saving: Calculated: 1. On the record now: 1." |
+| 5 | Change Luis's **Household Role** to **Child** and save, then click **Refresh** on the card. | The counts read 2 of 3 (after the instant update), and Luis is **Counted**. Change him back. |
+| 6 | Log in as the staff user and open **The Garcia Family**. | No card: it shows only to people with Manage BarnCRM Settings until you change its visibility. As admin, edit the page, remove the card's visibility filter and save; as the staff user, reload. | 
+| 6a | Read the card as the staff user. | The same entry without the admin line. |
+| 7 | Open an account no rollup fills (or switch the test rollup off and click **Refresh**). | "No BarnCRM rollup you can see fills a field on this record." |
+
+**Cleanup:** switch the test rollup back on if you switched it off; put the card's visibility filter back (Manage BarnCRM Settings is true), or remove the component if you added it only for this script.

@@ -1,0 +1,55 @@
+<template>
+    <lightning-card title={labels.title} icon-name="standard:formula">
+        <lightning-button
+            slot="actions"
+            data-id="refresh"
+            label={labels.refresh}
+            disabled={loading}
+            onclick={handleRefresh}
+        ></lightning-button>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={loading}>
+                <lightning-spinner size="small" alternative-text={labels.title}></lightning-spinner>
+            </template>
+            <template lwc:if={error}>
+                <div class="slds-box slds-box_x-small slds-theme_error" role="alert">
+                    <span data-id="error">{error}</span>
+                </div>
+            </template>
+            <template lwc:if={isEmpty}>
+                <p data-id="empty">{labels.empty}</p>
+            </template>
+            <template lwc:if={hasExplanations}>
+                <template for:each={explanations} for:item="item">
+                    <div key={item.definitionId} class="slds-var-m-bottom_medium" data-id="explanation">
+                        <h3 class="slds-text-heading_small" data-id="heading">{item.heading}</h3>
+                        <p data-id="sentence">{item.sentence}</p>
+                        <p data-id="counts">{item.counts}</p>
+                        <p class="slds-text-body_small slds-text-color_weak" data-id="last">{item.lastCalculated}</p>
+                        <template lwc:if={item.adminLine}>
+                            <p class="slds-text-body_small" data-id="admin">{item.adminLine}</p>
+                        </template>
+                        <template lwc:if={item.rowList.length}>
+                            <h4 class="slds-text-title_bold slds-var-m-top_x-small">{labels.rowsHeading}</h4>
+                            <template lwc:if={item.rows.summary}>
+                                <p class="slds-text-body_small" data-id="rows-summary">{item.rows.summary}</p>
+                            </template>
+                            <ul class="slds-list_dotted">
+                                <template for:each={item.rowList} for:item="row">
+                                    <li key={row.recordId} data-id="row">
+                                        <a href={row.url} target="_blank">{row.name}</a>:
+                                        <span class={row.outcomeClass}> {row.reason}</span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:if={item.rows.note}>
+                            <p class="slds-text-body_small" data-id="rows-note">{item.rows.note}</p>
+                        </template>
+                    </div>
+                </template>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="seen">{labels.seen}</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>
