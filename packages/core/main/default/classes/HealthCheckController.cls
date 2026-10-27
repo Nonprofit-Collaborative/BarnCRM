@@ -171,12 +171,21 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             return System.Label.Core_HealthCheck_InactiveOwnerJobsFix;
         }
+        if (ModuleSetups.FIX_KEY.equals(fixKey)) {
+            return System.Label.Core_ModuleSetup_FinishButton;
+        }
         HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
         return owner == null ? null : owner.fixLabel(fixKey);
     }
 
     /** Runs the fix and returns the sentence that says what it did. */
     private static String runFix(String fixKey, List<String> scope) {
+        if (ModuleSetups.FIX_KEY.equals(fixKey)) {
+            return String.format(
+                System.Label.Core_ModuleSetup_FixOutcome,
+                new List<Object>{ String.join(ModuleSetups.finishByLabel(scope), ', ') }
+            );
+        }
         HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
         if (owner != null) {
             return owner.runFix(fixKey, scope);

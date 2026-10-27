@@ -21,8 +21,15 @@
  * 5. Give the Rollup Builder sets to BarnCRM's roles (`RollupAccessSync`, D2), queued for the
  *    same reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Rollup Builder Admin at the same moment; with no installer it is queued alone.
+ *
+ * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
+ * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
  */
-public with sharing class RollupsPostInstall implements InstallHandler {
+@NamespaceAccessible
+public with sharing class RollupsPostInstall implements InstallHandler, ModuleSetup {
+    /** The module's key in the module catalog and the setup marker. */
+    private static final String MODULE_KEY = 'Rollups';
+
     @TestVisible
     private static final String ROLLUP_CONTEXT = 'RollupsPostInstall.ensureRollupDefaults';
     private static final String SWITCH_CONTEXT = 'RollupsPostInstall.ensureAutomationSwitches';
@@ -60,12 +67,28 @@ public with sharing class RollupsPostInstall implements InstallHandler {
         if (context == null) {
             return;
         }
+        runSetup(context.installerId());
+    }
+
+    /** Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor. */
+    @NamespaceAccessible
+    public RollupsPostInstall() {
+        // Nothing to set up: every step runs in runSetup.
+    }
+
+    /**
+     * The install's steps (see the class comment), with the given person standing in for the
+     * installer, then the module's key added to the setup marker. Never throws.
+     *
+     * @param installerId the person to give Rollup Builder Admin, or null for nobody
+     */
+    public void runSetup(Id installerId) {
         // The entry points record their own failures and return, so nothing here throws.
         carryOverCoreSettings();
         ensureSettingsRow();
         RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-        Id installerId = context.installerId();
+        ModuleSetups.markRan(MODULE_KEY);
         if (installerId == null) {
             RollupAccessSync.requestSync();
             return;

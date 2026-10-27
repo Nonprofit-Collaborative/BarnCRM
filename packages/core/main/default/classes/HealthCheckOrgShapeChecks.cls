@@ -299,7 +299,7 @@ public with sharing class HealthCheckOrgShapeChecks {
             )
             .withFix(
                 System.Label.Core_HealthCheck_MembershipHiddenFix,
-                HealthCheckService.SECTION_HOUSEHOLDS
+                HealthCheckService.SECTION_PEOPLE
             );
     }
 

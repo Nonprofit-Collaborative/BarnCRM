@@ -25,11 +25,12 @@ public with sharing class AddressTriggerHandler extends TriggerHandler {
         }
         AddressService.ownPersonAccountsAsPeople(records);
         AddressService.keepOneDefaultPerOwnerInSave(records);
+        AddressService.applyStatusBeforeSave(records, null);
     }
 
     /**
      * One default per owner within the save, and the address in use is not unticked unless
-     * another is put in use (R-AD2).
+     * another is put in use (R-AD2). The status is filled in as on insert (R-AD10).
      */
     public override void beforeUpdate() {
         List<Address__c> records = (List<Address__c>) newRecords();
@@ -38,10 +39,20 @@ public with sharing class AddressTriggerHandler extends TriggerHandler {
         }
         AddressService.keepOneDefaultPerOwnerInSave(records);
         AddressService.refuseLeavingAnOwnerWithoutADefault(records, oldRecordsById());
+        AddressService.applyStatusBeforeSave(records, oldRecordsById());
     }
 
+    /** A new address saved as the primary is a move (R-AD10). */
     public override void afterInsert() {
-        sync((List<Address__c>) newRecords());
+        List<Address__c> records = (List<Address__c>) newRecords();
+        if (records == null || records.isEmpty()) {
+            return;
+        }
+        try {
+            AddressService.syncDefaultToStandardFields(records, true);
+        } catch (Exception thrown) {
+            report(thrown, records, 'AddressTriggerHandler.sync');
+        }
     }
 
     public override void afterUpdate() {

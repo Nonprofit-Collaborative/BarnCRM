@@ -20,7 +20,8 @@ it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Ther
 to install and no Setup step.
 
 1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
-2. In the left navigation choose **Relationships**.
+2. In the left navigation choose **People and Households**. The setting is in the
+   **Relationships** box.
 3. Leave **Keep both sides of relationships in step** switched on, which is how it ships.
    Switch it off only if your organization deliberately keeps one side of every connection,
    for example because another system writes both sides and you do not want two sources
@@ -165,6 +166,6 @@ clear **Keep both sides in step** on that one record.
 
 **Nothing mirrors and you never touched the setting.** In releases before v0.3 the setting
 could be stored as off without anyone switching it off, if BarnCRM Settings had been saved
-for some other reason. Open BarnCRM Settings, Relationships, and check that **Keep both
+for some other reason. Open BarnCRM Settings, People and Households, Relationships box, and check that **Keep both
 sides of a relationship in step** is on. Relationships entered while it was off stayed one
 sided: re-save one and its other side is written.

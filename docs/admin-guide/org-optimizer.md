@@ -49,7 +49,7 @@ the **Duplicate Matching** section of **BarnCRM Settings** opens.
 Start from the sample data (see [Sample data](sample-data.md)).
 
 1. Open the **Org Optimizer** tab. **Overview** lists the sections with one line each.
-2. Choose **Data quality**. The nine checks count as the section opens. **People with no
+2. Choose **Data quality**. The ten checks count as the section opens. **People with no
    household** says **0** on fresh sample data.
 3. Choose **Field utilization**. In **Kind of record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.

@@ -26,7 +26,8 @@ turn it on: choose **Turn on** in the **Household upkeep** row in **BarnCRM Sett
 To change them:
 
 1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
-2. Click **Households** in the left navigation. The naming panel is in that section, and
+2. Click **People and Households** in the left navigation. The naming panel is in the
+   **Household Names and Greetings** box, and
    it is the only place the three patterns are edited: they are not also listed as
    separate rows. Searching the settings for a pattern, for example `greeting`, takes you
    to the panel.
@@ -93,7 +94,7 @@ Maria does steps 1 to 5. David does step 6.
 3. Open Wei's record, check **Deceased**, and save. Refresh the household: the informal
    greeting reads **Maria** again. The household name still mentions Lee only if you chose
    to keep people who have died in household names.
-4. Open **BarnCRM Settings**, click **Households**, and change the household name
+4. Open **BarnCRM Settings**, click **People and Households**, and change the household name
    pattern to `{LastName} Household`. Watch the sample preview change as you type.
    Click **Save**, then **Update all household names**, and confirm.
 5. Go back to a household with one surname. It now reads **Garcia Household**.

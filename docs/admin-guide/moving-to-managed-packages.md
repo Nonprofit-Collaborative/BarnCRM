@@ -16,17 +16,18 @@ BarnCRM added to them, and BarnCRM's own records, are copied off and put back.
 ## 2. How to turn it on
 
 This is the one BarnCRM task done from a computer's command line rather than inside the app,
-because removing and installing packages happens outside any package. Most organizations have
-their implementation partner run it, with the administrator alongside to do the in-app steps.
-Whoever runs it needs:
+because removing and installing packages happens outside any package. Your Salesforce
+administrator runs it, or a colleague who is comfortable with a command line does, with the
+administrator alongside to do the in-app steps. BarnCRM is self-service, so this page is the
+whole procedure. Whoever runs it needs:
 
 1. A Mac, Windows or Linux computer with the Salesforce CLI (`sf`, version 2) and Python 3.9 or
    later installed.
 2. A copy of the BarnCRM repository at the release you are moving to (`git clone`, then
-   `git checkout` the release tag your BarnCRM contact gives you).
+   `git checkout` the release tag named in the release notes of the release you are moving to).
 3. A Salesforce user in your org with the System Administrator profile and the **BarnCRM Admin**
    role (from the **Access** page).
-4. From your BarnCRM contact: the installation identifiers (they start `04t`) of the managed
+4. From the same release notes: the installation identifiers (they start `04t`) of the managed
    packages, and the namespace they use. If your pilot packages also used a namespace, its name
    too; you can read it in Setup, **Installed Packages**.
 5. A full copy sandbox of your org (or a partial copy holding every BarnCRM record) for the

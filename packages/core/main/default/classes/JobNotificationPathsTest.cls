@@ -259,14 +259,14 @@ private class JobNotificationPathsTest {
     }
 
     @IsTest
-    static void duplicateScanOpensHouseholds() {
+    static void duplicateScanOpensTheDuplicateMatchingBox() {
         System.runAs(TestUsers.admin()) {
             notifications(true);
 
             new DuplicateScanBatch('Contact', new List<String>()).finish(null);
 
             assertOneAboutSection(
-                JobNotifier.SECTION_HOUSEHOLDS,
+                SettingSections.DUPLICATE_MATCHING,
                 title(
                     System.Label.Core_JobNotice_Finished,
                     System.Label.Core_JobNotice_DuplicateScan
@@ -276,14 +276,14 @@ private class JobNotificationPathsTest {
     }
 
     @IsTest
-    static void householdNameRecomputeOpensHouseholds() {
+    static void householdNameRecomputeOpensTheNamingBox() {
         System.runAs(TestUsers.admin()) {
             notifications(true);
 
             new HouseholdNamingBatch().finish(null);
 
             assertOneAboutSection(
-                JobNotifier.SECTION_HOUSEHOLDS,
+                SettingSections.HOUSEHOLD_NAMES,
                 title(
                     System.Label.Core_JobNotice_Finished,
                     System.Label.Core_JobNotice_HouseholdNaming

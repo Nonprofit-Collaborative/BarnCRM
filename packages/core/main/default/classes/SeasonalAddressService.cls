@@ -298,13 +298,18 @@ public with sharing class SeasonalAddressService {
      *
      * Only an address that is not seasonal is ever a candidate. Restoring a seasonal address
      * whose own season is over would put mail back on a street the household is not at, which
-     * is the mistake the whole feature exists to stop.
+     * is the mistake the whole feature exists to stop. A Former address is not a candidate
+     * either: the owner has left it (R-AD10).
      */
     private static Address__c addressToRestore(List<Address__c> ownerAddresses, Id leavingId) {
         Address__c marked = null;
         Address__c newestOrdinary = null;
         for (Address__c address : ownerAddresses) {
-            if (address.Id == leavingId || address.Type__c == AddressService.TYPE_SEASONAL) {
+            if (
+                address.Id == leavingId ||
+                address.Type__c == AddressService.TYPE_SEASONAL ||
+                address.Status__c == AddressService.STATUS_FORMER
+            ) {
                 continue;
             }
             if (address.Replaced_By_Seasonal__c == true && isNewer(address, marked)) {

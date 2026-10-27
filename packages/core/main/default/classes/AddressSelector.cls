@@ -89,6 +89,70 @@ public with sharing class AddressSelector {
         ];
     }
 
+    /**
+     * The ordinary addresses waiting for these owners' seasons to end (marked Replaced By
+     * Seasonal): the homes a move made while a seasonal address was primary leaves (R-AD10).
+     */
+    public static List<Address__c> selectWaitingForSeason(Set<Id> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return new List<Address__c>();
+        }
+        String seasonal = AddressService.TYPE_SEASONAL;
+        return [
+            SELECT
+                Id,
+                Account__c,
+                Contact__c,
+                Person_Account__c,
+                Type__c,
+                Street__c,
+                City__c,
+                State__c,
+                Postal_Code__c,
+                Country__c
+            FROM Address__c
+            WHERE
+                Replaced_By_Seasonal__c = TRUE
+                AND Type__c != :seasonal
+                AND (Account__c IN :ownerIds
+                OR Contact__c IN :ownerIds
+                OR Person_Account__c IN :ownerIds)
+            WITH USER_MODE
+            ORDER BY CreatedDate DESC
+            LIMIT 10000
+        ];
+    }
+
+    /**
+     * Copies the history fields (Status, Start Date, End Date, R-AD10) onto addresses the
+     * caller already read in user mode, and returns the same list.
+     *
+     * System mode on purpose, for this internal bookkeeping read only. The address trigger
+     * keeps these three fields on every save, so a person who may save addresses without
+     * access to them (a profile that grants Address__c, no BarnCRM permission set) must not
+     * have the save fail on them. Only these three fields of records the user could already
+     * read are read, and nothing read here is shown to the user: the address card and every
+     * other user-facing read stay in user mode.
+     */
+    public static List<Address__c> withHistory(List<Address__c> addresses) {
+        if (addresses == null || addresses.isEmpty()) {
+            return addresses;
+        }
+        Map<Id, Address__c> byId = new Map<Id, Address__c>(addresses);
+        for (Address__c history : [
+            SELECT Id, Status__c, Start_Date__c, End_Date__c
+            FROM Address__c
+            WHERE Id IN :byId.keySet()
+            WITH SYSTEM_MODE
+        ]) {
+            Address__c address = byId.get(history.Id);
+            address.Status__c = history.Status__c;
+            address.Start_Date__c = history.Start_Date__c;
+            address.End_Date__c = history.End_Date__c;
+        }
+        return addresses;
+    }
+
     /** The billing address in the standard fields of these accounts. */
     public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
         return selectAccountBillingAddresses(accountIds, null);

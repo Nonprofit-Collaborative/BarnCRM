@@ -227,9 +227,9 @@ private class HealthCheckServiceTest {
                 'The finding says how many people are affected, in the singular for one.'
             );
             System.assertEquals(
-                HealthCheckService.SECTION_HOUSEHOLDS,
+                SettingSections.PEOPLE,
                 finding.fixTarget,
-                'The fix opens the household settings, where the way of belonging lives.'
+                'The fix opens the People box, where the way of belonging lives.'
             );
         }
     }

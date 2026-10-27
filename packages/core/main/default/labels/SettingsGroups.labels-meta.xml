@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SettingsGroup_Acknowledgments</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for thank yous and plans</shortDescription>
+        <value>Acknowledgments and Stewardship</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_AddressCard</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Addresses page: box heading for the card fields</shortDescription>
+        <value>Address Card</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_AddressUpdates</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Addresses page: box heading for address edits</shortDescription>
+        <value>Address Updates</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_DonorLevels</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for donor levels</shortDescription>
+        <value>Donor Levels</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_EditionAndFeatures</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, General page: box heading for edition and features</shortDescription>
+        <value>Edition and Features</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ErrorDigest</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Error Log page: box heading for the digest email</shortDescription>
+        <value>Error Digest</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ErrorLogRetention</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Error Log page: box heading for how long entries stay</shortDescription>
+        <value>Error Log Retention</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_FindAndBulk</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Import page: box heading for Find and bulk job limits</shortDescription>
+        <value>Find, Bulk Update and Bulk Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_GiftDefaults</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for gift defaults</shortDescription>
+        <value>Gift Defaults</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_GiftMatching</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Import page: box heading for matching gifts to payments</shortDescription>
+        <value>Gift Matching on Import</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_GivingJobs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for nightly jobs and periods</shortDescription>
+        <value>Nightly Jobs and Accounting Periods</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_HoursAndShifts</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Volunteers page: box heading for hours and shifts</shortDescription>
+        <value>Hours and Shifts</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_HouseholdNames</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, People and Households page: box heading for naming</shortDescription>
+        <value>Household Names and Greetings</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Households</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, People and Households page: box heading for households</shortDescription>
+        <value>Households</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Importing</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Import page: box heading for import settings</shortDescription>
+        <value>Importing</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Installments</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for pledges and payments</shortDescription>
+        <value>Commitments and Installments</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Mirror</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Giving page: box heading for the Mirror module</shortDescription>
+        <value>BarnCRM Mirror</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_OrganizationAddress</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Organization page: box heading for the address</shortDescription>
+        <value>Organization Address</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_OrganizationDetails</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Organization page: box heading for names and tax ID</shortDescription>
+        <value>Organization Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_People</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, People and Households page: box heading for people</shortDescription>
+        <value>People</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Preferences</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, General page: box heading for org-wide preferences</shortDescription>
+        <value>Preferences</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ReceiptDetails</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Receipts page: box heading for numbering and year</shortDescription>
+        <value>Receipt Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ReceiptPrinting</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Receipts page: box heading for how receipts print</shortDescription>
+        <value>Receipt Printing</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ReceiptRuns</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Receipts page: box heading for sending receipt runs</shortDescription>
+        <value>Receipt Letters and Year End Statements</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_ReceiptSignature</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Organization page: box heading for receipt logo, signer</shortDescription>
+        <value>Receipt Logo and Signature</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Relationships</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, People and Households page: box heading, relationships</shortDescription>
+        <value>Relationships</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_RollupBuilder</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Rollups page: box heading for the Rollup Builder</shortDescription>
+        <value>Rollup Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_RollupProcessing</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Rollups page: box heading for when totals are worked out</shortDescription>
+        <value>Rollup Processing</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_SeasonalAddresses</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Addresses page: box heading for seasonal addresses</shortDescription>
+        <value>Seasonal Addresses</value>
+    </labels>
+    <labels>
+        <fullName>Core_SettingsGroup_Tools</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, General page: box heading for metadata and sample data</shortDescription>
+        <value>Tools</value>
+    </labels>
+</CustomLabels>
