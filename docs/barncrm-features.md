@@ -12,14 +12,14 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 - **Built, not merged**: built on the named branch or open pull request, waiting for review, an org test run, or the branches it is stacked on.
 - **Replaced**: shipped earlier and superseded by the feature the row names; kept in the code only where the row says.
 - **Planned**: in the product plan roadmap (iteration shown where the plan gives one). "Proposed" marks an idea recorded for consideration, not approved or scheduled.
-- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders, CH = Corporate Hub, PB = Portal Builder, LB = LWC Builder), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
+- **Feature ID**: the product plan ID (C = Core, G = Giving, X = Mirror, V = Volunteers, P = Programs, L = Logic Models, F = Funders, CH = Corporate Hub, PB = Portal Builder, LB = LWC Builder, SG = Scholarships and Outbound Grants, EV = Event Management), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
 
 **Editions**
 
 | Edition | What it is | Packages |
 |---|---|---|
-| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events, Corporate Hub, Portal Builder, Territory Management and LWC Builder later); no nonprofit module is shown or offered |
-| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models and Funders offered as further modules (Corporate Hub, Portal Builder, Territory Management and LWC Builder later, in both editions) |
+| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Event Management, Corporate Hub, Portal Builder, Territory Management and LWC Builder later); no nonprofit module is shown or offered |
+| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Mirror, Volunteers, Programs, Logic Models, Funders and Scholarships and Outbound Grants offered as further modules (Event Management, Corporate Hub, Portal Builder, Territory Management and LWC Builder later, in both editions) |
 
 BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then chooses the edition once in the Setup Assistant; the Nonprofit Edition opens Salesforce's installer for Giving, and other modules are offered the same way. The Standard Edition shows no nonprofit module anywhere in Core; one already installed keeps working. A module that is never installed leaves nothing in the org. Changing the edition later: [editions.md](admin-guide/editions.md).
 
@@ -231,6 +231,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Automatic access | Minor | A guide page gives exact Salesforce user access policy definitions (new staff get a role; with Giving, each role also gets its Giving permission set) to create in Setup, with deployable samples; the Access page and the Setup Assistant's access step link to it. No policy ships in a package. | Shipped (#377) | Q-09, ADR-0095 |
 | Coexistence mode | Major | Detects whether the org also runs NPSP or Nonprofit Cloud, proposes the matching mode (Standalone, NPSP, Nonprofit Cloud) and records it. | Shipped | C-07 |
 | Rearrangeable home page | Major | The home page is built from separate tiles (welcome, setup checklist, errors, Health Check, rollups, seasonal addresses, regular files, quick links) in standard regions, so an admin can rearrange or hide them in App Builder. | Shipped | C-03 |
+| Integrations page | Minor | A page in BarnCRM Settings that is roadmap only: it lists planned integrations and migrations as "In Progress", with a request path for users and providers. Tools that overlap a BarnCRM module (V4S, PMM, Outbound Funds) show only when installed in the org; complementary apps (Summit Events, Community Commons Membership, DLRS) may always be listed; Mass Action Scheduler is never listed. No integration is built from it until Core QA and development are done. | Planned (v1.0, being built now) | C-48 (D-125) |
 | Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. Modules only the Nonprofit Edition offers are grouped in a Nonprofit Modules section at the bottom, with a Show Nonprofit Modules checkbox (on by default, saved for the whole org) that hides them, and a count of any installed ones it hides. | Shipped | C-24 |
 | Edition choice | Major | The Setup Assistant's first step asks Nonprofit Edition or Standard Edition and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
 | Edition gates visibility | Major | The Standard Edition (or no edition chosen) shows no nonprofit module that is not installed: not in the Setup Assistant's module step, the Module Manager, the home Modules card or the Health Check Mirror hint. The edition is chosen once: afterwards the Setup Assistant shows it read-only, and BarnCRM Settings, General shows it read-only with a low-key Change edition control and a confirmation; Setup, Custom Settings also works. | In progress | ADR-0124 |
@@ -590,12 +591,17 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Funder report merge template | Minor | A merge template for funder reports. | Planned (v0.10) | F-06 |
 | Board dashboard | Minor | Revenue mix, funder concentration and restricted balances. | Planned (v0.10) | F-07 |
 | Deadline calendar view | Minor | A calendar of funder deadlines. | Planned (v0.10) | F-08 |
+| Grant Finder | Major | Searches open funding opportunities (Grants.gov public API; paid directories only through the organization's own subscription) and saves one to the pipeline as a prospect. | Planned (TBD, proposed) | F-09 (D-121) |
+| Application tasks and checklists | Minor | Task and checklist templates by stage, with owners and due dates. | Planned (TBD) | F-10 (D-121) |
+| Grant document tracking | Minor | Tracks LOIs, applications and reports: status, version, due and submitted dates, on Salesforce Files. | Planned (TBD) | F-11 (D-121) |
+| Budget versus awarded | Minor | Compares requested budget lines with the awarded amount and spending from the restricted fund. | Planned (TBD) | F-12 (D-121) |
+| Grant renewals | Minor | Renewal reminders and a next-cycle application started from the current award, with history across years. | Planned (TBD) | F-13 (D-121) |
 
 ### 6.2 Other future modules
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Events package | Major | Simple event registration and attendance for non-fundraising events (both editions). | Planned (post-1.0) | plan 6.1 item 2 |
+| Events package | Major | Simple event registration and attendance for non-fundraising events. Replaced by the Event Management module (section 11, D-123). | Replaced (never built) | plan 6.1 item 2 |
 | Contact Point Sync | Major | Optional module, not Core: keeps the standard Contact Point Email, Contact Point Phone and Contact Point Address records in step with a person's email and phone fields and the address record. A separate package so Core stays free of those objects. | Planned (1.x, not scheduled) | C-45 (D-111) |
 | Address Verification | Major | Optional module, not Core: verifies address records with a provider key the organization brings and sets in the BarnCRM Settings console, and writes Verification Status and Latest Verified Date. No provider is bundled and BarnCRM adds no paid service. | Planned (1.x, not scheduled) | C-46 (D-112) |
 | Territory Management | Major | Optional module, not Core (formerly planned as a Core Super Tool): assigns people, households and organizations to territories and owners by rules (for example geography, postal code, type or size), with a preview before reassigning and undo. Both editions. | Planned (after v1.0, not scheduled) | C-40 (D-98, D-120) |
@@ -645,6 +651,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Volunteer portal template | Major | Volunteers see shifts, sign up, log hours and keep their profile current. Needs Volunteers. | Planned (1.x) | PB-03 |
 | Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |
 | Partner portal template | Major | Partner organizations see shared records and referrals, and grant reports where Funders is installed. | Planned (1.x) | PB-05 |
+| Applicant portal template | Major | Applicants apply, upload documents, see decisions and submit recipient reports. Needs Scholarships and Outbound Grants. | Planned (TBD) | PB-06 (D-122) |
+| Speaker portal template | Major | Speakers submit and edit applications, keep their profile, and see their sessions and deadlines. Needs Event Management. | Planned (TBD) | PB-07 (D-123) |
 
 ---
 
@@ -665,7 +673,48 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ---
 
-## 10. Cross-module platform capabilities
+## 10. Scholarships and Outbound Grants
+
+**Edition:** Nonprofit Edition (proposed). Depends on Core only; Giving and Funders are optional links. No package directory exists yet. For organizations that give money: scholarships, fellowships, mini-grants and other outbound grants. Planned after Core QA and the current module round, release target TBD, not v1.0; a new ADR is needed before build (plan 5.11, D-122).
+
+### 10.1 Grantmaking
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Programs and cycles | Major | A scholarship or grant program with cycles, open and close dates, eligibility rules, budget and award count. | Planned (TBD) | SG-01 |
+| Applications | Major | The applicant is a Core person or organization; application questions, documents on Salesforce Files and status. | Planned (TBD) | SG-02 |
+| Reviewers and scoring | Major | Rubrics, reviewer assignment, conflict-of-interest recusal, optional blind review, score totals and ranking. | Planned (TBD) | SG-03 |
+| Applicant portal | Major | Applicants use the applicant portal template of Portal Builder. Needs Portal Builder. | Planned (TBD) | SG-07, PB-06 |
+| Awards | Minor | Decision, award letter, acceptance and conditions. | Planned (TBD) | SG-04 |
+| Disbursements | Minor | Payment schedule, payee, status and an export for the accounting system; records payments made elsewhere, BarnCRM moves no money. | Planned (TBD) | SG-05 |
+| Recipient reporting | Minor | Progress reports, deadlines, reminders and renewal for multi-year awards. | Planned (TBD) | SG-06 |
+| Grantmaking dashboard | Minor | Applications, scores, awards and disbursements by program and cycle, in standard reports and dashboards. | Planned (TBD) | SG-08 |
+
+---
+
+## 11. Event Management
+
+**Edition:** Both editions (proposed). Depends on Core only; Volunteers, Giving, Funders and Portal Builder are optional links. No package directory exists yet. Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Planned after Core QA and the current module round, release target TBD, not v1.0; a new ADR is needed before build (plan 5.12, D-123).
+
+### 11.1 Events, Sessions and Sponsors
+
+| Feature | Type | What it does | Status | Feature ID |
+|---|---|---|---|---|
+| Events | Major | Single, multi-day or recurring events, venue or virtual, capacity, status and a public event page. | Planned (TBD) | EV-01 |
+| Registrations and attendees | Major | Registrants matched to Core people without duplicates (household-aware), waitlist, check-in and attendance. | Planned (TBD) | EV-02 |
+| Tracks, sessions and agenda | Major | Tracks, rooms, time slots, session capacity and sign-up, and a published agenda. | Planned (TBD) | EV-04 |
+| Call for speakers | Major | Speaker applications with review, scoring, and accept or decline notices. | Planned (TBD) | EV-06 |
+| Speaker portal | Major | Speakers use the speaker portal template of Portal Builder. Needs Portal Builder. | Planned (TBD) | EV-07, PB-07 |
+| Sponsorship management | Major | Sponsor organizations, tiers, benefits, a deliverables checklist (logo, booth, passes) and status; linked to a Giving gift or commitment, or a Funders award, when installed. | Planned (TBD) | EV-09 |
+| Ticket types | Minor | Price, quantity, sales dates and promo codes; payments happen outside BarnCRM. | Planned (TBD) | EV-03 |
+| Speakers | Minor | Profiles on Core people, session assignments and needs (travel, A/V). | Planned (TBD) | EV-05 |
+| Volunteer integration | Minor | Event volunteer jobs and shifts in Volunteers, through an optional link. | Planned (TBD) | EV-08 |
+| Summit Events compatibility | Minor | Summit registrants land in BarnCRM people and households without duplicates. | Planned (TBD) | EV-10 |
+| Event dashboard and conference template | Minor | An event dashboard and an opt-in community conference ("Dreamin") template with tracks, sessions, speakers, call for speakers, volunteers and sponsors; never applied by default. | Planned (TBD) | EV-11 |
+
+---
+
+## 12. Cross-module platform capabilities
 
 | Capability | What it means | Status | Source |
 |---|---|---|---|
