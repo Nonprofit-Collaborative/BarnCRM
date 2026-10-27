@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>End_Date__c</fullName>
+  <description>The day this address stopped being used. A move sets it to the day of the move on the primary address it replaces (R-AD10).</description>
+  <inlineHelpText>The day this address stopped being used. Filled in on a move; you can change it.</inlineHelpText>
+  <label>End Date</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

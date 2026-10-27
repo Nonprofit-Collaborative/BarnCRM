@@ -539,18 +539,28 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "rollups button in the Rollup Builder runs exactly the same step."
   fi
 
-  # The same gap for Giving's starting fund: GivingPostInstall creates one General Fund and makes
-  # it the default when the org has no fund and no default fund set, and a deployment runs no
-  # post-install. It never touches an org that already has a fund or a default. Skipped with
-  # SOURCE_POST_INSTALL=0, because the Apex tests assume an org with no funds.
+  # The same gap for every module's own post-install steps (Giving's starting fund, receipt
+  # letters and import templates, each module's automation switches, its admin permission set
+  # for the person deploying): a deployment runs no post-install. Each module's runSetup is
+  # exactly what its install runs, safe on an org that already has them, and it records the
+  # module in the setup marker so Health Check does not offer Finish Setup here (FS1). Skipped
+  # with SOURCE_POST_INSTALL=0, because the Apex tests assume an org with no funds and no saved
+  # BarnCRM Settings.
   if [[ "$SOURCE_POST_INSTALL" == "1" ]]; then
-    echo ""
-    echo "== Creating the starting fund =="
-    if ! printf '%s\n' "FundDefaultsService.installDefaultFundDuringInstall('deploy-packages.sh');" |
-      sf apex run --target-org "$ALIAS"; then
-      echo "The starting fund was not created. Nothing else is affected: create a fund on the"
-      echo "Funds tab and tick Is Default."
+    SETUP_MODULES=(Rollups Giving)
+    if volunteers_has_metadata; then
+      SETUP_MODULES+=(Volunteers)
     fi
+    SETUP_MODULES+=(Mirror)
+    for module in "${SETUP_MODULES[@]}"; do
+      echo ""
+      echo "== Running the ${module} module's setup steps =="
+      if ! printf '%s\n' "new ${module}PostInstall().runSetup(UserInfo.getUserId());" |
+        sf apex run --target-org "$ALIAS"; then
+        echo "The ${module} module's setup steps did not run. Run them from Health Check or the"
+        echo "Modules page with Finish Setup, which runs exactly the same steps."
+      fi
+    done
   fi
 fi
 

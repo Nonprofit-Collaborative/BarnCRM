@@ -44,8 +44,14 @@
  * administrator left it, including one that has been edited or switched off. Nothing here throws: an install must never fail
  * because of a bootstrap step, so a failure is written to the Error Log instead, and the
  * Rollups page still offers the same button.
+ *
+ * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
+ * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
  */
-public with sharing class GivingPostInstall implements InstallHandler {
+@NamespaceAccessible
+public with sharing class GivingPostInstall implements InstallHandler, ModuleSetup {
+    /** The module's key in the module catalog and the setup marker. */
+    private static final String MODULE_KEY = 'Giving';
     private static final String ROLLUP_CONTEXT = 'GivingPostInstall.ensureRollupDefaults';
     private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
     private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
@@ -59,6 +65,22 @@ public with sharing class GivingPostInstall implements InstallHandler {
      *        definitions belong to the org rather than to whoever pressed Install
      */
     public void onInstall(InstallContext context) {
+        runSetup(null);
+    }
+
+    /** Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor. */
+    @NamespaceAccessible
+    public GivingPostInstall() {
+        // Nothing to set up: every step runs in runSetup.
+    }
+
+    /**
+     * The install's steps (see the class comment), then the module's key added to the setup
+     * marker. Never throws.
+     *
+     * @param installerId unused: every step belongs to the org, not to a person
+     */
+    public void runSetup(Id installerId) {
         // Nothing is caught here because nothing can be thrown: the entry point records its own
         // failure in the Error Log and returns, so an install is never aborted by this step, and
         // the Rollups page can still create the rows on demand.
@@ -67,5 +89,6 @@ public with sharing class GivingPostInstall implements InstallHandler {
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
+        ModuleSetups.markRan(MODULE_KEY);
     }
 }

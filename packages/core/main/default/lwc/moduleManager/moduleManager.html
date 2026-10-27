@@ -60,8 +60,23 @@
                                     {module.installFirstText}
                                 </p>
                             </template>
+                            <template lwc:if={module.setupPending}>
+                                <p class="slds-text-body_small slds-text-color_error slds-var-m-top_xx-small" role="status" data-id="setup-not-run">
+                                    {labels.setupNotRun}
+                                </p>
+                            </template>
                             <template lwc:if={canEdit}>
                                 <div class="slds-var-m-top_x-small">
+                                    <template lwc:if={module.setupPending}>
+                                        <lightning-button
+                                            variant="brand"
+                                            class="slds-var-m-right_x-small"
+                                            label={labels.finishSetup}
+                                            data-id="finish-setup"
+                                            data-name={module.name}
+                                            onclick={handleFinishSetup}
+                                        ></lightning-button>
+                                    </template>
                                     <template lwc:if={module.showInstall}>
                                         <a
                                             class="slds-button slds-button_neutral"

@@ -121,6 +121,9 @@ public with sharing class HealthCheckService {
         if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
             return ScheduledJobSelector.namesOwnedByInactiveUsers();
         }
+        if (ModuleSetups.FIX_KEY.equals(fixKey)) {
+            return ModuleSetups.pendingLabels();
+        }
         HealthCheckFixExtension owner = fixOwner(fixKey);
         return owner == null ? null : owner.fixScope(fixKey);
     }
@@ -148,7 +151,8 @@ public with sharing class HealthCheckService {
     public static final String SECTION_STATE_PARAMETER = 'section';
 
     public static final String SECTION_GENERAL = 'General';
-    public static final String SECTION_HOUSEHOLDS = 'Households';
+    /** The People box of People and Households, where the way of belonging lives (P1). */
+    public static final String SECTION_PEOPLE = SettingSections.PEOPLE;
     public static final String SECTION_ACCESS = 'Access';
     public static final String SECTION_AUTOMATION = 'Automation';
 
@@ -582,6 +586,8 @@ public with sharing class HealthCheckService {
                     new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
                 )
             );
+            // A package copied in by hand, whose setup never ran (FS1).
+            steps.add(new CheckStep('module_setup', new ModuleSetups.SetupCheck()));
             // The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
             // ADR-0125), asked with the other extensions after these.
         }

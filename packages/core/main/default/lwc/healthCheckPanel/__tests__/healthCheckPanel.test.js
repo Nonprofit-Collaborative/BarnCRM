@@ -291,6 +291,45 @@ describe('c-health-check-panel', () => {
     expect(outcome.textContent).toContain('Created: Total Gifts, Last Gift Date');
   });
 
+  it('runs Finish Setup for the packages whose setup never ran, once confirmed (FS1)', async () => {
+    const setupFinding = {
+      key: 'module_setup_not_run',
+      title: 'Setup never ran for BarnCRM Giving',
+      detail: 'BarnCRM Giving: installed, but the setup steps a package install runs never ran.',
+      severity: 'Warning',
+      category: 'Settings',
+      fixLabel: 'Finish Setup',
+      fixTarget: 'action:finishModuleSetup',
+      fixScope: ['BarnCRM Giving']
+    };
+    getReport.mockResolvedValue(agentforceReport({ findings: [setupFinding] }));
+    applyFix.mockResolvedValue(
+      agentforceReport({ findings: [], fixOutcome: 'Done. Setup steps ran for: BarnCRM Giving.' })
+    );
+    const element = createPanel();
+    await flush();
+
+    const button = Array.from(element.shadowRoot.querySelectorAll('[data-id="fix"]')).find(
+      (fix) => fix.dataset.target === 'action:finishModuleSetup'
+    );
+    expect(button.label).toBe('Finish Setup');
+    button.click();
+    await flush();
+    await flush();
+
+    expect(BarnConfirmModal.open.mock.calls[0][0].details).toEqual([
+      setupFinding.title,
+      setupFinding.detail
+    ]);
+    expect(applyFix).toHaveBeenCalledWith({
+      fixKey: 'finishModuleSetup',
+      expectedScope: ['BarnCRM Giving']
+    });
+    expect(element.shadowRoot.querySelector('[data-id="fix-outcome"]').textContent).toContain(
+      'Setup steps ran for: BarnCRM Giving'
+    );
+  });
+
   it('runs nothing when the dialog is closed with Escape or its close button', async () => {
     BarnConfirmModal.open.mockResolvedValue(undefined);
     getReport.mockResolvedValue(agentforceReport());

@@ -6,6 +6,11 @@ import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
 import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdminAccess';
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
 import saveShowNonprofitModules from '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules';
+import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
+
+jest.mock('@salesforce/apex/ModuleManagerController.finishSetup', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ModuleManagerController.getState', () => ({ default: jest.fn() }), {
   virtual: true
@@ -383,5 +388,66 @@ describe('c-module-manager', () => {
     expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
       'The module could not be switched.'
     );
+  });
+
+  describe('Finish Setup (FS1)', () => {
+    function setupNotRun(canEdit = true) {
+      const base = state('On', canEdit);
+      return {
+        ...base,
+        modules: base.modules.map((module) => ({
+          ...module,
+          setupPending: module.name === 'Giving'
+        }))
+      };
+    }
+
+    it('flags a module whose setup never ran and offers Finish Setup', async () => {
+      getState.mockResolvedValue(setupNotRun());
+      const element = await build();
+
+      const giving = row(element, 'Giving');
+      expect(giving.querySelector('[data-id="setup-not-run"]').textContent).toContain(
+        'Core_ModuleSetup_NotRunNotice'
+      );
+      const button = giving.querySelector('[data-id="finish-setup"]');
+      expect(button.label).toBe('c.Core_ModuleSetup_FinishButton');
+      expect(row(element, 'Core').querySelector('[data-id="setup-not-run"]')).toBeNull();
+      expect(row(element, 'Core').querySelector('[data-id="finish-setup"]')).toBeNull();
+    });
+
+    it('runs the setup steps through Apex and clears the notice', async () => {
+      getState.mockResolvedValue(setupNotRun());
+      finishSetup.mockResolvedValue(state('On'));
+      const element = await build();
+
+      row(element, 'Giving').querySelector('[data-id="finish-setup"]').click();
+      await settle();
+
+      expect(finishSetup).toHaveBeenCalledWith({ moduleName: 'Giving' });
+      expect(row(element, 'Giving').querySelector('[data-id="setup-not-run"]')).toBeNull();
+      expect(row(element, 'Giving').querySelector('[data-id="finish-setup"]')).toBeNull();
+    });
+
+    it('shows the notice without the button to someone who cannot change settings', async () => {
+      getState.mockResolvedValue(setupNotRun(false));
+      const element = await build();
+
+      expect(row(element, 'Giving').querySelector('[data-id="setup-not-run"]')).not.toBeNull();
+      expect(row(element, 'Giving').querySelector('[data-id="finish-setup"]')).toBeNull();
+    });
+
+    it('shows the message when Finish Setup fails', async () => {
+      getState.mockResolvedValue(setupNotRun());
+      finishSetup.mockRejectedValue({ body: { message: 'The module could not be set up.' } });
+      const element = await build();
+
+      row(element, 'Giving').querySelector('[data-id="finish-setup"]').click();
+      await settle();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+        'The module could not be set up.'
+      );
+    });
   });
 });

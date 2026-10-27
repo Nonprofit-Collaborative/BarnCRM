@@ -93,6 +93,20 @@ public with sharing class SettingsController {
         public Decimal minValue;
         @AuraEnabled
         public Decimal maxValue;
+        /**
+         * True when the value shown is a default nobody has saved: nothing is stored, so the
+         * console offers to keep the shown value as a saved choice. Saving it stores exactly
+         * that value through `saveSettings`, a real change from the stored blank.
+         */
+        @AuraEnabled
+        public Boolean unsavedDefault;
+        /**
+         * True when an unsaved default is one BarnCRM's own detection would replace (the
+         * household membership mode on an org with Person Accounts or Nonprofit Cloud), so the
+         * console shows the note but offers no one-click keep.
+         */
+        @AuraEnabled
+        public Boolean detectionMayChange;
     }
 
     public class Option {
@@ -337,6 +351,8 @@ public with sharing class SettingsController {
                 definition.MasterLabel,
                 definition.Description__c,
                 definition.Section__c,
+                // The page the row shows on, when its section names a sub-section (P1).
+                SettingSections.pageFor(definition.Section__c),
                 definition.Setting_Key__c
             }
         ) {
@@ -460,7 +476,11 @@ public with sharing class SettingsController {
         setting.dataType = definition.Data_Type__c;
         setting.minValue = definition.Min_Value__c;
         setting.maxValue = definition.Max_Value__c;
-        setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
+        // A row that still names the old Households or Relationships page shows on People and
+        // Households (P1), so a module or a row not yet moved never makes a page of its own.
+        setting.section = String.isBlank(definition.Section__c)
+            ? ''
+            : SettingSections.pageFor(definition.Section__c);
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;
         setting.navigationLabel = definition.Navigation_Label__c;
@@ -507,14 +527,44 @@ public with sharing class SettingsController {
                 ? BLANK_SHOWS_AS.get(key)
                 : setting.value;
         }
-        setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
+        Boolean isCheckbox = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c);
+        setting.checked = isCheckbox && value == true;
+        // A checkbox is never blank (its shipped value is on the record, ADR-0035).
+        setting.unsavedDefault =
+            !isCheckbox &&
+            String.isNotBlank(setting.value) &&
+            String.isBlank(
+                SettingsService.asText(
+                    SettingsService.getValue(settingsObject, definition.Setting_Key__c)
+                )
+            );
+        String detected = setting.unsavedDefault
+            ? detectedValue(settingsObject, definition.Setting_Key__c)
+            : null;
+        setting.detectionMayChange = detected != null && !detected.equals(setting.value);
         return setting;
     }
 
     /**
-     * Gives a Record row its object and a Record Type List row its choices, read from describe
-     * (ADR-0074). False when the row names an object this org does not have, which leaves the
-     * row out as a missing settings object does.
+     * What BarnCRM's own detection would write for an unsaved row, or null for a row detection
+     * never writes. The coexistence mode is shown as the recommended mode, which is what
+     * detection writes; the membership mode is shown as the simple way, which detection
+     * replaces on an org with Person Accounts or Nonprofit Cloud.
+     */
+    private static String detectedValue(String settingsObject, String key) {
+        if (isCoexistenceMode(settingsObject, key)) {
+            return OrgShapeDetector.recommendedCoexistenceMode();
+        }
+        if (isMembershipMode(settingsObject, key)) {
+            return CoexistenceService.membershipDetectionWouldChoose();
+        }
+        return null;
+    }
+
+    /**
+     * Gives a Record row its object and a Record Type List or Field List row its choices, read
+     * from describe (ADR-0074, R-AD10). False when the row names an object this org does not
+     * have, which leaves the row out as a missing settings object does.
      */
     private static Boolean addRecordChoices(
         Setting_Definition__mdt definition,
@@ -524,7 +574,8 @@ public with sharing class SettingsController {
         Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(
             definition.Data_Type__c
         );
-        if (!isRecord && !isRecordTypes) {
+        Boolean isFields = SettingsService.FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c);
+        if (!isRecord && !isRecordTypes && !isFields) {
             return true;
         }
         Schema.SObjectType type = SettingsService.recordObjectType(definition);
@@ -537,6 +588,14 @@ public with sharing class SettingsController {
                 Option option = new Option();
                 option.value = info.getDeveloperName();
                 option.label = info.getName();
+                setting.options.add(option);
+            }
+        }
+        if (isFields) {
+            for (Schema.DescribeFieldResult field : SettingsService.fieldChoices(type)) {
+                Option option = new Option();
+                option.value = field.getName();
+                option.label = field.getLabel();
                 setting.options.add(option);
             }
         }
