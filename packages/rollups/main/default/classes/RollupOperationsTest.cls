@@ -403,9 +403,56 @@ private class RollupOperationsTest {
                 'A count into a checkbox'
             );
             Assert.areEqual(
-                Label.Core_Rollups_ErrorTargetType,
+                Label.Core_Rollups_ErrorPicklistTarget,
                 RollupPlanner.targetTypeProblem('MAX', Schema.DisplayType.PICKLIST),
                 'A maximum into a picklist'
+            );
+            Assert.isNull(
+                RollupPlanner.targetTypeProblem('FIRST', Schema.DisplayType.PICKLIST),
+                'First into a picklist (ADR-0136)'
+            );
+        }
+    }
+
+    /** R-R15: a picklist gets its own spelling of a value, and a value it lacks is logged. */
+    @IsTest
+    static void aPicklistIsFilledWithItsOwnValueAndOneItLacksIsLeftOut() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            List<Account> organizations = organizations(1);
+            Contact person = new Contact(LastName = 'child', AccountId = organizations[0].Id);
+            insert person;
+            Rollup_Definition__c role = definition(
+                'LAST',
+                'LastName',
+                'Household_Role__c',
+                RollupService.MODE_SCHEDULED
+            );
+            role.Order_By_Field__c = 'CreatedDate';
+            List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{ role };
+            Set<Id> ids = new Set<Id>{ organizations[0].Id };
+
+            Test.startTest();
+            RollupPlanner.Plan plan = RollupPlanner.plan(Account.SObjectType, definitions);
+            RollupEngine.recalculate(ids, definitions);
+            String matched = [SELECT Household_Role__c FROM Account WHERE Id IN :ids]
+            .Household_Role__c;
+            person.LastName = 'Nobody';
+            update person;
+            RollupEngine.Result refused = RollupEngine.recalculate(ids, definitions);
+            Test.stopTest();
+
+            Assert.isTrue(plan.queries[0].measures[0].asText, 'Copied as text, never converted');
+            Assert.areEqual('Child', matched, 'The picklist value, as the picklist spells it');
+            Assert.areEqual(
+                'Child',
+                [SELECT Household_Role__c FROM Account WHERE Id IN :ids].Household_Role__c,
+                'A value the picklist lacks is left out: the record keeps its value'
+            );
+            Assert.isTrue(refused.failed.isEmpty(), 'The record did not fail');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'RollupWriter'],
+                'One entry naming the value'
             );
         }
     }

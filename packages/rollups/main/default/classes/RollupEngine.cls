@@ -273,7 +273,7 @@ public with sharing class RollupEngine {
             // Read only for a text list, so a caller that queried a definition without the
             // delimiter still runs every other aggregate.
             String separator = aggregate.startsWith('TEXT_LIST')
-                ? RollupPlanner.separatorFor(definition.Delimiter__c)
+                ? RollupPlanner.separatorOf(definition)
                 : null;
             Schema.SObjectField field = plan.targetFields[i];
             Boolean toTargetCurrency =

@@ -111,6 +111,39 @@ public with sharing class RollupService {
         return AutomationControl.isPaused() || isTurnedOff();
     }
 
+    /** The handler a package registers on an entity to make its rollups real time (R-R12). */
+    private static final String REAL_TIME_HANDLER = 'RollupTriggerHandler';
+
+    /**
+     * Whether saving a record of this entity recalculates the totals that count it at once: a
+     * package registers `RollupTriggerHandler` for it in the Automation Registry, or the
+     * administrator deployed its generated trigger and it is on (`RollupInstantTotals.isOn`,
+     * R-R12, ADR-0136, ADR-0138). Any other entity's totals are recalculated in the background,
+     * by the nightly run and Recalculate, unless an administrator's own Flow calls
+     * `RollupRecalcAction`, which the engine cannot see. False for an entity the org does not
+     * have.
+     */
+    @NamespaceAccessible
+    public static Boolean hasInstantUpdates(String entity) {
+        Schema.SObjectType type = SettingsService.typeByName(entity);
+        if (type == null) {
+            return false;
+        }
+        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
+            String handler = String.isBlank(entry.Handler_Class__c) ? '' : entry.Handler_Class__c;
+            if (handler.contains('.')) {
+                handler = handler.substringAfterLast('.');
+            }
+            if (
+                REAL_TIME_HANDLER.equalsIgnoreCase(handler) &&
+                SettingsService.typeByName(entry.Object_Name__c) == type
+            ) {
+                return true;
+            }
+        }
+        return RollupInstantTotals.isOn(type);
+    }
+
     /**
      * Puts every total right after the module is turned on again (ADR-0125 decision 9, owner
      * decision: totals are right after Turn on): starts the processor for the entries that
@@ -150,6 +183,56 @@ public with sharing class RollupService {
         return REAL_TIME_MODES.contains(mode) || MODE_SCHEDULED.equals(mode) ? mode : MODE_BOTH;
     }
 
+    // ---------------------------------------------------------------------------------- bypass
+
+    /** Whether the running user holds each Bypass Permission asked about, for this transaction. */
+    private static Map<String, Boolean> bypassHeld = new Map<String, Boolean>();
+
+    /** The active Real-time and Both definitions a save by the running user runs (R-R4a). */
+    private static List<Rollup_Definition__c> realTimeForThisUser() {
+        return withoutBypassed(RollupSelector.selectActiveForModes(REAL_TIME_MODES));
+    }
+
+    /**
+     * These definitions without the ones whose Bypass Permission the running user holds
+     * (R-R4a, ADR-0136): a data migration user's saves neither recalculate nor queue them, and
+     * the nightly run and Recalculate, which never call this, still cover them.
+     */
+    private static List<Rollup_Definition__c> withoutBypassed(
+        List<Rollup_Definition__c> definitions
+    ) {
+        List<Rollup_Definition__c> kept = new List<Rollup_Definition__c>();
+        for (Rollup_Definition__c definition : definitions) {
+            if (!isBypassed(definition.Bypass_Permission__c)) {
+                kept.add(definition);
+            }
+        }
+        return kept;
+    }
+
+    /**
+     * Whether the running user holds this custom permission, asked once per user and name in a
+     * transaction. A name the platform does not know bypasses nobody: the definition's save
+     * refuses one, so this only meets a permission deleted since.
+     */
+    private static Boolean isBypassed(String permission) {
+        if (String.isBlank(permission)) {
+            return false;
+        }
+        String name = permission.trim();
+        String key = UserInfo.getUserId() + '|' + name.toLowerCase();
+        if (!bypassHeld.containsKey(key)) {
+            Boolean held = false;
+            try {
+                held = FeatureManagement.checkPermission(name);
+            } catch (Exception unknown) {
+                held = false;
+            }
+            bypassHeld.put(key, held == true);
+        }
+        return bypassHeld.get(key);
+    }
+
     // ------------------------------------------------------------------------------- real time
 
     /**
@@ -180,9 +263,7 @@ public with sharing class RollupService {
         ) {
             return;
         }
-        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
-            REAL_TIME_MODES
-        );
+        List<Rollup_Definition__c> definitions = realTimeForThisUser();
         if (definitions.isEmpty()) {
             return;
         }
@@ -217,9 +298,7 @@ public with sharing class RollupService {
         if (String.isBlank(sourceObject) || deletedRecords == null || isTurnedOff()) {
             return;
         }
-        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
-            REAL_TIME_MODES
-        );
+        List<Rollup_Definition__c> definitions = realTimeForThisUser();
         if (!definitions.isEmpty()) {
             recalculateNowOrQueue(
                 RollupChanges.afterDelete(sourceObject, deletedRecords, definitions)
@@ -274,9 +353,8 @@ public with sharing class RollupService {
         if (targetType == null || survivorIds == null || survivorIds.isEmpty() || isTurnedOff()) {
             return;
         }
-        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
-            targetObject,
-            REAL_TIME_MODES
+        List<Rollup_Definition__c> definitions = withoutBypassed(
+            RollupSelector.selectActiveForTarget(targetObject, REAL_TIME_MODES)
         );
         if (definitions.isEmpty()) {
             return;
@@ -387,9 +465,7 @@ public with sharing class RollupService {
         if (String.isBlank(sourceObject) || records == null || records.isEmpty() || isStopped()) {
             return;
         }
-        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
-            REAL_TIME_MODES
-        );
+        List<Rollup_Definition__c> definitions = realTimeForThisUser();
         if (definitions.isEmpty()) {
             return;
         }
@@ -436,23 +512,33 @@ public with sharing class RollupService {
             definitionsByTarget.put(
                 target,
                 definitions == null
-                    ? RollupSelector.selectActiveForTarget(target, EVERY_MODE)
+                    ? withoutBypassed(RollupSelector.selectActiveForTarget(target, EVERY_MODE))
                     : definitions
             );
         }
         return definitionsByTarget;
     }
 
-    /** Queues the records with the definitions to recalculate for them. */
+    /**
+     * Queues the records with the definitions to recalculate for them. A target entity left
+     * with an empty list has nothing to run (every definition on it bypassed for this user,
+     * R-R4a) and is not queued, since an entry naming no definition runs every one.
+     */
     private static void queue(
         Map<String, Set<Id>> idsByTarget,
         Map<String, List<Rollup_Definition__c>> definitionsByTarget
     ) {
+        Map<String, Set<Id>> queuedIds = new Map<String, Set<Id>>();
         Map<String, Set<Id>> definitionIdsByTarget = new Map<String, Set<Id>>();
-        for (String target : definitionsByTarget.keySet()) {
-            definitionIdsByTarget.put(target, idsOf(definitionsByTarget.get(target)));
+        for (String target : idsByTarget.keySet()) {
+            List<Rollup_Definition__c> definitions = definitionsByTarget.get(target);
+            if (definitions != null && definitions.isEmpty()) {
+                continue;
+            }
+            queuedIds.put(target, idsByTarget.get(target));
+            definitionIdsByTarget.put(target, idsOf(definitions));
         }
-        RollupQueue.add(idsByTarget, definitionIdsByTarget);
+        RollupQueue.add(queuedIds, definitionIdsByTarget);
     }
 
     /** The definitions' ids; a definition with none leaves a null in, which queues every one. */
@@ -482,11 +568,26 @@ public with sharing class RollupService {
             return;
         }
         Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
-        Map<String, List<Rollup_Definition__c>> definitionsByTarget = definitionsByTargetOf(
-            marked,
-            idsByTarget.keySet()
+        recalculateNowOrQueue(
+            idsByTarget,
+            definitionsByTargetOf(marked, idsByTarget.keySet()),
+            marked.size(),
+            recalculatesInTheSave()
         );
-        if (!recalculatesInTheSave() || !canRecalculateNow(marked.size(), definitionsByTarget)) {
+    }
+
+    /**
+     * Recalculates these records now when `now` is asked for and the transaction has room,
+     * otherwise queues them; a refused record is queued to be tried again and anything that
+     * stops the recalculation queues the lot.
+     */
+    private static void recalculateNowOrQueue(
+        Map<String, Set<Id>> idsByTarget,
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget,
+        Integer targetCount,
+        Boolean now
+    ) {
+        if (!now || !canRecalculateNow(targetCount, definitionsByTarget)) {
             queue(idsByTarget, definitionsByTarget);
             return;
         }
@@ -503,6 +604,74 @@ public with sharing class RollupService {
             ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
             queue(idsByTarget, definitionsByTarget);
         }
+    }
+
+    // ------------------------------------------------------------------------- named records
+
+    /**
+     * Recalculates the totals on these target records (R-R12 note, ADR-0136): every active
+     * definition targeting each record's entity, whatever its mode, or only the one named. The
+     * Recalculate totals on this record Flow action and `RollupApi.recalculate` call this. It is
+     * a request for these totals, not a save, so a Bypass Permission does not apply (R-R4a) and
+     * the records are recalculated in this transaction whenever it has room, whatever Rollup
+     * Processing says; a bulk request, a background transaction or one without the room queues
+     * them. Nothing happens while the module is turned off: Turn on recalculates every total.
+     *
+     * @param targetIds the records whose totals to recalculate, of any entities
+     * @param rollup a definition's Definition Key or name, or blank for every one
+     * @return the target entities that had something to recalculate
+     */
+    @NamespaceAccessible
+    public static Set<String> recalculateTargets(Set<Id> targetIds, String rollup) {
+        Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget = new Map<String, List<Rollup_Definition__c>>();
+        if (targetIds == null || isTurnedOff()) {
+            return idsByTarget.keySet();
+        }
+        Integer count = 0;
+        for (Id targetId : targetIds) {
+            if (targetId == null) {
+                continue;
+            }
+            String target = String.valueOf(targetId.getSObjectType());
+            if (!definitionsByTarget.containsKey(target)) {
+                definitionsByTarget.put(target, named(target, rollup));
+            }
+            if (definitionsByTarget.get(target).isEmpty()) {
+                continue;
+            }
+            if (!idsByTarget.containsKey(target)) {
+                idsByTarget.put(target, new Set<Id>());
+            }
+            idsByTarget.get(target).add(targetId);
+            count++;
+        }
+        if (!idsByTarget.isEmpty()) {
+            recalculateNowOrQueue(idsByTarget, definitionsByTarget, count, true);
+        }
+        return idsByTarget.keySet();
+    }
+
+    /** The active definitions on this target entity, or only the one with this key or name. */
+    private static List<Rollup_Definition__c> named(String target, String rollup) {
+        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
+            target,
+            EVERY_MODE
+        );
+        if (String.isBlank(rollup)) {
+            return definitions;
+        }
+        String wanted = rollup.trim();
+        List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
+        for (Rollup_Definition__c definition : definitions) {
+            if (
+                wanted.equalsIgnoreCase(definition.Definition_Key__c) ||
+                wanted.equalsIgnoreCase(definition.Name)
+            ) {
+                matching.add(definition);
+            }
+        }
+        return matching;
     }
 
     /** Whether this transaction recalculates now: few records, not async, room to spare. */

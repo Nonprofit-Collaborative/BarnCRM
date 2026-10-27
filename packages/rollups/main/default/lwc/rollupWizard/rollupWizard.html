@@ -13,6 +13,14 @@
     </template>
 
     <template lwc:if={isStep1}>
+        <lightning-input
+            type="search"
+            data-id="target-search"
+            label={labels.targetSearch}
+            value={targetSearch}
+            field-level-help={labels.targetSearchHelp}
+            onchange={handleTargetSearch}
+        ></lightning-input>
         <lightning-combobox
             name="targetObject"
             data-id="target-object"
@@ -57,9 +65,22 @@
                 data-id="source-field"
                 label={labels.sourceField}
                 value={draft.sourceField}
-                options={sourceFieldOptions}
+                options={copyFieldOptions}
                 onchange={handleInput}
             ></lightning-combobox>
+        </template>
+        <template lwc:if={takesRowLimit}>
+            <lightning-input
+                type="number"
+                name="rowLimit"
+                data-id="row-limit"
+                label={labels.rowLimit}
+                field-level-help={labels.rowLimitHelp}
+                min="1"
+                step="1"
+                value={draft.rowLimit}
+                onchange={handleInput}
+            ></lightning-input>
         </template>
         <template lwc:if={needsOrderBy}>
             <lightning-combobox
@@ -71,6 +92,16 @@
                 onchange={handleInput}
             ></lightning-combobox>
         </template>
+        <template lwc:if={takesDirection}>
+            <lightning-combobox
+                name="orderDirection"
+                data-id="order-direction"
+                label={labels.orderDirection}
+                value={orderDirection}
+                options={directionOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
         <template lwc:if={isTextList}>
             <lightning-combobox
                 name="delimiter"
@@ -79,6 +110,16 @@
                 options={delimiterOptions}
                 onchange={handleInput}
             ></lightning-combobox>
+            <template lwc:if={isCustomDelimiter}>
+                <lightning-input
+                    name="customDelimiter"
+                    data-id="custom-delimiter"
+                    label={labels.customDelimiter}
+                    max-length="10"
+                    value={draft.customDelimiter}
+                    onchange={handleInput}
+                ></lightning-input>
+            </template>
         </template>
         <lightning-radio-group
             data-id="window"
@@ -108,11 +149,24 @@
         <c-rollup-filter-builder
             data-name="filterJson"
             label={labels.filter}
-            fields={sourceFields}
+            fields={filterFields}
             records-label={recordsLabel}
             value={draft.filterJson}
             onchange={handleFilter}
         ></c-rollup-filter-builder>
+        <template lwc:if={readsParentField}>
+            <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="parent-field-note">{labels.parentFieldNote}</p>
+        </template>
+        <lightning-input
+            type="checkbox"
+            class="slds-var-m-top_small"
+            name="includeDeleted"
+            data-id="include-deleted"
+            label={labels.includeDeleted}
+            field-level-help={labels.includeDeletedHelp}
+            checked={draft.includeDeleted}
+            onchange={handleInput}
+        ></lightning-input>
         <div class="slds-var-m-top_medium">
             <c-rollup-filter-builder
                 data-name="targetFilterJson"
@@ -134,8 +188,24 @@
         </template>
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
-        <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <template lwc:if={noInstantNotice}>
+            <div class="slds-box slds-box_x-small slds-theme_info slds-var-m-vertical_small" role="status">
+                <span data-id="no-instant">{noInstantNotice}</span>
+            </div>
+        </template>
+        <lightning-radio-group name="mode" data-id="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <template lwc:if={instantObject}>
+            <c-rollup-instant-totals object-api-name={instantObject} can-manage={canManageInstant}></c-rollup-instant-totals>
+        </template>
         <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
+        <lightning-input
+            name="bypassPermission"
+            data-id="bypass-permission"
+            label={labels.bypassPermission}
+            field-level-help={labels.bypassPermissionHelp}
+            value={draft.bypassPermission}
+            onchange={handleInput}
+        ></lightning-input>
     </template>
 
     <div class="slds-var-m-top_medium slds-clearfix">

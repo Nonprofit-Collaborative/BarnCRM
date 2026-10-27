@@ -93,8 +93,8 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Status shown when the nightly schedule exists.</shortDescription>
-        <value>Nightly recalculation is scheduled for 2:00 AM.</value>
+        <shortDescription>Status when the nightly run is scheduled: {0} is its time</shortDescription>
+        <value>Nightly recalculation is scheduled for {0}.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ScheduleMissing</fullName>
@@ -127,6 +127,22 @@
         <protected>false</protected>
         <shortDescription>Error returned when a rollup id does not resolve.</shortDescription>
         <value>That rollup no longer exists. Refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorUnknownBypassPermission</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save error: {0} is the bypass permission name typed</shortDescription>
+        <value>No custom permission named {0} exists in this org. Enter the API name shown in Setup, Custom Permissions, or leave the field blank.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorNoRollupNamed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: {0} is the rollup name the Flow action got</shortDescription>
+        <value>Recalculate totals on this record: no active rollup on the record's object has the Definition Key or name {0}, so nothing was recalculated. Check the name on the Rollup Builder tab.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorInvalidMode</fullName>
@@ -185,6 +201,22 @@
         <value>A text field can show only First, Last or a text list. Choose one of those calculations, or choose another field.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorPicklistTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a picklist field is given a calculation other than First or Last.</shortDescription>
+        <value>A picklist field can show only First or Last. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_PicklistValueRefused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a value not in the target picklist. {0} is the value, {1} the field.</shortDescription>
+        <value>A rollup could not put "{0}" in {1}, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorTargetType</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -207,6 +239,46 @@
         <protected>false</protected>
         <shortDescription>Error when a calculation that reads a field on each record has no Source Field.</shortDescription>
         <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorRowLimitAggregate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is set on a calculation that does not take one.</shortDescription>
+        <value>Only the first N records works with Sum, Average, Minimum, Maximum and the text lists. Clear it for this calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorRowLimitNeedsOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is set without an order by field.</shortDescription>
+        <value>Only the first N records needs a field to order by, so BarnCRM knows which records come first. Choose one, or clear the limit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorRowLimitInvalid</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a row limit is below 1.</shortDescription>
+        <value>Only the first N records must be 1 or more. Leave it blank to count every record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorCustomDelimiterNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the delimiter is Custom and no custom delimiter is given.</shortDescription>
+        <value>Type the characters that go between the values in Custom delimiter, or choose another delimiter.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorDeletedLargeParent</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error: a rollup with deleted records reaches the large parent route.</shortDescription>
+        <value>This rollup includes deleted records, which cannot be read in parts for a record with this many source records. Its total on this record was left as it was.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_Recalculate</fullName>

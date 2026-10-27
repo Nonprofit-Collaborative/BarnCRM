@@ -979,7 +979,8 @@ Setup Assistant (C-12) keys arrived early and are listed in the table above, whe
 assistant that wrote them (they are Giving keys from v0.6, Section 21A). The two rollup keys
 published here, `Rollup_Mode_Default__c` and `Rollup_Processing__c`, moved with the engine to
 the BarnCRM Rollup Builder module's own `Rollup_Settings__c` (Section 14B, ADR-0125), with
-their API names and definitions unchanged.
+their API names and definitions unchanged. A third rollup key, `Nightly_Run_Hour__c`, was
+added there directly (Section 14B, ADR-0136).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -1518,8 +1519,12 @@ Core (`decisions/0125-rollup-builder-module.md`).
 | Relationship Path | text | yes | How a source record reaches its target, written in the path notation below; supports the household membership abstraction. |
 | Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT) | yes | The calculation applied to the matching source records (R-R15). |
 | Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT, ANY and NONE. |
-| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. For a text list, optional: the order the values are listed in. |
-| Delimiter | picklist(Comma, Semicolon, New line) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST and when a Row Limit is set. For a text list, optional: the order the values are listed in. |
+| Order Direction | picklist(Ascending, Descending) | no (defaults Ascending) | The direction of the Order By Attribute for a text list and a row limited aggregate (R-R15); FIRST and LAST ignore it. |
+| Row Limit | integer | no | Only the first N matching records, in the order of the Order By Attribute, are calculated (R-R15); for SUM, AVG, MIN, MAX and the text lists. Blank means every record. |
+| Delimiter | picklist(Comma, Semicolon, New line, Pipe, Custom) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Custom Delimiter | text(10) | conditional | The characters between the values when Delimiter is Custom; required then (R-R10). |
+| Include Deleted | boolean | yes (defaults false) | Whether source records in the Recycle Bin and archived activities count (R-R15). |
 | Target Attribute | text | yes | The attribute on the target entity that receives the result; its type must suit the aggregate (R-R15). |
 | Filter | long text | no | Which source records count, held as a filter document (see R-R2); empty means all of them. |
 | Target Filter | long text | no | Which target records this definition maintains, held in the same filter format; empty means all of them. |
@@ -1530,6 +1535,7 @@ Core (`decisions/0125-rollup-builder-module.md`).
 | Last Calculated | datetime | computed | When this definition last completed a calculation, of any scope. |
 | Is Package Default | boolean | yes (defaults false) | Marks a definition materialized from a shipped default rather than created by the admin. |
 | Active | boolean | yes (defaults true) | Whether the engine runs this definition; turning it off never deletes the values already calculated. |
+| Bypass Permission | text | no | The API name of a custom permission. A save made by a person who holds it neither recalculates nor queues this rollup; the nightly run, Recalculate and Recalculate all still cover it (R-R4a). Must name a custom permission in the org. |
 
 ### Relationships
 
@@ -1596,7 +1602,10 @@ version 1 reader refuses rather than misreads, so the version number does not ch
   back from that integer.
 - **Parent fields.** `field` may be a path through lookups, written with relationship
   names (`Household__r.Name`), at most two lookups deep. Each segment is checked against
-  the running user's describe of the object it is on.
+  the running user's describe of the object it is on. The Rollup Builder's source filter
+  goes one lookup deep only (ADR-0136): it offers the counted records' own fields and the
+  fields of a record each of their lookups points to (`Appeal__r.Type__c`), never a lookup
+  to more than one object, and its save refuses a path of more than one lookup (R-R10).
 - **Typed values.** The filter builder writes a number as a JSON number, a checkbox as
   `true` or `false`, a date as `YYYY-MM-DD`, a date/time as `YYYY-MM-DDThh:mm:ssZ`, and
   `in` and `not in` as a list. A reader that knows the object coerces each value to the
@@ -1653,6 +1662,18 @@ combination that keeps the numbers visibly right (Principle 2). Real-time needs 
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
 
+**R-R4a Bypass by custom permission.** A definition whose Bypass Permission names a custom
+permission the running user holds is left out of every real-time path for that user's saves:
+the packaged triggers, the delete and merge paths, the Recalculate rollups Flow action and
+`RollupApi.recalculateChanges`. It is neither recalculated in the save nor written to the Rollup
+Queue, so a data migration user's load leaves those totals to the nightly run (Scheduled and
+Both) or to Recalculate. Asking for a record's totals by name (the Recalculate totals on this
+record action, `RollupApi.recalculate`) is not a save and is never bypassed. The permission is
+checked with `FeatureManagement.checkPermission`, once per user and name in a transaction. A
+save of the definition is refused when no custom permission of that name exists in the org,
+matched on Developer Name and, when the value is written `prefix__Name`, on the namespace
+prefix too, so no prefix is ever assumed (ADR-0136).
+
 A merge has its own path, whichever `Rollup_Processing__c` says (of people, Section 29A, or of households,
 R-H13).
 The platform refuses a trigger's write to a record while it is in a merge, so the
@@ -1672,12 +1693,25 @@ reasoning is in Section 26.
 `Rollup_Definition_Default__mdt` on install and on "Restore defaults", matched by
 Definition Key. An upgrade adds newly shipped definitions and never overwrites a
 definition the admin has edited (ADR-0006). An admin who does not want a packaged
-definition sets Active to false; packaged code never deletes an admin's records.
+definition sets Active to false; packaged code never deletes an admin's records. The
+Rollup Builder's Delete (ADR-0136) removes only a definition with Is Package Default false,
+and refuses a packaged one with that advice, since "Restore defaults" would create it again.
+Deleting a definition leaves the values it wrote on the target records; a Rollup Queue entry
+that names it skips it, as it skips an inactive one (Section 14A). Delete is refused while a
+full run is going (R-R14).
 
 **R-R7 No cross-package reference.** Source Entity, Target Entity, Source Attribute,
 Target Attribute, and Order By Attribute are text. Core therefore drives rollups over
 Giving objects without holding a reference to them, which the package dependency
-direction forbids (ADR-0014).
+direction forbids (ADR-0014). The same holds for standard objects: a definition that names
+Opportunity or Case names it as data, resolved through describe, so it is not a dependency on
+the object and a Platform-only org simply never offers it (ADR-0013, ADR-0136). The Rollup
+Builder offers every entity the administrator can read and query (and, as a target, update):
+Account, Contact, the org's own objects and standard objects, leaving out custom settings, the
+platform's sharing, history, feed and change event objects, retired objects and BarnCRM's own
+bookkeeping. A short list of common standard objects is shown first; a standard object off it
+must also be one people create and search for. A source is offered only through a reference
+attribute that can be filtered and grouped on, as the engine's query needs.
 
 **R-R8 Disjoint targets.** Two active definitions may write the same Target Attribute on
 the same Target Entity only when their Target Filters make their target record sets
@@ -1704,8 +1738,9 @@ Attribute. A definition that fails validation is not saved, and the message name
 problem in plain language. The checks sit in two places:
 
 - **Every save** (the "Check rollups before saving" automation) refuses a target attribute
-  whose type does not suit the aggregate (R-R15) and a COUNT_DISTINCT or text list with no
-  Source Attribute. It leaves an entity or attribute the org does not have to the planner, so
+  whose type does not suit the aggregate (R-R15), a COUNT_DISTINCT or text list with no
+  Source Attribute, a Row Limit below 1, on an aggregate that does not take one, or with no
+  Order By Attribute, and a Custom Delimiter left empty when Delimiter is Custom. It leaves an entity or attribute the org does not have to the planner, so
   a definition for a module that is not installed can still be saved.
 - **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
   target entity or attribute the org does not have, or that the administrator saving it
@@ -1715,7 +1750,10 @@ problem in plain language. The checks sit in two places:
   anything but a number, currency or percent, and MIN and MAX of anything but those or a
   date; FIRST and LAST with no Order By Attribute; a fiscal window whose offset is not 0, -1 or
   -2 or whose date attribute is not a date; a filter document that cannot be read or names an
-  attribute the entity does not have; and an overlap under R-R8.
+  attribute the entity does not have; a parent attribute in a filter that is more than one
+  lookup away, crosses a lookup to more than one object, or that the administrator cannot read
+  (R-R2); a picklist target filled from anything but a picklist or text Source Attribute, or
+  from a picklist with a value the target does not have (R-R15); and an overlap under R-R8.
 
 A definition written another way (an import, the API) that fails a Builder check is left out of
 the run by the planner, which records why in the Error Log.
@@ -1738,7 +1776,11 @@ calculations overlap. A source change marks a target record for recalculation wh
 touches an attribute a definition reads: the source, order-by and fiscal date attributes,
 the path attributes, any attribute named in the filter, and attributes read through a
 relationship (for example a gift's status, which the fund totals read from Gift Allocation
-as `Gift__r.Status__c`). A changed path marks both the old and the new target; a delete
+as `Gift__r.Status__c`). The same holds for any filter on a parent's attribute (a gift's
+appeal's type, `Appeal__r.Type__c`): a change on the parent marks the targets of the source
+records under it, when the parent entity has the rollup trigger registered (R-R12). Where it
+has none, no save reports the change, and the nightly run or Recalculate puts the totals
+right; the Rollup Builder says so when such a filter is chosen. A changed path marks both the old and the new target; a delete
 marks the old target, including when a parent record is deleted and its source records go
 with it, which fires no trigger on them (deleting a gift removes its allocations, so the
 gift's delete marks their funds); an undelete marks the target again. A person who changes
@@ -1750,16 +1792,30 @@ calculated together, one write per target record, and a value that did not chang
 written.
 
 **R-R12 Where real time comes from.** Each package ships the trigger registration for its
-own source entities (Automation Registry, Section 13). An administrator's own entity has no
-packaged trigger, so real time on it comes from one of two places: a trigger the Rollup
-Builder generates and deploys for the administrator (one line that hands the changed
-records to the engine, plus its test, named from the entity so the same code is produced in
-every org), or a record-triggered Flow built from the shipped template. Editing a rollup
-never regenerates the trigger, because the rollup's settings live only in the definition.
-When the last active definition on that entity is removed, the Builder offers to remove the
-generated trigger, and Health Check reports a generated trigger that no active definition
-uses. A generated trigger is switched off like any other automation, through an Automation
-Setting row (Section 10) the Builder creates with Is Package Default false.
+own source entities (Automation Registry, Section 13). Any other entity (a standard object,
+another package's object, the organization's own) has no packaged trigger, so real time on it
+comes from one of two places: a trigger the Rollup Builder generates and the administrator
+deploys (one line, `RollupInstantTrigger.run()`, that hands the changed records to the
+engine, plus its test; named `BarnRollup_` and the entity's API name so the same code is
+produced in every org), or a record-triggered Flow built from the shipped template. The
+Builder offers the trigger only for an entity it offers as a source (R-R7) that can carry an
+Apex trigger, and shows its
+state from the org: built in, on, turned off, inactive
+in Setup, not set up, or not available (ADR-0138,
+`0138-instant-totals-generated-trigger-deployed-by-the-admin.md`). Editing a rollup never
+regenerates the trigger, because the rollup's settings live only in the definition. A
+generated trigger is switched off like any other automation, through an Automation Setting
+row (Section 10) named after the trigger, which the Builder creates with Is Package Default
+false the first time it is turned off; removing the trigger is a deploy the administrator
+makes from the Builder's removal package. Health Check findings for generated triggers are
+deferred (ADR-0138).
+
+Until a source entity has a rollup trigger (a registration of `RollupTriggerHandler` for it,
+or its generated trigger active in Setup with its switch on), the Builder says plainly, when that source is chosen, that its totals are updated by
+the nightly run and Recalculate and not instantly, does not offer Instantly alone, and refuses
+a save or a mode change on the rollup list that would make such a rollup Instantly alone
+(ADR-0136). Both and Every night are allowed; a Flow built from the template still makes Both
+instant, which the engine cannot see.
 
 **R-R13 Freshness stamps are written when the work is done.** A calculation writes
 `Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section
@@ -1783,7 +1839,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 |---|---|---|
 | SUM, AVG, MIN, MAX | The total, the average, the smallest and the largest value of the Source Attribute. | number, currency, percent, date, datetime |
 | COUNT | How many records match. | number, currency, percent, date, datetime (as before; a number is what makes sense) |
-| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text |
+| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text, picklist (from a picklist or text Source Attribute) |
 | COUNT_DISTINCT | How many different values the Source Attribute holds among the matching records. | number |
 | ANY | True when at least one record matches, false when none does. | checkbox |
 | NONE | True when no record matches, false when at least one does. | checkbox |
@@ -1797,16 +1853,50 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   the filter `Amount__c greater than 1000`.
 - **Ties.** When two records have the same Order By Attribute, FIRST and LAST take the one
   with the lower record Id, so the answer is the same on every run (R-R9).
-- **Order of a text list.** By the Order By Attribute when there is one, ascending, records
-  with a blank one last; otherwise alphabetically by value, ignoring case. Ties go to the lower
-  record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared exactly
-  (letter case counts), and so does COUNT_DISTINCT.
+- **Order of a text list.** By the Order By Attribute when there is one, in the Order
+  Direction (ascending when blank), records with a blank one last in either direction;
+  otherwise alphabetically by value, ignoring case, A to Z or, descending, Z to A. Ties go to
+  the lower record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared
+  exactly (letter case counts), and so does COUNT_DISTINCT.
+- **Order Direction and FIRST and LAST.** FIRST is always the record with the lowest Order By
+  Attribute and LAST the one with the highest; the direction does not apply to them, so a
+  saved definition means what it always meant. "Largest first" is LAST, or a row limited
+  aggregate in Descending order.
+- **Row Limit (ADR-0136).** SUM, AVG, MIN, MAX, TEXT_LIST and TEXT_LIST_DISTINCT may take a
+  Row Limit N: only the first N matching records that have a value, in the order of the Order
+  By Attribute and the Order Direction, are calculated, for example the sum of the 5 largest
+  gifts (Amount, Descending) or the last 3 gift amounts as a text list (Gift Date,
+  Descending). TEXT_LIST_DISTINCT lists the first N different values. A Row Limit needs an
+  Order By Attribute and is at least 1. COUNT, COUNT_DISTINCT, ANY, NONE, FIRST and LAST take
+  none: a limit would only cap a count, or FIRST and LAST already take one record. A grouped
+  query cannot limit rows per target, so a row limited aggregate reads the matching rows, as
+  a text list does, and keeps the first N per target record.
 - **Delimiter.** Comma joins with a comma and a space, Semicolon with a semicolon and a space,
-  New line with a line break. A value that contains the delimiter is written as it is, not
-  escaped, so a list of names that contain commas reads best with Semicolon or New line.
+  New line with a line break, Pipe with a space, a vertical bar and a space (` | `), and Custom
+  with the Custom Delimiter exactly as stored (up to 10 characters; a Custom Delimiter found
+  empty at run time joins with Comma). A value that contains the delimiter is written as it
+  is, not escaped, so a list of names that contain commas reads best with Semicolon, New line
+  or Pipe.
+- **Include Deleted (ADR-0136).** When true, every source query of the definition reads with
+  ALL ROWS, so records in the Recycle Bin and archived tasks and events count as if they were
+  not deleted or archived. It stays exact under recompute (R-R9): every calculation reads the
+  same rows. Two limits: a deleted record counts only until it is purged from the Recycle Bin
+  (emptied, or removed after the platform's retention period), and a purge fires no trigger,
+  so the total keeps it until the next full recalculation; and a delete marks the target as
+  usual (R-R11), but the recalculation still finds the deleted record, so the total does not
+  drop. A target whose source rows are read in chunks by the large parent route (R-RQ6) cannot
+  read deleted rows that way: the definition is left out of that record's write and the Error
+  Log says why, so the total is never written without them.
 - **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
   list is written as its plain value (`1250.00`, `2026-03-01`, `true`; a datetime in UTC as
   `2026-03-01 14:05`), not converted between currencies.
+- **Picklist targets.** FIRST and LAST may fill a picklist from a picklist or text Source
+  Attribute (ADR-0136). The value written is one of the target's active values, matched
+  without regard to letter case and written as the target spells it. The save refuses a
+  source picklist with an active value the target does not have (R-R10). A text value, or a
+  value added to the source picklist later, that the target does not have is left out of the
+  write: the record keeps what it holds and the Error Log records the value, the record and
+  the attribute, so one value never fails the save of the record's other totals.
 - **Cut at the field length.** A text result longer than the target attribute holds is cut at
   the attribute's length, so the save never fails on it and the same value is written on every
   run.
@@ -1829,9 +1919,13 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Target Entity | `Target_Object__c` | Text |
 | Relationship Path | `Relationship_Path__c` | Text |
 | Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT (labels Sum, Count, Minimum, Maximum, First, Last, Average, Count distinct, Any, None, Text list, Text list, each value once) |
-| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line (default Comma) |
+| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line, Pipe, Custom (default Comma) |
+| Custom Delimiter | `Custom_Delimiter__c` | Text (10) |
+| Include Deleted | `Include_Deleted__c` | Checkbox (default false) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |
+| Order Direction | `Order_Direction__c` | Picklist: Ascending, Descending (default Ascending) |
+| Row Limit | `Row_Limit__c` | Number (4, 0 decimals) |
 | Target Attribute | `Target_Field__c` | Text |
 | Filter | `Filter_JSON__c` | Long Text Area |
 | Target Filter | `Target_Filter_JSON__c` | Long Text Area |
@@ -1842,12 +1936,15 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Last Calculated | `Last_Calculated__c` | DateTime |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
 | Active | `Active__c` | Checkbox |
+| Bypass Permission | `Bypass_Permission__c` | Text(255) |
 
 - **Shipped defaults:** `Rollup_Definition_Default__mdt` (Section 13).
 - **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
   ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
   10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
-  target or the source attribute, so switching a definition on or off never re-checks it. It
+  target, the source attribute, the Order By Attribute, the Row Limit or the delimiters, so
+  switching a definition on or off never re-checks it. It also refuses a Bypass Permission that names no custom permission in the org (R-R4a), on an
+  insert and when the value changes, with one query for every name in the save. It
   pauses while the module is turned off (ADR-0125 `0125-rollup-builder-module.md`, decision
   9); a definition saved then that cannot be planned is refused by `RollupPlanner` and logged
   on every run, so no total is written wrong.
@@ -1859,7 +1956,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   completed with the Rollup Builder, which set Filter and Target Filter). Long text attributes
   record that they changed, not the values.
 - **Rollup Builder:** the `Rollup_Builder` tab and app page, `rollupBuilder` (which nests the
-  Rollups list, `rollupDefinitions`, with New, Edit and Copy), `rollupWizard` (the five steps)
+  Rollups list, `rollupDefinitions`, with New, Edit, Copy and Delete, the last through
+  `RollupController.deleteRollup` in user mode, R-R6), `rollupWizard` (the five steps)
   and `rollupFilterBuilder` (R-R2 documents, built once and shared with Find, plan Section
   4.9). `RollupBuilderController` describes the org for the steps, in the running user's
   describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
@@ -1868,7 +1966,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   unsaved definition for one record through `RollupEngine.preview`, which writes nothing, and
   counts the target records it would maintain in user mode. `RollupController.estimateFullRun`
   counts the records Recalculate all goes through at a fixed rough rate (1,650 records a
-  minute, to be measured on an org), and `runTonight` sets up one 2:00 AM run through
+  minute, to be measured on an org), and `runTonight` sets up one run at the nightly hour (Section 14B) through
   `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled. Needs
   attention (S13), `rollupNeedsAttention` under the list, reads the Rollup Queue in user mode
   through `RollupAttentionController` (records waiting and the oldest's age, one row per record
@@ -1876,6 +1974,24 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   how the last full run ended); its Retry, for the selected records' entries or all, goes
   through `RollupQueue.retry`, which sets them Pending with Attempts 0 and no Next Attempt in
   system mode (R-RQ4, R-RQ5).
+- **Moving rollups between orgs (ADR-0136; lifts ADR-0082's deferral):**
+  `RollupDefinitionTransfer`, from the Builder's list. Export writes a JSON file
+  `{"format": "BarnCRM rollups", "version": 1, "rollups": [...]}` of the ticked rollups, or
+  every one with Is Package Default false; each entry is the definition as the Builder edits it
+  (its `Draft`) with its Definition Key and without its record Id, Last Calculated or Is
+  Package Default. Shipped definitions are never exported or imported: each org has them from
+  the package (R-R6). **Keying rule:** an import matches an entry to an existing definition by
+  Definition Key, ignoring case; a match is updated in place, no match is created with the
+  file's key, so importing the same file twice changes nothing more. Import first says what it
+  would do to each entry, then saves each entry on its own through the Builder's save checks
+  (`RollupBuilderController.checkedRecord`: R-R10, R-R8), in user mode, so each is checked
+  against those saved before it. An entry keeps the file's Active value only by passing every
+  check; one that fails is not saved, and the reason is reported. Also refused per entry: a key
+  that is blank or appears twice, a shipped key, and an attribute this version's Builder does
+  not know (a file from a newer version is never saved as a different rollup). A file with
+  another format name or a higher version is refused whole. An import recalculates nothing;
+  the next run does. It stops before the transaction's query or DML limit and reports the
+  remaining entries as not imported yet, which a second import of the same file finishes.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
   the vendored apex-rollup tree, `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` were
@@ -1894,6 +2010,21 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   It does nothing while all automation is paused. `Recalculate_Rollups_Template` is a
   record-triggered Flow template (on Contact, never active) an administrator saves as her own
   copy and points at her entity.
+- **Recalculating named records (R-R12 note, ADR-0136):** `RollupRecalcRecordAction`, the
+  invocable action "Recalculate totals on this record", takes a target record Id and, optionally,
+  one rollup's Definition Key or name, and recalculates that record's totals: every active
+  definition targeting its entity, whatever the mode, or the one named. A request naming no
+  active definition on the record's entity recalculates nothing and is written to the Error
+  Log. `RollupService.recalculateTargets` does the work: in the same transaction when it has
+  room (R-R4's limits, whatever `Rollup_Processing__c` says, since the caller asked for the
+  totals now), queued otherwise, and nothing while the module is turned off.
+- **Global Apex (R-R12 note, ADR-0136):** `RollupApi`, for developers who called
+  `dlrs.RollupService`: `recalculate(Set<Id>)` is the action above for every active definition,
+  and `recalculateChanges(List<SObject>, Map<Id, SObject>, Boolean)` is the Recalculate rollups
+  Flow action (`RollupService.runForFlow`) for changed source records of any entities, with
+  their prior values and whether they are being deleted. Global is permanent once a managed
+  version is released, so the module makes nothing global without an ADR recording it
+  (ADR-0136 lists these two classes and the Flow actions).
 
 ## 14A. Rollup Queue
 
@@ -2086,14 +2217,23 @@ sets it again. Their Setting Definition rows name this object in `Settings_Objec
 settings console shows them in its Rollups section as before.
 
 - **Custom setting:** `Rollup_Settings__c`, hierarchy, protected.
-- **Defaults (ADR-0035):** both keys are text, so the field default only fills a record the
-  platform creates; the readers in `RollupService` treat blank, and anything outside the
+- **Defaults (ADR-0035):** the field default only fills a record the platform creates; the
+  readers in `RollupService` and `RollupScheduler` treat blank, and anything outside the
   allowed values, as the shipped value.
+- **Nightly run hour (ADR-0136):** the settings console shows `Nightly_Run_Hour__c` as a
+  picklist of the 24 hours (values 0 to 23, labels 12:00 AM (midnight) to 11:00 PM) from its Setting Definition
+  row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
+  Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
+  nightly run at once: Core's settings service hands every changed key to the engine through
+  the third engine seam (`RollupEngineExtensionV3.afterSettingsSaved`, ADR-0125 decision 4),
+  and `RollupScheduler.reschedule` replaces the job when one is scheduled and starts nothing
+  when none is.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
+| `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
 
 ---
 
@@ -8783,6 +8923,8 @@ mirrors the primary member).
 | v0.8 | 2026-10-25 | Related-record matching in the duplicate scan. Object `Duplicate_Reason__c` added (Section 29A) with `Set_Id__c` and `Reason__c`. R-DP6 added; R-DP1 names it as the one place Core compares values. |
 | v0.8 | 2026-10-25 | Related-record matching in imports. No object or field added. R-IT16: a person the duplicate rules match nobody for is looked up through the active match sources, ticked Matched By Duplicate Rule. |
 | v0.8 | 2026-10-26 | Organization address in six parts. `Organization_Address__c` (one line) removed from `BarnCRM_Settings__c` and replaced by `Organization_Street__c`, `Organization_Street_2__c`, `Organization_City__c`, `Organization_State__c`, `Organization_Postal_Code__c` and `Organization_Country__c` (Section 12), with rule R-OA1 (all or nothing: Street, City, State and Postal Code required once any part is filled). No data is migrated: no package version exists, so no subscriber org holds a value in the old field. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: row limit and order direction (ADR-0136). `Rollup_Definition__c` gains `Row_Limit__c` (only the first N records, for SUM, AVG, MIN, MAX and the text lists; needs an Order By Attribute) and `Order_Direction__c` (Ascending, Descending, for text lists and row limited aggregates), both with field history. R-R15 says how they combine with FIRST and LAST (not at all: FIRST stays lowest, LAST highest) and that blanks come last in either direction; R-R10 adds the row limit to the every-save check. A blank direction or limit calculates as before. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: delimiters and deleted records (ADR-0136). `Rollup_Definition__c.Delimiter__c` gains Pipe and Custom; new `Custom_Delimiter__c` (text, 10), required when Custom (R-R10), and `Include_Deleted__c` (checkbox, default false, field history on), which reads source records with ALL ROWS so Recycle Bin records and archived activities count. R-R15 says a deleted record counts until it is purged, that a delete does not remove it, and that the large parent route leaves such a definition out rather than write it without them. `Rollup_Definition_Default__mdt` is unchanged: no shipped rollup uses them. |
 | v0.8 | 2026-10-26 | Address propagation gaps. No object or field added. R-AD3: a household's default is not copied to a member stored as a Contact who has a default address of their own, nor, in junction mode, to a member for whom it is not their household, on save and on the seasonal swap; a household's or organization's billing address changed after it was created is captured as a new default address, as on insert. |
 | v0.8 | 2026-10-26 | Seasonal Addresses switch (owner QA S1). `BarnCRM_Settings__c` gains `Seasonal_Addresses_Enabled__c` (Checkbox, default false, Section 12). Saving it on schedules the nightly seasonal swap and saving it off stops it, so the Schedule and Stop buttons leave the seasonal swap panel (Run now and the last run stay). Health Check lists the swap among the unscheduled nightly jobs only while the switch is on. |
 | v0.8 | 2026-10-26 | One fiscal year, the org's (ADR-0135, owner decision). The BarnCRM fiscal year start month setting key removed from Section 12; R-R3 windows read the month the fiscal year starts in Setup. `Data_Type__c` on `Setting_Definition__mdt` gains SetupValue, a read-only console row showing a value Setup holds (Organization Name, fiscal year start). No object or field added. |
@@ -8793,6 +8935,13 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Duplicate Matching tool (ADR-0139). No object or field added. The review list moves from Org Optimizer to the new Duplicate Matching tab, shown by `BarnCRM_Tab_Duplicate_Matching`; BarnCRM Settings gains a Duplicate Matching section. Match Source (Section 13) is managed on the tab's Matching Logic area and no longer listed on the Custom metadata page (R-D2). |
 | v0.8 | 2026-10-26 | Addresses say primary, not default (owner decision PR1, 2026-10-26). No object or field added. The `Is_Default__c` field is labelled Primary and every user-facing text about addresses says primary; the API name is unchanged. Section 29 prose follows. |
 | v0.8 | 2026-10-26 | Address Updates (owner decision AD1, ADR-0140). No object or field added. `Contact_Address_Change_Behavior__c` is labelled Address Updates and gains a third value, Manual ("Nobody moves until you choose"); a blank reads and shows as Update household. R-AD3: in Manual a household's new primary reaches its members only on a chosen move or the seasonal swap. R-AD5 rewritten for the three choices. New R-AD9: Use for Whole Household and Update Everyone's Address on the address card. |
+| v0.8 | 2026-10-26 | Rollup Builder offers standard objects (`decisions/0136-rollup-builder-dlrs-parity.md`). No object or field added. R-R7 says a standard object named in a definition is data offered through describe, not a dependency (ADR-0013), and which objects the Builder offers. R-R12 says what the Builder does for a source entity with no rollup trigger: it says so, does not offer Instantly alone, and a save or mode change to Instantly alone is refused. |
+| v0.8 | 2026-10-26 | Rollup Builder parity: parent-field criteria and picklist targets (ADR-0136, gap report rows P5 and P7). No object or field added. R-R2: the Rollup Builder's source filter offers the fields of a record each lookup of the counted records points to, one lookup deep. R-R10: the Builder's save refuses a filter path of more than one lookup, through a lookup to more than one object, or to a field the administrator cannot read, and a picklist target filled from anything but a picklist or text, or from a picklist with a value the target lacks. R-R11: a parent's change marks the totals when the parent has the rollup trigger, otherwise the nightly run or Recalculate catches it. R-R15: FIRST and LAST fill picklist targets; a value the target does not have is left out and logged. |
+| v0.8 | 2026-10-26 | Rollup Builder parity operations (ADR-0136). Rollup Definition gains `Bypass_Permission__c` (Section 14) with rule R-R4a: holders of the named custom permission skip the rollup on their saves, and a name with no custom permission in the org is refused on save. Section 14 records two new `global` surfaces: the Flow action `RollupRecalcRecordAction` ("Recalculate totals on this record") and the Apex class `RollupApi`. |
+| v0.8 | 2026-10-26 | Nightly rollup run hour (ADR-0136, DLRS parity P10). `Rollup_Settings__c` gains `Nightly_Run_Hour__c` (Number, default 2, Section 14B), shown as a picklist of hours. The nightly job and Run tonight start at it, and saving a new hour moves the scheduled nightly run through a third rollup engine seam, `RollupEngineExtensionV3`, that Core's settings service calls after every settings save. |
+| v0.8 | 2026-10-26 | Rollup Builder Delete (ADR-0136, DLRS parity D26). No object or field added. R-R6 gains Delete: only a definition with Is Package Default false, in user mode, not during a full run; the values it wrote stay and queue entries naming it skip it. |
+| v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
+| v0.8 | 2026-10-26 | Rollup Builder parity and generated triggers together (ADR-0136, ADR-0138, landing batch 11). No object or field added. R-R12: a source entity whose generated trigger is active in Setup with its switch on has instant updates, so the Builder offers Instantly for it and the save no longer refuses it; the generator offers code only for an entity the Builder offers as a source (R-R7). |
 
 ---
 ## 32. Entity ownership by package

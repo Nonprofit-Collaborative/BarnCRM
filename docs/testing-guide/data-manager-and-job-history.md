@@ -164,3 +164,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
 
 **Cleanup:** Tick **Tell people when their long jobs finish** again and save.
+
+## T-DM-11: Snapshot History compares, shows and deletes saved counts
+
+**Purpose:** Confirm the Snapshot History list, the compare choice, the saved rows and the delete.
+**Prerequisites:** admin; T-DM-09 done (one saved count for **Account**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, choose **Field utilization**, and choose **Account**. | After the count, **Snapshot History** appears below the table with one row: **Taken**, **Saved by** (you), **Fields** and **Average fill rate**, and the buttons **Compare with this one** (greyed out, it is the one in use), **View** and **Delete**. |
+| 2 | Open any sample organization and fill in **Website**. Return, click **Count again**, then save the count again. | The list now has two rows, newest first. |
+| 3 | Fill in another field on an organization, such as **Phone**, then click **Count again**. On the older row choose **Compare with this one**. | The line above the table names the older save's date, and **Saved** and **Change (points)** now use the older save. The older row's button is greyed out. |
+| 4 | Click **Count again**. | The comparison is back on the latest save. |
+| 5 | On the newer row choose **View**. | Under the list, a table with **Kind of record**, **Record type**, **Field** and **Fill rate** shows that save's rows. |
+| 6 | Click **Close**. | The table goes away. |
+| 7 | On the newer row choose **Delete**, then **Cancel**. | Nothing is deleted. |
+| 8 | Choose **Delete** again and confirm with **Delete snapshot**. | **Snapshot deleted.** The list has one row, and **Saved** now compares with the older save. |
+| 9 | Choose a kind of record with no saved counts, such as **Contact** if you have not saved it. | **No snapshots have been saved for this kind of record yet.** |
+
+**Cleanup:** Delete the remaining snapshot with **Delete** if you want a tidy org.

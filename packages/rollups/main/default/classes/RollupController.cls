@@ -62,6 +62,9 @@ public with sharing class RollupController {
         public Boolean scheduled { get; set; }
         @AuraEnabled
         public Datetime nextRunAt { get; set; }
+        /** The nightly run's time as the reader writes it, for example 2:00 AM. */
+        @AuraEnabled
+        public String nightlyTime { get; set; }
         @AuraEnabled
         public Datetime lastCalculated { get; set; }
         @AuraEnabled
@@ -141,10 +144,40 @@ public with sharing class RollupController {
                     Label.Core_RollupBuilder_ErrorInstantMovesWithDate
                 );
             }
+            definition.Mode__c = mode;
+            String instantProblem = RollupBuilderController.instantProblem(definition);
+            if (instantProblem != null) {
+                throw new RollupService.RollupServiceException(instantProblem);
+            }
             RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Mode__c = mode));
             return currentPage();
         } catch (Exception caught) {
             throw asUserError(caught, 'Change a rollup mode');
+        }
+    }
+
+    /**
+     * Deletes one rollup an administrator made (ADR-0136). The values it already wrote stay on the
+     * records; nothing updates them again. A shipped rollup is refused, since Restore defaults
+     * would only bring it back: it is turned off instead (R-R6). A queue entry that names the
+     * rollup skips it, as it skips one switched off (`RollupSelector.selectActiveByIds`). Refused
+     * while a full run is going, which would otherwise fail to stamp the run's other rollups.
+     */
+    @AuraEnabled
+    public static RollupPageView deleteRollup(Id definitionId) {
+        try {
+            requirePermission();
+            Rollup_Definition__c definition = require(definitionId);
+            if (definition.Is_Package_Default__c == true) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_RollupBuilder_DeleteShipped
+                );
+            }
+            refuseWhileAFullRunIsGoing();
+            Database.delete(new Rollup_Definition__c(Id = definition.Id), AccessLevel.USER_MODE);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Delete a rollup');
         }
     }
 
@@ -258,9 +291,9 @@ public with sharing class RollupController {
 
     /**
      * Recalculate all, tonight: nothing extra when the nightly run is scheduled, since it
-     * recalculates every Every night and Both total at 2:00 AM and each save keeps the Instantly
-     * ones (a second run at the same moment would only be refused as one already running);
-     * otherwise one run of every definition at 2:00 AM tonight.
+     * recalculates every Every night and Both total at the nightly hour and each save keeps the
+     * Instantly ones (a second run at the same moment would only be refused as one already
+     * running); otherwise one run of every definition at the next nightly hour.
      *
      * @return what to tell the administrator
      */
@@ -269,11 +302,12 @@ public with sharing class RollupController {
         try {
             requirePermission();
             refuseWhileTurnedOff();
+            List<String> nightly = new List<String>{ RollupScheduler.nightlyTime() };
             if (RollupScheduler.isScheduled()) {
-                return Label.Core_RollupBuilder_TonightAlreadyScheduled;
+                return String.format(Label.Core_RollupBuilder_TonightAlreadyScheduled, nightly);
             }
             RollupScheduler.scheduleTonight();
-            return Label.Core_RollupBuilder_TonightScheduled;
+            return String.format(Label.Core_RollupBuilder_TonightScheduled, nightly);
         } catch (Exception caught) {
             throw asUserError(caught, 'Recalculate all rollups tonight');
         }
@@ -284,6 +318,7 @@ public with sharing class RollupController {
         page.canManage = canManage();
         page.scheduled = RollupScheduler.isScheduled();
         page.nextRunAt = RollupScheduler.nextRunAt();
+        page.nightlyTime = RollupScheduler.nightlyTime();
         page.lastCalculated = RollupService.lastCalculated();
         page.stale = RollupService.isStale();
         page.defaultMode = RollupService.defaultMode();

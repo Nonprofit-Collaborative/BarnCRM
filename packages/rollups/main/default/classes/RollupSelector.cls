@@ -28,7 +28,11 @@ public with sharing class RollupSelector {
                 Aggregate__c,
                 Source_Field__c,
                 Order_By_Field__c,
+                Order_Direction__c,
+                Row_Limit__c,
                 Delimiter__c,
+                Custom_Delimiter__c,
+                Include_Deleted__c,
                 Target_Field__c,
                 Filter_JSON__c,
                 Target_Filter_JSON__c,
@@ -38,7 +42,8 @@ public with sharing class RollupSelector {
                 Mode__c,
                 Last_Calculated__c,
                 Is_Package_Default__c,
-                Active__c
+                Active__c,
+                Bypass_Permission__c
             FROM Rollup_Definition__c
             WITH USER_MODE
             ORDER BY Target_Object__c, Name
@@ -84,7 +89,11 @@ public with sharing class RollupSelector {
                 Aggregate__c,
                 Source_Field__c,
                 Order_By_Field__c,
+                Order_Direction__c,
+                Row_Limit__c,
                 Delimiter__c,
+                Custom_Delimiter__c,
+                Include_Deleted__c,
                 Target_Field__c,
                 Filter_JSON__c,
                 Target_Filter_JSON__c,
@@ -94,7 +103,8 @@ public with sharing class RollupSelector {
                 Mode__c,
                 Last_Calculated__c,
                 Is_Package_Default__c,
-                Active__c
+                Active__c,
+                Bypass_Permission__c
             FROM Rollup_Definition__c
             WITH SYSTEM_MODE
             ORDER BY Target_Object__c, Name
@@ -172,7 +182,11 @@ public with sharing class RollupSelector {
                 Aggregate__c,
                 Source_Field__c,
                 Order_By_Field__c,
+                Order_Direction__c,
+                Row_Limit__c,
                 Delimiter__c,
+                Custom_Delimiter__c,
+                Include_Deleted__c,
                 Target_Field__c,
                 Filter_JSON__c,
                 Target_Filter_JSON__c,
@@ -182,7 +196,8 @@ public with sharing class RollupSelector {
                 Mode__c,
                 Last_Calculated__c,
                 Is_Package_Default__c,
-                Active__c
+                Active__c,
+                Bypass_Permission__c
             FROM Rollup_Definition__c
             WHERE Id = :definitionId
             WITH SYSTEM_MODE
@@ -203,6 +218,35 @@ public with sharing class RollupSelector {
             }
         }
         return latest;
+    }
+
+    /**
+     * The custom permissions in the org among these names, each as `name` and, for one in a
+     * namespace, `prefix__name` too, lower case, so a Bypass Permission can be checked whichever
+     * way it is written (R-R4a). Read as the package: whether a name exists is all it tells,
+     * and the person saving a rollup need not be able to see setup.
+     *
+     * @param developerNames the Developer Names to look for, without any prefix
+     */
+    public static Set<String> customPermissionNames(Set<String> developerNames) {
+        Set<String> found = new Set<String>();
+        if (developerNames == null || developerNames.isEmpty()) {
+            return found;
+        }
+        for (CustomPermission permission : [
+            SELECT DeveloperName, NamespacePrefix
+            FROM CustomPermission
+            WHERE DeveloperName IN :developerNames
+            WITH SYSTEM_MODE
+            LIMIT 2000
+        ]) {
+            String name = permission.DeveloperName.toLowerCase();
+            found.add(name);
+            if (String.isNotBlank(permission.NamespacePrefix)) {
+                found.add(permission.NamespacePrefix.toLowerCase() + '__' + name);
+            }
+        }
+        return found;
     }
 
     /** Every shipped default, whichever package ships it. */

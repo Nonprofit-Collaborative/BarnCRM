@@ -12,6 +12,16 @@ private class FieldUtilizationControllerTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
+        // Holds the Manage BarnCRM Settings permission and reads the counted object (Staff), but
+        // has no delete access on the snapshots. Without read access on the object she would be
+        // refused for that instead: a Standard User profile need not grant it.
+        System.runAs(TestUsers.admin()) {
+            User dana = TestDataFactory.createUser(
+                'DanaNoDelete',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
+            SettingsTestPermissions.grantTo('Snapshot_No_Delete_Test', dana.Id);
+        }
     }
 
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
@@ -410,6 +420,202 @@ private class FieldUtilizationControllerTest {
             );
             Assert.isFalse(counted.contains('Name'), 'Auto number.');
             Assert.isFalse(counted.contains('Id'), 'Identifier.');
+        }
+    }
+
+    private static final Datetime FIRST_OF_MONTH = Datetime.newInstanceGmt(2026, 10, 1, 9, 0, 10);
+
+    /** One saved row for the dismissal object, taken at the given time. */
+    private static Field_Utilization_Snapshot__c savedRow(
+        Datetime takenAt,
+        String fieldName,
+        Integer filled,
+        Integer total
+    ) {
+        return new Field_Utilization_Snapshot__c(
+            Object_Name__c = DISMISSAL,
+            Field_Name__c = fieldName,
+            Field_Label__c = fieldName,
+            Filled_Count__c = filled,
+            Record_Count__c = total,
+            Taken_At__c = takenAt
+        );
+    }
+
+    @IsTest
+    static void historyListsEachSaveNewestFirstEvenWhenTwoShareAnHour() {
+        System.runAs(TestUsers.admin()) {
+            User person = maria();
+            FieldUtilizationController.History listed;
+            System.runAs(person) {
+                insert new List<Field_Utilization_Snapshot__c>{
+                    savedRow(FIRST_OF_MONTH, REASON, 60, 100),
+                    savedRow(FIRST_OF_MONTH, 'Other_Field', 40, 100),
+                    savedRow(FIRST_OF_MONTH.addSeconds(30), REASON, 80, 100),
+                    savedRow(FIRST_OF_MONTH.addDays(-1), REASON, 10, 100)
+                };
+                Test.startTest();
+                listed = FieldUtilizationController.getHistory(DISMISSAL);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(3, listed.snapshots.size(), 'Two saves in one hour stay two.');
+            Assert.isTrue(listed.canDelete, 'BarnCRM Admin may delete saved counts.');
+            Assert.areEqual(50, listed.maxSnapshots, 'The list is capped at 50.');
+            Assert.areEqual(FIRST_OF_MONTH.addSeconds(30), listed.snapshots[0].takenAt, 'Newest.');
+            Assert.areEqual(1, listed.snapshots[0].fieldCount, 'One field in the newest.');
+            Assert.areEqual(80.0, listed.snapshots[0].averagePercent, '80 of 100.');
+            Assert.areEqual(FIRST_OF_MONTH, listed.snapshots[1].takenAt, 'The one before it.');
+            Assert.areEqual(2, listed.snapshots[1].fieldCount, 'Two different fields.');
+            Assert.areEqual(2, listed.snapshots[1].rowCount, 'Two saved rows.');
+            Assert.areEqual(50.0, listed.snapshots[1].averagePercent, '100 of 200.');
+            Assert.areEqual(FIRST_OF_MONTH.addDays(-1), listed.snapshots[2].takenAt, 'Oldest.');
+            Assert.areEqual(10.0, listed.snapshots[2].averagePercent, '10 of 100.');
+            Assert.areEqual(
+                [SELECT Name FROM User WHERE Id = :person.Id].Name,
+                listed.snapshots[0].savedBy,
+                'The name of the person who saved.'
+            );
+        }
+    }
+
+    @IsTest
+    static void historyListsAtMostTheNewest50() {
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.History listed;
+            System.runAs(maria()) {
+                List<Field_Utilization_Snapshot__c> rows = new List<Field_Utilization_Snapshot__c>();
+                for (Integer hour = 0; hour < 52; hour++) {
+                    rows.add(savedRow(FIRST_OF_MONTH.addHours(hour), REASON, 1, 2));
+                }
+                insert rows;
+                listed = FieldUtilizationController.getHistory(DISMISSAL);
+            }
+
+            Assert.areEqual(50, listed.snapshots.size(), 'No more than the limit.');
+            Assert.areEqual(FIRST_OF_MONTH.addHours(51), listed.snapshots[0].takenAt, 'Newest.');
+            Assert.areEqual(FIRST_OF_MONTH.addHours(2), listed.snapshots[49].takenAt, 'Cut off.');
+        }
+    }
+
+    @IsTest
+    static void historyIsEmptyWhenNothingWasSaved() {
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.History listed;
+            System.runAs(maria()) {
+                listed = FieldUtilizationController.getHistory(DISMISSAL);
+            }
+
+            Assert.isTrue(listed.snapshots.isEmpty(), 'Nothing saved, nothing listed.');
+        }
+    }
+
+    @IsTest
+    static void aChosenSnapshotsRowsComeBackAsCountRows() {
+        System.runAs(TestUsers.admin()) {
+            List<FieldUtilizationController.CountRow> rows;
+            List<FieldUtilizationController.CountRow> none;
+            System.runAs(maria()) {
+                insert new List<Field_Utilization_Snapshot__c>{
+                    savedRow(FIRST_OF_MONTH, REASON, 60, 100),
+                    savedRow(FIRST_OF_MONTH.addDays(1), REASON, 90, 100)
+                };
+                rows = FieldUtilizationController.getSnapshotRows(DISMISSAL, FIRST_OF_MONTH);
+                none = FieldUtilizationController.getSnapshotRows(DISMISSAL, null);
+            }
+
+            Assert.areEqual(1, rows.size(), 'Only the chosen save.');
+            Assert.areEqual(60.0, rows[0].percent, 'Its own percentage.');
+            Assert.areEqual(REASON + '|', rows[0].key, 'Keyed like a count row.');
+            Assert.isTrue(none.isEmpty(), 'No time, no rows.');
+        }
+    }
+
+    @IsTest
+    static void deletingASnapshotRemovesOnlyThatSave() {
+        System.runAs(TestUsers.admin()) {
+            Integer deleted;
+            System.runAs(maria()) {
+                insert new List<Field_Utilization_Snapshot__c>{
+                    savedRow(FIRST_OF_MONTH, REASON, 60, 100),
+                    savedRow(FIRST_OF_MONTH, 'Other_Field', 40, 100),
+                    savedRow(FIRST_OF_MONTH.addDays(1), REASON, 90, 100)
+                };
+                Test.startTest();
+                deleted = FieldUtilizationController.deleteSnapshot(DISMISSAL, FIRST_OF_MONTH);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(2, deleted, 'Both rows of the save.');
+            List<Field_Utilization_Snapshot__c> left = [
+                SELECT Taken_At__c
+                FROM Field_Utilization_Snapshot__c
+            ];
+            Assert.areEqual(1, left.size(), 'The other save is untouched.');
+            Assert.areEqual(FIRST_OF_MONTH.addDays(1), left[0].Taken_At__c, 'The later save.');
+        }
+    }
+
+    @IsTest
+    static void someoneWithoutDeleteAccessCannotDeleteASnapshot() {
+        System.runAs(TestUsers.admin()) {
+            User dana = [SELECT Id FROM User WHERE LastName = 'DanaNoDelete' LIMIT 1];
+            System.runAs(maria()) {
+                insert savedRow(FIRST_OF_MONTH, REASON, 60, 100);
+            }
+            String refusal;
+            System.runAs(dana) {
+                try {
+                    FieldUtilizationController.deleteSnapshot(DISMISSAL, FIRST_OF_MONTH);
+                } catch (AuraHandledException caught) {
+                    refusal = caught.getMessage();
+                }
+            }
+
+            Assert.areEqual(
+                System.Label.Core_FieldUtilization_DeleteNoAccess,
+                refusal,
+                'Refused without delete access.'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Field_Utilization_Snapshot__c],
+                'Nothing was deleted.'
+            );
+        }
+    }
+
+    @IsTest
+    static void historyCallsNeedThePermission() {
+        System.runAs(TestUsers.admin()) {
+            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+            List<String> refusals = new List<String>();
+            System.runAs(david) {
+                try {
+                    FieldUtilizationController.getHistory(DISMISSAL);
+                } catch (AuraHandledException caught) {
+                    refusals.add(caught.getMessage());
+                }
+                try {
+                    FieldUtilizationController.getSnapshotRows(DISMISSAL, FIRST_OF_MONTH);
+                } catch (AuraHandledException caught) {
+                    refusals.add(caught.getMessage());
+                }
+                try {
+                    FieldUtilizationController.deleteSnapshot(DISMISSAL, FIRST_OF_MONTH);
+                } catch (AuraHandledException caught) {
+                    refusals.add(caught.getMessage());
+                }
+            }
+
+            Assert.areEqual(3, refusals.size(), 'Each call is refused.');
+            for (String refusal : refusals) {
+                Assert.areEqual(
+                    System.Label.Core_FieldUtilization_PermissionRequired,
+                    refusal,
+                    'The permission is required.'
+                );
+            }
         }
     }
 }

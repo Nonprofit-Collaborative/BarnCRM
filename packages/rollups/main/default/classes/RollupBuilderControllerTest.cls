@@ -155,6 +155,120 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /**
+     * ADR-0136: standard objects are offered through describe, the shortlist first, and the
+     * platform's companion objects never. Task stands in for every standard object: the
+     * Platform-only gate forbids naming the sales and service objects here.
+     */
+    @IsTest
+    static void standardObjectsAreOfferedTheShortlistFirst() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.BuilderModel model = RollupBuilderController.getModel();
+
+            Map<String, RollupBuilderController.Option> byName = new Map<String, RollupBuilderController.Option>();
+            Boolean pastTheCommon = false;
+            Boolean commonFirst = true;
+            for (RollupBuilderController.Option option : model.targets) {
+                byName.put(option.value.toLowerCase(), option);
+                if (option.common != true) {
+                    pastTheCommon = true;
+                } else if (pastTheCommon) {
+                    commonFirst = false;
+                }
+            }
+
+            System.Assert.isTrue(byName.containsKey('task'), 'A standard object is offered');
+            System.Assert.isTrue(byName.get('task').common, 'On the shortlist, so listed first');
+            System.Assert.isTrue(byName.get('account').common, 'Account is listed first');
+            System.Assert.isTrue(commonFirst, 'Every common object comes before the others');
+            for (String companion : new List<String>{ 'accountshare', 'accounthistory' }) {
+                System.Assert.isFalse(byName.containsKey(companion), 'Never ' + companion);
+            }
+        }
+    }
+
+    /** ADR-0136: a standard object's records can be counted, and say whether they are instant. */
+    @IsTest
+    static void sourcesIncludeStandardObjectsAndSayWhichAreInstant() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Map<String, RollupBuilderController.SourceOption> byValue = new Map<String, RollupBuilderController.SourceOption>();
+            Boolean task = false;
+            for (
+                RollupBuilderController.SourceOption option : RollupBuilderController.getSources(
+                    'Account'
+                )
+            ) {
+                byValue.put(option.value.toLowerCase(), option);
+                if (option.sourceObject == 'Task') {
+                    task = true;
+                    System.Assert.isFalse(option.instant, 'No rollup trigger on Task yet');
+                }
+            }
+
+            System.Assert.isTrue(task, 'Tasks can be counted on an Account');
+            System.Assert.isTrue(
+                byValue.get('contact|accountid').instant,
+                'Contact has a packaged rollup trigger'
+            );
+        }
+    }
+
+    /** R-R12: only a packaged registration of the rollup handler makes an entity instant. */
+    @IsTest
+    static void anEntityIsInstantOnlyWithARegisteredRollupTrigger() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Automation_Registry__mdt row = TestDataFactory.registryEntry('Rollups_Task', true);
+            row.Handler_Class__c = 'RollupTriggerHandler';
+            row.Object_Name__c = 'Task';
+            Automation_Registry__mdt other = TestDataFactory.registryEntry('Other_Event', true);
+            other.Object_Name__c = 'Event';
+            TestDataFactory.useRegistry(new List<Automation_Registry__mdt>{ row, other });
+
+            System.Assert.isTrue(RollupService.hasInstantUpdates('Task'), 'Registered');
+            System.Assert.isFalse(RollupService.hasInstantUpdates('Event'), 'Another handler');
+            System.Assert.isFalse(RollupService.hasInstantUpdates('No_Such__c'), 'Not in the org');
+        }
+    }
+
+    /** ADR-0136: with no rollup trigger, Instantly alone is refused; Both is saved. */
+    @IsTest
+    static void instantlyAloneIsRefusedForRecordsWithNoTrigger() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.Draft instantly = childCount();
+            instantly.sourceObject = 'Task';
+            instantly.relationshipPath = 'WhatId';
+            instantly.mode = RollupService.MODE_REAL_TIME;
+            RollupBuilderController.Draft both = childCount();
+            both.sourceObject = 'Task';
+            both.relationshipPath = 'WhatId';
+
+            String instantlyRefusal;
+            String bothRefusal;
+            System.runAs(maria()) {
+                instantlyRefusal = saveRefusal(instantly);
+                bothRefusal = saveRefusal(both);
+            }
+
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_ErrorNoInstant,
+                    new List<String>{
+                        Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                            .getLabelPlural()
+                    }
+                ),
+                instantlyRefusal,
+                'Says why, and what to choose'
+            );
+            System.Assert.isNull(bothRefusal, 'Both is saved');
+            System.Assert.areEqual(
+                'Task',
+                [SELECT Source_Object__c FROM Rollup_Definition__c LIMIT 1].Source_Object__c,
+                'Counting Tasks'
+            );
+        }
+    }
+
     @IsTest
     static void sourceFieldsCarryTheirTypeAndPicklistValues() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
@@ -273,6 +387,38 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /** ADR-0136: the sum of the 5 largest, saved and read back for editing. */
+    @IsTest
+    static void aRowLimitAndItsDirectionAreSavedAndReadBack() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.Draft largest = childCount();
+            largest.aggregate = 'SUM';
+            largest.sourceField = 'NumberOfEmployees';
+            largest.orderByField = 'NumberOfEmployees';
+            largest.orderDirection = 'Descending';
+            largest.rowLimit = 5;
+            largest.includeDeleted = true;
+            RollupBuilderController.SaveResult result;
+
+            Test.startTest();
+            System.runAs(maria()) {
+                result = RollupBuilderController.save(largest, false);
+            }
+            Test.stopTest();
+
+            RollupBuilderController.Draft reread = RollupBuilderController.getDraft(
+                result.recordId
+            );
+            System.Assert.areEqual(5, reread.rowLimit, 'The limit');
+            System.Assert.areEqual('Descending', reread.orderDirection, 'And its direction');
+            System.Assert.isTrue(reread.includeDeleted, 'Deleted records included');
+            largest.orderDirection = null;
+            largest.rowLimit = null;
+            largest.active = false; // the saved one fills the same field
+            System.Assert.isNull(RollupBuilderController.problemWith(largest), 'Both optional');
+        }
+    }
+
     @IsTest
     static void saveAndCalculateNowStartsItsRecalculation() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
@@ -341,6 +487,21 @@ private class RollupBuilderControllerTest {
             unordered.sourceField = 'NumberOfEmployees';
             drafts.put(Label.Core_RollupBuilder_ErrorOrderByNeeded, unordered);
 
+            RollupBuilderController.Draft limitedCount = childCount();
+            limitedCount.rowLimit = 3;
+            limitedCount.orderByField = 'NumberOfEmployees';
+            drafts.put(Label.Core_Rollups_ErrorRowLimitAggregate, limitedCount);
+
+            RollupBuilderController.Draft limitedUnordered = childCount();
+            limitedUnordered.aggregate = 'SUM';
+            limitedUnordered.sourceField = 'NumberOfEmployees';
+            limitedUnordered.rowLimit = 3;
+            drafts.put(Label.Core_Rollups_ErrorRowLimitNeedsOrder, limitedUnordered);
+
+            RollupBuilderController.Draft emptyCustom = childCount();
+            emptyCustom.delimiter = 'Custom';
+            drafts.put(Label.Core_Rollups_ErrorCustomDelimiterNeeded, emptyCustom);
+
             RollupBuilderController.Draft noDate = childCount();
             noDate.fiscalYearAware = true;
             noDate.fiscalYearOffset = 0;
@@ -370,6 +531,104 @@ private class RollupBuilderControllerTest {
                 );
             }
             System.Assert.isNull(RollupBuilderController.problemWith(childCount()), 'A good one');
+        }
+    }
+
+    /** ADR-0136: the filter offers and accepts a field one lookup away, and no further. */
+    @IsTest
+    static void aFilterReadsAFieldOneLookupAway() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Map<String, String> labelByPath = new Map<String, String>();
+            for (
+                RollupBuilderController.FieldOption option : RollupBuilderController.getParentFields(
+                    'Account'
+                )
+            ) {
+                labelByPath.put(option.value, option.label);
+            }
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_ParentField,
+                    new List<String>{
+                        Account.ParentId.getDescribe().getLabel().removeEndIgnoreCase(' ID'),
+                        Account.Name.getDescribe().getLabel()
+                    }
+                ),
+                labelByPath.get('Parent.Name'),
+                'The parent organization\'s name, labelled through its lookup'
+            );
+            System.Assert.isFalse(
+                labelByPath.containsKey('CreatedBy.Name'),
+                'Lookups the platform keeps for itself are not offered'
+            );
+
+            Map<String, String> expectedByPath = new Map<String, String>{
+                'Parent.Name' => null,
+                'parent.name' => null,
+                'Parent.Nope__c' => Label.Core_RollupBuilder_ErrorFieldUnknown,
+                'Nope__r.Name' => Label.Core_RollupBuilder_ErrorFieldUnknown,
+                'Parent.Parent.Name' => Label.Core_RollupBuilder_ErrorOneLookup
+            };
+            for (String path : expectedByPath.keySet()) {
+                RollupBuilderController.Draft draft = childCount();
+                draft.filterJson = nameFilter('equals', 'Riverbend')
+                    .replace('"Name"', '"' + path + '"');
+                System.Assert.areEqual(
+                    expectedByPath.get(path),
+                    RollupBuilderController.problemWith(draft),
+                    path
+                );
+            }
+        }
+    }
+
+    /** R-R15: FIRST and LAST fill a picklist from a picklist or text, with values it has. */
+    @IsTest
+    static void aPicklistIsFilledFromAPicklistOrTextWithValuesItHas() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Map<String, String> sourceFieldByExpected = new Map<String, String>{
+                'same picklist' => 'Preferred_Email__c',
+                'text' => 'Name',
+                Label.Core_RollupBuilder_ErrorPicklistSource => 'NumberOfEmployees',
+                'missing values' => 'Household_Role__c'
+            };
+            for (String expected : sourceFieldByExpected.keySet()) {
+                RollupBuilderController.Draft draft = childCount();
+                draft.targetField = 'Preferred_Email__c';
+                draft.aggregate = 'LAST';
+                draft.sourceField = sourceFieldByExpected.get(expected);
+                draft.orderByField = 'CreatedDate';
+                String problem = RollupBuilderController.problemWith(draft);
+                if (expected == 'missing values') {
+                    System.Assert.isTrue(
+                        problem.startsWith(
+                            Label.Core_RollupBuilder_ErrorPicklistValues.substringBefore('{0}')
+                        ) && problem.contains('Head'),
+                        'Names the values the target lacks: ' + problem
+                    );
+                } else if (expected.startsWith('same') || expected == 'text') {
+                    System.Assert.isNull(problem, expected);
+                } else {
+                    System.Assert.areEqual(expected, problem, 'Only a picklist or text');
+                }
+            }
+
+            RollupBuilderController.Draft counted = childCount();
+            counted.targetField = 'Preferred_Email__c';
+            System.Assert.areEqual(
+                Label.Core_Rollups_ErrorPicklistTarget,
+                RollupBuilderController.problemWith(counted),
+                'A count is no picklist value'
+            );
+            Boolean offered = false;
+            for (
+                RollupBuilderController.FieldOption option : RollupBuilderController.getTargetFields(
+                    'Account'
+                )
+            ) {
+                offered = offered || option.value == 'Preferred_Email__c';
+            }
+            System.Assert.isTrue(offered, 'A picklist is offered as a target');
         }
     }
 

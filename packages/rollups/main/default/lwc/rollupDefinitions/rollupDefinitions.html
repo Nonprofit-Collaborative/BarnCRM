@@ -82,6 +82,13 @@
                             disabled={controlsDisabled}
                             onclick={handleNew}
                         ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            data-id="export"
+                            label={labels.exportRollups}
+                            disabled={controlsDisabled}
+                            onclick={handleExport}
+                        ></lightning-button>
                     </template>
                     <template lwc:if={showBuilderLink}>
                         <lightning-button
@@ -125,6 +132,57 @@
                         </div>
                     </div>
                 </template>
+                <template lwc:if={builder}>
+                    <lightning-input
+                        class="slds-var-m-top_small"
+                        type="file"
+                        data-id="import-file"
+                        label={labels.importFile}
+                        accept=".json"
+                        disabled={controlsDisabled}
+                        onchange={handleImportFile}
+                    ></lightning-input>
+                </template>
+                <template lwc:if={importRows}>
+                    <div class="slds-box slds-var-m-top_small" data-id="import">
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered"
+                            aria-label={labels.importFile}
+                        >
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col">{labels.columnRollup}</th>
+                                    <th scope="col">{labels.importColumn}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={importRows} for:item="row">
+                                    <tr key={row.key} data-id="import-row">
+                                        <th scope="row">{row.name}</th>
+                                        <td>{row.text}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                        <template lwc:if={importText}>
+                            <div class="slds-var-m-top_x-small">
+                                <lightning-button
+                                    data-id="cancel-import"
+                                    label={labels.cancel}
+                                    onclick={handleCancelImport}
+                                ></lightning-button>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    variant="brand"
+                                    data-id="apply-import"
+                                    label={labels.importApply}
+                                    disabled={importApplyDisabled}
+                                    onclick={handleApplyImport}
+                                ></lightning-button>
+                            </div>
+                        </template>
+                    </div>
+                </template>
             </div>
 
             <template lwc:if={isEmpty}>
@@ -154,6 +212,18 @@
                             <template for:each={rows} for:item="row">
                                 <tr key={row.recordId} data-id="rollup-row">
                                     <th scope="row">
+                                        <template lwc:if={row.exportable}>
+                                            <lightning-input
+                                                type="checkbox"
+                                                data-id={row.recordId}
+                                                data-action="select"
+                                                label={labels.exportSelect}
+                                                variant="label-hidden"
+                                                checked={row.selected}
+                                                disabled={controlsDisabled}
+                                                onchange={handleSelect}
+                                            ></lightning-input>
+                                        </template>
                                         <div>{row.name}</div>
                                         <div class="slds-text-body_small">{row.description}</div>
                                     </th>
@@ -219,6 +289,14 @@
                                                 label={labels.copy}
                                                 disabled={controlsDisabled}
                                                 onclick={handleCopy}
+                                            ></lightning-button>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="delete"
+                                                label={labels.deleteRollup}
+                                                disabled={controlsDisabled}
+                                                onclick={handleDelete}
                                             ></lightning-button>
                                         </template>
                                     </td>

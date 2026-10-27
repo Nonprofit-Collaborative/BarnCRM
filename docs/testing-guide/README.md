@@ -45,7 +45,7 @@ page, even if that puts it out of reading order.
 | [Imports](imports.md) | IMP | 11 | Import wizard, templates, row rules, matching (including match sources), undo |
 | [Find](find.md) | FIND | 9 | Query builder, typed queries, export, saved queries, summaries |
 | [Bulk update and delete](bulk-update-and-delete.md) | BULK | 9 | Bulk update, bulk delete, edit in Find, undo |
-| [Data Manager and job history](data-manager-and-job-history.md) | DM | 10 | Data Manager, data jobs and undo, data quality checks, field utilization |
+| [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
 | [Duplicates](duplicates.md) | DUP | 9 | Duplicate scan, review and merge, match sources |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
@@ -57,7 +57,7 @@ page, even if that puts it out of reading order.
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
 | [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
-| [Rollup Builder](rollup-builder.md) | RB | 9 | Building, recalculating and switching rollups |
+| [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
 ## Smoke list (every build, about one hour)

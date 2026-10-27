@@ -2,6 +2,7 @@ import { LightningElement, api } from 'lwc';
 import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetFields';
 import getSources from '@salesforce/apex/RollupBuilderController.getSources';
 import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceFields';
+import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
 
@@ -18,7 +19,15 @@ import SOURCE from '@salesforce/label/c.Core_RollupBuilder_Source';
 import AGGREGATE from '@salesforce/label/c.Core_RollupBuilder_Aggregate';
 import SOURCE_FIELD from '@salesforce/label/c.Core_RollupBuilder_SourceField';
 import ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_OrderBy';
+import ORDER_DIRECTION from '@salesforce/label/c.Core_RollupBuilder_OrderDirection';
+import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
+import ROW_LIMIT_HELP from '@salesforce/label/c.Core_RollupBuilder_RowLimitHelp';
+import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
+import CUSTOM_DELIMITER from '@salesforce/label/c.Core_RollupBuilder_CustomDelimiter';
+import ERROR_CUSTOM_DELIMITER from '@salesforce/label/c.Core_Rollups_ErrorCustomDelimiterNeeded';
+import INCLUDE_DELETED from '@salesforce/label/c.Core_RollupBuilder_IncludeDeleted';
+import INCLUDE_DELETED_HELP from '@salesforce/label/c.Core_RollupBuilder_IncludeDeletedHelp';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
 import WINDOW_THIS from '@salesforce/label/c.Core_RollupBuilder_WindowThisYear';
@@ -29,8 +38,11 @@ import CURRENCY_WARNING from '@salesforce/label/c.Core_RollupBuilder_CurrencyWar
 import NUMBER_WARNING from '@salesforce/label/c.Core_RollupBuilder_NumberWarning';
 import FILTER from '@salesforce/label/c.Core_RollupBuilder_Filter';
 import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
+import PARENT_FIELD_NOTE from '@salesforce/label/c.Core_RollupBuilder_ParentFieldNote';
 import NAME from '@salesforce/label/c.Core_RollupBuilder_Name';
 import DESCRIPTION from '@salesforce/label/c.Core_RollupBuilder_Description';
+import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPermission';
+import BYPASS_PERMISSION_HELP from '@salesforce/label/c.Core_RollupBuilder_BypassPermissionHelp';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import ACTIVE from '@salesforce/label/c.Core_Rollups_ColumnActive';
 import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
@@ -47,6 +59,13 @@ import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByN
 import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
+import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
+import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
+import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
+
+/** The stored modes (canonical model R-R4): Instantly alone, and Both. */
+const MODE_REAL_TIME = 'Real-time';
+const MODE_BOTH = 'Both';
 
 const NUMBERS = new Set(['double', 'integer', 'long']);
 const MONEY = new Set(['currency', 'percent']);
@@ -57,11 +76,18 @@ const TEXT = new Set(['string', 'textarea']);
 const READS_NO_FIELD = new Set(['COUNT', 'ANY', 'NONE']);
 const ORDERED = new Set(['FIRST', 'LAST']);
 const LISTS = new Set(['TEXT_LIST', 'TEXT_LIST_DISTINCT']);
+/** What a picklist target can be filled from (R-R15). */
+const INTO_PICKLIST = new Set(['picklist', 'string']);
+/** The calculations that take "only the first N records" (R-R15, ADR-0136). */
+const ROW_LIMITED = new Set(['SUM', 'AVG', 'MIN', 'MAX', ...LISTS]);
 
 /** The calculations a target field of this type can hold (canonical model R-R15). */
 function aggregatesFor(type) {
   if (type === 'boolean') {
     return ['ANY', 'NONE'];
+  }
+  if (type === 'picklist') {
+    return ['FIRST', 'LAST'];
   }
   if (TEXT.has(type)) {
     return ['FIRST', 'LAST', 'TEXT_LIST', 'TEXT_LIST_DISTINCT'];
@@ -97,13 +123,22 @@ export default class RollupWizard extends LightningElement {
     aggregate: AGGREGATE,
     sourceField: SOURCE_FIELD,
     orderBy: ORDER_BY,
+    orderDirection: ORDER_DIRECTION,
+    rowLimit: ROW_LIMIT,
+    rowLimitHelp: ROW_LIMIT_HELP,
     delimiter: DELIMITER,
+    customDelimiter: CUSTOM_DELIMITER,
+    includeDeleted: INCLUDE_DELETED,
+    includeDeletedHelp: INCLUDE_DELETED_HELP,
     window: WINDOW,
     windowDate: WINDOW_DATE,
     filter: FILTER,
     targetFilter: TARGET_FILTER,
+    parentFieldNote: PARENT_FIELD_NOTE,
     name: NAME,
     description: DESCRIPTION,
+    bypassPermission: BYPASS_PERMISSION,
+    bypassPermissionHelp: BYPASS_PERMISSION_HELP,
     mode: MODE,
     active: ACTIVE,
     back: BACK,
@@ -111,14 +146,21 @@ export default class RollupWizard extends LightningElement {
     cancel: CANCEL,
     save: SAVE,
     saveAndCalculate: SAVE_AND_CALCULATE,
-    previewRecord: PREVIEW_RECORD
+    previewRecord: PREVIEW_RECORD,
+    targetSearch: TARGET_SEARCH,
+    targetSearchHelp: TARGET_SEARCH_HELP
   };
+
+  /** Step 1: what the administrator typed to find an object off the common list (ADR-0136). */
+  targetSearch = '';
 
   step = 1;
   current = { active: true, fiscalYearAware: false };
   targetFields = [];
   sources = [];
   sourceFields = [];
+  /** Fields of the records the counted records point to, for the filter (ADR-0136). */
+  parentFields = [];
   targetEntityFields = [];
   error;
   busy = false;
@@ -178,14 +220,63 @@ export default class RollupWizard extends LightningElement {
   get isStep5() {
     return this.step === 5;
   }
+  /** Step 5: the counted object, whose instant totals state is shown (ADR-0138). */
+  get instantObject() {
+    return this.current.sourceObject;
+  }
+  get canManageInstant() {
+    return Boolean(this.model && this.model.canManage);
+  }
   get showBack() {
     return this.step > 1;
   }
 
   // ------------------------------------------------------------------------------- options
 
+  get allTargets() {
+    return this.model && this.model.targets ? this.model.targets : [];
+  }
+
+  /**
+   * The common objects, or every object whose name or API name holds what was typed, and the
+   * chosen one always, so an edited rollup on another object still shows it (ADR-0136).
+   */
   get targetOptions() {
-    return this.model ? this.model.targets : [];
+    const term = (this.targetSearch || '').trim().toLowerCase();
+    const matches = (option) => {
+      if (!term) {
+        return option.common !== false;
+      }
+      return option.label.toLowerCase().includes(term) || option.value.toLowerCase().includes(term);
+    };
+    const shown = this.allTargets
+      .filter(matches)
+      .map((option) => ({ value: option.value, label: option.label }));
+    const chosen = this.current.targetObject;
+    if (chosen && !shown.some((option) => option.value === chosen)) {
+      const found = this.allTargets.find((option) => option.value === chosen);
+      shown.unshift({ value: chosen, label: found ? found.label : chosen });
+    }
+    return shown;
+  }
+
+  handleTargetSearch(event) {
+    this.targetSearch = event.detail.value;
+  }
+
+  get chosenSource() {
+    return this.sources.find((entry) => entry.value === this.sourceValue);
+  }
+
+  /** False when the counted records have no rollup trigger (R-R12); unknown counts as instant. */
+  get sourceIsInstant() {
+    const source = this.chosenSource;
+    return !source || source.instant !== false;
+  }
+
+  /** Step 5: says plainly that this total is not instant, and why (ADR-0136). */
+  get noInstantNotice() {
+    return this.sourceIsInstant ? undefined : format(NO_INSTANT, this.recordsLabel);
   }
 
   get targetFieldOptions() {
@@ -226,15 +317,65 @@ export default class RollupWizard extends LightningElement {
   }
 
   get needsOrderBy() {
-    return ORDERED.has(this.current.aggregate) || LISTS.has(this.current.aggregate);
+    return (
+      ORDERED.has(this.current.aggregate) || LISTS.has(this.current.aggregate) || this.hasRowLimit
+    );
+  }
+
+  get takesRowLimit() {
+    return ROW_LIMITED.has(this.current.aggregate);
+  }
+
+  get hasRowLimit() {
+    return this.takesRowLimit && this.current.rowLimit != null && this.current.rowLimit !== '';
+  }
+
+  /** First is always the lowest and Last the highest, so only lists and limits take a direction. */
+  get takesDirection() {
+    return LISTS.has(this.current.aggregate) || this.hasRowLimit;
+  }
+
+  get orderDirection() {
+    return this.current.orderDirection || 'Ascending';
+  }
+
+  get directionOptions() {
+    return this.model && this.model.directions ? this.model.directions : [];
   }
 
   get isTextList() {
     return LISTS.has(this.current.aggregate);
   }
 
+  get isCustomDelimiter() {
+    return this.isTextList && this.current.delimiter === 'Custom';
+  }
+
   get sourceFieldOptions() {
     return this.sourceFields.map((field) => ({ value: field.value, label: field.label }));
+  }
+
+  /** The fields a value can be copied from: a picklist only from a picklist or text. */
+  get copyFieldOptions() {
+    return this.sourceFields
+      .filter((field) => this.targetFieldType !== 'picklist' || INTO_PICKLIST.has(field.type))
+      .map((field) => ({ value: field.value, label: field.label }));
+  }
+
+  /** The source filter offers the counted records' own fields, then those one lookup away. */
+  get filterFields() {
+    return [...this.sourceFields, ...this.parentFields];
+  }
+
+  /** Whether the source filter reads a field of another record, which may not update at once. */
+  get readsParentField() {
+    try {
+      const document = this.current.filterJson ? JSON.parse(this.current.filterJson) : null;
+      const conditions = document && Array.isArray(document.conditions) ? document.conditions : [];
+      return conditions.some((condition) => String(condition.field || '').includes('.'));
+    } catch {
+      return false;
+    }
   }
 
   get dateFieldOptions() {
@@ -247,8 +388,10 @@ export default class RollupWizard extends LightningElement {
     return this.model ? this.model.delimiters : [];
   }
 
+  /** Instantly alone is not offered for records with no rollup trigger. */
   get modeOptions() {
-    return this.model ? this.model.modes : [];
+    const modes = this.model ? this.model.modes : [];
+    return this.sourceIsInstant ? modes : modes.filter((mode) => mode.value !== MODE_REAL_TIME);
   }
 
   get windowOptions() {
@@ -274,7 +417,7 @@ export default class RollupWizard extends LightningElement {
   }
 
   get targetLabel() {
-    const target = this.targetOptions.find((entry) => entry.value === this.current.targetObject);
+    const target = this.allTargets.find((entry) => entry.value === this.current.targetObject);
     return target ? target.label : this.current.targetObject;
   }
 
@@ -340,11 +483,14 @@ export default class RollupWizard extends LightningElement {
   loadSource() {
     if (!this.current.sourceObject) {
       this.sourceFields = [];
+      this.parentFields = [];
       return Promise.resolve();
     }
-    return getSourceFields({ sourceObject: this.current.sourceObject })
-      .then((fields) => {
+    const sourceObject = this.current.sourceObject;
+    return Promise.all([getSourceFields({ sourceObject }), getParentFields({ sourceObject })])
+      .then(([fields, parentFields]) => {
         this.sourceFields = fields || [];
+        this.parentFields = parentFields || [];
       })
       .catch((error) => this.fail(error));
   }
@@ -372,14 +518,18 @@ export default class RollupWizard extends LightningElement {
     if (!source) {
       return;
     }
-    this.change({
+    const changes = {
       sourceObject: source.sourceObject,
       relationshipPath: source.relationshipPath,
       sourceField: undefined,
       orderByField: undefined,
       fiscalDateField: undefined,
       filterJson: undefined
-    });
+    };
+    if (source.instant === false && this.current.mode === MODE_REAL_TIME) {
+      changes.mode = MODE_BOTH;
+    }
+    this.change(changes);
     this.loadSource();
   }
 
@@ -423,6 +573,12 @@ export default class RollupWizard extends LightningElement {
       }
       if (ORDERED.has(draft.aggregate) && !draft.orderByField) {
         return ERROR_ORDER_BY;
+      }
+      if (this.hasRowLimit && !draft.orderByField) {
+        return ERROR_ROW_LIMIT_ORDER;
+      }
+      if (this.isCustomDelimiter && !draft.customDelimiter) {
+        return ERROR_CUSTOM_DELIMITER;
       }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
         return ERROR_WINDOW_DATE;
@@ -480,6 +636,11 @@ export default class RollupWizard extends LightningElement {
     if (READS_NO_FIELD.has(draft.aggregate)) {
       draft.sourceField = null;
     }
+    // A limit or a direction the calculation does not take is not saved with it.
+    draft.rowLimit = this.hasRowLimit ? Number(draft.rowLimit) : null;
+    draft.orderDirection = this.takesDirection ? this.orderDirection : 'Ascending';
+    draft.customDelimiter = this.isCustomDelimiter ? draft.customDelimiter : null;
+    draft.includeDeleted = draft.includeDeleted === true;
     return draft;
   }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Nightly_Run_Hour__c</fullName>
+    <defaultValue>2</defaultValue>
+    <description
+  >The hour the nightly rollup run starts, 0 for midnight through 23 for 11 PM, in the time zone of the person who scheduled it. Blank means 2 (2:00 AM). Custom settings cannot hold a picklist, so the allowed values and their labels are declared on the Rollup_Nightly_Run_Hour setting definition and validated by the settings service. Changing it moves the scheduled nightly run.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>When the nightly run recalculates every Every night and Both total.</inlineHelpText>
+    <label>Nightly Run Hour</label>
+    <precision>2</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -262,6 +262,60 @@ private class AutomationControlTest {
         }
     }
 
+    /** A generated rollup trigger's switch (ADR-0138): made once, then switched like the rest. */
+    @IsTest
+    static void aSwitchNoRegistryShipsIsMadeOnceAndThenSwitches() {
+        String generated = 'Generated_Switch';
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User maria = barnCrmAdmin();
+            User david = staffOnly();
+
+            Test.startTest();
+            System.runAs(david) {
+                try {
+                    AutomationControl.ensureSwitch(generated, 'Generated', 'Account', 'Test.');
+                    Assert.fail('David has no settings permission.');
+                } catch (AutomationControl.AutomationControlException expected) {
+                    Assert.areEqual(
+                        Label.Core_Automation_NoPermission,
+                        expected.getMessage(),
+                        'Refused, with the permission named.'
+                    );
+                }
+            }
+            System.runAs(maria) {
+                try {
+                    AutomationControl.ensureSwitch(' ', 'Nameless', 'Account', 'Test.');
+                    Assert.fail('A switch needs a name.');
+                } catch (AutomationControl.AutomationControlException expected) {
+                    Assert.areEqual(
+                        Label.Core_Automation_NameRequired,
+                        expected.getMessage(),
+                        'Refused, asking for a name.'
+                    );
+                }
+                AutomationControl.ensureSwitch(generated, 'Generated', 'Account', 'Test.');
+                AutomationControl.ensureSwitch(generated, 'Generated again', 'Account', 'Again.');
+                AutomationControl.setEnabled(generated, false);
+            }
+            Test.stopTest();
+
+            List<Automation_Setting__c> rows = [
+                SELECT Name, Is_Package_Default__c, Always_Runs__c, Object_Name__c
+                FROM Automation_Setting__c
+                WHERE Automation_Name__c = :generated
+            ];
+            Assert.areEqual(1, rows.size(), 'Asking twice makes one row.');
+            Assert.areEqual('Generated', rows[0].Name, 'The first label is kept.');
+            Assert.areEqual('Account', rows[0].Object_Name__c, 'It names its object.');
+            Assert.isFalse(rows[0].Is_Package_Default__c, 'It is not a shipped row.');
+            Assert.isFalse(rows[0].Always_Runs__c, 'It can be switched.');
+            AutomationControl.clearCache();
+            Assert.isFalse(AutomationControl.isEnabled(generated), 'And it was switched off.');
+        }
+    }
+
     @IsTest
     static void anAlwaysRunsAutomationCannotBeSwitched() {
         System.runAs(TestUsers.admin()) {

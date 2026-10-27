@@ -36,6 +36,65 @@ private class RollupAggregatorTest {
         );
     }
 
+    /** Five amounts, read in no particular order, each its own row (ADR-0136). */
+    private static RollupAggregator.Tally limited(Integer rowLimit, Boolean descending) {
+        RollupAggregator.Tally tally = new RollupAggregator.Tally();
+        tally.rowLimit = rowLimit;
+        List<Integer> amounts = new List<Integer>{ 10, 50, 30, 40, 20 };
+        for (Integer i = 0; i < amounts.size(); i++) {
+            RollupAggregator.Listed entry = new RollupAggregator.Listed(
+                amounts[i],
+                'row' + i,
+                String.valueOf(amounts[i])
+            );
+            entry.raw = amounts[i];
+            entry.descending = descending;
+            tally.add(entry, false);
+        }
+        return tally;
+    }
+
+    @IsTest
+    static void aRowLimitCountsOnlyTheFirstRowsInItsDirection() {
+        RollupAggregator.Tally largestOne = limited(1, true);
+        Assert.isTrue(largestOne.listed.size() <= 2, 'Trimmed while it reads, never past twice');
+        Assert.isTrue((Decimal) largestOne.result('SUM', null) == 50, 'The largest');
+        Assert.isTrue((Decimal) limited(2, true).result('SUM', null) == 90, 'The two largest');
+        Assert.isTrue((Decimal) limited(2, true).result('AVG', null) == 45, 'Their average');
+        Assert.areEqual(30, limited(3, true).result('MIN', null), 'Smallest of the largest 3');
+        Assert.areEqual(20, limited(2, false).result('MAX', null), 'Largest of the smallest 2');
+        Assert.areEqual('10, 20', limited(2, false).result('TEXT_LIST', ', '), 'First two');
+    }
+
+    @IsTest
+    static void aDescendingListPutsBlanksLastAndAFirstValueOnce() {
+        RollupAggregator.Tally everyValue = new RollupAggregator.Tally();
+        RollupAggregator.Tally firstTwo = new RollupAggregator.Tally();
+        firstTwo.rowLimit = 2;
+        List<Object> orders = new List<Object>{ 1, 3, 2, null };
+        List<String> values = new List<String>{ 'b', 'a', 'a', 'c' };
+        for (Integer i = 0; i < orders.size(); i++) {
+            RollupAggregator.Listed entry = new RollupAggregator.Listed(
+                orders[i],
+                'row' + i,
+                values[i]
+            );
+            entry.descending = true;
+            everyValue.add(entry, false);
+            firstTwo.add(entry, true);
+        }
+        Assert.areEqual(
+            'a, a, b, c',
+            everyValue.result('TEXT_LIST', ', '),
+            'Highest first, a blank order last'
+        );
+        Assert.areEqual(
+            'a; b',
+            firstTwo.result('TEXT_LIST_DISTINCT', '; '),
+            'The first two different values'
+        );
+    }
+
     @IsTest
     static void valuesCompareAndReadThroughRelationships() {
         Assert.areEqual(-1, RollupAggregator.compare(1, 2.5), 'Numbers of any type');

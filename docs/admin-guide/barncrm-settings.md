@@ -15,7 +15,10 @@ and the section of this page that depends on it says so at the top (see "When a 
 needs a change in Setup" below).
 
 No module has a settings tab of its own: a module's settings are a section of this page, for
-example **Rollups** and **Volunteers**.
+example **Rollups** and **Volunteers**. The **Rollups** section holds **Default rollup
+mode**, **When instant totals are calculated** and **Time of the nightly run**. Saving a new
+**Time of the nightly run** moves the scheduled nightly rollup run at once (see
+[Rollups](rollups.md#how-the-nightly-run-works)).
 
 The footer of the page has a **Report a problem or give feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.

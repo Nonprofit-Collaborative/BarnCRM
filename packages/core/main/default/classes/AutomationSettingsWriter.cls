@@ -17,7 +17,10 @@
  *    its row), so a user mode insert of a complete row is refused for everyone. The rows are
  *    written by the post-install scripts, where no permission set is assigned yet, and by the
  *    Health Check fix. Every value is copied from the package's own shipped registry by
- *    `AutomationControl`; nothing an administrator types reaches this class.
+ *    `AutomationControl`; nothing an administrator types reaches this class. The one row not
+ *    from the registry, a generated rollup trigger's switch (`AutomationControl.ensureSwitch`,
+ *    ADR-0138), is built from describe and labels, with Always Runs false, after the same
+ *    permission check.
  *
  * The permission is enforced before this class is reached: `AutomationControl` writes the pause
  * only after `FeatureManagement.checkPermission('Manage_BarnCRM_Settings')` passes, and the
@@ -43,7 +46,7 @@ public without sharing class AutomationSettingsWriter {
         );
     }
 
-    /** Inserts switch rows materialized from the shipped registry. */
+    /** Inserts switch rows materialized from the shipped registry, or a generated trigger's. */
     public static void insertSwitches(List<Automation_Setting__c> switches) {
         if (switches == null || switches.isEmpty()) {
             return;

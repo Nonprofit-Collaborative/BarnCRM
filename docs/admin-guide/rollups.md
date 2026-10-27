@@ -106,7 +106,7 @@ One step is left for you, and nothing in the app does it on your behalf:
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
-   is scheduled for 2:00 AM."
+   is scheduled for 2:00 AM." (or the hour you chose in **Time of the nightly run**).
 
 Do that on the day you install. The Setup Assistant has no rollup step, so until you click
 it nothing recalculates overnight and the home page tile stays in warning.
@@ -160,13 +160,14 @@ Every rollup has a mode.
 | Mode | What happens |
 |---|---|
 | **Instantly** | A gift saved by a person updates the totals a few seconds after the save: refresh the household a moment later and its total giving already includes it. A bulk change (an import, a data loader run, a big update) goes through the same queue and catches up within minutes, also when many batches or people save at the same moment. A change made by a background job is also queued, and the queue run starts as soon as that job's step is saved, so those totals catch up within minutes too. If that start fails, the next queue run or the nightly run picks them up. |
-| **Every night** | Recalculated in the nightly run at 2:00 AM, and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
+| **Every night** | Recalculated in the nightly run (2:00 AM unless you change **Time of the nightly run**), and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
 | **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
 
 "Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
-other BarnCRM records. For a total that counts records from one of your own objects, see
-[Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
-without that, such a total is calculated every night and on demand only.
+other BarnCRM records. For a total that counts records from any other object (a standard
+object such as opportunities, another app's object, or one your organization created), see
+[Instant Totals on Other Objects](#instant-totals-on-other-objects) below; without that,
+such a total is calculated every night and on demand only.
 
 A save recalculates only the totals its change can move. Saving a soft credit recalculates the
 soft credit totals on that person and household, not their gift or pledge totals, and an
@@ -192,6 +193,13 @@ never added to. Choose **During the save** only if your team relies on seeing a 
 the moment a gift is saved and your org has little automation of its own on gifts.
 
 ### How the nightly run works
+
+The nightly run starts at 2:00 AM by default, in the time zone of the person who scheduled
+it. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
+**Time of the nightly run** (any hour from 12:00 AM (midnight) to 11:00 PM). Saving a new
+hour moves the scheduled run straight away; if the nightly run is not scheduled, the new hour
+is used when you schedule it. Pick a quiet hour after the day's data entry and before the
+morning's reports.
 
 The nightly run, **Recalculate** and **Recalculate all** work
 through every record a rollup writes, one kind of record at a time (all accounts, then all
@@ -244,7 +252,7 @@ recalculation **Turn on** starts never writes a wrong total.
 | **Minimum**, **Maximum** | The smallest or largest value, for example the largest gift or the latest date. | A number, currency, percent or date field |
 | **Count** | How many records match. | A number field |
 | **Count distinct** | How many different values a field holds, for example how many different funds a donor has given to. Blank values are not counted. | A number field |
-| **First**, **Last** | The value from the earliest or latest record, by the field you choose to order by, for example the appeal of a donor's first gift. | A number, currency, percent, date or text field |
+| **First**, **Last** | The value from the earliest or latest record, by the field you choose to order by, for example the appeal of a donor's first gift. | A number, currency, percent, date, text or picklist field |
 | **Any** | Checked when at least one record matches, for example "has ever given a gift over $1,000". | A checkbox field |
 | **None** | Checked when no record matches, for example "has no open pledge". | A checkbox field |
 | **Text list** | Every matching value in one field, for example the names of every program a person volunteers for. Blank values are left out. | A text or long text field |
@@ -255,13 +263,28 @@ What to know about them:
 - **Any and None count the records your conditions describe.** They do not read a field of
   their own. For "has ever given a gift over $1,000", choose **Any** and the condition
   "Amount greater than 1000".
-- **A text list is separated by a comma, a semicolon, or a new line.** Choose one with
-  **Delimiter**; a comma is used when you choose nothing. A value that contains the
-  separator is not changed, so if your values contain commas (for example "Smith, Jane"),
-  choose a semicolon or a new line so the list still reads clearly. A new line suits a long
-  text field.
+- **A text list is separated by a comma, a semicolon, a new line, a pipe, or your own
+  characters.** Choose one with **Separate the values with**; a comma is used when you choose
+  nothing. **Pipe** writes ` | ` between the values. **Custom** writes what you type in
+  **Custom delimiter** (up to 10 characters, spaces included) exactly as typed, and cannot be
+  saved empty. A value that contains the separator is not changed, so if your values contain
+  commas (for example "Smith, Jane"), choose a semicolon, a new line or a pipe so the list
+  still reads clearly. A new line suits a long text field.
 - **A text list is in order.** If you choose a field to order by, the values follow it,
-  oldest or smallest first. Otherwise they are listed alphabetically.
+  oldest or smallest first, or with **Order** set to **Descending**, newest or largest first.
+  Otherwise they are listed alphabetically (Z to A when descending). Records whose order field
+  is blank come last either way.
+- **Only the first N records.** **Sum**, **Average**, **Minimum**, **Maximum** and the text
+  lists can count only the first few records, in the order you choose: enter a number in
+  **Only the first N records** and choose the field to order by. For example, the sum of the 5
+  largest gifts is **Sum** of Amount, 5, ordered by Amount, **Descending**; the last 3 gift
+  amounts as a text list is **Text list** of Amount, 3, ordered by Gift Date, **Descending**.
+  Records with a blank value are skipped, so N means N records that have one. **Text list,
+  each value once** lists the first N different values. Count, Count distinct, Any, None, First
+  and Last take no limit.
+- **Order does not change First and Last.** First is always the record with the lowest value
+  of the order field (the earliest date), and Last the one with the highest. For "the most
+  recent", choose Last.
 - **A text that is too long is cut.** A list longer than the field holds is cut at the
   field's length, so a 255 character field shows the first 255 characters. Use a long text
   field for a list that can grow.
@@ -271,6 +294,13 @@ What to know about them:
   "is not blank" on that field if you want the first record that has one. When two records
   share the same order value, the one with the lower record ID wins (usually the one created
   first), so the answer never changes from one run to the next.
+- **A picklist gets one of its own values.** First and Last can fill a picklist field from
+  a picklist or a text field, for example the channel of a donor's latest gift. If the field
+  you copy is a picklist, every value it has must also be a value of the picklist you fill, or
+  the Builder will not save. A text value the picklist does not have (or a value added to the
+  source picklist later) is not written: the record keeps what it had and the Error Log names
+  the value, so add it to the picklist and click **Recalculate**. Letter case does not matter:
+  "mail" is written as the picklist's "Mail".
 - **A number or date copied into text is written plainly**, for example `1250.00` or
   `2026-03-01`, without a currency symbol or your local date format. A date and time is
   written in UTC, for example `2026-03-01 14:05`, so it reads the same whoever saved the
@@ -279,6 +309,13 @@ What to know about them:
   all the matching records each time, so a deleted record, a record moved to another parent,
   or a value changed back is reflected the next time the total is calculated, whatever its
   mode.
+- **Deleted and archived records count only if you ask.** Tick **Include deleted and archived
+  records** in step 4 to count records in the Recycle Bin and archived tasks and events, as
+  if they were not deleted. Deleting a record then does not lower the total. A record counts
+  until the Recycle Bin is emptied (or the platform removes it after its retention period);
+  that fires nothing, so the total drops at the next nightly run or **Recalculate**. For a
+  record with so many source records that BarnCRM has to read them in parts (tens of
+  thousands), a rollup with this ticked is not recalculated and the Error Log says why.
 
 ## The Rollup Builder
 
@@ -289,7 +326,7 @@ own). Its settings are in the **Rollups** section of **BarnCRM Settings**.
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
 **Recalculate**, the nightly schedule, **Recalculate all** and **Restore shipped rollups**),
-and adds **New rollup**, and **Edit** and **Copy** on each row. The tab comes with the
+and adds **New rollup**, and **Edit**, **Copy** and **Delete** on each row. The tab comes with the
 **Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
@@ -313,29 +350,38 @@ user **Rollup Builder User**. People with a BarnCRM role get it at install, at e
 on** and with each nightly run; until then the same wait applies to them.
 
 The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
-rollup mode**, **When instant totals are calculated**, and a button that opens the Builder.
+rollup mode**, **When instant totals are calculated**, **Time of the nightly run**, and a
+button that opens the Builder.
 The fiscal year is your org's, shown read only in the **General** section.
 
 **Copy** is the quickest way to make a total like one you already have: it opens the Builder
 with everything filled in from that rollup, under a new name, for you to change. Editing a
-shipped rollup is fine: an upgrade never overwrites a rollup you have changed.
+shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
+rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
 
 1. **Where should the number appear?** The kind of record and the field that show the total.
-   Only fields BarnCRM can write are offered: numbers, amounts, percents, dates, checkboxes
-   and text. A field another active rollup already fills is marked with that rollup's name. If
-   the field does not exist yet, create it in Setup (a Number or Currency field is right for
-   most totals) and come back.
+   The list starts with the objects most often used: Account, Contact, BarnCRM's objects,
+   your organization's own objects, and the common Salesforce objects your org has
+   (Opportunity, Opportunity Product, Case, Campaign, Campaign Member, Lead, Task, Event,
+   Asset, Order, Order Product and Contract). To use any other object you can see, type part
+   of its name in **Find another object** and pick it from the list. Only fields BarnCRM can
+   write are offered: numbers, amounts, percents, dates, checkboxes, text and picklists. A
+   field another active rollup already fills is marked with that rollup's name. If the field
+   does not exist yet, create it in Setup (a Number or Currency field is right for most
+   totals) and come back.
 2. **What should be counted?** The records that feed the total and the field that links them
-   to the record from step 1, in plain words: "Gift, by Donor". When the total lands on an
-   account and the records point at a person, you can also choose that person's household,
-   for example "Gift, by Donor (their household)".
+   to the record from step 1, in plain words: "Gift, by Donor" or "Opportunity, by Account
+   ID". When the total lands on an account and the records point at a person, you can also
+   choose that person's household, for example "Gift, by Donor (their household)".
 3. **How should it be calculated?** Any calculation in
    [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
    hold, the field it reads, for First and Last the field that decides which record comes
-   first, and the time window: all time, this fiscal year, last fiscal year, or two fiscal
+   first (**Which record comes first, by**), for a sum, an average, a minimum, a maximum or a
+   text list **Only the first N records** if you want a limit, for a text list or a limit the
+   **Order** (Ascending or Descending), and the time window: all time, this fiscal year, last fiscal year, or two fiscal
    years ago, with the date that decides which year a record falls in (a date field, not a
    date and time field).
 4. **Which records count?** Conditions you pick from lists (a field, a comparison and a
@@ -346,11 +392,29 @@ to change, before it lets you go on.
    two rollups that fill one field for different records. The comparisons **is this year** and
    **is last year** in a condition mean the calendar year (January to December); for your fiscal
    year, use the time window in step 3. **Contains** and **starts with** match what you type
-   exactly, so `%` and `_` are ordinary characters.
+   exactly, so `%` and `_` are ordinary characters. **Include deleted and archived records**
+   counts records in the Recycle Bin and archived tasks and events too (see
+   [What a rollup can calculate](#what-a-rollup-can-calculate)).
+   A condition can also read a field of a record the counted records point to, one lookup
+   away: after the records' own fields, the list offers each lookup's fields, such as
+   **Appeal > Type** for "gifts whose appeal is a mail appeal". One lookup only: a field of
+   the appeal's campaign, two lookups away, is not offered. When you use one, step 4 says
+   so: a change on that other record (the appeal's type) updates the totals at once only
+   if its object has rollup triggers. BarnCRM ships them on contacts, gifts, gift
+   allocations, soft credits, commitments, household members and volunteer hours and sign-ups,
+   not on accounts or appeals; an object you created has them once you set up
+   [instant totals](#instant-totals-on-other-objects). Otherwise the nightly run, or
+   **Recalculate**, puts them right. A change on the counted record itself (a gift moved to
+   another appeal) is always picked up as usual.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
-   and calculate now** to start its recalculation straight away.
+   and calculate now** to start its recalculation straight away. When the records you count
+   have no instant updates yet, for example Opportunities or your own objects, this step says
+   "Instant totals are not available yet for ..." and offers only **Every night** and **Both
+   (recommended)**: see [Instant Totals on Other Objects](#instant-totals-on-other-objects).
+   **Skip for people with this custom permission (optional)** is for a data migration user: see
+   [Skipping a rollup for some people](#skipping-a-rollup-for-some-people).
 
 ### What the Builder will not save
 
@@ -363,13 +427,26 @@ It says what to change instead of saving:
 - A sum or average of something that is not a number or an amount, and a minimum or maximum
   of something that is not a number, an amount or a date.
 - First or Last without the field that decides which record comes first.
+- **Only the first N records** below 1, without a field to order by, or on a calculation that
+  takes no limit (Count, Count distinct, Any, None, First, Last). Every save checks this, not
+  only the Builder.
+- A **Custom** separator with nothing typed in **Custom delimiter**. Every save checks this too.
 - A fiscal year window without a date to measure it on, or measured on a date and time field.
   Choose a date field, such as the gift date.
 - An **Instantly** total with a fiscal year window, or with an **is this year**, **is last year** or
   **is in the last N days** condition. Such a total changes when the date moves on, with no record
   saved, so only the nightly run can keep it right. Choose **Both (recommended)** or **Every
   night**. Changing the mode on the Rollups list refuses it too.
-- Conditions that name a field the records do not have.
+- An **Instantly** total of records that have no instant updates yet (records of a Salesforce
+  object such as Opportunity or Task, or of your own object): "Instant totals are not
+  available yet for Opportunities, so this total cannot be Instantly only." Choose **Both
+  (recommended)** or **Every night**. Changing the mode on the Rollups list refuses it too. A
+  rollup you saved as **Instantly** before keeps working; the next time you edit it, choose
+  **Both (recommended)**, which stays instant if you use the Flow template.
+- Conditions that name a field the records do not have, a field more than one lookup away,
+  or a field of another record you cannot see.
+- A picklist filled from anything but a picklist or a text field, or from a picklist with
+  values the picklist you fill does not have. The message lists the missing values.
 - A field another active rollup already fills for some of the same records. Two rollups may
   fill one field only when their **Only for some records** conditions never pick the same
   record, as the household and the organization giving totals do. The Builder checks your
@@ -418,6 +495,38 @@ Under the list, **Needs attention** shows what the engine has not finished:
   that saves a record also takes it off the list.
 - A warning when the nightly run is not scheduled, and how the last full run ended.
 
+### Moving Rollups to Another Org
+
+Build and check rollups in a sandbox, then move them to production with a file:
+
+1. In the sandbox, on the **Rollup Builder** tab, tick **Include in the export** on the rollups
+   to move, or tick none to move every rollup you made. Click **Export to a file**. Your
+   browser saves `barncrm-rollups.json`.
+2. In production, on the **Rollup Builder** tab, choose the file under **Import from a file**.
+   A table says what would happen to each rollup: **New: will be created**, **Will replace the
+   rollup here with the same Definition Key**, or **Not saved** with the reason. Nothing is
+   saved yet.
+3. Click **Import these rollups** (or **Cancel**). The table then says what happened to each one.
+
+What to know:
+
+- **Rollups are matched by Definition Key.** A rollup moved once and changed in the sandbox
+  replaces its copy in production when you import it again; nothing is duplicated.
+- **Each rollup goes through the same checks as Save in the Builder**, against production's own
+  objects, fields and rollups. One that fails is not saved at all and the table says why (for
+  example, a field production does not have yet: create it in Setup and import again). The
+  others are saved.
+- **A rollup arrives switched on or off as it was in the file**, and only when every check
+  passes. Nothing is recalculated by the import: the next nightly run does it, or click
+  **Recalculate** on the row.
+- **Rollups that came with BarnCRM are not moved.** Every org has them; use **Restore shipped
+  rollups** if one is missing.
+- **The file holds no record Ids or dates**, only how each rollup is calculated, so it works
+  between any two orgs with BarnCRM Rollup Builder. A file from a newer version of BarnCRM is
+  refused until this org is upgraded.
+- **A very large file** may stop part way, saying **Not imported yet** on the rest; import the
+  same file again to finish.
+
 ### Recalculate all, now or tonight
 
 **Recalculate all** rebuilds every active rollup, whatever its mode: **Instantly** totals as
@@ -431,19 +540,107 @@ roughly how long that takes, for example "About 41,200 records, roughly 25 minut
 includes the records of every active rollup, **Instantly** ones too. During working hours
 (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it tonight instead,
 because a long run competes with people saving records. When the nightly run is not
-scheduled, **Run tonight** sets up a single run of every active rollup for 2:00 AM tonight.
-When it is scheduled, **Run tonight** adds nothing: the nightly run already recalculates the
-**Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
+scheduled, **Run tonight** sets up a single run of every active rollup at the next
+**Time of the nightly run** (2:00 AM unless you changed it), and says "One recalculation of
+every total is set for the next 2:00 AM." When it is scheduled, **Run tonight** adds nothing:
+the nightly run already recalculates the **Every night** and **Both** totals at that hour,
+and a second run at the same moment would
 only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
-## Instant totals on your own objects
+### Deleting a Rollup
 
-BarnCRM can only ship automation for its own records. A rollup that counts records from an
-object your organization created (for example volunteer hours on a custom Shift object) is
-calculated every night and when you click **Recalculate**, until you make it instant. Today
-the way to do that is the **Recalculate rollups** Flow template, which needs no code.
+**Delete** on a row removes a rollup you made, after a confirmation that says what happens:
 
-### With the Flow template
+- **The values it already wrote stay** on the records. Nothing updates them again, so clear
+  the field yourself if the old numbers would mislead anyone.
+- **It cannot be undone.** If you might want the rollup back, switch it off instead.
+- **Rollups that came with BarnCRM cannot be deleted.** Delete says so and does nothing, since
+  **Restore shipped rollups** would only bring them back. Switch them off instead.
+- **Not during a full recalculation.** While **Recalculate all** or the nightly run is going,
+  Delete says so; try again when it finishes. Totals already waiting to be recalculated for the
+  deleted rollup are skipped, as they are for a rollup that is switched off.
+
+## Instant Totals on Other Objects
+
+BarnCRM can only ship automation for its own records. A rollup that counts records from any
+other object (a standard object such as opportunities or tasks, another app's object, or one
+your organization created, for example volunteer hours on a custom Shift object) is
+calculated every night and when you click **Recalculate**, until you make it instant. Until
+then the Builder says so on its last step, and such a rollup is **Every night** or **Both
+(recommended)**, never **Instantly** alone. There are two ways to make it instant: a small
+trigger the Rollup Builder writes for you (below), or the **Recalculate rollups** Flow
+template, which needs no code. Once the object's generated trigger is on, **Instantly** is
+offered too.
+
+### With a Generated Trigger
+
+The **Instant Totals** section at the bottom of the Rollup Builder lists every object an
+**Instantly** or **Both (recommended)** rollup counts, and every object that still has a
+BarnCRM trigger, with what each one does today:
+
+| Shown | What it means |
+|---|---|
+| **Instant: BarnCRM updates these totals by itself.** | A BarnCRM object, or a person: nothing to do. |
+| **Not set up** | Totals update every night and when you click **Recalculate**. **Turn on instant totals** shows how to add the trigger. |
+| **On** | The trigger is in this org and running. |
+| **Turned off** | The trigger is there but its switch is off: totals update every night until you click **Turn on instant totals**. |
+| **Inactive** | The trigger is there but was deactivated in Setup. Activate it in a sandbox and deploy it again, or remove it. |
+| **Salesforce allows no trigger on this object** | Its totals stay nightly. |
+
+Step 5 of the Builder shows the same line for the object the rollup counts, with the same
+buttons.
+
+**Turn it on.** Click **Turn on instant totals**. The Builder shows a one-line trigger and its
+test, named from the object (for opportunities, `BarnRollup_Opportunity` and
+`BarnRollup_Opportunity_Test`), with a **Copy** button for each. Then:
+
+1. In a sandbox (or a Developer Edition org) where BarnCRM is installed, open the Developer
+   Console. Choose **File**, **New**, **Apex Trigger**, give it the trigger's name, pick the
+   object, replace the code with the trigger from the Builder and save.
+2. Choose **File**, **New**, **Apex Class**, give it the test's name, replace the code with
+   the test from the Builder and save. Run it from **Test**, **New Run**: it passes.
+3. In the sandbox's Setup, open **Outbound Change Sets**, add the trigger and the class, and
+   upload the change set to production.
+4. In production's Setup, open **Inbound Change Sets**, click **Deploy**, choose **Run
+   specified tests** and enter the test's name. Only that test runs, so tests elsewhere in
+   your org that already fail do not block it.
+5. Back in the Rollup Builder, the object shows **On** as soon as the trigger is in the org.
+
+If you use the Salesforce CLI, **Download deploy package** saves a zip with the trigger and
+its test, and the Builder shows the command that deploys it, to a sandbox or straight to
+production, running only the generated test.
+
+What to know:
+
+- **The trigger never needs changing.** It only tells BarnCRM which records changed; how each
+  total is worked out stays in the rollup, so you can add, edit and remove rollups on that
+  object without touching code. One trigger serves every rollup that counts the object.
+- **The code is the same in every org.** The names come from the object's API name, so a
+  sandbox's change set lands exactly what production's Builder looks for.
+- **The test never depends on your data.** It saves one empty record, which your required
+  fields or validation rules may refuse; the trigger has run by then, and that is all the
+  test checks.
+- **Deletes and restores are seen too**, unlike the Flow template, and pausing all automation
+  or turning the Rollup Builder module off stops the trigger like any other BarnCRM automation.
+- **Who can do it.** Creating Apex in a sandbox and deploying a change set use your
+  Salesforce permissions (an administrator has them). BarnCRM needs no extra permission and
+  deploys nothing itself.
+
+**Turn it off.** Click **Turn off instant totals**. Nothing is deployed: the trigger's switch
+goes off at once, in production too, and the object's totals update every night and when you
+click **Recalculate**. **Turn on instant totals** turns it back on. The switch is also on the
+**Automation** page as **Instant rollups on** and the object's name.
+
+**Remove it.** A switched-off trigger costs almost nothing, so you only need to remove it to
+tidy up, and before uninstalling BarnCRM (the trigger refers to BarnCRM, so Salesforce will
+not uninstall BarnCRM while it is there). Click **Remove the trigger**:
+
+1. In a sandbox, delete the trigger and its test class in Setup (**Apex Triggers**, **Apex
+   Classes**).
+2. Production does not allow deleting Apex in Setup. **Download removal package** saves a zip
+   that deletes both, and the Builder shows the Salesforce CLI command that deploys it.
+
+### With the Flow Template
 
 1. In Setup, open **Flows** and find **Recalculate rollups (template)**. Open it and click
    **Save As**, choosing **A New Flow**, so you have a copy of your own. The template itself
@@ -472,27 +669,65 @@ What to know:
   **Both (recommended)**.
 - **Pausing all automation** stops the action as well; the nightly run catches up.
 
-### One click (coming)
+If you prefer no code in your org, the Flow template does the same job, except for restores.
 
-The Rollup Builder will offer to make such a total instant by adding a small piece of
-automation for you:
+## Skipping a Rollup for Some People
 
-- One click deploys a one-line trigger on your object and a test for it. The trigger only
-  tells BarnCRM which records changed; how the total is calculated stays in the rollup, so
-  editing the rollup later never changes the code.
-- It runs only its own test while deploying, so tests elsewhere in your org that already
-  fail do not block it. If the deploy does fail, the Builder says why in plain words and what
-  to do next.
-- You need the **Customize Application** and **Modify All Data** permissions and the
-  BarnCRM permission to deploy rollup triggers, and you authorize the connection once. If you
-  do not have them, the Builder says "Ask a Salesforce admin, or use the Flow template."
-- Try it in a sandbox first. The trigger has the same name in every org, so moving it to
-  production with a change set gives the same result as deploying it from the Builder there.
-- When you remove the last rollup on that object, the Builder offers to remove the trigger
-  too. Health Check reports a BarnCRM trigger that no rollup uses any more. Remove these
-  triggers before uninstalling BarnCRM.
+A large data load can spend most of its time updating totals that the nightly run would
+put right anyway. To have one person's saves leave a rollup alone:
 
-If you prefer no code in your org, the Flow template above does the same job.
+1. In Setup, open **Custom Permissions** and create one, for example **Data Migration**
+   (API name `Data_Migration`), or use one you already have.
+2. Give it to that person through a permission set.
+3. In the Rollup Builder, edit the rollup and, on the last step, enter the API name in **Skip
+   for people with this custom permission (optional)**. Save.
+
+What to know:
+
+- **Saves by people who hold the permission do not update that total**, instantly or in the
+  queue. Everyone else's saves update it as usual.
+- **The nightly run still covers it** when the rollup runs **Every night** or **Both
+  (recommended)**, and so do **Recalculate** and **Recalculate all**. A rollup set to
+  **Instantly** is put right only when you click **Recalculate**, so prefer **Both** for a
+  rollup you skip.
+- **A name that does not exist is refused** when you save, with the name in the message.
+  Enter it exactly as the API name in Setup. A custom permission from an installed package is
+  written with its prefix, for example `prefix__Name`.
+- Leave the field blank to have everyone's saves update the total.
+
+## Recalculating from a Flow or from Apex
+
+### Recalculate Totals on This Record (Flow)
+
+The Flow action **Recalculate totals on this record** (category **BarnCRM**) recalculates the
+totals a record shows, for example from a screen flow button on a household or from a
+scheduled flow:
+
+- **Record ID** (required): the record that shows the totals.
+- **Rollup (optional)**: the **Definition Key** or the name of one rollup. Leave it empty to
+  recalculate every active rollup on that record's object, whatever its mode.
+
+The totals are recalculated straight away when the flow has room, and otherwise queued and
+recalculated a minute or two later. A rollup name that matches no active rollup on the
+record's object recalculates nothing and leaves a Warning in the Error Log; the flow carries
+on. This action is not a save, so **Skip for people with this custom permission** does not
+apply to it.
+
+### For Developers: Apex
+
+Code that used the DLRS Apex service can call `RollupApi` instead (prefix it with the
+package namespace in a subscriber org):
+
+- `RollupApi.recalculate(Set<Id> recordIds)`: the totals on these records, as the Flow action
+  above does for every rollup.
+- `RollupApi.recalculateChanges(List<SObject> records, Map<Id, SObject> oldRecords, Boolean deleting)`:
+  the totals that changed records affect, exactly as the **Recalculate rollups** action and
+  BarnCRM's own triggers work them out. Call it after the save with the records and their
+  prior values (null for new records), or before a delete with `deleting` set to true, which
+  queues the totals for after the delete. Records of several objects can go in one call.
+
+Neither method throws for a total: a failure goes to the Error Log and the nightly run puts it
+right. Pausing all automation stops `recalculateChanges`, as it stops the Flow action.
 
 ## Current limits
 
@@ -500,10 +735,9 @@ Fund totals and soft credit totals, including a household's soft credit totals, 
 instantly like every other giving total: saving a gift allocation or a soft credit moves them,
 and so does changing a gift's status or deleting a gift. What is not here yet:
 
-- **One-click instant totals on your own objects** are coming. Until then, use the
-  [Flow template](#with-the-flow-template); without it, a rollup that counts records from an
-  object your organization created is calculated every night and when you click
-  **Recalculate**.
+- **The Builder does not deploy the instant-totals trigger for you.** You add it in a sandbox
+  and move it with a change set (or the Salesforce CLI), as in
+  [With a Generated Trigger](#with-a-generated-trigger). A one-click deploy may come later.
 - **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
 - **BarnCRM is checked against its previous rollup engine** before that engine is removed
   from the package. A developer runs the comparison on a test org; it changes nothing in your
@@ -599,10 +833,10 @@ stops it being recalculated; it does not erase the values already on the records
 deliberate, so that turning something off never destroys data. If you want the field
 empty, clear it after you make the rollup inactive.
 
-**Deleting a rollup you do not want.** Deleting it works until the next upgrade, which
-creates it again, because a rollup that is gone is indistinguishable from one that was
-never created. Clear its **Active** box instead. That is remembered, and it leaves the
-numbers already calculated on the records.
+**Deleting a shipped rollup you do not want.** **Delete** refuses a rollup that came with
+BarnCRM, because a shipped rollup that is gone would be created again (an upgrade or
+**Restore shipped rollups** cannot tell it from one never created). Clear its **Active** box
+instead. That is remembered, and it leaves the numbers already calculated on the records.
 
 **Never starting the nightly schedule.** If nobody clicks **Schedule nightly
 recalculation**, nothing recalculates overnight and the home page tile stays in warning. Nothing
@@ -621,6 +855,9 @@ For report builders only. Nothing on this page requires you to know these.
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, in the Rollup Builder | `Last_Calculated__c` on Rollup Definition |
 | Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
+| Which record comes first, by; Order; Only the first N records | `Order_By_Field__c`, `Order_Direction__c` and `Row_Limit__c` on Rollup Definition |
+| Custom delimiter; Include deleted and archived records | `Custom_Delimiter__c` and `Include_Deleted__c` on Rollup Definition |
+| Skip for people with this custom permission | `Bypass_Permission__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
 With Giving installed:

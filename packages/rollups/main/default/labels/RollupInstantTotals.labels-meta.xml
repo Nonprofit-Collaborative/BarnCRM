@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: section title on the Rollup Builder</shortDescription>
+        <value>Instant Totals</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantIntro</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: what the section lists</shortDescription>
+        <value>The objects your instant rollups count, and whether saving one of their records updates the totals at once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusBuiltIn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: BarnCRM ships the trigger</shortDescription>
+        <value>Instant: BarnCRM updates these totals by itself.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: trigger on. {0} is the trigger name.</shortDescription>
+        <value>On: the trigger {0} updates these totals at once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: switched off</shortDescription>
+        <value>Turned off: these totals update every night and when you click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusInactive</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: inactive in Setup. {0} is the trigger name.</shortDescription>
+        <value>Inactive: the trigger {0} was deactivated in Setup. Activate it in a sandbox and deploy it again, or remove it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusNotSetUp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: no trigger yet</shortDescription>
+        <value>Not set up: these totals update every night and when you click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantStatusNotAvailable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals status: no trigger allowed on the object</shortDescription>
+        <value>Salesforce allows no trigger on this object: these totals update every night and when you click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: rollups counting the object. {0} is the count.</shortDescription>
+        <value>{0} instant rollups count this object.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCountOne</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: one rollup counts the object</shortDescription>
+        <value>1 instant rollup counts this object.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCountNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: no rollup counts the object any more</shortDescription>
+        <value>No instant rollup counts this object any more. Turn the trigger off or remove it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTurnOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: button that shows the steps or switches back on</shortDescription>
+        <value>Turn on instant totals</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTurnOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: button that switches the trigger off</shortDescription>
+        <value>Turn off instant totals</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantRemove</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: button that shows the removal steps</shortDescription>
+        <value>Remove the trigger</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantClose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: button that closes the steps</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCopy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: button that copies the code</shortDescription>
+        <value>Copy</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCopied</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: the code was copied</shortDescription>
+        <value>Copied.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantCopyFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: the browser would not copy</shortDescription>
+        <value>Your browser did not allow copying. Select the code and copy it yourself.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantDownloadDeploy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: link that downloads the deploy zip</shortDescription>
+        <value>Download deploy package</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantDownloadRemoval</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: link that downloads the removal zip</shortDescription>
+        <value>Download removal package</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: setup steps title. {0} is the object label.</shortDescription>
+        <value>Turn On Instant Totals for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupStep1</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup step 1. {0} is the trigger name, {1} the object API name.</shortDescription>
+        <value>In a sandbox (or a Developer Edition org) where BarnCRM is installed, open the Developer Console. Choose File, New, Apex Trigger, name it {0}, pick the object {1}, replace the code with the trigger below and save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupStep2</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup step 2. {0} is the test class name.</shortDescription>
+        <value>Choose File, New, Apex Class, name it {0}, replace the code with the test below and save. Run it from Test, New Run: it passes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupStep3</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup step 3. {0} is the trigger name, {1} the test class name.</shortDescription>
+        <value>In the sandbox's Setup, open Outbound Change Sets, add the trigger {0} and the class {1}, and upload the change set to production.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupStep4</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup step 4. {0} is the test class name.</shortDescription>
+        <value>In production's Setup, open Inbound Change Sets, click Deploy, choose Run specified tests and enter {0}. Only that test runs, so tests elsewhere in your org do not block it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupStep5</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup step 5: come back and see On</shortDescription>
+        <value>Back in the Rollup Builder, this object shows On as soon as the trigger is in the org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSetupCli</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: the Salesforce CLI alternative</shortDescription>
+        <value>With the Salesforce CLI instead, download the deploy package and run this command, to a sandbox or to production:</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantRemoveTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: removal steps title. {0} is the object label.</shortDescription>
+        <value>Remove the Trigger for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantRemoveStep1</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal step 1: turning off needs no deploy</shortDescription>
+        <value>To stop instant totals now, use Turn off instant totals: nothing is deployed, it works in production at once, and you can turn it back on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantRemoveStep2</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal step 2. {0} is the trigger name, {1} the test class name.</shortDescription>
+        <value>To delete it, for example before uninstalling BarnCRM: in a sandbox, delete the trigger {0} and the class {1} in Setup (Apex Triggers, Apex Classes).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantRemoveStep3</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removal step 3: production needs a deploy</shortDescription>
+        <value>Production does not allow deleting Apex in Setup. Download the removal package and deploy it with the Salesforce CLI:</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTriggerHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: heading over the trigger code</shortDescription>
+        <value>Trigger</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTestHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: heading over the test class code</shortDescription>
+        <value>Test Class</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTurnedOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: switched off. {0} is the object label.</shortDescription>
+        <value>Instant totals on {0} are turned off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantTurnedOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: switched back on. {0} is the object label.</shortDescription>
+        <value>Instant totals on {0} are turned back on.</value>
+    </labels>
+</CustomLabels>

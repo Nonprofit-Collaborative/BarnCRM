@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Order_Direction__c</fullName>
+    <description>The direction of the order by field for a text list and a row limited calculation; blank means Ascending. First and Last ignore it: First is always the lowest, Last the highest (ADR-0136).</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Descending lists the newest or largest first. Records with a blank order field come last either way.</inlineHelpText>
+    <label>Order Direction</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Ascending</fullName>
+                <default>true</default>
+                <label>Ascending</label>
+            </value>
+            <value>
+                <fullName>Descending</fullName>
+                <default>false</default>
+                <label>Descending</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

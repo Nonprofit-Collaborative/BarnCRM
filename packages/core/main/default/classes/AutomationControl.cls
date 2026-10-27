@@ -106,6 +106,43 @@ public with sharing class AutomationControl {
         );
     }
 
+    /**
+     * Creates the switch row for an automation no registry ships, when it has none yet: a
+     * rollup trigger the administrator deployed from the Rollup Builder (canonical model R-R12,
+     * ADR-0138). The row starts on, with Is Package Default false, so `setEnabled` can then
+     * switch it. Written through `AutomationSettingsWriter` like the shipped rows (ADR-0021):
+     * the caller builds every value from describe and its own labels, never from typed input.
+     */
+    @NamespaceAccessible
+    public static void ensureSwitch(
+        String automationName,
+        String switchLabel,
+        String objectName,
+        String description
+    ) {
+        if (String.isBlank(automationName)) {
+            throw new AutomationControlException(Label.Core_Automation_NameRequired);
+        }
+        requirePermission();
+        if (!AutomationSettingSelector.selectByNames(new Set<String>{ automationName }).isEmpty()) {
+            return;
+        }
+        AutomationSettingsWriter.insertSwitches(
+            new List<Automation_Setting__c>{
+                new Automation_Setting__c(
+                    Name = String.isBlank(switchLabel) ? automationName : switchLabel.left(80),
+                    Automation_Name__c = automationName,
+                    Description__c = description,
+                    Enabled__c = true,
+                    Always_Runs__c = false,
+                    Object_Name__c = objectName,
+                    Is_Package_Default__c = false
+                )
+            }
+        );
+        clearCache();
+    }
+
     @NamespaceAccessible
     public static void clearCache() {
         enabledByName = null;

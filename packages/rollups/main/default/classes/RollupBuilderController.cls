@@ -28,7 +28,23 @@ public with sharing class RollupBuilderController {
         'setting_change__c'
     };
 
-    private static final Set<String> STANDARD_ENTITIES = new Set<String>{ 'account', 'contact' };
+    /** The two standard entities Core itself holds, always offered first (R-R7). */
+    private static final Set<String> CORE_ENTITIES = new Set<String>{ 'account', 'contact' };
+
+    /**
+     * The standard objects most often rolled up from or to, listed first with Account, Contact
+     * and the org's own objects; every other object is found by searching (ADR-0136). Names
+     * only, resolved through describe: an object the org does not have is skipped.
+     */
+    private static final String COMMON_STANDARD = 'Opportunity,OpportunityLineItem,Case,Campaign,CampaignMember,Lead,Task,Event,Asset,Order,OrderItem,Contract'; // detection-only: Builder shortlist resolved through describe, an absent object is skipped (ADR-0136)
+
+    /** The platform's companion objects: sharing, history, feeds and change events. */
+    private static final List<String> COMPANION_SUFFIXES = new List<String>{
+        'share',
+        'history',
+        'feed',
+        'changeevent'
+    };
 
     private static final Set<Schema.DisplayType> NUMBER_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.DOUBLE,
@@ -46,7 +62,15 @@ public with sharing class RollupBuilderController {
     private static final Set<Schema.DisplayType> TARGET_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.BOOLEAN,
         Schema.DisplayType.STRING,
-        Schema.DisplayType.TEXTAREA
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.PICKLIST
+    };
+
+    /** Lookups the platform keeps for itself, whose records no filter needs (ADR-0136). */
+    private static final Set<String> NOT_FOLLOWED = new Set<String>{
+        'createdbyid',
+        'lastmodifiedbyid',
+        'masterrecordid'
     };
 
     private static final Set<String> READS_NO_FIELD = new Set<String>{ 'COUNT', 'ANY', 'NONE' };
@@ -64,6 +88,9 @@ public with sharing class RollupBuilderController {
         public String value { get; set; }
         @AuraEnabled
         public String label { get; set; }
+        /** For an entity: true when it is listed before searching (ADR-0136). */
+        @AuraEnabled
+        public Boolean common { get; set; }
 
         public Option(String value, String label) {
             this.value = value;
@@ -100,6 +127,9 @@ public with sharing class RollupBuilderController {
         /** The counted records' plural name, for the filter sentence: "Gifts". */
         @AuraEnabled
         public String recordsLabel { get; set; }
+        /** Whether saving one of them updates the total at once (R-R12, ADR-0136). */
+        @AuraEnabled
+        public Boolean instant { get; set; }
     }
 
     /** What the Builder needs before step 1. */
@@ -116,6 +146,8 @@ public with sharing class RollupBuilderController {
         public List<Option> aggregates { get; set; }
         @AuraEnabled
         public List<Option> delimiters { get; set; }
+        @AuraEnabled
+        public List<Option> directions { get; set; }
         @AuraEnabled
         public List<Option> modes { get; set; }
     }
@@ -143,7 +175,15 @@ public with sharing class RollupBuilderController {
         @AuraEnabled
         public String orderByField { get; set; }
         @AuraEnabled
+        public String orderDirection { get; set; }
+        @AuraEnabled
+        public Integer rowLimit { get; set; }
+        @AuraEnabled
         public String delimiter { get; set; }
+        @AuraEnabled
+        public String customDelimiter { get; set; }
+        @AuraEnabled
+        public Boolean includeDeleted { get; set; }
         @AuraEnabled
         public String filterJson { get; set; }
         @AuraEnabled
@@ -158,6 +198,8 @@ public with sharing class RollupBuilderController {
         public String mode { get; set; }
         @AuraEnabled
         public Boolean active { get; set; }
+        @AuraEnabled
+        public String bypassPermission { get; set; }
     }
 
     // ----------------------------------------------------------------------------------- reads
@@ -172,6 +214,7 @@ public with sharing class RollupBuilderController {
             model.targets = targetEntities();
             model.aggregates = picklist(Rollup_Definition__c.Aggregate__c);
             model.delimiters = picklist(Rollup_Definition__c.Delimiter__c);
+            model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
             return model;
         } catch (Exception caught) {
@@ -243,6 +286,52 @@ public with sharing class RollupBuilderController {
         } catch (Exception caught) {
             throw asUserError(caught);
         }
+    }
+
+    /**
+     * Step 4: the fields of each record the counted records point to, one lookup away and as the
+     * user sees them, named by path (`Appeal__r.Type__c`) for the filter (R-R2, ADR-0136).
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<FieldOption> getParentFields(String sourceObject) {
+        try {
+            List<FieldOption> options = new List<FieldOption>();
+            for (Schema.SObjectField field : fieldMap(requireEntity(sourceObject)).values()) {
+                Schema.DescribeFieldResult lookup = field.getDescribe();
+                if (
+                    !isParentLookup(lookup) || NOT_FOLLOWED.contains(lookup.getName().toLowerCase())
+                ) {
+                    continue;
+                }
+                String lookupLabel = lookup.getLabel().removeEndIgnoreCase(' ID');
+                for (
+                    Schema.SObjectField parentField : fieldMap(lookup.getReferenceTo()[0]).values()
+                ) {
+                    Schema.DescribeFieldResult described = parentField.getDescribe();
+                    if (!described.isAccessible() || !described.isFilterable()) {
+                        continue;
+                    }
+                    FieldOption option = toOption(described);
+                    option.value = lookup.getRelationshipName() + '.' + described.getName();
+                    option.label = String.format(
+                        Label.Core_RollupBuilder_ParentField,
+                        new List<String>{ lookupLabel, described.getLabel() }
+                    );
+                    options.add(option);
+                }
+            }
+            return sorted(options);
+        } catch (Exception caught) {
+            throw asUserError(caught);
+        }
+    }
+
+    /** A lookup a filter may read through: readable, named, and to one object only. */
+    private static Boolean isParentLookup(Schema.DescribeFieldResult lookup) {
+        return lookup.getType() == Schema.DisplayType.REFERENCE &&
+            lookup.isAccessible() &&
+            String.isNotBlank(lookup.getRelationshipName()) &&
+            lookup.getReferenceTo().size() == 1;
     }
 
     /** An existing rollup, to edit or to copy. */
@@ -378,20 +467,7 @@ public with sharing class RollupBuilderController {
                     Label.Core_Rollups_ErrorNoPermission
                 );
             }
-            String problem = problemWith(draft);
-            if (problem != null) {
-                throw new RollupService.RollupServiceException(problem);
-            }
-            Rollup_Definition__c definition = toRecord(draft);
-            // Checked on save only: the preview runs before the mode is chosen (ROLLUPS-8).
-            if (
-                RollupService.MODE_REAL_TIME.equals(definition.Mode__c) &&
-                RollupDateWindow.movesWithTheDate(definition)
-            ) {
-                throw new RollupService.RollupServiceException(
-                    Label.Core_RollupBuilder_ErrorInstantMovesWithDate
-                );
-            }
+            Rollup_Definition__c definition = checkedRecord(draft);
             RollupWriter.saveAsUser(definition);
             SaveResult result = new SaveResult();
             result.recordId = definition.Id;
@@ -412,6 +488,34 @@ public with sharing class RollupBuilderController {
         } catch (Exception caught) {
             throw asUserError(caught);
         }
+    }
+
+    /**
+     * Every check of the Builder's save (R-R10, R-R8), then the record the draft becomes, unsaved.
+     * Shared with import (`RollupDefinitionTransfer`, ADR-0136), so an imported rollup passes the
+     * same checks. Throws `RollupServiceException` with the reason in plain words.
+     */
+    public static Rollup_Definition__c checkedRecord(Draft draft) {
+        String problem = problemWith(draft);
+        if (problem != null) {
+            throw new RollupService.RollupServiceException(problem);
+        }
+        Rollup_Definition__c definition = toRecord(draft);
+        // Checked on save only: the preview runs before the mode is chosen (ROLLUPS-8).
+        if (
+            RollupService.MODE_REAL_TIME.equals(definition.Mode__c) &&
+            RollupDateWindow.movesWithTheDate(definition)
+        ) {
+            throw new RollupService.RollupServiceException(
+                Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+            );
+        }
+        // Instantly alone needs instant updates on the source entity (R-R12, ADR-0136).
+        String instantProblem = instantProblem(definition);
+        if (instantProblem != null) {
+            throw new RollupService.RollupServiceException(instantProblem);
+        }
+        return definition;
     }
 
     /**
@@ -439,6 +543,9 @@ public with sharing class RollupBuilderController {
         if (problem == null) {
             problem = sourceProblem(draft, aggregate);
         }
+        if (problem == null && target.getDescribe().getType() == Schema.DisplayType.PICKLIST) {
+            problem = picklistProblem(draft, target.getDescribe());
+        }
         if (problem == null) {
             problem = filterProblem(draft, targetType);
         }
@@ -446,6 +553,27 @@ public with sharing class RollupBuilderController {
             problem = overlapProblem(draft, targetType, target);
         }
         return problem;
+    }
+
+    /**
+     * Why this rollup cannot be Instantly only, or null: its source entity has no rollup trigger,
+     * so nothing would update it between nightly runs (R-R12, ADR-0136). Both and Every night
+     * are always allowed; with the Flow template, Both is still instant. The rollup list's mode
+     * change asks the same.
+     */
+    public static String instantProblem(Rollup_Definition__c definition) {
+        if (
+            definition == null ||
+            !RollupService.MODE_REAL_TIME.equals(definition.Mode__c) ||
+            RollupService.hasInstantUpdates(definition.Source_Object__c)
+        ) {
+            return null;
+        }
+        Schema.SObjectType sourceType = SettingsService.typeByName(definition.Source_Object__c);
+        String records = sourceType == null
+            ? definition.Source_Object__c
+            : sourceType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+        return String.format(Label.Core_RollupBuilder_ErrorNoInstant, new List<String>{ records });
     }
 
     /** The source entity, the path, the attributes read and the fiscal window. */
@@ -496,6 +624,17 @@ public with sharing class RollupBuilderController {
         if (String.isNotBlank(draft.orderByField) && typeOf(fields, draft.orderByField) == null) {
             return Label.Core_RollupBuilder_ErrorFieldUnknown;
         }
+        String limitProblem = RollupPlanner.rowLimitProblem(
+            aggregate,
+            draft.rowLimit,
+            draft.orderByField
+        );
+        if (limitProblem == null) {
+            limitProblem = RollupPlanner.delimiterProblem(draft.delimiter, draft.customDelimiter);
+        }
+        if (limitProblem != null) {
+            return limitProblem;
+        }
         if (draft.fiscalYearAware == true) {
             if (!FISCAL_OFFSETS.contains(draft.fiscalYearOffset)) {
                 return Label.Core_RollupBuilder_ErrorWindowInvalid;
@@ -510,6 +649,42 @@ public with sharing class RollupBuilderController {
             }
         }
         return null;
+    }
+
+    /**
+     * A picklist target is filled from a picklist or text attribute, and a source picklist may
+     * hold only values the target has (R-R15). Text is checked as it is written (`RollupWriter`).
+     */
+    private static String picklistProblem(Draft draft, Schema.DescribeFieldResult target) {
+        Schema.SObjectField source = String.isBlank(draft.sourceField)
+            ? null
+            : fieldMap(SettingsService.typeByName(draft.sourceObject))
+                  .get(draft.sourceField.toLowerCase());
+        Schema.DisplayType readType = source == null ? null : source.getDescribe().getType();
+        if (readType == Schema.DisplayType.STRING) {
+            return null;
+        }
+        if (readType != Schema.DisplayType.PICKLIST) {
+            return Label.Core_RollupBuilder_ErrorPicklistSource;
+        }
+        Set<String> targetValues = new Set<String>();
+        for (Schema.PicklistEntry entry : target.getPicklistValues()) {
+            if (entry.isActive()) {
+                targetValues.add(entry.getValue().toLowerCase());
+            }
+        }
+        List<String> missing = new List<String>();
+        for (Schema.PicklistEntry entry : source.getDescribe().getPicklistValues()) {
+            if (entry.isActive() && !targetValues.contains(entry.getValue().toLowerCase())) {
+                missing.add(entry.getValue());
+            }
+        }
+        return missing.isEmpty()
+            ? null
+            : String.format(
+                  Label.Core_RollupBuilder_ErrorPicklistValues,
+                  new List<String>{ String.join(missing, ', ') }
+              );
     }
 
     /** Both filter documents read, and name only attributes their entity has (R-R2). */
@@ -529,11 +704,38 @@ public with sharing class RollupBuilderController {
         }
         Map<String, Schema.SObjectField> fields = fieldMap(entity);
         for (String field : RollupFilterParser.fieldsOf(document)) {
-            if (!field.contains('.') && !fields.containsKey(field.toLowerCase())) {
-                return Label.Core_RollupBuilder_ErrorFieldUnknown;
+            String problem = field.contains('.')
+                ? parentFieldProblem(fields, field)
+                : (fields.containsKey(field.toLowerCase())
+                      ? null
+                      : Label.Core_RollupBuilder_ErrorFieldUnknown);
+            if (problem != null) {
+                return problem;
             }
         }
         return null;
+    }
+
+    /**
+     * A field of a record one lookup away (`Appeal__r.Type__c`): the lookup is readable and to
+     * one object, and the field is on it and readable, all as the administrator sees them.
+     */
+    private static String parentFieldProblem(Map<String, Schema.SObjectField> fields, String path) {
+        List<String> parts = path.split('\\.');
+        if (parts.size() > 2) {
+            return Label.Core_RollupBuilder_ErrorOneLookup;
+        }
+        for (Schema.SObjectField field : fields.values()) {
+            Schema.DescribeFieldResult lookup = field.getDescribe();
+            if (isParentLookup(lookup) && parts[0].equalsIgnoreCase(lookup.getRelationshipName())) {
+                Schema.SObjectField parentField = fieldMap(lookup.getReferenceTo()[0])
+                    .get(parts[1].toLowerCase());
+                return parentField != null && parentField.getDescribe().isAccessible()
+                    ? null
+                    : Label.Core_RollupBuilder_ErrorFieldUnknown;
+            }
+        }
+        return Label.Core_RollupBuilder_ErrorFieldUnknown;
     }
 
     /**
@@ -601,44 +803,119 @@ public with sharing class RollupBuilderController {
 
     // --------------------------------------------------------------------------------- helpers
 
+    /**
+     * Every entity a total can be shown on: common ones first (Account, Contact, the org's own
+     * objects and the standard shortlist), then every other the user may see, by label.
+     */
     private static List<Option> targetEntities() {
-        List<Option> options = new List<Option>();
+        List<Option> common = new List<Option>();
+        List<Option> others = new List<Option>();
+        Set<String> shortlist = commonStandard();
         for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
             String name = String.valueOf(type).toLowerCase();
-            Boolean candidate =
-                STANDARD_ENTITIES.contains(name) ||
-                (name.endsWith('__c') && !NOT_TARGETS.contains(localName(name)));
-            if (!candidate) {
+            if (!plausible(name) || NOT_TARGETS.contains(localName(name))) {
                 continue;
             }
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             );
-            if (described.isCustomSetting() || !described.isUpdateable()) {
+            if (!offered(described, shortlist) || !described.isUpdateable()) {
                 continue;
             }
-            options.add(new Option(described.getName(), described.getLabel()));
+            Option option = new Option(described.getName(), described.getLabel());
+            option.common = isCommon(name, shortlist);
+            if (option.common) {
+                common.add(option);
+            } else {
+                others.add(option);
+            }
         }
-        return sortedOptions(options);
+        List<Option> options = sortedOptions(common);
+        options.addAll(sortedOptions(others));
+        return options;
+    }
+
+    /** The standard shortlist, in lower case. */
+    private static Set<String> commonStandard() {
+        return new Set<String>(COMMON_STANDARD.toLowerCase().split(','));
+    }
+
+    private static Boolean isCommon(String name, Set<String> shortlist) {
+        return name.endsWith('__c') || CORE_ENTITIES.contains(name) || shortlist.contains(name);
+    }
+
+    /**
+     * Whether the Builder offers this entity as records a rollup counts (ADR-0136). The
+     * instant-totals generator (`RollupInstantTotals.getCode`, ADR-0138) asks the same rule, so
+     * code is generated only for an object a rollup can count.
+     */
+    public static Boolean offersAsSource(Schema.SObjectType type) {
+        if (type == null) {
+            return false;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        return plausible(described.getName().toLowerCase()) && offered(described, commonStandard());
+    }
+
+    /**
+     * Whether a name can be an entity the Builder offers, before paying for its describe: an
+     * object of the org's own (`__c`) or a standard one, and not a companion object.
+     */
+    private static Boolean plausible(String name) {
+        if (name.endsWith('__c')) {
+            return true;
+        }
+        if (name.contains('__')) {
+            return false;
+        }
+        for (String suffix : COMPANION_SUFFIXES) {
+            if (name.endsWith(suffix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Whether the Builder offers this entity (ADR-0136): the user can read and query it, and it
+     * is not a custom setting or retired. A standard object off the shortlist must also be one
+     * people create and search for, which leaves out logs and the platform's own records.
+     */
+    private static Boolean offered(Schema.DescribeSObjectResult described, Set<String> shortlist) {
+        if (
+            !described.isQueryable() ||
+            !described.isAccessible() ||
+            described.isCustomSetting() ||
+            described.isDeprecatedAndHidden()
+        ) {
+            return false;
+        }
+        String name = described.getName().toLowerCase();
+        return isCommon(name, shortlist) || (described.isCreateable() && described.isSearchable());
     }
 
     private static List<SourceOption> childrenOf(Schema.SObjectType parent, String token) {
         List<SourceOption> options = new List<SourceOption>();
+        Set<String> shortlist = commonStandard();
         for (
             Schema.ChildRelationship child : parent.getDescribe(SObjectDescribeOptions.DEFERRED)
                 .getChildRelationships()
         ) {
+            String name = String.valueOf(child.getChildSObject()).toLowerCase();
+            if (!plausible(name) || (token != null && name == 'account')) {
+                continue;
+            }
             Schema.DescribeSObjectResult childType = child.getChildSObject()
                 .getDescribe(SObjectDescribeOptions.DEFERRED);
-            String name = childType.getName().toLowerCase();
-            Boolean candidate = STANDARD_ENTITIES.contains(name) || name.endsWith('__c');
-            if (!candidate || !childType.isQueryable() || childType.isCustomSetting()) {
-                continue;
-            }
-            if (token != null && child.getChildSObject() == Account.SObjectType) {
-                continue;
-            }
             Schema.DescribeFieldResult reference = child.getField().getDescribe();
+            // The engine's query filters and groups on the reference (RollupAggregator).
+            if (
+                !offered(childType, shortlist) ||
+                !reference.isFilterable() ||
+                !reference.isGroupable()
+            ) {
+                continue;
+            }
             SourceOption option = new SourceOption();
             option.sourceObject = childType.getName();
             option.relationshipPath = token == null
@@ -646,6 +923,7 @@ public with sharing class RollupBuilderController {
                 : reference.getName() + ' > ' + token;
             option.value = option.sourceObject + '|' + option.relationshipPath;
             option.recordsLabel = childType.getLabelPlural();
+            option.instant = RollupService.hasInstantUpdates(option.sourceObject);
             option.label = String.format(
                 token == null
                     ? Label.Core_RollupBuilder_SourceBy
@@ -695,7 +973,8 @@ public with sharing class RollupBuilderController {
         return option;
     }
 
-    private static Draft toDraft(Rollup_Definition__c definition) {
+    /** A saved rollup as the Builder edits it; also what Export writes (ADR-0136). */
+    public static Draft toDraft(Rollup_Definition__c definition) {
         Draft draft = new Draft();
         draft.recordId = definition.Id;
         draft.name = definition.Name;
@@ -707,7 +986,13 @@ public with sharing class RollupBuilderController {
         draft.aggregate = definition.Aggregate__c;
         draft.sourceField = definition.Source_Field__c;
         draft.orderByField = definition.Order_By_Field__c;
+        draft.orderDirection = definition.Order_Direction__c;
+        draft.rowLimit = definition.Row_Limit__c == null
+            ? null
+            : definition.Row_Limit__c.intValue();
         draft.delimiter = definition.Delimiter__c;
+        draft.customDelimiter = definition.Custom_Delimiter__c;
+        draft.includeDeleted = definition.Include_Deleted__c;
         draft.filterJson = definition.Filter_JSON__c;
         draft.targetFilterJson = definition.Target_Filter_JSON__c;
         draft.fiscalYearAware = definition.Fiscal_Year_Aware__c;
@@ -717,6 +1002,7 @@ public with sharing class RollupBuilderController {
         draft.fiscalDateField = definition.Fiscal_Date_Field__c;
         draft.mode = definition.Mode__c;
         draft.active = definition.Active__c;
+        draft.bypassPermission = definition.Bypass_Permission__c;
         return draft;
     }
 
@@ -731,7 +1017,13 @@ public with sharing class RollupBuilderController {
             Aggregate__c = draft.aggregate.toUpperCase(),
             Source_Field__c = String.isBlank(draft.sourceField) ? null : draft.sourceField,
             Order_By_Field__c = String.isBlank(draft.orderByField) ? null : draft.orderByField,
+            Order_Direction__c = draft.orderDirection == 'Descending' ? 'Descending' : 'Ascending',
+            Row_Limit__c = draft.rowLimit,
             Delimiter__c = String.isBlank(draft.delimiter) ? null : draft.delimiter,
+            Custom_Delimiter__c = draft.delimiter == RollupPlanner.CUSTOM_DELIMITER
+                ? draft.customDelimiter
+                : null,
+            Include_Deleted__c = draft.includeDeleted == true,
             Filter_JSON__c = String.isBlank(draft.filterJson) ? null : draft.filterJson,
             Target_Filter_JSON__c = String.isBlank(draft.targetFilterJson)
                 ? null
@@ -745,7 +1037,10 @@ public with sharing class RollupBuilderController {
             Mode__c = valuesOf(Rollup_Definition__c.Mode__c).contains(draft.mode)
                 ? draft.mode
                 : RollupService.defaultMode(),
-            Active__c = draft.active != false
+            Active__c = draft.active != false,
+            Bypass_Permission__c = String.isBlank(draft.bypassPermission)
+                ? null
+                : draft.bypassPermission.trim()
         );
         if (String.isNotBlank(draft.recordId)) {
             record.Id = Id.valueOf(draft.recordId);

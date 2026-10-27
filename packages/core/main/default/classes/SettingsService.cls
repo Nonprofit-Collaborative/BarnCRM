@@ -289,7 +289,34 @@ public with sharing class SettingsService {
         if (changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c)) {
             TabAccessService.requestSync();
         }
+        notifyRollupEngine(objectName, changed);
         return orgDefault(type);
+    }
+
+    /**
+     * Tells the rollup engine, when its module is installed, which settings a save changed, so a
+     * setting that times a scheduled job (the nightly rollup run's hour) moves the job in the
+     * same save, as Seasonal Addresses does below. Core cannot name the module's settings, so
+     * it hands over every change and the engine picks its own (ADR-0125 decision 4, ADR-0136).
+     * A failure is logged and the saved setting stands.
+     */
+    private static void notifyRollupEngine(
+        String objectName,
+        Map<Schema.SObjectField, Object> changed
+    ) {
+        RollupEngineExtensionV3 engine = RollupEngineExtensions.findV3();
+        if (engine == null) {
+            return;
+        }
+        Set<String> keys = new Set<String>();
+        for (Schema.SObjectField token : changed.keySet()) {
+            keys.add(token.getDescribe().getLocalName());
+        }
+        try {
+            engine.afterSettingsSaved(objectName, keys);
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, 'SettingsService.notifyRollupEngine');
+        }
     }
 
     /**

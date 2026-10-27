@@ -97,6 +97,46 @@
         <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never pick the same record.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_ErrorOneLookup</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a filter reads a field more than one lookup away.</shortDescription>
+        <value>A filter can read a field of a record the counted records point to, but no further. Choose a field one lookup away.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorPicklistSource</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a picklist target is filled from a field that is not text.</shortDescription>
+        <value>A picklist can be filled only from a picklist or a text field. Choose one of those to copy, or choose another field to fill.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorPicklistValues</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: source picklist values the target lacks. {0} is the values.</shortDescription>
+        <value>The picklist you fill does not have these values of the field you copy: {0}. Add them to that picklist, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ParentField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter field on a parent record. {0} is the lookup, {1} the field.</shortDescription>
+        <value>{0} &gt; {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ParentFieldNote</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 note shown when a filter reads a field of another record.</shortDescription>
+        <value>This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_SourceBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -449,6 +489,38 @@
         <value>Only fields BarnCRM can write are listed. If the field you need does not exist, create a Number or Currency field in Setup, then come back.</value>
     </labels>
     <labels>
+        <fullName>Core_RollupBuilder_TargetSearch</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 label: a search box that finds any object to show the total on.</shortDescription>
+        <value>Find another object</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetSearchHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 help for the object search box.</shortDescription>
+        <value>The list shows the objects most often used. Type part of a name to find any other object you can see, then pick it from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 notice: counted records have no rollup trigger. {0} plural name.</shortDescription>
+        <value>Instant totals are not available yet for {0}. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorNoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: Instantly only, counted records have no trigger. {0} plural.</shortDescription>
+        <value>Instant totals are not available yet for {0}, so this total cannot be Instantly only. Choose Both (recommended) or Every night.</value>
+    </labels>
+    <labels>
         <fullName>Core_RollupBuilder_FilledBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -487,6 +559,54 @@
         <protected>false</protected>
         <shortDescription>Step 3 label: the field that decides which record comes first.</shortDescription>
         <value>Which record comes first, by</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_OrderDirection</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: ascending or descending order.</shortDescription>
+        <value>Order</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RowLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: calculate only the first N records.</shortDescription>
+        <value>Only the first N records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RowLimitHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 help for the row limit.</shortDescription>
+        <value>Optional. For the sum of the 5 largest gifts, enter 5 and order by Amount, Descending. Leave blank for every record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_CustomDelimiter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the characters a Custom delimiter writes.</shortDescription>
+        <value>Custom delimiter</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_IncludeDeleted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 label: count deleted and archived records too.</shortDescription>
+        <value>Include deleted and archived records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_IncludeDeletedHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 help for including deleted and archived records.</shortDescription>
+        <value>Counts records in the Recycle Bin and archived tasks and events. Deleting a record does not lower the total; emptying the Recycle Bin does, at the next full recalculation.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Delimiter</fullName>
@@ -591,6 +711,22 @@
         <protected>false</protected>
         <shortDescription>Step 5 label: the rollup's description.</shortDescription>
         <value>What this number means</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_BypassPermission</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 label: the optional bypass custom permission</shortDescription>
+        <value>Skip for people with this custom permission (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_BypassPermissionHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 help: what the bypass custom permission does</shortDescription>
+        <value>The API name of a custom permission, such as Data_Migration. Records saved by people who hold it do not update this total. Recalculate still does, and so does the nightly run when the rollup runs Every night or Both.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Summary</fullName>
@@ -773,16 +909,16 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run tonight: the nightly run already covers it</shortDescription>
-        <value>The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
+        <shortDescription>Run tonight, already covered: {0} is the nightly time</shortDescription>
+        <value>The nightly run already recalculates every Every night and Both total at {0}. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_TonightScheduled</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run tonight: one run set for 2:00 AM</shortDescription>
-        <value>One recalculation of every total is set for 2:00 AM tonight.</value>
+        <shortDescription>Run tonight: one run set; {0} is the nightly time</shortDescription>
+        <value>One recalculation of every total is set for the next {0}.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_AttentionTitle</fullName>
@@ -927,5 +1063,229 @@
         <protected>false</protected>
         <shortDescription>Needs attention: the waiting records were started</shortDescription>
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Delete</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row button: delete this rollup</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete confirmation: heading</shortDescription>
+        <value>Delete Rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteConfirm</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete confirmation: what happens; {0} is the rollup name</shortDescription>
+        <value>Delete {0}? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DeleteShipped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete refused: the rollup came with BarnCRM</shortDescription>
+        <value>This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Deleted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a rollup is deleted</shortDescription>
+        <value>Rollup deleted. The values it wrote stay on the records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Export</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: download the ticked rollups, or all admin-made ones, as a file</shortDescription>
+        <value>Export to a file</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ExportSelect</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row checkbox: include this rollup in the export</shortDescription>
+        <value>Include in the export</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ExportNothing</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export refused: no admin-made rollup to export</shortDescription>
+        <value>There is no rollup you made to export. Rollups that came with BarnCRM are in every org already.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportFile</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>File input: a rollups file made by Export</shortDescription>
+        <value>Import from a file</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportColumn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import table column: what happens to each rollup</shortDescription>
+        <value>What happens</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportApply</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: save the rollups the file holds</shortDescription>
+        <value>Import these rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportDone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after an import</shortDescription>
+        <value>Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportWillCreate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: the rollup is new here</shortDescription>
+        <value>New: will be created</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportWillUpdate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: the rollup replaces the one with the same key</shortDescription>
+        <value>Will replace the rollup here with the same Definition Key</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportCreated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: created</shortDescription>
+        <value>Created</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUpdated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: updated</shortDescription>
+        <value>Updated</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportRefused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: the rollup is not saved; the reason follows</shortDescription>
+        <value>Not saved</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNotReached</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import result: stopped before this rollup</shortDescription>
+        <value>Not imported yet: import the same file again to finish</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNotAFile</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import refused: not a rollups file</shortDescription>
+        <value>This is not a BarnCRM rollups file. Choose a file made by Export to a file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportNewer</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import refused: the file comes from a newer BarnCRM</shortDescription>
+        <value>This file was made by a newer BarnCRM. Upgrade BarnCRM in this org, then import it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUnreadable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: one rollup in the file cannot be read</shortDescription>
+        <value>This rollup cannot be read from the file. Export it again from the org it came from.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportTwice</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a Definition Key appears twice in the file</shortDescription>
+        <value>This rollup is in the file twice. Only the first one is used.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportShipped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: the rollup comes with BarnCRM</shortDescription>
+        <value>This rollup comes with BarnCRM, so it is not imported. Use Restore shipped rollups here instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ImportUnknown</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: attributes this org does not know; {0} lists them</shortDescription>
+        <value>This rollup uses settings that BarnCRM in this org does not have ({0}). Upgrade BarnCRM in this org, then import it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantBuiltInError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: BarnCRM already updates this object instantly</shortDescription>
+        <value>BarnCRM already keeps totals on this object up to date by itself, so it needs no trigger.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantNotAvailableError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Instant totals: Salesforce allows no trigger on this object</shortDescription>
+        <value>Salesforce does not allow a trigger on this object, so its totals cannot be made instant. They are calculated every night and when you click Recalculate.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSwitchDescription</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: generated trigger switch. {0} is the trigger name.</shortDescription>
+        <value>The rollup trigger {0}, deployed from the Rollup Builder. Switch it off to stop instant totals on this object; rollups in Both still recalculate every night.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_InstantSwitchName</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: generated trigger switch. {0} is the object label.</shortDescription>
+        <value>Instant rollups on {0}</value>
     </labels>
 </CustomLabels>

@@ -56,6 +56,11 @@ export default class RollupBuilder extends LightningElement {
     return this.editing ? 'slds-hide' : '';
   }
 
+  /** Whether the viewer may switch instant totals off and on (Manage BarnCRM Settings). */
+  get canManage() {
+    return Boolean(this.model && this.model.canManage);
+  }
+
   handleNew() {
     this.open(null);
   }
@@ -95,6 +100,10 @@ export default class RollupBuilder extends LightningElement {
     const list = this.template.querySelector('c-rollup-definitions');
     if (list) {
       list.refresh();
+    }
+    const instant = this.template.querySelector('c-rollup-instant-totals');
+    if (instant) {
+      instant.load();
     }
     const attention = this.template.querySelector('c-rollup-needs-attention');
     if (attention) {

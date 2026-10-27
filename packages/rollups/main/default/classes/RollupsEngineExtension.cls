@@ -2,10 +2,11 @@
  * The rollup engine's answer to Core's `RollupEngineExtension` (ADR-0125,
  * `0125-rollup-builder-module.md`). It only delegates: each method is the engine call Core made
  * directly before the engine became the BarnCRM Rollup Builder module. `RollupEngineExtensionV2`
- * is the later seam Core's Module Manager calls on Turn on (decision 9).
+ * is the later seam Core's Module Manager calls on Turn on (decision 9), and
+ * `RollupEngineExtensionV3` the one Core's settings service calls after a save (ADR-0136).
  */
 @NamespaceAccessible
-public with sharing class RollupsEngineExtension implements RollupEngineExtension, RollupEngineExtensionV2 {
+public with sharing class RollupsEngineExtension implements RollupEngineExtension, RollupEngineExtensionV2, RollupEngineExtensionV3 {
     @NamespaceAccessible
     public RollupsEngineExtension() {
         // Built by name from Core (RollupEngineExtensions), so it needs a public constructor.
@@ -16,6 +17,17 @@ public with sharing class RollupsEngineExtension implements RollupEngineExtensio
             RollupService.catchUpAfterTurnedOn();
             // People given a BarnCRM role while it was off get their sets now (D2).
             RollupAccessSync.requestSync();
+        }
+    }
+
+    /** A new nightly hour moves the scheduled nightly run (Section 14B). */
+    public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+        if (
+            RollupService.SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            changedKeys != null &&
+            changedKeys.contains(RollupScheduler.HOUR_SETTING)
+        ) {
+            RollupScheduler.reschedule();
         }
     }
 

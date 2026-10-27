@@ -216,7 +216,11 @@ public virtual with sharing class TriggerHandler {
      * governor limits back where they were before the attempt, so less work counted than when
      * the last trigger ended means a rollback, and the claims are cleared. A test's startTest and
      * stopTest move the count too, which only clears claims a test would clear itself.
+     *
+     * Namespace accessible for a module's own trigger entry point, which dispatches one handler
+     * without a registry row and marks progress the same way (`RollupInstantTrigger`, ADR-0138).
      */
+    @NamespaceAccessible
     public static void noteTriggerProgress() {
         Integer work = Limits.getQueries() + Limits.getDmlStatements();
         if (work < workAtLastTrigger) {

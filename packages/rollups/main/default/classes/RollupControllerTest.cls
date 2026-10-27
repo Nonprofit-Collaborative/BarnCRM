@@ -155,6 +155,41 @@ private class RollupControllerTest {
         }
     }
 
+    /** ADR-0136: records with no rollup trigger cannot be Instantly only, from the list either. */
+    @IsTest
+    static void aTotalOfRecordsWithNoTriggerCannotBeSwitchedToInstantlyOnly() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Source_Object__c = 'Task';
+            rollup.Relationship_Path__c = 'WhatId';
+            insert rollup;
+
+            String message;
+            try {
+                RollupController.setMode(rollup.Id, RollupService.MODE_REAL_TIME);
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+            RollupController.setMode(rollup.Id, RollupService.MODE_SCHEDULED);
+
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_ErrorNoInstant,
+                    new List<String>{
+                        Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                            .getLabelPlural()
+                    }
+                ),
+                message
+            );
+            System.Assert.areEqual(
+                RollupService.MODE_SCHEDULED,
+                [SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
+                'Every night is allowed'
+            );
+        }
+    }
+
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
@@ -317,17 +352,23 @@ private class RollupControllerTest {
             RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
             String first;
             String second;
+            String expected;
 
             Test.startTest();
             System.runAs(maria()) {
                 first = RollupController.runTonight();
                 second = RollupController.runTonight();
+                expected = String.format(
+                    Label.Core_RollupBuilder_TonightScheduled,
+                    new List<String>{ RollupScheduler.nightlyTime() }
+                );
             }
             Test.stopTest();
 
             String pattern = RollupScheduler.jobNameInUse + ' %';
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightScheduled, first);
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightScheduled, second);
+            System.Assert.areEqual(expected, first);
+            System.Assert.areEqual(expected, second);
+            System.Assert.isTrue(first.contains('2:00'), 'At the default hour');
             System.Assert.areEqual(
                 1,
                 [SELECT COUNT() FROM CronJobDetail WHERE Name LIKE :pattern],
@@ -346,16 +387,86 @@ private class RollupControllerTest {
             RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
             RollupScheduler.start();
             String notice;
+            String expected;
 
             Test.startTest();
             System.runAs(maria()) {
                 notice = RollupController.runTonight();
+                expected = String.format(
+                    Label.Core_RollupBuilder_TonightAlreadyScheduled,
+                    new List<String>{ RollupScheduler.nightlyTime() }
+                );
             }
             Test.stopTest();
 
             String pattern = RollupScheduler.jobNameInUse + ' %';
-            System.Assert.areEqual(Label.Core_RollupBuilder_TonightAlreadyScheduled, notice);
+            System.Assert.areEqual(expected, notice);
             System.Assert.areEqual(0, [SELECT COUNT() FROM CronJobDetail WHERE Name LIKE :pattern]);
+        }
+    }
+
+    @IsTest
+    static void deletingAnAdminMadeRollupRemovesItFromTheList() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            insert rollup;
+
+            RollupController.RollupPageView page = RollupController.deleteRollup(rollup.Id);
+
+            System.Assert.areEqual(0, page.rollups.size(), 'The list no longer shows it');
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id],
+                'The definition is gone'
+            );
+        }
+    }
+
+    @IsTest
+    static void aShippedRollupIsTurnedOffNotDeleted() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Is_Package_Default__c = true;
+            insert rollup;
+
+            try {
+                RollupController.deleteRollup(rollup.Id);
+                System.Assert.fail('R-R6: a shipped rollup is refused');
+            } catch (AuraHandledException refused) {
+                System.Assert.areEqual(
+                    Label.Core_RollupBuilder_DeleteShipped,
+                    refused.getMessage()
+                );
+            }
+            System.Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id],
+                'It is still there, to be switched off'
+            );
+        }
+    }
+
+    @IsTest
+    static void staffCannotDeleteARollup() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c rollup = definition();
+            insert rollup;
+            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+            System.runAs(david) {
+                try {
+                    RollupController.deleteRollup(rollup.Id);
+                    System.Assert.fail('Only a settings manager deletes');
+                } catch (AuraHandledException refused) {
+                    System.Assert.areEqual(
+                        Label.Core_Rollups_ErrorNoPermission,
+                        refused.getMessage()
+                    );
+                }
+            }
+            System.Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Id = :rollup.Id]
+            );
         }
     }
 
