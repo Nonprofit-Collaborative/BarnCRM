@@ -52,6 +52,12 @@ public with sharing class RollupController {
         public String filterJson { get; set; }
         @AuraEnabled
         public String targetFilterJson { get; set; }
+        /** The rollup in one plain sentence, by labels (U1, `RollupSentence`). */
+        @AuraEnabled
+        public String sentence { get; set; }
+        /** The target entity's label, which the list groups by (U12). */
+        @AuraEnabled
+        public String targetObjectLabel { get; set; }
     }
 
     /** The whole page: the schedule, the freshness, the permission, and the list. */
@@ -334,6 +340,11 @@ public with sharing class RollupController {
         Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);
         for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
             RollupView view = toView(definition);
+            view.sentence = RollupSentence.of(definition);
+            Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
+            view.targetObjectLabel = target == null
+                ? definition.Target_Object__c
+                : target.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
             String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
             view.aggregateLabel = aggregateLabels.containsKey(aggregate)
                 ? aggregateLabels.get(aggregate)

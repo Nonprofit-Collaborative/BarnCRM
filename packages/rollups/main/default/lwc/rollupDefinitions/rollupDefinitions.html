@@ -189,6 +189,21 @@
                 <p data-id="empty-message">{labels.emptyList}</p>
             </template>
 
+            <template lwc:if={hasAnyRollup}>
+                <lightning-input
+                    class="slds-var-m-bottom_small"
+                    type="search"
+                    data-id="search"
+                    label={labels.search}
+                    field-level-help={labels.searchHelp}
+                    value={searchTerm}
+                    onchange={handleSearch}
+                ></lightning-input>
+            </template>
+            <template lwc:if={noMatches}>
+                <p data-id="no-matches">{labels.noMatches}</p>
+            </template>
+
             <template lwc:if={hasRows}>
                 <div class="slds-scrollable_x">
                     <table
@@ -199,7 +214,6 @@
                             <tr class="slds-line-height_reset">
                                 <th scope="col">{labels.columnRollup}</th>
                                 <th scope="col">{labels.columnCounts}</th>
-                                <th scope="col">{labels.columnTarget}</th>
                                 <th scope="col">{labels.columnMode}</th>
                                 <th scope="col">{labels.columnLastCalculated}</th>
                                 <th scope="col">{labels.columnActive}</th>
@@ -209,7 +223,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <template for:each={rows} for:item="row">
+                            <template for:each={groups} for:item="group">
+                                <tr key={group.key} class="slds-theme_shade" data-id="group-row">
+                                    <th scope="colgroup" colspan="6">
+                                        <strong>{group.heading}</strong>
+                                    </th>
+                                </tr>
+                            <template for:each={group.rows} for:item="row">
                                 <tr key={row.recordId} data-id="rollup-row">
                                     <th scope="row">
                                         <template lwc:if={row.exportable}>
@@ -227,8 +247,12 @@
                                         <div>{row.name}</div>
                                         <div class="slds-text-body_small">{row.description}</div>
                                     </th>
-                                    <td>{row.counts}</td>
-                                    <td>{row.target}</td>
+                                    <td class="slds-cell-wrap">
+                                        <div data-id="sentence">{row.sentence}</div>
+                                        <div class="slds-text-body_small slds-text-color_weak">
+                                            {row.counts}: {row.target}
+                                        </div>
+                                    </td>
                                     <td>
                                         <lightning-combobox
                                             data-id={row.recordId}
@@ -301,6 +325,7 @@
                                         </template>
                                     </td>
                                 </tr>
+                            </template>
                             </template>
                         </tbody>
                     </table>

@@ -32,6 +32,9 @@ jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportRefused', () => ({ defau
 jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportCreated', () => ({ default: 'Created' }), {
   virtual: true
 });
+jest.mock('@salesforce/label/c.Core_RollupEase_Group', () => ({ default: '{0} ({1})' }), {
+  virtual: true
+});
 
 jest.mock(
   '@salesforce/apex/RollupController.getPage',
@@ -222,12 +225,72 @@ describe('c-rollup-definitions', () => {
     getPage.emit({ ...PAGE, rollups: [programs, major] });
     await flush();
 
+    // Grouped by the object that shows the total: Account before Contact (U12).
     const rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
-    expect(rows[0].textContent).toContain(
+    expect(rows[1].textContent).toContain(
       'Text list, each value once Program_Name__c on Program_Enrollment__c, separated by semicolon'
     );
-    expect(rows[1].textContent).toContain('Any on Gift__c');
-    expect(rows[1].textContent).not.toContain('separated by');
+    expect(rows[0].textContent).toContain('Any on Gift__c');
+    expect(rows[0].textContent).not.toContain('separated by');
+  });
+
+  describe('Plain sentences, search and groups', () => {
+    const giving = {
+      ...ROLLUP,
+      sentence: 'Total of Amount from Gifts by Household, shown in Total Giving on each Account.',
+      targetObjectLabel: 'Account'
+    };
+    const hours = {
+      ...ROLLUP,
+      recordId: 'a01000000000004AAA',
+      name: 'Volunteer hours',
+      description: null,
+      targetObject: 'Contact',
+      targetObjectLabel: 'Contact',
+      targetField: 'Hours__c',
+      sentence: 'Total of Hours from Volunteer Hours by Contact, shown in Hours on each Contact.'
+    };
+
+    async function listed() {
+      const element = createComponent();
+      getPage.emit({ ...PAGE, rollups: [hours, giving] });
+      await flush();
+      return element;
+    }
+
+    it('describes each rollup in a sentence (U1)', async () => {
+      const element = await listed();
+      const sentences = [...element.shadowRoot.querySelectorAll('[data-id="sentence"]')];
+      expect(sentences.map((node) => node.textContent)).toEqual([giving.sentence, hours.sentence]);
+    });
+
+    it('groups the rollups by the object that shows the total (U12)', async () => {
+      const element = await listed();
+      const groups = [...element.shadowRoot.querySelectorAll('[data-id="group-row"]')];
+      expect(groups.map((node) => node.textContent.trim())).toEqual(['Account (1)', 'Contact (1)']);
+    });
+
+    it('finds rollups by any word of their sentence, and says when nothing matches (U12)', async () => {
+      const element = await listed();
+      const search = element.shadowRoot.querySelector('[data-id="search"]');
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'volunteer' } }));
+      await flush();
+      let rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Volunteer hours');
+
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'TOTAL_GIVING__C' } }));
+      await flush();
+      rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Household total giving');
+
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'nothing like it' } }));
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('[data-id="rollup-row"]').length).toBe(0);
+      expect(element.shadowRoot.querySelector('[data-id="no-matches"]')).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="empty-message"]')).toBeNull();
+    });
   });
 
   it('offers the modes by the names an administrator reads, keeping the stored values', async () => {

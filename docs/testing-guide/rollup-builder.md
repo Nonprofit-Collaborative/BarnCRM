@@ -43,7 +43,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 8 | In **See it on a record**, pick **The Garcia Family**. | "Calculated: 1. On the record now: (empty)." |
 | 9 | In **Name**, type `Test children per household`. In **What this number means**, type `Children in the household`. Leave **Mode** on its default and **Active** on. | The fields hold what you typed. **Mode** shows the org's default rollup mode (**Both (recommended)** unless it was changed). |
 | 10 | Click **Save and calculate now**. | The Builder closes. A green notice reads "Rollup saved, and its recalculation has started." |
-| 11 | Find **Test children per household** in the list. | The row shows **Children in the household** under the name, a **What it counts** value, **Where it shows** names the Test Children Count field, the mode you saved, and **Active** on. |
+| 11 | Find **Test children per household** in the list. | The row is under the **Account** heading and shows **Children in the household** under the name, a **What it counts** sentence of the form "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", the mode you saved, and **Active** on. |
 | 12 | Wait a minute and refresh the page. | The row's **Last calculated** shows a time from a moment ago, not **Not calculated yet**. |
 | 13 | Open **The Garcia Family** household. | **Test Children Count** shows 1. |
 | 14 | Open any household with no person whose role is Child (for example a single-person household). | **Test Children Count** shows 0, not blank. |
@@ -427,3 +427,16 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the trigger** but no **Turn off instant totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
+
+## T-RB-40: Read, Search and Group the Rollup List
+
+**Purpose:** confirm each rollup reads as a sentence and the list groups and searches.
+**Prerequisites:** T-RB-02 done (**Test children per household** exists and is active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | The list has a heading row per object, such as **Account (1)**, in alphabetical order. **Test children per household** is under **Account**, and its **What it counts** column reads "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", with `Count on Contact: Account.Test_Children_Count__c` in small grey text below. |
+| 2 | In **Search rollups**, type `children`. | Only **Test children per household** is listed. |
+| 3 | Type `Test_Children_Count__c`. | The same rollup is listed. Type `zzz`: "No rollup matches your search." Clear the box: every rollup is back. |
+
+**Cleanup:** none.

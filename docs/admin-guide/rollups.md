@@ -359,6 +359,18 @@ with everything filled in from that rollup, under a new name, for you to change.
 shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
 rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
+### Reading the Rollup List
+
+- **One sentence per rollup.** The **What it counts** column says what each rollup does in words,
+  from your org's own field and object names: "Total of Amount from Gifts by Donor Contact,
+  shown in Largest Gift on each Contact. Only records that meet its conditions count." A
+  rollup with a time window or **Only the first N records** says that too. The API names
+  stay underneath in small grey text for when you need them.
+- **Grouped by the record that shows the total.** Rollups are grouped under a heading per
+  object (Account, Contact, Fund and so on), with how many each has, in alphabetical order.
+- **Search rollups** finds a rollup by any word of its name, description or sentence, or by
+  an object or field API name (`Total_Giving__c`). Clear the box to see them all.
+
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
 

@@ -66,6 +66,10 @@ import IMPORT_CREATED from '@salesforce/label/c.Core_RollupBuilder_ImportCreated
 import IMPORT_UPDATED from '@salesforce/label/c.Core_RollupBuilder_ImportUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
 import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
+import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
+import SEARCH_HELP from '@salesforce/label/c.Core_RollupEase_SearchHelp';
+import GROUP from '@salesforce/label/c.Core_RollupEase_Group';
+import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
 
 /** The words for each import outcome, before saving and after (ADR-0136). */
 const OUTCOMES = {
@@ -148,8 +152,14 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     neverCalculated: NEVER_CALCULATED,
     freshnessTitle: FRESHNESS_TITLE,
     freshnessStale: FRESHNESS_STALE,
-    readOnly: READ_ONLY
+    readOnly: READ_ONLY,
+    search: SEARCH,
+    searchHelp: SEARCH_HELP,
+    noMatches: NO_MATCHES
   };
+
+  /** What the administrator typed to find a rollup (U12). */
+  searchTerm = '';
 
   page;
   errorMessage;
@@ -210,12 +220,57 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     }));
   }
 
+  /** The rows the search finds: by name, description, sentence, or object and field names. */
+  get shownRows() {
+    const term = (this.searchTerm || '').trim().toLowerCase();
+    if (!term) {
+      return this.rows;
+    }
+    return this.rows.filter((row) =>
+      [row.name, row.description, row.sentence, row.counts, row.target, row.targetObjectLabel]
+        .filter(Boolean)
+        .some((text) => text.toLowerCase().includes(term))
+    );
+  }
+
+  /** The rows found, grouped by the object that shows the total, groups by name (U12). */
+  get groups() {
+    const byKey = new Map();
+    for (const row of this.shownRows) {
+      const name = row.targetObjectLabel || row.targetObject || '';
+      if (!byKey.has(name)) {
+        byKey.set(name, []);
+      }
+      byKey.get(name).push(row);
+    }
+    return [...byKey.keys()]
+      .sort((one, two) => one.localeCompare(two))
+      .map((name) => ({
+        key: name,
+        heading: GROUP.replace('{0}', name).replace('{1}', String(byKey.get(name).length)),
+        rows: byKey.get(name)
+      }));
+  }
+
   get hasRows() {
-    return this.rows.length > 0;
+    return this.shownRows.length > 0;
   }
 
   get isEmpty() {
-    return !!this.page && !this.hasRows;
+    return !!this.page && this.rows.length === 0;
+  }
+
+  /** Something was searched for and nothing matches. */
+  get noMatches() {
+    return this.rows.length > 0 && !this.hasRows;
+  }
+
+  get hasAnyRollup() {
+    return this.rows.length > 0;
+  }
+
+  handleSearch(event) {
+    this.searchTerm = event.detail.value;
   }
 
   get isScheduled() {
