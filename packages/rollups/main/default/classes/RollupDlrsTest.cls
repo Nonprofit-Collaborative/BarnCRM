@@ -88,12 +88,31 @@ private class RollupDlrsTest {
     }
 
     @IsTest
-    static void dlrsWithoutItsStoresReadsNothing() {
+    static void aStoreNotInThisOrgReadsNothing() {
         System.runAs(maria()) {
-            // The namespace is found but neither DLRS store is in this org.
-            OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.DLRS_NAMESPACE });
+            Assert.isTrue(
+                RollupDlrs.readFrom(
+                        OtherRollupTools.DLRS_NAMESPACE + '__',
+                        'NoSuchStore__c',
+                        'Name',
+                        'Name',
+                        RollupDlrs.SOURCE_OBJECT
+                    )
+                    .isEmpty(),
+                'No rows, and no failure'
+            );
 
-            Assert.isTrue(RollupDlrs.definitions().isEmpty(), 'No rows, and no failure');
+            // The org reader with the namespace found: nothing where DLRS's stores are missing,
+            // and in an org with DLRS installed only its custom metadata rows, since a test sees
+            // no records of DLRS's older object. Either way nothing fails.
+            OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.DLRS_NAMESPACE });
+            for (RollupDlrs.Definition read : RollupDlrs.definitions()) {
+                Assert.areEqual(
+                    RollupDlrs.SOURCE_METADATA,
+                    read.source,
+                    'Only custom metadata is seen'
+                );
+            }
         }
     }
 
