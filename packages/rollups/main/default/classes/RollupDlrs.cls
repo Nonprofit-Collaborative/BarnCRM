@@ -287,13 +287,16 @@ public with sharing class RollupDlrs {
                 localByQualified.put(prefix + field, field);
             }
         }
-        String query =
+        // The object and field names are this class's own constants, kept only when describe
+        // finds them, so nothing user supplied reaches the query; they are escaped regardless.
+        String query = String.escapeSingleQuotes(
             'SELECT ' +
-            String.join(new List<String>(selected), ', ') +
-            ' FROM ' +
-            prefix +
-            localName +
-            ' LIMIT 2000';
+                String.join(new List<String>(selected), ', ') +
+                ' FROM ' +
+                prefix +
+                localName +
+                ' LIMIT 2000'
+        );
         for (SObject row : Database.query(query, AccessLevel.SYSTEM_MODE)) {
             Map<String, Object> values = new Map<String, Object>();
             for (String qualified : localByQualified.keySet()) {
