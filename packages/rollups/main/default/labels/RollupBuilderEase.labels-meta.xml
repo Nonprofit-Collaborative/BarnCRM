@@ -280,4 +280,140 @@
         <shortDescription>Rollup list: nothing matches the search.</shortDescription>
         <value>No rollup matches your search.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_BuilderSentence</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} calculation, {1} records, {2} which, {3} field, {4} mode</shortDescription>
+        <value>Show {0} from {1}, counting {2}, in {3}. Updated: {4}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence help: its parts open the step that sets them.</shortDescription>
+        <value>Click a part of the sentence to change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NotChosen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: a part not chosen yet.</shortDescription>
+        <value>(not chosen yet)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_EveryRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: the rollup has no conditions.</shortDescription>
+        <value>every record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SomeRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} is how many conditions the records must meet.</shortDescription>
+        <value>only those that meet its conditions ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TargetPart</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} is the object, {1} the field showing the total.</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NotForField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is the field, {1} the calculations it cannot hold.</shortDescription>
+        <value>Not available for {0}: {1}. To use one of them, choose another field in step 1.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldsNumbers</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation that reads numbers only.</shortDescription>
+        <value>Only number, currency and percent fields are listed, because {0} works on numbers.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldsNumbersDates</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation that reads numbers or dates.</shortDescription>
+        <value>Only number, currency, percent and date fields are listed, because {0} compares numbers or dates.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NoFieldFits</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation no field of the records fits.</shortDescription>
+        <value>These records have no field that {0} can read. Choose another calculation, or other records in step 2.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 5 heading over what each mode means.</shortDescription>
+        <value>What Each Choice Means</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantAfter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the records counted.</shortDescription>
+        <value>Instantly, after the save: {0} changes within about a minute after one of the {1} is saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantDuring</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the records counted.</shortDescription>
+        <value>Instantly, during the save: {0} changes as one of the {1} is saved, which makes each save a little slower.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence, no trigger yet: {0} is the records counted.</shortDescription>
+        <value>Instantly: not available until {0} have instant totals (see Instant Totals below).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeNightly</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the nightly run's time.</shortDescription>
+        <value>Every night: {0} is recalculated at {1} each night, so a change made today shows tomorrow.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeBoth</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the nightly run's time.</shortDescription>
+        <value>Both (recommended): instantly, and the nightly run at {0} puts right anything a save missed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeBothNoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the nightly time, {1} the records counted.</shortDescription>
+        <value>Both (recommended): every night at {0} for now, and instantly too once {1} have instant totals.</value>
+    </labels>
 </CustomLabels>

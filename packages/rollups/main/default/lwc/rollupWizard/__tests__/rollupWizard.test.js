@@ -51,8 +51,83 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_BuilderSentence',
+  () => ({ default: 'Show {0} from {1}, counting {2}, in {3}. Updated: {4}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_RollupEase_NotChosen', () => ({ default: '(not chosen)' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_EveryRecord', () => ({ default: 'every record' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_SomeRecords', () => ({ default: '{0} rules' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_TargetPart', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_NotForField',
+  () => ({ default: 'Not for {0}: {1}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_FieldsNumbers',
+  () => ({ default: 'Numbers for {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_NoFieldFits',
+  () => ({ default: 'Nothing fits {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantAfter',
+  () => ({ default: 'After the save: {0} when {1} change.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantDuring',
+  () => ({ default: 'During the save: {0} when {1} change.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantNone',
+  () => ({ default: 'Not until {0} have instant totals.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeNightly',
+  () => ({ default: 'Nightly: {0} at {1}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeBoth',
+  () => ({ default: 'Both, and at {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant',
+  () => ({ default: 'Both: at {0}, instant once {1} have it.' }),
+  { virtual: true }
+);
+
 const MODEL = {
   multiCurrency: true,
+  nightlyTime: '2:00 AM',
+  inSave: false,
   defaultMode: 'Both',
   targets: [{ value: 'Account', label: 'Account' }],
   aggregates: ['SUM', 'COUNT', 'ANY', 'FIRST', 'LAST', 'TEXT_LIST'].map((value) => ({
@@ -439,6 +514,89 @@ describe('c-rollup-wizard', () => {
     expect(save).toHaveBeenCalledWith({
       draft: expect.objectContaining({ includeDeleted: true, customDelimiter: null }),
       calculateNow: false
+    });
+  });
+
+  describe('Ease of use', () => {
+    const parts = (element) =>
+      [...element.shadowRoot.querySelectorAll('[data-id="sentence-part"]')].map((part) => ({
+        label: part.label,
+        step: part.dataset.step,
+        disabled: part.disabled
+      }));
+
+    it('reads an edited rollup as one sentence whose parts open their steps (U3)', async () => {
+      const element = await build(DRAFT);
+      expect(query(element, 'builder-sentence').textContent).toContain('Show ');
+      expect(parts(element)).toEqual([
+        { label: 'SUM (Amount)', step: '3', disabled: false },
+        { label: 'Gift, by Household', step: '2', disabled: false },
+        { label: 'every record', step: '4', disabled: false },
+        { label: 'Account: Total Giving', step: '1', disabled: false },
+        { label: 'Both (recommended)', step: '5', disabled: false }
+      ]);
+      element.shadowRoot.querySelector('[data-step="3"]').click();
+      await flush();
+      expect(query(element, 'aggregate')).not.toBeNull();
+    });
+
+    it('opens only steps already reached for a new rollup (U3)', async () => {
+      const element = await build(null);
+      const shown = parts(element);
+      expect(shown.every((part) => part.label === '(not chosen)')).toBe(true);
+      expect(shown.filter((part) => !part.disabled).map((part) => part.step)).toEqual(['1']);
+      element.shadowRoot.querySelector('[data-step="3"]').click();
+      await flush();
+      expect(query(element, 'target-object')).not.toBeNull();
+    });
+
+    it('says which calculations the field cannot hold and lists only fields Sum can read (U9)', async () => {
+      const element = await build({ ...DRAFT, sourceField: undefined });
+      await next(element);
+      await next(element);
+      expect(query(element, 'unavailable').textContent).toBe(
+        'Not for Total Giving: ANY, TEXT_LIST.'
+      );
+      expect(query(element, 'source-field').options.map((option) => option.value)).toEqual([
+        'Amount__c'
+      ]);
+      expect(query(element, 'field-guidance').textContent).toBe('Numbers for SUM.');
+    });
+
+    it('clears a field the new calculation cannot read (U9)', async () => {
+      const element = await build({ ...DRAFT, aggregate: 'FIRST', sourceField: 'Gift_Date__c' });
+      await next(element);
+      await next(element);
+      query(element, 'aggregate').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'SUM' } })
+      );
+      await flush();
+      expect(query(element, 'source-field').value).toBeUndefined();
+    });
+
+    it('explains each mode by when the field changes (U10)', async () => {
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      expect(query(element, 'instantly').textContent).toBe(
+        'After the save: Total Giving when Gifts change.'
+      );
+      expect(query(element, 'nightly').textContent).toBe('Nightly: Total Giving at 2:00 AM.');
+      expect(query(element, 'both').textContent).toBe('Both, and at 2:00 AM.');
+
+      const during = await build(DRAFT, { ...MODEL, inSave: true });
+      await toLastStep(during);
+      expect(query(during, 'instantly').textContent).toBe(
+        'During the save: Total Giving when Gifts change.'
+      );
+
+      const noTrigger = await build(DRAFT, MODEL, false);
+      await toLastStep(noTrigger);
+      expect(query(noTrigger, 'instantly').textContent).toBe(
+        'Not until Gifts have instant totals.'
+      );
+      expect(query(noTrigger, 'both').textContent).toBe(
+        'Both: at 2:00 AM, instant once Gifts have it.'
+      );
     });
   });
 });

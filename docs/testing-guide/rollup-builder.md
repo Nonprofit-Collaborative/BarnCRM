@@ -455,3 +455,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the tab. | The **Status** column is empty. |
 
 **Cleanup:** delete **Test children copy** and the field **Test Children Count 2**.
+
+## T-RB-42: The Builder Sentence, Type Guidance and What Each Mode Means
+
+**Purpose:** confirm the sentence above the steps fills in and opens steps, the Builder only offers what it can save and says why, and step 5 explains each mode by its consequence.
+**Prerequisites:** T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. | Above the steps, a sentence starting "Show (not chosen yet) from (not chosen yet)". Only the part for step 1 can be clicked. |
+| 2 | Choose **Account** and **Test Children Count**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The sentence now names **Contact, by Account ID** and **Account: Test Children Count**. Under **Calculation**: "Not available for Test Children Count: Any, None, Text list, Text list, each value once. To use one of them, choose another field in step 1." |
+| 3 | Choose **Sum**. | **Field to calculate** lists only number, currency and percent fields of Contact, and the line under it reads "Only number, currency and percent fields are listed, because Sum works on numbers." |
+| 4 | Choose **Count**, click **Next** twice. On step 5 read **What Each Choice Means**. | Three lines: "Instantly, after the save: Test Children Count changes within about a minute after one of the Contacts is saved.", "Every night: Test Children Count is recalculated at 2:00 AM each night, so a change made today shows tomorrow." (or the time you set), and "Both (recommended): instantly, and the nightly run at 2:00 AM puts right anything a save missed." |
+| 5 | Click the **Contact, by Account ID** part of the sentence. | Step 2 opens. Click **Cancel**. |
+| 6 | Click **Edit** on **Test children per household**. | Every part of the sentence can be clicked; the conditions part reads "only those that meet its conditions (1)". Click **Cancel**. |
+
+**Cleanup:** none.

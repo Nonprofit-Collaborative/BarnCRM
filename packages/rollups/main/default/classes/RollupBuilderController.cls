@@ -150,6 +150,12 @@ public with sharing class RollupBuilderController {
         public List<Option> directions { get; set; }
         @AuraEnabled
         public List<Option> modes { get; set; }
+        /** Whether instant totals are recalculated in the save rather than after it (U10). */
+        @AuraEnabled
+        public Boolean inSave { get; set; }
+        /** The nightly run's time as the reader writes it, for example 2:00 AM (U10). */
+        @AuraEnabled
+        public String nightlyTime { get; set; }
     }
 
     /** One rollup as the Builder edits it. */
@@ -216,6 +222,8 @@ public with sharing class RollupBuilderController {
             model.delimiters = picklist(Rollup_Definition__c.Delimiter__c);
             model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
+            model.inSave = RollupService.recalculatesInTheSave();
+            model.nightlyTime = RollupScheduler.nightlyTime();
             return model;
         } catch (Exception caught) {
             throw asUserError(caught);

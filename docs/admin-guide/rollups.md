@@ -391,6 +391,24 @@ rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
 
+Above the steps, the whole rollup is written as one sentence that fills in as you go: "Show
+Sum (Amount) from Gift, by Donor, counting only those that meet its conditions (2), in Contact:
+Total Giving. Updated: Both (recommended)." A part you have not chosen yet reads "(not chosen
+yet)". Click any part you have already filled in to go straight to the step that sets it;
+when you edit or copy a rollup, every part can be clicked. Choosing another object in step 1,
+or other records in step 2, clears what the later steps chose, so those parts are filled in
+again in order.
+
+The Builder steers you away from choices it would refuse:
+
+- In step 3, the calculations the field from step 1 cannot hold are not offered, and a line
+  under **Calculation** names them: "Not available for Total Giving: Any, None, Text list. To
+  use one of them, choose another field in step 1."
+- **Field to calculate** lists only fields the calculation can read: for **Sum** and
+  **Average**, number, currency and percent fields; for **Minimum** and **Maximum**, those
+  and date fields. A line under it says why, and if the records have no such field it says
+  so. Changing the calculation clears a field it cannot read.
+
 1. **Where should the number appear?** The kind of record and the field that show the total.
    The list starts with the objects most often used: Account, Contact, BarnCRM's objects,
    your organization's own objects, and the common Salesforce objects your org has
@@ -442,6 +460,16 @@ to change, before it lets you go on.
    have no instant updates yet, for example Opportunities or your own objects, this step says
    "Instant totals are not available yet for ..." and offers only **Every night** and **Both
    (recommended)**: see [Instant Totals on Other Objects](#instant-totals-on-other-objects).
+   Under **Mode**, **What Each Choice Means** says what each mode does to this field:
+   - **Instantly, after the save**: the field changes within about a minute after one of the
+     counted records is saved (the default **When instant totals are calculated** setting); or
+     **Instantly, during the save** when that setting is **During the save**. When the counted
+     records have no instant totals yet, it says Instantly is not available until they do.
+   - **Every night**: the field is recalculated at the time of the nightly run (2:00 AM unless
+     you changed **Time of the nightly run**), so a change made today shows tomorrow.
+   - **Both (recommended)**: instantly, and the nightly run puts right anything a save
+     missed; for records with no instant totals yet, every night until they have them.
+
    **Skip for people with this custom permission (optional)** is for a data migration user: see
    [Skipping a rollup for some people](#skipping-a-rollup-for-some-people).
 

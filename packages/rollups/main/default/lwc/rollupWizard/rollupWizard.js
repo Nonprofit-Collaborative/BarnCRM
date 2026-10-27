@@ -62,6 +62,23 @@ import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
 import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
 import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
+import BUILDER_SENTENCE from '@salesforce/label/c.Core_RollupEase_BuilderSentence';
+import SENTENCE_HELP from '@salesforce/label/c.Core_RollupEase_SentenceHelp';
+import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
+import EVERY_RECORD from '@salesforce/label/c.Core_RollupEase_EveryRecord';
+import SOME_RECORDS from '@salesforce/label/c.Core_RollupEase_SomeRecords';
+import TARGET_PART from '@salesforce/label/c.Core_RollupEase_TargetPart';
+import NOT_FOR_FIELD from '@salesforce/label/c.Core_RollupEase_NotForField';
+import FIELDS_NUMBERS from '@salesforce/label/c.Core_RollupEase_FieldsNumbers';
+import FIELDS_NUMBERS_DATES from '@salesforce/label/c.Core_RollupEase_FieldsNumbersDates';
+import NO_FIELD_FITS from '@salesforce/label/c.Core_RollupEase_NoFieldFits';
+import MODE_HEADING from '@salesforce/label/c.Core_RollupEase_ModeHeading';
+import MODE_INSTANT_AFTER from '@salesforce/label/c.Core_RollupEase_ModeInstantAfter';
+import MODE_INSTANT_DURING from '@salesforce/label/c.Core_RollupEase_ModeInstantDuring';
+import MODE_INSTANT_NONE from '@salesforce/label/c.Core_RollupEase_ModeInstantNone';
+import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
+import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
+import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -80,6 +97,20 @@ const LISTS = new Set(['TEXT_LIST', 'TEXT_LIST_DISTINCT']);
 const INTO_PICKLIST = new Set(['picklist', 'string']);
 /** The calculations that take "only the first N records" (R-R15, ADR-0136). */
 const ROW_LIMITED = new Set(['SUM', 'AVG', 'MIN', 'MAX', ...LISTS]);
+/** Sum and Average read numbers; Minimum and Maximum numbers or dates (R-R10, U9). */
+const READS_NUMBERS = new Set(['SUM', 'AVG']);
+const READS_NUMBERS_OR_DATES = new Set(['MIN', 'MAX']);
+
+/** Whether a field of this type can feed this calculation, as the save checks it (U9). */
+function fitsCalculation(aggregate, type) {
+  if (READS_NUMBERS.has(aggregate)) {
+    return NUMBERS.has(type) || MONEY.has(type);
+  }
+  if (READS_NUMBERS_OR_DATES.has(aggregate)) {
+    return NUMBERS.has(type) || MONEY.has(type) || DATES.has(type);
+  }
+  return true;
+}
 
 /** The calculations a target field of this type can hold (canonical model R-R15). */
 function aggregatesFor(type) {
@@ -148,8 +179,13 @@ export default class RollupWizard extends LightningElement {
     saveAndCalculate: SAVE_AND_CALCULATE,
     previewRecord: PREVIEW_RECORD,
     targetSearch: TARGET_SEARCH,
-    targetSearchHelp: TARGET_SEARCH_HELP
+    targetSearchHelp: TARGET_SEARCH_HELP,
+    sentenceHelp: SENTENCE_HELP,
+    modeHeading: MODE_HEADING
   };
+
+  /** The furthest step reached, so the sentence jumps back to any step already filled (U3). */
+  furthest = 1;
 
   /** Step 1: what the administrator typed to find an object off the common list (ADR-0136). */
   targetSearch = '';
@@ -177,6 +213,8 @@ export default class RollupWizard extends LightningElement {
   set draft(value) {
     this.current = { active: true, fiscalYearAware: false, ...(value || {}) };
     this.step = 1;
+    // An edited or copied rollup has every step filled in, so any part of it can be opened.
+    this.furthest = value && value.targetObject ? 5 : 1;
     this.error = undefined;
     this.previewRecordId = undefined;
     this.loadTarget();
@@ -355,11 +393,162 @@ export default class RollupWizard extends LightningElement {
     return this.sourceFields.map((field) => ({ value: field.value, label: field.label }));
   }
 
-  /** The fields a value can be copied from: a picklist only from a picklist or text. */
+  /**
+   * The fields a value can be read from: a picklist only from a picklist or text, and only fields
+   * the calculation can read, so the save never has to refuse the pair (U9).
+   */
   get copyFieldOptions() {
     return this.sourceFields
       .filter((field) => this.targetFieldType !== 'picklist' || INTO_PICKLIST.has(field.type))
+      .filter((field) => fitsCalculation(this.current.aggregate, field.type))
       .map((field) => ({ value: field.value, label: field.label }));
+  }
+
+  get chosenAggregateLabel() {
+    const option = (this.model ? this.model.aggregates : []).find(
+      (entry) => entry.value === this.current.aggregate
+    );
+    return option ? option.label : this.current.aggregate;
+  }
+
+  get targetFieldLabel() {
+    const field = this.targetFields.find((entry) => entry.value === this.current.targetField);
+    return field ? field.label : this.current.targetField;
+  }
+
+  /** Step 3: the calculations this field cannot hold, and what to do instead (U9). */
+  get unavailableNotice() {
+    if (!this.model || !this.targetFieldType) {
+      return undefined;
+    }
+    const allowed = new Set(aggregatesFor(this.targetFieldType));
+    const hidden = this.model.aggregates
+      .filter((option) => !allowed.has(option.value))
+      .map((option) => option.label);
+    return hidden.length
+      ? format(NOT_FOR_FIELD, this.targetFieldLabel, hidden.join(', '))
+      : undefined;
+  }
+
+  /** Step 3: why only some fields are listed, or that none fits (U9). */
+  get fieldGuidance() {
+    if (!this.needsSourceField) {
+      return undefined;
+    }
+    if (this.sourceFields.length && !this.copyFieldOptions.length) {
+      return format(NO_FIELD_FITS, this.chosenAggregateLabel);
+    }
+    if (READS_NUMBERS.has(this.current.aggregate)) {
+      return format(FIELDS_NUMBERS, this.chosenAggregateLabel);
+    }
+    if (READS_NUMBERS_OR_DATES.has(this.current.aggregate)) {
+      return format(FIELDS_NUMBERS_DATES, this.chosenAggregateLabel);
+    }
+    return undefined;
+  }
+
+  // ------------------------------------------------------------------ the sentence (U3)
+
+  /** How many conditions the counted records must meet, in words. */
+  get conditionsText() {
+    try {
+      const document = this.current.filterJson ? JSON.parse(this.current.filterJson) : null;
+      const count = document && Array.isArray(document.conditions) ? document.conditions.length : 0;
+      return count ? format(SOME_RECORDS, count) : EVERY_RECORD;
+    } catch {
+      return EVERY_RECORD;
+    }
+  }
+
+  /** Each part of the sentence, by the step that sets it. */
+  get sentenceValues() {
+    const draft = this.current;
+    const source = this.chosenSource;
+    const field = this.sourceFields.find((entry) => entry.value === draft.sourceField);
+    let calculation;
+    if (draft.aggregate) {
+      calculation = field
+        ? `${this.chosenAggregateLabel} (${field.label})`
+        : this.chosenAggregateLabel;
+    }
+    const mode = (this.model ? this.model.modes : []).find((entry) => entry.value === draft.mode);
+    return [
+      { step: 3, text: calculation },
+      { step: 2, text: source ? source.label : draft.relationshipPath },
+      { step: 4, text: this.furthest >= 4 ? this.conditionsText : undefined },
+      {
+        step: 1,
+        text: draft.targetField
+          ? format(TARGET_PART, this.targetLabel, this.targetFieldLabel)
+          : undefined
+      },
+      { step: 5, text: this.furthest >= 5 && mode ? mode.label : undefined }
+    ];
+  }
+
+  /**
+   * The whole rollup as one sentence, built as the steps are filled in. Each chosen part is a
+   * link to the step that sets it; a part not chosen yet says so (U3).
+   */
+  get sentenceParts() {
+    const values = this.sentenceValues;
+    return BUILDER_SENTENCE.split(/(\{\d\})/)
+      .filter((piece) => piece !== '')
+      .map((piece, index) => {
+        const match = /^\{(\d)\}$/.exec(piece);
+        if (!match) {
+          return { key: `text-${index}`, text: piece, isText: true };
+        }
+        const part = values[Number(match[1])] || {};
+        return {
+          key: `part-${index}`,
+          text: part.text || NOT_CHOSEN,
+          step: String(part.step),
+          isText: false,
+          disabled: part.step > this.furthest
+        };
+      });
+  }
+
+  handleSentencePart(event) {
+    const step = Number(event.target.dataset.step);
+    if (step > this.furthest) {
+      return;
+    }
+    this.error = undefined;
+    this.step = step;
+    if (step === 5) {
+      this.loadPreview();
+    }
+  }
+
+  // ------------------------------------------------------------------- the modes (U10)
+
+  /** What each mode means for this rollup: when its field changes (U10). */
+  get modeConsequences() {
+    const target = this.targetFieldLabel || '';
+    const records = this.recordsLabel || '';
+    const time = this.model && this.model.nightlyTime ? this.model.nightlyTime : '';
+    let instantly;
+    if (!this.sourceIsInstant) {
+      instantly = format(MODE_INSTANT_NONE, records);
+    } else {
+      instantly = format(
+        this.model && this.model.inSave ? MODE_INSTANT_DURING : MODE_INSTANT_AFTER,
+        target,
+        records
+      );
+    }
+    return [
+      { key: 'instantly', text: instantly },
+      { key: 'nightly', text: format(MODE_NIGHTLY, target, time) },
+      {
+        key: 'both',
+        text: this.sourceIsInstant
+          ? format(MODE_BOTH_TEXT, time)
+          : format(MODE_BOTH_NO_INSTANT, time, records)
+      }
+    ];
   }
 
   /** The source filter offers the counted records' own fields, then those one lookup away. */
@@ -510,6 +699,8 @@ export default class RollupWizard extends LightningElement {
       relationshipPath: undefined,
       targetFilterJson: undefined
     });
+    // A new object clears what the later steps chose, so they are filled in again in order.
+    this.furthest = 1;
     this.loadTarget();
   }
 
@@ -530,6 +721,7 @@ export default class RollupWizard extends LightningElement {
       changes.mode = MODE_BOTH;
     }
     this.change(changes);
+    this.furthest = Math.min(this.furthest, 2);
     this.loadSource();
   }
 
@@ -550,6 +742,13 @@ export default class RollupWizard extends LightningElement {
         ? event.target.checked
         : event.detail.value;
     this.change({ [name]: value });
+    // A field the new calculation cannot read is cleared rather than refused on save (U9).
+    if (name === 'aggregate' && this.current.sourceField) {
+      const field = this.sourceFields.find((entry) => entry.value === this.current.sourceField);
+      if (field && !fitsCalculation(value, field.type)) {
+        this.change({ sourceField: undefined });
+      }
+    }
   }
 
   handleFilter(event) {
@@ -607,6 +806,7 @@ export default class RollupWizard extends LightningElement {
     this.error = this.stepProblem();
     if (!this.error) {
       this.step = Math.min(5, this.step + 1);
+      this.furthest = Math.max(this.furthest, this.step);
       if (this.step === 5) {
         this.loadPreview();
       }
