@@ -138,10 +138,9 @@ public with sharing class RollupFieldGenerator {
     /**
      * A field name from a label: letters, digits and single underscores, starting with a letter,
      * at most `NAME_LENGTH` characters, as Setup suggests one. Blank when the label has no letter
-     * or digit to start from.
+     * or digit to start from. Starter templates (U2) name their fields the same way.
      */
-    @TestVisible
-    private static String nameFor(String fieldLabel) {
+    public static String nameFor(String fieldLabel) {
         String name = fieldLabel.replaceAll('[^A-Za-z0-9]+', '_').replaceAll('^_+|_+$', '');
         if (String.isBlank(name)) {
             return '';

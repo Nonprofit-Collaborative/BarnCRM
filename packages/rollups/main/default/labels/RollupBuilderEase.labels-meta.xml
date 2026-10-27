@@ -848,4 +848,156 @@
         <shortDescription>Explain These Totals: button that reads the totals again.</shortDescription>
         <value>Refresh</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplButton</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder: button and heading of the starter templates.</shortDescription>
+        <value>Starter Templates</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplIntro</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: nothing is added until chosen.</shortDescription>
+        <value>Nothing is added until you tick rollups and click Add the Chosen Rollups. Each is added switched off: switch it on once its field shows what you expect.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAdd</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: button that adds the ticked rollups.</shortDescription>
+        <value>Add the Chosen Rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplOpen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: opens one rollup in the Builder, prefilled.</shortDescription>
+        <value>Open in Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplClose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: closes the panel.</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplStarter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nonprofit starter template.</shortDescription>
+        <value>Nonprofit Starter</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplStarterHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the nonprofit starter template holds.</shortDescription>
+        <value>Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAverageGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Average Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplFirstGiftAmount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>First Gift Amount</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplLastGiftAmount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Last Gift Amount</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplSmallestGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Smallest Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplGiftsThisYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Gifts This Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAppealAverageGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Appeal Average Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAppealDonors</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Number of Donors</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplNeedsObject</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is an object the org does not have.</shortDescription>
+        <value>Needs {0}, which this org does not have.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplFilled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is the rollup filling the field.</shortDescription>
+        <value>Already filled by {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplNeedsField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is the field label, {1} the object.</shortDescription>
+        <value>Needs a field labelled {0} on {1}: click Open in Builder, then Create a Field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplReady</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: can be added.</shortDescription>
+        <value>Ready to add, switched off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAdded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template outcome: added.</shortDescription>
+        <value>Added, switched off.</value>
+    </labels>
 </CustomLabels>
