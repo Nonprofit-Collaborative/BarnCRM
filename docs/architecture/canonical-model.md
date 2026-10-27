@@ -1948,9 +1948,11 @@ from the DLRS definition. The mapping:
   than one field, or NULLS FIRST, is refused. A First or Last with none orders by the field
   it reads.
 - Row Limit: kept for the R-R15 aggregates, dropped from First, refused on Last and the counts.
-- Concatenate Delimiter: `, `, `; `, ` | ` and `BR()` become Comma, Semicolon, Pipe and New
-  line; blank becomes Comma; anything else becomes Custom (SP() a space, TB() a tab) when it
-  fits ten characters on one line, otherwise it is refused.
+- Concatenate Delimiter: BR(), SP() and TB() are read as a new line, a space and a tab first
+  (DLRS writes them because Salesforce trims a text value's spaces on save). Then `, `, `; `,
+  ` | ` and a new line become Comma, Semicolon, Pipe and New line; blank becomes Comma;
+  anything else becomes Custom when it fits ten characters on one line with no space at
+  either end (the Custom Delimiter is trimmed on save too), otherwise it is refused.
 - Aggregate All Rows becomes Include Deleted; Bypass Permission is kept.
 - Calculation Mode: Realtime, Developer and Process Builder become Both; Scheduled stays
   Scheduled. Sharing mode User is not kept: definitions run in system mode.

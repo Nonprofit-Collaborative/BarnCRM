@@ -38,11 +38,12 @@ public with sharing class RollupDlrsImport {
         'first' => 'FIRST',
         'last' => 'LAST'
     };
+    /** BarnCRM's delimiters by the text DLRS writes, once its BR(), SP() and TB() are read. */
     private static final Map<String, String> DELIMITER_BY_TEXT = new Map<String, String>{
         ', ' => 'Comma',
         '; ' => 'Semicolon',
         ' | ' => 'Pipe',
-        'BR()' => 'New line'
+        '\n' => 'New line'
     };
     private static final Set<String> LISTS = new Set<String>{ 'TEXT_LIST', 'TEXT_LIST_DISTINCT' };
     private static final Set<String> ORDERED = new Set<String>{ 'FIRST', 'LAST' };
@@ -401,16 +402,22 @@ public with sharing class RollupDlrsImport {
         if (String.isEmpty(raw)) {
             draft.delimiter = 'Comma';
             candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteNoDelimiter);
-        } else if (DELIMITER_BY_TEXT.containsKey(raw)) {
-            draft.delimiter = DELIMITER_BY_TEXT.get(raw);
+            return;
+        }
+        // DLRS writes these tokens because Salesforce trims a text value's spaces on save.
+        String text = raw.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
+        if (DELIMITER_BY_TEXT.containsKey(text)) {
+            draft.delimiter = DELIMITER_BY_TEXT.get(text);
+        } else if (
+            text.contains('\n') ||
+            text.length() > CUSTOM_DELIMITER_LENGTH ||
+            // The Custom Delimiter is trimmed on save too, so a space at either end is lost.
+            text != text.trim()
+        ) {
+            reason(candidate, Label.Core_RollupBuilder_DlrsReasonDelimiter, raw);
         } else {
-            String text = raw.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
-            if (text.contains('\n') || text.length() > CUSTOM_DELIMITER_LENGTH) {
-                reason(candidate, Label.Core_RollupBuilder_DlrsReasonDelimiter, raw);
-            } else {
-                draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;
-                draft.customDelimiter = text;
-            }
+            draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;
+            draft.customDelimiter = text;
         }
     }
 
