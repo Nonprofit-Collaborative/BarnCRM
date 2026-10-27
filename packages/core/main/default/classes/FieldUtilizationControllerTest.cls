@@ -12,9 +12,14 @@ private class FieldUtilizationControllerTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
-        // Holds the Manage BarnCRM Settings permission but no delete access on the snapshots.
+        // Holds the Manage BarnCRM Settings permission and reads the counted object (Staff), but
+        // has no delete access on the snapshots. Without read access on the object she would be
+        // refused for that instead: a Standard User profile need not grant it.
         System.runAs(TestUsers.admin()) {
-            User dana = TestDataFactory.createUser('DanaNoDelete', new List<String>());
+            User dana = TestDataFactory.createUser(
+                'DanaNoDelete',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
             SettingsTestPermissions.grantTo('Snapshot_No_Delete_Test', dana.Id);
         }
     }
