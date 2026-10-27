@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS reason; {0} the DLRS delimiter</shortDescription>
-        <value>The delimiter {0} is longer than 10 characters or covers more than one line, which BarnCRM cannot hold.</value>
+        <value>The delimiter {0} is longer than 10 characters, covers more than one line, or starts or ends with a space, which BarnCRM cannot hold.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsReasonPath</fullName>

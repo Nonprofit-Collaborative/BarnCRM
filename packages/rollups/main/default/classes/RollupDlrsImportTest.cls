@@ -79,7 +79,8 @@ private class RollupDlrsImportTest {
 
     @IsTest
     static void someoneWithoutTheSettingsPermissionCannotImport() {
-        System.runAs(maria()) {
+        // An administrator creates David: a user on the standard profile cannot insert a user.
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
             RollupDlrsFake.use(
                 new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
@@ -270,7 +271,18 @@ private class RollupDlrsImportTest {
                         new Map<String, Object>{
                             'FieldToAggregate__c' => 'Name',
                             'FieldToOrderBy__c' => 'Name DESC',
-                            'ConcatenateDelimiter__c' => 'SP()-SP()'
+                            // As DLRS stores "; ": Salesforce trims the space on save.
+                            'ConcatenateDelimiter__c' => ';SP()'
+                        }
+                    ),
+                    dlrs(
+                        'Names_Slash',
+                        'Concatenate',
+                        TEXT_FIELD,
+                        new Map<String, Object>{
+                            'FieldToAggregate__c' => 'Name',
+                            'FieldToOrderBy__c' => 'Name',
+                            'ConcatenateDelimiter__c' => '/SP()TB()x'
                         }
                     ),
                     dlrs(
@@ -341,8 +353,13 @@ private class RollupDlrsImportTest {
 
             RollupDlrsImport.Candidate down = found.get('Names_Down');
             Assert.areEqual('Descending', down.draft.orderDirection, 'A list keeps its direction');
-            Assert.areEqual(RollupPlanner.CUSTOM_DELIMITER, down.draft.delimiter, 'Custom');
-            Assert.areEqual(' - ', down.draft.customDelimiter, 'SP() is a space');
+            Assert.areEqual('Semicolon', down.draft.delimiter, 'SP() is a space: Semicolon');
+            Assert.isNull(down.draft.customDelimiter, 'Nothing custom');
+
+            RollupDlrsImport.Candidate slash = found.get('Names_Slash');
+            Assert.isTrue(slash.importable, 'Copied');
+            Assert.areEqual(RollupPlanner.CUSTOM_DELIMITER, slash.draft.delimiter, 'Custom');
+            Assert.areEqual('/ \tx', slash.draft.customDelimiter, 'SP() a space, TB() a tab');
 
             RollupDlrsImport.Candidate plain = found.get('Names_Plain');
             Assert.areEqual(
@@ -433,6 +450,16 @@ private class RollupDlrsImportTest {
                         }
                     ),
                     dlrs(
+                        'Spaced_Delimiter',
+                        'Concatenate',
+                        TEXT_FIELD,
+                        new Map<String, Object>{
+                            'FieldToAggregate__c' => 'Name',
+                            // " - ": the Custom Delimiter would be trimmed to "-" on save.
+                            'ConcatenateDelimiter__c' => 'SP()-SP()'
+                        }
+                    ),
+                    dlrs(
                         'No_Path',
                         'Concatenate',
                         TEXT_FIELD,
@@ -460,6 +487,7 @@ private class RollupDlrsImportTest {
                 'Blanks_First' => Label.Core_RollupBuilder_DlrsReasonOrder,
                 'Limited_Last' => Label.Core_RollupBuilder_DlrsReasonRowLimit,
                 'Long_Delimiter' => Label.Core_RollupBuilder_DlrsReasonDelimiter,
+                'Spaced_Delimiter' => Label.Core_RollupBuilder_DlrsReasonDelimiter,
                 'No_Path' => Label.Core_RollupBuilder_DlrsReasonPath,
                 'Filled' => Label.Core_RollupBuilder_DlrsReasonFilled,
                 'Wrong_Type' => Label.Core_Rollups_ErrorTextTarget
