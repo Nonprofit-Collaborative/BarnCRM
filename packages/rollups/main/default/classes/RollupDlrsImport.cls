@@ -562,40 +562,41 @@ public with sharing class RollupDlrsImport {
         if (target == null) {
             throw refusal(Label.Core_Rollups_ErrorTargetNotWritable);
         }
+        // Every name comes from describe, never from the request; escaped regardless.
         String nameField = nameFieldOf(fields);
-        String query =
+        String query = String.escapeSingleQuotes(
             'SELECT Id' +
-            (nameField == null ? '' : ', ' + nameField) +
-            ' FROM ' +
-            String.valueOf(targetType);
+                (nameField == null ? '' : ', ' + nameField) +
+                ' FROM ' +
+                String.valueOf(targetType)
+        );
         String recent = fields.containsKey('lastmodifieddate')
             ? ' ORDER BY LastModifiedDate DESC'
             : '';
         List<SObject> records = new List<SObject>();
         if (target.getDescribe().isFilterable()) {
+            String filled = String.escapeSingleQuotes(
+                query + ' WHERE ' + String.valueOf(target) + ' != null' + recent + ' LIMIT :size'
+            );
             records.addAll(
-                Database.query(
-                    query +
-                        ' WHERE ' +
-                        String.valueOf(target) +
-                        ' != null' +
-                        recent +
-                        ' LIMIT ' +
-                        SAMPLE_SIZE,
+                Database.queryWithBinds(
+                    filled,
+                    new Map<String, Object>{ 'size' => SAMPLE_SIZE },
                     AccessLevel.USER_MODE
                 )
             );
         }
         if (records.size() < SAMPLE_SIZE) {
-            Set<Id> seen = new Map<Id, SObject>(records).keySet();
+            String others = String.escapeSingleQuotes(
+                query + ' WHERE Id NOT IN :seen' + recent + ' LIMIT :remaining'
+            );
             records.addAll(
                 Database.queryWithBinds(
-                    query +
-                        ' WHERE Id NOT IN :seen' +
-                        recent +
-                        ' LIMIT ' +
-                        (SAMPLE_SIZE - records.size()),
-                    new Map<String, Object>{ 'seen' => seen },
+                    others,
+                    new Map<String, Object>{
+                        'seen' => new Map<Id, SObject>(records).keySet(),
+                        'remaining' => SAMPLE_SIZE - records.size()
+                    },
                     AccessLevel.USER_MODE
                 )
             );
