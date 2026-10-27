@@ -592,4 +592,196 @@
         <shortDescription>Log: {0} is the rollup, {1} records cleared, {2} records refused.</shortDescription>
         <value>Values of the deleted rollup {0} cleared on {1} records; {2} records could not be saved.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupEase_CreateField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button and heading of the Create a Field panel.</shortDescription>
+        <value>Create a Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CreateFieldWhy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: why the field is written, not created.</shortDescription>
+        <value>BarnCRM cannot add a field to your org itself: that takes a Metadata API deploy. It writes the field for you to create in Setup, or to download and deploy.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NewFieldLabel</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: label of the new field's label box.</shortDescription>
+        <value>Field label</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NewFieldKind</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: label of the new field's type box.</shortDescription>
+        <value>Field type</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: which field type suits which calculation.</shortDescription>
+        <value>Number for counts and totals, Currency for amounts, Date or Date/Time for first and last dates, Text for a copied value, Text Area (Long) for a text list, Checkbox for Any and None.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Number</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindCurrency</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Currency</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindDate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindDateTime</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Date/Time</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindLongText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Text Area (Long)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindCheckbox</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Checkbox</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_WriteField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button that writes the new field.</shortDescription>
+        <value>Write the Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldLabelProblem</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: the label cannot make a field.</shortDescription>
+        <value>Choose the record that shows the total, and give the field a label of up to 40 characters with at least one letter or digit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldKindProblem</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: no field type chosen.</shortDescription>
+        <value>Choose the field type.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldExists</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: {0} is a field name the object already has.</shortDescription>
+        <value>This object already has a field named {0}. Choose it in the list, or give the new field another label.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldDescription</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Description written into a generated rollup field.</shortDescription>
+        <value>Filled by a BarnCRM rollup. Do not edit by hand: the next recalculation replaces it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepOpen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the object's label.</shortDescription>
+        <value>In Setup, open Object Manager, then {0}, then Fields &amp; Relationships, and click New.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the type, {1} the label, {2} the name.</shortDescription>
+        <value>Choose {0} and click Next. Enter the label {1}; Setup fills in the field name {2}. Click Next.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepAccess</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: field access and layouts.</shortDescription>
+        <value>Make it visible to the people who should see the total (read only is enough for most), add it to the page layouts where they look, and click Save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepBack</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the field's label.</shortDescription>
+        <value>Come back here, click Refresh Fields and choose {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldDeploy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field: {0} is the downloaded file's name.</shortDescription>
+        <value>Or deploy it with the Salesforce CLI: sf project deploy start --metadata-dir {0} --single-package. A deployed field is visible to nobody until you give access to it in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DownloadField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field: link that downloads the field package.</shortDescription>
+        <value>Download Field Package</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RefreshFields</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button that reloads the fields.</shortDescription>
+        <value>Refresh Fields</value>
+    </labels>
 </CustomLabels>

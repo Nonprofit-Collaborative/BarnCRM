@@ -7,6 +7,7 @@ import getParentFields from '@salesforce/apex/RollupBuilderController.getParentF
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
 import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
+import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -37,6 +38,9 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+jest.mock('@salesforce/apex/RollupFieldGenerator.generate', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning',
   () => ({ default: 'More than one currency.' }),
@@ -678,6 +682,73 @@ describe('c-rollup-wizard', () => {
       await flush();
       expect(query(element, 'rows-note').textContent).toBe('Read through a household.');
       expect(query(element, 'rows-summary')).toBeNull();
+    });
+
+    const GENERATED = {
+      apiName: 'Gift_Count__c',
+      steps: ['Open Setup.', 'Choose Number.', 'Give access.', 'Come back.'],
+      fieldPath: 'objects/Account/fields/Gift_Count__c.field-meta.xml',
+      fieldXml: '<CustomField>Gift_Count__c</CustomField>',
+      deployPackage: 'UEsDBA==',
+      fileName: 'BarnRollupField_Account_Gift_Count__c.zip'
+    };
+
+    it('writes a field to create in Setup or deploy, and nothing more (U8)', async () => {
+      generateField.mockResolvedValue(GENERATED);
+      const element = await build(DRAFT);
+      expect(query(element, 'create-field')).toBeNull();
+
+      query(element, 'open-create-field').click();
+      await flush();
+      expect(query(element, 'new-field-kind').value).toBe('NUMBER');
+      expect(query(element, 'write-field').disabled).toBe(true);
+
+      query(element, 'new-field-label').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Gift Count' } })
+      );
+      await flush();
+      expect(query(element, 'write-field').disabled).toBe(false);
+      query(element, 'write-field').click();
+      await flush();
+
+      expect(generateField).toHaveBeenCalledWith({
+        objectApiName: 'Account',
+        fieldLabel: 'Gift Count',
+        kind: 'NUMBER'
+      });
+      expect(element.shadowRoot.querySelectorAll('[data-id="field-steps"] li')).toHaveLength(4);
+      expect(query(element, 'field-xml').textContent).toBe(GENERATED.fieldXml);
+      const download = query(element, 'download-field');
+      expect(download.getAttribute('href')).toBe('data:application/zip;base64,UEsDBA==');
+      expect(download.getAttribute('download')).toBe(GENERATED.fileName);
+
+      Object.assign(navigator, { clipboard: { writeText: jest.fn().mockResolvedValue() } });
+      query(element, 'copy-field').click();
+      await flush();
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(GENERATED.fieldXml);
+      expect(query(element, 'field-notice').textContent).toBe('c.Core_RollupBuilder_InstantCopied');
+    });
+
+    it('chooses the new field once Refresh Fields finds it (U8)', async () => {
+      generateField.mockResolvedValue(GENERATED);
+      const element = await build({ ...DRAFT, targetField: undefined });
+      query(element, 'open-create-field').click();
+      await flush();
+      query(element, 'new-field-label').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Gift Count' } })
+      );
+      query(element, 'write-field').click();
+      await flush();
+
+      getTargetFields.mockResolvedValue([
+        { value: 'Total_Giving__c', label: 'Total Giving', type: 'currency' },
+        { value: 'Gift_Count__c', label: 'Gift Count', type: 'double' }
+      ]);
+      query(element, 'refresh-fields').click();
+      await flush();
+
+      expect(element.draft.targetField).toBe('Gift_Count__c');
+      expect(query(element, 'create-field')).toBeNull();
     });
   });
 });

@@ -86,6 +86,26 @@ import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading'
 import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
 import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
+import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
+import CREATE_FIELD from '@salesforce/label/c.Core_RollupEase_CreateField';
+import CREATE_FIELD_WHY from '@salesforce/label/c.Core_RollupEase_CreateFieldWhy';
+import NEW_FIELD_LABEL from '@salesforce/label/c.Core_RollupEase_NewFieldLabel';
+import NEW_FIELD_KIND from '@salesforce/label/c.Core_RollupEase_NewFieldKind';
+import KIND_HELP from '@salesforce/label/c.Core_RollupEase_KindHelp';
+import KIND_NUMBER from '@salesforce/label/c.Core_RollupEase_KindNumber';
+import KIND_CURRENCY from '@salesforce/label/c.Core_RollupEase_KindCurrency';
+import KIND_DATE from '@salesforce/label/c.Core_RollupEase_KindDate';
+import KIND_DATETIME from '@salesforce/label/c.Core_RollupEase_KindDateTime';
+import KIND_TEXT from '@salesforce/label/c.Core_RollupEase_KindText';
+import KIND_LONGTEXT from '@salesforce/label/c.Core_RollupEase_KindLongText';
+import KIND_CHECKBOX from '@salesforce/label/c.Core_RollupEase_KindCheckbox';
+import WRITE_FIELD from '@salesforce/label/c.Core_RollupEase_WriteField';
+import FIELD_DEPLOY from '@salesforce/label/c.Core_RollupEase_FieldDeploy';
+import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
+import REFRESH_FIELDS from '@salesforce/label/c.Core_RollupEase_RefreshFields';
+import COPY from '@salesforce/label/c.Core_RollupBuilder_InstantCopy';
+import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
+import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -194,8 +214,24 @@ export default class RollupWizard extends LightningElement {
     samplesHeading: SAMPLES_HEADING,
     samplesNone: SAMPLES_NONE,
     showRows: SHOW_ROWS,
-    rowsHeading: ROWS_HEADING
+    rowsHeading: ROWS_HEADING,
+    createField: CREATE_FIELD,
+    createFieldWhy: CREATE_FIELD_WHY,
+    newFieldLabel: NEW_FIELD_LABEL,
+    newFieldKind: NEW_FIELD_KIND,
+    kindHelp: KIND_HELP,
+    writeField: WRITE_FIELD,
+    downloadField: DOWNLOAD_FIELD,
+    refreshFields: REFRESH_FIELDS,
+    copy: COPY
   };
+
+  /** Step 1: the Create a Field panel, which writes a field for the administrator to make (U8). */
+  creatingField = false;
+  newFieldLabel = '';
+  newFieldKind = 'NUMBER';
+  generatedField;
+  fieldNotice;
 
   /** The furthest step reached, so the sentence jumps back to any step already filled (U3). */
   furthest = 1;
@@ -719,7 +755,89 @@ export default class RollupWizard extends LightningElement {
     });
     // A new object clears what the later steps chose, so they are filled in again in order.
     this.furthest = 1;
+    this.generatedField = undefined;
     this.loadTarget();
+  }
+
+  get kindOptions() {
+    return [
+      { label: KIND_NUMBER, value: 'NUMBER' },
+      { label: KIND_CURRENCY, value: 'CURRENCY' },
+      { label: KIND_DATE, value: 'DATE' },
+      { label: KIND_DATETIME, value: 'DATETIME' },
+      { label: KIND_TEXT, value: 'TEXT' },
+      { label: KIND_LONGTEXT, value: 'LONGTEXT' },
+      { label: KIND_CHECKBOX, value: 'CHECKBOX' }
+    ];
+  }
+
+  get cannotWriteField() {
+    return !this.current.targetObject || !this.newFieldLabel.trim();
+  }
+
+  get fieldHref() {
+    return `data:application/zip;base64,${this.generatedField.deployPackage}`;
+  }
+
+  get fieldDeployText() {
+    return FIELD_DEPLOY.replace('{0}', this.generatedField.fileName);
+  }
+
+  handleOpenCreateField() {
+    this.creatingField = !this.creatingField;
+  }
+
+  handleNewFieldLabel(event) {
+    this.newFieldLabel = event.detail.value || '';
+    this.generatedField = undefined;
+  }
+
+  handleNewFieldKind(event) {
+    this.newFieldKind = event.detail.value;
+    this.generatedField = undefined;
+  }
+
+  /** Writes the field's steps, source and package; nothing is created in the org. */
+  handleWriteField() {
+    this.error = undefined;
+    this.fieldNotice = undefined;
+    return generateField({
+      objectApiName: this.current.targetObject,
+      fieldLabel: this.newFieldLabel,
+      kind: this.newFieldKind
+    })
+      .then((result) => {
+        this.generatedField = result;
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  handleCopyField() {
+    const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
+    if (!clipboard || !clipboard.writeText) {
+      this.fieldNotice = COPY_FAILED;
+      return Promise.resolve();
+    }
+    return clipboard
+      .writeText(this.generatedField.fieldXml)
+      .then(() => {
+        this.fieldNotice = COPIED;
+      })
+      .catch(() => {
+        this.fieldNotice = COPY_FAILED;
+      });
+  }
+
+  /** Reads the object's fields again and chooses the new one once it exists. */
+  handleRefreshFields() {
+    const created = this.generatedField && this.generatedField.apiName;
+    return this.loadTarget().then(() => {
+      if (created && this.targetFields.some((field) => field.value === created)) {
+        this.change({ targetField: created });
+        this.creatingField = false;
+        this.generatedField = undefined;
+      }
+    });
   }
 
   handleSource(event) {

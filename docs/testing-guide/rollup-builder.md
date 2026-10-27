@@ -503,3 +503,20 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | In the Error Log, find the entry from **RollupClearBatch**. | "Values of the deleted rollup Test children per household cleared on N records; 0 records could not be saved." |
 
 **Cleanup:** rebuild **Test children per household** with T-RB-02 if later scripts need it.
+
+## T-RB-45: Create a Field From the Builder
+
+**Purpose:** confirm step 1 writes a field to create (Setup steps, source and package), creates nothing itself, and chooses the field once it exists.
+**Prerequisites:** admin user. A sandbox if you deploy with the CLI (step 6).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**, choose **Account**, then click **Create a Field**. | A **Create a Field** panel opens, saying BarnCRM cannot add a field itself because that takes a Metadata API deploy. **Field type** shows **Number**; **Write the Field** is disabled. |
+| 2 | Type `Test Gift Count` in **Field label** and click **Write the Field**. | Four numbered steps: open Object Manager, then Account, then Fields & Relationships, and click New; choose Number, enter the label Test Gift Count and the field name Test_Gift_Count; make it visible and save; come back and click Refresh Fields. Below, `objects/Account/fields/Test_Gift_Count__c.field-meta.xml` and its XML, **Copy**, **Download Field Package**, and the CLI command. |
+| 3 | Click **Copy**. | "Copied." The clipboard holds the XML. |
+| 4 | Click **Download Field Package**. | `BarnRollupField_Account_Test_Gift_Count__c.zip` downloads, holding `package.xml` and `objects/Account.object`. |
+| 5 | Click **Refresh Fields** without creating the field. | The panel stays open; **Field that shows the total** does not list Test Gift Count. No field was created in the org. |
+| 6 | Create the field by following the four steps in Setup (or, in a sandbox, deploy the zip with the command shown and give your profile access to the field). Back in the Builder, click **Refresh Fields**. | **Field that shows the total** now shows **Test Gift Count** and the panel closes. |
+| 7 | Type `Member Count` in **Field label** after opening **Create a Field** again, and click **Write the Field**. | A red message: "This object already has a field named Member_Count__c. Choose it in the list, or give the new field another label." |
+
+**Cleanup:** click **Cancel**; delete **Test Gift Count** in Setup if you created it.

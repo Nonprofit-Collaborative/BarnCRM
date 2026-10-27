@@ -58,6 +58,63 @@
             field-level-help={labels.targetFieldHelp}
             onchange={handleInput}
         ></lightning-combobox>
+        <lightning-button
+            variant="base"
+            data-id="open-create-field"
+            label={labels.createField}
+            onclick={handleOpenCreateField}
+        ></lightning-button>
+        <template lwc:if={creatingField}>
+            <div class="slds-box slds-box_x-small slds-var-m-top_x-small" data-id="create-field">
+                <h4 class="slds-text-title_bold">{labels.createField}</h4>
+                <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.createFieldWhy}</p>
+                <lightning-input
+                    data-id="new-field-label"
+                    label={labels.newFieldLabel}
+                    max-length="40"
+                    value={newFieldLabel}
+                    onchange={handleNewFieldLabel}
+                ></lightning-input>
+                <lightning-combobox
+                    data-id="new-field-kind"
+                    label={labels.newFieldKind}
+                    value={newFieldKind}
+                    options={kindOptions}
+                    field-level-help={labels.kindHelp}
+                    onchange={handleNewFieldKind}
+                ></lightning-combobox>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    data-id="write-field"
+                    label={labels.writeField}
+                    disabled={cannotWriteField}
+                    onclick={handleWriteField}
+                ></lightning-button>
+                <template lwc:if={generatedField}>
+                    <ol class="slds-list_ordered slds-var-m-vertical_x-small" data-id="field-steps">
+                        <template for:each={generatedField.steps} for:item="fieldStep">
+                            <li key={fieldStep}>{fieldStep}</li>
+                        </template>
+                    </ol>
+                    <p class="slds-text-body_small" data-id="field-path">{generatedField.fieldPath}</p>
+                    <pre class="slds-box slds-box_x-small slds-scrollable_x" data-id="field-xml">{generatedField.fieldXml}</pre>
+                    <div class="slds-var-m-vertical_x-small">
+                        <lightning-button data-id="copy-field" label={labels.copy} onclick={handleCopyField}></lightning-button>
+                        <a class="slds-button slds-button_neutral slds-var-m-left_x-small" data-id="download-field" href={fieldHref} download={generatedField.fileName}>{labels.downloadField}</a>
+                    </div>
+                    <template lwc:if={fieldNotice}>
+                        <p class="slds-text-body_small" data-id="field-notice">{fieldNotice}</p>
+                    </template>
+                    <p class="slds-text-body_small" data-id="field-deploy">{fieldDeployText}</p>
+                </template>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    data-id="refresh-fields"
+                    label={labels.refreshFields}
+                    onclick={handleRefreshFields}
+                ></lightning-button>
+            </div>
+        </template>
     </template>
 
     <template lwc:if={isStep2}>

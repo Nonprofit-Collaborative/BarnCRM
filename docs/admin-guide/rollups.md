@@ -417,8 +417,13 @@ The Builder steers you away from choices it would refuse:
    of its name in **Find another object** and pick it from the list. Only fields BarnCRM can
    write are offered: numbers, amounts, percents, dates, checkboxes, text and picklists. A
    field another active rollup already fills is marked with that rollup's name. If the field
-   does not exist yet, create it in Setup (a Number or Currency field is right for most
-   totals) and come back.
+   does not exist yet, click **Create a Field**, type its label and choose its type (a
+   Number or Currency field is right for most totals) and click **Write the Field**.
+   BarnCRM cannot add the field to your org itself, since that takes a Metadata API deploy;
+   instead it writes it for you: the exact Setup steps with the type, label and field name to
+   enter, the field's source file to copy, and **Download Field Package** with the Salesforce
+   CLI command to deploy it. A deployed field is visible to nobody until you give access to
+   it in Setup. When the field exists, click **Refresh Fields**: the Builder chooses it.
 2. **What should be counted?** The records that feed the total and the field that links them
    to the record from step 1, in plain words: "Gift, by Donor" or "Opportunity, by Account
    ID". When the total lands on an account and the records point at a person, you can also
