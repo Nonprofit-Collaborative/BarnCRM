@@ -750,5 +750,20 @@ describe('c-rollup-wizard', () => {
       expect(element.draft.targetField).toBe('Gift_Count__c');
       expect(query(element, 'create-field')).toBeNull();
     });
+
+    it('opens Create a Field filled in when a starter template names a missing field (U2)', async () => {
+      const element = await build({
+        ...DRAFT,
+        targetField: 'Average_Gift__c',
+        newFieldLabel: 'Average Gift',
+        newFieldKind: 'CURRENCY'
+      });
+
+      expect(query(element, 'create-field')).not.toBeNull();
+      expect(query(element, 'new-field-label').value).toBe('Average Gift');
+      expect(query(element, 'new-field-kind').value).toBe('CURRENCY');
+      expect(element.draft.newFieldLabel).toBeUndefined();
+      expect(element.draft.targetField).toBe('Average_Gift__c');
+    });
   });
 });

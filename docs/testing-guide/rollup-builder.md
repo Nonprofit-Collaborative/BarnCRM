@@ -538,3 +538,21 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Open an account no rollup fills (or switch the test rollup off and click **Refresh**). | "No BarnCRM rollup you can see fills a field on this record." |
 
 **Cleanup:** switch the test rollup back on if you switched it off; put the card's visibility filter back (Manage BarnCRM Settings is true), or remove the component if you added it only for this script.
+
+## T-RB-47: Starter Templates Add Only What You Tick, Switched Off
+
+**Purpose:** confirm Starter Templates adds nothing by default, adds only ticked rollups and adds them switched off, and opens a rollup prefilled with Create a Field ready.
+**Prerequisites:** admin user; Giving deployed; a staff user without Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab and note how many rollups are listed. | **Starter Templates** shows above the list. |
+| 2 | Click **Starter Templates**. | The **Nonprofit Starter** with seven rollups, none ticked, each with its sentence. Each says "Needs a field labelled ... on Contact" (or "on Appeal"), so its tick box is disabled. **Add the Chosen Rollups** is disabled. The rollup list has not changed. |
+| 3 | Next to **Average Gift**, click **Open in Builder**. | The Builder opens on step 1 named **Average Gift**, showing on **Contact**, with **Create a Field** open: label **Average Gift**, type **Currency**. |
+| 4 | Click **Write the Field**, create the field from the steps in Setup, then click **Refresh Fields**. Click **Cancel**. | **Field that shows the total** shows **Average Gift**. Cancel saves nothing. |
+| 5 | Click **Starter Templates** (twice if the panel is still open, to close and reopen it). | **Average Gift** says "Ready to add, switched off." and can be ticked; the others still need their fields. |
+| 6 | Tick **Average Gift** and click **Add the Chosen Rollups**. | "Average Gift: Added, switched off." The rollup list shows **Average Gift**, switched off, mode Both. |
+| 7 | Close **Starter Templates** and open it again. | **Average Gift** says "Already filled by Average Gift." and cannot be ticked. |
+| 8 | Log in as the staff user and open the **Rollup Builder** tab. | No **Starter Templates** button. |
+
+**Cleanup:** delete the **Average Gift** rollup (keep values) and the **Average Gift** field in Setup.

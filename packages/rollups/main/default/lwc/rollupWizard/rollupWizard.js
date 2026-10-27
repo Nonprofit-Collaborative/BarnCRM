@@ -263,7 +263,13 @@ export default class RollupWizard extends LightningElement {
     return this.current;
   }
   set draft(value) {
-    this.current = { active: true, fiscalYearAware: false, ...(value || {}) };
+    // A starter template (U2) may name the field to create; Create a Field opens filled in.
+    const { newFieldLabel, newFieldKind, ...rest } = value || {};
+    this.current = { active: true, fiscalYearAware: false, ...rest };
+    this.creatingField = Boolean(newFieldLabel);
+    this.newFieldLabel = newFieldLabel || '';
+    this.newFieldKind = newFieldKind || 'NUMBER';
+    this.generatedField = undefined;
     this.step = 1;
     // An edited or copied rollup has every step filled in, so any part of it can be opened.
     this.furthest = value && value.targetObject ? 5 : 1;

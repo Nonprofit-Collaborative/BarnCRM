@@ -359,6 +359,42 @@ with everything filled in from that rollup, under a new name, for you to change.
 shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
 rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
+### Starter Templates
+
+**Starter Templates**, above the rollup list, offers ready-made rollups for common totals.
+Nothing is ever added for you: opening it adds nothing, no rollup is ticked, and only the
+rollups you tick are added when you click **Add the Chosen Rollups**. Each is added
+**switched off**, through the same checks as a save in the Builder, so switch it on once its
+field shows what you expect. Only people with **Manage BarnCRM Settings** see the button.
+
+The **Nonprofit Starter** (needs Giving) adds totals Giving does not ship, all from received
+gifts (Received, Refunded or Written off, with an amount above zero, as the shipped giving
+totals count them):
+
+| Rollup | Shows on | What it is | Field type |
+|---|---|---|---|
+| Average Gift | Contact | Average gift amount | Currency |
+| First Gift Amount | Contact | Amount of the earliest gift, by gift date | Currency |
+| Last Gift Amount | Contact | Amount of the latest gift, by gift date | Currency |
+| Smallest Gift | Contact | Smallest gift amount | Currency |
+| Gifts This Fiscal Year | Contact | Number of gifts dated in the current fiscal year | Number |
+| Appeal Average Gift | Appeal | Average gift amount for the appeal | Currency |
+| Number of Donors | Appeal | Number of different donors who gave to the appeal | Number |
+
+Each rollup shows its sentence and whether it can be added:
+
+- **Needs a field labelled ... on ...**: BarnCRM does not ship these fields. Click **Open in
+  Builder**: the Builder opens with the rollup filled in and **Create a Field** ready with
+  the label and type, which writes the field for you to create (see step 1 of the Builder).
+  Create the field, click **Refresh Fields**, and save there (it saves switched off), or come
+  back here and tick it.
+- **Already filled by ...**: another rollup fills that field, so this one is not added.
+- **Needs ..., which this org does not have**: the module it needs (Giving) is not installed.
+- **Ready to add, switched off.**
+
+After **Add the Chosen Rollups**, each ticked rollup says **Added, switched off.** or why it
+was not added, and the list shows the new rollups.
+
 ### Reading the Rollup List
 
 - **One sentence per rollup.** The **What it counts** column says what each rollup does in words,
@@ -835,7 +871,8 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 - **The Builder does not deploy the instant-totals trigger for you.** You add it in a sandbox
   and move it with a change set (or the Salesforce CLI), as in
   [With a Generated Trigger](#with-a-generated-trigger). A one-click deploy may come later.
-- **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
+- **The Builder does not create a field itself.** **Create a Field** in step 1 writes it (Setup
+  steps, its source, and a package to deploy); you create it, then click **Refresh Fields**.
 - **BarnCRM is checked against its previous rollup engine** before that engine is removed
   from the package. A developer runs the comparison on a test org; it changes nothing in your
   data.
