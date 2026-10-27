@@ -91,6 +91,24 @@ Turning a module off does not hide its tabs: Salesforce does not let an app chan
 visibility. To hide a module from a colleague, take away its role on the
 [Access](access.md) page.
 
+## When a Module's Setup Never Ran
+
+Install BarnCRM and its modules as packages. Each package runs its own setup steps when it is
+installed and at every upgrade: it creates its automation switches, import templates and
+shipped totals, gives the installer its administrator access, and so on. Copying the source
+into an org by hand skips those steps, and the module then works only in part.
+
+A row whose setup steps never ran says "Its setup steps never ran, which happens when source
+is copied in by hand. Finish Setup runs the steps a package install runs." With the **Manage
+BarnCRM Settings** permission you also see a **Finish Setup** button on that row. Click it: the
+module's install steps run for the whole org, with you standing in for the installer, and the
+notice goes away. The steps only add what is missing, so pressing it twice does no harm. It is
+recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the same thing (see
+[Health Check](health-check.md#how-a-fix-button-works)).
+
+Finish Setup is a recovery step for an org built from copied source, not a way to install
+BarnCRM: install the packages.
+
 ## Common mistakes
 
 - **Expecting Show Nonprofit Modules to remove or pause anything.** It only hides rows. A

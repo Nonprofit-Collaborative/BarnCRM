@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Modules_Setup_Run__c</fullName>
+  <description>The comma separated keys of the BarnCRM packages whose setup steps have run in this org (Core, Giving and so on). Each package adds its own key when its install, its upgrade, the deploy script or Finish Setup runs those steps (FS1).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The BarnCRM packages whose setup steps have run.</inlineHelpText>
+  <label>Modules Setup Run</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>
