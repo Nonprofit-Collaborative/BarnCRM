@@ -1373,6 +1373,28 @@ describe('c-settings-console', () => {
       expect(notes(element)).toEqual(['Stale_Record_Years__c']);
     });
 
+    it('offers no keep for a default detection would replace, but still says it is not saved', async () => {
+      const withDetection = defaultsModel(true);
+      withDetection.sections[0].settings.push({
+        ...withDetection.sections[0].settings[0],
+        key: 'Household_Membership_Mode__c',
+        label: 'How people belong to a household',
+        value: 'Contact',
+        options: [
+          { label: 'One household per person', value: 'Contact' },
+          { label: 'More than one household', value: 'Junction' }
+        ],
+        detectionMayChange: true
+      });
+      getConsoleModel.mockResolvedValue(withDetection);
+      const element = build();
+      await settle();
+
+      expect(notes(element)).toContain('Household_Membership_Mode__c');
+      expect(keepButton(element, 'Household_Membership_Mode__c')).toBeNull();
+      expect(keepButton(element, 'Coexistence_Mode__c')).not.toBeNull();
+    });
+
     it('says a default is not saved but offers David no button to keep it', async () => {
       getConsoleModel.mockResolvedValue(defaultsModel(false));
       const element = build();

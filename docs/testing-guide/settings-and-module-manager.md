@@ -297,5 +297,6 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Open **Org Optimizer**. Change **Days before a user is unused** to `120` without saving. | Its note and button are gone; **Years before a person is not changed** still shows **5** with its note and button. |
 | 5 | Click **Keep this setting** under **Years before a person is not changed**. | "Your settings are saved." Its note is gone, **Days before a user is unused** still shows `120` and **Save** is still available. Click **Discard changes**: it shows **90** again, with its note. |
 | 6 | Sign in as the read-only user and open **Org Optimizer**. | **Days before a user is unused** says "Default, not yet saved." with no **Keep this setting** button. |
+| 7 | As an admin in an org with Person Accounts where **How people belong to a household** was never saved, open the section that holds it. | It shows **One household per person (simple)** with "Default, not yet saved." under it and no **Keep this setting** button, because BarnCRM would choose the flexible way for this org. In an org without Person Accounts or Nonprofit Cloud the same row has the button. |
 
 **Cleanup:** none. The values kept are the defaults BarnCRM was already using, so nothing behaves differently.

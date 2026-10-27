@@ -130,11 +130,29 @@ public with sharing class CoexistenceService {
      */
     private static Map<String, Object> withMembership(String mode) {
         Map<String, Object> values = new Map<String, Object>{ KEY_COEXISTENCE_MODE => mode };
-        Boolean needsJunction = MODE_NONPROFIT_CLOUD.equals(mode) || hasPersonAccounts();
-        if (needsJunction && !membershipModeChosen()) {
+        if (needsJunction(mode) && !membershipModeChosen()) {
             values.put(KEY_MEMBERSHIP_MODE, MEMBERSHIP_JUNCTION);
         }
         return values;
+    }
+
+    private static Boolean needsJunction(String mode) {
+        return MODE_NONPROFIT_CLOUD.equals(mode) || hasPersonAccounts();
+    }
+
+    /**
+     * The way of belonging detection would write while nobody has chosen one: the junction
+     * when the saved mode (or, with none saved, the recommended one) or the org calls for it,
+     * else the simple way, which a blank already means. The console offers to keep a shown
+     * membership default only when this agrees with it, so a one-click keep never pins a
+     * value detection would have changed (RM1).
+     */
+    public static String membershipDetectionWouldChoose() {
+        String mode = getCurrentMode();
+        if (String.isBlank(mode)) {
+            mode = OrgShapeDetector.recommendedCoexistenceMode();
+        }
+        return needsJunction(mode) ? MEMBERSHIP_JUNCTION : MEMBERSHIP_CONTACT;
     }
 
     private static Boolean hasPersonAccounts() {

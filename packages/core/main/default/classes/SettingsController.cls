@@ -100,6 +100,13 @@ public with sharing class SettingsController {
          */
         @AuraEnabled
         public Boolean unsavedDefault;
+        /**
+         * True when an unsaved default is one BarnCRM's own detection would replace (the
+         * household membership mode on an org with Person Accounts or Nonprofit Cloud), so the
+         * console shows the note but offers no one-click keep.
+         */
+        @AuraEnabled
+        public Boolean detectionMayChange;
     }
 
     public class Option {
@@ -525,7 +532,27 @@ public with sharing class SettingsController {
                     SettingsService.getValue(settingsObject, definition.Setting_Key__c)
                 )
             );
+        String detected = setting.unsavedDefault
+            ? detectedValue(settingsObject, definition.Setting_Key__c)
+            : null;
+        setting.detectionMayChange = detected != null && !detected.equals(setting.value);
         return setting;
+    }
+
+    /**
+     * What BarnCRM's own detection would write for an unsaved row, or null for a row detection
+     * never writes. The coexistence mode is shown as the recommended mode, which is what
+     * detection writes; the membership mode is shown as the simple way, which detection
+     * replaces on an org with Person Accounts or Nonprofit Cloud.
+     */
+    private static String detectedValue(String settingsObject, String key) {
+        if (isCoexistenceMode(settingsObject, key)) {
+            return OrgShapeDetector.recommendedCoexistenceMode();
+        }
+        if (isMembershipMode(settingsObject, key)) {
+            return CoexistenceService.membershipDetectionWouldChoose();
+        }
+        return null;
     }
 
     /**

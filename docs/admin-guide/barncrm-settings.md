@@ -247,7 +247,10 @@ value shown, as if you had chosen it yourself, with the same permission, checks 
 Changes** row, and anything choosing it by hand sets off (keeping **Coexistence mode**, for
 example, confirms that mode and completes its Setup Assistant step). Changes you have not saved
 yet stay on the page. A setting already saved shows no note, and people without Manage BarnCRM
-Settings see the note but no button.
+Settings see the note but no button. **How people belong to a household** has no button when
+BarnCRM would choose differently for your org (with Person Accounts or Nonprofit Cloud it
+moves a household choice nobody made to the flexible way): the note stays, and you choose the
+way you want from the list and save.
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.

@@ -314,7 +314,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       value: hasPending ? pendingValue : setting.value,
       selected: splitList(hasPending ? pendingValue : setting.value),
       showsUnsavedDefault,
-      canKeepDefault: showsUnsavedDefault && this.canEdit,
+      // No one-click keep for a default BarnCRM's detection would replace (a Person Account org's
+      // household membership): the admin chooses it by hand instead.
+      canKeepDefault: showsUnsavedDefault && this.canEdit && !setting.detectionMayChange,
       keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label),
       // Ties the description to the control for a screen reader; ids are scoped to this template.
       descriptionId: setting.description ? `description-${setting.key}` : undefined
@@ -536,7 +538,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const key = event.currentTarget.dataset.keep;
     const section = this.currentSection;
     const setting = section && section.settings.find((candidate) => candidate.key === key);
-    if (!this.canEdit || !setting || !setting.unsavedDefault) {
+    if (!this.canEdit || !setting || !setting.unsavedDefault || setting.detectionMayChange) {
       return;
     }
     await this.send({ [key]: setting.value });
