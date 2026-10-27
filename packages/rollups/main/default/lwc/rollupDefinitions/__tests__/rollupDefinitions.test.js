@@ -12,6 +12,7 @@ import runTonight from '@salesforce/apex/RollupController.runTonight';
 import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
 import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
 import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
+import LightningConfirm from 'lightning/confirm';
 
 jest.mock(
   '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions',
