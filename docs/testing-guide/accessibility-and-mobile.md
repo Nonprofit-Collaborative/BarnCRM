@@ -14,7 +14,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the **BarnCRM Admin** app and the **BarnCRM Settings** tab. Press Tab until focus reaches the page content. | A visible focus ring sits on the **Search settings** box. |
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
-| 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
+| 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
 | 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create a household automatically** and press Space. | The checkbox changes state. **Save** and **Discard changes** become enabled. |
 | 6 | Tab to **Discard changes** and press Enter. | The checkbox returns to its original state and nothing is saved. On **General**, **Recent Changes** has no new row. |
@@ -98,7 +98,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM Settings** tab. | A notice at the top reads **You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission.** A screen reader announces it as a status message. |
-| 2 | Press Tab through the **Households** section. | Every control is greyed out. There is no **Save** or **Discard changes** button. Each **Learn more** link is still reachable. |
+| 2 | Press Tab through the **People and Households** section. | Every control is greyed out. There is no **Save** or **Discard changes** button. Each **Learn more** link is still reachable. |
 | 3 | Open the **Import** tab from the app launcher. | The warning **You need the Manage BarnCRM Settings permission to import. Ask whoever set up your org for the BarnCRM Admin role.** shows. No wizard controls can be reached with Tab. |
 
 **Cleanup:** None.
@@ -110,7 +110,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Households**, Tab to the **Learn more** link under **Create a household automatically**. | Announced as **Learn more about Create a household automatically (opens a new tab)**, not just "Learn more". |
+| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the **Learn more** link under **Create a household automatically**. | Announced as **Learn more about Create a household automatically (opens a new tab)**, not just "Learn more". |
 | 2 | Tab onto the checkbox **Create a household automatically**. | The label and its description text are both read. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first **Make primary** button. | Announced as **Make Harper Garcia the primary contact** (the member's own name), not just "Make primary". |
 | 4 | Tab to a **Move to another household** button. | Announced as **Move** plus the member's name plus **to another household**. |

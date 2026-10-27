@@ -29,9 +29,13 @@ import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
+import DEFAULT_NOT_SAVED from '@salesforce/label/c.Core_Settings_DefaultNotSaved';
+import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
+import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
+import { groupRows, findBox } from './settingsGroups';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
@@ -144,7 +148,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     fromSetupHelp: FROM_SETUP_HELP,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
-    feedbackUrl: FEEDBACK_URL
+    feedbackUrl: FEEDBACK_URL,
+    defaultNotSaved: DEFAULT_NOT_SAVED,
+    keepDefault: KEEP_DEFAULT
   };
 
   columns = [
@@ -186,6 +192,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   requestedSection;
   enclosingTabId;
   focusKey;
+  /** The box a link named (P1), scrolled to once its page has rendered. */
+  focusBox;
+  boxRequestHandled = false;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -195,6 +204,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const requested = key && state[key];
     if (requested) {
       this.requestedSection = requested;
+      this.boxRequestHandled = false;
       this.selectRequestedSection();
     }
   }
@@ -213,6 +223,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   renderedCallback() {
     this.nameTab();
     this.focusChosenSetting();
+    this.scrollToChosenBox();
   }
 
   nameTab() {
@@ -241,6 +252,25 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return section.settings
       .filter((setting) => !isHiddenPanelSetting(section, setting))
       .map((setting) => this.toRow(setting));
+  }
+
+  /**
+   * The page's rows in boxed sub-sections (P1), each with a heading in title case. A panel alone
+   * in a box named like it keeps its heading for search and focus, hidden so the title does
+   * not show twice.
+   */
+  get currentGroups() {
+    return groupRows(this.selectedSection, this.currentSettings).map((box, index) => ({
+      ...box,
+      headingId: `settings-box-${index}`,
+      rows: box.rows.map((row) => ({
+        ...row,
+        headingClass:
+          box.rows.length === 1 && String(row.label).toLowerCase() === box.label.toLowerCase()
+            ? 'slds-assistive-text'
+            : 'slds-text-heading_small slds-var-m-bottom_x-small'
+      }))
+    }));
   }
 
   get sectionIsEmpty() {
@@ -278,6 +308,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const pendingValue = this.pending[setting.key];
     const hasPending = pendingValue !== undefined;
     const isCheckbox = setting.dataType === 'Checkbox';
+    // A default nobody saved, still on screen: the admin can keep it as a saved choice (RM1).
+    const showsUnsavedDefault = Boolean(setting.unsavedDefault) && !hasPending;
     return {
       ...setting,
       isCheckbox,
@@ -286,7 +318,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isPicklist: setting.dataType === 'Picklist',
       isDateTime: setting.dataType === 'DateTime',
       isRecord: setting.dataType === 'Record',
-      isRecordTypeList: setting.dataType === 'RecordTypeList',
+      // A Field List is the same checkbox list, of an object's fields (R-AD10).
+      isRecordTypeList: setting.dataType === 'RecordTypeList' || setting.dataType === 'FieldList',
       isComponent: setting.dataType === 'Component',
       // A value Setup holds: shown read only, never saved (ADR-0135).
       isSetupValue: setting.dataType === 'SetupValue',
@@ -306,6 +339,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       checked: isCheckbox ? (hasPending ? pendingValue === true : setting.checked) : false,
       value: hasPending ? pendingValue : setting.value,
       selected: splitList(hasPending ? pendingValue : setting.value),
+      showsUnsavedDefault,
+      // No one-click keep for a default BarnCRM's detection would replace (a Person Account org's
+      // household membership): the admin chooses it by hand instead.
+      canKeepDefault: showsUnsavedDefault && this.canEdit && !setting.detectionMayChange,
+      keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label),
       // Ties the description to the control for a screen reader; ids are scoped to this template.
       descriptionId: setting.description ? `description-${setting.key}` : undefined
     };
@@ -342,17 +380,33 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     this.loadCoreComponents();
   }
 
-  /** Opens the section a link asked for, when the model has one by that name. */
+  /**
+   * Opens the section a link asked for, when the model has one by that name. A link may name a
+   * box instead (P1), such as Households or Relationships, which were pages until they were
+   * merged into People and Households: its page opens, scrolled to that box once per link.
+   */
   selectRequestedSection() {
     if (!this.requestedSection) {
       return false;
     }
     const wanted = this.requestedSection.toLowerCase();
     const match = this.sections.find((section) => section.name.toLowerCase() === wanted);
-    if (!match) {
+    if (match) {
+      this.selectedSection = match.name;
+      return true;
+    }
+    const target = findBox(
+      this.sections.map((section) => section.name),
+      this.requestedSection
+    );
+    if (!target) {
       return false;
     }
-    this.selectedSection = match.name;
+    this.selectedSection = target.page;
+    if (!this.boxRequestHandled) {
+      this.boxRequestHandled = true;
+      this.focusBox = target.box;
+    }
     return true;
   }
 
@@ -475,6 +529,27 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** Scrolls to the box a link named and moves focus to its heading, once it has rendered. */
+  scrollToChosenBox() {
+    if (!this.focusBox) {
+      return;
+    }
+    const box = Array.from(this.template.querySelectorAll('[data-box]')).find(
+      (candidate) => candidate.dataset.box === this.focusBox
+    );
+    if (!box) {
+      return;
+    }
+    this.focusBox = undefined;
+    if (typeof box.scrollIntoView === 'function') {
+      box.scrollIntoView({ block: 'start' });
+    }
+    const heading = box.querySelector('h2');
+    if (heading && typeof heading.focus === 'function') {
+      heading.focus();
+    }
+  }
+
   handleChange(event) {
     const key = event.target.dataset.key;
     const kind = event.target.dataset.kind;
@@ -514,11 +589,32 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       this.message = this.labels.outOfRange;
       return;
     }
-    const values = { ...this.pending };
+    await this.send({ ...this.pending });
+  }
+
+  /**
+   * Keeps the default a row shows as a saved choice (RM1): the shown value goes through the
+   * same save as a value chosen by hand, so the permission, validation, change history and
+   * any follow-on work are the same. Other unsaved edits stay on the page.
+   */
+  async handleKeepDefault(event) {
+    const key = event.currentTarget.dataset.keep;
+    const section = this.currentSection;
+    const setting = section && section.settings.find((candidate) => candidate.key === key);
+    if (!this.canEdit || !setting || !setting.unsavedDefault || setting.detectionMayChange) {
+      return;
+    }
+    await this.send({ [key]: setting.value });
+  }
+
+  /** Saves the given values, then leaves on the page only the edits that were not sent. */
+  async send(values) {
     try {
       const model = await saveSettings({ values });
       this.applyModel(model);
-      this.pending = {};
+      const remaining = { ...this.pending };
+      Object.keys(values).forEach((key) => delete remaining[key]);
+      this.pending = remaining;
       this.messageIsError = false;
       this.message = this.labels.saved;
       this.refreshPanels();

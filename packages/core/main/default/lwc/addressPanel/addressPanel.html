@@ -24,52 +24,129 @@
         <p class="slds-text-body_regular" data-id="empty">{labels.emptyMessage}</p>
       </template>
 
-      <template for:each={cards} for:item="address">
-        <div key={address.id} class={address.cardClass} data-id="address-card">
-          <div class="slds-grid slds-grid_align-spread">
-            <div>
-              <p class="slds-text-title_caps" data-id="address-type">{address.addressType}</p>
-              <p data-id="address-street">{address.street}</p>
-              <p data-id="address-city">{address.cityLine}</p>
-              <p data-id="address-country">{address.country}</p>
-              <template lwc:if={address.seasonalText}>
-                <p class="slds-text-body_small" data-id="address-seasonal">
-                  {address.seasonalText}
-                </p>
+      <template for:each={groups} for:item="group">
+        <div key={group.key} data-id={group.dataId}>
+          <template lwc:if={group.isFormer}>
+            <h3 class="slds-section__title slds-var-m-vertical_small">
+              <button
+                class="slds-button slds-section__title-action"
+                aria-expanded={group.expanded}
+                onclick={handleToggleFormer}
+                data-id="former-toggle"
+              >
+                <lightning-icon
+                  icon-name={group.icon}
+                  size="x-small"
+                  class="slds-var-m-right_x-small"
+                ></lightning-icon>
+                <span>{group.heading}</span>
+              </button>
+            </h3>
+          </template>
+          <template for:each={group.cards} for:item="address">
+            <div key={address.id} class={address.cardClass} data-id="address-card">
+              <template lwc:if={address.flagUndeliverable}>
+                <div
+                  role="alert"
+                  class="slds-text-color_error slds-var-m-bottom_x-small"
+                  data-id="undeliverable-primary"
+                >
+                  {labels.undeliverablePrimary}
+                </div>
               </template>
+              <div class="slds-grid slds-grid_align-spread">
+                <div>
+                  <p class="slds-text-title_caps" data-id="address-type">{address.addressType}</p>
+                  <p data-id="address-street">{address.street}</p>
+                  <p data-id="address-city">{address.cityLine}</p>
+                  <p data-id="address-country">{address.country}</p>
+                  <template lwc:if={address.seasonalText}>
+                    <p class="slds-text-body_small" data-id="address-seasonal">
+                      {address.seasonalText}
+                    </p>
+                  </template>
+                  <template lwc:if={address.dateText}>
+                    <p class="slds-text-body_small" data-id="address-dates">{address.dateText}</p>
+                  </template>
+                  <template lwc:if={address.hasCardFields}>
+                    <lightning-record-view-form
+                      record-id={address.id}
+                      object-api-name={addressObject}
+                      density="compact"
+                      data-id="card-fields"
+                    >
+                      <template for:each={address.cardFields} for:item="field">
+                        <lightning-output-field
+                          key={field.apiName}
+                          field-name={field.apiName}
+                        ></lightning-output-field>
+                      </template>
+                    </lightning-record-view-form>
+                  </template>
+                </div>
+                <div>
+                  <template lwc:if={address.isDefault}>
+                    <lightning-badge
+                      label={labels.defaultBadge}
+                      data-id="default-badge"
+                    ></lightning-badge>
+                  </template>
+                  <template lwc:if={address.isUndeliverable}>
+                    <lightning-badge
+                      label={labels.undeliverableBadge}
+                      class="slds-theme_error"
+                      data-id="undeliverable-badge"
+                    ></lightning-badge>
+                  </template>
+                  <template lwc:if={canSetDefault}>
+                    <template lwc:if={address.showSetDefault}>
+                      <lightning-button
+                        label={labels.setDefaultButton}
+                        data-id={address.id}
+                        onclick={handleSetDefault}
+                        class="set-default"
+                      ></lightning-button>
+                    </template>
+                  </template>
+                  <template lwc:if={address.showUseForHousehold}>
+                    <lightning-button
+                      label={labels.useForHouseholdButton}
+                      data-id={address.id}
+                      onclick={handleUseForHousehold}
+                      class="use-for-household slds-var-m-left_x-small"
+                    ></lightning-button>
+                  </template>
+                  <template lwc:if={address.showUpdateEveryone}>
+                    <lightning-button
+                      label={labels.updateEveryoneButton}
+                      data-id={address.id}
+                      onclick={handleUpdateEveryone}
+                      class="update-everyone slds-var-m-left_x-small"
+                    ></lightning-button>
+                  </template>
+                  <template lwc:if={address.showStatusMenu}>
+                    <lightning-button-menu
+                      alternative-text={labels.statusMenu}
+                      title={labels.statusMenu}
+                      menu-alignment="right"
+                      icon-size="small"
+                      data-id={address.id}
+                      onselect={handleStatusSelect}
+                      class="status-menu slds-var-m-left_x-small"
+                    >
+                      <template for:each={address.statusActions} for:item="action">
+                        <lightning-menu-item
+                          key={action.value}
+                          value={action.value}
+                          label={action.label}
+                        ></lightning-menu-item>
+                      </template>
+                    </lightning-button-menu>
+                  </template>
+                </div>
+              </div>
             </div>
-            <div>
-              <template lwc:if={address.isDefault}>
-                <lightning-badge label={labels.defaultBadge} data-id="default-badge"></lightning-badge>
-              </template>
-              <template lwc:if={canSetDefault}>
-                <template lwc:if={address.showSetDefault}>
-                  <lightning-button
-                    label={labels.setDefaultButton}
-                    data-id={address.id}
-                    onclick={handleSetDefault}
-                    class="set-default"
-                  ></lightning-button>
-                </template>
-              </template>
-              <template lwc:if={address.showUseForHousehold}>
-                <lightning-button
-                  label={labels.useForHouseholdButton}
-                  data-id={address.id}
-                  onclick={handleUseForHousehold}
-                  class="use-for-household slds-var-m-left_x-small"
-                ></lightning-button>
-              </template>
-              <template lwc:if={address.showUpdateEveryone}>
-                <lightning-button
-                  label={labels.updateEveryoneButton}
-                  data-id={address.id}
-                  onclick={handleUpdateEveryone}
-                  class="update-everyone slds-var-m-left_x-small"
-                ></lightning-button>
-              </template>
-            </div>
-          </div>
+          </template>
         </div>
       </template>
 
@@ -175,6 +252,13 @@
                 value={isFirstAddress}
                 class="slds-hide"
                 data-id="first-address-default"
+              ></lightning-input-field>
+            </template>
+            <template lwc:else>
+              <!-- A new address saved as the primary is a move: it ends the old one (R-AD10). -->
+              <lightning-input-field
+                field-name="Is_Default__c"
+                data-id="new-address-primary"
               ></lightning-input-field>
             </template>
             <template for:each={formFields} for:item="fieldName">
