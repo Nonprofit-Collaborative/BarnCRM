@@ -81,6 +81,23 @@ describe('c-rollup-builder', () => {
     });
   });
 
+  it('opens a starter template rollup prefilled and refreshes the list after an add (U2)', async () => {
+    const element = build();
+    await flush();
+    const templates = element.shadowRoot.querySelector('c-rollup-templates');
+    expect(templates.canManage).toBe(true);
+
+    const draft = { name: 'Average Gift', active: false, newFieldLabel: 'Average Gift' };
+    templates.dispatchEvent(new CustomEvent('open', { detail: { draft } }));
+    await flush();
+    expect(wizard(element).draft).toEqual(draft);
+
+    wizard(element).dispatchEvent(new CustomEvent('cancel'));
+    templates.dispatchEvent(new CustomEvent('added'));
+    await flush();
+    expect(list(element).refresh).toHaveBeenCalled();
+  });
+
   it('closes the wizard on save, shows the notice and refreshes the list', async () => {
     getDraft.mockResolvedValue({ recordId: 'a01', name: 'Household total giving' });
     const element = build();

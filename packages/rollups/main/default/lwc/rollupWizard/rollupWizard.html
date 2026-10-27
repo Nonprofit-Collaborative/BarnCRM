@@ -4,6 +4,26 @@
             <lightning-progress-step key={item.value} label={item.label} value={item.value}></lightning-progress-step>
         </template>
     </lightning-progress-indicator>
+    <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-top_small" data-id="builder-sentence">
+        <p>
+            <template for:each={sentenceParts} for:item="part">
+                <span key={part.key}>
+                    <template lwc:if={part.isText}>{part.text}</template>
+                    <template lwc:else>
+                        <lightning-button
+                            variant="base"
+                            data-id="sentence-part"
+                            data-step={part.step}
+                            label={part.text}
+                            disabled={part.disabled}
+                            onclick={handleSentencePart}
+                        ></lightning-button>
+                    </template>
+                </span>
+            </template>
+        </p>
+        <p class="slds-text-body_small slds-text-color_weak">{labels.sentenceHelp}</p>
+    </div>
     <h3 class="slds-text-heading_small slds-var-m-vertical_small" data-id="step-title">{stepTitle}</h3>
 
     <template lwc:if={hasError}>
@@ -38,6 +58,63 @@
             field-level-help={labels.targetFieldHelp}
             onchange={handleInput}
         ></lightning-combobox>
+        <lightning-button
+            variant="base"
+            data-id="open-create-field"
+            label={labels.createField}
+            onclick={handleOpenCreateField}
+        ></lightning-button>
+        <template lwc:if={creatingField}>
+            <div class="slds-box slds-box_x-small slds-var-m-top_x-small" data-id="create-field">
+                <h4 class="slds-text-title_bold">{labels.createField}</h4>
+                <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.createFieldWhy}</p>
+                <lightning-input
+                    data-id="new-field-label"
+                    label={labels.newFieldLabel}
+                    max-length="40"
+                    value={newFieldLabel}
+                    onchange={handleNewFieldLabel}
+                ></lightning-input>
+                <lightning-combobox
+                    data-id="new-field-kind"
+                    label={labels.newFieldKind}
+                    value={newFieldKind}
+                    options={kindOptions}
+                    field-level-help={labels.kindHelp}
+                    onchange={handleNewFieldKind}
+                ></lightning-combobox>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    data-id="write-field"
+                    label={labels.writeField}
+                    disabled={cannotWriteField}
+                    onclick={handleWriteField}
+                ></lightning-button>
+                <template lwc:if={generatedField}>
+                    <ol class="slds-list_ordered slds-var-m-vertical_x-small" data-id="field-steps">
+                        <template for:each={generatedField.steps} for:item="fieldStep">
+                            <li key={fieldStep}>{fieldStep}</li>
+                        </template>
+                    </ol>
+                    <p class="slds-text-body_small" data-id="field-path">{generatedField.fieldPath}</p>
+                    <pre class="slds-box slds-box_x-small slds-scrollable_x" data-id="field-xml">{generatedField.fieldXml}</pre>
+                    <div class="slds-var-m-vertical_x-small">
+                        <lightning-button data-id="copy-field" label={labels.copy} onclick={handleCopyField}></lightning-button>
+                        <a class="slds-button slds-button_neutral slds-var-m-left_x-small" data-id="download-field" href={fieldHref} download={generatedField.fileName}>{labels.downloadField}</a>
+                    </div>
+                    <template lwc:if={fieldNotice}>
+                        <p class="slds-text-body_small" data-id="field-notice">{fieldNotice}</p>
+                    </template>
+                    <p class="slds-text-body_small" data-id="field-deploy">{fieldDeployText}</p>
+                </template>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    data-id="refresh-fields"
+                    label={labels.refreshFields}
+                    onclick={handleRefreshFields}
+                ></lightning-button>
+            </div>
+        </template>
     </template>
 
     <template lwc:if={isStep2}>
@@ -59,6 +136,9 @@
             options={aggregateOptions}
             onchange={handleInput}
         ></lightning-combobox>
+        <template lwc:if={unavailableNotice}>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="unavailable">{unavailableNotice}</p>
+        </template>
         <template lwc:if={needsSourceField}>
             <lightning-combobox
                 name="sourceField"
@@ -68,6 +148,9 @@
                 options={copyFieldOptions}
                 onchange={handleInput}
             ></lightning-combobox>
+            <template lwc:if={fieldGuidance}>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="field-guidance">{fieldGuidance}</p>
+            </template>
         </template>
         <template lwc:if={takesRowLimit}>
             <lightning-input
@@ -186,6 +269,43 @@
         <template lwc:if={previewResult}>
             <p class="slds-var-m-bottom_small" data-id="preview-result">{previewResult}</p>
         </template>
+        <template lwc:if={hasRowDetail}>
+            <div class="slds-var-m-bottom_small" data-id="preview-rows">
+                <h4 class="slds-text-title_bold">{labels.rowsHeading}</h4>
+                <template lwc:if={previewRows.summary}>
+                    <p class="slds-text-body_small" data-id="rows-summary">{previewRows.summary}</p>
+                </template>
+                <ul class="slds-list_dotted">
+                    <template for:each={rowList} for:item="row">
+                        <li key={row.recordId} data-id="preview-row">
+                            <a href={row.url} target="_blank">{row.name}</a>:
+                            <span class={row.outcomeClass}> {row.reason}</span>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={previewRows.note}>
+                    <p class="slds-text-body_small" data-id="rows-note">{previewRows.note}</p>
+                </template>
+            </div>
+        </template>
+        <div class="slds-var-m-bottom_small" data-id="samples">
+            <lightning-button data-id="pick-samples" label={labels.pickSamples} onclick={handlePickSamples}></lightning-button>
+            <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.pickSamplesHelp}</p>
+            <template lwc:if={hasSamples}>
+                <h4 class="slds-text-title_bold slds-var-m-top_x-small">{labels.samplesHeading}</h4>
+                <ul class="slds-list_dotted">
+                    <template for:each={samples} for:item="sample">
+                        <li key={sample.recordId} data-id="sample">
+                            <strong>{sample.name}</strong>: {sample.result}
+                            <lightning-button variant="base" class="slds-var-m-left_x-small" data-id="show-rows" data-record-id={sample.recordId} label={labels.showRows} onclick={handleShowRows}></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template lwc:if={noSamples}>
+                <p data-id="samples-none">{labels.samplesNone}</p>
+            </template>
+        </div>
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <template lwc:if={noInstantNotice}>
@@ -194,6 +314,14 @@
             </div>
         </template>
         <lightning-radio-group name="mode" data-id="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <div class="slds-var-m-vertical_x-small" data-id="mode-consequences">
+            <h4 class="slds-text-title_bold">{labels.modeHeading}</h4>
+            <ul class="slds-list_dotted">
+                <template for:each={modeConsequences} for:item="consequence">
+                    <li key={consequence.key} data-id={consequence.key}>{consequence.text}</li>
+                </template>
+            </ul>
+        </div>
         <template lwc:if={instantObject}>
             <c-rollup-instant-totals object-api-name={instantObject} can-manage={canManageInstant}></c-rollup-instant-totals>
         </template>

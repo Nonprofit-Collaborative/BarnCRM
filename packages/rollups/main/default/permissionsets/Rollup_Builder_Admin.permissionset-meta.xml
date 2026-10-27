@@ -28,7 +28,19 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RollupExplainController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupFieldGenerator</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RollupInstantTotals</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupTemplates</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>

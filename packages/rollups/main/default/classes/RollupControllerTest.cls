@@ -411,7 +411,7 @@ private class RollupControllerTest {
             Rollup_Definition__c rollup = definition();
             insert rollup;
 
-            RollupController.RollupPageView page = RollupController.deleteRollup(rollup.Id);
+            RollupController.RollupPageView page = RollupController.deleteRollup(rollup.Id, false);
 
             System.Assert.areEqual(0, page.rollups.size(), 'The list no longer shows it');
             System.Assert.areEqual(
@@ -430,7 +430,7 @@ private class RollupControllerTest {
             insert rollup;
 
             try {
-                RollupController.deleteRollup(rollup.Id);
+                RollupController.deleteRollup(rollup.Id, false);
                 System.Assert.fail('R-R6: a shipped rollup is refused');
             } catch (AuraHandledException refused) {
                 System.Assert.areEqual(
@@ -454,7 +454,7 @@ private class RollupControllerTest {
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
             System.runAs(david) {
                 try {
-                    RollupController.deleteRollup(rollup.Id);
+                    RollupController.deleteRollup(rollup.Id, false);
                     System.Assert.fail('Only a settings manager deletes');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(

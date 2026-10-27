@@ -117,6 +117,19 @@ export default class RollupBuilder extends LightningElement {
       });
   }
 
+  /** A starter template's rollup, opened prefilled (U2); nothing is saved until she saves. */
+  handleTemplateOpen(event) {
+    this.open(event.detail.draft);
+  }
+
+  /** Rollups added from a starter template, switched off, appear in the list. */
+  handleTemplatesAdded() {
+    const list = this.template.querySelector('c-rollup-definitions');
+    if (list) {
+      list.refresh();
+    }
+  }
+
   open(draft) {
     this.notice = undefined;
     this.draft = draft;

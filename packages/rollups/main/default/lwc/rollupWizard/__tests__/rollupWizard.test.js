@@ -8,6 +8,8 @@ import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
 import LightningConfirm from 'lightning/confirm';
+import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
+import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -39,6 +41,14 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  '@salesforce/apex/RollupBuilderController.previewSamples',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/RollupFieldGenerator.generate', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning',
   () => ({ default: 'More than one currency.' }),
   { virtual: true }
@@ -58,8 +68,83 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_BuilderSentence',
+  () => ({ default: 'Show {0} from {1}, counting {2}, in {3}. Updated: {4}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_RollupEase_NotChosen', () => ({ default: '(not chosen)' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_EveryRecord', () => ({ default: 'every record' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_SomeRecords', () => ({ default: '{0} rules' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_TargetPart', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_NotForField',
+  () => ({ default: 'Not for {0}: {1}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_FieldsNumbers',
+  () => ({ default: 'Numbers for {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_NoFieldFits',
+  () => ({ default: 'Nothing fits {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantAfter',
+  () => ({ default: 'After the save: {0} when {1} change.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantDuring',
+  () => ({ default: 'During the save: {0} when {1} change.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeInstantNone',
+  () => ({ default: 'Not until {0} have instant totals.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeNightly',
+  () => ({ default: 'Nightly: {0} at {1}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeBoth',
+  () => ({ default: 'Both, and at {0}.' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant',
+  () => ({ default: 'Both: at {0}, instant once {1} have it.' }),
+  { virtual: true }
+);
+
 const MODEL = {
   multiCurrency: true,
+  nightlyTime: '2:00 AM',
+  inSave: false,
   defaultMode: 'Both',
   targets: [{ value: 'Account', label: 'Account' }],
   aggregates: ['SUM', 'COUNT', 'ANY', 'FIRST', 'LAST', 'TEXT_LIST'].map((value) => ({
@@ -487,6 +572,246 @@ describe('c-rollup-wizard', () => {
     expect(save).toHaveBeenCalledWith({
       draft: expect.objectContaining({ includeDeleted: true, customDelimiter: null }),
       calculateNow: false
+    });
+  });
+
+  describe('Ease of use', () => {
+    const parts = (element) =>
+      [...element.shadowRoot.querySelectorAll('[data-id="sentence-part"]')].map((part) => ({
+        label: part.label,
+        step: part.dataset.step,
+        disabled: part.disabled
+      }));
+
+    it('reads an edited rollup as one sentence whose parts open their steps (U3)', async () => {
+      const element = await build(DRAFT);
+      expect(query(element, 'builder-sentence').textContent).toContain('Show ');
+      expect(parts(element)).toEqual([
+        { label: 'SUM (Amount)', step: '3', disabled: false },
+        { label: 'Gift, by Household', step: '2', disabled: false },
+        { label: 'every record', step: '4', disabled: false },
+        { label: 'Account: Total Giving', step: '1', disabled: false },
+        { label: 'Both (recommended)', step: '5', disabled: false }
+      ]);
+      element.shadowRoot.querySelector('[data-step="3"]').click();
+      await flush();
+      expect(query(element, 'aggregate')).not.toBeNull();
+    });
+
+    it('opens only steps already reached for a new rollup (U3)', async () => {
+      const element = await build(null);
+      const shown = parts(element);
+      expect(shown.every((part) => part.label === '(not chosen)')).toBe(true);
+      expect(shown.filter((part) => !part.disabled).map((part) => part.step)).toEqual(['1']);
+      element.shadowRoot.querySelector('[data-step="3"]').click();
+      await flush();
+      expect(query(element, 'target-object')).not.toBeNull();
+    });
+
+    it('says which calculations the field cannot hold and lists only fields Sum can read (U9)', async () => {
+      const element = await build({ ...DRAFT, sourceField: undefined });
+      await next(element);
+      await next(element);
+      expect(query(element, 'unavailable').textContent).toBe(
+        'Not for Total Giving: ANY, TEXT_LIST.'
+      );
+      expect(query(element, 'source-field').options.map((option) => option.value)).toEqual([
+        'Amount__c'
+      ]);
+      expect(query(element, 'field-guidance').textContent).toBe('Numbers for SUM.');
+    });
+
+    it('clears a field the new calculation cannot read (U9)', async () => {
+      const element = await build({ ...DRAFT, aggregate: 'FIRST', sourceField: 'Gift_Date__c' });
+      await next(element);
+      await next(element);
+      query(element, 'aggregate').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'SUM' } })
+      );
+      await flush();
+      expect(query(element, 'source-field').value).toBeUndefined();
+    });
+
+    it('explains each mode by when the field changes (U10)', async () => {
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      expect(query(element, 'instantly').textContent).toBe(
+        'After the save: Total Giving when Gifts change.'
+      );
+      expect(query(element, 'nightly').textContent).toBe('Nightly: Total Giving at 2:00 AM.');
+      expect(query(element, 'both').textContent).toBe('Both, and at 2:00 AM.');
+
+      const during = await build(DRAFT, { ...MODEL, inSave: true });
+      await toLastStep(during);
+      expect(query(during, 'instantly').textContent).toBe(
+        'During the save: Total Giving when Gifts change.'
+      );
+
+      const noTrigger = await build(DRAFT, MODEL, false);
+      await toLastStep(noTrigger);
+      expect(query(noTrigger, 'instantly').textContent).toBe(
+        'Not until Gifts have instant totals.'
+      );
+      expect(query(noTrigger, 'both').textContent).toBe(
+        'Both: at 2:00 AM, instant once Gifts have it.'
+      );
+    });
+
+    it('picks sample records and lists the records read for one (U4)', async () => {
+      previewSamples.mockResolvedValue([
+        { recordId: '001000000000001AAA', name: 'Rivera Household', result: 'Calculated: 250.' },
+        { recordId: '001000000000002AAA', name: 'Chen Household', result: 'Calculated: 0.' }
+      ]);
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      expect(previewSamples).not.toHaveBeenCalled();
+      expect(query(element, 'preview-rows')).toBeNull();
+
+      query(element, 'pick-samples').click();
+      await flush();
+      expect(previewSamples).toHaveBeenCalledWith({
+        draft: expect.objectContaining({ targetField: 'Total_Giving__c' })
+      });
+      const samples = element.shadowRoot.querySelectorAll('[data-id="sample"]');
+      expect(samples).toHaveLength(2);
+      expect(samples[0].textContent).toContain('Rivera Household');
+      expect(samples[0].textContent).toContain('Calculated: 250.');
+
+      preview.mockResolvedValue({
+        maintains: 'This rollup will maintain about 1,204 records.',
+        result: 'Calculated: 250. On the record now: 200.',
+        rows: {
+          total: 12,
+          summary: 'Showing 2 of the 12 records read for this record.',
+          rows: [
+            { recordId: 'a01000000000001AAA', name: 'G-0001', counted: true, reason: 'Counted' },
+            {
+              recordId: 'a01000000000002AAA',
+              name: 'G-0002',
+              counted: false,
+              reason: 'Left out: does not meet condition 1'
+            }
+          ]
+        }
+      });
+      element.shadowRoot.querySelectorAll('[data-id="show-rows"]')[0].click();
+      await flush();
+      expect(preview).toHaveBeenLastCalledWith({
+        draft: expect.objectContaining({ aggregate: 'SUM' }),
+        recordId: '001000000000001AAA'
+      });
+      expect(query(element, 'rows-summary').textContent).toBe(
+        'Showing 2 of the 12 records read for this record.'
+      );
+      const rows = element.shadowRoot.querySelectorAll('[data-id="preview-row"]');
+      expect(rows).toHaveLength(2);
+      expect(rows[0].querySelector('a').getAttribute('href')).toBe('/a01000000000001AAA');
+      expect(rows[1].textContent).toContain('Left out: does not meet condition 1');
+      // The samples stay, so another can be opened.
+      expect(element.shadowRoot.querySelectorAll('[data-id="sample"]')).toHaveLength(2);
+    });
+
+    it('says so when there is no record to sample, and shows a household note (U4)', async () => {
+      previewSamples.mockResolvedValue([]);
+      const element = await build(DRAFT);
+      await toLastStep(element);
+      query(element, 'pick-samples').click();
+      await flush();
+      expect(query(element, 'samples-none')).not.toBeNull();
+
+      preview.mockResolvedValue({
+        maintains: 'This rollup will maintain about 1,204 records.',
+        result: 'Calculated: 250. On the record now: 200.',
+        rows: { total: 0, rows: [], note: 'Read through a household.' }
+      });
+      query(element, 'preview-record').dispatchEvent(
+        new CustomEvent('change', { detail: { recordId: '001000000000001AAA' } })
+      );
+      await flush();
+      expect(query(element, 'rows-note').textContent).toBe('Read through a household.');
+      expect(query(element, 'rows-summary')).toBeNull();
+    });
+
+    const GENERATED = {
+      apiName: 'Gift_Count__c',
+      steps: ['Open Setup.', 'Choose Number.', 'Give access.', 'Come back.'],
+      fieldPath: 'objects/Account/fields/Gift_Count__c.field-meta.xml',
+      fieldXml: '<CustomField>Gift_Count__c</CustomField>',
+      deployPackage: 'UEsDBA==',
+      fileName: 'BarnRollupField_Account_Gift_Count__c.zip'
+    };
+
+    it('writes a field to create in Setup or deploy, and nothing more (U8)', async () => {
+      generateField.mockResolvedValue(GENERATED);
+      const element = await build(DRAFT);
+      expect(query(element, 'create-field')).toBeNull();
+
+      query(element, 'open-create-field').click();
+      await flush();
+      expect(query(element, 'new-field-kind').value).toBe('NUMBER');
+      expect(query(element, 'write-field').disabled).toBe(true);
+
+      query(element, 'new-field-label').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Gift Count' } })
+      );
+      await flush();
+      expect(query(element, 'write-field').disabled).toBe(false);
+      query(element, 'write-field').click();
+      await flush();
+
+      expect(generateField).toHaveBeenCalledWith({
+        objectApiName: 'Account',
+        fieldLabel: 'Gift Count',
+        kind: 'NUMBER'
+      });
+      expect(element.shadowRoot.querySelectorAll('[data-id="field-steps"] li')).toHaveLength(4);
+      expect(query(element, 'field-xml').textContent).toBe(GENERATED.fieldXml);
+      const download = query(element, 'download-field');
+      expect(download.getAttribute('href')).toBe('data:application/zip;base64,UEsDBA==');
+      expect(download.getAttribute('download')).toBe(GENERATED.fileName);
+
+      Object.assign(navigator, { clipboard: { writeText: jest.fn().mockResolvedValue() } });
+      query(element, 'copy-field').click();
+      await flush();
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(GENERATED.fieldXml);
+      expect(query(element, 'field-notice').textContent).toBe('c.Core_RollupBuilder_InstantCopied');
+    });
+
+    it('chooses the new field once Refresh Fields finds it (U8)', async () => {
+      generateField.mockResolvedValue(GENERATED);
+      const element = await build({ ...DRAFT, targetField: undefined });
+      query(element, 'open-create-field').click();
+      await flush();
+      query(element, 'new-field-label').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Gift Count' } })
+      );
+      query(element, 'write-field').click();
+      await flush();
+
+      getTargetFields.mockResolvedValue([
+        { value: 'Total_Giving__c', label: 'Total Giving', type: 'currency' },
+        { value: 'Gift_Count__c', label: 'Gift Count', type: 'double' }
+      ]);
+      query(element, 'refresh-fields').click();
+      await flush();
+
+      expect(element.draft.targetField).toBe('Gift_Count__c');
+      expect(query(element, 'create-field')).toBeNull();
+    });
+
+    it('opens Create a Field filled in when a starter template names a missing field (U2)', async () => {
+      const element = await build({
+        ...DRAFT,
+        targetField: 'Average_Gift__c',
+        newFieldLabel: 'Average Gift',
+        newFieldKind: 'CURRENCY'
+      });
+
+      expect(query(element, 'create-field')).not.toBeNull();
+      expect(query(element, 'new-field-label').value).toBe('Average Gift');
+      expect(query(element, 'new-field-kind').value).toBe('CURRENCY');
+      expect(element.draft.newFieldLabel).toBeUndefined();
+      expect(element.draft.targetField).toBe('Average_Gift__c');
     });
   });
 });

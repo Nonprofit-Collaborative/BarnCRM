@@ -359,8 +359,91 @@ with everything filled in from that rollup, under a new name, for you to change.
 shipped rollup is fine: an upgrade never overwrites a rollup you have changed. To remove a
 rollup you made, see [Deleting a Rollup](#deleting-a-rollup).
 
+### Starter Templates
+
+**Starter Templates**, above the rollup list, offers ready-made rollups for common totals.
+Nothing is ever added for you: opening it adds nothing, no rollup is ticked, and only the
+rollups you tick are added when you click **Add the Chosen Rollups**. Each is added
+**switched off**, through the same checks as a save in the Builder, so switch it on once its
+field shows what you expect. Only people with **Manage BarnCRM Settings** see the button.
+
+The **Nonprofit Starter** (needs Giving) adds totals Giving does not ship, all from received
+gifts (Received, Refunded or Written off, with an amount above zero, as the shipped giving
+totals count them):
+
+| Rollup | Shows on | What it is | Field type |
+|---|---|---|---|
+| Average Gift | Contact | Average gift amount | Currency |
+| First Gift Amount | Contact | Amount of the earliest gift, by gift date | Currency |
+| Last Gift Amount | Contact | Amount of the latest gift, by gift date | Currency |
+| Smallest Gift | Contact | Smallest gift amount | Currency |
+| Gifts This Fiscal Year | Contact | Number of gifts dated in the current fiscal year | Number |
+| Appeal Average Gift | Appeal | Average gift amount for the appeal | Currency |
+| Number of Donors | Appeal | Number of different donors who gave to the appeal | Number |
+
+Each rollup shows its sentence and whether it can be added:
+
+- **Needs a field labelled ... on ...**: BarnCRM does not ship these fields. Click **Open in
+  Builder**: the Builder opens with the rollup filled in and **Create a Field** ready with
+  the label and type, which writes the field for you to create (see step 1 of the Builder).
+  Create the field, click **Refresh Fields**, and save there (it saves switched off), or come
+  back here and tick it.
+- **Already filled by ...**: another rollup fills that field, so this one is not added.
+- **Needs ..., which this org does not have**: the module it needs (Giving) is not installed.
+- **Ready to add, switched off.**
+
+After **Add the Chosen Rollups**, each ticked rollup says **Added, switched off.** or why it
+was not added, and the list shows the new rollups.
+
+### Reading the Rollup List
+
+- **One sentence per rollup.** The **What it counts** column says what each rollup does in words,
+  from your org's own field and object names: "Total of Amount from Gifts by Donor Contact,
+  shown in Largest Gift on each Contact. Only records that meet its conditions count." A
+  rollup with a time window or **Only the first N records** says that too. The API names
+  stay underneath in small grey text for when you need them.
+- **Grouped by the record that shows the total.** Rollups are grouped under a heading per
+  object (Account, Contact, Fund and so on), with how many each has, in alphabetical order.
+- **Search rollups** finds a rollup by any word of its name, description or sentence, or by
+  an object or field API name (`Total_Giving__c`). Clear the box to see them all.
+- **Status** says how each rollup's recalculation stands right now: **Switched off**;
+  "2 records could not be saved: see Needs Attention"; **A full recalculation is running**
+  (a run is going, which may or may not include this rollup); "12 records waiting" (saved
+  records whose totals are queued and catch up within a minute); or **Nothing waiting**.
+  Only someone with **Manage BarnCRM Settings** sees it.
+- **Conflicts** are shown in red under a rollup's name:
+  - "Writes the same field as ... for the same records": two active rollups keep
+    overwriting each other's total. Switch one off, or give each **Only for some records**
+    conditions that never meet. Saving in the Builder already refuses this; it can still
+    arrive by **Restore shipped rollups** or an edit outside the Builder.
+  - "Cannot be switched on while ... fills the same field for the same records": the rollup
+    is off, and switching it on would be refused until the other one is off.
+  - "Calculates the same total as ..., into another field": two active rollups do the same
+    work. That is allowed, but usually one of them is left over.
+
+  Two rollups that fill one field for different records (the household and the organization
+  giving totals) are fine and are not listed.
+
 The Builder walks you through five steps. **Next** checks the step you are on, and says what
 to change, before it lets you go on.
+
+Above the steps, the whole rollup is written as one sentence that fills in as you go: "Show
+Sum (Amount) from Gift, by Donor, counting only those that meet its conditions (2), in Contact:
+Total Giving. Updated: Both (recommended)." A part you have not chosen yet reads "(not chosen
+yet)". Click any part you have already filled in to go straight to the step that sets it;
+when you edit or copy a rollup, every part can be clicked. Choosing another object in step 1,
+or other records in step 2, clears what the later steps chose, so those parts are filled in
+again in order.
+
+The Builder steers you away from choices it would refuse:
+
+- In step 3, the calculations the field from step 1 cannot hold are not offered, and a line
+  under **Calculation** names them: "Not available for Total Giving: Any, None, Text list. To
+  use one of them, choose another field in step 1."
+- **Field to calculate** lists only fields the calculation can read: for **Sum** and
+  **Average**, number, currency and percent fields; for **Minimum** and **Maximum**, those
+  and date fields. A line under it says why, and if the records have no such field it says
+  so. Changing the calculation clears a field it cannot read.
 
 1. **Where should the number appear?** The kind of record and the field that show the total.
    The list starts with the objects most often used: Account, Contact, BarnCRM's objects,
@@ -370,8 +453,13 @@ to change, before it lets you go on.
    of its name in **Find another object** and pick it from the list. Only fields BarnCRM can
    write are offered: numbers, amounts, percents, dates, checkboxes, text and picklists. A
    field another active rollup already fills is marked with that rollup's name. If the field
-   does not exist yet, create it in Setup (a Number or Currency field is right for most
-   totals) and come back.
+   does not exist yet, click **Create a Field**, type its label and choose its type (a
+   Number or Currency field is right for most totals) and click **Write the Field**.
+   BarnCRM cannot add the field to your org itself, since that takes a Metadata API deploy;
+   instead it writes it for you: the exact Setup steps with the type, label and field name to
+   enter, the field's source file to copy, and **Download Field Package** with the Salesforce
+   CLI command to deploy it. A deployed field is visible to nobody until you give access to
+   it in Setup. When the field exists, click **Refresh Fields**: the Builder chooses it.
 2. **What should be counted?** The records that feed the total and the field that links them
    to the record from step 1, in plain words: "Gift, by Donor" or "Opportunity, by Account
    ID". When the total lands on an account and the records point at a person, you can also
@@ -408,11 +496,28 @@ to change, before it lets you go on.
    another appeal) is always picked up as usual.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
-   rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
+   rollup will maintain. Under **Records Read for This Record**, up to ten of the records it
+   reads for that record are listed, each linked, with **Counted** or why it is left out: the
+   number of each condition it does not meet, outside the year the rollup counts, a blank
+   field that orders the records, or beyond a row limit. A rollup that reads through a
+   household does not list its records; the total still includes them. Rather than pick a
+   record yourself, click **Pick Sample Records**: the Builder calculates the rollup on up to
+   five records it would fill, choosing first records that recent counted records point to,
+   and **Show Records Read** lists one sample's records. Nothing is saved. Then give it a name, choose its mode, and click **Save**, or **Save
    and calculate now** to start its recalculation straight away. When the records you count
    have no instant updates yet, for example Opportunities or your own objects, this step says
    "Instant totals are not available yet for ..." and offers only **Every night** and **Both
    (recommended)**: see [Instant Totals on Other Objects](#instant-totals-on-other-objects).
+   Under **Mode**, **What Each Choice Means** says what each mode does to this field:
+   - **Instantly, after the save**: the field changes within about a minute after one of the
+     counted records is saved (the default **When instant totals are calculated** setting); or
+     **Instantly, during the save** when that setting is **During the save**. When the counted
+     records have no instant totals yet, it says Instantly is not available until they do.
+   - **Every night**: the field is recalculated at the time of the nightly run (2:00 AM unless
+     you changed **Time of the nightly run**), so a change made today shows tomorrow.
+   - **Both (recommended)**: instantly, and the nightly run puts right anything a save
+     missed; for records with no instant totals yet, every night until they have them.
+
    **Skip for people with this custom permission (optional)** is for a data migration user: see
    [Skipping a rollup for some people](#skipping-a-rollup-for-some-people).
 
@@ -549,16 +654,44 @@ only be turned away. To rebuild the **Instantly** totals as well, choose **Start
 
 ### Deleting a Rollup
 
-**Delete** on a row removes a rollup you made, after a confirmation that says what happens:
+**Delete** on a row opens a **Delete This Rollup** panel above the list, which asks what
+happens to the values the rollup wrote:
 
-- **The values it already wrote stay** on the records. Nothing updates them again, so clear
-  the field yourself if the old numbers would mislead anyone.
+- **Keep them on the records** (the default). Nothing updates them again, so choose this when
+  the old numbers are still worth reading.
+- **Clear them from every record it fills, in the background.** The field is blanked on every
+  record that meets the rollup's **Only for some records** conditions (all records of that
+  object when there are none). Records outside them keep their values. When it finishes, the
+  Error Log says how many records were cleared and how many could not be saved. Clearing is
+  refused while another active rollup fills the same field for the same records, since it
+  would wipe that rollup's totals too: keep the values, or switch the other rollup off first.
 - **It cannot be undone.** If you might want the rollup back, switch it off instead.
 - **Rollups that came with BarnCRM cannot be deleted.** Delete says so and does nothing, since
   **Restore shipped rollups** would only bring them back. Switch them off instead.
 - **Not during a full recalculation.** While **Recalculate all** or the nightly run is going,
   Delete says so; try again when it finishes. Totals already waiting to be recalculated for the
   deleted rollup are skipped, as they are for a rollup that is switched off.
+
+### Explain These Totals on a Record Page
+
+When someone asks "where does this number come from?", open the record: with Giving, the
+contact and account record pages show **Explain These Totals** in the sidebar to people with
+Manage BarnCRM Settings. To show it to staff too, or on another object's page, click the
+gear, **Edit Page**, select the card (or drag **Explain These Totals** from the custom
+components onto the page), change or remove its visibility filter, and save. It works on any
+object a rollup fills. For each active rollup that fills a field on that record (and whose field the
+person can read), it shows:
+
+- the total and what it counts, in the same sentence as the Rollup List;
+- how many records count and how many are left out, and when the record was last calculated;
+- up to ten of the records read, linked, each **Counted** or why it is left out, as in the
+  Builder's preview (a rollup that reads through a household lists none);
+- for you (Manage BarnCRM Settings), what the rollup would calculate now, next to what the
+  record holds, without saving.
+
+It reads as the person looking: the counts and the list include only records they can open,
+and they need the **Rollup Builder User** (or **Rollup Builder Admin**) permission set to read
+the rollups.
 
 ## Instant Totals on Other Objects
 
@@ -848,7 +981,8 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 - **The Builder does not deploy the instant-totals trigger for you.** You add it in a sandbox
   and move it with a change set (or the Salesforce CLI), as in
   [With a Generated Trigger](#with-a-generated-trigger). A one-click deploy may come later.
-- **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
+- **The Builder does not create a field itself.** **Create a Field** in step 1 writes it (Setup
+  steps, its source, and a package to deploy); you create it, then click **Refresh Fields**.
 - **BarnCRM is checked against its previous rollup engine** before that engine is removed
   from the package. A developer runs the comparison on a test org; it changes nothing in your
   data.

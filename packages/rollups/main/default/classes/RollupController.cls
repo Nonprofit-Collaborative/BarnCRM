@@ -58,6 +58,20 @@ public with sharing class RollupController {
          */
         @AuraEnabled
         public String otherToolConflict { get; set; }
+        /** The rollup in one plain sentence, by labels (U1, `RollupSentence`). */
+        @AuraEnabled
+        public String sentence { get; set; }
+        /** The target entity's label, which the list groups by (U12). */
+        @AuraEnabled
+        public String targetObjectLabel { get; set; }
+        /** How its recalculation stands (U6, `RollupStatus`): off, failed, running, waiting, clear. */
+        @AuraEnabled
+        public String statusLevel { get; set; }
+        @AuraEnabled
+        public String status { get; set; }
+        /** Conflicts with other BarnCRM rollups (U7, `RollupConflicts`), empty when none. */
+        @AuraEnabled
+        public List<String> conflicts { get; set; }
     }
 
     /** The whole page: the schedule, the freshness, the permission, and the list. */
@@ -142,6 +156,11 @@ public with sharing class RollupController {
         try {
             requirePermission();
             Rollup_Definition__c definition = require(definitionId);
+            // R-R8 on the switch too: never two active rollups writing one field for one record.
+            String blocker = active == true ? RollupConflicts.blockerOf(definition) : null;
+            if (blocker != null) {
+                throw new RollupService.RollupServiceException(blocker);
+            }
             if (active == true && dlrsOffConfirmed != true) {
                 String conflict = RollupDlrs.conflict(
                     definition.Target_Object__c,
@@ -197,14 +216,19 @@ public with sharing class RollupController {
     }
 
     /**
-     * Deletes one rollup an administrator made (ADR-0136). The values it already wrote stay on the
-     * records; nothing updates them again. A shipped rollup is refused, since Restore defaults
-     * would only bring it back: it is turned off instead (R-R6). A queue entry that names the
-     * rollup skips it, as it skips one switched off (`RollupSelector.selectActiveByIds`). Refused
-     * while a full run is going, which would otherwise fail to stamp the run's other rollups.
+     * Deletes one rollup an administrator made (ADR-0136). By default the values it already wrote
+     * stay on the records and nothing updates them again; with `clearValues` they are cleared in
+     * the background (`RollupClearBatch`, U11), unless another active rollup fills the same field
+     * for the same records. A shipped rollup is refused, since Restore defaults would only bring
+     * it back: it is turned off instead (R-R6). A queue entry that names the rollup skips it, as
+     * it skips one switched off (`RollupSelector.selectActiveByIds`). Refused while a full run is
+     * going, which would otherwise fail to stamp the run's other rollups.
+     *
+     * @param definitionId the rollup
+     * @param clearValues true to clear the values it wrote; false or null to keep them
      */
     @AuraEnabled
-    public static RollupPageView deleteRollup(Id definitionId) {
+    public static RollupPageView deleteRollup(Id definitionId, Boolean clearValues) {
         try {
             requirePermission();
             Rollup_Definition__c definition = require(definitionId);
@@ -214,7 +238,21 @@ public with sharing class RollupController {
                 );
             }
             refuseWhileAFullRunIsGoing();
+            Rollup_Definition__c sharer = clearValues == true
+                ? RollupConflicts.sharerOf(definition)
+                : null;
+            if (sharer != null) {
+                throw new RollupService.RollupServiceException(
+                    String.format(
+                        Label.Core_RollupEase_ClearShared,
+                        new List<String>{ sharer.Name }
+                    )
+                );
+            }
             Database.delete(new Rollup_Definition__c(Id = definition.Id), AccessLevel.USER_MODE);
+            if (clearValues == true) {
+                RollupClearBatch.begin(definition);
+            }
             return currentPage();
         } catch (Exception caught) {
             throw asUserError(caught, 'Delete a rollup');
@@ -372,8 +410,27 @@ public with sharing class RollupController {
         page.rollups = new List<RollupView>();
         Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
         Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);
-        for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
+        List<Rollup_Definition__c> definitions = RollupSelector.selectAllAsUser();
+        // The queue is read only for someone who can act on it, as Needs Attention does.
+        Map<Id, RollupStatus.State> states = page.canManage
+            ? RollupStatus.of(definitions)
+            : new Map<Id, RollupStatus.State>();
+        Map<Id, List<String>> conflicts = RollupConflicts.of(definitions);
+        for (Rollup_Definition__c definition : definitions) {
             RollupView view = toView(definition);
+            view.sentence = RollupSentence.of(definition);
+            Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
+            view.targetObjectLabel = target == null
+                ? definition.Target_Object__c
+                : target.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+            RollupStatus.State state = states.get(definition.Id);
+            if (state != null) {
+                view.statusLevel = state.level;
+                view.status = state.text;
+            }
+            view.conflicts = conflicts.containsKey(definition.Id)
+                ? conflicts.get(definition.Id)
+                : new List<String>();
             String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
             view.aggregateLabel = aggregateLabels.containsKey(aggregate)
                 ? aggregateLabels.get(aggregate)

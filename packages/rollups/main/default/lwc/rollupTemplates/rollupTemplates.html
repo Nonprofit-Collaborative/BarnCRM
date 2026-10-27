@@ -1,0 +1,70 @@
+<template>
+    <template lwc:if={canManage}>
+        <div class="slds-var-p-horizontal_medium slds-var-m-bottom_small">
+            <lightning-button data-id="toggle" label={labels.button} onclick={handleToggle}></lightning-button>
+            <template lwc:if={showing}>
+                <div class="slds-box slds-box_x-small slds-var-m-top_x-small" data-id="templates">
+                    <h3 class="slds-text-heading_small">{labels.button}</h3>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
+                    <template lwc:if={error}>
+                        <div class="slds-box slds-box_x-small slds-theme_error" role="alert">
+                            <span data-id="error">{error}</span>
+                        </div>
+                    </template>
+                    <template for:each={templateList} for:item="template">
+                        <div key={template.key} class="slds-var-m-bottom_small" data-id="template">
+                            <h4 class="slds-text-title_bold">{template.name}</h4>
+                            <p class="slds-text-body_small">{template.description}</p>
+                            <ul>
+                                <template for:each={template.items} for:item="item">
+                                    <li key={item.id} class="slds-var-m-vertical_xx-small" data-id="item">
+                                        <lightning-input
+                                            type="checkbox"
+                                            data-id={item.id}
+                                            data-role="choose"
+                                            label={item.name}
+                                            checked={item.checked}
+                                            disabled={item.disabled}
+                                            onchange={handleChoose}
+                                        ></lightning-input>
+                                        <p class="slds-text-body_small">{item.sentence}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak" data-role="status">{item.status}</p>
+                                        <template lwc:if={item.canOpen}>
+                                            <lightning-button
+                                                variant="base"
+                                                data-id={item.id}
+                                                data-role="open"
+                                                label={labels.open}
+                                                onclick={handleOpen}
+                                            ></lightning-button>
+                                        </template>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    <template lwc:if={outcomes}>
+                        <ul class="slds-list_dotted slds-var-m-bottom_x-small" data-id="outcomes">
+                            <template for:each={outcomes} for:item="outcome">
+                                <li key={outcome.key} data-role="outcome">{outcome.name}: {outcome.message}</li>
+                            </template>
+                        </ul>
+                    </template>
+                    <lightning-button
+                        variant="brand"
+                        data-id="add"
+                        label={labels.add}
+                        disabled={nothingChosen}
+                        onclick={handleAdd}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="close"
+                        label={labels.close}
+                        onclick={handleToggle}
+                    ></lightning-button>
+                </div>
+            </template>
+        </div>
+    </template>
+</template>
