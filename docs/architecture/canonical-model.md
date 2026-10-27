@@ -1011,6 +1011,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 |---|---|---|---|
 | `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-0140). A blank reads and shows as Update household. |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
+| `Address_Card_Fields__c` | text (field list) | none ticked | Address Card Fields: the Address fields the Addresses card shows on every address, beyond the ones it always shows, by API name separated by commas, chosen from a checkbox list in the console (R-AD10). A field the user cannot read is left out for that user, and a field the card already shows is not repeated. |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
 | `Seasonal_Address_Last_Run_Summary__c` | text | empty | What the last seasonal swap run did, in one sentence: how many addresses moved in, how many moved back, and how many failed (R-AD8). |
 | `Seasonal_Addresses_Enabled__c` | boolean | false | The Seasonal Addresses switch on the Addresses page. Saving it on schedules the nightly seasonal swap (nothing happens when the job is already scheduled); saving it off stops the job. An install or upgrade with it on schedules a missing job, and an upgrade whose org already runs the job turns it on (C-18, R-AD4). |
@@ -1218,9 +1219,9 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example People and Households, Automation, Access, Health. A row naming a sub-section of People and Households (People, Households, Household Names and Greetings, Relationships) shows on that page. The console boxes each page's rows by sub-section (P1). |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, FieldList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). FieldList is a checkbox list of an object's custom fields and Name that the administrator can read, storing their API names separated by commas (R-AD10). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
-| `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
+| `Record_Object__c` | text (80) | The object a Record row picks from, whose record types a RecordTypeList row lists, or whose fields a FieldList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
 | `Navigation_Target__c` | text (80) | The Lightning tab a module's own settings page lives on, used when the data type is Component and no component is named, because Core cannot import a component from a package that depends on it (Decision ADR-0020). |
 | `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
@@ -6244,6 +6245,9 @@ history is not lost when someone moves.
 | Verification Status | picklist(Unverified, Verified, Failed) | yes (defaults Unverified) | Whether an address verification service has confirmed this address. |
 | Latest Verified Date | date | no | When verification last succeeded. |
 | Replaced By Seasonal | boolean | yes (defaults false) | Marks the address the seasonal swap displaced, so the job knows which address to put back when the season ends. |
+| Status | picklist(Current, Former, Undeliverable) | no (a new address is saved Current) | Whether the address is in use now, was used before, or has mail coming back (R-AD10). A blank reads as Current. |
+| Start Date | date | no | The day this address came into use, set on a move (R-AD10). |
+| End Date | date | no | The day this address stopped being used, set on a move (R-AD10). |
 
 ### Relationships
 
@@ -6364,7 +6368,44 @@ out of scope (plan Section 4.7).
 
 **R-AD7 History is kept.** Moving a household creates a new address and clears the old
 one's primary flag. The old address is not deleted, so a mailing sent last year can still
-be explained.
+be explained. R-AD10 records when it stopped being used.
+
+**R-AD10 Status, start and end dates (AH1).** Every address is Current, Former or
+Undeliverable (`Status__c`). An address saved with no status is saved Current.
+
+- **A move ends the old address.** When a new address is added as an owner's primary and it
+  is a different place (street, city and postal code) from the primary it replaces, the
+  replaced primary gets End Date today and, if it was Current, Status Former; the new address
+  gets Start Date today when it has none. This covers every way a new primary is added: the
+  card with Primary ticked, a changed standard address captured under R-AD3 and R-AD5, Use for
+  Whole Household, and an import. A person's own primary that Use for Whole Household or a
+  tick in Update Everyone's Address releases (R-AD9) is ended the same way when it is a
+  different place from the household's primary they now take.
+- **Not a move:** choosing an address already on file as the primary (Set as Primary), the
+  seasonal swap (R-AD4), the promotion after a primary is deleted (R-AD2), and a merge keeping
+  one primary. None of them ends or starts anything. A Seasonal address is never ended by a
+  move: when the primary a move replaces is Seasonal, the address waiting to come back (marked
+  Replaced By Seasonal) is the one ended, and its mark is cleared.
+- **Undeliverable is a person's call.** Only a person sets or clears it, from the card's status
+  menu or the address record; BarnCRM never does. A move ending an Undeliverable address sets
+  its End Date and leaves the status.
+- **A Former address is not put back in use on its own.** The seasonal swap treats a Former
+  seasonal address as out of season and never restores a Former address; a deleted primary's
+  replacement is a Former address only when nothing else is left. An address made primary
+  while Former becomes Current again and its End Date is cleared, so the primary is never
+  Former.
+- **Existing addresses are not rewritten.** An address saved before Status existed has a blank
+  status, which every reader treats as Current; its next save fills in Current. No install or
+  upgrade step backfills it, because nothing on file says which old address was left behind,
+  and calling one Former would be a guess. Anyone can mark an old address Former from the card.
+- **The card.** The Addresses card lists the Current and Undeliverable addresses first, the
+  primary at the top, then a Former Addresses group, collapsed, holding every address that is
+  Former or whose End Date has passed (never the primary), each with its date range. An
+  Undeliverable address carries a badge, and an Undeliverable primary is flagged on the card.
+  The admin-chosen Address Card Fields setting (`Address_Card_Fields__c`, Section 12) adds
+  fields to every address on the card, each shown only to a user who can read it.
+- **The check.** Data Hygiene, and Find through it, lists the primary addresses marked
+  Undeliverable: the households, organizations and people whose mail is coming back.
 
 **R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
 Updates setting (ADR-0140). Each checks the user's own access as any address write does,
@@ -6404,12 +6445,15 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
 | Verification Status | `Verification_Status__c` | Picklist: Unverified, Verified, Failed |
 | Latest Verified Date | `Latest_Verified_Date__c` | Date |
 | Replaced By Seasonal | `Replaced_By_Seasonal__c` | Checkbox |
+| Status | `Status__c` | Picklist: Current (default), Former, Undeliverable |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
 
 - **Standard fields written:** `Account.BillingStreet`, `BillingCity`, `BillingState`,
   `BillingPostalCode`, `BillingCountry`; `Contact.MailingStreet`, `MailingCity`,
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
 - **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
-  `Seasonal_Address_Last_Run_Summary__c` (Section 12).
+  `Seasonal_Address_Last_Run_Summary__c`, `Address_Card_Fields__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
   Addresses card reads and saves through Lightning Data Service, ADR-0093 record reads
   through Lightning Data Service, and calls `AddressMoveController` only for the two
@@ -8944,6 +8988,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | Rollup export and import between orgs (ADR-0136, DLRS parity P12 and D23). No object or field added. Section 14 records the file format (format name, version 1, each definition as the Builder edits it with its Definition Key) and the keying rule: an import matches by Definition Key, updates a match, creates the rest, and saves each through the Builder's checks (R-R10, R-R8). |
 | v0.8 | 2026-10-26 | Rollup Builder parity and generated triggers together (ADR-0136, ADR-0138, landing batch 11). No object or field added. R-R12: a source entity whose generated trigger is active in Setup with its switch on has instant updates, so the Builder offers Instantly for it and the save no longer refuses it; the generator offers code only for an entity the Builder offers as a source (R-R7). |
 | v0.8 | 2026-10-26 | Finish Setup safety net (FS1). New field `Modules_Setup_Run__c` on BarnCRM Settings (Section 12, v0.8 keys): which packages' setup steps have run, so Health Check and the Modules page can offer Finish Setup for one copied into an org by hand. No object added. |
+| v0.8 | 2026-10-26 | Address history (owner-approved AH1). `Address__c` gains `Status__c` (Current, Former, Undeliverable; default Current), `Start_Date__c` and `End_Date__c` (Section 29), with rule R-AD10: a move ends the old primary and starts the new one, the seasonal swap is not a move, Undeliverable is set only by a person, and existing addresses are read as Current without a backfill. No existing field could hold this: `Verification_Status__c` belongs to a verification app (R-AD6) and the seasonal months and days repeat every year. `BarnCRM_Settings__c` gains `Address_Card_Fields__c` (Section 12), and `Setting_Definition__mdt.Data_Type__c` gains FieldList. |
 
 ---
 ## 32. Entity ownership by package

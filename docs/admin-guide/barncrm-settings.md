@@ -216,7 +216,7 @@ section's name.
 | General | Edition and Features; Preferences (the rest); Tools |
 | Organization | Organization Details (the rest); Organization Address; Receipt Logo and Signature |
 | People and Households | People; Households (the rest); Household Names and Greetings; Relationships |
-| Addresses | Address Updates (the rest); Seasonal Addresses |
+| Addresses | Address Updates (the rest); Address Card; Seasonal Addresses |
 | Giving | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Nightly Jobs and Accounting Periods; BarnCRM Mirror |
 | Receipts | Receipt Details (the rest); Receipt Printing; Receipt Letters and Year End Statements |
 | Rollups | Rollup Processing (the rest); Rollup Builder |

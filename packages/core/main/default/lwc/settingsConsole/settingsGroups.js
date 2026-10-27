@@ -9,6 +9,7 @@ import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import HOUSEHOLD_NAMES from '@salesforce/label/c.Core_SettingsGroup_HouseholdNames';
 import RELATIONSHIPS from '@salesforce/label/c.Core_SettingsGroup_Relationships';
 import ADDRESS_UPDATES from '@salesforce/label/c.Core_SettingsGroup_AddressUpdates';
+import ADDRESS_CARD from '@salesforce/label/c.Core_SettingsGroup_AddressCard';
 import SEASONAL_ADDRESSES from '@salesforce/label/c.Core_SettingsGroup_SeasonalAddresses';
 import GIFT_DEFAULTS from '@salesforce/label/c.Core_SettingsGroup_GiftDefaults';
 import INSTALLMENTS from '@salesforce/label/c.Core_SettingsGroup_Installments';
@@ -113,6 +114,7 @@ const PAGE_GROUPS = {
       fallback: true,
       keys: ['Contact_Address_Change_Behavior__c']
     },
+    { id: 'Address Card', label: ADDRESS_CARD, keys: ['Address_Card_Fields__c'] },
     {
       id: 'Seasonal Addresses',
       label: SEASONAL_ADDRESSES,

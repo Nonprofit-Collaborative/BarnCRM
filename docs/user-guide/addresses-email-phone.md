@@ -16,7 +16,8 @@ admin has turned on the Addresses feature. Ask your admin; see
 2. Click **Add address**. The **New address** form opens.
 3. Choose a **Type**: Home, Work, Mailing, Seasonal or Other.
 4. Fill in **Street**, **City**, **State**, **Postal Code** and **Country**.
-5. Click **Add address** at the foot of the form.
+5. Tick **Primary** only if this is where they moved to (see "To Record a Move").
+6. Click **Add address** at the foot of the form.
 
 You should see: "Address saved." The first address a record gets is made the primary
 automatically and carries a **Primary** badge.
@@ -43,6 +44,38 @@ automatically and carries a **Primary** badge.
 You should see: "This is now the primary address, and it has been copied to the standard
 address fields." The **Primary** badge moves, and the record's own address fields at the
 top of the page refresh. Nothing is deleted: the other addresses stay on the card.
+
+**Set as Primary** is not a move: the old primary stays **Current**. Use it to switch between
+addresses someone still uses, such as a home and a work address. To record a move, see below.
+
+## To Record a Move
+
+1. On the **Addresses** card, click **Add address** and fill in the new address.
+2. Tick **Primary**.
+3. Click **Add address** at the foot of the form.
+
+You should see: the new address at the top with the **Primary** badge and "Since" today's date.
+The old address moves into **Former Addresses**, with the day it started (when known) to today.
+The same happens when the household's or person's own address field is changed, or when
+**Use for Whole Household** moves the household.
+
+## To See Former Addresses
+
+Below the addresses in use, the card shows **Former Addresses** with a count. Click it to open
+the group: each old address shows the dates it was used, for example "January 5, 2020 to
+October 1, 2026". Click it again to close it.
+
+## To Mark an Address Former, Undeliverable or Current
+
+1. On the **Addresses** card, click the status menu (the small arrow) on the address.
+2. Choose **Mark as Former**, **Mark as Undeliverable** or **Mark as Current**.
+
+You should see: "The address status is saved." **Mark as Former** ends the address today
+(unless it already has an end date) and moves it into **Former Addresses**; the primary address
+cannot be marked Former. **Mark as Undeliverable** is for mail that comes back: the address
+gets an **Undeliverable** badge, and if it is the primary, a red warning on the card asks you
+to add the new address. **Mark as Current** brings a former address back and clears its end
+date. You can also change **Status**, **Start Date** and **End Date** on the address record.
 
 ## To Move the Whole Household to a Person's Address
 
@@ -141,6 +174,8 @@ BarnCRM's **Work Phone**.
   again." Fix the marked fields.
 - Problem: "We could not make that the primary address. Check that you have permission to
   edit addresses ..." Ask your admin for edit access.
+- Problem: "The address status could not be saved. You may not have access to change it." Ask
+  your admin for edit access to addresses. A card with no status menu means the same.
 - Problem: the **Addresses** card has no **Add address** or **Set as Primary** button. Your
   access lets you read addresses but not change them (the Read Only role, for example). Ask
   your admin.

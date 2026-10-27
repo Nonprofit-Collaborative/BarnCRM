@@ -562,9 +562,9 @@ public with sharing class SettingsController {
     }
 
     /**
-     * Gives a Record row its object and a Record Type List row its choices, read from describe
-     * (ADR-0074). False when the row names an object this org does not have, which leaves the
-     * row out as a missing settings object does.
+     * Gives a Record row its object and a Record Type List or Field List row its choices, read
+     * from describe (ADR-0074, R-AD10). False when the row names an object this org does not
+     * have, which leaves the row out as a missing settings object does.
      */
     private static Boolean addRecordChoices(
         Setting_Definition__mdt definition,
@@ -574,7 +574,8 @@ public with sharing class SettingsController {
         Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(
             definition.Data_Type__c
         );
-        if (!isRecord && !isRecordTypes) {
+        Boolean isFields = SettingsService.FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c);
+        if (!isRecord && !isRecordTypes && !isFields) {
             return true;
         }
         Schema.SObjectType type = SettingsService.recordObjectType(definition);
@@ -587,6 +588,14 @@ public with sharing class SettingsController {
                 Option option = new Option();
                 option.value = info.getDeveloperName();
                 option.label = info.getName();
+                setting.options.add(option);
+            }
+        }
+        if (isFields) {
+            for (Schema.DescribeFieldResult field : SettingsService.fieldChoices(type)) {
+                Option option = new Option();
+                option.value = field.getName();
+                option.label = field.getLabel();
                 setting.options.add(option);
             }
         }

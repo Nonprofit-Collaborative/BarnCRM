@@ -318,7 +318,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isPicklist: setting.dataType === 'Picklist',
       isDateTime: setting.dataType === 'DateTime',
       isRecord: setting.dataType === 'Record',
-      isRecordTypeList: setting.dataType === 'RecordTypeList',
+      // A Field List is the same checkbox list, of an object's fields (R-AD10).
+      isRecordTypeList: setting.dataType === 'RecordTypeList' || setting.dataType === 'FieldList',
       isComponent: setting.dataType === 'Component',
       // A value Setup holds: shown read only, never saved (ADR-0135).
       isSetupValue: setting.dataType === 'SetupValue',

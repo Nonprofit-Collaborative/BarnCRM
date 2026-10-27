@@ -859,6 +859,52 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('lets Maria tick the Address fields the card shows instead of typing API names', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        {
+          name: 'Addresses',
+          settings: [
+            {
+              key: 'Address_Card_Fields__c',
+              label: 'Address Card Fields',
+              description: 'Tick the Address fields to show on every address.',
+              dataType: 'FieldList',
+              section: 'Addresses',
+              objectApiName: 'Address__c',
+              component: null,
+              helpUrl: null,
+              value: '',
+              checked: false,
+              options: [
+                { label: 'Address Number', value: 'Name' },
+                { label: 'Verification Status', value: 'Verification_Status__c' }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+    const element = build();
+    openSection('Addresses');
+    await settle();
+
+    const boxes = element.shadowRoot.querySelector('lightning-checkbox-group');
+    expect(boxes.options).toHaveLength(2);
+    expect(boxes.value).toEqual([]);
+    boxes.dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['Verification_Status__c', 'Name'] } })
+    );
+    await settle();
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({
+      values: { Address_Card_Fields__c: 'Verification_Status__c,Name' }
+    });
+  });
+
   it('says the page could not load rather than showing nothing', async () => {
     getConsoleModel.mockRejectedValue(new Error('no'));
     const element = build();

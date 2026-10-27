@@ -319,6 +319,7 @@ describe('settingsGroups against the shipped registry', () => {
       groupRows(page, byPage[page]).find((box) => box.rows.some((one) => one.key === key));
 
     expect(boxOf('Addresses', 'Contact_Address_Change_Behavior__c').id).toBe('Address Updates');
+    expect(boxOf('Addresses', 'Address_Card_Fields__c').id).toBe('Address Card');
     expect(boxOf('General', 'App_Navigation_Style__c').id).toBe('Preferences');
     expect(boxOf('Rollups', 'Nightly_Run_Hour__c').id).toBe('Rollup Processing');
     expect(groupRows('Duplicate Matching', byPage['Duplicate Matching'])).toEqual([

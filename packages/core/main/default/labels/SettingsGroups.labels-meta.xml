@@ -9,6 +9,14 @@
         <value>Acknowledgments and Stewardship</value>
     </labels>
     <labels>
+        <fullName>Core_SettingsGroup_AddressCard</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console, Addresses page: box heading for the card fields</shortDescription>
+        <value>Address Card</value>
+    </labels>
+    <labels>
         <fullName>Core_SettingsGroup_AddressUpdates</fullName>
         <categories>Core</categories>
         <language>en_US</language>

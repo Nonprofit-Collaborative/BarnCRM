@@ -20,6 +20,7 @@ export them, or change them.
 | **Addresses that belong to nobody** | Address records whose household, organization or person was deleted. |
 | **Primary addresses with parts missing** | The address each household, organization or person is mailed at, missing a street, a city or a postal code. |
 | **Primary addresses that failed verification** | The address each one is mailed at, marked **Failed** by an address verification app. |
+| **Primary Addresses Marked Undeliverable** | The address each one is mailed at, marked **Undeliverable** by someone because mail came back. |
 | **People with no way to reach them** | Living people with no email, phone, mobile or mailing address. |
 | **Deceased people who can still be emailed** | People marked Deceased who have an email and are not opted out of email. |
 | **People not changed in 5 years** | People nobody has changed for the number of years you set (5 unless you change it). |
@@ -47,7 +48,7 @@ saved"). The check's name shows the number in use.
 Maria's organization loaded 3,000 people from a spreadsheet last month, with automation
 paused for the load. She wants to know what the load left behind.
 
-1. Maria opens the **Org Optimizer** tab and chooses **Data quality**. Nine checks are listed, each with a number. **People
+1. Maria opens the **Org Optimizer** tab and chooses **Data quality**. Ten checks are listed, each with a number. **People
    with no household** says **214**. **Primary addresses with parts missing** says **38**. The
    others say **0**.
 2. Next to **People with no household** she presses **Open in Find**. The Find tab opens with a
@@ -71,6 +72,7 @@ paused for the load. She wants to know what the load left behind.
 | **Addresses that belong to nobody** | Address records with no household, organization or person: the record they belonged to was deleted. | They are kept on purpose (an address is history), but nobody will ever see them from a record page. | Delete them, or set an owner if the address should be kept. |
 | **Primary addresses with parts missing** | Primary addresses (the one copied to the standard address fields) with no street, no city, or no postal code. | A letter to that address will not arrive. | Fill in the missing part on the address card. Only the primary address is checked: older addresses are the record of where mail went, and are left as they are. |
 | **Primary addresses that failed verification** | Primary addresses whose **Verification Status** is **Failed**. BarnCRM never sets this field; an address verification app does. | The verification app could not confirm the address. | Check the address with the person, then correct it. Without a verification app this check always says 0. |
+| **Primary Addresses Marked Undeliverable** | Primary addresses whose **Status** is **Undeliverable**. Only a person sets it, from the address card's status menu or the address record (see [Addresses](addresses.md), "Address History"). | Mail sent there comes back, so every letter and receipt to that household, organization or person is wasted. | Find the new address and add it on the card with **Primary** ticked (the old one becomes **Former**), or choose **Set as Primary** on another address they have. |
 | **People with no way to reach them** | Contacts (people) not marked **Deceased** with no **Email**, **Phone** or **Mobile**, and no **Mailing City** or **Mailing Postal Code**. The mailing fields are where the primary address is copied. | Nothing you send reaches them, and they still count in your totals. | Find a way to reach them, or decide whether to keep them. Another email field (personal, work) is not looked at. |
 | **Deceased people who can still be emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Bulk update can do it from the Find query). |
 | **People not changed in N years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
