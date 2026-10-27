@@ -54,12 +54,12 @@ private class RollupEngineExtensionsTest {
             RollupEngineExtensions.extensionOverride = engine;
 
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 7 }
+                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
             );
 
             Assert.areEqual(
                 new List<String>{
-                    'afterSettingsSaved BarnCRM_Settings__c {Fiscal_Year_Start_Month__c}'
+                    'afterSettingsSaved BarnCRM_Settings__c {Error_Log_Retention_Days__c}'
                 },
                 engine.calls,
                 'Told the settings object and the changed field, without a prefix'
@@ -75,14 +75,14 @@ private class RollupEngineExtensionsTest {
             RollupEngineExtensions.extensionOverride = engine;
 
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 4 }
+                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 45 }
             );
 
             Assert.areEqual(1, engine.calls.size(), 'The engine was asked');
             Assert.areEqual(
-                4,
+                45,
                 Integer.valueOf(
-                    String.valueOf(SettingsService.getValue('Fiscal_Year_Start_Month__c'))
+                    String.valueOf(SettingsService.getValue('Error_Log_Retention_Days__c'))
                 ),
                 'The setting is saved all the same'
             );
@@ -96,7 +96,7 @@ private class RollupEngineExtensionsTest {
             RollupEngineExtensions.extensionOverride = engine;
 
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Fiscal_Year_Start_Month__c' => 7 }
+                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
             );
 
             Assert.isNull(RollupEngineExtensions.findV3(), 'No third seam');
