@@ -1,6 +1,8 @@
 # Addresses
 
-Scripts for address records, the primary address, the Address Updates setting, the two household moves and the seasonal address swap. Setup detail: [Addresses](../admin-guide/addresses.md).
+Scripts for address records, the primary address, the Address Updates setting, the two household moves, the seasonal address swap, and address history (status, dates, former addresses). Setup detail: [Addresses](../admin-guide/addresses.md).
+
+A script that changes a household's billing address, or adds a new primary at a different place, records a move: the old address goes into **Former Addresses**, a closed group at the foot of the card (T-ADDR-16). Open that group first when a step or a cleanup says **Set as Primary** on it.
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. The **Addresses** feature must be on (BarnCRM Settings, **General**). The Garcia Family's sample address is 6830 Sunset Ln, Springfield, IL 62756.
 
@@ -13,7 +15,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **The Garcia Family**. | The **Addresses** card shows one **Home** address, 6830 Sunset Ln, Springfield IL 62756, with a **Primary** badge and no **Set as Primary** button. |
-| 2 | Select **Add address** on the card. | A **New address** form opens with Type, Street, City, State, Postal Code, Country and the four seasonal boxes. |
+| 2 | Select **Add address** on the card. | A **New address** form opens with a **Primary** tick box (unticked), Type, Street, City, State, Postal Code, Country and the four seasonal boxes. |
 | 3 | Enter Type **Seasonal**, Street `4120 East Camelback Road`, City `Phoenix`, State `AZ`, Postal Code `85018`, Country `United States`, Seasonal Start Month `1`, Start Day `1`, End Month `3`, End Day `31`. Select **Add address** in the form. | Toast **Address saved.** A second card reads **Used from January 1 to March 31**, with a **Set as Primary** button and no badge. |
 | 4 | Open the **Addresses** tab. | Both Garcia addresses are listed. |
 
@@ -160,7 +162,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On The Garcia Family, **Details**, change Billing Street to `27 Billing Test Ave` and save. | Saved. |
-| 2 | Look at the **Addresses** card. | A new **Home** card, 27 Billing Test Ave, carries **Primary**. The Sunset Ln card is still there without the badge. |
+| 2 | Look at the **Addresses** card. | A new **Home** card, 27 Billing Test Ave, carries **Primary**. The Sunset Ln card is still on file, under **Former Addresses**, ended today. |
 | 3 | Open Luis Garcia. | His mailing street is **27 Billing Test Ave**. |
 | 4 | Back on the household, save the record again without changing the address. | No third card is added. |
 | 5 | Undo: **Set as Primary** on the Sunset Ln card. | Billing Address and members are back on Sunset Ln. |
@@ -227,8 +229,72 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | On the household's 27 Manual Billing Ave card, look at the buttons. | It shows **Update Everyone's Address**. The other household cards do not. |
 | 4 | Select **Update Everyone's Address**. | The confirmation lists **These people will get this address:** Luis Garcia, and under **These people have an address of their own and stay where they are unless you tick them:** a tick box for Diego Garcia and one for Harper Garcia, both unticked. |
 | 5 | Tick Harper only, then select **Update Everyone's Address** in the confirmation. | Toast **Everyone's address has been updated.** |
-| 6 | Open Luis, Harper and Diego. | Luis and Harper read 27 Manual Billing Ave; Harper's own card is still there without **Primary**. Diego still reads 9 Dorm Test Hall. |
+| 6 | Open Luis, Harper and Diego. | Luis and Harper read 27 Manual Billing Ave; Harper's own card is still on file, under **Former Addresses**, ended today. Diego still reads 9 Dorm Test Hall. |
 | 7 | On the household, select **Update Everyone's Address** again. | Luis and Harper are listed as getting the address, and only Diego has a tick box. Select **Cancel**: nothing changes. |
 | 8 | As a read-only user, open The Garcia Family and Diego Garcia. | Neither **Update Everyone's Address** nor **Use for Whole Household** shows. |
 
 **Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. On the household, **Set as Primary** on the Sunset Ln card and delete the 27 Manual Billing Ave address. Delete Diego's 9 Dorm Test Hall and Harper's 14 Manual Test Ct addresses, then **Set as Primary** on Sunset Ln once more so everyone reads it.
+
+## T-ADDR-16: A Move Ends the Old Address
+
+**Purpose:** a new primary address added on the card ends the one it replaces, the card keeps former addresses in a closed group with their dates, and **Set as Primary** is not a move.
+**Prerequisites:** staff user, the Garcia household on Sunset Ln with no other Home address.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **The Garcia Family** and select **Add address**. | The form has a **Primary** tick box. |
+| 2 | Enter Type **Home**, Street `55 Move Test Rd`, City `Tucson`, tick **Primary**, and select **Add address** in the form. | 55 Move Test Rd is at the top with **Primary** and **Since** today's date. Billing Address reads 55 Move Test Rd. |
+| 3 | Look below the addresses in use. | A closed group **Former Addresses (1)**. The Sunset Ln card is not shown. |
+| 4 | Select **Former Addresses (1)**. | The group opens and shows the Sunset Ln card, reading **Until** today's date (it has no start date: it was on file before statuses existed, or was added without one). Select the heading again: the group closes. |
+| 5 | Open the Sunset Ln address record (Addresses related list). | **Status** is **Former** and **End Date** is today, in the **History** section. |
+| 6 | Back on the household, open **Former Addresses** and select **Set as Primary** on Sunset Ln. | Sunset Ln is back with the addresses in use, with **Primary** and no end date. 55 Move Test Rd is still in use (no **Former Addresses** group): **Set as Primary** ends nothing. |
+| 7 | On Diego Garcia, add a **Home** address `9 Dorm Test Hall` (his first, so it is his primary), then select **Use for Whole Household** and confirm. | On The Garcia Family, 9 Dorm Test Hall is the primary and the previous primary is under **Former Addresses**. Diego's own 9 Dorm Test Hall card is still in use: the household moved to the place he already lives. |
+
+**Cleanup:** on the household, open **Former Addresses**, **Set as Primary** on Sunset Ln, then delete the 55 Move Test Rd and 9 Dorm Test Hall addresses (the household's and Diego's).
+
+## T-ADDR-17: Undeliverable and the Status Menu
+
+**Purpose:** staff mark an address Former, Undeliverable or Current from the card; an undeliverable primary is flagged and counted by the Data quality check, which opens in Find.
+**Prerequisites:** staff user and an admin, T-ADDR-01 done (the Phoenix seasonal address exists), the Garcia household on Sunset Ln.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On The Garcia Family, open the status menu (the arrow) on the Sunset Ln card. | **Mark as Undeliverable** only: the primary cannot be marked Former. |
+| 2 | Choose **Mark as Undeliverable**. | Toast **The address status is saved.** The card has an **Undeliverable** badge and a red line: **Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.** |
+| 3 | As the admin, open **Org Optimizer**, **Data quality**. | **Primary Addresses Marked Undeliverable** shows **1** or more. |
+| 4 | Select **Open in Find** on that check. | Find opens the saved query **Data hygiene: Primary Addresses Marked Undeliverable**, already run, and the Garcia Sunset Ln address is listed. |
+| 5 | Back on the household, open the status menu on the Phoenix card and choose **Mark as Former**. | Phoenix moves into **Former Addresses**, reading **Until** today's date. |
+| 6 | Open **Former Addresses** and choose **Mark as Current** on Phoenix. | Phoenix is back with the addresses in use, with no dates shown. |
+| 7 | On Sunset Ln choose **Mark as Current**. | The badge and the red line go. |
+| 8 | As a read-only user, open The Garcia Family. | No status menu on any card. |
+
+**Cleanup:** none (Sunset Ln and Phoenix are both Current again).
+
+## T-ADDR-18: The Seasonal Swap Is Not a Move
+
+**Purpose:** the seasonal swap moves the primary without ending or starting anything, and a Former seasonal address is not swapped in.
+**Prerequisites:** admin, T-ADDR-01 done, **Seasonal Addresses** on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3) and choose **Run the swap now** in **BarnCRM Settings**, **Addresses**. Refresh after a minute. | **Primary** is on Phoenix. Sunset Ln is still with the addresses in use, not under **Former Addresses**, and neither card shows a date. |
+| 2 | Put the Phoenix dates back to January 1 to March 31 and run the swap again. | **Primary** is back on Sunset Ln. Still no **Former Addresses** group. |
+| 3 | Set the Phoenix dates so today falls inside them again, then mark Phoenix **Former** from its status menu, and run the swap. | **Primary** stays on Sunset Ln: a Former seasonal address is not swapped in. |
+
+**Cleanup:** mark Phoenix **Current** again and put its dates back to January 1 to March 31.
+
+## T-ADDR-19: Address Card Fields
+
+**Purpose:** the admin's Address Card Fields choice adds fields to every address on the card, and nothing is added until something is ticked.
+**Prerequisites:** admin, T-ADDR-01 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Address Card Fields** is a list of tick boxes (the address fields, including **Address Number** and **Verification Status**), none ticked. |
+| 2 | Open The Garcia Family. | The cards show only type, street, city, country, dates and badges. |
+| 3 | In **Address Card Fields** tick **Verification Status** and **Address Number** and choose **Save**. | **Your settings are saved.** |
+| 4 | Open The Garcia Family again (refresh the page). | Every address card shows **Verification Status** and **Address Number** with their values. |
+| 5 | Untick both and save. | The extra fields are gone after a refresh. |
+
+**Cleanup:** none.

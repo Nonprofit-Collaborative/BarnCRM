@@ -68,6 +68,7 @@ public without sharing class SeasonalAddressSelector {
                 Seasonal_End_Day__c,
                 Is_Default__c,
                 Replaced_By_Seasonal__c,
+                Status__c,
                 CreatedDate
             FROM Address__c
             WHERE

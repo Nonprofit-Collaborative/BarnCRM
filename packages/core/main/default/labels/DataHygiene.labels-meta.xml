@@ -225,6 +225,22 @@
         <value>Primary addresses an address verification app marked Failed. Without such an app this is always 0.</value>
     </labels>
     <labels>
+        <fullName>Core_DataHygiene_UndeliverableTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: primary addresses marked Undeliverable.</shortDescription>
+        <value>Primary Addresses Marked Undeliverable</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_UndeliverableDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: primary addresses marked Undeliverable.</shortDescription>
+        <value>Households, organizations and people whose primary address someone marked Undeliverable, so their mail comes back. Add the new address with Primary ticked, or set another address as primary.</value>
+    </labels>
+    <labels>
         <fullName>Core_DataHygiene_UnreachableTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>

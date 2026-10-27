@@ -33,6 +33,7 @@ public with sharing class AddressSelector {
                 Is_Default__c,
                 Verification_Status__c,
                 Latest_Verified_Date__c,
+                Status__c,
                 CreatedDate
             FROM Address__c
             WHERE
@@ -75,11 +76,49 @@ public with sharing class AddressSelector {
                 Seasonal_End_Month__c,
                 Seasonal_End_Day__c,
                 Is_Default__c,
+                Status__c,
+                End_Date__c,
                 CreatedDate
             FROM Address__c
             WHERE
                 Is_Default__c = TRUE
                 AND Id NOT IN :skip
+                AND (Account__c IN :ownerIds
+                OR Contact__c IN :ownerIds
+                OR Person_Account__c IN :ownerIds)
+            WITH USER_MODE
+            ORDER BY CreatedDate DESC
+            LIMIT 10000
+        ];
+    }
+
+    /**
+     * The ordinary addresses waiting for these owners' seasons to end (marked Replaced By
+     * Seasonal): the homes a move made while a seasonal address was primary leaves (R-AD10).
+     */
+    public static List<Address__c> selectWaitingForSeason(Set<Id> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return new List<Address__c>();
+        }
+        String seasonal = AddressService.TYPE_SEASONAL;
+        return [
+            SELECT
+                Id,
+                Account__c,
+                Contact__c,
+                Person_Account__c,
+                Type__c,
+                Street__c,
+                City__c,
+                State__c,
+                Postal_Code__c,
+                Country__c,
+                Status__c,
+                End_Date__c
+            FROM Address__c
+            WHERE
+                Replaced_By_Seasonal__c = TRUE
+                AND Type__c != :seasonal
                 AND (Account__c IN :ownerIds
                 OR Contact__c IN :ownerIds
                 OR Person_Account__c IN :ownerIds)

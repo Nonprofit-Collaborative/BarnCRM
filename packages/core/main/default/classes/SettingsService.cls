@@ -26,6 +26,7 @@ public with sharing class SettingsService {
     private static final String TEXT_TYPE = 'Text';
     public static final String RECORD = 'Record';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
+    public static final String FIELD_LIST = 'FieldList';
 
     /**
      * The Core checkbox settings that ship switched on, and the reason this map has to exist.
@@ -416,6 +417,10 @@ public with sharing class SettingsService {
             checkRecordTypes(definition, String.valueOf(newValue));
             return;
         }
+        if (FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkFields(definition, String.valueOf(newValue));
+            return;
+        }
         if (NUMBER_TYPE.equalsIgnoreCase(definition.Data_Type__c)) {
             checkRange(definition, newValue);
             return;
@@ -493,6 +498,47 @@ public with sharing class SettingsService {
                 throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
             }
         }
+    }
+
+    /** A Field List row names only fields its object offers (R-AD10). */
+    private static void checkFields(Setting_Definition__mdt definition, String candidate) {
+        Set<String> known = new Set<String>();
+        for (Schema.DescribeFieldResult field : fieldChoices(recordObjectType(definition))) {
+            known.add(field.getName().toLowerCase());
+        }
+        for (String name : candidate.split(',')) {
+            if (String.isNotBlank(name) && !known.contains(name.trim().toLowerCase())) {
+                throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            }
+        }
+    }
+
+    /**
+     * The fields a Field List row offers: the object's custom fields and its Name that the
+     * administrator can read, by label (R-AD10).
+     */
+    public static List<Schema.DescribeFieldResult> fieldChoices(Schema.SObjectType type) {
+        Map<String, Schema.DescribeFieldResult> byLabel = new Map<String, Schema.DescribeFieldResult>();
+        if (type == null) {
+            return byLabel.values();
+        }
+        for (
+            Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .fields.getMap()
+                .values()
+        ) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if ((field.isCustom() || field.isNameField()) && field.isAccessible()) {
+                byLabel.put(field.getLabel() + '|' + field.getName(), field);
+            }
+        }
+        List<String> labels = new List<String>(byLabel.keySet());
+        labels.sort();
+        List<Schema.DescribeFieldResult> chosen = new List<Schema.DescribeFieldResult>();
+        for (String label : labels) {
+            chosen.add(byLabel.get(label));
+        }
+        return chosen;
     }
 
     /** The object a Record or Record Type List row is about, or null when this org lacks it. */

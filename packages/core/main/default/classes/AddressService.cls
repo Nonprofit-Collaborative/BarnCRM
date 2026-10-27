@@ -44,6 +44,11 @@ public with sharing class AddressService {
     private static final String TYPE_WORK = 'Work';
     public static final String TYPE_SEASONAL = 'Seasonal';
 
+    /** The three address statuses (R-AD10). A blank reads as Current. */
+    public static final String STATUS_CURRENT = 'Current';
+    public static final String STATUS_FORMER = 'Former';
+    public static final String STATUS_UNDELIVERABLE = 'Undeliverable';
+
     private static final String RECORD_TYPE_HOUSEHOLD = 'Household';
     private static final String RECORD_TYPE_ORGANIZATION = 'Organization';
 
@@ -79,6 +84,14 @@ public with sharing class AddressService {
      * that person's mailing address only.
      */
     public static void syncDefaultToStandardFields(List<Address__c> addresses) {
+        syncDefaultToStandardFields(addresses, false);
+    }
+
+    /**
+     * The same, saying whether the addresses were just added: a new address saved as the
+     * primary is a move, which ends the primary it replaces (R-AD10).
+     */
+    public static void syncDefaultToStandardFields(List<Address__c> addresses, Boolean areNew) {
         if (addresses == null || addresses.isEmpty() || isPropagating) {
             return;
         }
@@ -88,7 +101,7 @@ public with sharing class AddressService {
         }
         isPropagating = true;
         try {
-            clearOtherDefaults(defaults);
+            clearOtherDefaults(defaults, areNew == true);
             applyToStandardFields(defaults);
         } finally {
             isPropagating = false;
@@ -147,10 +160,19 @@ public with sharing class AddressService {
         }
     }
 
-    /** Whether `candidate` is a better address to put in use than `held`, the best so far. */
+    /**
+     * Whether `candidate` is a better address to put in use than `held`, the best so far. A
+     * Former address only when nothing else is left (R-AD10), then a seasonal one only when
+     * nothing else is left.
+     */
     private static Boolean betterReplacement(Address__c candidate, Address__c held) {
         if (held == null) {
             return true;
+        }
+        Boolean candidateFormer = candidate.Status__c == STATUS_FORMER;
+        Boolean heldFormer = held.Status__c == STATUS_FORMER;
+        if (candidateFormer != heldFormer) {
+            return !candidateFormer;
         }
         Boolean candidateSeasonal = candidate.Type__c == TYPE_SEASONAL;
         Boolean heldSeasonal = held.Type__c == TYPE_SEASONAL;
@@ -181,6 +203,38 @@ public with sharing class AddressService {
             Address__c earlier = lastDefaultByOwner.put(ownerId, address);
             if (earlier != null) {
                 earlier.Is_Default__c = false;
+            }
+        }
+    }
+
+    /**
+     * Status before the save (R-AD10): an address with none is Current, and an address put in
+     * use as the primary while Former is Current again, its End Date cleared, so the primary is
+     * never Former. Undeliverable is a person's call and is never changed here.
+     *
+     * @param previousById the addresses before an update, or null on insert
+     */
+    public static void applyStatusBeforeSave(
+        List<Address__c> records,
+        Map<Id, SObject> previousById
+    ) {
+        if (records == null) {
+            return;
+        }
+        for (Address__c address : records) {
+            if (String.isBlank(address.Status__c)) {
+                address.Status__c = STATUS_CURRENT;
+            }
+            Address__c previous = previousById == null
+                ? null
+                : (Address__c) previousById.get(address.Id);
+            Boolean putInUse =
+                address.Is_Default__c == true &&
+                (previous == null ||
+                previous.Is_Default__c != true);
+            if (putInUse && address.Status__c == STATUS_FORMER) {
+                address.Status__c = STATUS_CURRENT;
+                address.End_Date__c = null;
             }
         }
     }
@@ -506,7 +560,7 @@ public with sharing class AddressService {
             return;
         }
         Database.insert(toInsert, AccessLevel.USER_MODE);
-        clearOtherDefaults(toInsert);
+        clearOtherDefaults(toInsert, true);
         applyToStandardFields(toInsert);
     }
 
@@ -524,6 +578,10 @@ public with sharing class AddressService {
     /** The same test against any day, so the swap job and its tests can name a date. */
     public static Boolean isSeasonalActiveOn(Address__c address, Date day) {
         if (address == null || day == null || address.Type__c != TYPE_SEASONAL) {
+            return false;
+        }
+        // A Former seasonal address is one the owner no longer goes to (R-AD10).
+        if (address.Status__c == STATUS_FORMER) {
             return false;
         }
         if (
@@ -607,7 +665,7 @@ public with sharing class AddressService {
                 primaryByHousehold.put(current.Account__c, current);
             }
         }
-        Set<Id> released = new Set<Id>();
+        Map<Id, Id> released = new Map<Id, Id>();
         for (Address__c source : sources) {
             Id personId = source.Contact__c != null ? source.Contact__c : source.Person_Account__c;
             Id householdId = householdByAddressId.get(source.Id);
@@ -616,7 +674,7 @@ public with sharing class AddressService {
                 throw new AddressMoveException(System.Label.Core_Address_MoveNotTheirHousehold);
             }
             if (source.Contact__c != null && ownHouseholdByPerson.get(personId) == householdId) {
-                released.add(personId);
+                released.put(personId, householdId);
             }
             if (!sameAddress(primaryByHousehold.get(householdId), source)) {
                 Address__c copy = householdCopyOf(source, householdId);
@@ -699,7 +757,7 @@ public with sharing class AddressService {
         }
         Map<Id, HouseholdMove> moves = householdMoves(tickedByHousehold.keySet());
         List<Address__c> primaries = new List<Address__c>();
-        Set<Id> released = new Set<Id>();
+        Map<Id, Id> released = new Map<Id, Id>();
         for (Id householdId : tickedByHousehold.keySet()) {
             HouseholdMove move = moves.get(householdId);
             if (move.primary == null) {
@@ -709,7 +767,7 @@ public with sharing class AddressService {
             Set<Id> ticked = tickedByHousehold.get(householdId);
             for (Id personId : ticked == null ? new Set<Id>() : ticked) {
                 if (move.withTheirOwn.contains(personId)) {
-                    released.add(personId);
+                    released.put(personId, householdId);
                 }
             }
         }
@@ -720,10 +778,15 @@ public with sharing class AddressService {
      * Saves a move someone chose: the household addresses to add, the people whose own primary
      * address stops being primary, then the copy of every household primary to its members.
      * Raised as a chosen move, so it reaches members in "Nobody moves until you choose" too.
+     * A released person's own primary is ended when it is a different place from the
+     * household primary they now take (R-AD10).
+     *
+     * @param householdByReleased each person whose own primary stops being primary, with the
+     *        household whose primary they take from now on
      */
     private static void moveChosen(
         List<Address__c> toAdd,
-        Set<Id> releasedPeople,
+        Map<Id, Id> householdByReleased,
         List<Address__c> primaries
     ) {
         Boolean movesWereChosen = chooseHouseholdMoves(true);
@@ -731,13 +794,28 @@ public with sharing class AddressService {
         try {
             if (!toAdd.isEmpty()) {
                 Database.insert(toAdd, AccessLevel.USER_MODE);
-                clearOtherDefaults(toAdd);
+                clearOtherDefaults(toAdd, true);
+            }
+            Map<Id, Address__c> primaryByHousehold = new Map<Id, Address__c>();
+            for (Address__c primary : primaries) {
+                primaryByHousehold.put(primary.Account__c, primary);
             }
             List<Address__c> released = new List<Address__c>();
-            for (Address__c own : AddressSelector.selectDefaultsByOwnerIds(releasedPeople, null)) {
-                if (own.Contact__c != null) {
-                    released.add(new Address__c(Id = own.Id, Is_Default__c = false));
+            for (
+                Address__c own : AddressSelector.selectDefaultsByOwnerIds(
+                    householdByReleased.keySet(),
+                    null
+                )
+            ) {
+                if (own.Contact__c == null) {
+                    continue;
                 }
+                Address__c release = new Address__c(Id = own.Id, Is_Default__c = false);
+                Address__c taken = primaryByHousehold.get(householdByReleased.get(own.Contact__c));
+                if (taken != null && own.Type__c != TYPE_SEASONAL && !sameAddress(own, taken)) {
+                    endAddress(release, own);
+                }
+                released.add(release);
             }
             if (!released.isEmpty()) {
                 Database.update(released, AccessLevel.USER_MODE);
@@ -775,9 +853,13 @@ public with sharing class AddressService {
         return address.Person_Account__c;
     }
 
-    /** At most one address per owner is the default (R-AD2). */
-    private static void clearOtherDefaults(List<Address__c> defaults) {
-        Set<Id> ownerIds = new Set<Id>();
+    /**
+     * At most one address per owner is the default (R-AD2). When the defaults were just added
+     * the save is a move (R-AD10): the primary each replaces is ended and the new one started,
+     * in the same update that clears the old flag.
+     */
+    private static void clearOtherDefaults(List<Address__c> defaults, Boolean areNew) {
+        Map<Id, Address__c> newByOwner = new Map<Id, Address__c>();
         Set<Id> keepIds = new Set<Id>();
         for (Address__c address : defaults) {
             if (address.Is_Default__c != true) {
@@ -785,19 +867,82 @@ public with sharing class AddressService {
             }
             Id ownerId = ownerIdOf(address);
             if (ownerId != null) {
-                ownerIds.add(ownerId);
+                newByOwner.put(ownerId, address);
                 keepIds.add(address.Id);
             }
         }
-        if (ownerIds.isEmpty()) {
+        if (newByOwner.isEmpty()) {
             return;
         }
-        List<Address__c> stale = new List<Address__c>();
-        for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(ownerIds, keepIds)) {
-            stale.add(new Address__c(Id = address.Id, Is_Default__c = false));
+        Map<Id, Address__c> updates = new Map<Id, Address__c>();
+        Map<Id, Address__c> replacedByOwner = new Map<Id, Address__c>();
+        for (
+            Address__c address : AddressSelector.selectDefaultsByOwnerIds(
+                newByOwner.keySet(),
+                keepIds
+            )
+        ) {
+            updates.put(address.Id, new Address__c(Id = address.Id, Is_Default__c = false));
+            replacedByOwner.put(ownerIdOf(address), address);
         }
-        if (!stale.isEmpty()) {
-            Database.update(stale, AccessLevel.USER_MODE);
+        if (areNew) {
+            recordMoves(replacedByOwner, newByOwner, updates);
+        }
+        if (!updates.isEmpty()) {
+            Database.update(updates.values(), AccessLevel.USER_MODE);
+        }
+    }
+
+    /**
+     * A move (R-AD10): each owner's replaced primary gets End Date today, and Status Former when
+     * it was Current, and the new primary gets Start Date today when it has none, unless the
+     * two are the same place or the new one is seasonal. A Seasonal primary is not ended: the
+     * address waiting for its season to end is, since that is the home the owner left.
+     */
+    private static void recordMoves(
+        Map<Id, Address__c> replacedByOwner,
+        Map<Id, Address__c> newByOwner,
+        Map<Id, Address__c> updates
+    ) {
+        Map<Id, Address__c> endingByOwner = new Map<Id, Address__c>();
+        Set<Id> seasonalOwners = new Set<Id>();
+        for (Id ownerId : replacedByOwner.keySet()) {
+            Address__c replaced = replacedByOwner.get(ownerId);
+            if (replaced.Type__c == TYPE_SEASONAL) {
+                seasonalOwners.add(ownerId);
+            } else {
+                endingByOwner.put(ownerId, replaced);
+            }
+        }
+        // Newest first, so the first one held for an owner is the one the swap would restore.
+        for (Address__c waiting : AddressSelector.selectWaitingForSeason(seasonalOwners)) {
+            if (!endingByOwner.containsKey(ownerIdOf(waiting))) {
+                endingByOwner.put(ownerIdOf(waiting), waiting);
+            }
+        }
+        for (Id ownerId : endingByOwner.keySet()) {
+            Address__c ending = endingByOwner.get(ownerId);
+            Address__c moved = newByOwner.get(ownerId);
+            if (moved.Type__c == TYPE_SEASONAL || sameAddress(ending, moved)) {
+                continue;
+            }
+            if (!updates.containsKey(ending.Id)) {
+                updates.put(ending.Id, new Address__c(Id = ending.Id));
+            }
+            endAddress(updates.get(ending.Id), ending);
+            if (moved.Start_Date__c == null) {
+                updates.put(moved.Id, new Address__c(Id = moved.Id, Start_Date__c = Date.today()));
+            }
+        }
+    }
+
+    /** Ends an address on today's date, keeping an end date a person already gave it. */
+    private static void endAddress(Address__c changes, Address__c ending) {
+        if (ending.End_Date__c == null) {
+            changes.End_Date__c = Date.today();
+        }
+        if (String.isBlank(ending.Status__c) || ending.Status__c == STATUS_CURRENT) {
+            changes.Status__c = STATUS_FORMER;
         }
     }
 

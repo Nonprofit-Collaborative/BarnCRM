@@ -875,6 +875,39 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void aFieldListRowOffersTheObjectsCustomFieldsAndName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Address_Card_Fields',
+                    MasterLabel = 'Address Card Fields',
+                    Setting_Key__c = 'Address_Card_Fields__c',
+                    Section__c = 'Addresses',
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.FIELD_LIST,
+                    Record_Object__c = 'Address__c',
+                    Sort_Order__c = 1
+                )
+            };
+
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            SettingsController.SettingModel row = model.sections[0].settings[0];
+            Set<String> offered = new Set<String>();
+            for (SettingsController.Option option : row.options) {
+                offered.add(option.value);
+            }
+            String verification = Address__c.Verification_Status__c.getDescribe().getName();
+            Assert.isTrue(offered.contains(verification), 'A custom field is offered: ' + offered);
+            Assert.isTrue(offered.contains('Name'), 'The address number is offered');
+            Assert.isFalse(offered.contains('CreatedById'), 'A system field is not');
+            Assert.isTrue(String.isBlank(row.value), 'Nothing is ticked until an admin ticks it');
+        }
+    }
+
+    @IsTest
     static void setupChecksSayWhetherEachPrerequisiteIsMet() {
         System.runAs(TestUsers.admin()) {
             SettingsController.emailAllowedOverride = true;

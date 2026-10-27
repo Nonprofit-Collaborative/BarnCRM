@@ -264,4 +264,100 @@
         <shortDescription>Address panel: heading of the Use for Whole Household confirmation</shortDescription>
         <value>Make This the Household's Primary Address?</value>
     </labels>
+    <labels>
+        <fullName>Core_Address_FormerHeading</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: former addresses group heading; {0} is the count</shortDescription>
+        <value>Former Addresses ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_DateRange</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: dates used; {0} is the start date, {1} the end date</shortDescription>
+        <value>{0} to {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_DateSince</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: in use since a date; {0} is the start date</shortDescription>
+        <value>Since {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_DateUntil</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: used until a date, start unknown; {0} is the end date</shortDescription>
+        <value>Until {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UndeliverableBadge</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: badge on an address whose mail comes back</shortDescription>
+        <value>Undeliverable</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UndeliverablePrimary</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: warning on a primary address marked Undeliverable</shortDescription>
+        <value>Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_StatusMenu</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: name of the menu that changes an address status</shortDescription>
+        <value>Change Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MarkCurrent</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: status menu item that marks an address Current</shortDescription>
+        <value>Mark as Current</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MarkFormer</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: status menu item that marks an address Former</shortDescription>
+        <value>Mark as Former</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_MarkUndeliverable</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: status menu item that marks an address Undeliverable</shortDescription>
+        <value>Mark as Undeliverable</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_StatusSaved</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: confirmation after an address status change</shortDescription>
+        <value>The address status is saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_StatusFailed</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: an address status change could not be saved</shortDescription>
+        <value>The address status could not be saved. You may not have access to change it.</value>
+    </labels>
 </CustomLabels>

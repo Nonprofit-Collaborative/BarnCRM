@@ -185,6 +185,53 @@ With **Nobody moves until you choose**, **Update Everyone's Address** is how a h
 new address reaches its people. In the other two settings it is how you bring someone with an
 address of their own back to the household's address.
 
+## Address History
+
+Every address has a **Status** (**Current**, **Former** or **Undeliverable**), a **Start Date**
+and an **End Date**, so the card can tell where someone lives now from where they used to.
+
+**A move fills them in for you.** When a new address is added as the primary and it is a
+different place from the primary it replaces, the old one gets today as its **End Date** and
+becomes **Former**, and the new one gets today as its **Start Date**. That happens however the
+new primary arrives: added on the card with **Primary** ticked, typed into the household's
+billing address or a person's mailing address, **Use for Whole Household**, or an import. A
+person whose own address **Use for Whole Household** or **Update Everyone's Address** stops
+using is ended the same way, unless the household's address is the same place.
+
+**These are not moves, and end nothing:** **Set as Primary** on an address already on the card
+(a household with a home and a work address can switch between them), the nightly seasonal swap,
+the address put in use when a primary is deleted, and a merge. A seasonal address is never
+ended by a move: if a household moves while its winter address is the primary, the home it
+left is the one that becomes **Former**, and it still goes to the winter address next year.
+
+**Undeliverable is your call.** Staff mark an address **Undeliverable** from its card (the
+status menu) when mail comes back; BarnCRM never sets or clears it. An undeliverable primary
+address is flagged in red on the card, and the **Primary Addresses Marked Undeliverable** check
+in **Org Optimizer**, **Data quality** lists every household, organization and person whose
+primary is marked that way, with **Open in Find** (see [Data hygiene](data-hygiene.md)).
+
+**A Former address stays out of use.** The seasonal swap skips a **Former** seasonal address
+(the household no longer winters there) and never puts a **Former** address back when a season
+ends; after a primary is deleted, a **Former** address is chosen only when nothing else is
+left. Choosing **Set as Primary** on a **Former** address makes it **Current** again and clears
+its end date.
+
+**Addresses you already have are not rewritten.** An address saved before statuses existed has
+no status, and BarnCRM reads that as **Current**; it is filled in the next time the address is
+saved. Nothing records which old address a household actually left, so BarnCRM does not guess:
+mark old addresses **Former** from the card when you know.
+
+On the card, the addresses in use come first, the primary at the top, each with the day it
+started when that is known. Below them, **Former Addresses** is a closed group, holding every
+**Former** address and any address whose end date has passed, each with its dates (for
+example "January 5, 2020 to October 1, 2026"). Select the group's heading to open it.
+
+**Address Card Fields** (BarnCRM Settings, **Addresses**) adds fields of your choice to every
+address on the card: tick them in the list, which holds every custom Address field, yours
+included, and the address number. Nothing is ticked on a new install, so the card shows only
+its usual fields. A field someone cannot see is left out for them, and a field the card
+already shows is not repeated.
+
 ## A five-minute walkthrough for the seasonal swap
 
 Still the Garcia household, and still five minutes. This time you are proving to yourself
