@@ -377,6 +377,53 @@ private class DataHygieneServiceTest {
     }
 
     @IsTest
+    static void countsPrimaryAddressesMarkedUndeliverableAndFindListsTheSame() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            Account first = HouseholdTestDataFactory.newHousehold('First Family');
+            Account second = HouseholdTestDataFactory.newHousehold('Second Family');
+            insert new List<Account>{ first, second };
+            insert new List<Address__c>{
+                new Address__c(
+                    Account__c = first.Id,
+                    Type__c = 'Home',
+                    Is_Default__c = true,
+                    City__c = 'Springfield',
+                    Status__c = 'Undeliverable'
+                ),
+                new Address__c(
+                    Account__c = second.Id,
+                    Type__c = 'Other',
+                    Is_Default__c = false,
+                    City__c = 'Old',
+                    Status__c = 'Undeliverable'
+                ),
+                new Address__c(
+                    Account__c = second.Id,
+                    Type__c = 'Home',
+                    Is_Default__c = true,
+                    City__c = 'Springfield'
+                )
+            };
+            User maria = maria();
+
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.DEFAULT_ADDRESSES_UNDELIVERABLE
+            );
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(1, result.count, 'Only the primary address marked Undeliverable.');
+            Assert.isTrue(result.canOpenInFind, 'The check opens in Find.');
+            Assert.areEqual(
+                1,
+                findRows(maria, DataHygieneService.DEFAULT_ADDRESSES_UNDELIVERABLE),
+                'Find lists what the check counts.'
+            );
+        }
+    }
+
+    @IsTest
     static void runAllListsEveryCheckInOrderAndShowsZeroWhenClean() {
         System.runAs(TestUsers.admin()) {
             mode(HouseholdTestDataFactory.MODE_CONTACT);

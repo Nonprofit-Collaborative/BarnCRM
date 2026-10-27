@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Address_Card_Fields__c</fullName>
+  <description>Address Card Fields: the Address fields the Addresses card shows on every address beyond the ones it always shows, by API name separated by commas. Chosen from a checkbox list on the Addresses page of BarnCRM Settings; none ticked shows only the usual fields (R-AD10).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The extra Address fields shown on every address on the Addresses card.</inlineHelpText>
+  <label>Address Card Fields</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

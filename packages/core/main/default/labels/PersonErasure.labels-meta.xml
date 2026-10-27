@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase a person: a household left empty and kept, the delete setting off</shortDescription>
-        <value>Kept because Delete Empty Households is off (BarnCRM Settings, Households). Renamed, and its greetings and addresses emptied.</value>
+        <value>Kept because Delete Empty Households is off (BarnCRM Settings, People and Households). Renamed, and its greetings and addresses emptied.</value>
     </labels>
     <labels>
         <fullName>Core_Erase_NoteHistoryKept</fullName>

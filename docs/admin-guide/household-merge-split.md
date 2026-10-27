@@ -39,7 +39,7 @@ the one you chose to keep, so merging two households that both happen to have no
 them leaves you with one empty household rather than with none.
 
 **What happens to the empty household after a split.** If "Delete a household when the last
-person leaves" is on (BarnCRM Settings, Households), a household that a split empties is
+person leaves" is on (BarnCRM Settings, People and Households), a household that a split empties is
 deleted for you. If it is off, the empty household stays and you delete it yourself. The
 setting is off when Core is installed.
 

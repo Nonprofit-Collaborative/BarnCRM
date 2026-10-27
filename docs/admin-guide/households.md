@@ -29,8 +29,9 @@ Households work as soon as Core is installed. Everything you can change is on th
 BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
 1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
-2. Click **Households** in the left navigation.
-3. Check the four settings and change any that do not match how you work.
+2. Click **People and Households** in the left navigation.
+3. Check the four settings and change any that do not match how you work. The first two are
+   in the **People** box, the other two in the **Households** box.
 
 | Setting | What it does | Ships as |
 |---|---|---|

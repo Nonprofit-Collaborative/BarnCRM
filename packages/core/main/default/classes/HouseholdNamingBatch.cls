@@ -46,7 +46,7 @@ public with sharing class HouseholdNamingBatch implements Database.Batchable<SOb
                     householdsSkippedNative.format()
                 }
             ),
-            JobNotifier.SECTION_HOUSEHOLDS
+            JobNotifier.SECTION_HOUSEHOLD_NAMES
         );
     }
 }

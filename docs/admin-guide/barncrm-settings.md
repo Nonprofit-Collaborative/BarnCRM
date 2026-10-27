@@ -5,8 +5,9 @@
 BarnCRM Settings is the one page where
 everything about how BarnCRM behaves is changed: how households are named, which
 automations run, who has access, and how this org fits alongside anything you already had.
-Settings are grouped into sections on the left, every setting has a plain-language
-description under it, and there is a search box for when you
+Settings are grouped into sections on the left, and on each section's page into boxes, each
+with its own heading (see "Sections and their boxes" below). Every setting has a
+plain-language description under it, and there is a search box for when you
 remember the word but not the section.
 
 You never need Salesforce Setup for a normal day. When something genuinely can only be
@@ -114,7 +115,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the primary address | Its three automations and the Addresses section |
-| Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
+| Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
 
@@ -161,10 +162,11 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Console**). It opens on the **BarnCRM Settings** tab.
 2. The console opens with the section list on the
    left and the first section showing on the right. The sections are General, Modules,
-   Organization, Households, Duplicate Matching, Relationships, Addresses, Giving, Receipts,
+   Organization, People and Households, Duplicate Matching, Addresses, Giving, Receipts,
    Rollups, Volunteers, Automation, Error Log, Access, Import, Org Optimizer, Integrations, and
-   Health. You only see the ones that have something in them, and a feature that is off hides
-   its sections: Giving and
+   Health. Each section's settings sit in bordered boxes with a heading, such as **People** and
+   **Households** on People and Households. You only see
+   the ones that have something in them, and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
@@ -175,8 +177,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    matches.
    Every setting whose name, description, or section mentions greeting is listed, which
    includes the household formal and informal greeting settings.
-4. Click the result **Formal greeting pattern**. The console jumps to the Households
-   section and to the **Preview and Recompute** panel. The three household naming
+4. Click the result **Formal greeting pattern**. The console jumps to the People and
+   Households section and to the **Preview and Recompute** panel, in the **Household Names
+   and Greetings** box. The three household naming
    patterns (household name, formal greeting, informal greeting) are edited only in that
    panel, not as separate rows, so the panel is where the search result takes you. The
    panel's own text explains the patterns; the household naming page of this admin guide
@@ -199,6 +202,46 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    administrator for the Manage BarnCRM Settings permission." Every control is greyed
    out and there is no Save button. He can still read every description and follow every
    Learn more link.
+
+## Sections and their boxes
+
+Each section's page groups its settings into boxes. A box shows only when it has a setting
+to show, and a setting added later that no box names goes in the box marked "(the rest)"
+below, so nothing is ever hidden by the grouping. A section not listed here, such as Modules,
+Duplicate Matching, Automation, Access, Integrations or Health, shows one box headed with the
+section's name.
+
+| Section | Boxes, in order |
+|---|---|
+| General | Edition and Features; Preferences (the rest); Tools |
+| Organization | Organization Details (the rest); Organization Address; Receipt Logo and Signature |
+| People and Households | People; Households (the rest); Household Names and Greetings; Relationships |
+| Addresses | Address Updates (the rest); Address Card; Seasonal Addresses |
+| Giving | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Nightly Jobs and Accounting Periods; BarnCRM Mirror |
+| Receipts | Receipt Details (the rest); Receipt Printing; Receipt Letters and Year End Statements |
+| Rollups | Rollup Processing (the rest); Rollup Builder |
+| Volunteers | Hours and Shifts |
+| Error Log | Error Digest (the rest); Error Log Retention |
+| Import | Importing (the rest); Gift Matching on Import; Find, Bulk Update and Bulk Delete |
+
+### People and Households
+
+People and Households is one section for the settings that used to be on two, Households and
+Relationships. No setting changed: each keeps its value, its default and its name. Duplicates
+are not here: they have their own **Duplicate Matching** section, right after this one.
+
+| Box | Settings |
+|---|---|
+| People | How people belong to a household; Create a household automatically |
+| Households | Delete a household once it is empty; Keep the households of deleted people |
+| Household Names and Greetings | The **Preview and Recompute** naming panel (the three patterns); Include people who have died in names |
+| Relationships | Keep both sides of relationships in step |
+
+A link that opens the old **Households** or **Relationships** section, such as a bookmark, a
+job notification or a Health Check fix, opens People and Households scrolled to the
+**Households** or **Relationships** box. The Setup Assistant's naming step opens the
+**Household Names and Greetings** box, and Health Check's fix for people hidden from their
+households opens the **People** box.
 
 ## Your organization's address
 
@@ -240,6 +283,17 @@ the shipped pattern), not an empty box. Opening the page saves nothing. **Coexis
 shows the mode BarnCRM detects as right for your org, and stays unconfirmed until you choose
 one and save. Settings that point at a record (such as a default fund), a list of record
 types, or a date have no default to show and stay empty until you choose.
+
+A setting showing a default nobody has saved says **Default, not yet saved.** under it. If you
+agree with the value shown, click **Keep this setting** beside that note: it saves exactly the
+value shown, as if you had chosen it yourself, with the same permission, checks and **Recent
+Changes** row, and anything choosing it by hand sets off (keeping **Coexistence mode**, for
+example, confirms that mode and completes its Setup Assistant step). Changes you have not saved
+yet stay on the page. A setting already saved shows no note, and people without Manage BarnCRM
+Settings see the note but no button. **How people belong to a household** has no button when
+BarnCRM would choose differently for your org (with Person Accounts or Nonprofit Cloud it
+moves a household choice nobody made to the flexible way): the note stays, and you choose the
+way you want from the list and save.
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
