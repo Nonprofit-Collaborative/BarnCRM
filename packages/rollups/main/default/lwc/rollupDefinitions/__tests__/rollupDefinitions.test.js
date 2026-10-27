@@ -4,6 +4,7 @@ import getPage from '@salesforce/apex/RollupController.getPage';
 import recalculate from '@salesforce/apex/RollupController.recalculate';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
 import setActive from '@salesforce/apex/RollupController.setActive';
+import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
 import restoreDefaults from '@salesforce/apex/RollupController.restoreDefaults';
 import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
@@ -54,6 +55,11 @@ jest.mock('@salesforce/apex/RollupController.setSchedule', () => ({ default: jes
 jest.mock('@salesforce/apex/RollupController.setActive', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/RollupController.setMode', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -309,6 +315,54 @@ describe('c-rollup-definitions', () => {
     expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
       'You do not have permission.'
     );
+  });
+
+  describe('a field DLRS also fills', () => {
+    const OFF_WITH_DLRS = {
+      ...PAGE,
+      rollups: [
+        { ...ROLLUP, active: false, otherToolConflict: 'The DLRS rollup Giving also fills it.' }
+      ]
+    };
+
+    async function switchOn() {
+      const element = createComponent();
+      getPage.emit(OFF_WITH_DLRS);
+      await flush();
+      const toggle = element.shadowRoot.querySelector(
+        `lightning-input[data-id="${ROLLUP.recordId}"]`
+      );
+      toggle.checked = true;
+      toggle.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      await flush();
+      return toggle;
+    }
+
+    it('turns on only after the admin says she will switch DLRS off', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(true);
+      turnOnSwitchingOffDlrs.mockResolvedValue(PAGE);
+
+      await switchOn();
+
+      expect(LightningConfirm.open).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('The DLRS rollup Giving also fills it.')
+        })
+      );
+      expect(turnOnSwitchingOffDlrs).toHaveBeenCalledWith({ definitionId: ROLLUP.recordId });
+      expect(setActive).not.toHaveBeenCalled();
+    });
+
+    it('stays off when the admin says no', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(false);
+
+      const toggle = await switchOn();
+
+      expect(turnOnSwitchingOffDlrs).not.toHaveBeenCalled();
+      expect(setActive).not.toHaveBeenCalled();
+      expect(toggle.checked).toBe(false);
+    });
   });
 
   it('restores the shipped rollups', async () => {

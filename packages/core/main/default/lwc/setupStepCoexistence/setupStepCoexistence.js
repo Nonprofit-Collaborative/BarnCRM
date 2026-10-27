@@ -8,6 +8,7 @@ import MODE_STANDALONE from '@salesforce/label/c.Core_SetupAssistant_ModeStandal
 import MODE_NPSP from '@salesforce/label/c.Core_SetupAssistant_ModeNpsp';
 import MODE_NONPROFIT_CLOUD from '@salesforce/label/c.Core_SetupAssistant_ModeNonprofitCloud';
 import CONFIRM from '@salesforce/label/c.Core_SetupAssistant_ConfirmButton';
+import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 
 const SHAPE_TEXT = {
   PersonAccounts: SHAPE_PERSON_ACCOUNTS,
@@ -33,7 +34,8 @@ export default class SetupStepCoexistence extends LightningElement {
   labels = {
     recommended: RECOMMENDED,
     mode: MODE_LABEL,
-    confirm: CONFIRM
+    confirm: CONFIRM,
+    otherRollupTools: OTHER_ROLLUP_TOOLS
   };
 
   _coexistence = {};
@@ -54,6 +56,15 @@ export default class SetupStepCoexistence extends LightningElement {
 
   get shapeText() {
     return SHAPE_TEXT[this._coexistence.detectedShape] || SHAPE_FRESH;
+  }
+
+  /** DLRS or Rollup Helper found in the org: separate tools BarnCRM does not manage (R-R16). */
+  get otherRollupTools() {
+    return this._coexistence.otherRollupTools || [];
+  }
+
+  get hasOtherRollupTools() {
+    return this.otherRollupTools.length > 0;
   }
 
   get recommendedText() {

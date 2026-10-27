@@ -62,6 +62,10 @@ import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
 import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
 import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
+import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
+import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
+import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
+import LightningConfirm from 'lightning/confirm';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -659,17 +663,41 @@ export default class RollupWizard extends LightningElement {
       return;
     }
     const calculateNow = event.target.dataset.id === 'save-and-calculate';
+    const draft = this.payload();
     this.busy = true;
-    save({ draft: this.payload(), calculateNow })
+    save({ draft, calculateNow })
       .then((result) => {
-        this.dispatchEvent(
-          new CustomEvent('saved', { detail: { notice: result.notice, recordId: result.recordId } })
-        );
+        if (result.confirmation) {
+          return this.askDlrs(result.confirmation, draft, calculateNow);
+        }
+        return result;
+      })
+      .then((result) => {
+        if (result) {
+          this.dispatchEvent(
+            new CustomEvent('saved', {
+              detail: { notice: result.notice, recordId: result.recordId }
+            })
+          );
+        }
       })
       .catch((error) => this.fail(error))
       .finally(() => {
         this.busy = false;
       });
+  }
+
+  /**
+   * An active DLRS rollup fills the same field (R-R16): nothing was saved. Saves only when the
+   * admin says she will switch the DLRS rollup off, and stays on this step otherwise.
+   */
+  async askDlrs(conflict, draft, calculateNow) {
+    const confirmed = await LightningConfirm.open({
+      label: DLRS_CONFIRM_TITLE,
+      message: `${conflict} ${DLRS_CONFIRM_QUESTION}`,
+      theme: 'warning'
+    });
+    return confirmed ? saveSwitchingOffDlrs({ draft, calculateNow }) : undefined;
   }
 
   fail(error) {

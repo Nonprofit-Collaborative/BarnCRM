@@ -1,6 +1,15 @@
 <template>
     <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="shape">{shapeText}</p>
 
+    <template lwc:if={hasOtherRollupTools}>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
+            <h3 class="slds-text-heading_x-small">{labels.otherRollupTools}</h3>
+            <template for:each={otherRollupTools} for:item="notice">
+                <p key={notice} class="slds-text-body_small">{notice}</p>
+            </template>
+        </div>
+    </template>
+
     <p class="slds-text-body_small slds-var-m-bottom_small">
         <strong>{labels.recommended}:</strong>
         <span data-id="recommended">{recommendedText}</span>

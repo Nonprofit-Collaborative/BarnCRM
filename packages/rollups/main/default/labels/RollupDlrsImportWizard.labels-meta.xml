@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportButton</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button that opens Import from DLRS</shortDescription>
+        <value>Import from DLRS</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS wizard title</shortDescription>
+        <value>Import from DLRS</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportIntro</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS wizard introduction</shortDescription>
+        <value>Copy DLRS rollups into BarnCRM. Each copy starts switched off: compare its values with the ones DLRS wrote, then turn it on and switch the DLRS rollup off in DLRS. BarnCRM never changes DLRS.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportStepChoose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS step name</shortDescription>
+        <value>Choose</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportStepReview</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS step name</shortDescription>
+        <value>Review</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportStepCompare</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS step name</shortDescription>
+        <value>Compare</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportStepTurnOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS step name</shortDescription>
+        <value>Turn On</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportCanCopy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS heading over the rollups that can be copied</shortDescription>
+        <value>Can Be Copied</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportStays</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS heading over the rollups that cannot be copied</shortDescription>
+        <value>Stays in DLRS</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNoneActive</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS when DLRS has no active rollups</shortDescription>
+        <value>This org has no active DLRS rollups.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportFills</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS line; {0} is the field, {1} is the DLRS operation</shortDescription>
+        <value>Fills {0}. DLRS operation: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportBecomes</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS review line; {0} is the total, {1} is the field</shortDescription>
+        <value>Becomes a BarnCRM {0}, filling {1}, switched off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNoChanges</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS review line when nothing changes</shortDescription>
+        <value>Copied as it is in DLRS.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportCopy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button that copies the chosen rollups</shortDescription>
+        <value>Copy Switched Off</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNext</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button to the next step</shortDescription>
+        <value>Next</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportBack</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button to the step before</shortDescription>
+        <value>Back</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportClose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button that leaves the wizard</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportFinish</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button that ends the wizard</shortDescription>
+        <value>Finish</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportCompare</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button that compares one copy</shortDescription>
+        <value>Compare</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportTurnOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS button that turns one copy on</shortDescription>
+        <value>Turn On</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportCreated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS outcome of one rollup</shortDescription>
+        <value>Copied, switched off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportUpdated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS outcome of one rollup</shortDescription>
+        <value>Copy updated, switched off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportRefused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS outcome; {0} is the reason</shortDescription>
+        <value>Not copied: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNotReached</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS outcome when limits stopped the run</shortDescription>
+        <value>Not copied this time. Run the import again for the rest.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportActive</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS outcome once a copy is on</shortDescription>
+        <value>Turned on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNothingCopied</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS when no rollup was copied</shortDescription>
+        <value>Nothing was copied.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare column</shortDescription>
+        <value>Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportValueNow</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare column: the value DLRS wrote</shortDescription>
+        <value>Value Now (DLRS)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportValueBarn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare column: the value BarnCRM calculates</shortDescription>
+        <value>BarnCRM Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportResult</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare column</shortDescription>
+        <value>Result</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportSame</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare result when both values agree</shortDescription>
+        <value>Same</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportNoRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare with no target records</shortDescription>
+        <value>No records to compare yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportFinishHint</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS: why Finish waits</shortDescription>
+        <value>Finish is available once every copy is turned on. Close keeps the copies switched off; you can turn them on later in the rollup list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportFinished</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS notice; {0} is how many copies were turned on</shortDescription>
+        <value>Import from DLRS finished: {0} copies turned on. Switch their DLRS rollups off in DLRS.</value>
+    </labels>
+</CustomLabels>

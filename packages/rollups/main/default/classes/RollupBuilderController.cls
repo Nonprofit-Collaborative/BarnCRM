@@ -150,6 +150,12 @@ public with sharing class RollupBuilderController {
         public List<Option> directions { get; set; }
         @AuraEnabled
         public List<Option> modes { get; set; }
+        /** A plain notice for each other rollup tool in the org, DLRS or Rollup Helper (R-R16). */
+        @AuraEnabled
+        public List<String> otherToolNotices { get; set; }
+        /** Whether to offer Import from DLRS: an active DLRS rollup, and the right to manage. */
+        @AuraEnabled
+        public Boolean canImportFromDlrs { get; set; }
     }
 
     /** One rollup as the Builder edits it. */
@@ -204,6 +210,18 @@ public with sharing class RollupBuilderController {
 
     // ----------------------------------------------------------------------------------- reads
 
+    /**
+     * Whether DLRS has an active rollup to import (R-R16). The model is cacheable, where a
+     * failure log cannot be written, so a failure here only hides the button.
+     */
+    private static Boolean canImportFromDlrs() {
+        try {
+            return RollupDlrs.hasActive();
+        } catch (Exception unreadable) {
+            return false;
+        }
+    }
+
     @AuraEnabled(cacheable=true)
     public static BuilderModel getModel() {
         try {
@@ -216,6 +234,8 @@ public with sharing class RollupBuilderController {
             model.delimiters = picklist(Rollup_Definition__c.Delimiter__c);
             model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
             model.modes = picklist(Rollup_Definition__c.Mode__c);
+            model.otherToolNotices = OtherRollupTools.notices();
+            model.canImportFromDlrs = model.canManage && canImportFromDlrs();
             return model;
         } catch (Exception caught) {
             throw asUserError(caught);
@@ -421,9 +441,8 @@ public with sharing class RollupBuilderController {
         );
     }
 
-    /** A value as the administrator reads it, in her locale. */
-    @TestVisible
-    private static String display(Object value) {
+    /** A value as the administrator reads it, in her locale; also Import from DLRS's compare. */
+    public static String display(Object value) {
         if (value == null || value == '') {
             return Label.Core_RollupBuilder_PreviewEmpty;
         }
@@ -450,6 +469,12 @@ public with sharing class RollupBuilderController {
         public Id recordId { get; set; }
         @AuraEnabled
         public String notice { get; set; }
+        /**
+         * Set, and nothing saved, when an active DLRS rollup fills the same field: what to ask
+         * the administrator before `saveSwitchingOffDlrs` (R-R16).
+         */
+        @AuraEnabled
+        public String confirmation { get; set; }
     }
 
     /**
@@ -461,14 +486,44 @@ public with sharing class RollupBuilderController {
      */
     @AuraEnabled
     public static SaveResult save(Draft draft, Boolean calculateNow) {
+        return saveAs(draft, calculateNow, false);
+    }
+
+    /**
+     * The same save, for a rollup whose field an active DLRS rollup fills, once the administrator
+     * confirmed she will switch the DLRS rollup off. The confirmation is recorded in the settings
+     * change history; DLRS itself is not changed (R-R16).
+     */
+    @AuraEnabled
+    public static SaveResult saveSwitchingOffDlrs(Draft draft, Boolean calculateNow) {
+        return saveAs(draft, calculateNow, true);
+    }
+
+    private static SaveResult saveAs(Draft draft, Boolean calculateNow, Boolean dlrsOffConfirmed) {
         try {
             if (!BarnCRMPermissions.canManageSettings()) {
                 throw new RollupService.RollupServiceException(
                     Label.Core_Rollups_ErrorNoPermission
                 );
             }
-            Rollup_Definition__c definition = checkedRecord(draft);
+            // Every other check first, so the question is asked only of a rollup that can save.
+            Rollup_Definition__c definition = checkedRecord(draft, true);
+            String conflict = definition.Active__c
+                ? RollupDlrs.conflict(definition.Target_Object__c, definition.Target_Field__c)
+                : null;
+            if (conflict != null && !dlrsOffConfirmed) {
+                SaveResult asked = new SaveResult();
+                asked.confirmation = conflict;
+                return asked;
+            }
             RollupWriter.saveAsUser(definition);
+            if (conflict != null) {
+                RollupDlrs.recordSwitchOff(
+                    definition.Name,
+                    definition.Target_Object__c,
+                    definition.Target_Field__c
+                );
+            }
             SaveResult result = new SaveResult();
             result.recordId = definition.Id;
             result.notice = Label.Core_RollupBuilder_Saved;
@@ -496,6 +551,15 @@ public with sharing class RollupBuilderController {
      * same checks. Throws `RollupServiceException` with the reason in plain words.
      */
     public static Rollup_Definition__c checkedRecord(Draft draft) {
+        return checkedRecord(draft, false);
+    }
+
+    /**
+     * The same checks. With `dlrsOffConfirmed` false, an active rollup on a field an active DLRS
+     * rollup fills is refused too (R-R16); true when the administrator confirmed she will switch
+     * the DLRS rollup off, and the caller records that.
+     */
+    public static Rollup_Definition__c checkedRecord(Draft draft, Boolean dlrsOffConfirmed) {
         String problem = problemWith(draft);
         if (problem != null) {
             throw new RollupService.RollupServiceException(problem);
@@ -514,6 +578,15 @@ public with sharing class RollupBuilderController {
         String instantProblem = instantProblem(definition);
         if (instantProblem != null) {
             throw new RollupService.RollupServiceException(instantProblem);
+        }
+        if (definition.Active__c && dlrsOffConfirmed != true) {
+            String conflict = RollupDlrs.conflict(
+                definition.Target_Object__c,
+                definition.Target_Field__c
+            );
+            if (conflict != null) {
+                throw new RollupService.RollupServiceException(conflict);
+            }
         }
         return definition;
     }

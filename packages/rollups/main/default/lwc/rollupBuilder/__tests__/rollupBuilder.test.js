@@ -31,6 +31,9 @@ jest.mock('c/rollupWizard', () =>
 jest.mock('c/rollupNeedsAttention', () =>
   require('../../../../../test/jest-mocks/rollupBuilder/rollupNeedsAttention')
 );
+jest.mock('c/rollupDlrsImport', () =>
+  require('../../../../../test/jest-mocks/rollupBuilder/rollupDlrsImport')
+);
 
 const MODEL = { canManage: true, multiCurrency: false, targets: [], aggregates: [], modes: [] };
 const flush = () => Promise.resolve().then(() => Promise.resolve());
@@ -90,6 +93,54 @@ describe('c-rollup-builder', () => {
 
     expect(wizard(element)).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe('Saved.');
+    expect(list(element).refresh).toHaveBeenCalled();
+  });
+
+  it('says nothing about other rollup tools when the org has none', async () => {
+    const element = build();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="other-rollup-tools"]')).toBeNull();
+  });
+
+  it('names DLRS as a separate tool above the list', async () => {
+    const element = createElement('c-rollup-builder', { is: RollupBuilder });
+    document.body.appendChild(element);
+    getModel.emit({ ...MODEL, otherToolNotices: ['This org also runs DLRS.'] });
+    await flush();
+
+    const notice = element.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
+    expect(notice.textContent).toContain('c.Core_OtherRollupTools_Title');
+    expect(notice.textContent).toContain('This org also runs DLRS.');
+    expect(element.shadowRoot.querySelector('[data-id="import-from-dlrs"]')).toBeNull();
+  });
+
+  it('opens Import from DLRS in place of the list, and back with its notice', async () => {
+    const element = createElement('c-rollup-builder', { is: RollupBuilder });
+    document.body.appendChild(element);
+    getModel.emit({
+      ...MODEL,
+      otherToolNotices: ['This org also runs DLRS.'],
+      canImportFromDlrs: true
+    });
+    await flush();
+    const importer = () => element.shadowRoot.querySelector('c-rollup-dlrs-import');
+    expect(importer()).toBeNull();
+
+    element.shadowRoot
+      .querySelector('[data-id="import-from-dlrs"]')
+      .dispatchEvent(new CustomEvent('click'));
+    await flush();
+
+    expect(importer().model.canImportFromDlrs).toBe(true);
+    expect(list(element).parentElement.className).toContain('slds-hide');
+    expect(element.shadowRoot.querySelector('[data-id="import-from-dlrs"]')).toBeNull();
+
+    importer().dispatchEvent(new CustomEvent('close', { detail: { notice: '1 turned on' } }));
+    await flush();
+
+    expect(importer()).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe('1 turned on');
     expect(list(element).refresh).toHaveBeenCalled();
   });
 

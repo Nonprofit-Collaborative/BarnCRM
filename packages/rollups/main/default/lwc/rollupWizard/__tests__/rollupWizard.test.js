@@ -6,6 +6,8 @@ import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceF
 import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
+import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
+import LightningConfirm from 'lightning/confirm';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -31,6 +33,11 @@ jest.mock('@salesforce/apex/RollupBuilderController.save', () => ({ default: jes
 jest.mock('@salesforce/apex/RollupBuilderController.preview', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning',
   () => ({ default: 'More than one currency.' }),
@@ -323,6 +330,47 @@ describe('c-rollup-wizard', () => {
       draft: expect.objectContaining({ bypassPermission: 'Data_Migration' }),
       calculateNow: false
     });
+  });
+
+  it('asks before saving over a DLRS rollup and saves on yes', async () => {
+    save.mockResolvedValue({ confirmation: 'The DLRS rollup Giving also fills Account.Total.' });
+    saveSwitchingOffDlrs.mockResolvedValue({ recordId: DRAFT.recordId, notice: 'Rollup saved.' });
+    LightningConfirm.open = jest.fn().mockResolvedValue(true);
+    const element = await build(DRAFT);
+    const saved = jest.fn();
+    element.addEventListener('saved', saved);
+    await toLastStep(element);
+
+    query(element, 'save').click();
+    await flush();
+    await flush();
+
+    expect(LightningConfirm.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('The DLRS rollup Giving also fills Account.Total.')
+      })
+    );
+    expect(saveSwitchingOffDlrs).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ targetField: 'Total_Giving__c' }),
+      calculateNow: false
+    });
+    expect(saved.mock.calls[0][0].detail.notice).toBe('Rollup saved.');
+  });
+
+  it('saves nothing over a DLRS rollup when the admin says no', async () => {
+    save.mockResolvedValue({ confirmation: 'The DLRS rollup Giving also fills Account.Total.' });
+    LightningConfirm.open = jest.fn().mockResolvedValue(false);
+    const element = await build(DRAFT);
+    const saved = jest.fn();
+    element.addEventListener('saved', saved);
+    await toLastStep(element);
+
+    query(element, 'save').click();
+    await flush();
+    await flush();
+
+    expect(saveSwitchingOffDlrs).not.toHaveBeenCalled();
+    expect(saved).not.toHaveBeenCalled();
   });
 
   it('shows the server refusal on the last step', async () => {

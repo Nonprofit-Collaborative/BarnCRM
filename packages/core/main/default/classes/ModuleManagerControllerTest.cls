@@ -195,4 +195,47 @@ private class ModuleManagerControllerTest {
             );
         }
     }
+
+    @IsTest
+    static void dlrsIsMentionedOnlyWhenAModuleThatTotalsIsInstalled() {
+        System.runAs(TestUsers.admin()) {
+            volunteersInstalled();
+            OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.DLRS_NAMESPACE });
+
+            ModuleManagerController.ManagerState volunteersOnly = ModuleManagerController.getState();
+            ModuleDetectionService.givingPresentOverride = true;
+            ModuleManagerController.ManagerState withGiving = ModuleManagerController.getState();
+
+            // Rollup Builder is found by its own object, so an org that has it is told too.
+            Boolean rollupsHere = false;
+            for (ModuleManagerService.ModuleStatus module : volunteersOnly.modules) {
+                rollupsHere |=
+                    module.name == 'Rollups' &&
+                    module.status != ModuleManagerService.STATUS_NOT_INSTALLED;
+            }
+            Assert.areEqual(
+                rollupsHere ? 1 : 0,
+                volunteersOnly.otherRollupTools.size(),
+                'Volunteers calculates no totals, so DLRS is mentioned only beside Rollup Builder'
+            );
+            Assert.areEqual(
+                new List<String>{ System.Label.Core_OtherRollupTools_Dlrs },
+                withGiving.otherRollupTools,
+                'With Giving installed, the page says DLRS is a separate tool'
+            );
+        }
+    }
+
+    @IsTest
+    static void noOtherToolMeansNoNotice() {
+        System.runAs(TestUsers.admin()) {
+            volunteersInstalled();
+            ModuleDetectionService.givingPresentOverride = true;
+            OtherRollupTools.overrideForTest(new Set<String>());
+
+            ModuleManagerController.ManagerState state = ModuleManagerController.getState();
+
+            Assert.isTrue(state.otherRollupTools.isEmpty(), 'Nothing to say without DLRS');
+        }
+    }
 }

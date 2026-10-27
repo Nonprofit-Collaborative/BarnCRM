@@ -74,6 +74,24 @@ private class RollupBuilderControllerTest {
     // ------------------------------------------------------------------------------------ reads
 
     @IsTest
+    static void theModelNamesAnotherRollupToolOnlyWhenOneIsHere() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            OtherRollupTools.overrideForTest(new Set<String>());
+            List<String> without = RollupBuilderController.getModel().otherToolNotices;
+            OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.DLRS_NAMESPACE });
+            List<String> withDlrs = RollupBuilderController.getModel().otherToolNotices;
+
+            System.Assert.isTrue(without.isEmpty(), 'Nothing is said in an org without DLRS');
+            System.Assert.areEqual(
+                OtherRollupTools.notices(),
+                withDlrs,
+                'The Builder says DLRS is a separate tool, as Core words it'
+            );
+            System.Assert.areEqual(1, withDlrs.size(), 'One notice, for DLRS');
+        }
+    }
+
+    @IsTest
     static void theModelOffersAccountAndCustomObjectsButNotBookkeeping() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             RollupBuilderController.BuilderModel model = RollupBuilderController.getModel();

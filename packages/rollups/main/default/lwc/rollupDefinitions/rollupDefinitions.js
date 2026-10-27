@@ -66,6 +66,9 @@ import IMPORT_CREATED from '@salesforce/label/c.Core_RollupBuilder_ImportCreated
 import IMPORT_UPDATED from '@salesforce/label/c.Core_RollupBuilder_ImportUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
 import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
+import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
+import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
+import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 
 /** The words for each import outcome, before saving and after (ADR-0136). */
 const OUTCOMES = {
@@ -266,14 +269,29 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     return `${counts}, ${separator}`;
   }
 
-  handleActiveToggle(event) {
+  async handleActiveToggle(event) {
     const definitionId = event.target.dataset.id;
     const active = event.target.checked;
     const input = event.target;
     const before = !active;
-    this.runAction(setActive({ definitionId, active }), () => {
+    const revert = () => {
       input.checked = before;
-    });
+    };
+    const rollup = (this.page.rollups || []).find((item) => item.recordId === definitionId);
+    // An active DLRS rollup fills the same field (R-R16): turn on only on the admin's word.
+    if (active && rollup && rollup.otherToolConflict) {
+      const confirmed = await LightningConfirm.open({
+        label: DLRS_CONFIRM_TITLE,
+        message: `${rollup.otherToolConflict} ${DLRS_CONFIRM_QUESTION}`,
+        theme: 'warning'
+      });
+      if (!confirmed) {
+        revert();
+        return undefined;
+      }
+      return this.runAction(turnOnSwitchingOffDlrs({ definitionId }), revert);
+    }
+    return this.runAction(setActive({ definitionId, active }), revert);
   }
 
   handleModeChange(event) {

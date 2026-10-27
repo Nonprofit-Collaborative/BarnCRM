@@ -729,6 +729,116 @@ package namespace in a subscriber org):
 Neither method throws for a total: a failure goes to the Error Log and the nightly run puts it
 right. Pausing all automation stops `recalculateChanges`, as it stops the Flow action.
 
+## DLRS and Rollup Helper in the Same Org
+
+BarnCRM looks for two other rollup tools: DLRS (Declarative Lookup Rollup Summaries, managed
+namespace `dlrs`) and Rollup Helper (managed namespace `rh2`). It finds each by its objects,
+so nothing has to be set up. When either is installed, **Other Rollup Tools** appears with one
+line per tool:
+
+- at the top of the **Rollup Builder** tab;
+- in the Setup Assistant, on the step that says what BarnCRM found in your org;
+- in the **Modules** section of BarnCRM Settings, when Rollup Builder or Giving is installed.
+
+The line reads, for DLRS: "This org also runs DLRS (Declarative Lookup Rollup Summaries). It is
+a separate rollup tool; BarnCRM does not manage its rollups." An org without either tool sees
+nothing.
+
+What to know:
+
+- **BarnCRM never changes the other tool.** It does not edit, switch off, delete or uninstall
+  a DLRS or Rollup Helper rollup, or its triggers. You do that in the other tool, when you are
+  ready.
+- **Both can run side by side**, as long as they do not fill the same field. Two tools writing
+  one field overwrite each other, and the value you see depends on which ran last.
+- **Rollup Helper's rollups are not read.** BarnCRM only says Rollup Helper is here. To move
+  its rollups, rebuild them by hand: see
+  [Moving Rollups from Rollup Helper](moving-from-rollup-helper.md).
+
+### When BarnCRM and DLRS Fill the Same Field
+
+BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling one field:
+
+- **Turning a rollup on asks first.** When an active DLRS rollup fills the field a rollup
+  fills, saving it switched on in the Builder, or switching **Active** on in the list, opens
+  **Switch Off the DLRS Rollup**: "The DLRS rollup ... also fills .... Two tools filling one
+  field overwrite each other. Turn this rollup on only if you will switch the DLRS rollup off in
+  DLRS." Click **OK** to turn it on, or **Cancel** to leave it off (in the Builder, nothing is
+  saved and you stay on the last step).
+- **Your answer is recorded.** **OK** writes a row to **Recent Changes** in BarnCRM Settings,
+  named **Rollup Builder:** and the rollup's name, saying you confirmed the DLRS rollup will be
+  switched off. Then switch it off in DLRS yourself; BarnCRM does not.
+- **A file import cannot ask**, so **Import from a file** does not save a rollup that is on in
+  the file when an active DLRS rollup fills its field, and says why. Import it switched off, or
+  switch the DLRS rollup off first.
+- **Switching off and saving a rollup switched off** never ask: a rollup that is off fills
+  nothing.
+- **Health Check** warns **BarnCRM and DLRS fill the same field** when such a pair appears
+  later, for example when a DLRS rollup is switched back on, and names each field and both
+  rollups.
+
+Only DLRS rollups that are active in DLRS count. Rollup Helper's rollups are not read, so
+neither the question nor the Health Check finding sees them: check those yourself.
+
+### Import from DLRS
+
+When DLRS has at least one active rollup, **Other Rollup Tools** on the **Rollup Builder** tab
+has an **Import from DLRS** button (you need Manage BarnCRM Settings). It copies DLRS rollups
+into BarnCRM in four steps. BarnCRM never edits, switches off or deletes anything in DLRS.
+
+1. **Choose.** Every active DLRS rollup is listed with the field it fills and its DLRS
+   operation. Under **Can Be Copied**, each is ticked; untick any you want to leave. Under
+   **Stays in DLRS**, each says why BarnCRM cannot hold it (see the table below). Click
+   **Next**.
+2. **Review.** Each chosen rollup says what it becomes ("Becomes a BarnCRM Count, filling
+   Account.Member_Count__c, switched off.") and anything that works differently in BarnCRM, or
+   "Copied as it is in DLRS." Click **Copy Switched Off**.
+3. **Compare.** Each rollup says **Copied, switched off.**, **Copy updated, switched off.** (it
+   was imported before) or **Not copied:** and the reason. Click **Compare** on a copy to see up
+   to five records of its object: **Value Now (DLRS)** is what DLRS wrote, **BarnCRM Value** is
+   what the copy calculates, and **Result** says **Same**, "Blank in one, zero in the other" or
+   "The values differ." Nothing is written. Click **Next**.
+4. **Turn On.** Click **Turn On** on each copy. **Switch Off the DLRS Rollup** asks first, as
+   above; **OK** turns the copy on and records your answer in **Recent Changes**. **Finish** is
+   available once every copy is on. Then switch each DLRS rollup off in DLRS.
+
+**Close** leaves at any step. Copies already made stay switched off, and you can turn them on
+later in the rollup list (which asks the same question). Importing again updates the same
+copies rather than adding new ones: each copy's Definition Key is `DLRS_` and the DLRS
+rollup's name. A copy already turned on is not offered again.
+
+How each DLRS setting is copied:
+
+| DLRS setting | In BarnCRM |
+|---|---|
+| Parent Object, Child Object, Relationship Field | The rollup's object, field and the records it counts, when the Builder offers those records by that lookup |
+| Aggregate Operation | Sum, Max, Min, Avg, Count, Count Distinct, Concatenate (Text list), Concatenate Distinct (Text list, each value once), First, Last |
+| Field to Aggregate | The field read. For Count, any field but Id becomes a filter "is not blank", since DLRS counts only records with it filled |
+| Relationship Criteria | The filter, when it compares fields with values (equals, not equals, greater or less, blank or not, in a list, starts with, contains, this year, last year, last n days), joined by AND, OR and NOT |
+| Field to Order By | One field, ascending or descending. A descending First becomes Last, and the other way round. BarnCRM lists blank values last |
+| Row Limit | Kept for Sum, Avg, Min, Max and the text lists; left out of First, where it changes nothing |
+| Concatenate Delimiter | Comma, Semicolon, Pipe or New line when it is one of those; otherwise Custom, up to 10 characters. Blank becomes Comma |
+| Aggregate All Rows | **Include deleted and archived records** |
+| Bypass Permission | Kept |
+| Calculation Mode | Realtime, Developer and Process Builder become **Both** (updated as records change and every night); Scheduled stays **Scheduled** |
+| Calculation Sharing Mode | Not kept: BarnCRM counts every record, whoever saves |
+
+A DLRS rollup stays in DLRS, and the wizard says why, when:
+
+- its operation has no BarnCRM total;
+- its Relationship Criteria uses anything the filter cannot hold, such as a subquery, a
+  function like CALENDAR_YEAR, a comparison of two fields or another LIKE pattern (the reason
+  quotes the part);
+- it orders by more than one field, or puts blank values first (NULLS FIRST);
+- it has a Row Limit on Last, Count or Count Distinct;
+- its delimiter is longer than 10 characters or covers more than one line;
+- the Builder does not offer its records by its lookup for its object;
+- an active BarnCRM rollup already fills its field, or its copy is already on;
+- or any other Builder check refuses it, with the Builder's own words.
+
+Rebuild those by hand in the Builder if you want them in BarnCRM, or leave them running in
+DLRS on a field BarnCRM does not fill.
+
 ## Current limits
 
 Fund totals and soft credit totals, including a household's soft credit totals, now update
