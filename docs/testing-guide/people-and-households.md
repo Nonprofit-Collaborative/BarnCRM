@@ -2,7 +2,7 @@
 
 Scripts for people, households, the Members and Household panels, names and greetings, merge and split, preferred phone, interaction notes and the record pages. Setup detail: [Households](../admin-guide/households.md), [Household members](../admin-guide/household-members.md), [Household names and greetings](../admin-guide/household-naming.md), [Merging and splitting households](../admin-guide/household-merge-split.md), [Preferred phone](../admin-guide/preferred-phone.md), [Interaction notes](../admin-guide/interaction-notes.md), [Record pages](../admin-guide/record-pages.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household upkeep** and **Preferred email and phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household upkeep** and **Preferred email and phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **People and Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
 
 ## T-HH-01: A new person gets a household
 
@@ -90,7 +90,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Households**. | The **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
+| 1 | Open **BarnCRM Settings**, **People and Households**. | In the **Household Names and Greetings** box, the **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
 | 2 | Change **Household name pattern** to `{LastName} Household`. | The preview updates as you type. |
 | 3 | Select **Save**. | **Saved. New households use these patterns straight away.** |
 | 4 | Select **Update all household names**, then **Yes, recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
@@ -139,7 +139,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
+| 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **People and Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
 | 2 | Switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
 | 3 | Tick **Delete a household once it is empty** and save. | Saved. |
 | 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
@@ -157,7 +157,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open the **Households** tab and The Garcia Family. | The **Members** panel and **Name and Greetings** show. |
 | 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add member**, **Move to another household** or **Make primary** button. |
 | 3 | Open the **Household Members** tab (from the navigation menu if it is not shown). | It opens and lists membership records (none in the simple way of belonging); no **New** button. |
-| 4 | Open **BarnCRM Settings**, **Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
+| 4 | Open **BarnCRM Settings**, **People and Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
 
 **Cleanup:** None.
 
@@ -212,7 +212,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Create a person account `Pat` `Testaccount`. | Saved. Its **Household** panel links to **The Testaccount Family**, **1 member**. |
 | 2 | Open that household. | **Members** lists Pat Testaccount with **Primary**; Primary Contact names Pat. |
-| 3 | In **BarnCRM Settings**, **Households**, try to switch to **One household per person (simple)** and save. | Refused with a message starting **You cannot switch to the simple way of belonging yet.** The setting is unchanged. |
+| 3 | In **BarnCRM Settings**, **People and Households**, try to switch to **One household per person (simple)** and save. | Refused with a message starting **You cannot switch to the simple way of belonging yet.** The setting is unchanged. |
 
 **Cleanup:** delete Pat Testaccount and the household.
 

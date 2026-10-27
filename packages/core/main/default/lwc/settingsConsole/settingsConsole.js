@@ -32,6 +32,7 @@ import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
+import { groupRows, findBox } from './settingsGroups';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
@@ -186,6 +187,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   requestedSection;
   enclosingTabId;
   focusKey;
+  /** The box a link named (P1), scrolled to once its page has rendered. */
+  focusBox;
+  boxRequestHandled = false;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -195,6 +199,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const requested = key && state[key];
     if (requested) {
       this.requestedSection = requested;
+      this.boxRequestHandled = false;
       this.selectRequestedSection();
     }
   }
@@ -213,6 +218,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   renderedCallback() {
     this.nameTab();
     this.focusChosenSetting();
+    this.scrollToChosenBox();
   }
 
   nameTab() {
@@ -241,6 +247,25 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return section.settings
       .filter((setting) => !isHiddenPanelSetting(section, setting))
       .map((setting) => this.toRow(setting));
+  }
+
+  /**
+   * The page's rows in boxed sub-sections (P1), each with a heading in title case. A panel alone
+   * in a box named like it keeps its heading for search and focus, hidden so the title does
+   * not show twice.
+   */
+  get currentGroups() {
+    return groupRows(this.selectedSection, this.currentSettings).map((box, index) => ({
+      ...box,
+      headingId: `settings-box-${index}`,
+      rows: box.rows.map((row) => ({
+        ...row,
+        headingClass:
+          box.rows.length === 1 && String(row.label).toLowerCase() === box.label.toLowerCase()
+            ? 'slds-assistive-text'
+            : 'slds-text-heading_small slds-var-m-bottom_x-small'
+      }))
+    }));
   }
 
   get sectionIsEmpty() {
@@ -342,17 +367,33 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     this.loadCoreComponents();
   }
 
-  /** Opens the section a link asked for, when the model has one by that name. */
+  /**
+   * Opens the section a link asked for, when the model has one by that name. A link may name a
+   * box instead (P1), such as Households or Relationships, which were pages until they were
+   * merged into People and Households: its page opens, scrolled to that box once per link.
+   */
   selectRequestedSection() {
     if (!this.requestedSection) {
       return false;
     }
     const wanted = this.requestedSection.toLowerCase();
     const match = this.sections.find((section) => section.name.toLowerCase() === wanted);
-    if (!match) {
+    if (match) {
+      this.selectedSection = match.name;
+      return true;
+    }
+    const target = findBox(
+      this.sections.map((section) => section.name),
+      this.requestedSection
+    );
+    if (!target) {
       return false;
     }
-    this.selectedSection = match.name;
+    this.selectedSection = target.page;
+    if (!this.boxRequestHandled) {
+      this.boxRequestHandled = true;
+      this.focusBox = target.box;
+    }
     return true;
   }
 
@@ -472,6 +513,27 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
     if (typeof row.focus === 'function') {
       row.focus();
+    }
+  }
+
+  /** Scrolls to the box a link named and moves focus to its heading, once it has rendered. */
+  scrollToChosenBox() {
+    if (!this.focusBox) {
+      return;
+    }
+    const box = Array.from(this.template.querySelectorAll('[data-box]')).find(
+      (candidate) => candidate.dataset.box === this.focusBox
+    );
+    if (!box) {
+      return;
+    }
+    this.focusBox = undefined;
+    if (typeof box.scrollIntoView === 'function') {
+      box.scrollIntoView({ block: 'start' });
+    }
+    const heading = box.querySelector('h2');
+    if (heading && typeof heading.focus === 'function') {
+      heading.focus();
     }
   }
 

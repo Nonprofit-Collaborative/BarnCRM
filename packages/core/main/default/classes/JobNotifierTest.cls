@@ -202,4 +202,17 @@ private class JobNotifierTest {
             );
         }
     }
+
+    /** The duplicate scan's notice opens Duplicate Matching, where its panel is (batch 10, P1). */
+    @IsTest
+    static void theDuplicateScanNoticeOpensDuplicateMatching() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            String page = SettingSections.pageFor(JobNotifier.SECTION_DUPLICATE_MATCHING);
+            Test.stopTest();
+
+            Assert.areEqual(SettingSections.DUPLICATE_MATCHING, page, 'Its own page');
+            Assert.isTrue(SettingSections.all().contains(page), 'A page the console lists');
+        }
+    }
 }

@@ -201,7 +201,7 @@ subtabs), BarnCRM pages use those tabs instead of replacing the page you are on:
   in a duplicate suggestion, and an entry in the Error Log tile. Hold Ctrl (Cmd on a Mac)
   while clicking to open the record in a new browser tab instead.
 - **BarnCRM Settings**, **Import**, **Find** and **Rollup Builder** name their tab for what
-  is on screen, for example "BarnCRM Settings: Households", "Import: donors.csv",
+  is on screen, for example "BarnCRM Settings: People and Households", "Import: donors.csv",
   "Find: Contact" or "Rollup Builder: Household total giving", with the page's own icon.
 - After **Merge** or **Split** in Household Merge and Split, the household's tab refreshes
   in place, and a split opens the other household as a subtab beside it.

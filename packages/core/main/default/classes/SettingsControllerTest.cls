@@ -35,7 +35,7 @@ private class SettingsControllerTest {
                 DeveloperName = 'Household_Name_Pattern',
                 MasterLabel = 'Household name pattern',
                 Setting_Key__c = TEXT_KEY,
-                Section__c = SettingSections.HOUSEHOLDS,
+                Section__c = SettingSections.PEOPLE_AND_HOUSEHOLDS,
                 Module__c = 'Core',
                 Data_Type__c = 'Text',
                 Description__c = 'How a household name and the greetings on your letters are built.',
@@ -46,6 +46,7 @@ private class SettingsControllerTest {
                 DeveloperName = 'Auto_Create_Households',
                 MasterLabel = 'Create households automatically',
                 Setting_Key__c = CHECKBOX_KEY,
+                // Still names the old Households page, as a row not yet moved would (P1).
                 Section__c = SettingSections.HOUSEHOLDS,
                 Module__c = 'Core',
                 Data_Type__c = 'Checkbox',
@@ -221,23 +222,32 @@ private class SettingsControllerTest {
                 model.sections[0].name,
                 'The console opens on General'
             );
-            Assert.areEqual(SettingSections.HOUSEHOLDS, model.sections[1].name, 'Then Households');
+            Assert.areEqual(
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
+                model.sections[1].name,
+                'Then People and Households'
+            );
             Assert.areEqual(SettingSections.AUTOMATION, model.sections[2].name, 'Then Automation');
             Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
             for (SettingsController.SectionModel section : model.sections) {
                 byName.put(section.name, section);
             }
-            Assert.isTrue(
+            Assert.isFalse(
                 byName.containsKey(SettingSections.HOUSEHOLDS),
-                'The household settings have their own section'
+                'A row still naming the old Households page makes no page of its own'
             );
             Assert.areEqual(
                 2,
-                byName.get(SettingSections.HOUSEHOLDS).settings.size(),
-                'Both household settings are in it'
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS).settings.size(),
+                'Both household settings are on People and Households'
+            );
+            Assert.areEqual(
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS).settings[1].section,
+                'The row that names the old page says the page it is on'
             );
             Assert.isTrue(
-                byName.get(SettingSections.HOUSEHOLDS)
+                byName.get(SettingSections.PEOPLE_AND_HOUSEHOLDS)
                     .settings[0]
                     .helpUrl.endsWith('household-naming.md'),
                 'Learn more points at the admin guide page for that setting'
@@ -376,11 +386,16 @@ private class SettingsControllerTest {
                 'Searching the description finds the naming setting'
             );
             Assert.areEqual(
-                SettingSections.HOUSEHOLDS,
+                SettingSections.PEOPLE_AND_HOUSEHOLDS,
                 byDescription[0].section,
                 'The result says which section to open'
             );
             Assert.areEqual(2, bySection.size(), 'Searching a section name finds everything in it');
+            Assert.areEqual(
+                2,
+                SettingsController.search('people and').size(),
+                'Searching the page name finds a row that still names the old Households page'
+            );
             Assert.areEqual(0, nothing.size(), 'An empty search asks for nothing');
         }
     }

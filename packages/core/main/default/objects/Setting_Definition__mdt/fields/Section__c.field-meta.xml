@@ -3,7 +3,8 @@
   <fullName>Section__c</fullName>
   <description>
     The left navigation group this row belongs to in the BarnCRM Settings console, for example
-    Households, Automation, Access, Health.
+    People and Households, Automation, Access, Health. The console boxes each page's rows by
+    sub-section.
   </description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>

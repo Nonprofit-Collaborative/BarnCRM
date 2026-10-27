@@ -590,7 +590,8 @@ public with sharing class SetupAssistantService {
                     System.Label.Core_SetupAssistant_Step2Label,
                     System.Label.Core_SetupAssistant_Step2Description
                 )
-                .withTarget(SettingSections.HOUSEHOLDS)
+                // The naming box of People and Households, which the console scrolls to (P1).
+                .withTarget(SettingSections.HOUSEHOLD_NAMES)
                 .completedBy(null, 'Household_Name_Pattern__c')
         );
         Step access = new Step(

@@ -132,7 +132,7 @@ working. Confirm that here, or choose a different fit." BarnCRM then looks at yo
   household membership to those membership records, unless an administrator already chose
   a way of belonging, which is never overwritten. From then on saving a new person creates
   their household and their membership of it, exactly as it does in the simple mode. The
-  switch that governs that is "create a household automatically" on the Households page of
+  switch that governs that is "create a household automatically" on the People and Households page of
   BarnCRM Settings.
 - **Only in an org with Salesforce Nonprofit Cloud:** when BarnCRM finds Nonprofit Cloud
   objects, it recommends **Nonprofit Cloud coexistence**, with a membership record for

@@ -143,7 +143,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | As admin, in **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Find and Export** from the staff user and give them **BarnCRM Duplicate Review**. | A message says the staff user now has it. |
 | 3 | As staff, wait a minute, reload, and open the **Duplicate Matching** tab (from the app launcher if it is not in the navigation bar). | Only the **Review** area. |
 | 4 | Read the **Review** area. | The waiting pairs are listed, with **You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.** **Scan for duplicates** and the pair actions are disabled. |
-| 5 | As admin, open **BarnCRM Settings**. Under **Households**, look for a duplicates row; then choose the **Duplicate Matching** section. | **Households** has no duplicates row and no duplicates note. **Duplicate Matching** shows the note about duplicate rules and Duplicate Review, and the **Duplicate Matching** row with **Open this page**. |
+| 5 | As admin, open **BarnCRM Settings**. Under **People and Households**, look for a duplicates row; then choose the **Duplicate Matching** section. | **People and Households** has no duplicates row and no duplicates note. **Duplicate Matching** shows the note about duplicate rules and Duplicate Review, and the **Duplicate Matching** row with **Open this page**. |
 | 6 | Click **Open this page**. | The **Duplicate Matching** tab opens on **Review**. |
 
 **Cleanup:** Remove **BarnCRM Duplicate Review** from the staff user.
