@@ -268,6 +268,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Open **Former Addresses** and choose **Mark as Current** on Phoenix. | Phoenix is back with the addresses in use, with no dates shown. |
 | 7 | On Sunset Ln choose **Mark as Current**. | The badge and the red line go. |
 | 8 | As a read-only user, open The Garcia Family. | No status menu on any card. |
+| 9 | As a user whose profile and permission sets give no read on the address **Status**, **Start Date** and **End Date** fields, open The Garcia Family. | The Addresses card still loads, every address shows with the addresses in use (none under **Former Addresses**), and no dates are shown. |
 
 **Cleanup:** none (Sunset Ln and Phoenix are both Current again).
 

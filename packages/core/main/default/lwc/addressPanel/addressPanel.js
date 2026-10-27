@@ -84,7 +84,9 @@ const MOVE_FOR_EVERYONE = 'everyone';
  * sharing apply and the card picks up edits made elsewhere on the page. The record is a
  * household or organization (Account__c), a person stored as a contact (Contact__c) or a
  * person stored as an account (Person_Account__c); all three lookups exist in every org.
- * At most 2,000, the most a query returns at once.
+ * At most 2,000, the most a query returns at once. Status, start date and end date are
+ * @optional: a user without read on one still gets the card, with that value null or absent
+ * (a missing status counts as Current, a missing date as blank).
  */
 const ADDRESSES_QUERY = gql`
   query addressPanel($ownerId: ID) {
@@ -141,13 +143,13 @@ const ADDRESSES_QUERY = gql`
               Seasonal_End_Day__c {
                 value
               }
-              Status__c {
+              Status__c @optional {
                 value
               }
-              Start_Date__c {
+              Start_Date__c @optional {
                 value
               }
-              End_Date__c {
+              End_Date__c @optional {
                 value
               }
             }
