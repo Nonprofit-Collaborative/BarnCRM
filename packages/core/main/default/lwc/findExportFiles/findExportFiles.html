@@ -12,7 +12,7 @@
                 <ul class="slds-list_dotted">
                     <template for:each={files} for:item="file">
                         <li key={file.documentId} data-id="file">
-                            <a href={file.url} target="_blank">{file.title}</a>
+                            <a href={file.url} target="_blank" rel="noopener noreferrer">{file.title}</a>
                         </li>
                     </template>
                 </ul>

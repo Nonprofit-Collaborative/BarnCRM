@@ -160,7 +160,13 @@ public with sharing class QueryFieldCatalog {
         return info;
     }
 
-    /** The describe of an object the running user can query, or a refusal that says so. */
+    /**
+     * The describe of an object the running user can query, or a refusal that says so. The
+     * platform's own tables and settings (`isSystemObject`) are refused here too, not only left
+     * out of the picker: Find, its export, Bulk Update and Bulk Delete, and every parent a field
+     * path crosses come through this method, so a call made outside the page cannot reach an
+     * object the page never offers.
+     */
     public static Schema.DescribeSObjectResult describeObject(String objectApiName) {
         if (String.isBlank(objectApiName) || !NAME.matcher(objectApiName).matches()) {
             throw unknownObject(objectApiName);
@@ -178,7 +184,12 @@ public with sharing class QueryFieldCatalog {
         } catch (InvalidParameterValueException missing) {
             throw unknownObject(objectApiName);
         }
-        if (found.isEmpty() || !found[0].isAccessible() || !found[0].isQueryable()) {
+        if (
+            found.isEmpty() ||
+            !found[0].isAccessible() ||
+            !found[0].isQueryable() ||
+            isSystemObject(found[0])
+        ) {
             throw unknownObject(objectApiName);
         }
         objectsRead.put(key, found[0]);

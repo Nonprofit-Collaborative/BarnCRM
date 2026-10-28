@@ -3,8 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Admin</label>
   <description>
-    For the person who configures BarnCRM. Grants the settings
-    console, automation control, and the Error Log. Later features add to this set: it is never
+    For the person who configures BarnCRM: settings, automation control, Error Log. View All and
+    Modify All on Account and Contact let its data tools reach every person (ADR-NEXT). Never
     meant to be cloned.
   </description>
   <classAccesses>
