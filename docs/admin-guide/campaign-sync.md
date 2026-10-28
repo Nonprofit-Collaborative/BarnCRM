@@ -1,6 +1,6 @@
 # Campaign Sync
 
-## What it does
+## What It Does
 
 BarnCRM records fundraising efforts as appeals. Salesforce has its own object for the
 same idea, the Campaign, and many tools only understand that one: Campaign Members, email
@@ -33,7 +33,7 @@ and its members, where they are. The one exception is a Campaign that **Sync all
 created a moment earlier and then could not link to its appeal (see Common mistakes): it is
 removed again, so the next run does not leave a second one beside it.
 
-## How to turn it on
+## How to Turn It On
 
 You need the Mirror module installed, and a Salesforce edition that has Campaigns (Sales
 Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform licenses only has no
@@ -73,7 +73,7 @@ tool that sends them in one transaction, the appeals save without their Campaign
 Warning says so. Click **Sync all appeals** afterwards. A load that sends 200 rows at a
 time, as Data Loader does by default, is copied as usual.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Maria, in an org that has Campaigns, with the sample data loaded and Campaign
 sync switched on as above.
@@ -93,7 +93,7 @@ sync switched on as above.
 7. On the `Giving Tuesday` Campaign, add a Campaign Member. Open the appeal again: nothing
    about it changed, because the copy only goes from appeal to Campaign.
 
-## Common mistakes
+## Common Mistakes
 
 **An appeal has no Campaign.** The **Appeals and Their Campaigns** list view on the
 Appeals tab shows which ones: their Campaign ID is empty. Most often the person who created

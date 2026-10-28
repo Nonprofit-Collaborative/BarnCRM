@@ -1,6 +1,6 @@
-# Find and export
+# Find and Export
 
-## 1. What it does
+## 1. What It Does
 
 **Find** answers "show me exactly these records" without a report type, Setup or a query
 language. You pick one object (Households, Contacts, Gifts with the Giving module, or any
@@ -31,7 +31,7 @@ exactly what Find does, or copy it into another tool. Someone who prefers typing
 query in the same language instead of building it (section 7.4); Find reads it into the
 builder and checks it exactly as if it had been built by hand.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 1. Find needs the **Find and Export Records** permission. The **BarnCRM Admin** role has it.
    To let a staff member find and export without making them an admin, assign them the
@@ -45,7 +45,7 @@ builder and checks it exactly as if it had been built by hand.
    person can still read every record their access allows, in several exports or other tools.
    To keep data from someone, take away their access to it.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 Maria wants every household in Springfield that has no email address on its primary contact,
 to send them a letter.
@@ -98,7 +98,7 @@ a value; the operators offered depend on the field:
 - A condition that is incomplete, or a value that does not fit the field, is marked in place
   and the query does not run until it is fixed.
 
-## 5. Saved and shared queries
+## 5. Saved and Shared Queries
 
 - **Save** stores the object, columns, conditions, sort and row count under a name. Saving
   again with the same query open updates it; **Save as** makes a copy under a new name.
@@ -120,7 +120,7 @@ a value; the operators offered depend on the field:
   that query and runs it straight away, as if you had chosen it from the list and pressed
   **Run**. A query you cannot open (deleted, or not shared with you) is simply not opened.
 
-## 6. Common mistakes
+## 6. Common Mistakes
 
 - **"This object is not available to you."** Your access does not include reading that
   object. Ask whoever manages access in your org.
@@ -137,7 +137,7 @@ a value; the operators offered depend on the field:
 
 ## 7. Advanced Find
 
-### 7.1 Related records in conditions
+### 7.1 Related Records in Conditions
 
 Under **Related records**, press **Add related records** to keep only the records that have,
 or do not have, related records matching conditions of their own. For example, on Account:
@@ -151,9 +151,9 @@ The list offers each kind of record that points at the object, with the lookup i
 through in brackets, because one object can point at another in more than one way. You can add
 two related-records conditions to a query; they are combined with the other conditions by AND.
 
-### 7.2 Related record columns
+### 7.2 Related Record Columns
 
-Under **Related record columns**, choose a kind of related record and up to five of its
+Under **Related Record Columns**, choose a kind of related record and up to five of its
 fields, to show the most recent related records in one column. For example, on Account, the
 column **Contacts** with **Full Name** and **Email** shows each household's members as
 "Ana Ruiz, ana@example.org; Ben Ruiz, ben@example.org". A column shows at most 10 related
@@ -174,7 +174,7 @@ Press **Summarize** to count or total the matching records instead of listing th
 Summaries use the same conditions and your own access. They cover at most 20,000 matching
 records and show at most 2,000 groups; for more, narrow the conditions or use a report.
 
-### 7.4 Typing a query
+### 7.4 Typing a Query
 
 Press **Type a query** to type or paste a query instead of building it, for example:
 
@@ -239,7 +239,7 @@ more rows than the limit, whoever asks. For **Export to CSV** and **Export to Ex
 is where your browser stops reading; treat it as a convenience, not a control on what people
 with Find can read, which is always only what their own access allows.
 
-### 7.6 Editing in the table
+### 7.6 Editing in the Table
 
 If you hold the **Bulk Update Records** permission as well as Find's, the columns you may edit
 show a pencil after a query runs. Double-click a cell (or press Enter on it), change the value,
@@ -255,16 +255,16 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
   **Data Jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 
-## 8. What Find does not do (yet)
+## 8. What Find Does Not Do (Yet)
 
 An export to Files runs once, when you press it: scheduled or recurring exports and sending a
 file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
-value at once, run a query and press **Bulk update**, shown to people who also hold the Bulk
+value at once, run a query and press **Bulk Update**, shown to people who also hold the Bulk
 Update Records permission. See [Bulk update](bulk-update.md). To delete every record a query
-returns, press **Bulk delete**, shown only to people who hold the Bulk Delete Records
+returns, press **Bulk Delete**, shown only to people who hold the Bulk Delete Records
 permission. See [Bulk delete](bulk-delete.md).
 
-## Field reference
+## Field Reference
 
 | Where | Field | What it holds |
 |---|---|---|

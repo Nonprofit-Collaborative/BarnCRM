@@ -1,6 +1,6 @@
-# Donor levels
+# Donor Levels
 
-## What it does
+## What It Does
 
 Donor levels put your organization's own names on your donors: Friend, Sustainer,
 Leadership Circle, whatever your ladder calls them. You set the rungs and the amount each
@@ -16,7 +16,7 @@ A level is a label on a total you already have. It reads the giving total that a
 the same record, the one the Rollup Builder maintains, so a donor's level and the number
 printed next to it can never disagree.
 
-## How to turn it on
+## How to Turn It On
 
 Everything is in the app. You never open Setup.
 
@@ -53,7 +53,7 @@ From then on it looks after itself. A gift updates the donor's giving total, and
 is worked out in the same moment. A nightly pass catches the two things a gift does not
 announce: your fiscal year turning over, and a ladder you edited.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
@@ -67,7 +67,7 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
    giving, everything ever given**.
 6. Open **Donor Levels** again and choose **Recalculate now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
-7. Use **Quick gift entry** to enter a gift of 1200 from one of the sample households.
+7. Use **Quick Gift Entry** to enter a gift of 1200 from one of the sample households.
    Open that household. **Total giving** reads 1200, **Donor level** reads `Sustainer`,
    **Previous donor level** is empty because this donor has not moved before, and **Donor
    level changed** is today.
@@ -80,11 +80,11 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
    **Previous donor level** reads `Leadership Circle`. The level always matches the total
    on the record, and the record still shows where the donor came from.
 
-## List views
+## List Views
 
 **Donor Levels** has **All Donor Levels**, **Active Donor Levels** and **Inactive Donor Levels**.
 
-## Common mistakes
+## Common Mistakes
 
 **A big in-kind donor is not on the ladder.** Levels are measured on a giving total, and a
 gift of goods carries no amount, so it moves no level. That is deliberate: a level is a

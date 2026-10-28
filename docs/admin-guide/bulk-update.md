@@ -1,8 +1,8 @@
-# Bulk update
+# Bulk Update
 
-## 1. What it does
+## 1. What It Does
 
-**Bulk update** changes up to five fields on every record a [Find](find.md) query returns, in
+**Bulk Update** changes up to five fields on every record a [Find](find.md) query returns, in
 one go. For each field you choose one of:
 
 - **Set to a value**: every record gets the same value, for example Mailing City "Portland".
@@ -31,7 +31,7 @@ Values you change by editing Find's results table ([Find](find.md), section 7.6)
 the same way, and each save is listed with the bulk updates under **Data Jobs** on the **Data Manager** tab, its
 run log starting "Edited in Find", with the same undo.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 1. Bulk update needs two permissions: **Bulk Update Records**, and **Find and Export Records**,
    because every bulk update starts from a Find query. The **BarnCRM Admin** role has both. To
@@ -47,14 +47,14 @@ run log starting "Edited in Find", with the same undo.
 3. **Days an import can be undone**, on the same page, is also how long a bulk update can be
    undone. Each bulk update keeps the deadline it started with.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 Maria's office moved its Springfield mailings to a new volunteer, and every household in
 Springfield should now say "Springfield" with a capital S; some were typed in lower case.
 
 1. Open **Find**. Choose **Account**, add the column **Billing City**, and add the condition
    **Billing City**, **equals**, `springfield`. Press **Run**.
-2. Press **Bulk update**. The bulk update panel opens below the results. It uses the query as
+2. Press **Bulk Update**. The bulk update panel opens below the results. It uses the query as
    it is now; changing the query closes the panel.
 3. Under **Changes**, choose the field **Billing City**, **Set to a value**, and type
    `Springfield`. To change a second field, press **Add a change** (up to five).
@@ -72,7 +72,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
    The list shows your own bulk updates. Someone who manages BarnCRM Settings can tick **Show
    everyone's jobs** to see and undo anyone's.
 
-## 4. What can and cannot be changed
+## 4. What Can and Cannot Be Changed
 
 - **Every matching record, not only the rows shown.** Find's **Rows to show** and sort order
   only shape the results table. A bulk update covers every record the object and conditions
@@ -100,7 +100,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   the household, check **Custom name** and type the name (see
   [Household naming](household-naming.md)).
 
-## 5. Common mistakes
+## 5. Common Mistakes
 
 - **"More records match now than the 37 you confirmed."** Somebody added or changed records
   between your preview and your confirmation. Nothing was changed. Press **Preview** again and
@@ -129,7 +129,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   text value (tens of thousands of characters) cannot be kept for an undo, so that record is
   left as it was rather than changed without one. Change it on the record itself.
 
-## 6. Changing values with steps
+## 6. Changing Values with Steps
 
 **Change with steps** changes each record's own value rather than giving every record the same
 one. Choose the field, choose **Change with steps**, then **Add a change** (up to ten). Steps run
@@ -176,7 +176,7 @@ never reads another record.
 Deleting the records a query returns is a separate tool with its own permission: see
 [Bulk delete](bulk-delete.md).
 
-## Field reference
+## Field Reference
 
 | Where | Field | What it holds |
 |---|---|---|

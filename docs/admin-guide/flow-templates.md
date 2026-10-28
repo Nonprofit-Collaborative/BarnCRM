@@ -1,6 +1,6 @@
-# Your own version of an automation
+# Your Own Version of an Automation
 
-## What it does
+## What It Does
 
 Every piece of automation BarnCRM ships has a switch on the **Automation** page of BarnCRM
 Settings. Sometimes an automation does almost what your organization wants, but not quite:
@@ -16,7 +16,7 @@ never touch it, and never touch your switch settings either.
 Some automations do not have a template, because they cannot be done well as a flow. The table
 under "Which automations have a template" says which, and why.
 
-## How to turn it on
+## How to Turn It On
 
 The templates arrive with Core. There is nothing to install and nothing to enable: until you
 copy one and activate your copy, a template does nothing at all.
@@ -37,7 +37,7 @@ offer it anywhere else.
 7. Open **BarnCRM Settings**, then **Automation**, and switch our version **Off**. Do this
    straight after step 6. While both are on, the same work is done twice.
 
-### Which automations have a template
+### Which Automations Have a Template
 
 | On the Automation page | Template | Why there is no template |
 |---|---|---|
@@ -67,7 +67,7 @@ offer it anywhere else.
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria's organization records family connections, colleagues, and friends as relationships, but
 it only wants the other side written for family. A colleague relationship should stay on the
@@ -97,12 +97,12 @@ one person who entered it.
 
 To go back to BarnCRM's version at any time, switch ours **On** and then deactivate yours.
 
-## What a template does differently from ours
+## What a Template Does Differently From Ours
 
 A template does the same work as ours with the tools a flow has. Those tools are not the same
 as ours in a few places, and you should know where before you switch ours off.
 
-- **A pause does not stop your flow.** **Pause all automation** on the Automation page pauses
+- **A pause does not stop your flow.** **Pause All Automation** on the Automation page pauses
   BarnCRM's automation only. Your flow keeps running during a pause, as every flow you build
   does. To stop it during an import, deactivate it, and activate it again afterwards.
 - **Your flow does not look at our switch.** BarnCRM's own automation checks its switch on the
@@ -130,7 +130,7 @@ as ours in a few places, and you should know where before you switch ours off.
   the two edits win, always the same one. A copy of the template keeps whichever
   edit is written last.
 
-## Rollups on your own objects
+## Rollups on Your Own Objects
 
 The rollup update that is coming adds a flow action, **Recalculate rollups for these
 records**, and a template, **BarnCRM template: Recalculate rollups**, for totals that come
@@ -139,7 +139,7 @@ instantly for objects it ships. For your own object you will copy the template, 
 your object, and activate it. Until then, set rollups from your own objects to **Every
 night** on the **Rollups** page.
 
-## Common mistakes
+## Common Mistakes
 
 - **Editing the template instead of a copy.** An upgrade replaces the template, and your
   change with it. If the flow you are changing is still named "BarnCRM template", you are in

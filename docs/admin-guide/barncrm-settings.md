@@ -1,6 +1,6 @@
 # BarnCRM Settings
 
-## What it does
+## What It Does
 
 BarnCRM Settings is the one page where
 everything about how BarnCRM behaves is changed: how households are named, which
@@ -21,10 +21,10 @@ mode**, **When instant totals are calculated** and **Time of the nightly run**. 
 **Time of the nightly run** moves the scheduled nightly rollup run at once (see
 [Rollups](rollups.md#how-the-nightly-run-works)).
 
-The footer of the page has a **Report a problem or give feedback** link. It opens the
+The footer of the page has a **Report a Problem or Give Feedback** link. It opens the
 BarnCRM support page on GitHub in a new tab.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on, but there is one permission to give out.
 
@@ -39,7 +39,7 @@ There is nothing to turn on, but there is one permission to give out.
 Everyone can open the page and read it. That is deliberate: David should be able to see
 how greetings are configured before he asks Maria to change them.
 
-## First-run setup
+## First-Run Setup
 
 Until BarnCRM's first-run setup is finished, the BarnCRM home page and this page both show
 the same setup window in front of everything else, and nothing behind it can be used.
@@ -100,7 +100,7 @@ feature on, so nothing it already used disappears.
 The **General** section starts with **Edition** (read-only, see [Editions](editions.md)) and
 then **Features**: one row per feature, each with a short description and its state. Above
 the rows a warning says that **a feature cannot be turned off once it is turned on**. A
-feature that is off has a **Turn on** button, which asks you to confirm before it does
+feature that is off has a **Turn On** button, which asks you to confirm before it does
 anything; a feature that is on just says **On**. Only people with Manage BarnCRM Settings see
 the Turn on buttons.
 
@@ -154,7 +154,7 @@ Standard Edition lists no Nonprofit Edition module that is not installed. BarnCR
 Builder ships as its own package, installed from this section like the others. See the
 [Module Manager](module-manager.md) for what else you can do with an installed module.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 
@@ -170,7 +170,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
-   **Change edition** link under it is the way to change it later (see
+   **Change Edition** link under it is the way to change it later (see
    [Editions](editions.md)).
 3. Click in the **Search settings** box and type `greeting`. Results appear as you type. If
    the search cannot run, the box says so and asks you to try again, instead of saying nothing
@@ -203,7 +203,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    out and there is no Save button. He can still read every description and follow every
    Learn more link.
 
-## Sections and their boxes
+## Sections and Their Boxes
 
 Each section's page groups its settings into boxes. A box shows only when it has a setting
 to show, and a setting added later that no box names goes in the box marked "(the rest)"
@@ -243,7 +243,7 @@ job notification or a Health Check fix, opens People and Households scrolled to 
 **Household Names and Greetings** box, and Health Check's fix for people hidden from their
 households opens the **People** box.
 
-## Your organization's address
+## Your Organization's Address
 
 The **Organization** section shows your mailing address as one **Organization Address**
 block, laid out like a Salesforce address: **Street**, **Street 2**, then **City**, **State**
@@ -263,7 +263,7 @@ line. In a letter's body, the `{{OrganizationAddress}}` token (receipts) and
 `{OrganizationAddress}` token (volunteer letters) put the whole address on one line, with the
 parts separated by commas.
 
-## You never type an identifier
+## You Never Type an Identifier
 
 No setting asks you for a record ID, an API name or a developer name. Where a setting points
 at something, you choose it:
@@ -285,7 +285,7 @@ one and save. Settings that point at a record (such as a default fund), a list o
 types, or a date have no default to show and stay empty until you choose.
 
 A setting showing a default nobody has saved says **Default, not yet saved.** under it. If you
-agree with the value shown, click **Keep this setting** beside that note: it saves exactly the
+agree with the value shown, click **Keep This Setting** beside that note: it saves exactly the
 value shown, as if you had chosen it yourself, with the same permission, checks and **Recent
 Changes** row, and anything choosing it by hand sets off (keeping **Coexistence mode**, for
 example, confirms that mode and completes its Setup Assistant step). Changes you have not saved
@@ -298,7 +298,7 @@ way you want from the list and save.
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
 
-## Values that come from Setup
+## Values That Come From Setup
 
 A few things BarnCRM needs are already held by Salesforce Setup. BarnCRM shows them on this
 page, read only, and keeps no copy that could drift from Setup. Each one says where in Setup it
@@ -314,7 +314,7 @@ If your org uses a custom fiscal year, Health Check says so, because reports the
 custom periods while BarnCRM totals stay in whole years (see
 [Health Check](health-check.md#what-health-check-looks-at)).
 
-## When a section needs a change in Setup
+## When a Section Needs a Change in Setup
 
 BarnCRM avoids Salesforce Setup wherever it can. A few features still depend on something only
 Setup can change, usually because Salesforce keeps that switch for itself. When a section has
@@ -335,7 +335,7 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Duplicate Matching | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra Permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra Permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
+| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra Permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra Permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
@@ -354,7 +354,7 @@ form at the top of that page:
 | Giving, Opportunity Mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
 | Giving, Accounting Export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
 
-## Common mistakes
+## Common Mistakes
 
 - **Trying to change settings without the permission and thinking the page is broken.**
   If the controls are greyed out, read the notice at the top of the page. It names the
@@ -389,7 +389,7 @@ form at the top of that page:
   pattern changes what happens next. To apply it to households you already have, use the
   recompute action on the household naming settings.
 
-## Fields behind this page, for report builders
+## Fields Behind This Page, for Report Builders
 
 Maria does not need these. They are here for someone building a report on settings
 changes.

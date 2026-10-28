@@ -1,6 +1,6 @@
-# Access: give a colleague access by name and role
+# Access: Give a Colleague Access by Name and Role
 
-## What it does
+## What It Does
 
 Access lets you give a colleague what they need to do their job by picking their name and
 choosing a role, for example Team Member or Read Only. You never have to learn what a
@@ -46,14 +46,14 @@ keep working; you only need those names for an
 Of the roles, only BarnCRM Admin gives Delete on accounts and contacts (a person's Salesforce
 profile may give it too). The other roles leave it out on purpose, and they do not need it for
 merging households: anyone who can edit both households can merge
-them with **Merge or split**, with no Delete permission (see
+them with **Merge or Split**, with no Delete permission (see
 [Household merge and split](household-merge-split.md)). The roles do give edit on a contact's
 **Account Name** (the household), so staff can move people between households, and move members
 when they merge households, even on the Minimum Access profile. Merging two people uses Salesforce's
 own **Compare and merge**, which Salesforce allows only to people who can delete them, so
 staff ask an admin for that.
 
-## Who can read a donor's receipts and tax statements (with Giving)
+## Who Can Read a Donor's Receipts and Tax Statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
 worth stating plainly, because a file in Salesforce is reached through the record it is attached
@@ -81,7 +81,7 @@ and the fix is a Giving permission set, which you give them under "Extra Permiss
 Nobody can edit or delete a receipt PDF, whatever they hold. See
 [Receipts and year-end statements](receipts.md).
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on. Access is part of BarnCRM Core and appears in BarnCRM
 Settings as soon as the package is installed.
@@ -105,7 +105,7 @@ Three things control who can use the page:
    a colleague with a Salesforce license gives the roles. Everything else in BarnCRM Settings
    works on a Platform license. The same permission lets the
    [Module Manager](module-manager.md) give you a module's admin set when you turn it on.
-   Without it, the page shows who holds each role and extra permission, the **Give access**
+   Without it, the page shows who holds each role and extra permission, the **Give Access**
    button is disabled, the extra permission picker and the **Remove** buttons are hidden, and a
    notice says why: "You can see who has each role and extra permission but not change
    them.", followed by where the permission comes from.
@@ -116,7 +116,7 @@ Three things control who can use the page:
 Giving the extra permissions (see "Extra Permissions" below) needs the same two
 permissions as giving a role.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria has just hired David to run a program. His Salesforce user already exists.
 Here is how she gives him access, checks it, and takes it away again.
@@ -128,8 +128,8 @@ Here is how she gives him access, checks it, and takes it away again.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
    each with their name and email address so you can tell two Davids apart.
 4. Choose **David Okafor**.
-5. Choose the role **Team Member** and click **Give access**. A confirmation asks you
-   to confirm the person and the role. Click **Give access** again.
+5. Choose the role **Team Member** and click **Give Access**. A confirmation asks you
+   to confirm the person and the role. Click **Give Access** again.
 6. A message says "David Okafor now has the Team Member role." David's name appears
    on the Team Member card, and the number in brackets beside the role name goes up
    by one.
@@ -189,7 +189,7 @@ To give one:
 2. In **Extra permission**, choose the permission. Its sentence from the table above appears
    under the picker. For Bulk Delete and Erase People a warning appears as well: "This
    permission lets the person remove data. Give it only to someone you trust to do that."
-3. Click **Give permission**, and confirm. The confirmation repeats the warning. A message says,
+3. Click **Give Permission**, and confirm. The confirmation repeats the warning. A message says,
    for example, "Priya Nair now has the BarnCRM Erase People permission."
 
 Each extra permission has its own card below the roles, listing who has it, with a **Remove**
@@ -213,7 +213,7 @@ let you remove it from is named with the reason ("BarnCRM Bulk Update could not 
 Priya Nair. Salesforce said: ..."), and the others are still removed. Nothing is written to the
 Error Log when it works.
 
-## Tabs that follow a feature
+## Tabs That Follow a Feature
 
 Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
 General, Features: Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or
@@ -236,7 +236,7 @@ upgraded org keeps exactly the tabs it had. The BarnCRM Tab sets are never liste
 page and should not be assigned by hand. Nobody needs Assign Permission Sets for this: BarnCRM
 does it itself, and the tab sets grant nothing but the tab.
 
-## What still needs Setup
+## What Still Needs Setup
 
 BarnCRM can give a person a role, but it cannot create the person or hand out a
 Salesforce license. Only Salesforce Setup can do that, because licenses are billed and
@@ -244,7 +244,7 @@ managed by Salesforce rather than by an installed app.
 
 So the order is always: create the user in Setup first, then give them a role here.
 
-The **Create a user in Setup** link on the Access page opens the Users page in Setup in a
+The **Create a User in Setup** link on the Access page opens the Users page in Setup in a
 new tab. The address it opens is:
 
 `/lightning/setup/ManageUsers/home`
@@ -254,10 +254,10 @@ Access and search for their name.
 
 If you add people often, you can skip the second step: a Salesforce user access policy can
 give every new user with your staff profile a BarnCRM role the moment the user is created.
-The **Set up automatic access** link at the bottom of the Access page opens
+The **Set Up Automatic Access** link at the bottom of the Access page opens
 [Automatic access](automatic-access.md), which has the exact policy to create in Setup.
 
-## Common mistakes
+## Common Mistakes
 
 **You cannot find the person in the search box.** The search only shows active users. If
 you just created the user, check that you saved it and that the Active checkbox is ticked.

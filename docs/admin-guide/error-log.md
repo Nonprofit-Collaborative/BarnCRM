@@ -1,6 +1,6 @@
 # Error Log
 
-## What it does
+## What It Does
 
 When something goes wrong inside BarnCRM, it writes down what happened in plain
 language and puts it somewhere you can read it. That is the Error Log. Instead of a
@@ -10,14 +10,14 @@ of entries that say what went wrong, which record it happened on, and what to do
 You can work through the list, mark the ones you have looked at, and mark the ones you
 have fixed, so the list stays short and honest.
 
-## How to turn it on
+## How to Turn It On
 
 The Error Log is on as soon as BarnCRM is installed. Nothing is recorded unless
 something actually fails, so on a healthy organization the list is empty.
 
 You will find it in three places:
 
-- **The BarnCRM home page.** The **Errors to review** tile shows a count of the new
+- **The BarnCRM home page.** The **Errors to Review** tile shows a count of the new
   errors waiting, and an **Open the Error Log** link that opens the list of new entries.
   The tile shows the count only, not the entries.
 - **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
@@ -35,7 +35,7 @@ that a colleague's own access would not show them.
 Errors are recorded whatever else is happening: turning an automation off, or pausing all
 automation, never stops the Error Log from recording a problem.
 
-## The error digest email
+## The Error Digest Email
 
 If nobody opens the BarnCRM home page for a few days, nobody sees the tile. The error digest fixes that:
 once a day (or once a week), BarnCRM emails a short summary of the new entries to the
@@ -59,7 +59,7 @@ to see the rest.
 
 If nothing new has arrived, no email is sent at all.
 
-### Switch it on
+### Switch It On
 
 1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
 2. In **Digest recipients**, leave the box empty to send the digest to everyone who holds
@@ -68,7 +68,7 @@ If nothing new has arrived, no email is sent at all.
    the email address of an active user of your Salesforce: the digest is never sent to
    anyone outside it, and an address that is not a user's is refused when you save.
 3. In **Digest frequency**, choose **Every day** or **Once a week**, then click **Save**.
-4. In the **Error Digest** panel, click **Schedule daily run**. The panel now says the digest is
+4. In the **Error Digest** panel, click **Schedule Daily Run**. The panel now says the digest is
    scheduled and when it runs next: every morning at 7:00 AM in your organization's time zone, after the nightly jobs, so their
    problems are in it. A weekly digest checks every morning and sends once seven days have
    passed since the last one.
@@ -77,13 +77,13 @@ If nothing new has arrived, no email is sent at all.
 
 The panel always shows when the digest last ran, what it did in one sentence (for example
 "Sent 7 new entries to 2 people" or "Nothing new since Sep 23, 7:00 AM: no email sent"),
-and who it goes to. Click **Stop daily run** to switch it off.
+and who it goes to. Click **Stop Daily Run** to switch it off.
 
 Sending the digest does not use up your organization's daily email allowance: it goes to
 users of your own Salesforce, which the platform does not count. At most 50 people receive
 it.
 
-## How long entries are kept
+## How Long Entries Are Kept
 
 Each entry can hold a long technical detail, so an Error Log that is never emptied slowly
 fills your organization's data storage. BarnCRM deletes entries older than **180 days**, whatever
@@ -101,11 +101,11 @@ sends the digest).
 Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need
 an entry for longer, export the Error Log list or build a report on it before it ages out.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria has heard from a colleague that "something did not save this morning."
 
-1. Open the **BarnCRM** app. On the home page, look at the **Errors to review** tile. It
+1. Open the **BarnCRM** app. On the home page, look at the **Errors to Review** tile. It
    shows how many new errors there are, for example "3".
 2. Open the **Org Optimizer** tab and choose **Errors**. The **Error Log** card shows
    "3 new" and the five most recent entries. Each shows the message and where it came
@@ -124,9 +124,9 @@ Maria has heard from a colleague that "something did not save this morning."
 7. If you cannot fix an entry yourself, set **Status** to **Acknowledged** instead, so
    your colleagues know someone has seen it, and send the **Technical detail** to whoever
    supports your Salesforce. That section is the part written for a developer.
-8. Go back to the home page. The **Errors to review** count has gone down by one.
+8. Go back to the home page. The **Errors to Review** count has gone down by one.
 
-## Common mistakes
+## Common Mistakes
 
 - **Treating the Error Log as a to-do list that someone else owns.** Unless you switch on
   the error digest, nobody is emailed about these. If you do not look at the home page count or the Org Optimizer's Errors section, nobody
@@ -137,7 +137,7 @@ Maria has heard from a colleague that "something did not save this morning."
   every day). Whoever administers your Salesforce can change the setting.
 - **Deactivating the person who scheduled the digest.** The digest runs as that person, so
   it stops. Health Check warns when a scheduled digest has not run for two days: open the
-  Error Log section of BarnCRM Settings, click **Stop daily run**, then **Schedule daily run** again as
+  Error Log section of BarnCRM Settings, click **Stop Daily Run**, then **Schedule Daily Run** again as
   yourself.
 - **Marking entries Acknowledged and expecting them in the digest.** The digest counts only
   entries that are still New, because those are the ones nobody has looked at.

@@ -1,6 +1,6 @@
 # Duplicates
 
-## What it does
+## What It Does
 
 Finds people and households that are in your database twice, and helps you deal with them one
 pair at a time, on the **Duplicate Matching** tab. Salesforce does the finding, with the duplicate rules every org starts with:
@@ -18,10 +18,10 @@ listed too, with a line saying why, for example "Same email on Contact Point Ema
 sources are listed, added, deactivated and tried out in the tool's **Matching Logic** area;
 see [Matching Logic](#matching-logic).
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to install, but on a new install the **Duplicate Matching** feature is off
-until you turn it on: choose **Turn on** in the **Duplicate Matching** row in **BarnCRM
+until you turn it on: choose **Turn On** in the **Duplicate Matching** row in **BarnCRM
 Settings**, **General** (or leave it ticked in first-run setup); see
 [BarnCRM Settings](barncrm-settings.md). While it is off the **Duplicate Matching** tab is
 hidden for everyone. Salesforce switches on its standard duplicate rules
@@ -50,9 +50,9 @@ Metadata Admin** (see [Access](access.md)).
    Settings**, the **Duplicate Matching** section's **Duplicate Matching** row has an **Open
    this page** button that brings you here too.)
 2. The **Review** area opens first.
-3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
+3. Under **Duplicate Rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
-4. Choose **Scan for duplicates**. The scan looks through the people and households you
+4. Choose **Scan for Duplicates**. The scan looks through the people and households you
    already have. It runs in the background and can take a while in a large database.
 5. When it finishes, the line under the button says what the last scan did, for example
    "Duplicate scan of Contact, Account finished: 3 new possible duplicates recorded." If part of
@@ -66,7 +66,7 @@ it is saved, but an import that saved past a warning leaves the pair for the sca
 
 In **BarnCRM Settings**, the **Duplicate Matching** section holds the tool's settings: a note
 on the one Setup step (keep the duplicate rules active, give reviewers Duplicate Review) and
-the **Duplicate Matching** row, whose **Open this page** button opens the tab. The scan has
+the **Duplicate Matching** row, whose **Open This Page** button opens the tab. The scan has
 no options to set: it always checks every person and household with your active duplicate
 rules and your active match sources.
 
@@ -155,7 +155,7 @@ gets one warning naming the source, and the values that lookup found are not use
 of the records holding them were not read. Some duplicates may then be missed until the next
 scan. A source whose values are very common is a candidate to deactivate.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)). Create one duplicate
 on purpose: open any sample person, note their email address, and create a new contact with
@@ -163,9 +163,9 @@ the same first name, last name and email. Salesforce warns you that a similar re
 choose to save anyway.
 
 1. Open the **Duplicate Matching** tab. The **Review** area opens.
-2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
+2. Choose **Scan for Duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
-3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
+3. Wait a minute and refresh the page. Under **Possible Duplicates** you see the pair you made,
    each person with their email address.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
@@ -177,24 +177,24 @@ choose to save anyway.
    the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because
-   records can still point at it: merge it into the kept person's household with **Merge households** (step 6).
+   records can still point at it: merge it into the kept person's household with **Merge Households** (step 6).
    Within a minute or so BarnCRM also tidies the kept person in the background: one default
    address stays (see [Addresses](addresses.md)), a relationship the two records had with each
    other is removed, so is a second copy of a relationship both had with the same person, and
    their primary affiliation is chosen again.
 5. Back on the Duplicates panel, refresh. The pair is gone.
-6. If the scan found two households, choose **Merge households** on the pair. You see the two
+6. If the scan found two households, choose **Merge Households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
    keep and choose **Merge these two**. You see "The two households are now one."
 7. For a pair that is not the same person, for example twin sisters at one address, choose
-   **Not a duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
+   **Not a Duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
    suggested again." Scan again and check that the pair does not come back. It stays off the
    panel even when a duplicate rule reports the pair again as someone saves one of the two.
    A suggestion that names three or more records (one a duplicate rule wrote as someone saved)
    is dismissed as a whole: every pair in it is noted. If two of them are in fact the same
    person, merge those first, then dismiss the rest.
 
-### Pairs found through related records
+### Pairs Found Through Related Records
 
 Each pair on the list says why it is there: the name of the duplicate rule that found it, or,
 for a pair a match source found, what the two share and where ("Same address on Address
@@ -220,7 +220,7 @@ Limits to know:
   that a lookup reaches that limit, some pairs are missed and a warning naming the source is
   written to the Error Log.
 
-## Common mistakes
+## Common Mistakes
 
 **The panel says no duplicate rule is switched on, and the scan button is refused.** The scan
 asks Salesforce to apply your active duplicate rules to the records you already have. With no
@@ -247,7 +247,7 @@ person's totals are recalculated straight away.
 
 **A Nonprofit Cloud household never appears.** In an org that also uses Salesforce Nonprofit
 Cloud households, a household that is one of those is not suggested and cannot be merged here
-or with **Merge or split**: merging deletes one of the two records, and its Nonprofit Cloud
+or with **Merge or Split**: merging deletes one of the two records, and its Nonprofit Cloud
 household group would be deleted or moved with it. Combine those with Nonprofit Cloud's own
 tools.
 
@@ -259,7 +259,7 @@ started. Wait for it to finish and choose **Refresh**. Two scans at once would s
 same pairs twice, so a second one is refused.
 
 **A household pair should not be merged with the Salesforce merge.** Always merge households
-from this panel or with **Merge or split** on the household's record page. That merge moves
+from this panel or with **Merge or Split** on the household's record page. That merge moves
 the members, recalculates the totals and renames the household, and lets you choose what to
 keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
 and renames the kept household, settles its primary member and keeps one primary address within
@@ -299,7 +299,7 @@ cause and scan again: pairs already found are not suggested twice.
 **After merging two people, an empty household is left.** That is on purpose. Records made
 while the other person lived there (with Giving, their gifts) still name that household. Until you merge it, Health Check
 lists it under **Households have nobody in them**. Merge it into the kept person's household
-from this panel or with **Merge or split** on the household's page.
+from this panel or with **Merge or Split** on the household's page.
 
 **You dismissed a pair and now want it back.** Dismissals are records. On the panel, choose
 **View** next to **Dismissed pairs**, pick the **All Duplicate Dismissals** list, find the pair

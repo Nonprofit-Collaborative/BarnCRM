@@ -1,8 +1,8 @@
-# Commitments: pledges and recurring gifts
+# Commitments: Pledges and Recurring Gifts
 
 **Feature:** G-07 and G-11 | **Package:** Giving | **Iteration:** v0.3
 
-## What it does
+## What It Does
 
 A commitment is a promise to give. It covers a pledge, where a donor promises a fixed
 total paid over time, and a recurring gift, where a donor gives the same amount on a
@@ -14,7 +14,7 @@ Because the expected payments are real records, David can see what is coming up 
 next thirty days and Jen can see what is overdue, without building a report or exporting
 to a spreadsheet.
 
-## How to turn it on
+## How to Turn It On
 
 Commitments come with the Giving module. When Giving is on, the Commitments and
 Installments tabs are in the app and no further step is required.
@@ -31,7 +31,7 @@ Three settings control how the schedules behave. Open **BarnCRM Settings** and c
 Change a value and choose **Save**. The new value applies to the next commitment you
 create or change; existing schedules are left alone until you edit them.
 
-## Switching the nightly jobs on
+## Switching the Nightly Jobs On
 
 Commitments need three jobs to run overnight, and until you switch them on none of them
 runs. This is the step that makes a payment turn Overdue on its own.
@@ -39,7 +39,7 @@ runs. This is the step that makes a payment turn Overdue on its own.
 Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly Jobs**.
 The page opens with a line for each job, then one button.
 
-Choose **Schedule nightly run**. Three jobs are scheduled at once:
+Choose **Schedule Nightly Run**. Three jobs are scheduled at once:
 
 | Job | Runs at | What it does |
 |---|---|---|
@@ -58,7 +58,7 @@ for tonight, choose **Run the jobs now**: the top up and the overdue pass start
 immediately, and the page shows what they did once they finish. (Donor levels have their
 own **Recalculate now** button on the Donor Levels page.)
 
-### Checking they are running
+### Checking They Are Running
 
 The same page is where you check on them afterwards. Each job shows when it last finished
 and what it did, for example "Marked 4 payments overdue." A job that ran and had nothing to
@@ -68,14 +68,14 @@ the job has not run at all.
 Three things the page can tell you:
 
 - **Not scheduled.** Nobody has switched the jobs on in this org. Nothing is late, because
-  nothing was ever going to run. The button under the line says **Schedule nightly run**.
+  nothing was ever going to run. The button under the line says **Schedule Nightly Run**.
 - **Scheduled, with a last run and a next run.** This is the normal state.
 - **Scheduled but has not run in more than 36 hours.** Something stopped the job. Open the
   **Error Log** in BarnCRM Settings: a job that fails writes there and carries on with
   the rest of its work rather than stopping, so the log tells you which commitment or which
   payment is the problem.
 
-**Stop nightly run** unschedules all three. Nothing already generated or already
+**Stop Nightly Run** unschedules all three. Nothing already generated or already
 marked Overdue is changed; the schedules simply stop being extended and payments stop
 turning Overdue.
 
@@ -91,11 +91,11 @@ received against the commitment, newest first, and its action bar carries **Edit
 its own, add the **Commitment Payment Schedule** component to that page, and a **Dynamic
 Related List - Single** for Gifts.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start from the sample data. The first part is David's work, the last step is Jen's.
 
-### David records a pledge
+### David Records a Pledge
 
 1. Open the **Commitments** tab and choose **New**.
 2. Set **Type** to Pledge.
@@ -111,7 +111,7 @@ Start from the sample data. The first part is David's work, the last step is Jen
    one due next month and the last one eleven months later, each for 100. The balance
    reads 1,200 because nothing has been paid yet.
 
-### David enters the first payment
+### David Enters the First Payment
 
 9. Open the first payment in the list and note its due date.
 10. Open the **Gifts** tab, choose **New**, and enter a gift for Ana for 100 with the
@@ -136,7 +136,7 @@ and her household's all rise by the same amount. A part refund leaves the paymen
 **Partially paid**; a full one leaves it unpaid. A pledge the payment had completed is
 Active again.
 
-### David pauses a recurring gift
+### David Pauses a Recurring Gift
 
 12. Open the **Commitments** tab and open one of the sample recurring gifts, or create one:
     Type Recurring, Amount 25, Frequency Monthly, a start date, no expected total and no
@@ -151,7 +151,7 @@ The same card offers **Mark complete** for a commitment that is finished and **C
 commitment** for one the donor has stopped. Cancelling marks the unpaid payments Skipped
 and deletes nothing.
 
-### Jen checks what is overdue
+### Jen Checks What Is Overdue
 
 14. Open the **Installments** tab and choose the **Overdue** list view. Every payment
     already marked Overdue is here, with its commitment, its donor, and what was expected.
@@ -162,13 +162,13 @@ and deletes nothing.
 15. Switch to **Upcoming 30 Days** to see what should arrive next, which is the list Jen
     uses when she reconciles the bank statement.
 
-## List views
+## List Views
 
 **Commitments** has **All Commitments**, **My Commitments**, **Active Pledges**, **Active
 Recurring Gifts** and **Paused Commitments**. **Installments** has **All Installments**,
 **Overdue** and **Upcoming 30 Days**.
 
-## Common mistakes
+## Common Mistakes
 
 **Entering the total in the amount field.** Amount is what is expected each time. A
 1,200 pledge paid monthly has an amount of 100 and an expected total of 1,200. If the
@@ -205,7 +205,7 @@ does mean the schedule after the change no longer matches the pledge letter the 
 signed. Log an activity on the commitment (the **Activity** panel on its record page) that
 says why, so the next person to look at it knows why the numbers moved.
 
-## Field reference for report builders
+## Field Reference for Report Builders
 
 Everything above is on two objects: Commitment and Installment. The list views named here
 are shipped and can be copied.

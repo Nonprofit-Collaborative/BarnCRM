@@ -1,10 +1,10 @@
-# Email addresses
+# Email Addresses
 
 **Feature:** C-25 Multiple email addresses on a person
 **Package:** Core
 **Iteration:** v0.5
 
-## What it does
+## What It Does
 
 Most people you know have more than one email address: one at home, one at work, and
 sometimes a third. Salesforce gives a person one email box, so keeping the other addresses
@@ -15,7 +15,7 @@ choice: which of them you write to. Whatever you choose is copied into the ordin
 box on the person, so every mailing, every acknowledgment and every list view sends to the
 right address without anybody having to remember which one it was.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to switch on and nothing to set up in Salesforce Setup. The three email
 boxes and the choice arrive with Core and are on the person's page as soon as it is
@@ -39,7 +39,7 @@ Who can do what comes from the permission set somebody already holds:
 | BarnCRM Staff | Read and change all three addresses and the choice |
 | BarnCRM Read Only | Read them, change nothing |
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does this from the sample data.
 
@@ -66,7 +66,7 @@ Maria does this from the sample data.
 That is the whole feature: three boxes, one choice, and an ordinary email box that is always
 the address you meant.
 
-## Common mistakes
+## Common Mistakes
 
 **"I filled the three boxes in and nothing happened."**
 You have not chosen a preferred email yet. The three boxes on their own are just somewhere
@@ -90,7 +90,7 @@ Clearing the choice stops the copying, it does not undo it. Whatever was copied 
 stays there until somebody changes it, which is deliberate: the address is still a real
 address for that person. Type over it if you want a different one.
 
-## Field reference
+## Field Reference
 
 For report builders only. Maria never needs this to use the feature.
 
