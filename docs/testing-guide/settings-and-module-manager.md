@@ -16,7 +16,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
 | 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **People and Households**, **Duplicate Matching**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, **Rollups** with Rollup Builder installed, and **Volunteers** with Volunteers installed (a Core-only org has no **Rollups** section). |
-| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top names **Setup, Apex Settings**. No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
+| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top has numbered steps and an **Open in Setup** button (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
 | 4 | Click **Learn More** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old Value**, **New Value**, **Changed By**, **Changed At**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
@@ -71,7 +71,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Click **Remove** beside **Staff Tester** on the **Coordinator** card. | A dialog titled **Remove Access**: "Remove the Coordinator role from Staff Tester? Any other role they hold stays in place." |
 | 7 | Click **Remove**. | "Staff Tester no longer has the Coordinator role." The name leaves the card. **Staff Tester** is still on the **Team Member** card. |
 | 8 | Click **Create a User in Setup**. | Setup, Users opens in a new tab. |
-| 9 | Back on **Access**, read the **Needs a Change in Setup** note. | It names **Setup, Users, the person, Permission Set Assignments** and says "Core's extra permissions, and any permission set an installed module lists here, are given on this page. A module permission set not listed here is assigned in Setup." |
+| 9 | Back on **Access**, read the **Needs a Change in Setup** note. | It says "Core's extra permissions and every permission set a module lists here are given on this page; any other is assigned in Setup.", numbers three steps starting "Click the module's permission set.", and has **Open in Setup**. |
 
 **Cleanup:** None.
 
@@ -255,9 +255,9 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings** and click **Organization**. | The first row is **Organization name**, showing the org's name exactly as Company Information shows it. It cannot be typed in. Its description says to change it in **Setup, Company Settings, Company Information**. **Organization legal name** is the next row, directly below it, and can be edited. |
+| 1 | Open **BarnCRM Settings** and click **Organization**. | The first row is **Organization name**, showing the org's name exactly as Company Information shows it. It cannot be typed in. Its description says to click **Open in Setup**, and **Open in Setup** under the row opens **Company Information** in a new tab. **Organization legal name** is the next row, directly below it, and can be edited. |
 | 2 | Hover over the help icon next to **Organization name**. | "Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy." |
-| 3 | Click **General**. | A **Fiscal year start month** row shows the month the fiscal year starts in Setup, by name (for example **January**). It cannot be changed here, and its description says to change it in **Setup, Company Settings, Fiscal Year**, then recalculate rollups. There is no month list to choose from. |
+| 3 | Click **General**. | A **Fiscal year start month** row shows the month the fiscal year starts in Setup, by name (for example **January**). It cannot be changed here, and its description says to click **Open in Setup**, then recalculate rollups. **Open in Setup** under the row opens **Fiscal Year** in a new tab. There is no month list to choose from. |
 | 4 | Change **Organization legal name** and click **Save**, then click **General**. | Saved. **Recent Changes** lists the legal name only; **Organization name** never appears there. |
 | 5 | In Setup, open **Company Information**, click **Edit**, add ` Test` to the end of **Organization Name** and save. Reload **BarnCRM Settings**, **Organization**. | **Organization name** shows the new name. |
 | 6 | Sign in as the staff user and open **BarnCRM Settings**, **Organization**. | **Organization name** shows the same value, read only. |
@@ -337,3 +337,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 9 | Open **General** and scroll to **Recent Changes**. | **Finish Setup** and **Health Check: Finish Setup** each list **BarnCRM Giving**, with your name. |
 
 **Cleanup:** None: **Modules Setup Run** lists Giving again.
+
+## T-SET-20: Needs a Change in Setup Opens the Right Setup Page
+
+**Purpose:** confirm every **Needs a Change in Setup** note gives one sentence on why, numbered steps, and an **Open in Setup** button that opens the right Setup page in a new tab, and that **Check Again** re-reads a check.
+**Prerequisites:** admin user. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test has one sentence on why and 2 to 4 numbered steps above the button. |
+| 2 | Click **Duplicate Matching**, then **Open in Setup**. | A new tab opens **Duplicate Rules**. |
+| 3 | Click **Rollups** (Rollup Builder installed), then **Open in Setup**. | A new tab opens **Object Manager**; the first step says to click the object the rollup totals onto. |
+| 4 | Click **Error Log**, then **Open in Setup**. | A new tab opens **Deliverability**. The note shows **Done** or **Not done yet** and a **Check Again** button. |
+| 5 | In the Deliverability tab, set **Access level** to **System email only** and save. Back in BarnCRM, click **Check Again**. | The note changes to **Not done yet** without reloading. Set **Access level** back to **All email**, save, click **Check Again**: **Done**. |
+| 6 | Click **Access**, then **Open in Setup** on the note. | A new tab opens **Permission Sets**. |
+| 7 | Open **Giving**, **Acknowledgments**. Click **Open in Setup** on each of the three notes in turn. | The From address note opens **Organization-Wide Addresses**, the email note opens **Deliverability** (with **Check Again**), and the template note opens **Classic Email Templates**. |
+| 8 | Open **Receipts**, then **Open in Setup** on the note. | A new tab opens **Lightning App Builder** (the Lightning Pages list). There is no note about Giving permission sets. |
+| 9 | Open **Giving**, **Campaign Sync**. Click **Open in Setup** on each of the two notes. | The Campaign access note opens **Permission Sets**; the Marketing User note opens **Users**. |
+| 10 | Open **Giving**, **Opportunity Mirror**, then **Open in Setup**; then open **Accounting Export**. | **Permission Sets** opens. **Accounting Export** shows no **Needs a Change in Setup** note. |
+
+**Cleanup:** None, if Deliverability is back to **All email**.
