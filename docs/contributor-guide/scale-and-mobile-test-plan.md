@@ -111,6 +111,16 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   "Generic gift list" template's headings) for the Import row; those rows need the
   "Scale test General" fund, so run the import before cleanup, or clean up with
   `--keep-funds`. Undo the import batch in the wizard, not in cleanup.
+- The running user needs field access to the Giving objects. The org test gate no longer
+  assigns permission sets, so on a fresh `oi-test` the CLI user cannot see
+  `Gift__c.External_Id__c` and the load stops before it starts ("count -1"). Assign
+  `Giving_Admin` to the CLI user for the run and remove it afterwards.
+- Without a browser, drive the import through the same `ImportController` calls the wizard
+  makes, one anonymous Apex transaction per call: `getTemplates`, `suggestMapping`,
+  `createBatch`, `stageRows` per 500-row page in file order, `startDryRun`, `startCommit`,
+  then `previewUndo` and `startUndo` with the preview's total. Anonymous Apex refuses a script
+  holding a 500-row page, so put each page in a ContentVersion and read it in the script. The
+  25k file is over 2.5 MB, so the wizard keeps no copy of it either (`fileId` null).
 - The load script records the four limits above, record counts, and per load the job id, rows
   processed and failed (read with `sf data bulk results`), elapsed seconds and the top error
   messages with counts in `scale-test-data/results-run-<alias>-<time>.md`. Each run also gets
