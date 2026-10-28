@@ -24,6 +24,9 @@ public without sharing class RollupDependents {
     /** Reference attributes on one entity that point at another, by `source|target`. */
     private static final Map<String, List<Schema.SObjectField>> REFERENCES = new Map<String, List<Schema.SObjectField>>();
 
+    /** What a definition reads through a relationship, by parent entity, relationship and reads. */
+    private static final Map<String, Set<String>> THROUGH_BY_KEY = new Map<String, Set<String>>();
+
     /**
      * After an update, the targets of the rows whose rollups read a changed attribute of their
      * parent; after an undelete, the targets of the rows restored with it.
@@ -93,8 +96,9 @@ public without sharing class RollupDependents {
                           ? new Map<Id, SObject>(records).keySet()
                           : new Set<Id>())
                     : changedParents(
-                          readThrough(
-                              RollupChanges.readsOf(definition, path),
+                          readThroughFor(
+                              definition,
+                              changedType,
                               describe.getRelationshipName(),
                               changedFields
                           ),
@@ -123,12 +127,44 @@ public without sharing class RollupDependents {
         }
     }
 
+    /**
+     * `readThrough` of a definition's reads, worked out once per transaction for each parent
+     * entity and relationship. Shared: callers read the set and never change it.
+     */
+    private static Set<String> readThroughFor(
+        Rollup_Definition__c definition,
+        Schema.SObjectType parentType,
+        String relationshipName,
+        Map<String, Schema.SObjectField> parentFields
+    ) {
+        String key =
+            String.valueOf(parentType) +
+            '|' +
+            relationshipName +
+            '|' +
+            RollupChanges.readKeyOf(definition);
+        Set<String> onParent = THROUGH_BY_KEY.get(key);
+        if (onParent == null) {
+            onParent = readThrough(
+                RollupChanges.readsFor(definition),
+                relationshipName,
+                parentFields
+            );
+            THROUGH_BY_KEY.put(key, onParent);
+        }
+        return onParent;
+    }
+
     private static Set<Id> changedParents(
         Set<String> readThrough,
         List<SObject> records,
         Map<Id, SObject> oldRecords
     ) {
         Set<Id> parents = new Set<Id>();
+        if (readThrough.isEmpty()) {
+            // Nothing on the parent is read through this relationship, so no change of it counts.
+            return parents;
+        }
         for (SObject record : records) {
             SObject previous = oldRecords.get(record.Id);
             if (previous != null && RollupChanges.changed(readThrough, record, previous)) {
