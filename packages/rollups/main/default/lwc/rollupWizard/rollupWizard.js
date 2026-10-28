@@ -5,6 +5,7 @@ import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceF
 import getParentFields from '@salesforce/apex/RollupBuilderController.getParentFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
 import preview from '@salesforce/apex/RollupBuilderController.preview';
+import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
 
 import STEP_1 from '@salesforce/label/c.Core_RollupBuilder_Step1';
 import STEP_2 from '@salesforce/label/c.Core_RollupBuilder_Step2';
@@ -62,6 +63,53 @@ import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
 import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
 import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
+import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
+import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
+import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
+import LightningConfirm from 'lightning/confirm';
+import BUILDER_SENTENCE from '@salesforce/label/c.Core_RollupEase_BuilderSentence';
+import SENTENCE_HELP from '@salesforce/label/c.Core_RollupEase_SentenceHelp';
+import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
+import EVERY_RECORD from '@salesforce/label/c.Core_RollupEase_EveryRecord';
+import SOME_RECORDS from '@salesforce/label/c.Core_RollupEase_SomeRecords';
+import TARGET_PART from '@salesforce/label/c.Core_RollupEase_TargetPart';
+import NOT_FOR_FIELD from '@salesforce/label/c.Core_RollupEase_NotForField';
+import FIELDS_NUMBERS from '@salesforce/label/c.Core_RollupEase_FieldsNumbers';
+import FIELDS_NUMBERS_DATES from '@salesforce/label/c.Core_RollupEase_FieldsNumbersDates';
+import NO_FIELD_FITS from '@salesforce/label/c.Core_RollupEase_NoFieldFits';
+import MODE_HEADING from '@salesforce/label/c.Core_RollupEase_ModeHeading';
+import MODE_INSTANT_AFTER from '@salesforce/label/c.Core_RollupEase_ModeInstantAfter';
+import MODE_INSTANT_DURING from '@salesforce/label/c.Core_RollupEase_ModeInstantDuring';
+import MODE_INSTANT_NONE from '@salesforce/label/c.Core_RollupEase_ModeInstantNone';
+import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
+import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
+import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
+import PICK_SAMPLES from '@salesforce/label/c.Core_RollupEase_PickSamples';
+import PICK_SAMPLES_HELP from '@salesforce/label/c.Core_RollupEase_PickSamplesHelp';
+import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading';
+import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
+import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
+import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
+import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
+import CREATE_FIELD from '@salesforce/label/c.Core_RollupEase_CreateField';
+import CREATE_FIELD_WHY from '@salesforce/label/c.Core_RollupEase_CreateFieldWhy';
+import NEW_FIELD_LABEL from '@salesforce/label/c.Core_RollupEase_NewFieldLabel';
+import NEW_FIELD_KIND from '@salesforce/label/c.Core_RollupEase_NewFieldKind';
+import KIND_HELP from '@salesforce/label/c.Core_RollupEase_KindHelp';
+import KIND_NUMBER from '@salesforce/label/c.Core_RollupEase_KindNumber';
+import KIND_CURRENCY from '@salesforce/label/c.Core_RollupEase_KindCurrency';
+import KIND_DATE from '@salesforce/label/c.Core_RollupEase_KindDate';
+import KIND_DATETIME from '@salesforce/label/c.Core_RollupEase_KindDateTime';
+import KIND_TEXT from '@salesforce/label/c.Core_RollupEase_KindText';
+import KIND_LONGTEXT from '@salesforce/label/c.Core_RollupEase_KindLongText';
+import KIND_CHECKBOX from '@salesforce/label/c.Core_RollupEase_KindCheckbox';
+import WRITE_FIELD from '@salesforce/label/c.Core_RollupEase_WriteField';
+import FIELD_DEPLOY from '@salesforce/label/c.Core_RollupEase_FieldDeploy';
+import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
+import REFRESH_FIELDS from '@salesforce/label/c.Core_RollupEase_RefreshFields';
+import COPY from '@salesforce/label/c.Core_RollupBuilder_InstantCopy';
+import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
+import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -80,6 +128,20 @@ const LISTS = new Set(['TEXT_LIST', 'TEXT_LIST_DISTINCT']);
 const INTO_PICKLIST = new Set(['picklist', 'string']);
 /** The calculations that take "only the first N records" (R-R15, ADR-0136). */
 const ROW_LIMITED = new Set(['SUM', 'AVG', 'MIN', 'MAX', ...LISTS]);
+/** Sum and Average read numbers; Minimum and Maximum numbers or dates (R-R10, U9). */
+const READS_NUMBERS = new Set(['SUM', 'AVG']);
+const READS_NUMBERS_OR_DATES = new Set(['MIN', 'MAX']);
+
+/** Whether a field of this type can feed this calculation, as the save checks it (U9). */
+function fitsCalculation(aggregate, type) {
+  if (READS_NUMBERS.has(aggregate)) {
+    return NUMBERS.has(type) || MONEY.has(type);
+  }
+  if (READS_NUMBERS_OR_DATES.has(aggregate)) {
+    return NUMBERS.has(type) || MONEY.has(type) || DATES.has(type);
+  }
+  return true;
+}
 
 /** The calculations a target field of this type can hold (canonical model R-R15). */
 function aggregatesFor(type) {
@@ -148,8 +210,35 @@ export default class RollupWizard extends LightningElement {
     saveAndCalculate: SAVE_AND_CALCULATE,
     previewRecord: PREVIEW_RECORD,
     targetSearch: TARGET_SEARCH,
-    targetSearchHelp: TARGET_SEARCH_HELP
+    targetSearchHelp: TARGET_SEARCH_HELP,
+    sentenceHelp: SENTENCE_HELP,
+    modeHeading: MODE_HEADING,
+    pickSamples: PICK_SAMPLES,
+    pickSamplesHelp: PICK_SAMPLES_HELP,
+    samplesHeading: SAMPLES_HEADING,
+    samplesNone: SAMPLES_NONE,
+    showRows: SHOW_ROWS,
+    rowsHeading: ROWS_HEADING,
+    createField: CREATE_FIELD,
+    createFieldWhy: CREATE_FIELD_WHY,
+    newFieldLabel: NEW_FIELD_LABEL,
+    newFieldKind: NEW_FIELD_KIND,
+    kindHelp: KIND_HELP,
+    writeField: WRITE_FIELD,
+    downloadField: DOWNLOAD_FIELD,
+    refreshFields: REFRESH_FIELDS,
+    copy: COPY
   };
+
+  /** Step 1: the Create a Field panel, which writes a field for the administrator to make (U8). */
+  creatingField = false;
+  newFieldLabel = '';
+  newFieldKind = 'NUMBER';
+  generatedField;
+  fieldNotice;
+
+  /** The furthest step reached, so the sentence jumps back to any step already filled (U3). */
+  furthest = 1;
 
   /** Step 1: what the administrator typed to find an object off the common list (ADR-0136). */
   targetSearch = '';
@@ -168,6 +257,9 @@ export default class RollupWizard extends LightningElement {
   maintains;
   previewResult;
   previewRecordId;
+  /** Step 5: records the rollup would fill, picked for her, and the records read (U4). */
+  samples;
+  previewRows;
 
   /** The rollup to edit or copy, or nothing for a new one. */
   @api
@@ -175,10 +267,19 @@ export default class RollupWizard extends LightningElement {
     return this.current;
   }
   set draft(value) {
-    this.current = { active: true, fiscalYearAware: false, ...(value || {}) };
+    // A starter template (U2) may name the field to create; Create a Field opens filled in.
+    const { newFieldLabel, newFieldKind, ...rest } = value || {};
+    this.current = { active: true, fiscalYearAware: false, ...rest };
+    this.creatingField = Boolean(newFieldLabel);
+    this.newFieldLabel = newFieldLabel || '';
+    this.newFieldKind = newFieldKind || 'NUMBER';
+    this.generatedField = undefined;
     this.step = 1;
+    // An edited or copied rollup has every step filled in, so any part of it can be opened.
+    this.furthest = value && value.targetObject ? 5 : 1;
     this.error = undefined;
     this.previewRecordId = undefined;
+    this.samples = undefined;
     this.loadTarget();
   }
 
@@ -355,11 +456,163 @@ export default class RollupWizard extends LightningElement {
     return this.sourceFields.map((field) => ({ value: field.value, label: field.label }));
   }
 
-  /** The fields a value can be copied from: a picklist only from a picklist or text. */
+  /**
+   * The fields a value can be read from: a picklist only from a picklist or text, and only fields
+   * the calculation can read, so the save never has to refuse the pair (U9).
+   */
   get copyFieldOptions() {
     return this.sourceFields
       .filter((field) => this.targetFieldType !== 'picklist' || INTO_PICKLIST.has(field.type))
+      .filter((field) => fitsCalculation(this.current.aggregate, field.type))
       .map((field) => ({ value: field.value, label: field.label }));
+  }
+
+  get chosenAggregateLabel() {
+    const option = (this.model ? this.model.aggregates : []).find(
+      (entry) => entry.value === this.current.aggregate
+    );
+    return option ? option.label : this.current.aggregate;
+  }
+
+  get targetFieldLabel() {
+    const field = this.targetFields.find((entry) => entry.value === this.current.targetField);
+    return field ? field.label : this.current.targetField;
+  }
+
+  /** Step 3: the calculations this field cannot hold, and what to do instead (U9). */
+  get unavailableNotice() {
+    if (!this.model || !this.targetFieldType) {
+      return undefined;
+    }
+    const allowed = new Set(aggregatesFor(this.targetFieldType));
+    const hidden = this.model.aggregates
+      .filter((option) => !allowed.has(option.value))
+      .map((option) => option.label);
+    return hidden.length
+      ? format(NOT_FOR_FIELD, this.targetFieldLabel, hidden.join(', '))
+      : undefined;
+  }
+
+  /** Step 3: why only some fields are listed, or that none fits (U9). */
+  get fieldGuidance() {
+    if (!this.needsSourceField) {
+      return undefined;
+    }
+    if (this.sourceFields.length && !this.copyFieldOptions.length) {
+      return format(NO_FIELD_FITS, this.chosenAggregateLabel);
+    }
+    if (READS_NUMBERS.has(this.current.aggregate)) {
+      return format(FIELDS_NUMBERS, this.chosenAggregateLabel);
+    }
+    if (READS_NUMBERS_OR_DATES.has(this.current.aggregate)) {
+      return format(FIELDS_NUMBERS_DATES, this.chosenAggregateLabel);
+    }
+    return undefined;
+  }
+
+  // ------------------------------------------------------------------ the sentence (U3)
+
+  /** How many conditions the counted records must meet, in words. */
+  get conditionsText() {
+    try {
+      const document = this.current.filterJson ? JSON.parse(this.current.filterJson) : null;
+      const count = document && Array.isArray(document.conditions) ? document.conditions.length : 0;
+      return count ? format(SOME_RECORDS, count) : EVERY_RECORD;
+    } catch {
+      return EVERY_RECORD;
+    }
+  }
+
+  /** Each part of the sentence, by the step that sets it. */
+  get sentenceValues() {
+    const draft = this.current;
+    const source = this.chosenSource;
+    const field = this.sourceFields.find((entry) => entry.value === draft.sourceField);
+    let calculation;
+    if (draft.aggregate) {
+      calculation = field
+        ? `${this.chosenAggregateLabel} (${field.label})`
+        : this.chosenAggregateLabel;
+    }
+    const mode = (this.model ? this.model.modes : []).find((entry) => entry.value === draft.mode);
+    return [
+      { step: 3, text: calculation },
+      { step: 2, text: source ? source.label : draft.relationshipPath },
+      { step: 4, text: this.furthest >= 4 ? this.conditionsText : undefined },
+      {
+        step: 1,
+        text: draft.targetField
+          ? format(TARGET_PART, this.targetLabel, this.targetFieldLabel)
+          : undefined
+      },
+      { step: 5, text: this.furthest >= 5 && mode ? mode.label : undefined }
+    ];
+  }
+
+  /**
+   * The whole rollup as one sentence, built as the steps are filled in. Each chosen part is a
+   * link to the step that sets it; a part not chosen yet says so (U3).
+   */
+  get sentenceParts() {
+    const values = this.sentenceValues;
+    return BUILDER_SENTENCE.split(/(\{\d\})/)
+      .filter((piece) => piece !== '')
+      .map((piece, index) => {
+        const match = /^\{(\d)\}$/.exec(piece);
+        if (!match) {
+          return { key: `text-${index}`, text: piece, isText: true };
+        }
+        const part = values[Number(match[1])] || {};
+        return {
+          key: `part-${index}`,
+          text: part.text || NOT_CHOSEN,
+          step: String(part.step),
+          isText: false,
+          disabled: part.step > this.furthest
+        };
+      });
+  }
+
+  handleSentencePart(event) {
+    const step = Number(event.target.dataset.step);
+    if (step > this.furthest) {
+      return;
+    }
+    this.error = undefined;
+    this.step = step;
+    if (step === 5) {
+      this.samples = undefined;
+      this.loadPreview();
+    }
+  }
+
+  // ------------------------------------------------------------------- the modes (U10)
+
+  /** What each mode means for this rollup: when its field changes (U10). */
+  get modeConsequences() {
+    const target = this.targetFieldLabel || '';
+    const records = this.recordsLabel || '';
+    const time = this.model && this.model.nightlyTime ? this.model.nightlyTime : '';
+    let instantly;
+    if (!this.sourceIsInstant) {
+      instantly = format(MODE_INSTANT_NONE, records);
+    } else {
+      instantly = format(
+        this.model && this.model.inSave ? MODE_INSTANT_DURING : MODE_INSTANT_AFTER,
+        target,
+        records
+      );
+    }
+    return [
+      { key: 'instantly', text: instantly },
+      { key: 'nightly', text: format(MODE_NIGHTLY, target, time) },
+      {
+        key: 'both',
+        text: this.sourceIsInstant
+          ? format(MODE_BOTH_TEXT, time)
+          : format(MODE_BOTH_NO_INSTANT, time, records)
+      }
+    ];
   }
 
   /** The source filter offers the counted records' own fields, then those one lookup away. */
@@ -510,7 +763,91 @@ export default class RollupWizard extends LightningElement {
       relationshipPath: undefined,
       targetFilterJson: undefined
     });
+    // A new object clears what the later steps chose, so they are filled in again in order.
+    this.furthest = 1;
+    this.generatedField = undefined;
     this.loadTarget();
+  }
+
+  get kindOptions() {
+    return [
+      { label: KIND_NUMBER, value: 'NUMBER' },
+      { label: KIND_CURRENCY, value: 'CURRENCY' },
+      { label: KIND_DATE, value: 'DATE' },
+      { label: KIND_DATETIME, value: 'DATETIME' },
+      { label: KIND_TEXT, value: 'TEXT' },
+      { label: KIND_LONGTEXT, value: 'LONGTEXT' },
+      { label: KIND_CHECKBOX, value: 'CHECKBOX' }
+    ];
+  }
+
+  get cannotWriteField() {
+    return !this.current.targetObject || !this.newFieldLabel.trim();
+  }
+
+  get fieldHref() {
+    return `data:application/zip;base64,${this.generatedField.deployPackage}`;
+  }
+
+  get fieldDeployText() {
+    return FIELD_DEPLOY.replace('{0}', this.generatedField.fileName);
+  }
+
+  handleOpenCreateField() {
+    this.creatingField = !this.creatingField;
+  }
+
+  handleNewFieldLabel(event) {
+    this.newFieldLabel = event.detail.value || '';
+    this.generatedField = undefined;
+  }
+
+  handleNewFieldKind(event) {
+    this.newFieldKind = event.detail.value;
+    this.generatedField = undefined;
+  }
+
+  /** Writes the field's steps, source and package; nothing is created in the org. */
+  handleWriteField() {
+    this.error = undefined;
+    this.fieldNotice = undefined;
+    return generateField({
+      objectApiName: this.current.targetObject,
+      fieldLabel: this.newFieldLabel,
+      kind: this.newFieldKind
+    })
+      .then((result) => {
+        this.generatedField = result;
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  handleCopyField() {
+    const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
+    if (!clipboard || !clipboard.writeText) {
+      this.fieldNotice = COPY_FAILED;
+      return Promise.resolve();
+    }
+    return clipboard
+      .writeText(this.generatedField.fieldXml)
+      .then(() => {
+        this.fieldNotice = COPIED;
+      })
+      .catch(() => {
+        this.fieldNotice = COPY_FAILED;
+      });
+  }
+
+  /** Reads the object's fields again and chooses the new one once it exists. */
+  handleRefreshFields() {
+    const created = this.generatedField && this.generatedField.apiName;
+    return this.loadTarget().then(() => {
+      if (created && this.targetFields.some((field) => field.value === created)) {
+        this.change({ targetField: created });
+        this.creatingField = false;
+        this.generatedField = undefined;
+      }
+    });
   }
 
   handleSource(event) {
@@ -530,6 +867,7 @@ export default class RollupWizard extends LightningElement {
       changes.mode = MODE_BOTH;
     }
     this.change(changes);
+    this.furthest = Math.min(this.furthest, 2);
     this.loadSource();
   }
 
@@ -550,6 +888,13 @@ export default class RollupWizard extends LightningElement {
         ? event.target.checked
         : event.detail.value;
     this.change({ [name]: value });
+    // A field the new calculation cannot read is cleared rather than refused on save (U9).
+    if (name === 'aggregate' && this.current.sourceField) {
+      const field = this.sourceFields.find((entry) => entry.value === this.current.sourceField);
+      if (field && !fitsCalculation(value, field.type)) {
+        this.change({ sourceField: undefined });
+      }
+    }
   }
 
   handleFilter(event) {
@@ -607,7 +952,10 @@ export default class RollupWizard extends LightningElement {
     this.error = this.stepProblem();
     if (!this.error) {
       this.step = Math.min(5, this.step + 1);
+      this.furthest = Math.max(this.furthest, this.step);
       if (this.step === 5) {
+        // Samples calculated before a change elsewhere would show old totals.
+        this.samples = undefined;
         this.loadPreview();
       }
     }
@@ -622,12 +970,52 @@ export default class RollupWizard extends LightningElement {
   loadPreview() {
     this.maintains = undefined;
     this.previewResult = undefined;
+    this.previewRows = undefined;
     preview({ draft: this.payload(), recordId: this.previewRecordId || null })
       .then((result) => {
         this.maintains = result.maintains;
         this.previewResult = result.result;
+        this.previewRows = result.rows;
       })
       .catch((error) => this.fail(error));
+  }
+
+  /** Calculates the unsaved rollup on up to five records it would fill, picked for her (U4). */
+  handlePickSamples() {
+    this.samples = undefined;
+    previewSamples({ draft: this.payload() })
+      .then((result) => {
+        this.samples = result || [];
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  /** Previews one sample as if it were picked, listing the records read for it. */
+  handleShowRows(event) {
+    this.previewRecordId = event.currentTarget.dataset.recordId;
+    this.loadPreview();
+  }
+
+  get hasSamples() {
+    return Array.isArray(this.samples) && this.samples.length > 0;
+  }
+
+  get noSamples() {
+    return Array.isArray(this.samples) && this.samples.length === 0;
+  }
+
+  /** The records read for the previewed record, each with a link and its outcome. */
+  get rowList() {
+    const rows = (this.previewRows && this.previewRows.rows) || [];
+    return rows.map((row) => ({
+      ...row,
+      url: '/' + row.recordId,
+      outcomeClass: row.counted ? 'slds-text-color_success' : 'slds-text-color_weak'
+    }));
+  }
+
+  get hasRowDetail() {
+    return Boolean(this.previewRows);
   }
 
   /** The draft as the server reads it. */
@@ -659,17 +1047,41 @@ export default class RollupWizard extends LightningElement {
       return;
     }
     const calculateNow = event.target.dataset.id === 'save-and-calculate';
+    const draft = this.payload();
     this.busy = true;
-    save({ draft: this.payload(), calculateNow })
+    save({ draft, calculateNow })
       .then((result) => {
-        this.dispatchEvent(
-          new CustomEvent('saved', { detail: { notice: result.notice, recordId: result.recordId } })
-        );
+        if (result.confirmation) {
+          return this.askDlrs(result.confirmation, draft, calculateNow);
+        }
+        return result;
+      })
+      .then((result) => {
+        if (result) {
+          this.dispatchEvent(
+            new CustomEvent('saved', {
+              detail: { notice: result.notice, recordId: result.recordId }
+            })
+          );
+        }
       })
       .catch((error) => this.fail(error))
       .finally(() => {
         this.busy = false;
       });
+  }
+
+  /**
+   * An active DLRS rollup fills the same field (R-R16): nothing was saved. Saves only when the
+   * admin says she will switch the DLRS rollup off, and stays on this step otherwise.
+   */
+  async askDlrs(conflict, draft, calculateNow) {
+    const confirmed = await LightningConfirm.open({
+      label: DLRS_CONFIRM_TITLE,
+      message: `${conflict} ${DLRS_CONFIRM_QUESTION}`,
+      theme: 'warning'
+    });
+    return confirmed ? saveSwitchingOffDlrs({ draft, calculateNow }) : undefined;
   }
 
   fail(error) {

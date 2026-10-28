@@ -65,4 +65,16 @@ describe('c-setup-step-coexistence', () => {
     expect(element.shadowRoot.querySelector('lightning-button')).toBeNull();
     expect(element.shadowRoot.querySelector('lightning-combobox').disabled).toBe(true);
   });
+
+  it('names another rollup tool found in the org, and says nothing without one', () => {
+    const without = build(NONPROFIT_CLOUD);
+    expect(without.shadowRoot.querySelector('[data-id="other-rollup-tools"]')).toBeNull();
+
+    const withTool = build({
+      ...NONPROFIT_CLOUD,
+      otherRollupTools: ['This org also runs Rollup Helper.']
+    });
+    const notice = withTool.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
+    expect(notice.textContent).toContain('This org also runs Rollup Helper.');
+  });
 });

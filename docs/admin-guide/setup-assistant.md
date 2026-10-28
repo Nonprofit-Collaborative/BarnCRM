@@ -144,6 +144,12 @@ working. Confirm that here, or choose a different fit." BarnCRM then looks at yo
   BarnCRM can run on its own."** BarnCRM recommends **Standalone**, the simplest
   arrangement.
 
+If the org also runs DLRS or Rollup Helper, the step shows **Other Rollup Tools** under what
+BarnCRM found, with one line per tool, for example "This org also runs DLRS (Declarative
+Lookup Rollup Summaries). It is a separate rollup tool; BarnCRM does not manage its rollups."
+It changes nothing in either tool. See
+[DLRS and Rollup Helper in the Same Org](rollups.md#dlrs-and-rollup-helper-in-the-same-org).
+
 The list of modes offers **Standalone** in every org, **NPSP coexistence** only when NPSP
 is in your org, and **Nonprofit Cloud coexistence** only when Nonprofit Cloud objects are
 in your org. A mode you saved earlier is always in the list, so your choice is never

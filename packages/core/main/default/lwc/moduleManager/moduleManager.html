@@ -7,6 +7,14 @@
             {labels.readOnly}
         </p>
     </template>
+    <template lwc:if={hasOtherRollupTools}>
+        <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
+            <h3 class="slds-text-heading_x-small">{labels.otherRollupTools}</h3>
+            <template for:each={otherRollupTools} for:item="notice">
+                <p key={notice} class="slds-text-body_small">{notice}</p>
+            </template>
+        </div>
+    </template>
 
     <template for:each={groups} for:item="group">
         <div key={group.key} data-group={group.key}>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsActivateNeedsConfirm</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS: turning a copy on needs the confirmation</shortDescription>
+        <value>Confirm you will switch the DLRS rollup off in DLRS before turning its copy on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsImportedFrom</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Description of an imported rollup; {0} the DLRS rollup's name</shortDescription>
+        <value>Imported from the DLRS rollup {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteSystemMode</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note: DLRS sharing mode User</shortDescription>
+        <value>DLRS counted only the records the person saving could see. BarnCRM counts every record, whoever saves.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonOperation</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the DLRS operation</shortDescription>
+        <value>BarnCRM has no total like the DLRS operation {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteCountField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note; {0} the counted field</shortDescription>
+        <value>DLRS counted only records with {0} filled in, so the copy counts records where {0} is not blank.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonCriteria</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the unread part of the criteria</shortDescription>
+        <value>BarnCRM cannot read this part of the Relationship Criteria: {0}. The filter holds fields compared with values, joined by AND, OR and NOT.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteCalledByCode</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note; {0} the DLRS calculation mode</shortDescription>
+        <value>DLRS calculated this rollup only when called ({0}). The copy updates when records change and every night.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteNightly</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note; {0} the counted object</shortDescription>
+        <value>Saving a {0} record does not update totals at once, so the copy updates every night.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteNoOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note; {0} the field the copy orders by</shortDescription>
+        <value>DLRS had no Field to Order By, so the copy orders by {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the DLRS Field to Order By</shortDescription>
+        <value>BarnCRM orders by one field with blanks last, so it cannot order by {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteBlanksLast</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note: blank order values move last</shortDescription>
+        <value>DLRS listed records with a blank order field first; the copy lists them last.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteRowLimitFirst</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note: Row Limit dropped from a First</shortDescription>
+        <value>The Row Limit is left out: the first value is the same without it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonRowLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the DLRS operation</shortDescription>
+        <value>BarnCRM limits rows only for sums, averages, minimums, maximums and text lists, not for {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsNoteNoDelimiter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS note: no delimiter set</shortDescription>
+        <value>DLRS had no delimiter, so the copy separates values with a comma.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonDelimiter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the DLRS delimiter</shortDescription>
+        <value>The delimiter {0} is longer than 10 characters, covers more than one line, or starts or ends with a space, which BarnCRM cannot hold.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonPath</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} child object, {1} lookup, {2} parent object</shortDescription>
+        <value>The Rollup Builder does not offer {0} records by {1} for {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonAlreadyOn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason: its copy is already on</shortDescription>
+        <value>Already copied and turned on in BarnCRM.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsReasonFilled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS reason; {0} the BarnCRM rollup</shortDescription>
+        <value>The active BarnCRM rollup {0} already fills this field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsCompareNotCalculated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare: no value calculated</shortDescription>
+        <value>BarnCRM could not calculate this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsCompareBlankZero</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare: blank against zero</shortDescription>
+        <value>Blank in one, zero in the other.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_DlrsCompareDiffer</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from DLRS compare: values differ</shortDescription>
+        <value>The values differ.</value>
+    </labels>
+</CustomLabels>

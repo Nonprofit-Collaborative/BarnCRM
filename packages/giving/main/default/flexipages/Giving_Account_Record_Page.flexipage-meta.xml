@@ -999,6 +999,19 @@
         <identifier>runtime_sales_activities_activityPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>rollupExplain</componentName>
+        <identifier>rollupExplain1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
     <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>

@@ -28,6 +28,41 @@
                 </div>
             </template>
 
+            <template lwc:if={deleting}>
+                <div
+                    class="slds-box slds-theme_warning slds-var-m-bottom_small"
+                    role="dialog"
+                    aria-labelledby="delete-heading"
+                    data-id="delete-panel"
+                >
+                    <h3 id="delete-heading" class="slds-text-heading_small">{labels.deleteHeading}</h3>
+                    <p class="slds-var-m-vertical_x-small" data-id="delete-question">{deleteQuestion}</p>
+                    <lightning-radio-group
+                        name="deleteChoice"
+                        data-id="delete-choice"
+                        label={labels.deleteChoice}
+                        options={deleteOptions}
+                        value={deleteChoice}
+                        onchange={handleDeleteChoice}
+                    ></lightning-radio-group>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button
+                            data-id="delete-cancel"
+                            label={labels.cancel}
+                            onclick={handleCancelDelete}
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="destructive"
+                            data-id="delete-confirm"
+                            label={labels.deleteRollup}
+                            disabled={controlsDisabled}
+                            onclick={handleConfirmDelete}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
             <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
                 <p>
                     <strong>{labels.freshnessTitle}:</strong>
@@ -189,6 +224,21 @@
                 <p data-id="empty-message">{labels.emptyList}</p>
             </template>
 
+            <template lwc:if={hasAnyRollup}>
+                <lightning-input
+                    class="slds-var-m-bottom_small"
+                    type="search"
+                    data-id="search"
+                    label={labels.search}
+                    field-level-help={labels.searchHelp}
+                    value={searchTerm}
+                    onchange={handleSearch}
+                ></lightning-input>
+            </template>
+            <template lwc:if={noMatches}>
+                <p data-id="no-matches">{labels.noMatches}</p>
+            </template>
+
             <template lwc:if={hasRows}>
                 <div class="slds-scrollable_x">
                     <table
@@ -199,7 +249,7 @@
                             <tr class="slds-line-height_reset">
                                 <th scope="col">{labels.columnRollup}</th>
                                 <th scope="col">{labels.columnCounts}</th>
-                                <th scope="col">{labels.columnTarget}</th>
+                                <th scope="col">{labels.columnStatus}</th>
                                 <th scope="col">{labels.columnMode}</th>
                                 <th scope="col">{labels.columnLastCalculated}</th>
                                 <th scope="col">{labels.columnActive}</th>
@@ -209,7 +259,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <template for:each={rows} for:item="row">
+                            <template for:each={groups} for:item="group">
+                                <tr key={group.key} class="slds-theme_shade" data-id="group-row">
+                                    <th scope="colgroup" colspan="7">
+                                        <strong>{group.heading}</strong>
+                                    </th>
+                                </tr>
+                            <template for:each={group.rows} for:item="row">
                                 <tr key={row.recordId} data-id="rollup-row">
                                     <th scope="row">
                                         <template lwc:if={row.exportable}>
@@ -226,9 +282,23 @@
                                         </template>
                                         <div>{row.name}</div>
                                         <div class="slds-text-body_small">{row.description}</div>
+                                        <template for:each={row.conflicts} for:item="conflict">
+                                            <div
+                                                key={conflict.key}
+                                                class="slds-text-body_small slds-text-color_error"
+                                                data-id="conflict"
+                                            >
+                                                {conflict.text}
+                                            </div>
+                                        </template>
                                     </th>
-                                    <td>{row.counts}</td>
-                                    <td>{row.target}</td>
+                                    <td class="slds-cell-wrap">
+                                        <div data-id="sentence">{row.sentence}</div>
+                                        <div class="slds-text-body_small slds-text-color_weak">
+                                            {row.counts}: {row.target}
+                                        </div>
+                                    </td>
+                                    <td class={row.statusClass} data-id="status">{row.status}</td>
                                     <td>
                                         <lightning-combobox
                                             data-id={row.recordId}
@@ -301,6 +371,7 @@
                                         </template>
                                     </td>
                                 </tr>
+                            </template>
                             </template>
                         </tbody>
                     </table>

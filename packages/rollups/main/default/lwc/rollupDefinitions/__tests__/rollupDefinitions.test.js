@@ -4,14 +4,15 @@ import getPage from '@salesforce/apex/RollupController.getPage';
 import recalculate from '@salesforce/apex/RollupController.recalculate';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
 import setActive from '@salesforce/apex/RollupController.setActive';
+import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
 import restoreDefaults from '@salesforce/apex/RollupController.restoreDefaults';
 import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
 import runTonight from '@salesforce/apex/RollupController.runTonight';
 import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
-import LightningConfirm from 'lightning/confirm';
 import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
 import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
+import LightningConfirm from 'lightning/confirm';
 
 jest.mock(
   '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions',
@@ -30,6 +31,9 @@ jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportRefused', () => ({ defau
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportCreated', () => ({ default: 'Created' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_RollupEase_Group', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
 
@@ -54,6 +58,11 @@ jest.mock('@salesforce/apex/RollupController.setSchedule', () => ({ default: jes
 jest.mock('@salesforce/apex/RollupController.setActive', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/RollupController.setMode', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -72,6 +81,11 @@ jest.mock('@salesforce/apex/RollupController.deleteRollup', () => ({ default: je
 jest.mock(
   '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm',
   () => ({ default: 'Delete {0}? The values stay.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_RollupEase_DeleteQuestion',
+  () => ({ default: 'Delete {0}? This cannot be undone.' }),
   { virtual: true }
 );
 jest.mock(
@@ -222,12 +236,84 @@ describe('c-rollup-definitions', () => {
     getPage.emit({ ...PAGE, rollups: [programs, major] });
     await flush();
 
+    // Grouped by the object that shows the total: Account before Contact (U12).
     const rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
-    expect(rows[0].textContent).toContain(
+    expect(rows[1].textContent).toContain(
       'Text list, each value once Program_Name__c on Program_Enrollment__c, separated by semicolon'
     );
-    expect(rows[1].textContent).toContain('Any on Gift__c');
-    expect(rows[1].textContent).not.toContain('separated by');
+    expect(rows[0].textContent).toContain('Any on Gift__c');
+    expect(rows[0].textContent).not.toContain('separated by');
+  });
+
+  describe('Plain sentences, status, conflicts, search and groups', () => {
+    const giving = {
+      ...ROLLUP,
+      sentence: 'Total of Amount from Gifts by Household, shown in Total Giving on each Account.',
+      targetObjectLabel: 'Account',
+      statusLevel: 'failed',
+      status: '2 records could not be saved: see Needs Attention',
+      conflicts: ['Writes the same field as Old total for the same records.']
+    };
+    const hours = {
+      ...ROLLUP,
+      recordId: 'a01000000000004AAA',
+      name: 'Volunteer hours',
+      description: null,
+      targetObject: 'Contact',
+      targetObjectLabel: 'Contact',
+      targetField: 'Hours__c',
+      sentence: 'Total of Hours from Volunteer Hours by Contact, shown in Hours on each Contact.',
+      statusLevel: 'clear',
+      status: 'Nothing waiting',
+      conflicts: []
+    };
+
+    async function listed() {
+      const element = createComponent();
+      getPage.emit({ ...PAGE, rollups: [hours, giving] });
+      await flush();
+      return element;
+    }
+
+    it('describes each rollup in a sentence with its status and conflicts (U1, U6, U7)', async () => {
+      const element = await listed();
+      const sentences = [...element.shadowRoot.querySelectorAll('[data-id="sentence"]')];
+      expect(sentences.map((node) => node.textContent)).toEqual([giving.sentence, hours.sentence]);
+      const status = element.shadowRoot.querySelector('[data-id="status"]');
+      expect(status.textContent).toBe(giving.status);
+      expect(status.className).toContain('slds-text-color_error');
+      const conflicts = element.shadowRoot.querySelectorAll('[data-id="conflict"]');
+      expect(conflicts.length).toBe(1);
+      expect(conflicts[0].textContent).toContain('Old total');
+    });
+
+    it('groups the rollups by the object that shows the total (U12)', async () => {
+      const element = await listed();
+      const groups = [...element.shadowRoot.querySelectorAll('[data-id="group-row"]')];
+      expect(groups.map((node) => node.textContent.trim())).toEqual(['Account (1)', 'Contact (1)']);
+    });
+
+    it('finds rollups by any word of their sentence, and says when nothing matches (U12)', async () => {
+      const element = await listed();
+      const search = element.shadowRoot.querySelector('[data-id="search"]');
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'volunteer' } }));
+      await flush();
+      let rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Volunteer hours');
+
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'TOTAL_GIVING__C' } }));
+      await flush();
+      rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
+      expect(rows.length).toBe(1);
+      expect(rows[0].textContent).toContain('Household total giving');
+
+      search.dispatchEvent(new CustomEvent('change', { detail: { value: 'nothing like it' } }));
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('[data-id="rollup-row"]').length).toBe(0);
+      expect(element.shadowRoot.querySelector('[data-id="no-matches"]')).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="empty-message"]')).toBeNull();
+    });
   });
 
   it('offers the modes by the names an administrator reads, keeping the stored values', async () => {
@@ -309,6 +395,54 @@ describe('c-rollup-definitions', () => {
     expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
       'You do not have permission.'
     );
+  });
+
+  describe('a field DLRS also fills', () => {
+    const OFF_WITH_DLRS = {
+      ...PAGE,
+      rollups: [
+        { ...ROLLUP, active: false, otherToolConflict: 'The DLRS rollup Giving also fills it.' }
+      ]
+    };
+
+    async function switchOn() {
+      const element = createComponent();
+      getPage.emit(OFF_WITH_DLRS);
+      await flush();
+      const toggle = element.shadowRoot.querySelector(
+        `lightning-input[data-id="${ROLLUP.recordId}"]`
+      );
+      toggle.checked = true;
+      toggle.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      await flush();
+      return toggle;
+    }
+
+    it('turns on only after the admin says she will switch DLRS off', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(true);
+      turnOnSwitchingOffDlrs.mockResolvedValue(PAGE);
+
+      await switchOn();
+
+      expect(LightningConfirm.open).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('The DLRS rollup Giving also fills it.')
+        })
+      );
+      expect(turnOnSwitchingOffDlrs).toHaveBeenCalledWith({ definitionId: ROLLUP.recordId });
+      expect(setActive).not.toHaveBeenCalled();
+    });
+
+    it('stays off when the admin says no', async () => {
+      LightningConfirm.open = jest.fn().mockResolvedValue(false);
+
+      const toggle = await switchOn();
+
+      expect(turnOnSwitchingOffDlrs).not.toHaveBeenCalled();
+      expect(setActive).not.toHaveBeenCalled();
+      expect(toggle.checked).toBe(false);
+    });
   });
 
   it('restores the shipped rollups', async () => {
@@ -419,40 +553,76 @@ describe('c-rollup-definitions', () => {
       return element;
     }
 
-    it('says what happens, then deletes an admin-made rollup', async () => {
-      LightningConfirm.open = jest.fn().mockResolvedValue(true);
+    const panel = (element) => element.shadowRoot.querySelector('[data-id="delete-panel"]');
+
+    it('asks whether to keep the values, keeps them by default, then deletes (U11)', async () => {
+      deleteRollup.mockResolvedValue({ ...PAGE, rollups: [] });
+      const element = await builderWith([MINE]);
+      expect(panel(element)).toBeNull();
+
+      element.shadowRoot.querySelector('[data-action="delete"]').click();
+      await flush();
+
+      expect(panel(element)).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="delete-question"]').textContent).toBe(
+        'Delete Gift count? This cannot be undone.'
+      );
+      const choice = element.shadowRoot.querySelector('[data-id="delete-choice"]');
+      expect(choice.value).toBe('keep');
+      expect(choice.options.map((option) => option.value)).toEqual(['keep', 'clear']);
+      expect(deleteRollup).not.toHaveBeenCalled();
+
+      element.shadowRoot.querySelector('[data-id="delete-confirm"]').click();
+      await flush();
+
+      expect(deleteRollup).toHaveBeenCalledWith({
+        definitionId: MINE.recordId,
+        clearValues: false
+      });
+      expect(panel(element)).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
+    });
+
+    it('clears the values when the administrator chooses to (U11)', async () => {
       deleteRollup.mockResolvedValue({ ...PAGE, rollups: [] });
       const element = await builderWith([MINE]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
+      element.shadowRoot
+        .querySelector('[data-id="delete-choice"]')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'clear' } }));
+      element.shadowRoot.querySelector('[data-id="delete-confirm"]').click();
       await flush();
 
-      expect(LightningConfirm.open).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Delete Gift count? The values stay.' })
+      expect(deleteRollup).toHaveBeenCalledWith({
+        definitionId: MINE.recordId,
+        clearValues: true
+      });
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
+        'c.Core_RollupEase_DeletedCleared'
       );
-      expect(deleteRollup).toHaveBeenCalledWith({ definitionId: MINE.recordId });
-      expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
     });
 
     it('keeps the rollup when the administrator cancels', async () => {
-      LightningConfirm.open = jest.fn().mockResolvedValue(false);
       const element = await builderWith([MINE]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
+      element.shadowRoot.querySelector('[data-id="delete-cancel"]').click();
+      await flush();
 
+      expect(panel(element)).toBeNull();
       expect(deleteRollup).not.toHaveBeenCalled();
     });
 
     it('refuses a shipped rollup with the reason and never asks the server', async () => {
-      LightningConfirm.open = jest.fn();
       const element = await builderWith([ROLLUP]);
 
       element.shadowRoot.querySelector('[data-action="delete"]').click();
       await flush();
 
-      expect(LightningConfirm.open).not.toHaveBeenCalled();
+      expect(panel(element)).toBeNull();
       expect(deleteRollup).not.toHaveBeenCalled();
       expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
         'Switch it off instead.'
@@ -471,10 +641,15 @@ describe('c-rollup-definitions', () => {
       return element;
     }
 
-    function settle() {
-      // FileReader finishes on a later task, not a microtask.
-      // eslint-disable-next-line @lwc/lwc/no-async-operation
-      return new Promise((resolve) => setTimeout(resolve, 20)).then(flush);
+    async function settle() {
+      // FileReader finishes on a later task, not a microtask; a loaded CI runner can take more
+      // than one short wait, so wait a few times.
+      for (let i = 0; i < 5; i++) {
+        // eslint-disable-next-line no-await-in-loop, @lwc/lwc/no-async-operation
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
     }
 
     it('offers a tick box on admin-made rollups only, and exports the ticked ones', async () => {

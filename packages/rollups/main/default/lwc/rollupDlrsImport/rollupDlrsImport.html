@@ -1,0 +1,185 @@
+<template>
+    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small" data-id="title">{labels.title}</h3>
+    <p class="slds-text-body_small slds-var-m-bottom_small">{labels.intro}</p>
+    <lightning-progress-indicator current-step={step} type="path" variant="base">
+        <template for:each={steps} for:item="item">
+            <lightning-progress-step key={item.value} label={item.label} value={item.value}></lightning-progress-step>
+        </template>
+    </lightning-progress-indicator>
+
+    <template lwc:if={error}>
+        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-vertical_small" role="alert">
+            <span data-id="error">{error}</span>
+        </div>
+    </template>
+
+    <div class="slds-var-m-top_small">
+        <template lwc:if={loading}>
+            <lightning-spinner size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:elseif={isChoose}>
+            <template lwc:if={hasCandidates}>
+                <template lwc:if={hasCopyable}>
+                    <h4 class="slds-text-heading_x-small slds-var-m-bottom_x-small">{labels.canCopy}</h4>
+                    <template for:each={copyable} for:item="candidate">
+                        <div key={candidate.key} class="slds-var-m-bottom_x-small" data-id="copyable">
+                            <lightning-input
+                                type="checkbox"
+                                label={candidate.label}
+                                checked={candidate.checked}
+                                data-key={candidate.key}
+                                onchange={handleChoose}
+                            ></lightning-input>
+                            <p class="slds-text-body_small slds-text-color_weak">{candidate.fills}</p>
+                        </div>
+                    </template>
+                </template>
+                <template lwc:if={hasStaying}>
+                    <h4 class="slds-text-heading_x-small slds-var-m-vertical_x-small">{labels.stays}</h4>
+                    <template for:each={staying} for:item="candidate">
+                        <div key={candidate.key} class="slds-var-m-bottom_x-small" data-id="staying">
+                            <p class="slds-text-title_bold">{candidate.label}</p>
+                            <p class="slds-text-body_small slds-text-color_weak">{candidate.fills}</p>
+                            <ul class="slds-list_dotted">
+                                <template for:each={candidate.reasons} for:item="reason">
+                                    <li key={reason.id} class="slds-text-body_small" data-id="reason">{reason.text}</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </template>
+            </template>
+            <template lwc:else>
+                <p data-id="none-active">{labels.noneActive}</p>
+            </template>
+        </template>
+
+        <template lwc:elseif={isReview}>
+            <template for:each={reviewed} for:item="candidate">
+                <div key={candidate.key} class="slds-var-m-bottom_small" data-id="reviewed">
+                    <p class="slds-text-title_bold">{candidate.label}</p>
+                    <p class="slds-text-body_small" data-id="becomes">{candidate.becomes}</p>
+                    <template lwc:if={candidate.unchanged}>
+                        <p class="slds-text-body_small slds-text-color_weak">{labels.noChanges}</p>
+                    </template>
+                    <ul class="slds-list_dotted">
+                        <template for:each={candidate.notes} for:item="note">
+                            <li key={note.id} class="slds-text-body_small" data-id="note">{note.text}</li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </template>
+
+        <template lwc:elseif={isCompare}>
+            <template lwc:if={nothingCopied}>
+                <p data-id="nothing-copied">{labels.nothingCopied}</p>
+            </template>
+            <template for:each={rowViews} for:item="row">
+                <div key={row.key} class="slds-var-m-bottom_small" data-id="row">
+                    <p class="slds-text-title_bold">{row.name}</p>
+                    <p class="slds-text-body_small" data-id="outcome">{row.outcome}</p>
+                    <template lwc:if={row.copied}>
+                        <lightning-button
+                            class="slds-var-m-vertical_x-small"
+                            label={labels.compare}
+                            data-id="compare"
+                            data-record={row.recordId}
+                            disabled={busy}
+                            onclick={handleCompare}
+                        ></lightning-button>
+                        <template lwc:if={row.noRecords}>
+                            <p class="slds-text-body_small slds-text-color_weak">{labels.noRecords}</p>
+                        </template>
+                        <template lwc:elseif={row.compared}>
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="comparison">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{labels.record}</th>
+                                        <th scope="col">{labels.valueNow}</th>
+                                        <th scope="col">{labels.valueBarn}</th>
+                                        <th scope="col">{labels.result}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={row.comparisons} for:item="compared">
+                                        <tr key={compared.recordId}>
+                                            <td>{compared.recordName}</td>
+                                            <td>{compared.dlrsValue}</td>
+                                            <td>{compared.barncrmValue}</td>
+                                            <td data-id="result">{compared.result}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                    </template>
+                </div>
+            </template>
+        </template>
+
+        <template lwc:elseif={isTurnOn}>
+            <template for:each={copies} for:item="row">
+                <div key={row.key} class="slds-var-m-bottom_small" data-id="copy-row">
+                    <p class="slds-text-title_bold">{row.name}</p>
+                    <p class="slds-text-body_small" data-id="outcome">{row.outcome}</p>
+                    <template lwc:if={row.switchedOff}>
+                        <lightning-button
+                            class="slds-var-m-vertical_x-small"
+                            variant="brand"
+                            label={labels.turnOn}
+                            data-id="turn-on"
+                            data-record={row.recordId}
+                            disabled={busy}
+                            onclick={handleTurnOn}
+                        ></lightning-button>
+                    </template>
+                </div>
+            </template>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="finish-hint">{labels.finishHint}</p>
+        </template>
+    </div>
+
+    <div class="slds-var-m-top_medium slds-clearfix">
+        <lightning-button data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+        <div class="slds-float_right">
+            <template lwc:if={isChoose}>
+                <lightning-button
+                    variant="brand"
+                    data-id="next"
+                    label={labels.next}
+                    disabled={nothingChosen}
+                    onclick={handleNext}
+                ></lightning-button>
+            </template>
+            <template lwc:elseif={isReview}>
+                <lightning-button data-id="back" label={labels.back} onclick={handleBack}></lightning-button>
+                <lightning-button
+                    class="slds-var-m-left_x-small"
+                    variant="brand"
+                    data-id="copy"
+                    label={labels.copy}
+                    disabled={copyDisabled}
+                    onclick={handleCopy}
+                ></lightning-button>
+            </template>
+            <template lwc:elseif={isCompare}>
+                <template lwc:if={hasCopies}>
+                    <lightning-button variant="brand" data-id="next" label={labels.next} onclick={handleNext}></lightning-button>
+                </template>
+            </template>
+            <template lwc:elseif={isTurnOn}>
+                <lightning-button data-id="back" label={labels.back} onclick={handleBack}></lightning-button>
+                <lightning-button
+                    class="slds-var-m-left_x-small"
+                    variant="brand"
+                    data-id="finish"
+                    label={labels.finish}
+                    disabled={finishDisabled}
+                    onclick={handleFinish}
+                ></lightning-button>
+            </template>
+        </div>
+    </div>
+</template>

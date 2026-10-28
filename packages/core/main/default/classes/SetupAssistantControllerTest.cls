@@ -23,6 +23,26 @@ private class SetupAssistantControllerTest {
     }
 
     @IsTest
+    static void theCoexistenceStepNamesAnotherRollupTool() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            SetupAssistantTestExtension.useNone();
+            ModuleDetectionService.givingPresentOverride = false;
+            OtherRollupTools.overrideForTest(
+                new Set<String>{ OtherRollupTools.ROLLUP_HELPER_NAMESPACE }
+            );
+
+            SetupAssistantController.SetupState state = SetupAssistantController.getState();
+
+            Assert.areEqual(
+                new List<String>{ System.Label.Core_OtherRollupTools_RollupHelper },
+                state.coexistence.otherRollupTools,
+                'Step two says Rollup Helper is a separate tool'
+            );
+        }
+    }
+
+    @IsTest
     static void opensWithEveryPanelItNeeds() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();

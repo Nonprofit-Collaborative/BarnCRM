@@ -43,7 +43,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 8 | In **See it on a record**, pick **The Garcia Family**. | "Calculated: 1. On the record now: (empty)." |
 | 9 | In **Name**, type `Test children per household`. In **What this number means**, type `Children in the household`. Leave **Mode** on its default and **Active** on. | The fields hold what you typed. **Mode** shows the org's default rollup mode (**Both (recommended)** unless it was changed). |
 | 10 | Click **Save and calculate now**. | The Builder closes. A green notice reads "Rollup saved, and its recalculation has started." |
-| 11 | Find **Test children per household** in the list. | The row shows **Children in the household** under the name, a **What it counts** value, **Where it shows** names the Test Children Count field, the mode you saved, and **Active** on. |
+| 11 | Find **Test children per household** in the list. | The row is under the **Account** heading and shows **Children in the household** under the name, a **What it counts** sentence of the form "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", the mode you saved, and **Active** on. |
 | 12 | Wait a minute and refresh the page. | The row's **Last calculated** shows a time from a moment ago, not **Not calculated yet**. |
 | 13 | Open **The Garcia Family** household. | **Test Children Count** shows 1. |
 | 14 | Open any household with no person whose role is Child (for example a single-person household). | **Test Children Count** shows 0, not blank. |
@@ -356,9 +356,9 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On the **Rollup Builder** tab, click **Copy** on **Test children per household**, click **Next** until **Check and save**, turn off **Active** and click **Save**. | A row **Copy of Test children per household** appears, switched off. |
-| 2 | Click **Delete** on **Copy of Test children per household**. | A **Delete Rollup** box reads "Delete Copy of Test children per household? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone." |
+| 2 | Click **Delete** on **Copy of Test children per household**. | A **Delete This Rollup** panel opens above the list: "Delete Copy of Test children per household? This cannot be undone.", with **What happens to the values it wrote** set to **Keep them on the records (nothing updates them again)**. |
 | 3 | Click **Cancel**. | The row is still listed. |
-| 4 | Click **Delete** on the same row again, then **OK**. | The notice reads "Rollup deleted. The values it wrote stay on the records." The row is gone; **Test children per household** is still listed. |
+| 4 | Click **Delete** on the same row again, leave **Keep them on the records** chosen, and click **Delete** in the panel. | The notice reads "Rollup deleted. The values it wrote stay on the records." The row is gone; **Test children per household** is still listed. |
 | 5 | Open **The Garcia Family**. | **Test Children Count** still shows 1. |
 | 6 | Back on the **Rollup Builder** tab, click **Delete** on **Account gift count**. | No confirmation opens. A red message reads "This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead." The row is still listed. |
 | 7 | Log in as the staff user and open the **Rollup Builder** tab. | **Delete** is disabled on every row, as **Edit** and **Copy** are. |
@@ -427,3 +427,201 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the trigger** but no **Turn off instant totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
+
+## T-RB-32: BarnCRM Names DLRS and Rollup Helper Where It Matters
+
+**Purpose:** confirm BarnCRM says when another rollup tool is installed, says nothing when none is, and changes nothing in the other tool.
+**Prerequisites:** admin user with Manage BarnCRM Settings; two sandboxes or Developer Edition orgs with BarnCRM Rollup Builder: one without DLRS or Rollup Helper, one with DLRS installed (free, from the AppExchange listing "Declarative Lookup Rollup Summaries Tool").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the org without DLRS, open the **Rollup Builder** tab, the Setup Assistant step that says what BarnCRM found, and the **Modules** section of BarnCRM Settings. | None shows **Other Rollup Tools**. |
+| 2 | In the org with DLRS, open the **Rollup Builder** tab. | **Other Rollup Tools** is at the top: "This org also runs DLRS (Declarative Lookup Rollup Summaries). It is a separate rollup tool; BarnCRM does not manage its rollups." |
+| 3 | Open the Setup Assistant at the step that says what BarnCRM found in your org. | The same **Other Rollup Tools** line is under what BarnCRM found. |
+| 4 | Open the **Modules** section of BarnCRM Settings. | The same line is at the top of the list (Rollup Builder is installed). |
+| 5 | In DLRS (the **Lookup Rollup Summaries** tab), open any DLRS rollup. | It is exactly as before: BarnCRM changed nothing. |
+| 6 | If you can, repeat step 2 in an org with Rollup Helper installed. | The line reads "This org also runs Rollup Helper. It is a separate rollup tool; BarnCRM does not manage its rollups." |
+
+**Cleanup:** None.
+
+## T-RB-33: Turning On a Rollup That DLRS Also Fills Asks First, and the Answer Is Recorded
+
+**Purpose:** confirm the same-field guard in the Builder, in the list and in Import from a file, and that BarnCRM never changes DLRS.
+**Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** on Account. In DLRS, create and activate a rollup **Test child count** on Account: child object Account, relationship field `ParentId`, Count, aggregate result field **Test child count**, calculation mode Realtime (deploy its trigger as DLRS asks).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **New rollup** and build a rollup on **Account**, field **Test child count**, counting **Account, by Parent Account**, **Count**, **Active** ticked. Click **Save**. | **Switch Off the DLRS Rollup** opens: "The DLRS rollup Test child count also fills Account.Test_child_count__c. Two tools filling one field overwrite each other..." |
+| 2 | Click **Cancel**. | The dialog closes, you are still on **Check and save**, and nothing is saved (the list has no new rollup). |
+| 3 | Click **Save** again, then **OK**. | The rollup is saved and switched on. |
+| 4 | In BarnCRM Settings, open **Recent Changes**. | A row **Rollup Builder:** and the rollup's name, old value "DLRS rollup Test child count fills Account.Test_child_count__c", new value "Turned on; the admin confirmed the DLRS rollup will be switched off". |
+| 5 | In DLRS, open **Test child count**. | It is still active: BarnCRM changed nothing. |
+| 6 | Back in the list, switch **Active** off for the rollup, then on again. Click **Cancel** in the dialog. | Switching off asks nothing. Switching on opens **Switch Off the DLRS Rollup**; after **Cancel** the switch is back off. |
+| 7 | Switch **Active** on again and click **OK**. | The rollup is on, and a second **Recent Changes** row is written. |
+| 8 | Tick the rollup, click **Export to a file**, delete the rollup, and import the file under **Import from a file**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
+
+**Cleanup:** delete the BarnCRM rollup; keep the DLRS rollup and field for T-RB-34.
+
+## T-RB-34: Health Check Names a Field BarnCRM and DLRS Both Fill
+
+**Purpose:** confirm Health Check reports a field both tools fill and stops once one is switched off.
+**Prerequisites:** T-RB-33 setup (DLRS rollup **Test child count** active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Build the BarnCRM rollup of T-RB-33 step 1 again and click **OK** to turn it on. | Saved and on. |
+| 2 | Open Health Check and run it. | A warning **BarnCRM and DLRS fill the same field** names `Account.Test_child_count__c`, the BarnCRM rollup and **Test child count** (DLRS), with **Open the Rollup Builder**. |
+| 3 | Click **Open the Rollup Builder**. | The **Rollup Builder** tab opens. |
+| 4 | In DLRS, deactivate **Test child count**. Run Health Check again. | The warning is gone. |
+
+**Cleanup:** delete the BarnCRM rollup, the DLRS rollup (and its trigger, as DLRS describes) and the **Test child count** field.
+
+## T-RB-35: Import from DLRS Copies Switched Off, Compares, and Finishes Only When Every Copy Is On
+
+**Purpose:** confirm the Import from DLRS wizard copies what BarnCRM can hold, says why for the rest, compares values, asks before turning each copy on, and never changes DLRS.
+**Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** and a text field **Test child names** (255) on Account. In DLRS, create and activate three rollups on Account, child object Account, relationship field `ParentId`, calculation mode Realtime: **Test child count** (Count into **Test child count**); **Test child names** (Concatenate of Name into **Test child names**, delimiter `; `); **Test unreadable** (Count into **Test child count** with Relationship Criteria `CALENDAR_YEAR(CreatedDate) = 2024`, kept inactive until step 1, then active). Run DLRS's Calculate once so the fields hold DLRS's values. Create a parent account with two child accounts.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | **Other Rollup Tools** has an **Import from DLRS** button. |
+| 2 | Click **Import from DLRS**. | The list is hidden. **Choose** lists **Test child count** and **Test child names** under **Can Be Copied**, both ticked, each with "Fills Account.... DLRS operation: ...". **Test unreadable** is under **Stays in DLRS** with "BarnCRM cannot read this part of the Relationship Criteria: CALENDAR_YEAR ( CreatedDate ) = 2024...". |
+| 3 | Untick both. Tick them again. Click **Next**. | **Next** is unavailable with nothing ticked. **Review** says "Becomes a BarnCRM Count, filling Account.Test_child_count__c, switched off." and "Becomes a BarnCRM Text list, filling Account.Test_child_names__c, switched off." |
+| 4 | Click **Copy Switched Off**. | **Compare** shows **Copied, switched off.** for both. In another tab, the rollup list shows both copies switched off, each described "Imported from the DLRS rollup ...". |
+| 5 | Click **Compare** on **Test child count**. | Up to five accounts: the parent shows 2 under **Value Now (DLRS)** and **BarnCRM Value**, **Result** **Same**. Nothing on the accounts changes. |
+| 6 | Click **Next**. | **Turn On** lists both copies with **Turn On** buttons; **Finish** is unavailable. |
+| 7 | Click **Turn On** on **Test child count**, then **Cancel**. | **Switch Off the DLRS Rollup** opened naming the DLRS rollup and the field; after **Cancel** the copy is still off and **Finish** is still unavailable. |
+| 8 | Click **Turn On** on each copy and **OK** each time. | Each reads **Turned on.** **Finish** becomes available. **Recent Changes** has one row per copy. |
+| 9 | Click **Finish**. | The list is back with the notice "Import from DLRS finished: 2 copies turned on. Switch their DLRS rollups off in DLRS." |
+| 10 | In DLRS, open the three rollups. | Each is exactly as before: BarnCRM changed nothing. |
+| 11 | Click **Import from DLRS** again. | Both copies are under **Stays in DLRS** with "Already copied and turned on in BarnCRM." |
+
+**Cleanup:** delete both BarnCRM copies; deactivate and delete the three DLRS rollups (and their triggers, as DLRS describes); delete the two fields and the test accounts.
+
+## T-RB-40: Read, Search and Group the Rollup List
+
+**Purpose:** confirm each rollup reads as a sentence and the list groups and searches.
+**Prerequisites:** T-RB-02 done (**Test children per household** exists and is active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | The list has a heading row per object, such as **Account (1)**, in alphabetical order. **Test children per household** is under **Account**, and its **What it counts** column reads "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", with `Count on Contact: Account.Test_Children_Count__c` in small grey text below. |
+| 2 | In **Search rollups**, type `children`. | Only **Test children per household** is listed. |
+| 3 | Type `Test_Children_Count__c`. | The same rollup is listed. Type `zzz`: "No rollup matches your search." Clear the box: every rollup is back. |
+
+**Cleanup:** none.
+
+## T-RB-41: Recalculation Status and Conflicts in the Rollup List
+
+**Purpose:** confirm each row says how its recalculation stands, and that conflicts between rollups are shown and the Active switch refuses one.
+**Prerequisites:** T-RB-02 done (**Test children per household** exists and is active).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab and look at the **Status** column of **Test children per household**. | **Nothing waiting** (or "N records waiting" for a moment after a save). |
+| 2 | Click **Copy** on **Test children per household**, change only the name to `Test children copy`, switch **Active** off and save. | The copy shows **Switched off** in **Status** and, in red under its name, "Cannot be switched on while Test children per household fills the same field for the same records." |
+| 3 | Switch the copy's **Active** toggle on. | It is refused with that reason, and the toggle goes back off. |
+| 4 | In Setup, on **Account**, create a Number field **Test Children Count 2** (`Test_Children_Count_2__c`). Edit the copy, choose **Test Children Count 2** in step 1, switch **Active** on and save. | Both rollups show, in red, "Calculates the same total as ..., into another field." |
+| 5 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the tab. | The **Status** column is empty. |
+
+**Cleanup:** delete **Test children copy** and the field **Test Children Count 2**.
+
+## T-RB-42: The Builder Sentence, Type Guidance and What Each Mode Means
+
+**Purpose:** confirm the sentence above the steps fills in and opens steps, the Builder only offers what it can save and says why, and step 5 explains each mode by its consequence.
+**Prerequisites:** T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**. | Above the steps, a sentence starting "Show (not chosen yet) from (not chosen yet)". Only the part for step 1 can be clicked. |
+| 2 | Choose **Account** and **Test Children Count**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The sentence now names **Contact, by Account ID** and **Account: Test Children Count**. Under **Calculation**: "Not available for Test Children Count: Any, None, Text list, Text list, each value once. To use one of them, choose another field in step 1." |
+| 3 | Choose **Sum**. | **Field to calculate** lists only number, currency and percent fields of Contact, and the line under it reads "Only number, currency and percent fields are listed, because Sum works on numbers." |
+| 4 | Choose **Count**, click **Next** twice. On step 5 read **What Each Choice Means**. | Three lines: "Instantly, after the save: Test Children Count changes within about a minute after one of the Contacts is saved.", "Every night: Test Children Count is recalculated at 2:00 AM each night, so a change made today shows tomorrow." (or the time you set), and "Both (recommended): instantly, and the nightly run at 2:00 AM puts right anything a save missed." |
+| 5 | Click the **Contact, by Account ID** part of the sentence. | Step 2 opens. Click **Cancel**. |
+| 6 | Click **Edit** on **Test children per household**. | Every part of the sentence can be clicked; the conditions part reads "only those that meet its conditions (1)". Click **Cancel**. |
+
+**Cleanup:** none.
+
+## T-RB-43: Preview With Sample Records and the Records Read
+
+**Purpose:** confirm step 5 picks sample records, calculates each without saving, and lists the records read for one record as counted or left out with the reason.
+**Prerequisites:** T-RB-02 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **Edit** on **Test children per household** and click **Next** until step 5. | **Pick Sample Records** shows, with "Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved." under it. No **Records Read for This Record** yet. |
+| 2 | In **See it on a record**, pick **The Garcia Family**. | The total line shows 1 next to what the record holds. **Records Read for This Record** reads "Showing 3 of the 3 records read for this record." and lists Harper, Luis and Diego, each linked: Diego **Counted**, Harper and Luis "Left out: does not meet condition 1". |
+| 3 | Click a name in the list. | The contact opens in a new tab. |
+| 4 | Click **Pick Sample Records**. | **Sample Records** lists up to five households, each with its calculated total next to what it holds now. |
+| 5 | Click **Show Records Read** on one sample. | **See it on a record** shows that household, and **Records Read for This Record** lists its people. The samples stay listed. |
+| 6 | Click **Cancel**, then open the Rollup Builder tab again. | **Test children per household** is unchanged: no field on any household changed. |
+
+**Cleanup:** none.
+
+## T-RB-44: Delete a Rollup and Clear Its Values
+
+**Purpose:** confirm Delete can clear the values a rollup wrote, only on the records it fills, and refuses to clear a field another active rollup fills.
+**Prerequisites:** T-RB-02 done; **Test Children Count** on **The Garcia Family** shows 1.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Rollup Builder** tab, click **Copy** on **Test children per household**, click **Next** until **Check and save**, turn off **Active** and click **Save**. | **Copy of Test children per household** is listed, switched off. |
+| 2 | Click **Delete** on the copy, choose **Clear them from every record it fills, in the background** and click **Delete** in the panel. | A red message: "Test children per household also fills this field for the same records, so its values cannot be cleared. Keep the values, or switch Test children per household off first." The copy is still listed. |
+| 3 | Click **Delete** on the copy again, leave **Keep them on the records** chosen and click **Delete**. | "Rollup deleted. The values it wrote stay on the records." |
+| 4 | Switch **Test children per household** off. Click **Delete** on it, choose **Clear them from every record it fills, in the background** and click **Delete**. | "Rollup deleted. Its values are being cleared from the records in the background." |
+| 5 | After a minute, open **The Garcia Family**. | **Test Children Count** is blank. |
+| 6 | In the Error Log, find the entry from **RollupClearBatch**. | "Values of the deleted rollup Test children per household cleared on N records; 0 records could not be saved." |
+
+**Cleanup:** rebuild **Test children per household** with T-RB-02 if later scripts need it.
+
+## T-RB-45: Create a Field From the Builder
+
+**Purpose:** confirm step 1 writes a field to create (Setup steps, source and package), creates nothing itself, and chooses the field once it exists.
+**Prerequisites:** admin user. A sandbox if you deploy with the CLI (step 6).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **New rollup**, choose **Account**, then click **Create a Field**. | A **Create a Field** panel opens, saying BarnCRM cannot add a field itself because that takes a Metadata API deploy. **Field type** shows **Number**; **Write the Field** is disabled. |
+| 2 | Type `Test Gift Count` in **Field label** and click **Write the Field**. | Four numbered steps: open Object Manager, then Account, then Fields & Relationships, and click New; choose Number, enter the label Test Gift Count and the field name Test_Gift_Count; make it visible and save; come back and click Refresh Fields. Below, `objects/Account/fields/Test_Gift_Count__c.field-meta.xml` and its XML, **Copy**, **Download Field Package**, and the CLI command. |
+| 3 | Click **Copy**. | "Copied." The clipboard holds the XML. |
+| 4 | Click **Download Field Package**. | `BarnRollupField_Account_Test_Gift_Count__c.zip` downloads, holding `package.xml` and `objects/Account.object`. |
+| 5 | Click **Refresh Fields** without creating the field. | The panel stays open; **Field that shows the total** does not list Test Gift Count. No field was created in the org. |
+| 6 | Create the field by following the four steps in Setup (or, in a sandbox, deploy the zip with the command shown and give your profile access to the field). Back in the Builder, click **Refresh Fields**. | **Field that shows the total** now shows **Test Gift Count** and the panel closes. |
+| 7 | Type `Member Count` in **Field label** after opening **Create a Field** again, and click **Write the Field**. | A red message: "This object already has a field named Member_Count__c. Choose it in the list, or give the new field another label." |
+
+**Cleanup:** click **Cancel**; delete **Test Gift Count** in Setup if you created it.
+
+## T-RB-46: Explain These Totals on a Record Page
+
+**Purpose:** confirm the record-page component explains each total, counts what was read, links the records, and shows the recalculation to admins only.
+**Prerequisites:** T-RB-02 done; **Test children per household** active; a staff user with **Rollup Builder User**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Giving deployed, open **The Garcia Family** as admin. (Without Giving: click the gear, **Edit Page**, drag **Explain These Totals** onto the page and save.) | The **Explain These Totals** card shows in the sidebar. |
+| 2 | Read the entry for **Test Children Count**. | "Test Children Count: 1", the sentence "Number of Contacts ... shown in Test Children Count on each Account." (with its condition note), "1 of the 3 records read count; 2 are left out.", and "Last calculated ..." or "Not calculated yet." |
+| 3 | Read **Records Read for This Record**. | Harper, Luis and Diego linked: Diego **Counted**, Harper and Luis "Left out: does not meet condition 1". |
+| 4 | Read the admin line. | "For admins, recalculated now without saving: Calculated: 1. On the record now: 1." |
+| 5 | Change Luis's **Household Role** to **Child** and save, then click **Refresh** on the card. | The counts read 2 of 3 (after the instant update), and Luis is **Counted**. Change him back. |
+| 6 | Log in as the staff user and open **The Garcia Family**. | No card: it shows only to people with Manage BarnCRM Settings until you change its visibility. As admin, edit the page, remove the card's visibility filter and save; as the staff user, reload. | 
+| 6a | Read the card as the staff user. | The same entry without the admin line. |
+| 7 | Open an account no rollup fills (or switch the test rollup off and click **Refresh**). | "No BarnCRM rollup you can see fills a field on this record." |
+
+**Cleanup:** switch the test rollup back on if you switched it off; put the card's visibility filter back (Manage BarnCRM Settings is true), or remove the component if you added it only for this script.
+
+## T-RB-47: Starter Templates Add Only What You Tick, Switched Off
+
+**Purpose:** confirm Starter Templates adds nothing by default, adds only ticked rollups and adds them switched off, and opens a rollup prefilled with Create a Field ready.
+**Prerequisites:** admin user; Giving deployed; a staff user without Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab and note how many rollups are listed. | **Starter Templates** shows above the list. |
+| 2 | Click **Starter Templates**. | The **Nonprofit Starter** with seven rollups, none ticked, each with its sentence. Each says "Needs a field labelled ... on Contact" (or "on Appeal"), so its tick box is disabled. **Add the Chosen Rollups** is disabled. The rollup list has not changed. |
+| 3 | Next to **Average Gift**, click **Open in Builder**. | The Builder opens on step 1 named **Average Gift**, showing on **Contact**, with **Create a Field** open: label **Average Gift**, type **Currency**. |
+| 4 | Click **Write the Field**, create the field from the steps in Setup, then click **Refresh Fields**. Click **Cancel**. | **Field that shows the total** shows **Average Gift**. Cancel saves nothing. |
+| 5 | Click **Starter Templates** (twice if the panel is still open, to close and reopen it). | **Average Gift** says "Ready to add, switched off." and can be ticked; the others still need their fields. |
+| 6 | Tick **Average Gift** and click **Add the Chosen Rollups**. | "Average Gift: Added, switched off." The rollup list shows **Average Gift**, switched off, mode Both. |
+| 7 | Close **Starter Templates** and open it again. | **Average Gift** says "Already filled by Average Gift." and cannot be ticked. |
+| 8 | Log in as the staff user and open the **Rollup Builder** tab. | No **Starter Templates** button. |
+
+**Cleanup:** delete the **Average Gift** rollup (keep values) and the **Average Gift** field in Setup.

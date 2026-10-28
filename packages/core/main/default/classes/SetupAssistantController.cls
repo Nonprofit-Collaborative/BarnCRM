@@ -59,6 +59,9 @@ public with sharing class SetupAssistantController {
         public String currentMode;
         @AuraEnabled
         public List<String> modes;
+        /** A plain notice for each other rollup tool in the org, DLRS or Rollup Helper (R-R16). */
+        @AuraEnabled
+        public List<String> otherRollupTools;
     }
 
     @AuraEnabled
@@ -304,6 +307,7 @@ public with sharing class SetupAssistantController {
         model.detectedShape = SetupAssistantService.detectedShape();
         model.recommendedMode = SetupAssistantService.recommendedMode();
         model.modes = SetupAssistantService.modes();
+        model.otherRollupTools = OtherRollupTools.notices();
         try {
             model.currentMode = CoexistenceService.getCurrentMode();
         } catch (Exception e) {

@@ -124,6 +124,21 @@ describe('c-module-manager', () => {
     jest.clearAllMocks();
   });
 
+  it('says nothing about other rollup tools when the org has none', async () => {
+    const element = await build();
+
+    expect(element.shadowRoot.querySelector('[data-id="other-rollup-tools"]')).toBeNull();
+  });
+
+  it('names DLRS as a separate rollup tool when the page is told it is here', async () => {
+    getState.mockResolvedValue({ ...state(), otherRollupTools: ['This org also runs DLRS.'] });
+    const element = await build();
+
+    const notice = element.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
+    expect(notice.textContent).toContain('Core_OtherRollupTools_Title');
+    expect(notice.textContent).toContain('This org also runs DLRS.');
+  });
+
   it('says what each module is doing', async () => {
     const element = await build();
 

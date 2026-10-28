@@ -6,6 +6,8 @@ import TITLE from '@salesforce/label/c.Core_RollupBuilder_Title';
 import COPY_OF from '@salesforce/label/c.Core_RollupBuilder_CopyOf';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
+import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportButton';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 
@@ -17,11 +19,12 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
-  labels = { title: TITLE };
+  labels = { title: TITLE, otherTools: OTHER_TOOLS, importFromDlrs: IMPORT_FROM_DLRS };
 
   model;
   draft;
   editing = false;
+  importing = false;
   notice;
   error;
   enclosingTabId;
@@ -52,8 +55,34 @@ export default class RollupBuilder extends LightningElement {
     }
   }
 
+  /** DLRS or Rollup Helper in this org: separate tools whose rollups BarnCRM does not manage. */
+  get otherToolNotices() {
+    return (this.model && this.model.otherToolNotices) || [];
+  }
+
+  get hasOtherTools() {
+    return this.otherToolNotices.length > 0;
+  }
+
   get listClass() {
-    return this.editing ? 'slds-hide' : '';
+    return this.editing || this.importing ? 'slds-hide' : '';
+  }
+
+  /** Import from DLRS, offered when DLRS has an active rollup and the viewer may manage (R-R16). */
+  get showImport() {
+    return Boolean(this.model && this.model.canImportFromDlrs) && !this.editing && !this.importing;
+  }
+
+  handleImport() {
+    this.notice = undefined;
+    this.error = undefined;
+    this.importing = true;
+  }
+
+  /** The wizard closed: finished (with its notice) or left, the copies kept either way. */
+  handleImportClosed(event) {
+    this.importing = false;
+    this.handleSaved({ detail: { notice: event.detail && event.detail.notice } });
   }
 
   /** Whether the viewer may switch instant totals off and on (Manage BarnCRM Settings). */
@@ -86,6 +115,19 @@ export default class RollupBuilder extends LightningElement {
       .catch((error) => {
         this.error = this.messageFrom(error);
       });
+  }
+
+  /** A starter template's rollup, opened prefilled (U2); nothing is saved until she saves. */
+  handleTemplateOpen(event) {
+    this.open(event.detail.draft);
+  }
+
+  /** Rollups added from a starter template, switched off, appear in the list. */
+  handleTemplatesAdded() {
+    const list = this.template.querySelector('c-rollup-definitions');
+    if (list) {
+      list.refresh();
+    }
   }
 
   open(draft) {

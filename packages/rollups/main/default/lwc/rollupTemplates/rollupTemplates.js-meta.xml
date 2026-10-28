@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Rollup Builder's Starter Templates: rollups an administrator may tick and add, switched off, or open in the Builder prefilled. Nothing is added by default.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

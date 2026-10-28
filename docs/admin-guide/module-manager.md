@@ -11,6 +11,11 @@ Every module is a separate package. A module that is not installed leaves nothin
 your org. BarnCRM never installs or removes a package for you: Salesforce does not let one
 app do that, and you should see and approve what goes into your org.
 
+When Rollup Builder or Giving is installed and the org also runs DLRS or Rollup Helper, the
+list starts with **Other Rollup Tools**: one line per tool, saying it is a separate rollup tool
+whose rollups BarnCRM does not manage. See
+[DLRS and Rollup Helper in the Same Org](rollups.md#dlrs-and-rollup-helper-in-the-same-org).
+
 ## How to turn it on
 
 There is nothing to turn on.

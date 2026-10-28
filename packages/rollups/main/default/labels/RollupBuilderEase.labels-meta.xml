@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupEase_CalcSum</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a sum: {0} is the counted field's label.</shortDescription>
+        <value>Total of {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcCount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a count, followed by the records counted.</shortDescription>
+        <value>Number of</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcMin</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a minimum: {0} is the counted field's label.</shortDescription>
+        <value>Smallest {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcMax</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a maximum: {0} is the counted field's label.</shortDescription>
+        <value>Largest {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcAvg</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, an average: {0} is the counted field's label.</shortDescription>
+        <value>Average {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcFirst</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, the first value: {0} is the field's label.</shortDescription>
+        <value>First {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcLast</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, the last value: {0} is the field's label.</shortDescription>
+        <value>Last {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcCountDistinct</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a count distinct: {0} is the field's label.</shortDescription>
+        <value>Number of different {0} values</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcAny</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, Any into a checkbox, followed by the records.</shortDescription>
+        <value>Whether there are any</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, None into a checkbox, followed by the records.</shortDescription>
+        <value>Whether there are no</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcTextList</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a text list: {0} is the field's label.</shortDescription>
+        <value>List of {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CalcTextListDistinct</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a text list of each value once: {0} is the field.</shortDescription>
+        <value>List of each different {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_Sentence</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: {0} calculation, {1} records, {2} link, {3} field, {4} object</shortDescription>
+        <value>{0} from {1} by {2}, shown in {3} on each {4}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Count sentence: {0} calculation, {1} records, {2} link, {3} field, {4} object</shortDescription>
+        <value>{0} {1} by {2}, shown in {3} on each {4}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceConditions</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: the rollup has conditions on the records counted.</shortDescription>
+        <value>Only records that meet its conditions count.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceThisYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: only the current fiscal year counts.</shortDescription>
+        <value>Only this fiscal year counts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceLastYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: only the previous fiscal year counts.</shortDescription>
+        <value>Only last fiscal year counts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceTwoYearsAgo</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: only the fiscal year two years ago counts.</shortDescription>
+        <value>Only the fiscal year two years ago counts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, a row limit: {0} is how many records count.</shortDescription>
+        <value>Only the first {0} records, in its order, count.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_Or</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence: joins two ways the records reach the total.</shortDescription>
+        <value>or</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_LinkHousehold</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, link through a household: {0} is the person field.</shortDescription>
+        <value>{0}'s household</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_LinkHouseholdMembers</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup sentence, link through household members: {0} is the field.</shortDescription>
+        <value>{0}'s household members</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: the rollup is switched off.</shortDescription>
+        <value>Switched off</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: {0} is how many records failed to save.</shortDescription>
+        <value>{0} records could not be saved: see Needs Attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusRunning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: a full recalculation is going now.</shortDescription>
+        <value>A full recalculation is running</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusWaiting</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: {0} is how many records wait in the queue.</shortDescription>
+        <value>{0} records waiting</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_StatusClear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list status: no record waits for this rollup.</shortDescription>
+        <value>Nothing waiting</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictOverwrites</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the other rollup writing this field.</shortDescription>
+        <value>Writes the same field as {0} for the same records, so each overwrites the other: switch one off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictBlocked</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the active rollup filling this field.</shortDescription>
+        <value>Cannot be switched on while {0} fills the same field for the same records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ConflictDuplicate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list conflict: {0} is the rollup that calculates the same.</shortDescription>
+        <value>Calculates the same total as {0}, into another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ColumnStatus</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list column: how each rollup's recalculation stands.</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_Search</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list search box label.</shortDescription>
+        <value>Search rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SearchHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list search box help text.</shortDescription>
+        <value>Finds rollups by name, description, what they count, or the object and field that show the total.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_Group</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list group heading: {0} is the object, {1} how many rollups.</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NoMatches</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list: nothing matches the search.</shortDescription>
+        <value>No rollup matches your search.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_BuilderSentence</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} calculation, {1} records, {2} which, {3} field, {4} mode</shortDescription>
+        <value>Show {0} from {1}, counting {2}, in {3}. Updated: {4}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SentenceHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence help: its parts open the step that sets them.</shortDescription>
+        <value>Click a part of the sentence to change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NotChosen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: a part not chosen yet.</shortDescription>
+        <value>(not chosen yet)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_EveryRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: the rollup has no conditions.</shortDescription>
+        <value>every record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SomeRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} is how many conditions the records must meet.</shortDescription>
+        <value>only those that meet its conditions ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TargetPart</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder sentence: {0} is the object, {1} the field showing the total.</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NotForField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is the field, {1} the calculations it cannot hold.</shortDescription>
+        <value>Not available for {0}: {1}. To use one of them, choose another field in step 1.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldsNumbers</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation that reads numbers only.</shortDescription>
+        <value>Only number, currency and percent fields are listed, because {0} works on numbers.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldsNumbersDates</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation that reads numbers or dates.</shortDescription>
+        <value>Only number, currency, percent and date fields are listed, because {0} compares numbers or dates.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NoFieldFits</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 3: {0} is a calculation no field of the records fits.</shortDescription>
+        <value>These records have no field that {0} can read. Choose another calculation, or other records in step 2.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 5 heading over what each mode means.</shortDescription>
+        <value>What Each Choice Means</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantAfter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the records counted.</shortDescription>
+        <value>Instantly, after the save: {0} changes within about a minute after one of the {1} is saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantDuring</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the records counted.</shortDescription>
+        <value>Instantly, during the save: {0} changes as one of the {1} is saved, which makes each save a little slower.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeInstantNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence, no trigger yet: {0} is the records counted.</shortDescription>
+        <value>Instantly: not available until {0} have instant totals (see Instant Totals below).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeNightly</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the field, {1} the nightly run's time.</shortDescription>
+        <value>Every night: {0} is recalculated at {1} each night, so a change made today shows tomorrow.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeBoth</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the nightly run's time.</shortDescription>
+        <value>Both (recommended): instantly, and the nightly run at {0} puts right anything a save missed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ModeBothNoInstant</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Mode consequence: {0} is the nightly time, {1} the records counted.</shortDescription>
+        <value>Both (recommended): every night at {0} for now, and instantly too once {1} have instant totals.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_PickSamples</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: button that picks sample records.</shortDescription>
+        <value>Pick Sample Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_PickSamplesHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: what picking sample records does.</shortDescription>
+        <value>Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SamplesHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: heading over the sample records.</shortDescription>
+        <value>Sample Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_SamplesNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: no record to sample.</shortDescription>
+        <value>There is no record this rollup would fill yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ShowRows</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: button that lists a sample's source records.</shortDescription>
+        <value>Show Records Read</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: heading over the source records read.</shortDescription>
+        <value>Records Read for This Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsShown</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the records listed, {1} the records read.</shortDescription>
+        <value>Showing {0} of the {1} records read for this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsNone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: the record has no source records.</shortDescription>
+        <value>No records are read for this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowsHousehold</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: rows are not listed through a household.</shortDescription>
+        <value>Records read through a household are not listed here; the total above includes them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowCounted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: a source record that counts.</shortDescription>
+        <value>Counted</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowFails</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the numbers of the conditions not met.</shortDescription>
+        <value>Left out: does not meet condition {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowNoOrder</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the blank field that orders records.</shortDescription>
+        <value>Left out: {0} is blank</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowBeyondLimit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: {0} is the row limit.</shortDescription>
+        <value>Left out: only the first {0} count</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RowOutsideWindow</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder preview: a source record outside the year counted.</shortDescription>
+        <value>Left out: outside the year this rollup counts</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteHeading</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list: heading of the delete panel.</shortDescription>
+        <value>Delete This Rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteQuestion</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: {0} is the rollup's name.</shortDescription>
+        <value>Delete {0}? This cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteChoice</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: label of the keep or clear choice.</shortDescription>
+        <value>What happens to the values it wrote</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteKeep</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: keep the values (default).</shortDescription>
+        <value>Keep them on the records (nothing updates them again)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeleteClear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list delete panel: clear the values.</shortDescription>
+        <value>Clear them from every record it fills, in the background</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DeletedCleared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup list: notice after deleting and clearing.</shortDescription>
+        <value>Rollup deleted. Its values are being cleared from the records in the background.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ClearShared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Delete refused: {0} is the other rollup filling the field.</shortDescription>
+        <value>{0} also fills this field for the same records, so its values cannot be cleared. Keep the values, or switch {0} off first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ClearDone</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Log: {0} is the rollup, {1} records cleared, {2} records refused.</shortDescription>
+        <value>Values of the deleted rollup {0} cleared on {1} records; {2} records could not be saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CreateField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button and heading of the Create a Field panel.</shortDescription>
+        <value>Create a Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_CreateFieldWhy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: why the field is written, not created.</shortDescription>
+        <value>BarnCRM cannot add a field to your org itself: that takes a Metadata API deploy. It writes the field for you to create in Setup, or to download and deploy.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NewFieldLabel</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: label of the new field's label box.</shortDescription>
+        <value>Field label</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_NewFieldKind</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: label of the new field's type box.</shortDescription>
+        <value>Field type</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: which field type suits which calculation.</shortDescription>
+        <value>Number for counts and totals, Currency for amounts, Date or Date/Time for first and last dates, Text for a copied value, Text Area (Long) for a text list, Checkbox for Any and None.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Number</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindCurrency</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Currency</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindDate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindDateTime</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Date/Time</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindLongText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Text Area (Long)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_KindCheckbox</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type, as Setup names it.</shortDescription>
+        <value>Checkbox</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_WriteField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button that writes the new field.</shortDescription>
+        <value>Write the Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldLabelProblem</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: the label cannot make a field.</shortDescription>
+        <value>Choose the record that shows the total, and give the field a label of up to 40 characters with at least one letter or digit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldKindProblem</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: no field type chosen.</shortDescription>
+        <value>Choose the field type.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldExists</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: {0} is a field name the object already has.</shortDescription>
+        <value>This object already has a field named {0}. Choose it in the list, or give the new field another label.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldDescription</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Description written into a generated rollup field.</shortDescription>
+        <value>Filled by a BarnCRM rollup. Do not edit by hand: the next recalculation replaces it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepOpen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the object's label.</shortDescription>
+        <value>In Setup, open Object Manager, then {0}, then Fields &amp; Relationships, and click New.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the type, {1} the label, {2} the name.</shortDescription>
+        <value>Choose {0} and click Next. Enter the label {1}; Setup fills in the field name {2}. Click Next.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepAccess</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: field access and layouts.</shortDescription>
+        <value>Make it visible to the people who should see the total (read only is enough for most), add it to the page layouts where they look, and click Save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldStepBack</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field step: {0} is the field's label.</shortDescription>
+        <value>Come back here, click Refresh Fields and choose {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_FieldDeploy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field: {0} is the downloaded file's name.</shortDescription>
+        <value>Or deploy it with the Salesforce CLI: sf project deploy start --metadata-dir {0} --single-package. A deployed field is visible to nobody until you give access to it in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_DownloadField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create a Field: link that downloads the field package.</shortDescription>
+        <value>Download Field Package</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_RefreshFields</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder step 1: button that reloads the fields.</shortDescription>
+        <value>Refresh Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page card: title of Explain These Totals.</shortDescription>
+        <value>Explain These Totals</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainEmpty</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: no rollup fills this record.</shortDescription>
+        <value>No BarnCRM rollup you can see fills a field on this record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainCounts</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>{0} is records counted, {1} records read, {2} records left out.</shortDescription>
+        <value>{0} of the {1} records read count; {2} are left out.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainLast</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: {0} is when the total was last calculated.</shortDescription>
+        <value>Last calculated {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainNever</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: the total was never calculated.</shortDescription>
+        <value>Not calculated yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainAdmin</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: {0} is the admin's calculation now.</shortDescription>
+        <value>For admins, recalculated now without saving: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainSeen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: counts cover only what the viewer can see.</shortDescription>
+        <value>The counts and the list include only records you can open; the total includes them all.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_ExplainRefresh</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explain These Totals: button that reads the totals again.</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplButton</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder: button and heading of the starter templates.</shortDescription>
+        <value>Starter Templates</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplIntro</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: nothing is added until chosen.</shortDescription>
+        <value>Nothing is added until you tick rollups and click Add the Chosen Rollups. Each is added switched off: switch it on once its field shows what you expect.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAdd</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: button that adds the ticked rollups.</shortDescription>
+        <value>Add the Chosen Rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplOpen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: opens one rollup in the Builder, prefilled.</shortDescription>
+        <value>Open in Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplClose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter Templates: closes the panel.</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplStarter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nonprofit starter template.</shortDescription>
+        <value>Nonprofit Starter</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplStarterHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What the nonprofit starter template holds.</shortDescription>
+        <value>Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAverageGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Average Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplFirstGiftAmount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>First Gift Amount</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplLastGiftAmount</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Last Gift Amount</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplSmallestGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Smallest Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplGiftsThisYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Gifts This Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAppealAverageGift</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Appeal Average Gift</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAppealDonors</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template rollup and field name.</shortDescription>
+        <value>Number of Donors</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplNeedsObject</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is an object the org does not have.</shortDescription>
+        <value>Needs {0}, which this org does not have.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplFilled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is the rollup filling the field.</shortDescription>
+        <value>Already filled by {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplNeedsField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: {0} is the field label, {1} the object.</shortDescription>
+        <value>Needs a field labelled {0} on {1}: click Open in Builder, then Create a Field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplReady</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template status: can be added.</shortDescription>
+        <value>Ready to add, switched off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupEase_TplAdded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Starter template outcome: added.</shortDescription>
+        <value>Added, switched off.</value>
+    </labels>
+</CustomLabels>
