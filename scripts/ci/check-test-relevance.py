@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fails if an Apex test class says nothing about which code it tests.
 
-The fast org gate (scripts/org/run-org-tests.sh --relevant) deploys a branch's changed
+The incremental org gate (scripts/org/run-org-tests.sh, plan D-142) deploys a batch's changed
 Apex with the RunRelevantTests test level, and Salesforce picks the tests to run. Its
 own dependency analysis follows direct references only, so a test that reaches the
 changed class through a trigger, a handler registry or Type.forName is missed. The
