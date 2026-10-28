@@ -160,6 +160,7 @@ public with sharing class IntegrationAppService {
                       Show_Only_When_Installed__c,
                       Sort_Order__c
                   FROM Integration_App__mdt
+                  WITH SYSTEM_MODE
               ];
         List<Integration_App__mdt> sorted = new List<Integration_App__mdt>();
         for (Integration_App__mdt row : rows) {
