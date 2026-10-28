@@ -405,7 +405,12 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /**
+     * A real-time text list into Account.Description. No DLRS rollups, so an org whose DLRS fills
+     * Account.Description does not turn the save into the switch-off question.
+     */
     private static RollupBuilderController.Draft namesList(String customDelimiter) {
+        RollupDlrsFake.use(new List<RollupDlrs.Definition>());
         RollupBuilderController.Draft draft = childCount();
         draft.name = 'Contact last names';
         draft.targetField = 'Description';
@@ -425,11 +430,9 @@ private class RollupBuilderControllerTest {
     static void aCustomDelimiterWithSpacesSurvivesTheSaveTheEngineAndTheBuilder() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             RollupBuilderController.SaveResult result;
-            Test.startTest();
             System.runAs(maria()) {
                 result = RollupBuilderController.save(namesList(' - '), false);
             }
-            Test.stopTest();
 
             Rollup_Definition__c stored = [
                 SELECT Delimiter__c, Custom_Delimiter__c
@@ -454,10 +457,14 @@ private class RollupBuilderControllerTest {
 
             Account family = new Account(Name = 'Delimiter Family');
             insert family;
+            // Real-time totals are queued and recalculated just after the save (ADR-0098), so the
+            // queued run finishes at stopTest.
+            Test.startTest();
             insert new List<Contact>{
                 new Contact(LastName = 'Baker', AccountId = family.Id),
                 new Contact(LastName = 'Ames', AccountId = family.Id)
             };
+            Test.stopTest();
             System.Assert.areEqual(
                 'Ames - Baker',
                 [SELECT Description FROM Account WHERE Id = :family.Id].Description,
@@ -503,16 +510,26 @@ private class RollupBuilderControllerTest {
             old.Source_Field__c = 'LastName';
             old.Target_Field__c = 'Description';
             old.Delimiter__c = RollupPlanner.CUSTOM_DELIMITER;
-            old.Custom_Delimiter__c = ' / ';
+            // Saved before tokens: Salesforce had already trimmed it, so it never has edge spaces.
+            old.Custom_Delimiter__c = '/';
             insert old;
+            old = [
+                SELECT Delimiter__c, Custom_Delimiter__c
+                FROM Rollup_Definition__c
+                WHERE Id = :old.Id
+            ];
 
-            System.Assert.areEqual(' / ', RollupPlanner.separatorOf(old), 'Used as it is');
+            System.Assert.areEqual('/', RollupPlanner.separatorOf(old), 'Used as it is');
             System.Assert.areEqual(
-                ' / ',
+                '/',
                 RollupBuilderController.getDraft(old.Id).customDelimiter,
                 'Shown as it is'
             );
-            System.Assert.areEqual('/', RollupPlanner.decodeDelimiter('/'), 'No token, no change');
+            System.Assert.areEqual(
+                'a b',
+                RollupPlanner.decodeDelimiter('a b'),
+                'Inner spaces without tokens, no change'
+            );
             System.Assert.isNull(RollupPlanner.decodeDelimiter(null), 'Nothing stays nothing');
         }
     }
