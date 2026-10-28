@@ -68,7 +68,7 @@ ways, and they do the same thing.
    or **Cancel** to leave it as it is.
 
 The change is saved at once and listed under **Recent Changes** at the bottom of BarnCRM
-Settings. Reload any open BarnCRM page to see the new module lists.
+Settings, with the old and new edition by name (for example "Standard Edition"). Reload any open BarnCRM page to see the new module lists.
 
 ### In Salesforce Setup
 

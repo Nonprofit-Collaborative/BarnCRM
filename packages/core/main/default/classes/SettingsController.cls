@@ -269,6 +269,7 @@ public with sharing class SettingsController {
         List<ChangeModel> changes = new List<ChangeModel>();
         try {
             Map<String, String> labels = labelsByStoredName();
+            Map<String, Map<String, String>> choices = choiceLabelsByStoredName();
             for (Setting_Change__c record : SettingChangeSelector.getRecent(limitCount)) {
                 ChangeModel change = new ChangeModel();
                 change.id = record.Id;
@@ -278,8 +279,8 @@ public with sharing class SettingsController {
                 change.settingName = labels.containsKey(stored)
                     ? labels.get(stored)
                     : record.Setting_Name__c;
-                change.oldValue = record.Old_Value__c;
-                change.newValue = record.New_Value__c;
+                change.oldValue = shownValue(record.Old_Value__c, choices.get(stored));
+                change.newValue = shownValue(record.New_Value__c, choices.get(stored));
                 change.changedBy = record.Changed_By__r == null ? null : record.Changed_By__r.Name;
                 change.changedAt = record.Changed_At__c;
                 changes.add(change);
@@ -299,18 +300,57 @@ public with sharing class SettingsController {
     private static Map<String, String> labelsByStoredName() {
         Map<String, String> labels = new Map<String, String>();
         for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
-            if (String.isBlank(definition.Setting_Key__c)) {
-                continue;
+            if (String.isNotBlank(definition.Setting_Key__c)) {
+                labels.put(storedNameOf(definition), definition.MasterLabel);
             }
-            String settingsObject = String.isBlank(definition.Settings_Object__c)
-                ? SettingsService.CORE_SETTINGS_OBJECT
-                : definition.Settings_Object__c.trim();
-            labels.put(
-                (settingsObject + '.' + definition.Setting_Key__c.trim()).toLowerCase(),
-                definition.MasterLabel
-            );
         }
         return labels;
+    }
+
+    /**
+     * Each choice setting's labels by stored value (lower case), keyed like
+     * `labelsByStoredName`, so Recent Changes shows what the setting's own picker shows: the
+     * Edition row reads "Nonprofit Edition", not the stored code "Impact". Translated when read,
+     * so rows logged before a label changed read the current label too.
+     */
+    private static Map<String, Map<String, String>> choiceLabelsByStoredName() {
+        Map<String, Map<String, String>> choices = new Map<String, Map<String, String>>();
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+            Map<String, String> byValue = new Map<String, String>();
+            for (Option option : toOptions(definition)) {
+                byValue.put(option.value.toLowerCase(), option.label);
+            }
+            if (String.isNotBlank(definition.Setting_Key__c) && !byValue.isEmpty()) {
+                choices.put(storedNameOf(definition), byValue);
+            }
+        }
+        // The Edition row is a component with its own picker, which names the stored codes with
+        // these labels (editionSetting): Community is the Standard Edition, Impact the Nonprofit.
+        choices.put(
+            (SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(),
+            new Map<String, String>{
+                ModuleDetectionService.SUITE_COMMUNITY.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,
+                ModuleDetectionService.SUITE_IMPACT.toLowerCase() => System.Label.Core_SuiteChoice_NonprofitName
+            }
+        );
+        return choices;
+    }
+
+    /** The name an audit row stores for a definition's setting, in lower case. */
+    private static String storedNameOf(Setting_Definition__mdt definition) {
+        String settingsObject = String.isBlank(definition.Settings_Object__c)
+            ? SettingsService.CORE_SETTINGS_OBJECT
+            : definition.Settings_Object__c.trim();
+        return (settingsObject + '.' + definition.Setting_Key__c.trim()).toLowerCase();
+    }
+
+    /** A logged value as its choice's label when it is one, otherwise as stored. */
+    private static String shownValue(String stored, Map<String, String> byValue) {
+        if (stored == null || byValue == null) {
+            return stored;
+        }
+        String label = byValue.get(stored.trim().toLowerCase());
+        return label == null ? stored : label;
     }
 
     /**
