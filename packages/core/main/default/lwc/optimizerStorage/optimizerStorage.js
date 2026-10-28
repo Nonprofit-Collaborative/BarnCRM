@@ -17,6 +17,10 @@ import COLUMN_RECORDS from '@salesforce/label/c.Core_OrgOptimizer_ColumnRecords'
 import COLUMN_MB from '@salesforce/label/c.Core_OrgOptimizer_ColumnMB';
 import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import NEAR_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_NearLimit';
+
+/** A limit used to this percentage or more carries a Near Limit badge. */
+const NEAR_LIMIT_PERCENT = 80;
 
 const LIMIT_LABELS = {
   DataStorageMB: LIMIT_DATA,
@@ -33,7 +37,8 @@ function format(template, ...values) {
 /**
  * Org Optimizer's Storage and limits section (admin guide org-optimizer.md): the org's storage
  * and daily limits from OrgLimits, and the records BarnCRM's own objects hold. Read only; read
- * when the section is opened and on Refresh.
+ * when the section is opened and on Refresh. After each read it fires `summary` with
+ * `detail.dataStoragePercent` for the Overview tile.
  */
 export default class OptimizerStorage extends LightningElement {
   labels = {
@@ -41,7 +46,8 @@ export default class OptimizerStorage extends LightningElement {
     limitsHeading: LIMITS_HEADING,
     ownHeading: OWN_HEADING,
     ownIntro: OWN_INTRO,
-    refresh: REFRESH
+    refresh: REFRESH,
+    nearLimit: NEAR_LIMIT
   };
 
   columns = [
@@ -63,6 +69,14 @@ export default class OptimizerStorage extends LightningElement {
     this.errorMessage = undefined;
     try {
       this.storage = await getStorage();
+      const data = ((this.storage && this.storage.limits) || []).find(
+        (use) => use.name === 'DataStorageMB'
+      );
+      if (data) {
+        this.dispatchEvent(
+          new CustomEvent('summary', { detail: { dataStoragePercent: data.percent } })
+        );
+      }
     } catch (error) {
       this.errorMessage = (error && error.body && error.body.message) || UNEXPECTED_ERROR;
     } finally {
@@ -74,7 +88,8 @@ export default class OptimizerStorage extends LightningElement {
     return ((this.storage && this.storage.limits) || []).map((use) => ({
       ...use,
       label: LIMIT_LABELS[use.name] || use.name,
-      usage: format(LIMIT_USAGE, use.used, use.max, use.percent)
+      usage: format(LIMIT_USAGE, use.used, use.max, use.percent),
+      nearLimit: use.percent >= NEAR_LIMIT_PERCENT
     }));
   }
 

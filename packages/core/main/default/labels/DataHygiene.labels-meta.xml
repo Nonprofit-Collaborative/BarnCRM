@@ -14,15 +14,23 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Quality section introduction.</shortDescription>
-        <value>Records that need tidying up, counted with your own access. Open a check in Find to read, export or change its records. Nothing here changes a record.</value>
+        <value>Records that need tidying up, counted with your own access. Nothing here changes a record.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_HealthCheckNote</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>How Data Quality differs from Health Check.</shortDescription>
-        <value>Health Check says whether BarnCRM is set up right. This page is about the records themselves.</value>
+        <shortDescription>Help popover: Open in Find, and how Data Quality differs from Health Check.</shortDescription>
+        <value>Open a check in Find to read, export or change its records. Health Check says whether BarnCRM is set up right; this section is about the records themselves.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NeedsAttention</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Badge on a check that found records.</shortDescription>
+        <value>Needs Attention</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_Recount</fullName>

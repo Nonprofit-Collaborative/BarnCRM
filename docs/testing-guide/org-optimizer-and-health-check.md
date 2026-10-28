@@ -12,13 +12,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the BarnCRM app, open the **Org Optimizer** tab. | Title **Org Optimizer**, with **What in your org needs attention. Each section runs only when you open it.** **Overview** is selected. |
-| 2 | Read **Overview**. | One line per section, each with **Open**: **Data Quality**, **Field Utilization**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. No **Duplicates** (they are on the **Duplicate Matching** tab). |
-| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. |
-| 4 | Click **Open** on **Errors**. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
-| 5 | Choose **Health Check**. | **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
+| 1 | In the BarnCRM app, open the **Org Optimizer** tab. | The page name **Org Optimizer** once (no second title card), then **What in your org needs attention, one section at a time.** On your first visit **About This Tool** is open with a **Learn More** link that opens the admin guide in a new tab. **Overview** is selected. |
+| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
+| 4 | Select the **Errors** tile. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
+| 5 | Choose **Health Check**. | An illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
 | 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
-| 7 | Choose **Overview**, then **Health Check** again. | The same report shows without running again. |
+| 7 | Choose **Overview**, then **Health Check** again. | On **Overview** the **Health Check** tile shows the run's result (**Errors: {n}**, **Warnings: {n}** or **Passed**). Back on **Health Check**, the same report shows without running again. |
+| 8 | Choose **Data Quality**, then **Storage and Limits**, then **Overview**. | **Data Quality** has **{n} Need Attention** or **All Clear**; **Storage and Limits** has **Data Storage {n}%**. Reload the page: **About This Tool** is now closed. |
 
 **Cleanup:** None.
 
@@ -31,7 +32,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Org Optimizer** tab. |
 | 2 | As admin, give the staff user **BarnCRM Find and Export** in **BarnCRM Settings**, **Access**, **Extra Permissions**. | A message says the staff user now has it. |
-| 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Data Quality**. **Overview** lists one section. |
+| 3 | As staff, wait a minute, reload, and open **Org Optimizer**. | Only **Overview** and **Data Quality**. **Overview** has one tile, **Data Quality**, under **Check Your Data**. |
 | 4 | Choose **Data Quality**. | The checks count with the staff user's own access. |
 
 **Cleanup:** Remove **BarnCRM Find and Export** from the staff user.
@@ -117,7 +118,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Storage and Limits**. | **Your Org's Limits** lists **Data Storage (MB)**, **File Storage (MB)**, **API Requests in the Last 24 Hours**, **Background Jobs (Asynchronous Apex) in the Last 24 Hours**, **Single Emails Sent Today**, each as **N of N (N%)**. |
+| 1 | Open **Org Optimizer**, choose **Storage and Limits**. | **Your Org's Limits** lists **Data Storage (MB)**, **File Storage (MB)**, **API Requests in the Last 24 Hours**, **Background Jobs (Asynchronous Apex) in the Last 24 Hours**, **Single Emails Sent Today**, each as **N of N (N%)** with a bar, and a **Near Limit** badge on any at 80% or more. |
 | 2 | Read **What BarnCRM Stores**. | **Records BarnCRM keeps for imports, undo and errors. Salesforce counts most records as 2 KB.** and a table with **Kind of Record**, **Records** and **About (MB)**. |
 | 3 | Look for anything that changes data. | Only **Refresh**. Click it: the numbers reload. |
 
@@ -131,7 +132,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then eight checks, including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Inactive Flows**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
-| 2 | Read a check with a count above 0. | Up to five names and **Open in Setup**. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
+| 2 | Read a check with a count above 0. | The count in a warning-colored badge, up to five names, and **Open in Setup** with a new-window icon. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
 | 5 | Set it to `60`, **Save**, then **Refresh** on **Unused Setup**. | **Your settings are saved.** The first check reads **Active Users Who Have Not Logged In for 60 Days**. |

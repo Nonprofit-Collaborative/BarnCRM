@@ -35,7 +35,9 @@ cannot see says so instead of showing a number.
    **BarnCRM Admin** role has it, and so does the **BarnCRM Find and Export** permission set
    (see [Find and export](find.md)).
 2. Open the **Org Optimizer** tab in the BarnCRM app and choose **Data Quality** (the tile on
-   **Overview**, or the tab on the left). The checks run as the section opens.
+   **Overview**, or the tab on the left). The checks run as the section opens. Each count has
+   a **Needs Attention** badge when it found records and **All Clear** when it found none, and
+   the help icon by the heading says how Data Quality differs from Health Check.
 3. Press **Recount** whenever you want fresh numbers. Nothing is saved between visits.
 
 There is one setting: **Years before a person is not changed**, in the **Org Optimizer**

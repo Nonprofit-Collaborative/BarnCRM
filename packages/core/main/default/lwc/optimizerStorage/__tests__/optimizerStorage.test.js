@@ -62,6 +62,25 @@ describe('c-optimizer-storage', () => {
     const table = element.shadowRoot.querySelector('[data-id="own"]');
     expect(table.data[0].recordsText).toBe('More than 10000');
     expect(table.data[1].recordsText).toBe('12');
+    expect(limit.querySelector('[data-id="near-limit"]')).toBeNull();
+  });
+
+  it('marks a limit near its end, and tells the page how full data storage is', async () => {
+    getStorage.mockResolvedValue({
+      ...STORAGE,
+      limits: [{ name: 'DataStorageMB', used: 180, max: 200, percent: 90 }]
+    });
+    const summary = jest.fn();
+    const element = createElement('c-optimizer-storage', { is: OptimizerStorage });
+    element.addEventListener('summary', summary);
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+
+    const limit = element.shadowRoot.querySelector('[data-id="DataStorageMB"]');
+    expect(limit.querySelector('[data-id="near-limit"]')).not.toBeNull();
+    expect(summary.mock.calls[0][0].detail).toEqual({ dataStoragePercent: 90 });
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
   it('shows the unexpected-error label when the failure has no message', async () => {

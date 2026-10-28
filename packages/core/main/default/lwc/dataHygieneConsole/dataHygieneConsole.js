@@ -13,12 +13,16 @@ import OPEN_IN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import RECORDS_FOUND from '@salesforce/label/c.Core_DataHygiene_RecordsFound';
 import OPENED_NOTICE from '@salesforce/label/c.Core_DataHygiene_OpenedNotice';
 import CHECK_FAILED from '@salesforce/label/c.Core_DataHygiene_CheckFailed';
+import NEEDS_ATTENTION from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
+import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 
 /**
- * The Data Hygiene tab (C-28, admin guide data-hygiene.md): every check with its count, read
- * with the person's own access, and "Open in Find", which saves the check's query as the
- * person's own saved query and opens the Find tab. The tab name and the page state key come
- * from Apex, because both carry the package namespace. Nothing here changes a record.
+ * Org Optimizer's Data Quality section (C-28, admin guide data-hygiene.md): every check with
+ * its count and a Needs Attention or All Clear badge, read with the person's own access, and
+ * "Open in Find", which saves the check's query as the person's own saved query and opens the
+ * Find tab. The tab name and the page state key come from Apex, because both carry the package
+ * namespace. After each count it fires `summary` with `detail.needsAttention`, the number of
+ * checks that found records, for the Overview tile. Nothing here changes a record.
  */
 export default class DataHygieneConsole extends NavigationMixin(LightningElement) {
   labels = {
@@ -40,11 +44,16 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
   }
 
   get rows() {
-    return this.checks.map((check) => ({
-      ...check,
-      headingId: `heading-${check.key}`,
-      hasCount: check.count !== undefined && check.count !== null
-    }));
+    return this.checks.map((check) => {
+      const found = check.count > 0;
+      return {
+        ...check,
+        headingId: `heading-${check.key}`,
+        hasCount: check.count !== undefined && check.count !== null,
+        badgeLabel: found ? NEEDS_ATTENTION : ALL_CLEAR,
+        badgeClass: found ? 'slds-theme_warning' : 'slds-theme_success'
+      };
+    });
   }
 
   get ariaBusy() {
@@ -56,6 +65,8 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
     this.errorMessage = undefined;
     try {
       this.checks = (await getChecks()) || [];
+      const needsAttention = this.checks.filter((check) => check.count > 0).length;
+      this.dispatchEvent(new CustomEvent('summary', { detail: { needsAttention } }));
     } catch (error) {
       this.errorMessage = this.messageFrom(error);
     } finally {

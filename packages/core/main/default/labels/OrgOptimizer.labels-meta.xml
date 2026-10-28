@@ -13,8 +13,112 @@
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Org Optimizer: one line under the title</shortDescription>
-        <value>What in your org needs attention. Each section runs only when you open it.</value>
+        <shortDescription>Org Optimizer: purpose line in the page header</shortDescription>
+        <value>What in your org needs attention, one section at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HelpText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: About This Tool text</shortDescription>
+        <value>Each section runs only when you open it, so the page opens quickly however large your org is. Health Check runs only when you press Run Health Check. Nothing changes unless you press a button that says so.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_GroupData</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview group heading for record checks</shortDescription>
+        <value>Check Your Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_GroupSetup</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview group heading for setup checks</shortDescription>
+        <value>Check Your Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeAllClear</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: badge when a section found nothing to fix</shortDescription>
+        <value>All Clear</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNew</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Errors tile badge; {0} unread entries</shortDescription>
+        <value>{0} New</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNeedAttention</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Data Quality tile badge; {0} checks that found records</shortDescription>
+        <value>{0} Need Attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeErrors</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge; {0} errors in the last run</shortDescription>
+        <value>Errors: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeWarnings</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge; {0} warnings in the last run</shortDescription>
+        <value>Warnings: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgePassed</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge when the last run found no problem</shortDescription>
+        <value>Passed</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNotRun</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge before any full run</shortDescription>
+        <value>Not Run Yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeDataStorage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Storage tile badge; {0} percent of data storage used</shortDescription>
+        <value>Data Storage {0}%</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_NearLimit</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: badge on a limit 80 percent or more used</shortDescription>
+        <value>Near Limit</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HealthCheckNotRunHeading</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: heading in the Health Check section before it runs</shortDescription>
+        <value>Health Check Runs When You Ask</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_Overview</fullName>
@@ -73,22 +177,6 @@
         <value>Whether BarnCRM is set up the way it should be.</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_Open</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: button that opens a section from Overview</shortDescription>
-        <value>Open</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_OpenAria</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: screen reader name of an Overview button; {0} is the section</shortDescription>
-        <value>Open {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_RunHealthCheck</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -142,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: what the Storage and limits section answers</shortDescription>
-        <value>How much storage and how many daily limits are used, and what BarnCRM adds.</value>
+        <value>Storage and daily limits used, and what BarnCRM adds.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitsHeading</fullName>
@@ -270,7 +358,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Overview line for Unused setup</shortDescription>
-        <value>Users, permission sets, reports, email templates, flows and jobs nobody seems to use. Read only.</value>
+        <value>Users, permission sets, reports, flows and jobs nobody seems to use.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_SetupIntro</fullName>
