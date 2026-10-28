@@ -7,37 +7,54 @@
 private class RollupAccessSyncTest {
     private static final String ADMIN_SET = RollupsPostInstall.ADMIN_PERMISSION_SET;
 
+    /** The role each person holds through a permission set group, by last name. */
+    private static final Map<String, String> GROUP_BY_NAME = new Map<String, String>{
+        'Reader' => 'Read_Only',
+        'Coordinator' => 'Volunteer_Coordinator',
+        'Boss' => 'BarnCRM_Admin_Group'
+    };
+
+    /** The test user and the people, created once for every method. */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void createTestUsers() {
+        System.runAs(TestUsers.admin()) {
+            createPeople();
+        }
     }
 
     /** The people, by last name: one per way of holding a role, and one with none. */
     private static Map<String, Id> people() {
-        Map<String, Id> ids = new Map<String, Id>{
-            'Staffer' => TestUsers.standardUserWith('Staffer', new List<String>{ 'BarnCRM_Staff' })
-                .Id,
-            'Outsider' => TestUsers.standardUser('Outsider').Id
-        };
-        Map<String, String> groupByName = new Map<String, String>{
-            'Reader' => 'Read_Only',
-            'Coordinator' => 'Volunteer_Coordinator',
-            'Boss' => 'BarnCRM_Admin_Group'
-        };
+        Map<String, Id> ids = new Map<String, Id>();
+        for (User person : [
+            SELECT Id, LastName
+            FROM User
+            WHERE
+                Username LIKE 'barn-test.%'
+                AND LastName IN ('Staffer', 'Outsider', 'Reader', 'Coordinator', 'Boss')
+            WITH SYSTEM_MODE
+        ]) {
+            ids.put(person.LastName, person.Id);
+        }
+        for (String developerName : GROUP_BY_NAME.values()) {
+            TestDataFactory.prepareRoleGroup(developerName);
+        }
+        return ids;
+    }
+
+    private static void createPeople() {
+        TestUsers.standardUserWith('Staffer', new List<String>{ 'BarnCRM_Staff' });
+        TestUsers.standardUser('Outsider');
         List<PermissionSetAssignment> roles = new List<PermissionSetAssignment>();
-        for (String name : groupByName.keySet()) {
-            Id userId = TestUsers.standardUser(name).Id;
-            ids.put(name, userId);
+        for (String name : GROUP_BY_NAME.keySet()) {
             roles.add(
                 new PermissionSetAssignment(
-                    AssigneeId = userId,
-                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup(groupByName.get(name))
+                    AssigneeId = TestUsers.standardUser(name).Id,
+                    PermissionSetGroupId = TestDataFactory.prepareRoleGroup(GROUP_BY_NAME.get(name))
                         .Id
                 )
             );
         }
         insert roles;
-        return ids;
     }
 
     private static Set<String> setsOf(Id userId) {
