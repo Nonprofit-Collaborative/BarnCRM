@@ -2,9 +2,9 @@
 // driven from a test.
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import HubWelcome from 'c/hubWelcome';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import createHousehold from '@salesforce/apex/HubController.createHousehold';
 
 jest.mock(
   '@salesforce/apex/HubController.getHomeModel',
@@ -14,6 +14,10 @@ jest.mock(
   },
   { virtual: true }
 );
+
+jest.mock('@salesforce/apex/HubController.createHousehold', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -32,42 +36,17 @@ jest.mock(
   { virtual: true }
 );
 
-const mockEncodeDefaultFieldValues = jest.fn(
-  (fields) =>
-    `encoded:${Object.keys(fields)
-      .map((key) => `${key}=${fields[key]}`)
-      .join(',')}`
-);
-jest.mock(
-  'lightning/pageReferenceUtils',
-  () => ({
-    encodeDefaultFieldValues: (...args) => mockEncodeDefaultFieldValues(...args)
-  }),
-  { virtual: true }
-);
-
-const HOUSEHOLD_RECORD_TYPE_ID = '012000000000001AAA';
-
-const ACCOUNT_INFO = {
-  createable: true,
-  recordTypeInfos: {
-    [HOUSEHOLD_RECORD_TYPE_ID]: {
-      recordTypeId: HOUSEHOLD_RECORD_TYPE_ID,
-      developerName: 'Household',
-      name: 'Household',
-      available: true
-    },
-    '012000000000002AAA': {
-      recordTypeId: '012000000000002AAA',
-      developerName: 'Organization',
-      name: 'Organization',
-      available: true
-    }
-  }
-};
+const NEW_HOUSEHOLD_ID = '001000000000001AAA';
 
 function model(overrides) {
-  return { canEdit: true, automationPaused: false, stepsCompleted: 1, stepsTotal: 2, ...overrides };
+  return {
+    canEdit: true,
+    automationPaused: false,
+    stepsCompleted: 1,
+    stepsTotal: 2,
+    canCreateHousehold: true,
+    ...overrides
+  };
 }
 
 function build() {
@@ -83,6 +62,10 @@ function settle() {
 
 function message(element) {
   return element.shadowRoot.querySelector('[data-id="welcome-message"]').textContent;
+}
+
+function button(element) {
+  return element.shadowRoot.querySelector('[data-id="new-household"]');
 }
 
 describe('c-hub-welcome', () => {
@@ -141,48 +124,65 @@ describe('c-hub-welcome', () => {
     );
   });
 
-  it('hides the New household button until the record type is resolved', async () => {
+  it('hides the New household button until the home model has loaded', async () => {
     const element = build();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="new-household"]')).toBeNull();
+    expect(button(element)).toBeNull();
   });
 
-  it('hides the New household button when the user cannot create accounts', async () => {
+  it('hides the New household button from someone who may not create a household', async () => {
     const element = build();
-    getObjectInfo.emit({ ...ACCOUNT_INFO, createable: false });
+    getHomeModel.emit(model({ canCreateHousehold: false }));
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="new-household"]')).toBeNull();
+    expect(button(element)).toBeNull();
   });
 
-  it('hides the New household button when the user may not use the household record type', async () => {
+  it('creates the household in Apex and opens it, without the standard New form', async () => {
+    createHousehold.mockResolvedValue(NEW_HOUSEHOLD_ID);
     const element = build();
-    const infos = { ...ACCOUNT_INFO.recordTypeInfos };
-    infos[HOUSEHOLD_RECORD_TYPE_ID] = { ...infos[HOUSEHOLD_RECORD_TYPE_ID], available: false };
-    getObjectInfo.emit({ ...ACCOUNT_INFO, recordTypeInfos: infos });
+    getHomeModel.emit(model());
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="new-household"]')).toBeNull();
-  });
-
-  it('navigates straight to a new household, skipping the record-type chooser', async () => {
-    const element = build();
-    getObjectInfo.emit(ACCOUNT_INFO);
+    button(element).click();
     await settle();
 
-    element.shadowRoot.querySelector('[data-id="new-household"]').click();
-
-    expect(mockEncodeDefaultFieldValues).toHaveBeenCalledWith({
-      Name: 'c.Core_Households_NamePlaceholder'
-    });
+    expect(createHousehold).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith({
-      type: 'standard__objectPage',
-      attributes: { objectApiName: 'Account', actionName: 'new' },
-      state: {
-        recordTypeId: HOUSEHOLD_RECORD_TYPE_ID,
-        defaultFieldValues: 'encoded:Name=c.Core_Households_NamePlaceholder'
-      }
+      type: 'standard__recordPage',
+      attributes: { recordId: NEW_HOUSEHOLD_ID, objectApiName: 'Account', actionName: 'view' }
     });
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]')).toBeNull();
+  });
+
+  it('shows why when the household could not be created, and stays on the page', async () => {
+    createHousehold.mockRejectedValue({ body: { message: 'You need permission' } });
+    const element = build();
+    getHomeModel.emit(model());
+    await settle();
+
+    button(element).click();
+    await settle();
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+      'You need permission'
+    );
+    expect(button(element).disabled).toBe(false);
+  });
+
+  it('falls back to its own message when the error has none', async () => {
+    createHousehold.mockRejectedValue({});
+    const element = build();
+    getHomeModel.emit(model());
+    await settle();
+
+    button(element).click();
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+      'Core_HubHomeActions_NewHouseholdFailed'
+    );
   });
 });

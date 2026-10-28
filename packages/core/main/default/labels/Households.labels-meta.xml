@@ -57,6 +57,22 @@
         <value>The new household could not be created, so nobody was moved. The Error Log has the details.</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorCreateNoAccess</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Creating a household: the user cannot create or edit accounts or a field</shortDescription>
+        <value>You need permission to create and edit accounts, and their fields, to create a household. Nothing was created. Ask your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Households_ErrorCreateNoHouseholdAccess</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Creating a household: no edit access to a household the change touches</shortDescription>
+        <value>You need edit access to every household this change touches. Nothing was created.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorPersonToOrganization</fullName>
         <categories>Households</categories>
         <language>en_US</language>

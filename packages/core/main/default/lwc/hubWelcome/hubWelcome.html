@@ -10,8 +10,15 @@
                 variant="brand"
                 label={labels.newHousehold}
                 data-id="new-household"
+                disabled={creating}
                 onclick={handleNewHousehold}
             ></lightning-button>
+        </template>
+
+        <template lwc:if={createError}>
+            <p class="slds-text-color_error slds-var-m-top_small" data-id="create-error" role="alert">
+                {createError}
+            </p>
         </template>
 
         <template lwc:if={automationPaused}>

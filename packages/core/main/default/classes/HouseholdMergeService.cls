@@ -533,7 +533,7 @@ public with sharing class HouseholdMergeService {
 
         Id destination = targetHouseholdId;
         if (destination == null) {
-            destination = HouseholdService.createHouseholdFor(moving);
+            destination = HouseholdService.createHouseholdFor(moving, bothEnds);
         }
 
         Set<Id> affected = HouseholdService.moveMembersWithoutUpkeep(

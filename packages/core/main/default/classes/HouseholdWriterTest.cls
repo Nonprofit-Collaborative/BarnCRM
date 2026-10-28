@@ -304,4 +304,188 @@ private class HouseholdWriterTest {
             );
         }
     }
+
+    // ------------------------------------------------- households a person asks for
+
+    /** A staff member whose access comes only from BarnCRM Staff, as in a real org. */
+    private static User staff(String lastName) {
+        return TestUsers.minimumAccessUserWith(lastName, new List<String>{ 'BarnCRM_Staff' });
+    }
+
+    private static String refusalFor(List<Account> households, Set<Id> touched) {
+        try {
+            HouseholdWriter.createHouseholdsForUser(households, touched);
+        } catch (HouseholdException e) {
+            return e.getMessage();
+        }
+        return null;
+    }
+
+    private static Integer householdsNamed(String name) {
+        return [SELECT COUNT() FROM Account WHERE Name = :name WITH SYSTEM_MODE];
+    }
+
+    @IsTest
+    static void aPersonWhoMayCreateAccountsGetsAHouseholdOfTheHouseholdRecordType() {
+        System.runAs(TestUsers.admin()) {
+            User maria = staff('Hwstaff');
+            Account household = new Account(Name = 'Asked For Household', Member_Count__c = 0);
+            List<Database.SaveResult> saves;
+
+            Test.startTest();
+            System.runAs(maria) {
+                Assert.isTrue(HouseholdWriter.canCreateHouseholds(), 'Maria may create one');
+                saves = HouseholdWriter.createHouseholdsForUser(
+                    new List<Account>{ household },
+                    new Set<Id>()
+                );
+            }
+            Test.stopTest();
+
+            Assert.isTrue(saves[0].isSuccess(), HouseholdWriter.failureReason(saves[0]));
+            Assert.areEqual(
+                HouseholdService.householdRecordTypeId(),
+                [SELECT RecordTypeId FROM Account WHERE Id = :saves[0].getId()].RecordTypeId,
+                'A record with no record type is given Household'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPersonWhoCannotCreateAccountsIsRefusedAndNothingIsCreated() {
+        System.runAs(TestUsers.admin()) {
+            User reader = TestUsers.peopleReaderWith('Hwreader', new List<String>());
+            String message;
+
+            Test.startTest();
+            System.runAs(reader) {
+                Assert.isFalse(HouseholdWriter.canCreateHouseholds(), 'No button for a reader');
+                message = refusalFor(
+                    new List<Account>{ HouseholdTestDataFactory.newHousehold('Reader Household') },
+                    null
+                );
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(0, householdsNamed('Reader Household'), 'Nothing was created');
+        }
+    }
+
+    @IsTest
+    static void aFieldThePersonCannotSetIsRefusedAndNothingIsCreated() {
+        System.runAs(TestUsers.admin()) {
+            User maria = staff('Hwfield');
+            Account household = HouseholdTestDataFactory.newHousehold('Field Household');
+            // Sample Data is the package's own marker, which BarnCRM Staff cannot edit.
+            household.Sample_Data__c = true;
+            String message;
+
+            Test.startTest();
+            System.runAs(maria) {
+                message = refusalFor(new List<Account>{ household }, null);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(0, householdsNamed('Field Household'), 'Nothing was created');
+        }
+    }
+
+    @IsTest
+    static void aTouchedHouseholdThePersonCannotEditIsRefusedAndNothingIsCreated() {
+        System.runAs(TestUsers.admin()) {
+            String orgDefault = [SELECT DefaultAccountAccess FROM Organization LIMIT 1]
+            .DefaultAccountAccess;
+            if (orgDefault == 'Edit' || orgDefault == 'ReadEditTransfer') {
+                // Everyone edits every account here, so no household is one staff cannot edit.
+                Assert.isNotNull(orgDefault, 'Only a public read and write org skips this');
+                return;
+            }
+            Account theirs = HouseholdTestDataFactory.newHousehold('Not Theirs');
+            insert theirs;
+            User maria = staff('Hwtouch');
+            String message;
+
+            Test.startTest();
+            System.runAs(maria) {
+                message = refusalFor(
+                    new List<Account>{ HouseholdTestDataFactory.newHousehold('Split Household') },
+                    new Set<Id>{ theirs.Id }
+                );
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Households_ErrorCreateNoHouseholdAccess, message, 'Refused');
+            Assert.areEqual(0, householdsNamed('Split Household'), 'Nothing was created');
+        }
+    }
+
+    @IsTest
+    static void anAccountOfAnotherRecordTypeIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            Id other;
+            for (Schema.RecordTypeInfo info : Schema.SObjectType.Account.getRecordTypeInfos()) {
+                if (
+                    !info.isMaster() &&
+                    info.getRecordTypeId() != HouseholdService.householdRecordTypeId()
+                ) {
+                    other = info.getRecordTypeId();
+                    break;
+                }
+            }
+            if (other == null) {
+                Assert.isNotNull(HouseholdService.householdRecordTypeId(), 'Only Household here');
+                return;
+            }
+            User maria = staff('Hwother');
+            String message;
+
+            Test.startTest();
+            System.runAs(maria) {
+                message = refusalFor(
+                    new List<Account>{ new Account(Name = 'Other Type', RecordTypeId = other) },
+                    null
+                );
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Households_ErrorNotAHousehold, message, 'Refused');
+            Assert.areEqual(0, householdsNamed('Other Type'), 'Nothing was created');
+        }
+    }
+
+    /** 251 households, then one more whose change touches all 251 (checked 200 at a time). */
+    @IsTest
+    static void twoHundredFiftyOneHouseholdsAreCreatedAndCheckedInBulk() {
+        System.runAs(TestUsers.admin()) {
+            User maria = staff('Hwbulk');
+            List<Account> created;
+            List<Database.SaveResult> last;
+
+            Test.startTest();
+            System.runAs(maria) {
+                created = HouseholdTestDataFactory.insertHouseholds('Bulk Household', 251);
+                Set<Id> touched = new Map<Id, Account>(created).keySet();
+                last = HouseholdWriter.createHouseholdsForUser(
+                    new List<Account>{ HouseholdTestDataFactory.newHousehold('Bulk Touching') },
+                    touched
+                );
+            }
+            Test.stopTest();
+
+            Assert.isTrue(last[0].isSuccess(), HouseholdWriter.failureReason(last[0]));
+            Id householdType = HouseholdService.householdRecordTypeId();
+            Assert.areEqual(
+                252,
+                [
+                    SELECT COUNT()
+                    FROM Account
+                    WHERE Name LIKE 'Bulk %' AND RecordTypeId = :householdType
+                    WITH SYSTEM_MODE
+                ],
+                'Every household was created'
+            );
+        }
+    }
 }

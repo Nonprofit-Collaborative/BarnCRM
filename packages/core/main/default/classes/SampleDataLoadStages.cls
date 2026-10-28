@@ -67,11 +67,11 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
             );
         }
 
-        List<Account> allAccounts = new List<Account>();
-        allAccounts.addAll(householdAccounts);
-        allAccounts.addAll(organizationAccounts);
-        if (!allAccounts.isEmpty()) {
-            Database.insert(allAccounts, sampleSaveOptions(), AccessLevel.USER_MODE);
+        // No user is given the Household record type (ADR-0141), so households are
+        // created by HouseholdWriter, which checks the loading user's access first.
+        HouseholdWriter.createHouseholdsForUser(householdAccounts, null, sampleSaveOptions());
+        if (!organizationAccounts.isEmpty()) {
+            Database.insert(organizationAccounts, sampleSaveOptions(), AccessLevel.USER_MODE);
         }
 
         Map<String, Id> keysToIds = new Map<String, Id>();

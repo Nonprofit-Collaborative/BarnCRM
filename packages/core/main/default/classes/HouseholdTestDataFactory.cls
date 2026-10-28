@@ -78,6 +78,35 @@ public class HouseholdTestDataFactory {
         );
     }
 
+    /**
+     * Inserts households the way BarnCRM creates them for a person: through HouseholdWriter in
+     * system mode, with its access checks, since no user is given the Household record type
+     * (ADR-0141). Run it as the user the test is about; a plain `insert` of a
+     * household in user mode is refused for anyone without the record type. Asserts that every
+     * household was saved, and answers the same records, now with their Ids.
+     */
+    @NamespaceAccessible
+    public static List<Account> insertHouseholds(List<Account> households) {
+        List<Database.SaveResult> saves = HouseholdWriter.createHouseholdsForUser(households, null);
+        for (Integer i = 0; i < saves.size(); i++) {
+            Assert.isTrue(
+                saves[i].isSuccess(),
+                'Household ' + i + ' was saved: ' + HouseholdWriter.failureReason(saves[i])
+            );
+        }
+        return households;
+    }
+
+    /** Named households, numbered from 1, inserted through HouseholdWriter as above. */
+    @NamespaceAccessible
+    public static List<Account> insertHouseholds(String namePrefix, Integer count) {
+        List<Account> households = new List<Account>();
+        for (Integer i = 1; i <= count; i++) {
+            households.add(newHousehold(namePrefix + ' ' + i));
+        }
+        return insertHouseholds(households);
+    }
+
     public static HouseholdService.Person person(
         String salutation,
         String firstName,

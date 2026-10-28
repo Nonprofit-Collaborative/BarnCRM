@@ -33,6 +33,11 @@ roles deliberately leave that out. So BarnCRM checks first that the person has E
 and edit access to both households (sharing included), and only then runs that one merge step
 itself. It never lets anyone merge away a household they could not edit.
 
+A split into a new household also needs Create and Edit on Account. Nobody is given the
+Household record type, so BarnCRM creates the new household itself, after checking those
+permissions and edit access to the household the people leave. Without them the split stops
+before anything changes.
+
 **What happens to the household you merge into.** It stays, always. "Delete a household
 when the last person leaves" is about a household somebody was the last to leave, not about
 the one you chose to keep, so merging two households that both happen to have no members in

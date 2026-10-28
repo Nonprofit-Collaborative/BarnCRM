@@ -193,7 +193,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | In **Modules**, click **Open the Module Manager**. | **BarnCRM Settings** opens on **Modules**. |
 | 4 | On **Home**, click **Dismiss** on What's new. Reload. | The card is gone and stays gone. |
 | 5 | As staff, open the **Home** tab. | What's new is still shown (dismissing is per person). Staff sees **Welcome to BarnCRM**, **New household** and **Quick Links** only: no setup checklist, Health Check, Errors to review or Modules card. |
-| 6 | As staff, click **New household**. | A new Household account form opens. Cancel it. |
+| 6 | As staff, click **New household**. | A household named **New Household** is created and its page opens, with no record type prompt. As admin, delete it. |
 
 **Cleanup:** None.
 
