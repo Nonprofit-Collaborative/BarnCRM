@@ -1,0 +1,22 @@
+<template>
+    <div class={barClass} data-id="bar">
+        <p class="slds-text-body_regular" aria-live="polite" data-id="count">{countText}</p>
+        <template lwc:if={isDirty}>
+            <div class="savebar__actions">
+                <lightning-button
+                    label={labels.discard}
+                    disabled={saving}
+                    data-id="discard"
+                    onclick={handleDiscard}
+                ></lightning-button>
+                <lightning-button
+                    variant="brand"
+                    label={labels.save}
+                    disabled={saving}
+                    data-id="save"
+                    onclick={handleSave}
+                ></lightning-button>
+            </div>
+        </template>
+    </div>
+</template>

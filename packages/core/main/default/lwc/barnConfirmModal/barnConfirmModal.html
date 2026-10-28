@@ -5,6 +5,15 @@
     <template for:each={detailLines} for:item="line">
       <p key={line.key} class="slds-var-m-top_x-small" data-id="detail">{line.text}</p>
     </template>
+    <template lwc:if={asksToType}>
+      <lightning-input
+        class="slds-show slds-var-m-top_small"
+        label={typeToConfirmLabel}
+        autocomplete="off"
+        data-id="type-to-confirm"
+        onchange={handleTyped}
+      ></lightning-input>
+    </template>
   </lightning-modal-body>
   <lightning-modal-footer>
     <lightning-button
@@ -16,6 +25,7 @@
       class="slds-var-m-left_x-small"
       variant={buttonVariant}
       label={confirmLabel}
+      disabled={confirmDisabled}
       onclick={handleConfirm}
       data-id="confirm"
     ></lightning-button>

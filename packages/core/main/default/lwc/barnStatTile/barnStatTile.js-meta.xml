@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: one count as a big number over a label with an optional state badge, used by the
+    import preview and results and by Org Optimizer counts.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

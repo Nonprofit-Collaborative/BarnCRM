@@ -1,0 +1,17 @@
+.savebar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+  border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.savebar__actions {
+  display: flex;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}

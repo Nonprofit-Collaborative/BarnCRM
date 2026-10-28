@@ -1,0 +1,14 @@
+<template>
+    <div class="stat" data-id="tile">
+        <p class="stat__value slds-text-heading_large" data-id="value">
+            <template lwc:if={isNumber}>
+                <lightning-formatted-number value={value}></lightning-formatted-number>
+            </template>
+            <template lwc:else>{value}</template>
+        </p>
+        <p class="slds-text-body_small" data-id="label">{label}</p>
+        <template lwc:if={hasBadge}>
+            <lightning-badge class={badgeClass} label={badgeLabel} data-id="badge"></lightning-badge>
+        </template>
+    </div>
+</template>
