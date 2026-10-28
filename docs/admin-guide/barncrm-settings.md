@@ -193,7 +193,8 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 6. Open the **General** section and scroll to **Recent Changes** at the bottom of the page.
    It shows on **General** only, whichever section the change was made in. Your change is the first row,
    showing the setting by the name you see on this page, the old value, the new value, your
-   name, and the time. Nothing is ever changed silently: one row is written per setting you
+   name, and the time. A setting with a list of choices shows each value as the choice reads
+   on this page (the edition, for example, reads "Nonprofit Edition"). Nothing is ever changed silently: one row is written per setting you
    actually changed, and saving a page without changing anything writes nothing. Ticking or
    skipping a step in the setup checklist is not a settings change, so it is not listed.
 7. Now sign in as David, who has the Team Member role and not Manage BarnCRM

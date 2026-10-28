@@ -837,6 +837,52 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void recentChangesShowAChoiceByItsLabel() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            Datetime now = System.now();
+            insert new List<Setting_Change__c>{
+                new Setting_Change__c(
+                    Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c',
+                    Old_Value__c = ModuleDetectionService.SUITE_COMMUNITY,
+                    New_Value__c = ModuleDetectionService.SUITE_IMPACT,
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = now
+                ),
+                new Setting_Change__c(
+                    Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.Coexistence_Mode__c',
+                    Old_Value__c = 'Standalone',
+                    New_Value__c = 'Retired',
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = now.addMinutes(-1)
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Assert.areEqual(2, changes.size(), 'Both changes are listed');
+            Assert.areEqual(
+                System.Label.Core_SuiteChoice_StandardName,
+                changes[0].oldValue,
+                'The old edition reads as the edition picker names it'
+            );
+            Assert.areEqual(
+                System.Label.Core_SuiteChoice_NonprofitName,
+                changes[0].newValue,
+                'The new edition reads as the edition picker names it'
+            );
+            Assert.areEqual('On its own', changes[1].oldValue, 'A choice reads as its label');
+            Assert.areEqual(
+                'Retired',
+                changes[1].newValue,
+                'A value no choice names reads as stored'
+            );
+        }
+    }
+
+    @IsTest
     static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
