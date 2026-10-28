@@ -113,6 +113,14 @@
         <value>That value is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_NoRecordType</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: the choice for accounts with no record type</shortDescription>
+        <value>No record type</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_NumberOutOfRange</fullName>
         <categories>Core</categories>
         <language>en_US</language>

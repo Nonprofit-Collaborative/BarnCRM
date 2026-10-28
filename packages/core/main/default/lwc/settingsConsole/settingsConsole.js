@@ -315,7 +315,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isCheckbox,
       isText: setting.dataType === 'Text',
       isNumber: setting.dataType === 'Number',
-      isPicklist: setting.dataType === 'Picklist',
+      // A Record Type row is one choice from a list, so it is the same dropdown (ADR-NEXT).
+      isPicklist: setting.dataType === 'Picklist' || setting.dataType === 'RecordType',
       isDateTime: setting.dataType === 'DateTime',
       isRecord: setting.dataType === 'Record',
       // A Field List is the same checkbox list, of an object's fields (R-AD10).

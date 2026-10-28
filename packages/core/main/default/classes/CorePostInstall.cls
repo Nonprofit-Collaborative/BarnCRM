@@ -69,6 +69,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
     private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
     private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
+    private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
 
     /** Test seam: true lets a test see the nightly tab access check scheduled. */
     @TestVisible
@@ -161,6 +162,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
         markFeaturesOffOnANewInstall(isNewInstall);
         saveEditionOnAnUpgrade(isUpgrade);
         applyRecommendedMode();
+        storeOrganizationRecordType();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
         // Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
@@ -256,6 +258,20 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
             CoexistenceService.applyRecommendedIfUnset();
         } catch (Exception e) {
             ErrorLogger.log(e, MODE_CONTEXT);
+        }
+    }
+
+    /**
+     * Stores the record type for organizations when none is stored, so the setting is never
+     * blank (ADR-NEXT, R-O5). Detection picks one the org already has, or No record type; no
+     * record type is created, activated or made visible, and a stored one is never replaced.
+     * Never throws.
+     */
+    private void storeOrganizationRecordType() {
+        try {
+            AccountKinds.storeDetectedIfBlank();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ORGANIZATION_CONTEXT);
         }
     }
 

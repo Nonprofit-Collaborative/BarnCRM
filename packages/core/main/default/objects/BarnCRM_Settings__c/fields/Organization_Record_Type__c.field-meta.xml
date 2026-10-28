@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Organization_Record_Type__c</fullName>
+  <description>The developer name of the Account record type whose accounts are organizations, or Master for no record type (canonical model R-O4, ADR-NEXT). Detected and stored on install and source deploy when blank, never overwritten there. Text because a custom setting field cannot be a picklist (ADR-0019).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Choose it in BarnCRM Settings, General, Record type for organizations.</inlineHelpText>
+  <label>Organization Record Type</label>
+  <length>80</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

@@ -905,6 +905,54 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('lets Maria choose one record type for organizations, or none', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        {
+          name: 'Defaults',
+          settings: [
+            {
+              key: 'Organization_Record_Type__c',
+              label: 'Record type for organizations',
+              description: 'Accounts of this record type are treated as organizations.',
+              dataType: 'RecordType',
+              section: 'Defaults',
+              objectApiName: 'Account',
+              component: null,
+              helpUrl: null,
+              value: 'Business_Account',
+              checked: false,
+              options: [
+                { label: 'Business Account', value: 'Business_Account' },
+                { label: 'No record type', value: 'Master' }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+    const element = build();
+    openSection('Defaults');
+    await settle();
+
+    expect(element.shadowRoot.querySelector('lightning-checkbox-group')).toBeNull();
+    const choice = element.shadowRoot.querySelector('lightning-combobox');
+    expect(choice.value).toBe('Business_Account');
+    expect(choice.options.map((option) => option.label)).toEqual([
+      'Business Account',
+      'No record type'
+    ]);
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Master' } }));
+    await settle();
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({
+      values: { Organization_Record_Type__c: 'Master' }
+    });
+  });
+
   it('says the page could not load rather than showing nothing', async () => {
     getConsoleModel.mockRejectedValue(new Error('no'));
     const element = build();

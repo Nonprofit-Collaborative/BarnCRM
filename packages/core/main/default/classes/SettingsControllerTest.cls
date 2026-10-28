@@ -890,6 +890,43 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void theOrganizationRecordTypeRowIsOneChoiceNeverBlank() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            SettingsController.SettingModel row = rowWithKey(
+                model,
+                SettingSections.GENERAL,
+                AccountKinds.KEY_ORGANIZATION_RECORD_TYPE
+            );
+            Assert.isNotNull(row, 'General always shows the record type for organizations');
+            Assert.areEqual(SettingsService.RECORD_TYPE, row.dataType, 'One record type');
+            Assert.areEqual(
+                AccountKinds.candidateRecordTypes().size() + 1,
+                row.options.size(),
+                'The candidates, then No record type'
+            );
+            SettingsController.Option last = row.options[row.options.size() - 1];
+            Assert.areEqual(AccountKinds.NO_RECORD_TYPE, last.value, 'Stored as Master');
+            Assert.areEqual(System.Label.Core_Settings_NoRecordType, last.label, 'Shown by name');
+            Assert.areEqual(
+                AccountKinds.detectOrganizationRecordType(),
+                row.value,
+                'Nothing stored: the detected record type is shown, never a blank'
+            );
+            Assert.isTrue(row.unsavedDefault, 'Shown, not saved, until somebody keeps it');
+            for (SettingsController.Option option : row.options) {
+                Assert.isFalse(
+                    option.label.toLowerCase().contains('household'),
+                    'A household record type is never offered'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void aFieldListRowOffersTheObjectsCustomFieldsAndName() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{

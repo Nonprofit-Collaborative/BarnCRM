@@ -908,6 +908,46 @@ private class SettingsServiceTest {
     }
 
     @IsTest
+    static void theOrganizationRecordTypeTakesOnlyACandidateOrNoRecordType() {
+        System.runAs(TestUsers.admin()) {
+            String key = AccountKinds.KEY_ORGANIZATION_RECORD_TYPE;
+            List<Schema.RecordTypeInfo> offered = AccountKinds.candidateRecordTypes();
+            Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+
+            Test.startTest();
+            String unknown = refusalOf(key, 'Not_A_Record_Type');
+            String household = HouseholdService.householdRecordTypeId() == null
+                ? 'refused'
+                : refusalOf(key, 'Household');
+            String person = 'refused';
+            for (Schema.RecordTypeInfo info : SettingsService.recordTypes(Account.SObjectType)) {
+                if (personTypes.contains(info.getRecordTypeId())) {
+                    person = refusalOf(key, info.getDeveloperName());
+                }
+            }
+            String none = refusalOf(key, AccountKinds.NO_RECORD_TYPE);
+            String candidate = offered.isEmpty()
+                ? null
+                : refusalOf(key, offered[0].getDeveloperName());
+            Test.stopTest();
+
+            Assert.isTrue(
+                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A record type the org does not have is refused'
+            );
+            Assert.isNotNull(household, 'The Household record type is refused');
+            Assert.isNotNull(person, 'A person account record type is refused');
+            Assert.isNull(none, 'No record type is accepted');
+            Assert.isNull(candidate, 'A candidate record type is accepted');
+            Assert.areEqual(
+                offered.isEmpty() ? AccountKinds.NO_RECORD_TYPE : offered[0].getDeveloperName(),
+                BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+                'Saved org-wide'
+            );
+        }
+    }
+
+    @IsTest
     static void aFieldListTakesOnlyFieldsTheObjectOffersAndSavesOrgWide() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{

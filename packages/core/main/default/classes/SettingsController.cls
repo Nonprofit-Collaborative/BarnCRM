@@ -510,7 +510,11 @@ public with sharing class SettingsController {
             definition.Data_Type__c
         );
         setting.value = SettingsService.asText(value);
-        if (isMembershipMode(settingsObject, definition.Setting_Key__c)) {
+        if (isOrganizationRecordType(settingsObject, definition.Setting_Key__c)) {
+            // Never blank: the stored record type, or the one detection picks while nothing
+            // usable is stored (R-O5). Showing it is not saving it; install stores it.
+            setting.value = AccountKinds.organizationRecordTypeName();
+        } else if (isMembershipMode(settingsObject, definition.Setting_Key__c)) {
             // Blank means nobody has chosen yet, and every reader treats it as the simple way,
             // so the console shows that way as selected. Showing it is not saving it: the
             // stored value stays blank, which is what lets detection still propose the
@@ -562,20 +566,23 @@ public with sharing class SettingsController {
     }
 
     /**
-     * Gives a Record row its object and a Record Type List or Field List row its choices, read
-     * from describe (ADR-0074, R-AD10). False when the row names an object this org does not
-     * have, which leaves the row out as a missing settings object does.
+     * Gives a Record row its object and a Record Type, Record Type List or Field List row its
+     * choices, read from describe (ADR-0074, R-AD10, ADR-NEXT). False when the row names an
+     * object this org does not have, which leaves the row out as a missing settings object does.
      */
     private static Boolean addRecordChoices(
         Setting_Definition__mdt definition,
         SettingModel setting
     ) {
         Boolean isRecord = SettingsService.RECORD.equalsIgnoreCase(definition.Data_Type__c);
+        Boolean isRecordType = SettingsService.RECORD_TYPE.equalsIgnoreCase(
+            definition.Data_Type__c
+        );
         Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(
             definition.Data_Type__c
         );
         Boolean isFields = SettingsService.FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c);
-        if (!isRecord && !isRecordTypes && !isFields) {
+        if (!isRecord && !isRecordType && !isRecordTypes && !isFields) {
             return true;
         }
         Schema.SObjectType type = SettingsService.recordObjectType(definition);
@@ -583,6 +590,19 @@ public with sharing class SettingsController {
             return false;
         }
         setting.objectApiName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        if (isRecordType) {
+            // One choice: the record types the row offers, then "No record type" (Master).
+            for (Schema.RecordTypeInfo info : SettingsService.recordTypeChoices(type)) {
+                Option option = new Option();
+                option.value = info.getDeveloperName();
+                option.label = info.getName();
+                setting.options.add(option);
+            }
+            Option none = new Option();
+            none.value = AccountKinds.NO_RECORD_TYPE;
+            none.label = System.Label.Core_Settings_NoRecordType;
+            setting.options.add(none);
+        }
         if (isRecordTypes) {
             for (Schema.RecordTypeInfo info : SettingsService.recordTypes(type)) {
                 Option option = new Option();
@@ -627,6 +647,11 @@ public with sharing class SettingsController {
     private static Boolean isCoexistenceMode(String settingsObject, String key) {
         return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
             CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    private static Boolean isOrganizationRecordType(String settingsObject, String key) {
+        return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            AccountKinds.KEY_ORGANIZATION_RECORD_TYPE.equalsIgnoreCase(key);
     }
 
     private static Boolean isMembershipMode(String settingsObject, String key) {
