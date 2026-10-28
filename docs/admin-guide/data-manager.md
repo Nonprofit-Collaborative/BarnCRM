@@ -18,19 +18,21 @@ their own pages in this guide describe; Data Manager is how you reach them.
 On a new install the **Data Manager** feature is off until you turn it on: choose **Turn
 on** in the **Data Manager** row in **BarnCRM Settings**, **General** (or leave it ticked in
 first-run setup); see [BarnCRM Settings](barncrm-settings.md). While it is off its tabs are
-hidden for everyone. Once it is on, the **Data Manager** tab is in the BarnCRM app for anyone
-with the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk
-Update** or **BarnCRM Bulk Delete** permission sets.
+hidden for everyone. Once it is on, the **Data Manager** tab is in the navigation of every
+BarnCRM app (BarnCRM, BarnCRM Console, BarnCRM Admin and BarnCRM Admin Console) for anyone with
+the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
+or **BarnCRM Bulk Delete** permission sets.
 
-Each card and each kind of job is shown only to people who may use it:
+The cards under **Start a Task** are listed in this order, and each card and each kind of job
+is shown only to people who may use it:
 
 | Card | Needs a file? | Opens | Who sees it |
 |---|---|---|---|
 | **Import a File** | Yes | The **Import** tab: add new records and update existing ones from a spreadsheet (people and organizations, gifts with Giving, or one object), with a dry run first | Administrators |
 | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
 | **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
-| **Delete Many Records** | No | The **Find** tab: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
 | **Tidy and Check Your Data** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
+| **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
 | **Import Templates** | | The templates you import with, and when each recurring file was last loaded | Administrators |
 | **Data Jobs** | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
 | **Salesforce's Own Tools** | | Weekly Data Export (your backup), the Recycle Bin, and the Data Import Wizard for records BarnCRM does not load | Administrators |
@@ -45,10 +47,12 @@ spreadsheet, each row with its own values, use **Import a File**. To delete reco
 spreadsheet lists by record ID, an administrator uses **Import a File**, **Load One Object**,
 then **Delete by record ID** in **What each row does** ([Bulk delete](bulk-delete.md)).
 
-**Delete Many Records** is marked as destructive: its **Open** button is red, and a warning box
-on the card reads "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data
-Jobs, on this page, for up to 15 days." Nothing is deleted for good: a bulk delete, and a delete
-by file, go to the Recycle Bin, and **Undo** brings them back (section 4).
+**Delete Many Records** is the last card and is marked as destructive: its **Open** button is
+red. Choosing **Open** shows a **Delete Many Records** box that reads "Deleted records go to the
+Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days."
+**Continue** opens the Find tab to choose the records; **Cancel** (or Escape) closes the box and
+nothing else happens. Nothing is deleted for good: a bulk delete, and a delete by file, go to
+the Recycle Bin, and **Undo** brings them back (section 4).
 
 **Import Templates.** A template remembers how a file's columns match BarnCRM fields, so every
 file with the same layout (for example, a monthly donations export) opens already matched.
@@ -59,9 +63,10 @@ select **Create** ([Importing](importing.md), section 9). There is no separate s
 column matches, changes and row rules you settle on are saved to the template each time you
 import with it.
 
-The **Import** and **Bulk Update** tabs are no longer in the app's navigation: open them from
-here. Bookmarks to them still work. **Find** stays in the navigation, because staff use it
-every day.
+The **Import**, **Find** and **Bulk Update** tabs are not in the apps' navigation: open them
+from here (the **Bulk Update** tab lists recent bulk updates, which **Data Jobs** below shows
+too). Bookmarks to them still work, and so do the links that open Find from elsewhere
+(**Open in Find** on the Org Optimizer page, for example).
 
 ## 3. A Five-Minute Walkthrough (as Maria)
 
@@ -96,8 +101,8 @@ only once. A job that can no longer be undone is still listed, with its counts.
 
 ## 5. Common Mistakes
 
-- **Looking for the Import tab in the navigation.** It moved into Data Manager: choose **Import
-  a file**.
+- **Looking for the Import or Find tab in the navigation.** They moved into Data Manager:
+  choose **Import a File** or **Find and Export Records**.
 - **A job is missing from the list.** Each person sees the kinds of jobs they may run: imports
   need the BarnCRM Admin role, bulk updates and bulk deletes their own permission sets. The list
   shows the ten most recent jobs of each kind; report on **Data Jobs** for older ones.

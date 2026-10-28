@@ -1,3 +1,4 @@
+import glob
 import importlib.util
 import json
 import os
@@ -159,6 +160,30 @@ class ModuleAppTabsTest(unittest.TestCase):
         self.assertEqual(manifest.findtext("m:version", namespaces=NS), "67.0")
         self.assertEqual(set(written), set(mat.ADMIN_APPS), "Rollups has admin tabs only")
 
+    def test_module_tabs_go_before_error_log_which_stays_last(self):
+        root, out = repo(), tempfile.mkdtemp()
+        for app in mat.ADMIN_APPS:
+            source = os.path.join(root, CORE, "applications", app + ".app-meta.xml")
+            text = read(source).replace(
+                "<tabs>BarnCRM_Home</tabs>", "<tabs>BarnCRM_Home</tabs>\n  <tabs>Error_Log__c</tabs>"
+            ).replace(
+                "</mappings>\n  </workspaceConfig>",
+                "</mappings>\n    <mappings>\n      <tab>Error_Log__c</tab>\n    </mappings>\n  </workspaceConfig>",
+            )
+            write(root, f"{CORE}/applications/{app}.app-meta.xml", text)
+        mat.write_package(root, out, {"giving", "rollups"})
+
+        for app in mat.ADMIN_APPS:
+            self.assertEqual(
+                tabs(parsed(out, app)),
+                ["BarnCRM_Home", "Rollup_Builder", "Giving_Nightly_Jobs", "Error_Log__c"],
+                app,
+            )
+        mapped = [
+            m.text for m in parsed(out, "BarnCRM_Admin_Console").findall("m:workspaceConfig/m:mappings/m:tab", NS)
+        ]
+        self.assertEqual(mapped, ["BarnCRM_Home", "Rollup_Builder", "Giving_Nightly_Jobs", "Error_Log__c"])
+
     def test_an_entry_label_after_a_colon_is_not_part_of_the_tab_name(self):
         self.assertEqual(mat.names("Donor_Levels:Donor Level Ladder; Gift__c"), ["Donor_Levels", "Gift__c"])
 
@@ -187,7 +212,10 @@ class RealCatalogTest(unittest.TestCase):
 class CoreAppsTest(unittest.TestCase):
     """The four Core apps between them hold every tab Core ships, and only tabs that exist, so a
     tab added on one branch (Duplicate Matching) or removed on another is not missed in the apps.
-    A console app maps every one of its tabs to a workspace."""
+    A console app maps every one of its tabs to a workspace. Find, Import and Bulk Update are in
+    no app: they open from their Data Manager cards (D-135)."""
+
+    DATA_MANAGER_ONLY = {"Find", "Import", "Bulk_Update"}
 
     def test_every_core_tab_is_in_a_core_app_and_every_app_tab_exists(self):
         root = os.path.join(HERE, "..", "..", "..")
@@ -204,7 +232,25 @@ class CoreAppsTest(unittest.TestCase):
                 mapped = [m.findtext("m:tab", namespaces=NS) for m in app.findall("m:workspaceConfig/m:mappings", NS)]
                 self.assertEqual(set(tabs), set(mapped), f"{app_name}: every tab has a workspace mapping")
             in_apps.update(tabs)
-        self.assertEqual(set(), shipped - in_apps, "every Core tab is in at least one Core app")
+        self.assertEqual(
+            self.DATA_MANAGER_ONLY,
+            shipped - in_apps,
+            "every Core tab is in at least one Core app, except those Data Manager opens",
+        )
+        for app_name in mat.STAFF_APPS + mat.ADMIN_APPS:
+            app = ET.parse(os.path.join(root, CORE, "applications", app_name + ".app-meta.xml")).getroot()
+            self.assertIn("Data_Manager", [tab.text for tab in app.findall("m:tabs", NS)], app_name)
+
+    def test_error_log_is_the_last_tab_of_every_app_that_has_it(self):
+        root = os.path.join(HERE, "..", "..", "..")
+        pattern = os.path.join(root, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
+        paths = glob.glob(pattern)
+        self.assertTrue(paths)
+        for path in paths:
+            app = ET.parse(path).getroot()
+            tabs = [tab.text for tab in app.findall("m:tabs", NS)]
+            if mat.ERROR_LOG_TAB in tabs:
+                self.assertEqual(tabs[-1], mat.ERROR_LOG_TAB, f"{os.path.basename(path)}: Error Log is last")
 
     def test_duplicate_matching_is_in_both_admin_apps(self):
         root = os.path.join(HERE, "..", "..", "..")

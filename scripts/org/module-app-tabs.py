@@ -31,6 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 CORE = "packages/core/main/default"
 STAFF_APPS = ("BarnCRM_Standard", "BarnCRM")
 ADMIN_APPS = ("BarnCRM_Admin_Standard", "BarnCRM_Admin_Console")
+ERROR_LOG_TAB = "Error_Log__c"
 
 ET.register_namespace("", NS)
 
@@ -99,8 +100,9 @@ def key(override):
 
 
 def changed_app(app_path, tabs, overrides):
-    """The app's XML with the tabs added after its last tab (and a console workspace mapping for
-    each) and the overrides after its last override; None when nothing is new."""
+    """The app's XML with the tabs added after its last tab, or before Error Log when the app has
+    it, since Error Log is always an app's last tab (D-135), with a console workspace mapping for
+    each, and the overrides after its last override; None when nothing is new."""
     app = ET.parse(app_path).getroot()
     children = list(app)
     present = {child.text for child in children if child.tag == q("tabs")}
@@ -113,17 +115,23 @@ def changed_app(app_path, tabs, overrides):
             new_overrides.append(override)
     if not new_tabs and not new_overrides:
         return None
-    last_tab = max(i for i, child in enumerate(children) if child.tag == q("tabs"))
-    for offset, tab in enumerate(new_tabs, start=1):
+    tab_positions = [i for i, child in enumerate(children) if child.tag == q("tabs")]
+    error_log = [i for i in tab_positions if children[i].text == ERROR_LOG_TAB]
+    start = error_log[0] if error_log else max(tab_positions) + 1
+    for offset, tab in enumerate(new_tabs):
         element = ET.Element(q("tabs"))
         element.text, element.tail = tab, "\n  "
-        app.insert(last_tab + offset, element)
+        app.insert(start + offset, element)
     workspace = app.find(q("workspaceConfig"))
     if workspace is not None:
-        for tab in new_tabs:
-            mapping = ET.SubElement(workspace, q("mappings"))
+        mappings = list(workspace)
+        last = [i for i, m in enumerate(mappings) if m.findtext(q("tab")) == ERROR_LOG_TAB]
+        at = last[0] if last else len(mappings)
+        for offset, tab in enumerate(new_tabs):
+            mapping = ET.Element(q("mappings"))
             ET.SubElement(mapping, q("tab")).text = tab
-            mapping.tail = "\n  "
+            mapping.tail = "\n    " if at + offset < len(list(workspace)) else "\n  "
+            workspace.insert(at + offset, mapping)
     for override in new_overrides:
         override.tail = "\n  "
         app.insert(0, override)

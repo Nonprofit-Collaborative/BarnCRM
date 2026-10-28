@@ -93,16 +93,24 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: warning on the bulk delete card</shortDescription>
+        <shortDescription>Data Manager: warning in the box shown when bulk delete is opened</shortDescription>
         <value>Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_WarningAlt</fullName>
+        <fullName>Core_DataManager_DeleteContinue</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: screen reader text of the warning icon</shortDescription>
-        <value>Warning</value>
+        <shortDescription>Data Manager: button in the delete warning box that opens Find</shortDescription>
+        <value>Continue</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DeleteCancel</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: button that closes the delete warning box</shortDescription>
+        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerTitle</fullName>
