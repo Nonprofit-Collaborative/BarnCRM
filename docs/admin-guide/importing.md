@@ -69,8 +69,17 @@ A few things are worth knowing before your first large file:
 6. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
-BarnCRM Core ships one ready-made template, the **Generic contact list**. You can edit it,
-and your edits are never overwritten by an upgrade. With the Giving module installed (and
+BarnCRM Core ships three ready-made people templates, added at install and on upgrade:
+
+| Template | For a file of | Columns it reads |
+|---|---|---|
+| **People and Organizations List** | People with their contact details, and optionally their household or organization. Chosen for you under **People and Organizations**. | First Name, Last Name, Email, Phone, Street, City, State, Postal Code, Country, Household Name, Organization |
+| **Organization List** | Organizations only: businesses, foundations, partner groups. Organizations are matched by name. | Organization Name, Street, City, State, Postal Code, Country (the billing address), Phone, Website |
+| **Couples and Households** | Two people on each row who share a household (section 4). | Contact 1 First Name, Last Name, Email and Phone; Contact 2 First Name, Last Name, Email and Phone; Household Name; Street, City, State, Postal Code, Country |
+
+In an org installed before 2026-10-28 the first is called **Generic contact list**: an upgrade
+adds the two new templates but never renames or changes one you already have. You can edit
+any of them, and your edits are never overwritten by an upgrade. With the Giving module installed (and
 only then), Giving adds a **generic gift list** and templates that read the exports of the
 system you are moving from, without renaming a column: see [Migrating from Nonprofit
 Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-from-npsp.md).
@@ -81,7 +90,8 @@ You need a CSV file (or another text file whose columns are separated by semicol
 pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five or six rows.
 
 1. Open the **Import** tab. Under **What Are You Importing?**, choose **People and
-   Organizations**. **Generic contact list** is chosen for you; select **Next**.
+   Organizations**. **People and Organizations List** (or **Generic contact list** in an older
+   org) is chosen for you; select **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
    For a text file, **Columns are separated by** shows the separator BarnCRM found (commas,
@@ -170,8 +180,9 @@ It links back to the import.
 ## 4. Two People on One Row
 
 Most contact lists give a couple one line: two names, one address. Map the second
-person's columns to **Contact 2** and BarnCRM puts both people in the same household.
-You get one household with two members, not two households, and it works the same way
+person's columns to **Contact 2** and BarnCRM puts both people in the same household. The
+shipped **Couples and Households** template already maps columns headed "Contact 1 ..." and
+"Contact 2 ..." (section 2). You get one household with two members, not two households, and it works the same way
 whether your org keeps people as contacts or as person accounts.
 
 Where your org keeps people as person accounts, map the columns exactly as you would for
@@ -318,6 +329,23 @@ than you expect, that file has not been loaded this month.
 Marking a template recurring changes nothing about how its files are imported. BarnCRM
 never fetches or loads a file on its own: every file is still uploaded, previewed and
 imported by a person, because an import nobody watched is an import nobody checked.
+
+### Start a New Template From This One
+
+A template remembers the columns, changes, row rules and matching of the last file imported
+with it. Two people files with different layouts, such as a monthly membership export and an
+event sign-up list, should each have their own template, so one does not overwrite the
+other's choices.
+
+1. Open the **Import** tab and choose **People and Organizations** or **Gifts**, then the
+   template closest to your file.
+2. Select **Start a New Template From This One**. **New template name** starts as "Copy of"
+   and the template's name; change it, for example to "Event sign-ups".
+3. Select **Create**. The new template has the same columns, values for every row, row rules,
+   matching and payment matching, and is chosen for you. It is yours: not recurring, never
+   loaded, and the template it came from is unchanged. Select **Next**.
+
+A template that loads one object has no such button: **One Kind of Record** makes a new one.
 
 ## 7. Common Mistakes
 
