@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Find and Export</label>
   <description>
-    Find (C-34) and Data Hygiene (C-28): build, run, save, share and export queries. Grants no
+    Find (C-34) and Org Optimizer's Data Quality checks (C-28): build, run, save, share and export queries. Grants no
     record or field access;
     Find reads with the user's own. Assignable alone or beside any role. BarnCRM Admin has it.
   </description>

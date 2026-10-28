@@ -117,10 +117,10 @@ public with sharing class DataHygieneService {
         } catch (System.QueryException noAccess) {
             // Usually the user-mode refusal of a field or object, but a timeout on a large
             // count reads the same way, so it is logged for whoever looks into it.
-            ErrorLogger.log(noAccess, 'Data hygiene check ' + key);
+            ErrorLogger.log(noAccess, 'Data Quality check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_NoAccess;
         } catch (Exception unexpected) {
-            ErrorLogger.log(unexpected, 'Data hygiene check ' + key);
+            ErrorLogger.log(unexpected, 'Data Quality check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_CheckFailed;
         }
         return result;

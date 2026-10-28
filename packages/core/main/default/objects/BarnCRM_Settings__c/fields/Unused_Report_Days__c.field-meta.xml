@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Unused_Report_Days__c</fullName>
   <defaultValue>365</defaultValue>
-  <description>Days without a run before Org Optimizer's Unused setup section lists a report. Read as 365 when empty, held between 90 and 1095 (D-40).</description>
+  <description>Days without a run before Org Optimizer's Unused Setup section lists a report. Read as 365 when empty, held between 90 and 1095 (D-40).</description>
   <externalId>false</externalId>
   <inlineHelpText>Days without a run before a report is listed as unused.</inlineHelpText>
   <label>Days Before A Report Is Unused</label>

@@ -112,7 +112,7 @@ to the people who should see them, shows its settings, and starts its automation
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
-| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the Org Optimizer section (its three thresholds) |
+| Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the primary address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
@@ -128,7 +128,7 @@ grants it, and an app cannot hide a tab any other way. So each feature tab has i
 packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Data Hygiene, Bulk Update or Bulk Delete for Bulk Update and
+Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Bulk Update and
 Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every night (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch

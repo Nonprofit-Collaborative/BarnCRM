@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Tab: Data Hygiene</label>
+  <label>BarnCRM Tab: Org Optimizer</label>
   <description>
-    Shows the Data Hygiene tab (Org Optimizer) and nothing else. Given and taken by BarnCRM
+    Shows the Org Optimizer tab (API name Data_Hygiene) and nothing else. Given and taken by BarnCRM
     while the Org Optimizer and Health Check feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>

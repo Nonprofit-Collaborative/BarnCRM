@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How many years without a change before Org Optimizer's Data quality section lists a person under People not changed. The default is 5, and anything from 1 to 20 is accepted; a value outside that range is read as the nearest end.</value>
+    <value xsi:type="xsd:string">How many years without a change before Org Optimizer's Data Quality section lists a person under People Not Changed. The default is 5, and anything from 1 to 20 is accepted; a value outside that range is read as the nearest end.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

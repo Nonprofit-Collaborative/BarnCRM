@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
-        <value>Tidy and Check Your Data</value>
+        <value>Org Optimizer</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerText</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the Org Optimizer card does</shortDescription>
-        <value>No file needed. Open Org Optimizer to see which records and settings need attention.</value>
+        <value>No file needed. See which records and settings need attention.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_Open</fullName>

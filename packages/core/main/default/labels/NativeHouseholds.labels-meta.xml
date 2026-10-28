@@ -77,7 +77,7 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Data hygiene note: Nonprofit Cloud households can be listed here</shortDescription>
+        <shortDescription>Data Quality note: Nonprofit Cloud households can be listed here</shortDescription>
         <value>This org has Salesforce Nonprofit Cloud households. One that is also a BarnCRM household keeps its members in Nonprofit Cloud, so it can be listed here. Do not delete it: that would delete its Nonprofit Cloud household group too.</value>
     </labels>
 </CustomLabels>

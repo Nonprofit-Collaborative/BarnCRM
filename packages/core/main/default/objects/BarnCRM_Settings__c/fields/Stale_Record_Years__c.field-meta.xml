@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Stale_Record_Years__c</fullName>
   <defaultValue>5</defaultValue>
-  <description>Years without a change before Org Optimizer's Data quality section lists a person as not changed. Read as 5 when empty, held between 1 and 20 (D-40).</description>
+  <description>Years without a change before Org Optimizer's Data Quality section lists a person as not changed. Read as 5 when empty, held between 1 and 20 (D-40).</description>
   <externalId>false</externalId>
   <inlineHelpText>Years without a change before a person is listed as not changed.</inlineHelpText>
   <label>Years Before A Person Is Not Changed</label>
