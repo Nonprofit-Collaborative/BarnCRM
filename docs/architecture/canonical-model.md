@@ -379,7 +379,7 @@ households with Custom Name set.
 - **Object:** Account, record type `Household`, which ships active with a compact layout.
   Households share one Lightning record page built with Dynamic Forms and one fallback page
   layout with organizations (Section 8; ADR-0043).
-- **Record type access (ADR-NEXT):** no packaged permission set grants the Household record
+- **Record type access (ADR-0141):** no packaged permission set grants the Household record
   type, so no user can create an account of it or change an account to it. Every household is
   created by `HouseholdWriter` in system mode (household automation, New Household, merge and
   split), after explicit checks that the user can create and edit accounts and edit each
@@ -715,7 +715,7 @@ uses; the field is shared across record types and its meaning differs by record 
 defined above. Member Count, Anniversary, the two greeting fields, and Custom Name are
 not shown for Organization records on the Account record page.
 
-**R-O4 Defined by the org's own record type (ADR-NEXT).** Core ships no Organization record
+**R-O4 Defined by the org's own record type (ADR-0141).** Core ships no Organization record
 type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
 type, by developer name, or holds `Master` for "No record type"; a person record type or one
 whose developer name or label contains Household is refused. One record type, never several.
@@ -1120,7 +1120,7 @@ a BarnCRM record.
 
 ### Organization Record Type Key
 
-Added by ADR-NEXT (D-134). Shown in the console's General section, always, as **Record type
+Added by ADR-0141 (D-134). Shown in the console's General section, always, as **Record type
 for organizations**, a single choice (data type `RecordType`, Section 13).
 
 | Key | Type | Default | Definition |
@@ -1257,7 +1257,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example People and Households, Automation, Access, Health. A row naming a sub-section of People and Households (People, Households, Household Names and Greetings, Relationships) shows on that page. The console boxes each page's rows by sub-section (P1). |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordType, RecordTypeList, FieldList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordType is a single choice of the active, non-person record types of an object plus "No record type", storing one developer name or `Master` (ADR-NEXT); RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). FieldList is a checkbox list of an object's custom fields and Name that the administrator can read, storing their API names separated by commas (R-AD10). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordType, RecordTypeList, FieldList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordType is a single choice of the active, non-person record types of an object plus "No record type", storing one developer name or `Master` (ADR-0141); RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). FieldList is a checkbox list of an object's custom fields and Name that the administrator can read, storing their API names separated by commas (R-AD10). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
 | `Record_Object__c` | text (80) | The object a Record row picks from, whose record types a RecordType or RecordTypeList row lists, or whose fields a FieldList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
@@ -9094,7 +9094,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | DLRS and Rollup Helper detection (plan D-124 item 6, RB-C). No object or field added. New R-R16: DLRS (`dlrs`) and Rollup Helper (`rh2`) are detected by the namespace prefix of their objects, never referenced; the Rollup Builder, the Setup Assistant and the Modules page say each is a separate tool; BarnCRM never changes the other tool, and Rollup Helper's definitions are not read. |
 | v0.8 | 2026-10-26 | Same-field guard with DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "No shared target with DLRS": an active definition on a field an active DLRS definition fills is saved or switched on only after the administrator confirms the DLRS one will be switched off, recorded as a setting change; a file import refuses it; Health Check warns about pairs found later. |
 | v0.8 | 2026-10-26 | Import from DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "Import from DLRS": each active DLRS definition maps to a definition saved switched off through the Builder's checks with Definition Key `DLRS_` and its name, or is refused with the reason; the mapping of each DLRS field is listed; a compare step writes nothing; switching a copy on needs the same-field confirmation; DLRS is never changed. |
-| v0.8 | 2026-10-28 | Account record types (ADR-NEXT, D-134). The Organization record type is no longer shipped: Section 8 gains R-O4 (organizations are the accounts of the record type the org chose, or of none) and R-O5 (detection), and the formula field `Account.Is_Organization__c` (Checkbox). `BarnCRM_Settings__c` gains `Organization_Record_Type__c` (text, Section 12). `Setting_Definition__mdt.Data_Type__c` gains RecordType. Section 5: no user is given the Household record type; households are created only by `HouseholdWriter` in system mode, and the new permission set `BarnCRM_Households` carries only the Households tab, given while Household Upkeep is on. Import (R-IT ID and matching rules) and matching gifts read R-O4 instead of a record type name. |
+| v0.8 | 2026-10-28 | Account record types (ADR-0141, D-134). The Organization record type is no longer shipped: Section 8 gains R-O4 (organizations are the accounts of the record type the org chose, or of none) and R-O5 (detection), and the formula field `Account.Is_Organization__c` (Checkbox). `BarnCRM_Settings__c` gains `Organization_Record_Type__c` (text, Section 12). `Setting_Definition__mdt.Data_Type__c` gains RecordType. Section 5: no user is given the Household record type; households are created only by `HouseholdWriter` in system mode, and the new permission set `BarnCRM_Households` carries only the Households tab, given while Household Upkeep is on. Import (R-IT ID and matching rules) and matching gifts read R-O4 instead of a record type name. |
 
 ---
 ## 32. Entity ownership by package

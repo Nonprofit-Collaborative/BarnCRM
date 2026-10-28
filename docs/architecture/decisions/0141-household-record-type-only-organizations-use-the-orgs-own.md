@@ -1,4 +1,4 @@
-# ADR-NEXT: Core Ships the Household Record Type for Households Only, and Organizations Use a Record Type the Org Already Has
+# ADR-0141: Core Ships the Household Record Type for Households Only, and Organizations Use a Record Type the Org Already Has
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-28)
 **Date:** 2026-10-28
