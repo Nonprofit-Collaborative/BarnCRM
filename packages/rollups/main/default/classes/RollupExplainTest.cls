@@ -53,12 +53,17 @@ private class RollupExplainTest {
     }
 
     private static Account parent() {
-        Account parent = new Account(Name = 'Parent Org', Member_Count__c = 2);
+        return parent(UserInfo.getUserId());
+    }
+
+    /** The organization and its children, owned by this person so they can open them. */
+    private static Account parent(Id ownerId) {
+        Account parent = new Account(Name = 'Parent Org', Member_Count__c = 2, OwnerId = ownerId);
         insert parent;
         insert new List<Account>{
-            new Account(Name = 'Kid One', ParentId = parent.Id),
-            new Account(Name = 'Kid Two', ParentId = parent.Id),
-            new Account(Name = 'Other', ParentId = parent.Id)
+            new Account(Name = 'Kid One', ParentId = parent.Id, OwnerId = ownerId),
+            new Account(Name = 'Kid Two', ParentId = parent.Id, OwnerId = ownerId),
+            new Account(Name = 'Other', ParentId = parent.Id, OwnerId = ownerId)
         };
         return parent;
     }
@@ -128,23 +133,41 @@ private class RollupExplainTest {
     @IsTest
     static void someoneWhoIsNotAnAdministratorDoesNotSeeTheRecalculation() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Account org;
-            System.runAs(maria()) {
-                org = parent();
-                insert kidCount(null, true);
-            }
             User reader = TestDataFactory.createUser(
                 'Rhea',
                 new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User' }
             );
+            Account org;
+            System.runAs(maria()) {
+                // Rhea owns the records, so she can open them whatever the org's sharing.
+                org = parent(reader.Id);
+                insert kidCount(null, true);
+            }
             List<RollupExplainController.Explanation> explained;
             System.runAs(reader) {
                 explained = RollupExplainController.explain(org.Id);
             }
 
-            for (RollupExplainController.Explanation explanation : explained) {
-                System.Assert.isNull(explanation.calculatedNow, 'Only an administrator sees it');
+            System.Assert.areEqual(1, explained.size(), 'Rhea sees the total explained');
+            System.Assert.areEqual((2).format(), explained[0].value);
+            System.Assert.isNull(explained[0].calculatedNow, 'Only an administrator sees it');
+        }
+    }
+
+    @IsTest
+    static void aRecordThatIsGoneExplainsNothing() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            List<RollupExplainController.Explanation> explained;
+            System.runAs(maria()) {
+                insert kidCount(null, true);
+                // Deleted after the page loaded: the record query finds nothing to read.
+                Account gone = new Account(Name = 'Gone Org');
+                insert gone;
+                delete gone;
+                explained = RollupExplainController.explain(gone.Id);
             }
+
+            System.Assert.isTrue(explained.isEmpty(), 'Nothing to explain, and no error');
         }
     }
 

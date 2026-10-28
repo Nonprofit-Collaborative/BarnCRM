@@ -31,28 +31,39 @@ private class RollupFieldGeneratorTest {
     static void aNumberFieldIsWrittenAsStepsASourceFileAndAPackage() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             RollupFieldGenerator.GeneratedField field;
+            // A label no module ships a field for (Giving ships Gift Count on Account), so the
+            // generator writes it instead of refusing it as a field that exists.
             System.runAs(maria()) {
-                field = RollupFieldGenerator.generate('Account', 'Gift Count', 'NUMBER');
+                field = RollupFieldGenerator.generate('Account', 'Rollup Test Tally', 'NUMBER');
             }
 
-            System.Assert.areEqual('Gift_Count__c', field.apiName);
+            System.Assert.areEqual('Rollup_Test_Tally__c', field.apiName);
             System.Assert.areEqual(
-                'objects/Account/fields/Gift_Count__c.field-meta.xml',
+                'objects/Account/fields/Rollup_Test_Tally__c.field-meta.xml',
                 field.fieldPath
             );
-            System.Assert.isTrue(field.fieldXml.contains('<fullName>Gift_Count__c</fullName>'));
-            System.Assert.isTrue(field.fieldXml.contains('<label>Gift Count</label>'));
+            System.Assert.isTrue(
+                field.fieldXml.contains('<fullName>Rollup_Test_Tally__c</fullName>')
+            );
+            System.Assert.isTrue(field.fieldXml.contains('<label>Rollup Test Tally</label>'));
             System.Assert.isTrue(field.fieldXml.contains('<type>Number</type>'));
             System.Assert.isTrue(field.fieldXml.contains('<scale>0</scale>'));
             System.Assert.areEqual(4, field.steps.size(), 'Open, type and name, access, back');
             System.Assert.areEqual(
                 String.format(
                     Label.Core_RollupEase_FieldStepType,
-                    new List<String>{ Label.Core_RollupEase_KindNumber, 'Gift Count', 'Gift_Count' }
+                    new List<String>{
+                        Label.Core_RollupEase_KindNumber,
+                        'Rollup Test Tally',
+                        'Rollup_Test_Tally'
+                    }
                 ),
                 field.steps[1]
             );
-            System.Assert.areEqual('BarnRollupField_Account_Gift_Count__c.zip', field.fileName);
+            System.Assert.areEqual(
+                'BarnRollupField_Account_Rollup_Test_Tally__c.zip',
+                field.fileName
+            );
 
             Compression.ZipReader deploy = new Compression.ZipReader(
                 EncodingUtil.base64Decode(field.deployPackage)
@@ -68,7 +79,7 @@ private class RollupFieldGeneratorTest {
             System.Assert.isTrue(
                 deploy.extract(deploy.getEntry('package.xml'))
                     .toString()
-                    .contains('<members>Account.Gift_Count__c</members>')
+                    .contains('<members>Account.Rollup_Test_Tally__c</members>')
             );
             String objectXml = deploy.extract(deploy.getEntry('objects/Account.object')).toString();
             System.Assert.isTrue(objectXml.contains('<fields>'));
@@ -142,11 +153,11 @@ private class RollupFieldGeneratorTest {
                 );
                 System.Assert.areEqual(
                     Label.Core_RollupEase_FieldLabelProblem,
-                    refusal('No_Such_Object__c', 'Gift Count', 'NUMBER')
+                    refusal('No_Such_Object__c', 'Rollup Test Tally', 'NUMBER')
                 );
                 System.Assert.areEqual(
                     Label.Core_RollupEase_FieldKindProblem,
-                    refusal('Account', 'Gift Count', 'PICKLIST')
+                    refusal('Account', 'Rollup Test Tally', 'PICKLIST')
                 );
             }
         }
@@ -158,7 +169,7 @@ private class RollupFieldGeneratorTest {
             User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
             String message;
             System.runAs(david) {
-                message = refusal('Account', 'Gift Count', 'NUMBER');
+                message = refusal('Account', 'Rollup Test Tally', 'NUMBER');
             }
             System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
         }

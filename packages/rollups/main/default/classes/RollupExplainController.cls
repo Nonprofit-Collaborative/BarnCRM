@@ -72,7 +72,7 @@ public with sharing class RollupExplainController {
                 columns.add(stamp.getDescribe().getName());
             }
             // The entity and the fields come from describe.
-            SObject record = Database.queryWithBinds(
+            List<SObject> found = Database.queryWithBinds(
                 'SELECT ' +
                     String.join(new List<String>(columns), ', ') +
                     ' FROM ' +
@@ -80,7 +80,13 @@ public with sharing class RollupExplainController {
                     ' WHERE Id = :recordId',
                 new Map<String, Object>{ 'recordId' => recordId },
                 AccessLevel.USER_MODE
-            )[0];
+            );
+            // A record the person cannot open, or one deleted since the page loaded, has no
+            // totals to explain to them.
+            if (found.isEmpty()) {
+                return explained;
+            }
+            SObject record = found[0];
             Boolean admin = FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
             for (Rollup_Definition__c definition : definitions) {
                 if (fills(definition, recordType, recordId)) {

@@ -19,6 +19,29 @@ private class RollupTemplatesTest {
         );
     }
 
+    /**
+     * Edit on one field for one person, from a permission set built in Setup. Written inside
+     * `runAs` because a permission set is a setup object.
+     */
+    private static void grantEdit(User person, String objectName, String fieldName) {
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            String name = 'Rollup_Target_Edit_Test';
+            PermissionSet granted = new PermissionSet(Name = name, Label = name);
+            insert granted;
+            insert new FieldPermissions(
+                ParentId = granted.Id,
+                SobjectType = objectName,
+                Field = objectName + '.' + fieldName,
+                PermissionsRead = true,
+                PermissionsEdit = true
+            );
+            insert new PermissionSetAssignment(
+                AssigneeId = person.Id,
+                PermissionSetId = granted.Id
+            );
+        }
+    }
+
     /** Whether Giving's gift and appeal objects are in this org. */
     private static Boolean givingInstalled() {
         return SettingsService.typeByName('Gift__c') != null &&
@@ -100,12 +123,16 @@ private class RollupTemplatesTest {
             if (!givingInstalled()) {
                 return;
             }
-            // A shipped field stands in for the one the administrator would create.
+            // A shipped field stands in for the one the administrator would create. Giving makes
+            // it read only to everyone (ADR-0033), so Maria is given Edit on it, as the field
+            // access step of Create a Field gives the administrator on a field they make.
             RollupTemplates.Spec spec = RollupTemplates.nonprofitStarter()[0];
             spec.draft.targetField = 'Total_Giving__c';
             RollupTemplates.Outcome first;
             RollupTemplates.Outcome second;
-            System.runAs(maria()) {
+            User maria = maria();
+            grantEdit(maria, 'Contact', 'Total_Giving__c');
+            System.runAs(maria) {
                 first = RollupTemplates.add(spec, RollupTemplates.filledBy());
                 second = RollupTemplates.add(spec, RollupTemplates.filledBy());
             }
