@@ -31,12 +31,18 @@ the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
 **The Household record type and the Households tab.** BarnCRM installs one Account record
 type, **Household**. Setup lists it on every install, because a package cannot leave out a
-record type it ships, but nobody has it until you turn Household Upkeep on: until then no one
-can pick it when creating an account, and the **Households** tab is hidden. Turning it on gives
-the record type and the tab to everyone with a BarnCRM role (Admin, Staff or Read Only),
-through the permission set **BarnCRM Households**, within a few minutes. The confirmation says
-so, and names the record type your organizations keep using. People without a BarnCRM role
-are not given it; add the permission set to them yourself if they create households.
+record type it ships, but BarnCRM never gives it to anyone, so nobody is ever offered it when
+creating an account and your users' record type choices stay as they were. Households are
+made only by BarnCRM: automatically for new people, with **New household** on BarnCRM Home,
+and by merge and split. Staff open and edit a household like any account. Do not add the
+Household record type to profiles or permission sets yourself: anyone who has it, and whose
+profile has no default Account record type, gets Household for every account they create.
+
+The **Households** tab is hidden until you turn Household Upkeep on. Turning it on shows the
+tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
+**BarnCRM Households**, within a few minutes. The confirmation says so, and names the record
+type your organizations keep using. People without a BarnCRM role are not given the tab; add
+the permission set to them yourself if they need it.
 
 BarnCRM does not add an Organization record type. Organizations are the accounts of the
 record type you choose in **Record type for organizations** on **General** (see
@@ -91,9 +97,9 @@ That is the whole lifecycle: created for you, named for you, counted for you, an
 up for you if you ask.
 
 To start from the household instead of the person, click **New household** on the Hub
-home. It opens a new household without the record-type prompt or a name to invent:
-Salesforce fills in a placeholder name that the naming automation replaces once you add
-a member.
+home. BarnCRM creates the household straight away, with a placeholder name that the naming
+automation replaces once you add a member, and opens it. There is no record type to choose
+and no name to invent.
 
 The walkthrough reads the same in the flexible way of belonging, with one difference at
 step 3: the household is not shown in the household field on the person, because in that
@@ -145,15 +151,18 @@ the same Members panel. A household is still its own record, never a person.
 
 ## Common Mistakes
 
-**"There is no Households tab, and nobody can pick the Household record type."**
-Household Upkeep is off. Turn it on in **General**; the tab and the record type reach everyone
-with a BarnCRM role within a few minutes. Someone without a BarnCRM role needs the
-**BarnCRM Households** permission set added by hand.
+**"There is no Households tab."**
+Household Upkeep is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
+role within a few minutes. Someone without a BarnCRM role needs the **BarnCRM Households**
+permission set added by hand.
 
-**"Since Households went on, people are asked for a record type when creating an account."**
-Salesforce shows the record type choice to anyone who has more than one. Pick **Household**
-only for a household; for anything else pick your usual record type. BarnCRM's own **New
-Household** button and household automation never ask.
+**"Nobody can choose Household when creating an account."**
+That is by design. Create households with **New household** on BarnCRM Home, or add a person
+and let BarnCRM make their household. An account can't be changed to Household either.
+
+**"Every new account someone creates turns into a household."**
+Someone gave that person the Household record type in a profile or permission set, and their
+profile has no default Account record type. Remove the Household record type from them.
 
 **"I added a person and no household appeared."**
 Either "create a household automatically" is off, or the person already belongs to a

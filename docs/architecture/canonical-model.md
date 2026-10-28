@@ -379,10 +379,14 @@ households with Custom Name set.
 - **Object:** Account, record type `Household`, which ships active with a compact layout.
   Households share one Lightning record page built with Dynamic Forms and one fallback page
   layout with organizations (Section 8; ADR-0043).
-- **Record type access (ADR-NEXT):** no role permission set grants the Household record type
-  or the Households tab. The packaged permission set `BarnCRM_Households` grants both, and
-  `TabAccessService` gives it to holders of the Admin, Staff and Read Only role sets while the
-  Household Upkeep feature is on, and to nobody while it is off.
+- **Record type access (ADR-NEXT):** no packaged permission set grants the Household record
+  type, so no user can create an account of it or change an account to it. Every household is
+  created by `HouseholdWriter` in system mode (household automation, New Household, merge and
+  split), after explicit checks that the user can create and edit accounts and edit each
+  household touched. Users read and edit existing households as any account. The packaged
+  permission set `BarnCRM_Households` grants only the Households tab, and `TabAccessService`
+  gives it to holders of the Admin, Staff and Read Only role sets while the Household Upkeep
+  feature is on, and to nobody while it is off.
 - **Standard fields used:** `Name` (the computed household name).
 - **Custom fields on Account:**
 

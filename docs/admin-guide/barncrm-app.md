@@ -94,7 +94,7 @@ person what they can act on:
 |---|---|
 | **What's New in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
 | **Welcome to BarnCRM** and the paused automation banner | Everyone |
-| **New household** button | People who can create accounts with the Household record type |
+| **New household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
 | **Setup Checklist** (or the **Setup Complete** tile once it is finished) | Administrators |
 | **Health Check** | Administrators |
 | **Errors to Review** | Administrators |

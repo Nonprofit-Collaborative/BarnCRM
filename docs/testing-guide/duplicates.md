@@ -60,7 +60,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Create an Account, record type **Household**, with the same **Account Name** as **The Garcia Family** and Billing Street `6830 Sunset Ln`, City `Springfield`, Zip `62756`. Save past the warning. | The household saves. |
+| 1 | On **Home**, click **New household**, then edit it: the same **Account Name** as **The Garcia Family** and Billing Street `6830 Sunset Ln`, City `Springfield`, Zip `62756`. Save past the warning. | The household saves. |
 | 2 | Scan and refresh **Duplicates**. | A pair of two households, each with **Household:** and its detail, with **Merge Households** and **Not a Duplicate**. |
 | 3 | Click **Merge Households**. | A box **Merge Two Households**: **Members, related records, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.**, a **Household to keep** list, the fields where they differ, and **To choose field by field, use Merge or split on the household record instead.** |
 | 4 | In **Household to keep**, choose the sample household (the one with members). | The list of differing fields marks which values are kept and which dropped. |
@@ -76,7 +76,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Create an Account, record type **Household**, named `Sunset Test Household` (a name no rule would match). | The household saves. |
+| 1 | On **Home**, click **New household** and rename it `Sunset Test Household` (a name no rule would match). | The household saves. |
 | 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Primary** ticked. | The address saves. |
 | 3 | On **Duplicate Matching**, **Matching Logic**, choose **Try a value** on **Address (household)**. Enter **Value** `6830 Sunset Ln`, **Postal code** `62756`, and choose **Try**. | **Compared as: 6830 sunset ln\|62756**, then **These records would match:** with **Household: The Garcia Family** and **Household: Sunset Test Household**. |
 | 4 | On **Review**, scan and refresh. | A pair of `Sunset Test Household` and **The Garcia Family**, both **Household:**, with the grey line **Same address on Address (household)**. Capitals and the full stop did not stop the match. |
