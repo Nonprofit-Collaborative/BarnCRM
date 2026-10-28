@@ -43,6 +43,15 @@ jest.mock(
   },
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -91,6 +100,8 @@ describe('c-data-manager', () => {
 
   it('asks before opening the delete tool, and opens Find only on Continue', async () => {
     const element = await render();
+    // The key comes from Apex with the namespace's prefix; a made-up one proves it is used as is.
+    findToolStateKey.emit('ns__tool');
     BarnConfirmModal.open.mockResolvedValueOnce(true);
 
     element.shadowRoot.querySelector('lightning-button[data-id="delete"]').click();
@@ -107,7 +118,8 @@ describe('c-data-manager', () => {
     });
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'Find' }
+      attributes: { apiName: 'Find' },
+      state: { ns__tool: 'delete' }
     });
   });
 

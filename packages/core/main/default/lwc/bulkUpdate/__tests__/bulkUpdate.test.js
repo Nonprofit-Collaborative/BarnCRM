@@ -153,11 +153,14 @@ describe('c-bulk-update', () => {
     getJob.mockResolvedValue(FINISHED);
     const element = await render(QUERY);
     expect(getTargets).toHaveBeenCalledWith({ objectName: 'Contact' });
+    const path = element.shadowRoot.querySelector('[data-id="path"]');
+    expect(path.currentStep).toBe('changes');
 
     await change(byPart(element, 'field'), 'Title');
     await change(byPart(element, 'value'), 'Coordinator');
     element.shadowRoot.querySelector('[data-id="preview"]').click();
     await flush();
+    expect(path.currentStep).toBe('confirm');
 
     expect(previewUpdate).toHaveBeenCalledWith({
       queryJson: QUERY,
@@ -195,6 +198,7 @@ describe('c-bulk-update', () => {
       '200 matched: 200 updated, 0 unchanged, 0 failed.'
     );
     expect(element.shadowRoot.querySelector('[data-id="undo-from-tab"]')).not.toBeNull();
+    expect(path.currentStep).toBe('run');
   });
 
   it('retries one failed progress read, and reports the error after a second (FINDB-19)', async () => {

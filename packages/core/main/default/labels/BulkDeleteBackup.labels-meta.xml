@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete: download the records before deleting</shortDescription>
-        <value>Download these records first</value>
+        <value>Download a Backup First</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_BackupHelp</fullName>

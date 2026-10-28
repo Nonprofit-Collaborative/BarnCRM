@@ -1,7 +1,22 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:edit">
-        <lightning-button slot="actions" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
-        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+    <section class="slds-box slds-is-relative" aria-labelledby="bulk-update-title" data-id="panel">
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <lightning-icon icon-name="utility:edit" size="small" class="slds-var-m-right_x-small"></lightning-icon>
+            <h2 class="slds-text-heading_small slds-col" id="bulk-update-title">{labels.title}</h2>
+            <lightning-button data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+        </div>
+        <lightning-progress-indicator
+            class="slds-var-m-bottom_small"
+            data-id="path"
+            type="path"
+            variant="base"
+            current-step={currentStep}
+        >
+            <template for:each={steps} for:item="step">
+                <lightning-progress-step key={step.value} label={step.label} value={step.value}></lightning-progress-step>
+            </template>
+        </lightning-progress-indicator>
+        <div>
             <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
@@ -233,5 +248,5 @@
                     </section>
                 </template>
         </div>
-    </lightning-card>
+    </section>
 </template>

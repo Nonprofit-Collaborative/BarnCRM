@@ -123,4 +123,17 @@ private class DataManagerControllerTest {
             );
         }
     }
+
+    @IsTest
+    static void namesTheFindToolStateKeyForThisNamespace() {
+        System.runAs(TestUsers.admin()) {
+            String key = DataManagerController.findToolStateKey();
+            Assert.areEqual(
+                NamespaceUtil.stateKey('tool'),
+                key,
+                'Find reads the key by its __tool suffix, whatever the prefix.'
+            );
+            Assert.isTrue(key.endsWith('__tool'), 'The key ends in __tool.');
+        }
+    }
 }

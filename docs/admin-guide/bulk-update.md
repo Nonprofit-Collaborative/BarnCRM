@@ -3,7 +3,9 @@
 ## 1. What It Does
 
 **Bulk Update** changes up to five fields on every record a [Find](find.md) query returns, in
-one go. For each field you choose one of:
+one go. It always starts in Find: the **Update Many Records** card on the Data Manager tab
+opens Find with a note, and the **Bulk Update** page (recent bulk updates and their undo) has
+an **Open Find** button. For each field you choose one of:
 
 - **Set to a value**: every record gets the same value, for example Mailing City "Portland".
 - **Clear**: the field is emptied.
@@ -54,10 +56,11 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 
 1. Open **Find**. Choose **Account**, add the column **Billing City**, and add the condition
    **Billing City**, **equals**, `springfield`. Press **Run**.
-2. Press **Bulk Update**. The bulk update panel opens below the results. It uses the query as
-   it is now; changing the query closes the panel.
+2. Open the **Change Records** menu and choose **Bulk Update**. The bulk update panel opens
+   right under the buttons, with its steps along the top: **Choose Changes**, **Confirm**,
+   **Run**. It uses the query as it is now; changing the query closes the panel.
 3. Under **Changes**, choose the field **Billing City**, **Set to a value**, and type
-   `Springfield`. To change a second field, press **Add a change** (up to five).
+   `Springfield`. To change a second field, press **Add a Change** (up to five).
 4. Press **Preview**. BarnCRM says how many records match, for example 37, and shows the first
    five with the value before and after.
 5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
