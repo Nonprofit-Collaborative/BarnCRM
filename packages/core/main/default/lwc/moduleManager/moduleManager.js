@@ -32,9 +32,10 @@ import NONPROFIT_TITLE from '@salesforce/label/c.Core_ModuleManager_NonprofitTit
 import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit';
 import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
+import { setupPath } from 'c/setupLinks';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
-const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
+const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
 
 /**
  * The Module Manager (C-24), the BarnCRM Settings Modules section (ADR-0124): every module this

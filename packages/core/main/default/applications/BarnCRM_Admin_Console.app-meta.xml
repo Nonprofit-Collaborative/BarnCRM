@@ -52,8 +52,6 @@
   <navType>Console</navType>
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Data_Manager</tabs>
-  <tabs>Import</tabs>
-  <tabs>Bulk_Update</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>Duplicate_Matching</tabs>
   <tabs>Error_Log__c</tabs>
@@ -64,12 +62,6 @@
     </mappings>
     <mappings>
       <tab>Data_Manager</tab>
-    </mappings>
-    <mappings>
-      <tab>Import</tab>
-    </mappings>
-    <mappings>
-      <tab>Bulk_Update</tab>
     </mappings>
     <mappings>
       <tab>Data_Hygiene</tab>

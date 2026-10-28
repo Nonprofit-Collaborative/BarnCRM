@@ -193,7 +193,7 @@ RELEVANT_BASE="${RELEVANT_BASE:-origin/main}"
 COVERAGE_TOTAL_FLOOR="${COVERAGE_TOTAL_FLOOR:-75}"
 COVERAGE_CLASS_FLOOR="${COVERAGE_CLASS_FLOOR:-75}"
 TEST_WAIT_MINUTES="${TEST_WAIT_MINUTES:-90}"
-TEST_POLL_SECONDS="${TEST_POLL_SECONDS:-30}"
+TEST_POLL_SECONDS="${TEST_POLL_SECONDS:-15}"
 
 # The status context names the mode, so a relevant run can never stand in for the full gate
 # that the main ruleset requires; the description names it too, for anyone reading the list.
@@ -251,8 +251,26 @@ if ! gh api "repos/${REPO}/commits/${SHA}" --silent 2>/dev/null; then
   exit 1
 fi
 
+# PARALLEL GATES (D-141, 2026-10-28). A landing batch is gated on two orgs at once, and both
+# runs post the same context on the same commit, where GitHub shows only the newest. So a
+# success never replaces a failure that another org posted on this commit: that status stays
+# until the failing org is rerun (its own success may replace it) or the batch gets a new
+# head. A failure always posts. If the statuses cannot be read, the success is posted.
 post_status() {
-  local state="$1" description="$2"
+  local state="$1" description="$2" held=""
+  if [[ "$state" == "success" ]]; then
+    held="$(gh api "repos/${REPO}/commits/${SHA}/statuses?per_page=100" 2>/dev/null \
+      | jq -r --arg c "$CONTEXT" --arg a "$ALIAS" \
+        'map(select(.context == $c))[0] // empty
+          | select(.state == "failure" or .state == "error")
+          | select((.description // "") | contains($a) | not) | .description' 2>/dev/null)" || true
+    if [[ -n "$held" ]]; then
+      echo "== Held: this run passed on ${ALIAS}, but \"${CONTEXT}\" on ${SHA:0:7} already shows another" >&2
+      echo "   org's failure, which a success from here must not hide: ${held}" >&2
+      echo "   Success was not posted. Fix that failure or rerun that org's gate. ==" >&2
+      return 0
+    fi
+  fi
   gh api "repos/${REPO}/statuses/${SHA}" --silent \
     -f state="$state" \
     -f context="$CONTEXT" \

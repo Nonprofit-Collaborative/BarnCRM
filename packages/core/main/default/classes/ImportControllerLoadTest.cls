@@ -174,6 +174,12 @@ private class ImportControllerLoadTest {
                 );
                 Assert.isTrue(none.isEmpty(), 'Nothing for a field pointing elsewhere.');
                 Assert.areEqual(
+                    Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabel(),
+                    shown.relatedLabel,
+                    'The related object is named for what the template loads (D-136).'
+                );
+                Assert.areEqual(
                     'Affiliation__c.Organization__c',
                     shown.related,
                     'The saved choice is shown.'
@@ -278,6 +284,106 @@ private class ImportControllerLoadTest {
                 );
             }
 
+        }
+    }
+
+    @IsTest
+    static void startsANewPeopleTemplateFromAnotherWithItsChoices() {
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = true;
+            DataProtectionExtensions.noneForTest = true;
+            System.runAs(admin()) {
+                Import_Template__c source = ImportTestDataFactory.template(
+                    ImportTestDataFactory.donorMapping(),
+                    ImportTemplateService.RULE_NAME_POSTAL
+                );
+                source.Is_Package_Default__c = true;
+                source.Is_Recurring__c = true;
+                source.Source_Name__c = 'Monthly export';
+                source.Several_Matches__c = ImportTemplateService.SEVERAL_MOST_RECENT;
+                source.Use_Duplicate_Rules__c = true;
+                source.Last_Import_Date__c = Date.today();
+                update source;
+                Import_Template__c oneObject = ImportTemplateService.createObjectTemplate(
+                    'Organizations',
+                    'Account'
+                );
+
+                Test.startTest();
+                ImportController.TemplateView copy = ImportController.copyTemplate(
+                    source.Id,
+                    '  Event sign-ups '
+                );
+                String unnamed;
+                try {
+                    ImportController.copyTemplate(source.Id, ' ');
+                } catch (Exception e) {
+                    unnamed = e.getMessage();
+                }
+                String objectRefused;
+                try {
+                    ImportController.copyTemplate(oneObject.Id, 'Copy of organizations');
+                } catch (Exception e) {
+                    objectRefused = e.getMessage();
+                }
+                Test.stopTest();
+
+                Assert.areEqual('Event sign-ups', copy.name, 'The new name, trimmed.');
+                Assert.areNotEqual(source.Id, copy.id, 'A new template.');
+                Assert.areEqual(source.Column_Mapping_JSON__c, copy.mapping, 'Its columns.');
+                Assert.areEqual(
+                    ImportTemplateService.RULE_NAME_POSTAL,
+                    copy.matchingRule,
+                    'Its matching.'
+                );
+                Assert.areEqual(
+                    ImportTemplateService.SEVERAL_MOST_RECENT,
+                    copy.severalMatches,
+                    'Its choice for several matches.'
+                );
+                Assert.isTrue(copy.useDuplicateRules, 'Its duplicate rule choice.');
+                Assert.isFalse(copy.isPackageDefault, 'The copy is the admin\'s own.');
+                Assert.isFalse(copy.isRecurring, 'Not recurring.');
+                Assert.isNull(copy.sourceName, 'With no source name.');
+                Assert.isNull(copy.lastImportDate, 'Never loaded.');
+                Assert.isTrue(copy.templateKey.startsWith('copy_'), 'Its own key.');
+                Import_Template__c after = [
+                    SELECT Name, Is_Recurring__c
+                    FROM Import_Template__c
+                    WHERE Id = :source.Id
+                ];
+                Assert.isTrue(after.Is_Recurring__c, 'The source is unchanged.');
+                Assert.areEqual(
+                    Label.Core_Import_ErrorObjectTemplateName,
+                    unnamed,
+                    'A name is needed.'
+                );
+                Assert.areEqual(
+                    Label.Core_Import_ErrorCopyOneObject,
+                    objectRefused,
+                    'A one-object template is not copied.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void startingANewTemplateNeedsThePermission() {
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = false;
+            Import_Template__c source = ImportTestDataFactory.template(
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            Test.startTest();
+            try {
+                ImportController.copyTemplate(source.Id, 'Another');
+                Assert.fail('Copying a template needs Manage BarnCRM Settings.');
+            } catch (Exception e) {
+                Assert.areEqual(Label.Core_Import_ErrorNoPermission, e.getMessage(), 'Refused.');
+            }
+            Test.stopTest();
+            Assert.areEqual(1, [SELECT COUNT() FROM Import_Template__c], 'Nothing was created.');
         }
     }
 }

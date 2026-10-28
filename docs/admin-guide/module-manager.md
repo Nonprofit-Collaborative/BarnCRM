@@ -107,7 +107,10 @@ A row whose setup steps never ran says "Its setup steps never ran, which happens
 is copied in by hand. Finish Setup runs the steps a package install runs." With the **Manage
 BarnCRM Settings** permission you also see a **Finish Setup** button on that row. Click it: the
 module's install steps run for the whole org, with you standing in for the installer, and the
-notice goes away. The steps only add what is missing, so pressing it twice does no harm. It is
+notice goes away. For Core, the install gives the BarnCRM Admin role to the installer; Finish
+Setup gives it to you only when you also hold Salesforce's **Assign Permission Sets** (or
+**Manage Users**) permission, as giving a role on the Access page does, and otherwise runs the
+other steps without it. The steps only add what is missing, so pressing it twice does no harm. It is
 recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the same thing (see
 [Health Check](health-check.md#how-a-fix-button-works)).
 

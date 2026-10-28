@@ -63,8 +63,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the app launcher, search `Import`, open the **Import** tab. Tab to the box **Choose what kind of file this is**. | Card **Import a Spreadsheet** shows. Focus ring on the template box. |
-| 2 | Open the box with Enter, choose **NPSP: contacts** with the arrow keys, press Enter. Tab to **Next** and press Enter. | The step heading **Upload the file** and an **Upload file** control show. |
+| 1 | Open the app launcher, search `Import`, open the **Import** tab. Tab to the card **People and Organizations** and press Enter. | Card **Import a Spreadsheet** shows, with step heading **What Are You Importing?**. Focus ring on each card as you tab, and a **Template** box shows once a card is chosen. |
+| 2 | Tab to the **Template** box, open it with Enter, choose **NPSP: contacts** with the arrow keys, press Enter. Tab to **Next** and press Enter. | The step heading **Upload the file** and an **Upload file** control show. |
 | 3 | Press Tab until focus is on **Upload file**, press Enter or Space and pick the sample file in the file dialog. | **Reading your file.** shows briefly, then the step **Check the Columns** with a table of **Column in Your File**, **What It Means** and **First Values**. |
 | 4 | Tab into the table. Change one **What It Means** box with Enter and the arrow keys. | The box opens, the choice is applied and focus stays in that row. |
 | 5 | Press Tab until focus reaches **Next** and press Enter. | The step **Choose how rows are matched** shows. |

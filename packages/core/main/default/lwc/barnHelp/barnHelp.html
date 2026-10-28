@@ -1,0 +1,28 @@
+<template>
+    <span class="slds-grid slds-grid_vertical-align-center slds-wrap">
+        <template lwc:if={hasContent}>
+            <lightning-helptext
+                content={content}
+                alternative-text={alternativeText}
+                data-id="helptext"
+            ></lightning-helptext>
+        </template>
+        <template lwc:if={hasLink}>
+            <a
+                class="slds-var-m-left_xx-small"
+                href={learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-id="learn-more"
+            >
+                <span>{linkText}</span>
+                <lightning-icon
+                    class="slds-var-m-left_xx-small"
+                    icon-name="utility:new_window"
+                    size="xx-small"
+                ></lightning-icon>
+                <span class="slds-assistive-text" data-id="new-tab">{labels.newTab}</span>
+            </a>
+        </template>
+    </span>
+</template>

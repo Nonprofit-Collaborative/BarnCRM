@@ -2434,9 +2434,45 @@ public with sharing class HouseholdService {
      * Creates one household named from the people who are about to join it, for a split
      * that has no household to move them into yet. The people are not attached here: the
      * caller moves them, so that one move path serves every caller.
+     *
+     * The split is a person's request, so the household is created with the checks of
+     * HouseholdWriter.createHouseholdsForUser: `touchedHouseholdIds` are the households the
+     * same split edits, and the running user needs edit access to each.
      */
     @NamespaceAccessible
-    public static Id createHouseholdFor(List<Person> members) {
+    public static Id createHouseholdFor(List<Person> members, Set<Id> touchedHouseholdIds) {
+        Database.SaveResult created = saveNewHousehold(members, touchedHouseholdIds);
+        if (!created.isSuccess()) {
+            // HouseholdWriter has already logged why. Nobody is moved into a household
+            // that does not exist, so the split stops here rather than half happening.
+            throw new HouseholdException(Label.Core_Households_ErrorCreateFailed);
+        }
+        return created.getId();
+    }
+
+    /**
+     * Creates one household with no members yet, named with the placeholder until people join
+     * it, for New Household on BarnCRM Home. Staff never get the Household record type
+     * (ADR-0141), so this is the way a person creates a household by hand.
+     */
+    @NamespaceAccessible
+    public static Id createEmptyHousehold() {
+        Database.SaveResult created = saveNewHousehold(new List<Person>(), new Set<Id>());
+        if (!created.isSuccess()) {
+            throw new HouseholdException(
+                String.format(
+                    Label.Core_HubHomeActions_NewHouseholdFailed,
+                    new List<Object>{ HouseholdWriter.failureReason(created) }
+                )
+            );
+        }
+        return created.getId();
+    }
+
+    private static Database.SaveResult saveNewHousehold(
+        List<Person> members,
+        Set<Id> touchedHouseholdIds
+    ) {
         Id recordTypeId = householdRecordTypeId();
         if (recordTypeId == null) {
             throw new HouseholdException(Label.Core_Households_ErrorRecordTypeMissing);
@@ -2445,18 +2481,14 @@ public with sharing class HouseholdService {
         Account household = newHousehold(people, recordTypeId, SettingsService.getSettings());
         household.Member_Count__c = 0;
         // The name, the greetings and the count on this record are the package's own
-        // bookkeeping, so it is saved by HouseholdWriter for the reason ADR-0021 gives.
-        List<Database.SaveResult> created = HouseholdWriter.createHouseholds(
-            new List<Account>{ household }
+        // bookkeeping, and nobody is given the Household record type, so it is saved by
+        // HouseholdWriter, which checks the person's own access first.
+        List<Database.SaveResult> created = HouseholdWriter.createHouseholdsForUser(
+            new List<Account>{ household },
+            touchedHouseholdIds
         );
         HOUSEHOLD_ID_BY_PERSON.clear();
-        Id householdId = created.isEmpty() || !created[0].isSuccess() ? null : created[0].getId();
-        if (householdId == null) {
-            // HouseholdWriter has already logged why. Nobody is moved into a household
-            // that does not exist, so the split stops here rather than half happening.
-            throw new HouseholdException(Label.Core_Households_ErrorCreateFailed);
-        }
-        return householdId;
+        return created[0];
     }
 
     /**

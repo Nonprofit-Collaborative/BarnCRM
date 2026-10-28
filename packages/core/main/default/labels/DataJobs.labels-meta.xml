@@ -13,8 +13,16 @@
         <categories>DataJobs</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data job history: nothing to list</shortDescription>
-        <value>No data jobs to show yet.</value>
+        <shortDescription>Data job history: empty state heading, nothing to list</shortDescription>
+        <value>No Data Jobs Yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_EmptyHint</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: empty state line under the heading</shortDescription>
+        <value>Each import, bulk update and bulk delete is listed here, with its undo.</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_Show</fullName>

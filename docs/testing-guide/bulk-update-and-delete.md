@@ -129,7 +129,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). Select **Load One Object**, choose **Contact**, name the template `Test delete by file`, and select **Create**. | The new template is chosen. |
+| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). Under **What Are You Importing?**, choose **Delete the Records a File Lists**, choose **Contact**, name the template `Test delete by file`, and select **Create**. | The new template is chosen, already on **Delete by record ID**, and the line under it reads "Deletes: Contact". |
 | 2 | Select **Next**, upload `delete-ids.csv`, map **Id** to **Salesforce record ID** if needed, and select **Next**. | **What each row does** includes **Delete by record ID**, with its risk text ending "undo from Data Jobs on the Data Manager tab within 15 days." |
 | 3 | Choose **Delete by record ID** and select **Preview**. | The dry run finds 1 record. A delete panel opens: "Delete every record this dry run found, with your own access..." with **Download these records first**, **Type the number of records to confirm** and the delete button. |
 | 4 | Type `1` and select **Delete 1 records**. | "1 matched: 1 deleted, 0 refused." Del1 is gone; Del2 and Del3 remain. |

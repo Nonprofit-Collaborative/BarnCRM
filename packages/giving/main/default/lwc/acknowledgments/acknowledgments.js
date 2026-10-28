@@ -63,13 +63,13 @@ import DOWNLOAD_FILE from '@salesforce/label/c.Giving_Acknowledgments_DownloadFi
 import ANY_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_AnyAmount';
 import FROM_WHAT from '@salesforce/label/c.Giving_SetupNote_FromAddress_What';
 import FROM_WHY from '@salesforce/label/c.Giving_SetupNote_FromAddress_Why';
-import FROM_WHERE from '@salesforce/label/c.Giving_SetupNote_FromAddress_Where';
+import FROM_STEPS from '@salesforce/label/c.Giving_SetupNote_FromAddress_Steps';
 import EMAIL_WHAT from '@salesforce/label/c.Giving_SetupNote_Email_What';
 import EMAIL_WHY from '@salesforce/label/c.Giving_SetupNote_Email_Why';
-import EMAIL_WHERE from '@salesforce/label/c.Giving_SetupNote_Email_Where';
+import EMAIL_STEPS from '@salesforce/label/c.Giving_SetupNote_Email_Steps';
 import TEMPLATES_WHAT from '@salesforce/label/c.Giving_SetupNote_Templates_What';
 import TEMPLATES_WHY from '@salesforce/label/c.Giving_SetupNote_Templates_Why';
-import TEMPLATES_WHERE from '@salesforce/label/c.Giving_SetupNote_Templates_Where';
+import TEMPLATES_STEPS from '@salesforce/label/c.Giving_SetupNote_Templates_Steps';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -88,15 +88,28 @@ const CHANNEL_EMAIL = 'Email';
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
   /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
   setupNotes = [
-    { key: 'fromAddress', what: FROM_WHAT, why: FROM_WHY, where: FROM_WHERE },
+    {
+      key: 'fromAddress',
+      what: FROM_WHAT,
+      why: FROM_WHY,
+      steps: FROM_STEPS,
+      link: 'orgWideAddresses'
+    },
     {
       key: 'emailDeliverability',
       what: EMAIL_WHAT,
       why: EMAIL_WHY,
-      where: EMAIL_WHERE,
+      steps: EMAIL_STEPS,
+      link: 'deliverability',
       check: 'emailDeliverability'
     },
-    { key: 'templates', what: TEMPLATES_WHAT, why: TEMPLATES_WHY, where: TEMPLATES_WHERE }
+    {
+      key: 'templates',
+      what: TEMPLATES_WHAT,
+      why: TEMPLATES_WHY,
+      steps: TEMPLATES_STEPS,
+      link: 'emailTemplates'
+    }
   ];
 
   labels = {

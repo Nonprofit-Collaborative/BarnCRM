@@ -53,6 +53,13 @@ when they merge households, even on the Minimum Access profile. Merging two peop
 own **Compare and merge**, which Salesforce allows only to people who can delete them, so
 staff ask an admin for that.
 
+BarnCRM Admin also gives **View All** and **Modify All** on accounts and contacts, so the data
+tools an admin runs (Find and export, Bulk Update, Bulk Delete, Duplicate Matching, Erase a
+Person, merges) see and change every person and household, not only the ones your sharing
+settings show them. That reaches every account and contact in the org, so give the role only to
+people you trust with all of them. To hold it back from someone, add a muting permission set to
+the role in Setup.
+
 ## Who Can Read a Donor's Receipts and Tax Statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
@@ -93,7 +100,8 @@ page. If that person was you, you can start straight away.
 Three things control who can use the page:
 
 1. You need the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin
-   role. Anyone without it sees the page in read-only mode with a notice explaining why.
+   role. Anyone without it sees no role holders, only a notice explaining why: who holds
+   which role is for the people who manage access.
 2. To give or remove a role or an extra permission you also need Salesforce's **Assign
    Permission Sets** (or **Manage Users**) permission. A system administrator has it already. A BarnCRM Admin who is not a system
    administrator gets it from the optional **BarnCRM Access Manager** permission set: in

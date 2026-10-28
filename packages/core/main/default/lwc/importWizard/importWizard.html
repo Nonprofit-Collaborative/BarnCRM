@@ -16,42 +16,148 @@
 
             <template lwc:if={showWizard}>
                 <template lwc:if={isStepTemplate}>
-                    <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                        {labels.stepTemplate}
-                    </h2>
-                    <lightning-combobox
-                        data-id="template"
-                        label={labels.stepTemplate}
-                        value={templateId}
-                        options={templateOptions}
-                        onchange={handleTemplateChange}
-                    ></lightning-combobox>
-                    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="template-help">
-                        {templateDescription}
-                    </p>
-                    <lightning-input
-                        class="slds-var-m-top_medium"
-                        type="checkbox"
-                        data-id="recurring"
-                        label={labels.recurringLabel}
-                        field-level-help={labels.recurringHelp}
-                        checked={isRecurring}
-                        onchange={handleRecurringChange}
-                    ></lightning-input>
-                    <template lwc:if={isRecurring}>
-                        <lightning-input
-                            data-id="source-name"
-                            label={labels.sourceNameLabel}
-                            value={sourceName}
-                            required
-                            max-length="255"
-                            onchange={handleSourceNameChange}
-                        ></lightning-input>
+                    <template lwc:if={choosingKind}>
+                        <h2 class="slds-text-heading_small slds-var-m-bottom_small">
+                            {labels.stepKind}
+                        </h2>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small">
+                            <template for:each={kindCards} for:item="card">
+                                <div
+                                    key={card.key}
+                                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-p-bottom_small"
+                                >
+                                    <button
+                                        type="button"
+                                        class="slds-box slds-box_link slds-show slds-size_full slds-text-align_left"
+                                        data-id="kind"
+                                        data-kind={card.key}
+                                        onclick={handleKindChoice}
+                                    >
+                                        <span class="slds-text-heading_small slds-show">
+                                            <template lwc:if={card.warning}>
+                                                <lightning-icon
+                                                    class="slds-var-m-right_x-small"
+                                                    icon-name="utility:warning"
+                                                    variant="warning"
+                                                    size="x-small"
+                                                ></lightning-icon>
+                                            </template>
+                                            {card.title}
+                                        </span>
+                                        <span class="slds-text-body_regular slds-show slds-var-m-top_xx-small">
+                                            {card.text}
+                                        </span>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
                     </template>
-                    <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
-                        {labels.loadObjectHeading}
-                    </h3>
-                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.loadObjectHelp}</p>
+                    <template lwc:else>
+                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-bottom_small">
+                            <h2 class="slds-text-heading_small" data-id="kind-title">{kindTitle}</h2>
+                            <lightning-button
+                                variant="base"
+                                label={labels.changeKind}
+                                data-id="change-kind"
+                                onclick={handleChangeKind}
+                            ></lightning-button>
+                        </div>
+                        <template lwc:if={picksFromKind}>
+                            <lightning-combobox
+                                data-id="template"
+                                label={labels.stepTemplate}
+                                value={templateId}
+                                options={templateOptions}
+                                onchange={handleTemplateChange}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={listsAllTemplates}>
+                            <ul class="slds-has-dividers_around-space" data-id="template-list">
+                                <template for:each={templateList} for:item="item">
+                                    <li key={item.id} class="slds-item" data-id="template-item">
+                                        <p class="slds-text-title_bold">{item.name}</p>
+                                        <p class="slds-text-body_small">{item.description}</p>
+                                        <p class="slds-text-body_small" data-id="template-item-creates">
+                                            {item.creates}
+                                        </p>
+                                        <p class="slds-text-body_small slds-text-color_weak">
+                                            <template lwc:if={item.lastImportDate}>
+                                                {labels.lastLoaded}
+                                                <lightning-formatted-date-time
+                                                    class="slds-var-m-left_xx-small"
+                                                    value={item.lastImportDate}
+                                                    time-zone="UTC"
+                                                ></lightning-formatted-date-time>
+                                            </template>
+                                            <template lwc:else>{labels.notLoadedYet}</template>
+                                        </p>
+                                        <lightning-button
+                                            class="slds-var-m-top_x-small"
+                                            label={labels.useTemplate}
+                                            variant={item.variant}
+                                            data-id="use-template"
+                                            data-template-id={item.id}
+                                            onclick={handleUseTemplate}
+                                        ></lightning-button>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:if={hasChosenTemplate}>
+                            <p class="slds-text-body_small slds-var-m-top_x-small" data-id="template-help">
+                                {templateDescription}
+                            </p>
+                            <p class="slds-text-body_small slds-var-m-top_x-small" data-id="template-creates">
+                                {templateCreates}
+                            </p>
+                            <template lwc:if={canCopyTemplate}>
+                                <template lwc:if={copyingTemplate}>
+                                    <lightning-input
+                                        data-id="copy-name"
+                                        label={labels.copyTemplateNameLabel}
+                                        value={copyName}
+                                        max-length="80"
+                                        onchange={handleCopyNameChange}
+                                    ></lightning-input>
+                                    <lightning-button
+                                        class="slds-var-m-top_x-small"
+                                        label={labels.loadObjectCreateButton}
+                                        data-id="create-copy"
+                                        disabled={cannotCreateCopy}
+                                        onclick={handleCreateCopy}
+                                    ></lightning-button>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-button
+                                        class="slds-var-m-top_x-small"
+                                        variant="base"
+                                        label={labels.copyTemplateButton}
+                                        data-id="start-copy"
+                                        onclick={handleStartCopy}
+                                    ></lightning-button>
+                                </template>
+                            </template>
+                            <lightning-input
+                                class="slds-var-m-top_medium"
+                                type="checkbox"
+                                data-id="recurring"
+                                label={labels.recurringLabel}
+                                field-level-help={labels.recurringHelp}
+                                checked={isRecurring}
+                                onchange={handleRecurringChange}
+                            ></lightning-input>
+                            <template lwc:if={isRecurring}>
+                                <lightning-input
+                                    data-id="source-name"
+                                    label={labels.sourceNameLabel}
+                                    value={sourceName}
+                                    required
+                                    max-length="255"
+                                    onchange={handleSourceNameChange}
+                                ></lightning-input>
+                            </template>
+                        </template>
+                    </template>
                     <template lwc:if={choosingObject}>
                         <lightning-combobox
                             data-id="new-object"
@@ -73,13 +179,6 @@
                             data-id="create-object-template"
                             disabled={cannotCreateObjectTemplate}
                             onclick={handleCreateObjectTemplate}
-                        ></lightning-button>
-                    </template>
-                    <template lwc:else>
-                        <lightning-button
-                            label={labels.loadObjectHeading}
-                            data-id="choose-object"
-                            onclick={handleChooseObject}
                         ></lightning-button>
                     </template>
                 </template>
@@ -510,7 +609,7 @@
                             onclick={handleBack}
                         ></lightning-button>
                     </template>
-                    <template lwc:if={isStepTemplate}>
+                    <template lwc:if={showTemplateNext}>
                         <lightning-button
                             class="slds-var-m-left_x-small"
                             variant="brand"

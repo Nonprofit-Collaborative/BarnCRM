@@ -4,7 +4,7 @@
   <isExposed>true</isExposed>
   <masterLabel>BarnCRM Setup Notes</masterLabel>
   <description>
-    What a settings section or module settings page needs changed in Setup: what, why, where,
-    and whether it is done. Exposed with no targets so Giving and Mirror can nest it.
+    What a settings section or module settings page needs changed in Setup: what, why, the steps,
+    a link to the Setup page, and whether it is done. Exposed with no targets so Giving and Mirror can nest it.
   </description>
 </LightningComponentBundle>

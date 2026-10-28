@@ -3,8 +3,10 @@
 The checks an AppExchange security review makes, applied to BarnCRM on every change even
 though there is no listing yet (plan Section 8.1). Run through it when a pull request adds an
 `@AuraEnabled` method, a dynamic query, a `without sharing` class, a field that can hold
-personal data, or any LWC that renders text. The last full pass was the v0.11 hardening pass
-(2026-10-12); its open items are at the end.
+personal data, or any LWC that renders text. The last full pass was the pre-AppExchange review
+of 2026-10-28, after the v0.11 hardening pass (2026-10-12); open items are at the end. The
+scanner false positives and design justifications for the submission are in
+[AppExchange Submission Notes](appexchange-submission-notes.md).
 
 ## What CI already enforces
 
@@ -98,3 +100,12 @@ Closed since the v0.11 pass:
 | Item | What was done |
 | ---- | ------------- |
 | `Error_Log_Event__e` readable by Staff and Read Only | Kept (2026-10-13). The org refuses Create on a platform event without Read ("Permission Create Error_Log_Event__e depends on permission(s): Read Error_Log_Event__e"), and publishing needs Create, so every packaged set that publishes holds both |
+| Any BarnCRM user could publish `Merge_Settlement_Ready__e` (review C-M1, 2026-10-28) | Fixed (#654): Read Only holds neither Read nor Create on it, and the subscriber settles only records the event's `CreatedById` may edit |
+| Error Log entries attributed from a payload field (C-L1) | Fixed (#654): `User__c` comes from the event's `CreatedById` |
+| Finish Setup could grant BarnCRM Admin in system mode (C-L2) | Fixed (#654): outside an install, only to the running user, and only with Assign Permission Sets or Manage Users (ADR-0121) |
+| Inner queued job with no sharing keyword (C-L4) | Fixed (#654): `TabAccessService.Job` is `with sharing`, and `check-apex-access-modes.py` flags any Core inner async job without a keyword |
+| Read Only could read every role assignment (C-L7) | Fixed (#654): `getAccessOverview` refuses anyone without Manage BarnCRM Settings |
+| Find, export, Bulk Update and Bulk Delete trusted the picker's object list (C-L3) | Fixed: `QueryFieldCatalog.describeObject` refuses system objects, which covers every entry point and each parent a field path crosses |
+| New-tab links without `rel` (C-L6) | Fixed in `findExportFiles`, `optimizerSetup` and `dataManager` |
+| View All and Modify All on Account and Contact for BarnCRM Admin (C-M2) | Kept, justified in ADR-0142, the permission set description and the submission notes |
+| BarnCRM Access Manager carries Assign Permission Sets (C-L5) | Kept (ADR-0121, D-91), justified in the submission notes |

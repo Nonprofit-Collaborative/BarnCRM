@@ -51,9 +51,10 @@ import REMOVE_PERSON from '@salesforce/label/c.Core_Access_RemovePerson';
 import TOAST_ERROR_TITLE from '@salesforce/label/c.Core_Access_ToastErrorTitle';
 import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_Access_ToastSuccessTitle';
 import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
+import { setupPath } from 'c/setupLinks';
 
 const ADMIN_ROLE = 'BarnCRM_Admin_Group';
-const SETUP_USERS_PAGE = '/lightning/setup/ManageUsers/home';
+const SETUP_USERS_PAGE = setupPath('users');
 // User access policies cannot be created from a package, so this opens the guide with the exact definitions (ADR-0095).
 const AUTOMATIC_ACCESS_GUIDE =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';

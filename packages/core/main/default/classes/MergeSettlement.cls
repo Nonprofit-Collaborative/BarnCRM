@@ -21,6 +21,13 @@
  * publishes `Merge_Settlement_Ready__e` naming its survivors instead. The event is delivered
  * after the merge commits, and its subscriber queues this job in a fresh transaction (ADR-0118),
  * as `Rollup_Queue_Ready__e` starts the Rollup Queue (ADR-0100, ADR-0117).
+ *
+ * The subscriber trusts only the records the event's publisher may edit. The parts of this job
+ * write in system mode, and anyone holding Create on the event could publish one through the
+ * API naming records they cannot touch. A real merge names only its survivors, which the person
+ * merging could edit, so every identifier is checked against the publisher's own record access
+ * (`UserRecordAccess` for the event's `CreatedById`, which the platform sets; nothing in the
+ * payload names the publisher). The rest are left alone and named in the Error Log.
  */
 public with sharing class MergeSettlement implements Queueable {
     /** Identifiers one event carries per list: 200 of 18 characters and a comma fit the field. */
@@ -124,9 +131,10 @@ public with sharing class MergeSettlement implements Queueable {
             ? jobsLeftForTest
             : Limits.getLimitQueueableJobs() - Limits.getQueueableJobs();
         Integer queuedJobs = 0;
+        Integer handled = 0;
         for (Merge_Settlement_Ready__e event : events) {
-            if (queuedJobs >= room) {
-                if (queuedJobs == 0) {
+            if (queuedJobs >= room || !queriesLeftToCheck(event)) {
+                if (handled == 0) {
                     Integer retries = retriesForTest != null
                         ? retriesForTest
                         : EventBus.TriggerContext.currentContext().retries;
@@ -140,14 +148,19 @@ public with sharing class MergeSettlement implements Queueable {
                 }
                 break;
             }
-            queuedJobs++;
+            handled++;
+            Set<Id> permitted = permittedIds(event);
             Set<Id> householdIds = idsIn(event.Household_Ids__c);
             Set<Id> ownerIds = idsIn(event.Owner_Ids__c);
             Set<Id> personIds = idsIn(event.Person_Ids__c);
-            queued.addAll(householdIds);
-            queued.addAll(ownerIds);
-            queued.addAll(personIds);
-            System.enqueueJob(new MergeSettlement(householdIds, ownerIds, personIds));
+            householdIds.retainAll(permitted);
+            ownerIds.retainAll(permitted);
+            personIds.retainAll(permitted);
+            if (!permitted.isEmpty()) {
+                queuedJobs++;
+                queued.addAll(permitted);
+                System.enqueueJob(new MergeSettlement(householdIds, ownerIds, personIds));
+            }
             EventBus.TriggerContext.currentContext().setResumeCheckpoint(event.ReplayId);
         }
         lastQueued = queued;
@@ -155,6 +168,84 @@ public with sharing class MergeSettlement implements Queueable {
             queuedByEvents = new Set<Id>();
         }
         queuedByEvents.addAll(queued);
+    }
+
+    /**
+     * Of the identifiers an event names, the ones its publisher may edit. The publisher is the
+     * event's `CreatedById`, set by the platform, never a payload field. Read in system mode
+     * because the subscriber runs as the platform's own user and asks about the publisher's
+     * access, not its own. The rest are named in the Error Log as a warning; a read that fails
+     * trusts nothing.
+     */
+    @TestVisible
+    private static Set<Id> permittedIds(Merge_Settlement_Ready__e event) {
+        Set<Id> named = survivorsIn(new List<Merge_Settlement_Ready__e>{ event });
+        Set<Id> permitted = new Set<Id>();
+        if (named.isEmpty()) {
+            return permitted;
+        }
+        Id publisherId = event.CreatedById;
+        if (publisherId != null) {
+            for (Set<Id> chunk : chunksOf(named)) {
+                try {
+                    for (UserRecordAccess access : [
+                        SELECT RecordId
+                        FROM UserRecordAccess
+                        WHERE UserId = :publisherId AND RecordId IN :chunk AND HasEditAccess = TRUE
+                        WITH SYSTEM_MODE
+                        LIMIT 200
+                    ]) {
+                        permitted.add(access.RecordId);
+                    }
+                } catch (Exception unreadable) {
+                    ErrorLogger.log(unreadable, Label.Core_Households_ErrorContextMergeSettle);
+                }
+            }
+        }
+        Set<Id> refused = named.clone();
+        refused.removeAll(permitted);
+        if (!refused.isEmpty()) {
+            logRefused(refused, publisherId);
+        }
+        return permitted;
+    }
+
+    /** Whether this transaction can still read the publisher's access to all the event names. */
+    private static Boolean queriesLeftToCheck(Merge_Settlement_Ready__e event) {
+        Integer needed = chunksOf(survivorsIn(new List<Merge_Settlement_Ready__e>{ event })).size();
+        return Limits.getQueries() + needed < Limits.getLimitQueries();
+    }
+
+    /** The identifiers in groups of up to 200, the most `UserRecordAccess` answers at once. */
+    private static List<Set<Id>> chunksOf(Set<Id> ids) {
+        List<Set<Id>> chunks = new List<Set<Id>>();
+        Set<Id> current = new Set<Id>();
+        for (Id each : ids) {
+            if (current.size() == IDS_PER_EVENT) {
+                chunks.add(current);
+                current = new Set<Id>();
+            }
+            current.add(each);
+        }
+        if (!current.isEmpty()) {
+            chunks.add(current);
+        }
+        return chunks;
+    }
+
+    private static void logRefused(Set<Id> refused, Id publisherId) {
+        List<String> named = new List<String>();
+        for (Id refusedId : refused) {
+            named.add(String.valueOf(refusedId));
+        }
+        ErrorLogger.logMessage(
+            String.format(
+                Label.Core_Households_MergeSettleRefused,
+                new List<String>{ String.join(named, ', '), String.valueOf(publisherId) }
+            ),
+            Label.Core_Households_ErrorContextMergeSettle,
+            ErrorLogger.SEVERITY_WARNING
+        );
     }
 
     /**

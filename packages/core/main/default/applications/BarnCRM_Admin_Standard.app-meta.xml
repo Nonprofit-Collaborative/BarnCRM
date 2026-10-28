@@ -51,8 +51,6 @@
   <navType>Standard</navType>
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Data_Manager</tabs>
-  <tabs>Import</tabs>
-  <tabs>Bulk_Update</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>Duplicate_Matching</tabs>
   <tabs>Error_Log__c</tabs>

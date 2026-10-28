@@ -429,8 +429,8 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: step one heading</shortDescription>
-        <value>Choose what kind of file this is</value>
+        <shortDescription>Import wizard: label of the template picker on step one</shortDescription>
+        <value>Template</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepUpload</fullName>

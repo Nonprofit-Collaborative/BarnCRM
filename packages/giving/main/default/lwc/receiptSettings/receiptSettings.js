@@ -54,10 +54,7 @@ import NOT_STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_NotStartedTitl
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import PAGES_WHAT from '@salesforce/label/c.Giving_SetupNote_RecordPages_What';
 import PAGES_WHY from '@salesforce/label/c.Giving_SetupNote_RecordPages_Why';
-import PAGES_WHERE from '@salesforce/label/c.Giving_SetupNote_RecordPages_Where';
-import ACCESS_WHAT from '@salesforce/label/c.Giving_SetupNote_Access_What';
-import ACCESS_WHY from '@salesforce/label/c.Giving_SetupNote_Access_Why';
-import ACCESS_WHERE from '@salesforce/label/c.Giving_SetupNote_Access_Where';
+import PAGES_STEPS from '@salesforce/label/c.Giving_SetupNote_RecordPages_Steps';
 
 const TOKENS = [
   '{{OrganizationName}}',
@@ -94,10 +91,18 @@ const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link
  * looking rather than typing them in twice.
  */
 export default class ReceiptSettings extends LightningElement {
-  /** What Giving needs from Setup, shown by Core's settingsSetupNotes. */
+  /**
+   * What Giving needs from Setup, shown by Core's settingsSetupNotes with its Open in Setup
+   * link. Giving's permission sets are given on the Access page, so they need no note here.
+   */
   setupNotes = [
-    { key: 'recordPages', what: PAGES_WHAT, why: PAGES_WHY, where: PAGES_WHERE },
-    { key: 'givingAccess', what: ACCESS_WHAT, why: ACCESS_WHY, where: ACCESS_WHERE }
+    {
+      key: 'recordPages',
+      what: PAGES_WHAT,
+      why: PAGES_WHY,
+      steps: PAGES_STEPS,
+      link: 'lightningPages'
+    }
   ];
 
   labels = {

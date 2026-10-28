@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: one clickable tool tile (icon, name, one line, optional badge), used on hubs such as
+    Data Manager and the Org Optimizer overview.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

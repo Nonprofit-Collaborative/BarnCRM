@@ -33,6 +33,9 @@ public with sharing class ImportController {
         public String mapping;
         @AuraEnabled
         public Boolean isPackageDefault;
+        /** The stable key, so People and Organizations can choose the general template first. */
+        @AuraEnabled
+        public String templateKey;
         @AuraEnabled
         public String lastImportDate;
         @AuraEnabled
@@ -75,6 +78,9 @@ public with sharing class ImportController {
         /** The related records each row also creates, `Object.Field`, or null (R-IT17). */
         @AuraEnabled
         public String related;
+        /** The related object's label, for what the template loads (D-136), or null. */
+        @AuraEnabled
+        public String relatedLabel;
     }
 
     /** One field a column of a one-object template can be mapped to (R-IT12). */
@@ -308,40 +314,60 @@ public with sharing class ImportController {
             enforcePermission();
             List<TemplateView> result = new List<TemplateView>();
             for (Import_Template__c template : ImportTemplateService.listActive()) {
-                TemplateView view = new TemplateView();
-                view.id = template.Id;
-                view.name = template.Name;
-                view.description = template.Description__c;
-                view.matchingRule = template.Matching_Rule__c;
-                view.personMode = template.Person_Mode__c;
-                view.mapping = template.Column_Mapping_JSON__c;
-                view.isPackageDefault = template.Is_Package_Default__c;
-                view.lastImportDate = template.Last_Import_Date__c == null
-                    ? null
-                    : String.valueOf(template.Last_Import_Date__c);
-                view.isRecurring = template.Is_Recurring__c;
-                view.sourceName = template.Source_Name__c;
-                view.paymentMatching = template.Payment_Matching__c;
-                view.matchDateWindowDays = template.Match_Date_Window_Days__c == null
-                    ? null
-                    : template.Match_Date_Window_Days__c.intValue();
-                view.matchAmountTolerance = template.Match_Amount_Tolerance__c;
-                view.personMatchField = template.Person_Match_Field__c;
-                view.organizationRule = ImportTemplateService.normalizedOrganizationRule(
-                    template.Organization_Matching_Rule__c
-                );
-                view.organizationMatchField = template.Organization_Match_Field__c;
-                view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
-                    template.Several_Matches__c
-                );
-                view.useDuplicateRules = template.Use_Duplicate_Rules__c == true;
-                describeLoad(template, view);
-                result.add(view);
+                result.add(toTemplateView(template));
             }
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getTemplates');
         }
+    }
+
+    /**
+     * Starts a new people or gift template from this one under a new name (D-136), and
+     * returns it as the wizard shows it.
+     */
+    @AuraEnabled
+    public static TemplateView copyTemplate(String templateId, String name) {
+        try {
+            enforcePermission();
+            Import_Template__c copy = ImportTemplateService.copyTemplate(templateId, name);
+            return toTemplateView(ImportTemplateSelector.selectById(copy.Id));
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.copyTemplate');
+        }
+    }
+
+    private static TemplateView toTemplateView(Import_Template__c template) {
+        TemplateView view = new TemplateView();
+        view.id = template.Id;
+        view.name = template.Name;
+        view.description = template.Description__c;
+        view.matchingRule = template.Matching_Rule__c;
+        view.personMode = template.Person_Mode__c;
+        view.mapping = template.Column_Mapping_JSON__c;
+        view.isPackageDefault = template.Is_Package_Default__c;
+        view.templateKey = template.Template_Key__c;
+        view.lastImportDate = template.Last_Import_Date__c == null
+            ? null
+            : String.valueOf(template.Last_Import_Date__c);
+        view.isRecurring = template.Is_Recurring__c;
+        view.sourceName = template.Source_Name__c;
+        view.paymentMatching = template.Payment_Matching__c;
+        view.matchDateWindowDays = template.Match_Date_Window_Days__c == null
+            ? null
+            : template.Match_Date_Window_Days__c.intValue();
+        view.matchAmountTolerance = template.Match_Amount_Tolerance__c;
+        view.personMatchField = template.Person_Match_Field__c;
+        view.organizationRule = ImportTemplateService.normalizedOrganizationRule(
+            template.Organization_Matching_Rule__c
+        );
+        view.organizationMatchField = template.Organization_Match_Field__c;
+        view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
+            template.Several_Matches__c
+        );
+        view.useDuplicateRules = template.Use_Duplicate_Rules__c == true;
+        describeLoad(template, view);
+        return view;
     }
 
     /**
@@ -566,6 +592,10 @@ public with sharing class ImportController {
         view.related = ImportObjectSchema.loadsRelated(template)
             ? template.Related_Object__c + '.' + template.Related_Parent_Field__c
             : null;
+        Schema.SObjectType relatedType = ImportObjectSchema.relatedTypeOf(template);
+        view.relatedLabel = relatedType == null
+            ? null
+            : relatedType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */

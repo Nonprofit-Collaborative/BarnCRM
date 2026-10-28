@@ -129,7 +129,7 @@
                                     <template lwc:if={module.reportEmpty}>
                                         <p class="slds-text-body_small" data-id="report-empty">{labels.reportEmpty}</p>
                                     </template>
-                                    <a href={installedPackagesUrl} data-id="installed-packages">{labels.installedPackages}</a>
+                                    <a href={installedPackagesUrl} target="_blank" rel="noopener noreferrer" data-id="installed-packages">{labels.installedPackages}</a>
                                 </div>
                             </template>
                         </li>
@@ -142,6 +142,6 @@
     <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">{labels.tabsNotice}</p>
     <div class="slds-var-m-top_x-small">
         <lightning-button label={labels.checkAgain} data-id="check-again" onclick={handleCheckAgain}></lightning-button>
-        <a class="slds-var-m-left_small" href={installedPackagesUrl}>{labels.installedPackages}</a>
+        <a class="slds-var-m-left_small" href={installedPackagesUrl} target="_blank" rel="noopener noreferrer">{labels.installedPackages}</a>
     </div>
 </template>
