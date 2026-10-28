@@ -49,7 +49,6 @@ public with sharing class IntegrationAppService {
         @AuraEnabled
         public String linkUrl;
         @AuraEnabled
-        @AuraEnabled
         public String relatedModule;
         @AuraEnabled
         public String compatibility;
