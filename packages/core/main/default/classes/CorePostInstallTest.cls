@@ -1040,4 +1040,44 @@ private class CorePostInstallTest {
             WHERE JobType = 'Queueable' AND ApexClass.Name = 'CorePostInstallRetryQueueable'
         ];
     }
+
+    @IsTest
+    static void finishSetupGivesNoAdminWithoutAssignPermissionSets() {
+        System.runAs(TestUsers.admin()) {
+            AccessService.assignPermissionSetsOverride = false;
+
+            Test.startTest();
+            new CorePostInstall().runSetup(UserInfo.getUserId());
+            Integer queued = countRetryJobs();
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                queued,
+                'Outside an install, someone who cannot assign permission sets is given nothing'
+            );
+            Assert.isFalse(CorePostInstall.mayGrantOutsideInstall(UserInfo.getUserId()));
+        }
+    }
+
+    @IsTest
+    static void finishSetupGivesAdminOnlyToThePersonRunningIt() {
+        System.runAs(TestUsers.admin()) {
+            User someoneElse = TestUsers.minimumAccessUserWith(
+                'Okafor',
+                new List<String>{ 'BarnCRM_Read_Only' }
+            );
+            AccessService.assignPermissionSetsOverride = true;
+
+            Assert.isTrue(
+                CorePostInstall.mayGrantOutsideInstall(UserInfo.getUserId()),
+                'Someone who could assign it in Setup may be given it'
+            );
+            Assert.isFalse(
+                CorePostInstall.mayGrantOutsideInstall(someoneElse.Id),
+                'But never someone else through Finish Setup'
+            );
+            Assert.isFalse(CorePostInstall.mayGrantOutsideInstall(null), 'Nor nobody');
+        }
+    }
 }

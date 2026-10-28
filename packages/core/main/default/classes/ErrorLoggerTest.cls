@@ -346,6 +346,44 @@ private class ErrorLoggerTest {
     }
 
     @IsTest
+    static void anEntryNamesThePublisherNotTheUserThePayloadClaims() {
+        System.runAs(TestUsers.admin()) {
+            User someoneElse = TestUsers.minimumAccessUserWith(
+                'Okafor',
+                new List<String>{ 'BarnCRM_Read_Only' }
+            );
+            Error_Log_Event__e forged = (Error_Log_Event__e) JSON.deserialize(
+                JSON.serialize(
+                    new Map<String, Object>{
+                        'attributes' => new Map<String, Object>{ 'type' => 'Error_Log_Event__e' },
+                        'CreatedById' => UserInfo.getUserId(),
+                        'User_Id__c' => someoneElse.Id,
+                        'Message__c' => 'Blamed on someone else.',
+                        'Context__c' => 'Forged'
+                    }
+                ),
+                Error_Log_Event__e.class
+            );
+
+            Test.startTest();
+            ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ forged });
+            Test.stopTest();
+
+            Error_Log__c written = [
+                SELECT User__c
+                FROM Error_Log__c
+                WHERE Context__c = 'Forged'
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(
+                UserInfo.getUserId(),
+                written.User__c,
+                'The entry names whoever published the event, not the user its payload names.'
+            );
+        }
+    }
+
+    @IsTest
     static void theFallbackWritesEvenForSomeoneWithNoAccessToTheErrorLog() {
         System.runAs(TestUsers.admin()) {
             // The documented reason ErrorLogWriter is without sharing and writes in system mode: a

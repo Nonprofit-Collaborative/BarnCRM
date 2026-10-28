@@ -232,4 +232,12 @@
         <shortDescription>Merge tidy-up could not start; {0} kept records, {1} platform message</shortDescription>
         <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because Salesforce refused the request to run it ({1}). These kept records may have a stale member count or name, two primary addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
     </labels>
+    <labels>
+        <fullName>Core_Households_MergeSettleRefused</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Merge tidy-up refused for records the sender cannot edit; {0} ids, {1} user</shortDescription>
+        <value>A request to tidy up after a merge named records that the person who sent it (user {1}) cannot edit, so BarnCRM left them alone: {0}. A merge only names records the person merging can edit, so check who sent it.</value>
+    </labels>
 </CustomLabels>

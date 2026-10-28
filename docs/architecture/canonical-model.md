@@ -791,7 +791,9 @@ setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 - **Event:** `Error_Log_Event__e`, a platform event with publish behavior Publish
   Immediately, carrying the same values so that they survive a rollback (rule R-E4):
   `Message__c`, `Technical_Detail__c` (Long Text Area), `Context__c`,
-  `Record_Reference__c`, `Object_Name__c`, `Severity__c`, `User_Id__c` (Text). The event
+  `Record_Reference__c`, `Object_Name__c`, `Severity__c`, `User_Id__c` (Text). The row's
+  `User__c` is the event's `CreatedById` (the publisher, set by the platform), never
+  `User_Id__c`, which a publisher could set to anyone. The event
   has no Status: every entry is written as New.
 - **Service:** `ErrorLogger`, with `ErrorLogWriter` (publishes the event, and is the only
   class allowed to write the object directly, in system mode, so that a failure is recorded
@@ -6678,8 +6680,11 @@ logged and counted as a failure.
   `MergeSettlementReadyTrigger` subscribes, as the Automated Process user, in batches of 50
   (`PlatformEventSubscriberConfig` `MergeSettlementReadyTriggerConfig`, no running user), and
   queues one settlement job per event, resuming from a checkpoint when its transaction can
-  queue no more and retrying a batch it could queue nothing for. The three packaged permission sets
-  grant Read and Create on it, as on `Rollup_Queue_Ready__e`.
+  queue no more and retrying a batch it could queue nothing for. Each event is settled only for
+  the identifiers its publisher (`CreatedById`) may edit (`UserRecordAccess`); the rest are left
+  alone and named in the Error Log as a warning. BarnCRM Admin and BarnCRM Staff (who merge
+  households) grant Read and Create on it; BarnCRM Read Only, which merges nothing, grants
+  neither.
 - **Matching** is `Datacloud.FindDuplicatesByIds`, which evaluates the org's active duplicate
   rules. It is called for one object at a time, and for households only among accounts: a
   call that includes a person stored as an account is refused by the platform when no person
@@ -9055,6 +9060,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | DLRS and Rollup Helper detection (plan D-124 item 6, RB-C). No object or field added. New R-R16: DLRS (`dlrs`) and Rollup Helper (`rh2`) are detected by the namespace prefix of their objects, never referenced; the Rollup Builder, the Setup Assistant and the Modules page say each is a separate tool; BarnCRM never changes the other tool, and Rollup Helper's definitions are not read. |
 | v0.8 | 2026-10-26 | Same-field guard with DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "No shared target with DLRS": an active definition on a field an active DLRS definition fills is saved or switched on only after the administrator confirms the DLRS one will be switched off, recorded as a setting change; a file import refuses it; Health Check warns about pairs found later. |
 | v0.8 | 2026-10-26 | Import from DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "Import from DLRS": each active DLRS definition maps to a definition saved switched off through the Builder's checks with Definition Key `DLRS_` and its name, or is refused with the reason; the mapping of each DLRS field is listed; a compare step writes nothing; switching a copy on needs the same-field confirmation; DLRS is never changed. |
+| v0.11 | 2026-10-28 | Security review fixes (Core, owner-approved 2026-10-28). No object or field added. BarnCRM Read Only loses Read and Create on `Merge_Settlement_Ready__e`; its subscriber settles only the records the event's publisher (`CreatedById`) may edit. `ErrorLogEventHandler` sets `Error_Log__c.User__c` from the event's `CreatedById`, not the payload's `User_Id__c`. |
 
 ---
 ## 32. Entity ownership by package

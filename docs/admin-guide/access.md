@@ -93,7 +93,8 @@ page. If that person was you, you can start straight away.
 Three things control who can use the page:
 
 1. You need the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin
-   role. Anyone without it sees the page in read-only mode with a notice explaining why.
+   role. Anyone without it sees no role holders, only a notice explaining why: who holds
+   which role is for the people who manage access.
 2. To give or remove a role or an extra permission you also need Salesforce's **Assign
    Permission Sets** (or **Manage Users**) permission. A system administrator has it already. A BarnCRM Admin who is not a system
    administrator gets it from the optional **BarnCRM Access Manager** permission set: in

@@ -8,6 +8,10 @@
  * permission to create it. It runs in the platform's own subscriber transaction, reads nothing,
  * and returns nothing.
  *
+ * The entry names the person who published the event, `CreatedById`, which the platform sets.
+ * The payload's `User_Id__c` is never trusted for that: anyone with Create on the event could
+ * publish one through the API naming somebody else.
+ *
  * It does not go through `TriggerDispatcher`. Recording a failure is not an automation an
  * administrator can switch off or pause: rule R-A3 says turning an automation off never suppresses
  * error logging, and a pause during a bulk load is exactly when the entries matter most.
@@ -32,7 +36,7 @@ public without sharing class ErrorLogEventHandler {
             entries.add(
                 new Error_Log__c(
                     Timestamp__c = event.CreatedDate == null ? System.now() : event.CreatedDate,
-                    User__c = event.User_Id__c,
+                    User__c = event.CreatedById,
                     Context__c = event.Context__c,
                     Message__c = event.Message__c,
                     Technical_Detail__c = event.Technical_Detail__c,

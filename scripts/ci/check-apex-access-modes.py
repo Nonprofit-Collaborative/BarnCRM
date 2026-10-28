@@ -17,7 +17,7 @@ states its sharing, and every query and DML statement states its access mode:
   comment on the line of the call or the line above.
 
 An inner class does not take its outer class's sharing, so one that touches the
-database states its own.
+database, or is a queued, batch, scheduled or finalizer job, states its own.
 
 Test classes are not checked: they run as the test user and set up data on
 purpose.
@@ -52,6 +52,12 @@ CLASS_DECL = re.compile(
     re.I | re.M,
 )
 SHARING = re.compile(r"\b(with|without|inherited)\s+sharing\b", re.I)
+# A queued, batch, scheduled or finalizer job is entered by the platform, so with no keyword
+# it runs without sharing, whatever it touches.
+ASYNC_ENTRY = re.compile(r"\bimplements\b.*\b(Queueable|Database\.Batchable|Schedulable|Finalizer)\b", re.I | re.S)
+# Core only for now: the module jobs it would flag are recorded with the 2026-10-28 security
+# review's module findings, to be fixed with them.
+ASYNC_CHECKED = ("packages/core/",)
 MARKER = re.compile(r"//\s*Access mode:", re.I)
 
 
@@ -95,6 +101,10 @@ def check(path):
             if INLINE_QUERY.search(body) or DML.search(body) or DB_CALL.search(body):
                 problems.append(
                     (line_of(text, inner.start(4)), f"inner class {inner.group(4)} touches the database but has no sharing keyword")
+                )
+            elif path.startswith(ASYNC_CHECKED) and ASYNC_ENTRY.search(text[inner.end():body_start]):
+                problems.append(
+                    (line_of(text, inner.start(4)), f"inner class {inner.group(4)} is an async entry point but has no sharing keyword")
                 )
     for m in INLINE_QUERY.finditer(text):
         end = closing(text, m.start(), "[", "]")
