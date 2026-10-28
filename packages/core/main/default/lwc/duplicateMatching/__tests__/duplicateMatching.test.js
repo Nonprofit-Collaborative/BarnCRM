@@ -35,6 +35,16 @@ describe('c-duplicate-matching for an administrator', () => {
     }
   });
 
+  it('leaves the page name to the App Page header, with no card around the page', async () => {
+    const element = await render();
+
+    const shell = element.shadowRoot.querySelector('c-barn-page-shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_DuplicateMatching_Title');
+    expect(shell.purpose).toBe('c.Core_DuplicateMatching_Intro');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
   it('opens on the review list, and offers Matching Logic', async () => {
     const element = await render();
 

@@ -66,6 +66,16 @@ describe('c-org-optimizer as an administrator', () => {
     jest.clearAllMocks();
   });
 
+  it('leaves the page name to the App Page header, with no card around the page', async () => {
+    const element = await render();
+
+    const shell = element.shadowRoot.querySelector('c-barn-page-shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_OrgOptimizer_Title');
+    expect(shell.purpose).toBe('c.Core_OrgOptimizer_Intro');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
   it('names each Overview Open button for its section', async () => {
     const element = await render();
 

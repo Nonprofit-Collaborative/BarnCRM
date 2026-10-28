@@ -1,6 +1,6 @@
 <template>
-    <lightning-card title={labels.cardTitle} icon-name="standard:file">
-        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
+    <c-barn-page-shell title={labels.cardTitle} title-hidden data-id="shell">
+        <div>
             <template lwc:if={loading}>
                 <lightning-spinner
                     alternative-text={labels.loadingAltText}
@@ -690,5 +690,5 @@
                 <p data-id="read-only">{labels.readOnlyMessage}</p>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
 </template>

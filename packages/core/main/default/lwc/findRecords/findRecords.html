@@ -1,10 +1,9 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:search">
-        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} title-hidden data-id="shell">
+        <div class="slds-is-relative">
             <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
-            <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
             <template lwc:if={hasError}>
                 <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
@@ -287,5 +286,5 @@
                 </template>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
 </template>

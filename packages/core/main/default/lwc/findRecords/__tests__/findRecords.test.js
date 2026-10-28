@@ -204,6 +204,16 @@ describe('c-find-records', () => {
     jest.restoreAllMocks();
   });
 
+  it('leaves the page name to the App Page header, with no card around the page', async () => {
+    const element = await render();
+
+    const shell = one(element, 'shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_Find_Title');
+    expect(shell.purpose).toBe('c.Core_Find_Intro');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
   it('offers the objects and starts a query with the name column and its SOQL', async () => {
     const element = await render();
     expect(one(element, 'object').options).toHaveLength(2);
