@@ -209,22 +209,6 @@
         <value>Kept: this record was not created by the person who ran this import while it ran, so the undo left it in place.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LoadObjectHeading</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: heading and button of the one-object mapping section</shortDescription>
-        <value>Load One Object</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LoadObjectHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what a one-object mapping is for</shortDescription>
-        <value>For a file that is not a list of people: program sessions, volunteer hours, or a corrected export of one of your objects.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_LoadObjectLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

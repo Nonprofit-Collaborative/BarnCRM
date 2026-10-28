@@ -14,15 +14,36 @@ import running from '@salesforce/label/c.Mirror_CampaignSync_Running';
 import errorFailed from '@salesforce/label/c.Mirror_CampaignSync_ErrorFailed';
 import noteWhat from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_What';
 import noteWhy from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_Why';
-import noteWhere from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_Where';
+import noteSteps from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_Steps';
+import marketingWhat from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_What';
+import marketingWhy from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_Why';
+import marketingSteps from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_Steps';
 
 /**
  * The Campaign sync page (feature X-02). The controller decides what the org and the person
  * allow and refuses in words; the page shows the state, the counts, and the one button.
  */
 export default class CampaignSync extends LightningElement {
-  /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
-  setupNotes = [{ key: 'campaignAccess', what: noteWhat, why: noteWhy, where: noteWhere }];
+  /**
+   * What this page needs from Setup, shown by Core's settingsSetupNotes with its Open in Setup
+   * link (a c/setupLinks key). Campaign Sync itself is given on the Access page.
+   */
+  setupNotes = [
+    {
+      key: 'campaignAccess',
+      what: noteWhat,
+      why: noteWhy,
+      steps: noteSteps,
+      link: 'permissionSets'
+    },
+    {
+      key: 'marketingUser',
+      what: marketingWhat,
+      why: marketingWhy,
+      steps: marketingSteps,
+      link: 'users'
+    }
+  ];
 
   labels = {
     title,

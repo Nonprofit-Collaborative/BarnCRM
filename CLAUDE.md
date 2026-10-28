@@ -11,7 +11,8 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 - Commits carry a DCO sign-off (`git commit -s`).
 
 ## Working rules
-- Feature branches per feature ID (for example `feature/c-04-trigger-framework`), squash-merged to `main`, PRs under about 800 changed lines.
+- Feature branches per feature ID (for example `feature/c-04-trigger-framework`), landed on `main` through a squash-merged landing batch, PRs under about 800 changed lines.
+- Testing is batched (plan D-141): a feature PR runs Static checks, DCO, local Jest and the `scripts/ci` checks only, never an org gate. The integrator merges every ready branch into one `landing/batch-N` branch, runs the `barn-sales` and `oi-test` full gates in parallel on its head, fixes failures there, squash-merges it only after both pass, and closes the included PRs as landed. Make testing faster wherever prudent, never by dropping coverage that catches real failures.
 - Canonical model (`docs/architecture/canonical-model.md`) is updated before any object or field is added.
 - A new ADR written on a branch uses `ADR-NEXT`, never a chosen number: file `NEXT-title.md`, heading `# ADR-NEXT`, and every citation the same. The integrator assigns the number at merge. Picking a number on a branch collides when branches run in parallel, and renumbering afterwards is what rewrites correct citations in files that mention several ADRs.
 - Admin-guide page (`docs/admin-guide/`) is written before the LWC.

@@ -6,8 +6,8 @@
 clearing out what should not be there: a test load, a list of contacts a partner sent twice,
 last year's event sign-ups.
 
-To delete the records a file lists by their record IDs instead, use **Load One Object** with
-**Delete by record ID** on the Import tab ([Importing](importing.md), section 9). It needs
+To delete the records a file lists by their record IDs instead, use **Delete the Records a File Lists**
+(which starts on **Delete by record ID**) on the Import tab ([Importing](importing.md), section 9). It needs
 **Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
 
 Before anything is deleted, BarnCRM counts the records that match and shows the first five by

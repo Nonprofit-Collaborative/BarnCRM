@@ -113,14 +113,11 @@ describe('c-integrations-panel', () => {
   });
 
   it('opens each link in a new tab and says so to a screen reader', async () => {
-    getApps.mockResolvedValue([
-      app('one', 'Complement', false, { installUrl: 'https://example.invalid/install' })
-    ]);
+    getApps.mockResolvedValue([app('one', 'Complement', false)]);
     const element = await build();
 
     const item = row(element, 'one');
     const learn = item.querySelector('[data-id="learn-more"]');
-    const install = item.querySelector('[data-id="install"]');
     expect(learn.getAttribute('href')).toBe('https://example.invalid/one');
     expect(learn.target).toBe('_blank');
     expect(learn.rel).toContain('noopener');
@@ -128,19 +125,14 @@ describe('c-integrations-panel', () => {
       'Core_SuiteChoice_NewTab'
     );
     expect(learn.querySelector('.slds-assistive-text').textContent).toContain('Product one');
-    expect(install.getAttribute('href')).toBe('https://example.invalid/install');
-    expect(install.target).toBe('_blank');
-    expect(install.querySelector('.slds-assistive-text').textContent).toContain(
-      'Core_SuiteChoice_NewTab'
-    );
+    expect(item.querySelector('[data-id="install"]')).toBeNull();
   });
 
-  it('shows no install link, and no migration line, when the row has none', async () => {
+  it('shows no migration line when the row has none', async () => {
     getApps.mockResolvedValue([app('one', 'Complement', false)]);
     const element = await build();
 
     const item = row(element, 'one');
-    expect(item.querySelector('[data-id="install"]')).toBeNull();
     expect(item.querySelector('[data-id="migration-path"]')).toBeNull();
   });
 

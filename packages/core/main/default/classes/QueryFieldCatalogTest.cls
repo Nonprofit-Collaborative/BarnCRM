@@ -178,6 +178,56 @@ private class QueryFieldCatalogTest {
         }
     }
 
+    /** The picker hides them, and the server refuses them too, whoever calls it. */
+    @IsTest
+    static void thePlatformsOwnTablesAreRefusedOnTheServer() {
+        System.runAs(TestUsers.admin()) {
+            for (String objectName : new List<String>{ 'AccountShare', 'BarnCRM_Settings__c' }) {
+                try {
+                    QueryFieldCatalog.describeObject(objectName);
+                    System.Assert.fail('A system object is refused: ' + objectName);
+                } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+                    System.Assert.isTrue(
+                        refused.getMessage().contains(objectName),
+                        'The refusal names it: ' + refused.getMessage()
+                    );
+                }
+            }
+            try {
+                QueryCompiler.compile('{"object":"AccountHistory","fields":["Id"]}');
+                System.Assert.fail('Find and its export refuse a system object');
+            } catch (QueryCompiler.QueryCompilerException refused) {
+                System.Assert.isTrue(
+                    refused.getMessage().contains('AccountHistory'),
+                    'Named: ' + refused.getMessage()
+                );
+            }
+            try {
+                BulkDeleteService.planForFile('AccountShare');
+                System.Assert.fail('Bulk Delete refuses a system object');
+            } catch (Exception refused) {
+                System.Assert.isTrue(
+                    refused.getMessage().contains('AccountShare'),
+                    'Named: ' + refused.getMessage()
+                );
+            }
+            try {
+                BulkUpdateFields.writableObject('AccountShare');
+                System.Assert.fail('Bulk Update refuses a system object');
+            } catch (BulkUpdateFields.BulkUpdateException refused) {
+                System.Assert.isTrue(
+                    refused.getMessage().contains('AccountShare'),
+                    'Named: ' + refused.getMessage()
+                );
+            }
+            System.Assert.areEqual(
+                'Account',
+                QueryFieldCatalog.describeObject('Account').getName(),
+                'An object people keep records in is still described'
+            );
+        }
+    }
+
     private static QueryFieldCatalog.FieldInfo field(
         QueryFieldCatalog.ObjectInfo info,
         String apiNameSuffix

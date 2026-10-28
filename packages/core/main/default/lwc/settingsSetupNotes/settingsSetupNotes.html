@@ -18,10 +18,45 @@
                 <p class="slds-text-title_bold">{labels.heading}</p>
                 <p>{note.what}</p>
                 <p class="slds-text-color_weak">{note.why}</p>
-                <p>{labels.where} {note.where}</p>
+                <template lwc:if={note.hasSteps}>
+                    <ol class="slds-list_ordered slds-var-m-vertical_x-small" data-id="steps">
+                        <template for:each={note.stepList} for:item="step">
+                            <li key={step}>{step}</li>
+                        </template>
+                    </ol>
+                </template>
                 <template lwc:if={note.hasStatus}>
                     <p class="slds-text-title_bold" data-id="status">{note.statusText}</p>
                 </template>
+                <div class="slds-var-m-top_x-small">
+                    <template lwc:if={note.url}>
+                        <a
+                            class="slds-button slds-button_neutral"
+                            href={note.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-id="open-setup"
+                        >
+                            <lightning-icon
+                                icon-name="utility:new_window"
+                                size="xx-small"
+                                class="slds-button__icon slds-button__icon_left"
+                            ></lightning-icon>
+                            {labels.openInSetup}
+                            <span class="slds-assistive-text">{labels.newTab}</span>
+                        </a>
+                    </template>
+                    <template lwc:if={note.canCheckAgain}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.checkAgain}
+                            icon-name="utility:refresh"
+                            disabled={checking}
+                            onclick={handleCheckAgain}
+                            data-id="check-again"
+                        ></lightning-button>
+                    </template>
+                </div>
             </div>
         </div>
     </template>

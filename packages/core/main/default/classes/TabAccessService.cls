@@ -129,8 +129,12 @@ public with sharing class TabAccessService {
         return syncOnce(rowsPerRun);
     }
 
-    /** The queued sync: one slice, then itself again while more is left. */
-    public class Job implements Queueable {
+    /**
+     * The queued sync: one slice, then itself again while more is left. Declares its sharing
+     * because an inner class does not take its outer class's, and a queued job with none runs
+     * without sharing; its reads and writes are system mode on setup objects either way.
+     */
+    public with sharing class Job implements Queueable {
         public void execute(QueueableContext jobContext) {
             try {
                 // A test cannot chain one queued job from another.

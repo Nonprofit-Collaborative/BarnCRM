@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the import card does</shortDescription>
-        <value>Needs a file. Add new records and update existing ones from a spreadsheet (CSV or Excel): people and organizations, or one kind of record. A dry run shows what would change before anything is saved.</value>
+        <value>Needs a file. People and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindTitle</fullName>
@@ -93,16 +93,24 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: warning on the bulk delete card</shortDescription>
+        <shortDescription>Data Manager: warning in the box shown when bulk delete is opened</shortDescription>
         <value>Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_WarningAlt</fullName>
+        <fullName>Core_DataManager_DeleteContinue</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: screen reader text of the warning icon</shortDescription>
-        <value>Warning</value>
+        <shortDescription>Data Manager: button in the delete warning box that opens Find</shortDescription>
+        <value>Continue</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DeleteCancel</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: button that closes the delete warning box</shortDescription>
+        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerTitle</fullName>

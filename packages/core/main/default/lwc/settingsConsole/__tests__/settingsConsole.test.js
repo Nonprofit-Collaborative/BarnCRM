@@ -516,6 +516,27 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('shows Save and Discard Changes to an editor everywhere but on Integrations', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [...model(true).sections, { name: 'Integrations', settings: [] }]
+    });
+    const element = build();
+    await settle();
+
+    const labels = () =>
+      Array.from(element.shadowRoot.querySelectorAll('lightning-button')).map((b) => b.label);
+    expect(labels()).toEqual(
+      expect.arrayContaining(['c.Core_Settings_SaveButton', 'c.Core_Settings_DiscardButton'])
+    );
+
+    openSection('Integrations');
+    await settle();
+
+    expect(labels()).not.toContain('c.Core_Settings_SaveButton');
+    expect(labels()).not.toContain('c.Core_Settings_DiscardButton');
+  });
+
   it('opens the section a search result points at', async () => {
     const element = build();
     await settle();
@@ -749,6 +770,12 @@ describe('c-settings-console', () => {
     expect(inputs[0].value).toBe('Barn Rescue');
     expect(inputs[0].readOnly).toBe(true);
     expect(inputs[0].fieldLevelHelp).toBe('c.Core_Settings_FromSetupHelp');
+    // The value's own Setup page opens in a new tab; an editable row has no Setup link.
+    const links = element.shadowRoot.querySelectorAll('[data-id="open-setup"]');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('/lightning/setup/CompanyProfileInfo/home');
+    expect(links[0].getAttribute('target')).toBe('_blank');
+    expect(links[0].getAttribute('rel')).toBe('noopener noreferrer');
     expect(inputs[1].dataset.key).toBe('Organization_Legal_Name__c');
     expect(inputs[1].readOnly).toBeFalsy();
 

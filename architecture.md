@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-28 (main at #648, 52909176; `mwdbdevsb` deployed at 9a10ef84).
+Last verified 2026-10-28 (landing/batch-8; main at #660, 2fa85483e; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
 
 ## Pointers
 
@@ -18,6 +18,7 @@ Last verified 2026-10-28 (main at #648, 52909176; `mwdbdevsb` deployed at 9a10ef
 - GitHub: `Nonprofit-Collaborative/BarnCRM`, default branch `main`.
 - Feature branch per feature ID (for example `feature/c-04-trigger-framework`), squash-merged to `main`; PRs under about 800 changed lines, stacked as `-1`, `-2` when larger.
 - Ruleset on `main` requires the status `Org tests (local)`, posted by `scripts/org/run-org-tests.sh`. Run it from a clean detached worktree at the pushed head, with `NODE_OPTIONS=--max-old-space-size=8192` (the sf CLI runs out of heap reading about 2,200 results).
+- Org gates run per landing batch (D-141), `barn-sales` and `oi-test` in parallel. Defaults: `POLL_SECONDS=5`, `TEST_POLL_SECONDS=15`, `DEPLOY_SHOW_COMPONENTS=0`. Gotcha: both gates post the same `Org tests (local)` status, so a success never replaces the other org's failure (Held).
 - Worktrees live under `~/worktrees/BarnCRM/<branch>`; the main checkout (in a synced folder) is not used for work.
 - Commits carry a DCO sign-off (`git commit -s`).
 
@@ -25,7 +26,7 @@ Last verified 2026-10-28 (main at #648, 52909176; `mwdbdevsb` deployed at 9a10ef
 
 | Alias | What it is | Rules |
 |---|---|---|
-| `devhub` | Dev Hub | Creates scratch orgs |
+| `devhub` | Dev Hub | Creates scratch orgs. At its limit of 3 on 2026-10-28; the RT1 spike used two 1-day scratch orgs on `sftapanel` instead (deleted) |
 | `oi-test` | Default scratch test org, Person Accounts shape | Named by the `SF_TEST_ORG_AUTH_URL` secret. Recreated 2026-10-25 (the previous org expired 2026-10-23): person-accounts shape, Enterprise, expires 2026-11-24; seeded with 200 households, 440 contacts and 25 organizations (`seed-sample-data.sh`; the create script's seed step failed on file mode until #527). The owner replaced the secret value 2026-10-26 (`gh secret list` shows updated 2026-10-26) |
 | `barn-personaccount` | Person Account scratch org, successor of `oi-pa` | Expires 2026-11-24. First full gate on main 71e97ead 2026-10-25: 3,542 of 3,542, coverage 93%, 0 classes under the floor. Gate org for Person Account runs |
 | `barn-sales` | Scratch org, Sales Cloud shape, contacts mode; the "DLRS present" test org | Expires 2026-11-25. DLRS 2.25.0.2 installed 2026-10-28 for coexistence QA (6 QA_* DLRS rollups and 2 legacy rows left in place); Giving_Admin assigned to the admin user. Batch 13 gate: every test passed, OpportunityMirrorSelector at 71% (floor 75%), fix in batch 14. DeploymentSettings `doesSkipAsyncApexValidation` is true (deployed as metadata 2026-10-26) so Apex redeploys are not blocked by the scheduled "BarnCRM Tab Access Check" job. Scratch org limit is 3 active (`oi-test`, `barn-personaccount`, `barn-sales`), all in use |
@@ -158,3 +159,13 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Apex compile gotchas the offline checks miss (each broke a landing batch's org deploy): `Schema.SObjectField.getDescribe()` takes no arguments (only `SObjectType.getDescribe(options)` takes `SObjectDescribeOptions`); `new Map<String, Object>(Map<String, String>)` does not compile (copy key by key); LongTextArea fields cannot be `<required>true</required>`; never remove an LWC `@api` property a Lightning page may use (declare it and ignore it); deploy with `sf project deploy start --metadata-dir` without `--single-package`.
 - Mead Drive sync makes `name 2` duplicates inside `.git/refs`; they make `git fetch` exit 1 and leave `origin` refs stale. Workaround: update the refs from `git ls-remote` (the session's `sync-origin.sh` does this).
 - LWC GraphQL `@optional` on a field the user cannot read returns no error and no value (verified at API v67.0); the Address card relies on it (#637).
+- Record type mechanics (RT1 spike on `sftapanel` scratch orgs, ADR-0141): a permission-set record type becomes the effective default when the user's profile has none (Master); a user without a record type can read and edit an existing account of it but cannot create one or change another account to it; a permission-set source deploy removes record type visibility it no longer names; a newly deployed record type is visible to no profile, System Administrator included; anonymous Apex refuses `SYSTEM_MODE`. BarnCRM never gives users the Household record type (D-134).
+- Never insert a Household account in user mode: use `HouseholdWriter.createHouseholdsForUser` (a person's request; checks Account create and edit, field create access and edit on touched households) or `createHouseholds` (automation); tests use `HouseholdTestDataFactory.insertHouseholds` (#661).
+- `AccountKinds` is the only reader of `Organization_Record_Type__c` (developer name, or Master); never name an organization record type in code (#660). `AccountKinds.organizationRecordTypeId()` is null for Master; tests call `AccountKinds.reset()`. `SampleDataSelector.countSampleOrganizations` still filters by `RecordType.DeveloperName` 'Organization' (account record types PR 4); PR 4 also covers `ImportRowProcessor`, `AddressService`, `MatchingGiftService`, the Import log message `Core_Import_LogOrganizationRecordTypeMissing` and about 36 test `.get('Organization')` calls.
+- `BarnCRM_Settings__c.Suite__c` stores `Community` (Standard Edition) and `Impact` (Nonprofit Edition); show them through `Core_SuiteChoice_StandardName` and `Core_SuiteChoice_NonprofitName` (`SettingsController.choiceLabelsByStoredName`), never as codes (#656).
+- `Merge_Settlement_Ready__e`: the subscriber settles only records its publisher (the event's CreatedById) may edit; otherwise the survivor is left unsettled with an Error Log warning (#654). `check-apex-access-modes.py` flags Core inner async jobs with no sharing keyword.
+- `Integration_App__mdt.Install_Url__c` no longer exists (#655, D-138).
+- Setup deep links live in the shared `c/setupLinks` module; six paths are unverified in a browser (ApexSettings, ForecastFiscalYear, OrgWideEmailAddresses, FlexiPageList, OrgEmailSettings, CompanyProfileInfo), checked in batch QA (T-SET-20) (#659, D-137).
+- Import templates are listed by Name; the People card picks `generic_contact_list` by key (#658).
+- GitHub workflows run only on pull requests into `main`, so a stacked PR (for example #662 on #658) gets no CI until it is retargeted.
+- Lightning App Pages print the page name above the component, so the page shell passes title-hidden (#663); Lightning desktop at 390 px is not the mobile app (the console tab bar overflows).

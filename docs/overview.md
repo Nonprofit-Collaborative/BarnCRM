@@ -12,7 +12,7 @@ Three promises shape it:
 - **Upgrades are safe.** Nothing you configure is overwritten by a new version, and nothing has to be cloned to be used.
 - **It is open.** The source is public, there is no paid tier, and no data leaves your Salesforce org.
 
-Every setting an administrator needs lives on a page inside the app (BarnCRM Settings), not only in Salesforce Setup.
+Every setting an administrator needs lives on a page inside the app (BarnCRM Settings), not only in Salesforce Setup. The few changes only Setup can make are listed where they matter, each with numbered steps and a button that opens the right Setup page.
 
 BarnCRM is in development. No package version exists yet and nothing is installable from a listing, so this page describes what is built on the main branch of the source code.
 

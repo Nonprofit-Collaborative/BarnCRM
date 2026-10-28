@@ -6,7 +6,28 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-28
 
+### Landing batch 8 (PR pending, branch `landing/batch-8`; org gates not yet run; more PRs may follow)
+
+Merges #657, #654, #655, #653, #658, #662, #659, #661, #663 and #664.
+
+- #664 (batch testing, D-141; plan 7.4, 9.6 and D-131 amended): batch process docs, parallel-gate Held rule, 5 s deploy polling, 15 s test polling, component listing opt-in.
+- #661 (RT2a, D-134, ADR-0141): households a person asks for (New household on Home, split into a new household, sample data) are created in system mode by `HouseholdWriter.createHouseholdsForUser` with explicit checks (Account create and edit, field create access, edit on each touched household); New household creates in Apex and opens the record.
+- #663 (UX kit part 1, D-140): `barnPageShell`, `barnToolTile`, `barnToolGrid`, `barnEmptyState`, `barnHelp`; Data Jobs empty state ("No Data Jobs Yet") on the kit. Baseline UX screenshots of `oi-test` captured read-only.
+- #658 and #662 (Import redesign, D-136): Import "What Are You Importing?" cards and a creates summary per template (#658); Start a New Template From This One, Organization List and Couples and Households templates, and the People and Organizations List rename for new installs (#662, stacked on #658).
+- #659 (Setup links, D-137): "Needs a Change in Setup" notes get Open in Setup links, numbered steps and Check Again; shared `c/setupLinks` module; stale Giving and Accounting Export permission-set notes removed.
+- #653 (Data Manager, D-135): Find, Import and Bulk Update reached from Data Manager; Data Manager in the everyday apps; Delete Many Records last with a confirmation dialog; Error Log last tab. D-51 and plan 4.9 amended.
+- #655 (Integrations, D-138): install link, `installUrl`, `Install_Url__c` field and its 6 record values and a label removed; Save and Discard hidden on Integrations only (`settingsConsole` `showSaveBar`).
+- #654 and #657 (Core security review fixes, D-139): #654 merge-settlement event trust, Error Log attribution, Finish Setup grant, `TabAccessService.Job` sharing, `getAccessOverview` gate, CI inner-async rule; #657 system objects refused server side, `rel` on new-tab links, ADR-0142 for BarnCRM Admin View All and Modify All on Account and Contact, AppExchange submission notes. BMemory plan 11.5 records the module findings.
+- Integrator changes on the landing branch: #657's ADR numbered ADR-0142 (BarnCRM Admin keeps View All and Modify All on Account and Contact); BMemory D-139 updated to cite ADR-0142 (BMemory commit 7e90a749); `SampleDataLoadStages` takes the organization record type from `AccountKinds.organizationRecordTypeId()` instead of by name; `rel="noopener noreferrer"` on the Data Manager Salesforce-tools links; Data Manager Import card text now "Needs a file. People and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists."; testing guide T-DM-01 step 5 shows the Data Jobs empty state (No Data Jobs Yet); `docs/product-plan.md` refreshed from BMemory.
+- Deleted metadata to add to deploy destructive lists: `Integration_App__mdt.Install_Url__c` and label `Core_Integrations_InstallLink` (#655); labels `*_SetupNote_*_Where`, `Core_SetupNote_Where`, `Giving_SetupNote_Access_*`, `Mirror_SetupNote_Export_*` (#659); `Core_DataManager_WarningAlt` (#653); `Core_Import_LoadObjectHeading`, `Core_Import_LoadObjectHelp` (#658).
+- Root docs: `changelog.md`, `roadmap.md`, `memory.md` (D-134 to D-141) and `architecture.md` refreshed for these PRs.
+
 ### Claude sessions
+
+- Website and SEO work: barncrm.com schema and peerdiscipleship SEO, BarnCRM additions on nonprofitcollaborative.org, Missionpreneur PR #2 merged (see those projects' changelogs).
+- `barn-npc` validation 0Afhk000001z7SHCAY passed at 62d63ae7 (6,093 components, 3,553 tests). The first attempt failed on the Tab Access Check CronTrigger; destructive list 84 members.
+- BMemory: D-134 amended (adjustment A, plan 4.6 and 10.3); D-135 to D-141 added; plan 11.5 gained the security review module findings; D-139 updated to cite ADR-0142 (commit 7e90a749).
+- RT1 spike (V2 to V6) ran in two 1-day scratch orgs on `sftapanel` (`barn-rt-spike`, then `barn-rt-spike2`, both deleted). V2 contradicted the first design; Brandon chose adjustment A (the Household record type is never given to users).
 
 - `mwdbdevsb` deployed (Brandon approved) at main 9a10ef84, Core and Rollups:
   - First validation 0AfWF00000H52x30AB failed: 499 "schedulable class has jobs pending" errors from the BarnCRM Tab Access Check cron, plus cascades. The Tab Access Check CronTrigger was aborted (no org setting changed).
@@ -20,6 +41,9 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main (newest first)
 
+- #660 (squash 2fa85483e, RT3, D-134, ADR-0141; `barn-sales` 3,947 of 3,947 at b29d7ba, `oi-test` run on main afterwards): setting "Record type for organizations" (`Organization_Record_Type__c`, General, RecordType console data type); Core `AccountKinds` resolver and detection (R-O5); `SettingsService` validation; `CorePostInstall` stores the detected value when blank.
+- #656 (squash a967c42f7, `barn-sales` 3,935 of 3,935; `oi-test` stopped at merge): Recent Changes shows choice settings by their labels, translated at read time; Edition reads Standard Edition or Nonprofit Edition instead of the codes Community and Impact. Stored values unchanged.
+- #652 (squash 96be96759, RT1 docs, ADR-0141): account record types design recorded after the spike (see Claude sessions above); BMemory D-134 amended with plan 4.6 and 10.3.
 - #650 (squash 0079c1ed): v0.11 scale test, 25,000-row Import wizard run on tier 1 `oi-test`, passed; results in `docs/release-notes/v0.11-draft-scale-test.md`.
   - Dry run 185 s, commit 354 s (about 4,240 rows a minute), 0 failed rows, no chunk over 70% of any limit (largest commit chunk CPU 1,428 of 60,000 ms), 0 Error Log rows during the run. Rollup queue empty 5 min 9 s after commit.
   - Undo (ImportUndoBatch) completed in 584 s, 704 of 704 items, counts back to pre-import exactly.

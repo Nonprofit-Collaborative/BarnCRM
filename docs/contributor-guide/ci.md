@@ -265,8 +265,9 @@ you to run `npm ci` and stops.
 
 ### Run the same checks locally, before you push
 
-Every gate above except the org tests runs on a laptop, and all of them are fast (the org
-tests run on a laptop too, through the gate script described under "The org test gate"):
+Every gate above except the org tests runs on a laptop, and all of them are fast. For a
+feature pull request these, with Jest (`test:unit`), are the whole test duty: org tests run once
+per landing batch, through the gate script described under "The org test gate":
 
 ```
 npm run prettier:verify
@@ -410,6 +411,29 @@ A pull request that changes deployable source cannot merge into `main` until its
 have passed in an org on its exact head commit. The `main` ruleset requires three checks:
 `Static checks`, `DCO sign-off check`, and the commit status `Org tests (local)`.
 
+**Testing is done in batches (owner decision, 2026-10-28, plan D-141).** "I want the testing to
+be done in batches and optimized to go faster wherever prudent," for everything in this project
+going forward:
+
+1. **A feature pull request gets no org gate.** It runs `Static checks` and `DCO sign-off check`
+   on GitHub, and its author runs Jest and the `scripts/ci` checks locally before pushing (see
+   "Run the same checks locally, before you push"). No full or light org run is done for it.
+2. **The integrator builds one landing batch.** Every ready feature branch is merged into one
+   `landing/batch-N` branch (the first was PR #219, "Landing batch 7"). Conflicts are resolved
+   once, `docs/product-plan.md` is refreshed from BMemory once, and the root docs
+   (`architecture.md`, `changelog.md`, `roadmap.md`, `memory.md`) are written there.
+3. **Both org gates run in parallel on the landing head:** the full run on `barn-sales` and the
+   full run on `oi-test`, each from its own clean detached worktree and under its own org lock,
+   at the same time.
+4. **Failures are fixed on the landing branch**, and both gates rerun on the new head.
+5. **The landing pull request is squash-merged only after both gates pass.** The feature pull
+   requests it carried are then closed as landed.
+
+Full gates still run on every batch: a speedup never drops coverage that catches real failures.
+Because both orgs post the same `Org tests (local)` context on the same commit, a passing run
+never replaces a failure that the other org posted there: it prints "Held" and posts nothing, so
+the failure stays visible until it is fixed (a new head) or that org's gate is rerun.
+
 That last one is posted from your machine, not by a GitHub runner:
 
 ```
@@ -430,7 +454,7 @@ The results are written to `test-results/org-tests.json`, which git ignores.
 
 **Every full run checks code coverage.** The tests are enqueued with coverage on, so the org
 records it, and the run is followed by polling its `AsyncApexJob` every `TEST_POLL_SECONDS`
-(30) for up to `TEST_WAIT_MINUTES` (90). The results are then fetched without coverage, and
+(15) for up to `TEST_WAIT_MINUTES` (90). The results are then fetched without coverage, and
 coverage is read separately from the org's per-class totals (`ApexCodeCoverageAggregate`
 through the Tooling API, a few hundred rows). Only Apex in the commit's source counts: not test
 classes, not the vendored engine, not whatever another branch left in the shared org. The run
@@ -463,12 +487,14 @@ never stand in for the full gate. Results go to `test-results/org-tests-relevant
 
 The full run stays the merge gate. `RunRelevantTests` is beta, follows direct Apex references
 only, and selects nothing for a change to an object, a flow, a permission set or a label, all
-of which a Core test can fail on. Use the relevant run while a branch is moving and the full
-run on the head you intend to merge.
+of which a Core test can fail on. Use the relevant run while a branch is moving, if an org is
+free; the full runs happen on the landing batch.
 
 **The light run, for screen-only changes.** `scripts/org/run-org-tests.sh <alias> --light` (or
 `ORG_TESTS_MODE=light`) is the lighter check the owner approved on 2026-10-26 for a change that
-touches only screens, labels or docs, so it does not need the full run of about 3,600 tests. It
+touches only screens, labels or docs, so it does not need the full run of about 3,600 tests.
+Since batch testing (2026-10-28, D-141) feature pull requests take no org gate at all, so the
+light run is no longer part of the normal process; it stays available for a one-off check. It
 posts the same required status, `Org tests (local)`, but its description starts "Light gate:" and
 reads "no Apex-affecting changes; deploy and Jest passed", so a reviewer can tell it from a
 "Full run:". Before any deploy it lists the files changed since the merge base with
@@ -494,16 +520,14 @@ groups, custom metadata, flows, layouts, tabs, applications, scripts, config and
 `GivingSampleData`. A mixed change is refused, and the refusal prints the paths that need the
 full run.
 
-**Every landing batch gets a full run before merge.** The light run is for a single screen-only
-branch. A combined pull request (a landing batch of several branches) is always gated with the
-full run on its head, even when each branch in it passed the light run, because the batch is
-what reaches `main`.
+**Every landing batch gets the full run on both gate orgs before merge.** A landing batch is
+never gated with the light run, because the batch is what reaches `main`.
 
 `bash scripts/org/run-org-tests.sh --light-selfcheck` runs the allow-list against sample path
 lists with no org and no GitHub (the `Static checks` job runs it through
 `scripts/ci/tests/test_run_org_tests_light.py`). Run it after changing the list.
 
-Three rules make the status worth trusting:
+Four rules make the status worth trusting:
 
 - **It belongs to one commit.** A new push has no status, so the pull request is blocked
   again until someone reruns the script. A pass on an earlier commit never carries over.
@@ -511,6 +535,9 @@ Three rules make the status worth trusting:
   has to be the code at `HEAD`. Commit or stash first.
 - **It refuses an unpushed commit**, which GitHub could not attach a status to anyway. It
   checks before deploying, so you find out in a second rather than after the run.
+- **A success never hides another org's failure.** Before posting success, the script reads the
+  newest `Org tests (local)` status on the commit; if it is a failure or error whose description
+  names a different org, it posts nothing and prints "Held". A failure always posts.
 
 A pull request that changes nothing under `packages/`, `scripts/org/`, `config/`, or
 `sfdx-project.json` (documentation, the workflow itself, a Dependabot bump of an action) has
@@ -721,7 +748,7 @@ also reporting "Too many concurrent Apex compilations during resource mitigation
 `sf project deploy cancel` reported Canceled, but the tooling DeployRequest stayed Pending, and
 about ten such requests remain there. Resubmitting the same stage deploys normally. So each
 stage is now submitted with `--async` and followed with `sf project deploy report` every
-`POLL_SECONDS` (15): a job still Pending with no start after `STALL_SECONDS` (300) is logged
+`POLL_SECONDS` (5; 15 before 2026-10-28): a job still Pending with no start after `STALL_SECONDS` (300) is logged
 as `STALLED DEPLOY`, cancelled (best effort) and resubmitted once. A second stall fails the
 stage, naming both job ids. A job that has started is not a stall and keeps the 30 minute
 limit (`DEPLOY_WAIT_MINUTES`). Component errors are reported exactly as before. The script
@@ -835,6 +862,13 @@ clean, so both are now the defaults:
   fails with component errors, the run stops as usual. If it fails with none (the opaque
   `UNKNOWN_EXCEPTION`), the script falls back to one object per stage in the same run.
   `DATA_MODEL_STAGES=per-object` always deploys one object per stage.
+- `POLL_SECONDS` defaults to 5 (batch testing, 2026-10-28). At 15, a stage of a handful of
+  components finished in a few seconds but was not seen as done until the first report, so
+  each of the twelve stages cost at least about 17 seconds.
+- `DEPLOY_SHOW_COMPONENTS` defaults to 0: a stage that succeeded is no longer followed by a
+  second report call listing every deployed component (one more CLI round trip per stage and
+  about 1 MB of log per run). Set it to 1 to bring the list back. A failed stage still prints
+  its full report and its component failures.
 
 If the opaque fault comes back, run with `STAGE_PAUSE_SECONDS=15 DATA_MODEL_STAGES=per-object`
 and record in this section and the script header what the run showed.

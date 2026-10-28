@@ -764,4 +764,102 @@ private class MergeSettlementTest {
             Test.stopTest();
         }
     }
+
+    /** An event as the platform would deliver it, with the publisher the platform recorded. */
+    private static Merge_Settlement_Ready__e deliveredEvent(Id publisherId, Id personId) {
+        return (Merge_Settlement_Ready__e) JSON.deserialize(
+            JSON.serialize(
+                new Map<String, Object>{
+                    'attributes' => new Map<String, Object>{
+                        'type' => 'Merge_Settlement_Ready__e'
+                    },
+                    'CreatedById' => publisherId,
+                    'Owner_Ids__c' => String.valueOf(personId),
+                    'Person_Ids__c' => String.valueOf(personId)
+                }
+            ),
+            Merge_Settlement_Ready__e.class
+        );
+    }
+
+    @IsTest
+    static void readOnlyMayNotPublishTheMergeEvent() {
+        System.runAs(TestUsers.admin()) {
+            Id readOnlySet = TestUsers.permissionSetsByName(new List<String>{ 'BarnCRM_Read_Only' })
+                .get('BarnCRM_Read_Only')
+                .Id;
+            List<ObjectPermissions> granted = [
+                SELECT PermissionsCreate, PermissionsRead
+                FROM ObjectPermissions
+                WHERE ParentId = :readOnlySet AND SobjectType = 'Merge_Settlement_Ready__e'
+                WITH SYSTEM_MODE
+            ];
+            for (ObjectPermissions row : granted) {
+                Assert.isFalse(row.PermissionsCreate, 'Read Only cannot publish it');
+                Assert.isFalse(row.PermissionsRead, 'Nor read it');
+            }
+        }
+    }
+
+    @IsTest
+    static void onlyRecordsThePublisherMayEditAreSettled() {
+        System.runAs(TestUsers.admin()) {
+            User reader = TestUsers.minimumAccessUserWith(
+                'Reader',
+                new List<String>{ 'BarnCRM_Read_Only' }
+            );
+            Contact person = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert person;
+
+            Test.startTest();
+            Set<Id> forReader = MergeSettlement.permittedIds(deliveredEvent(reader.Id, person.Id));
+            Set<Id> forAdmin = MergeSettlement.permittedIds(
+                deliveredEvent(UserInfo.getUserId(), person.Id)
+            );
+            Set<Id> forNobody = MergeSettlement.permittedIds(deliveredEvent(null, person.Id));
+            Test.stopTest();
+
+            Assert.isTrue(forReader.isEmpty(), 'A publisher who cannot edit it gets nothing');
+            Assert.areEqual(new Set<Id>{ person.Id }, forAdmin, 'One who can edit it is trusted');
+            Assert.isTrue(forNobody.isEmpty(), 'No publisher is trusted with nothing');
+            List<Error_Log__c> warnings = settlementWarnings();
+            Assert.areEqual(2, warnings.size(), 'Each refusal is named for an administrator');
+            Assert.isTrue(
+                warnings[0].Message__c.contains(String.valueOf(person.Id)),
+                'Naming the record left alone: ' + warnings[0].Message__c
+            );
+        }
+    }
+
+    @IsTest
+    static void anEventPublishedBySomeoneWhoCannotEditQueuesNothing() {
+        System.runAs(TestUsers.admin()) {
+            User publisher = TestUsers.minimumAccessUserWith(
+                'Publisher',
+                new List<String>{ 'BarnCRM_Read_Only' }
+            );
+            Contact person = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert person;
+
+            Test.startTest();
+            System.runAs(publisher) {
+                // Through the API this is refused for want of Create; Apex may still publish,
+                // so the subscriber's own check is what is proven here.
+                EventBus.publish(
+                    new Merge_Settlement_Ready__e(
+                        Owner_Ids__c = String.valueOf(person.Id),
+                        Person_Ids__c = String.valueOf(person.Id)
+                    )
+                );
+            }
+            Test.getEventBus().deliver();
+            Test.stopTest();
+
+            Assert.isTrue(
+                MergeSettlement.queuedByEvents == null ||
+                !MergeSettlement.queuedByEvents.contains(person.Id),
+                'Nothing is settled for records the publisher cannot edit'
+            );
+        }
+    }
 }

@@ -122,6 +122,12 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
      * The same steps as `runAsSourceDeploy`, with the given person standing in for the
      * installer: what Finish Setup runs (FS1, `ModuleSetups`). Never throws.
      *
+     * Outside an install the BarnCRM Admin grant is made only to the person running it, and only
+     * when they could assign permission sets in Setup themselves (ADR-0121). The grant runs in
+     * system mode, so without that check a person holding Manage BarnCRM Settings from an org's
+     * own permission set could give themselves BarnCRM Admin through Finish Setup or the Health
+     * Check fix. The rest of setup runs either way.
+     *
      * @param installerId the person to give BarnCRM Admin, or null for nobody
      */
     public void runSetup(Id installerId) {
@@ -132,7 +138,18 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
             // Unsure means existing: marking a working org as new would turn its features off.
             ErrorLogger.log(e, FEATURE_CONTEXT);
         }
-        run(!alreadySetUp, alreadySetUp, installerId);
+        run(!alreadySetUp, alreadySetUp, mayGrantOutsideInstall(installerId) ? installerId : null);
+    }
+
+    /**
+     * Whether the system mode BarnCRM Admin grant may go to this person outside an install:
+     * only the running user, and only one who holds Assign Permission Sets or Manage Users.
+     */
+    @TestVisible
+    private static Boolean mayGrantOutsideInstall(Id installerId) {
+        return installerId != null &&
+            installerId == UserInfo.getUserId() &&
+            AccessService.canAssignPermissionSets();
     }
 
     /**

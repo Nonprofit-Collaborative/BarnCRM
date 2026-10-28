@@ -562,7 +562,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
-Volunteer Hours record per row, using the Core import's **Load One Object** (see
+Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
 all work as they do for any import.
 

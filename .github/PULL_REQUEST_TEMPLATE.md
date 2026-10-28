@@ -37,7 +37,8 @@
 
 ## Org tests
 
-- [ ] `scripts/org/run-org-tests.sh <alias>` passed on the head commit, so the `Org tests (local)` status is green (or the `Org tests not needed` job posted it because no deployable source changed; a screen-only branch may use `--light`, but a landing batch always needs the full run). See docs/contributor-guide/ci.md, "The org test gate".
+- [ ] Feature pull request: no org gate; Jest (`npm run test:unit`) and the `scripts/ci` checks passed locally, and the branch lands through a landing batch (plan D-141).
+- [ ] Landing batch (`landing/batch-N`): the full `scripts/org/run-org-tests.sh` run passed on the head commit on both `barn-sales` and `oi-test`, run in parallel, so the `Org tests (local)` status is green. See docs/contributor-guide/ci.md, "The org test gate".
 
 ## DCO sign-off
 

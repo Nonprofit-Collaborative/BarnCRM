@@ -24,6 +24,9 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import FROM_SETUP_HELP from '@salesforce/label/c.Core_Settings_FromSetupHelp';
+import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
+import NEW_TAB from '@salesforce/label/c.Core_SetupNote_NewTab';
+import { setupValuePath } from 'c/setupLinks';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
 import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
@@ -42,6 +45,8 @@ const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
 /** The stored name of the General section (SettingSections.GENERAL), not a display label. */
 const GENERAL_SECTION = 'General';
+/** The stored name of the Integrations section: a read-only page with nothing to save. */
+const INTEGRATIONS_SECTION = 'Integrations';
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
 // saves them. Their plain rows are hidden while that panel is in the section so a pattern has
@@ -146,6 +151,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     recentEmpty: RECENT_EMPTY,
     notInstalled: NOT_INSTALLED,
     fromSetupHelp: FROM_SETUP_HELP,
+    openInSetup: OPEN_IN_SETUP,
+    newTab: NEW_TAB,
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
     feedbackUrl: FEEDBACK_URL,
@@ -294,6 +301,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return Object.keys(this.pending).length > 0;
   }
 
+  /** Save and Discard Changes show to editors, except on the Integrations page. */
+  get showSaveBar() {
+    return this.canEdit && this.selectedSection !== INTEGRATIONS_SECTION;
+  }
+
   get saveDisabled() {
     return !this.canEdit || !this.isDirty;
   }
@@ -324,6 +336,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isComponent: setting.dataType === 'Component',
       // A value Setup holds: shown read only, never saved (ADR-0135).
       isSetupValue: setting.dataType === 'SetupValue',
+      // The Setup page that changes it, opened in a new tab (D-137).
+      setupUrl: setting.dataType === 'SetupValue' ? setupValuePath(setting.key) : undefined,
       hasHelp: Boolean(setting.helpUrl),
       learnMoreLabel: LEARN_MORE_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,

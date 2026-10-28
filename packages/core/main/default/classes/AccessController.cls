@@ -49,13 +49,26 @@ public with sharing class AccessController {
 
     /**
      * Returns everything the page needs to draw itself: whether this person may change
-     * roles, the five roles, and who holds each one.
+     * roles, the five roles, and who holds each one. Only for someone with Manage BarnCRM
+     * Settings, like the user search: who holds which role and permission is not for every
+     * BarnCRM user to read. Anyone else gets empty lists and a refusal the page shows.
      *
      * @return the roles and their members, or a structured error
      */
     @AuraEnabled(cacheable=true)
     public static AccessResult getAccessOverview() {
         AccessResult result = new AccessResult();
+        if (!result.canManage) {
+            result.roles = new List<AccessService.Role>();
+            result.assignments = new List<AccessService.RoleAssignments>();
+            result.addOns = new List<AccessService.AddOn>();
+            result.addOnAssignments = new List<AccessService.AddOnAssignments>();
+            result.canChangeAccess = false;
+            result.success = false;
+            result.errorCode = ERROR_NO_PERMISSION;
+            result.message = Label.Core_Access_ErrorRolesNotVisible;
+            return result;
+        }
         try {
             result.roles = AccessService.getRoles();
             result.assignments = AccessService.getAssignments();

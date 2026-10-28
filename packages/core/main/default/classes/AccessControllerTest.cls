@@ -139,15 +139,17 @@ private class AccessControllerTest {
 
             Assert.isFalse(
                 result.canManage,
-                'David has no Manage BarnCRM Settings permission, so the page opens read only for him.'
+                'David has no Manage BarnCRM Settings permission, so he may not change roles.'
             );
-            // Read only means read, not blank. Either David can see the roles, or the page
-            // tells him why he cannot. What it must never do is come back empty and silent.
-            Assert.isTrue(
-                result.success || String.isNotBlank(result.message),
-                'A read only page must either show the roles or say why it cannot.'
-            );
+            // Who holds which role is for those who manage access only. The page is told why,
+            // never left empty and silent.
+            Assert.isFalse(result.success, 'David may not read who holds each role.');
+            Assert.areEqual(AccessController.ERROR_NO_PERMISSION, result.errorCode);
+            Assert.areEqual(Label.Core_Access_ErrorRolesNotVisible, result.message);
             Assert.isNotNull(result.roles, 'The page always gets a list, even an empty one.');
+            Assert.isTrue(result.assignments.isEmpty(), 'No role holders are returned to him.');
+            Assert.isTrue(result.addOnAssignments.isEmpty(), 'Nor add-on holders.');
+            Assert.isFalse(result.canChangeAccess, 'And he may change nothing.');
         }
     }
 

@@ -7,15 +7,18 @@ standard navigation and console navigation.
 
 | App | For | Navigation | Tabs |
 |---|---|---|---|
-| **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Find |
-| **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Find, Addresses, Relationships, Affiliations, Household Members |
-| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log |
+| **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Data Manager |
+| **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Data Manager, Addresses, Relationships, Affiliations, Household Members |
+| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Org Optimizer, Duplicate Matching, Error Log |
 | **BarnCRM Admin Console** | The BarnCRM Admin role only | Console | The same as BarnCRM Admin |
 
 The everyday apps give you one home page that tells you what to do next, a setup checklist
 that remembers how far you got, and the places you go most: your households, your people and
 your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
+**Import**, **Find** and **Bulk Update** are not in any app's navigation: open them from the
+cards on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
+after any pages a module adds.
 
 If you have ever installed something in Salesforce and then wondered where to start, this
 is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
@@ -24,10 +27,11 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 
 | What you are looking for | Where it is |
 |---|---|
-| People, households, organizations, Find | **BarnCRM** or **BarnCRM Console** |
+| People, households, organizations | **BarnCRM** or **BarnCRM Console** |
+| Find, Import and Bulk Update | The **Data Manager** tab, in any BarnCRM app |
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Data Manager, Import, Bulk Update, Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
@@ -131,11 +135,11 @@ they keep the records you are working on open side by side in tabs across the to
 
   If that link is blank (for example an address that belongs to a person, not a household),
   the record opens in its own tab instead.
-- **Pages such as Find and BarnCRM Settings open as tabs too.** Choose them from the
+- **Pages such as Data Manager and BarnCRM Settings open as tabs too.** Choose them from the
   navigation menu (the arrow next to the app name). In **BarnCRM Console**, Addresses,
   Relationships, Affiliations and Household Members are at the end of that menu. In **BarnCRM
-  Admin Console** the menu holds BarnCRM Settings, Data Manager, Import, Bulk Update, Org
-  Optimizer and Error Log.
+  Admin Console** the menu holds BarnCRM Settings, Data Manager, Org Optimizer, Duplicate
+  Matching and Error Log. Find and Import open as tabs from their Data Manager cards.
 - **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
   still there when you come back.
 - **On a phone**, the Salesforce mobile app shows each BarnCRM app as an ordinary app without
@@ -238,10 +242,15 @@ compare it with the page that came with the package.
   have not been assigned a BarnCRM role: ask whoever installed the package to add you
   on the Access page. If the role was given a moment ago, wait a minute: BarnCRM gives the
   apps in a queued job.
-- **Looking for BarnCRM Settings or Data Manager in the BarnCRM app.** The tools are in
+- **Looking for BarnCRM Settings in the BarnCRM app.** The settings and the admin tools are in
   **BarnCRM Admin** and **BarnCRM Admin Console**, which only the BarnCRM Admin role sees.
-  Someone without that role who has the Bulk Update, Find and Export or Duplicate Review
-  permission opens Data Manager or Org Optimizer by typing its name in the app launcher.
+  **Data Manager** is in the BarnCRM apps too, for anyone with the Find and Export, Bulk Update
+  or Bulk Delete permission. Someone without the admin role who has the Duplicate Review
+  permission opens Org Optimizer or Duplicate Matching by typing its name in the app launcher.
+- **Looking for Find, Import or Bulk Update in the navigation.** None is in any app's
+  navigation: open **Data Manager** and choose the **Find and Export Records**, **Import a
+  File** or **Update Many Records** card. Recent bulk updates and their undo are under **Data
+  Jobs** on the same page.
 - **Hiding a style and wondering why a person still has it as their default.** **App
   Navigation Style** takes the other style's apps away; the next time that person opens
   Salesforce they land in an app they can still see. Nothing else about their access changes.

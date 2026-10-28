@@ -25,13 +25,13 @@ Your admin may have hidden one of them for everyone. Open **Fundraising** for gi
 Volunteers** for volunteers. **BarnCRM Admin** and **BarnCRM Admin Console** are for
 administrators only.
 
-**BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Find**.
-**BarnCRM Console** has the same, plus **Addresses**, **Relationships**, **Affiliations** and
-**Household Members** at the end of its navigation menu. The admin apps have **BarnCRM
-Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer** and **Error Log**.
-You see only the tabs your access allows, so your menu may be shorter. If you have an extra
-permission such as Bulk Update but not the admin role, open **Data Manager** by typing its name
-in the App Launcher.
+**BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Data
+Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships**,
+**Affiliations** and **Household Members** at the end of its navigation menu. The admin apps
+have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
+**Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
+**Import** and **Bulk Update** are not in the navigation: open them from their cards on the
+**Data Manager** tab.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
@@ -83,8 +83,9 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
   in the tabs above."
-- **New household**: opens a new household with a placeholder name. The name is replaced
-  automatically once you add a member. You see this button only if you can create households.
+- **New household**: creates a household with a placeholder name and opens it. The name is
+  replaced automatically once you add a member. You see this button only if you can create
+  and edit accounts.
 - **Quick Links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
   going back to the App Launcher.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is
@@ -142,11 +143,12 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 |---|---|
 | **Find and Export Records** | The **Find** tab |
 | **Update Many Records** | **Find**: run a query, then press **Bulk Update** (no file needed) |
-| **Delete Many Records** | **Find**: run a query, then press **Bulk Delete** (no file needed) |
 | **Tidy and Check Your Data** | The **Org Optimizer** tab |
+| **Delete Many Records** (last) | **Find**: run a query, then press **Bulk Delete** (no file needed) |
 
-Deleted records go to the Recycle Bin, not away for good: the **Delete Many Records** card says
-so in a yellow warning box, and you can undo a bulk delete from **Data Jobs** for up to 15 days.
+Deleted records go to the Recycle Bin, not away for good: choosing **Open** on **Delete Many
+Records** first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to
+stay on Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
 1. Choose **Open** on the card you want.
 2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk

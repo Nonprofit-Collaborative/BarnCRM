@@ -58,8 +58,11 @@ describe('c-campaign-sync', () => {
   it('says what Campaign sync needs from Setup at the top of the page', async () => {
     const element = await mount(READY);
     const notes = element.shadowRoot.querySelector('c-settings-setup-notes');
-    expect(notes.notes).toHaveLength(1);
-    expect(notes.notes[0].where).toBe('c.Mirror_SetupNote_CampaignSync_Where');
+    expect(notes.notes.map((note) => [note.key, note.link])).toEqual([
+      ['campaignAccess', 'permissionSets'],
+      ['marketingUser', 'users']
+    ]);
+    expect(notes.notes[1].steps).toBe('c.Mirror_SetupNote_MarketingUser_Steps');
   });
 
   it('counts the appeals with a Campaign and offers Sync all appeals', async () => {

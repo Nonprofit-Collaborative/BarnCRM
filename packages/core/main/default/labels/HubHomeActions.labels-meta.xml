@@ -5,7 +5,15 @@
         <categories>Hub Home</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: button that opens the New Household form</shortDescription>
+        <shortDescription>Hub home: button that creates a household and opens it</shortDescription>
         <value>New household</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHomeActions_NewHouseholdFailed</fullName>
+        <categories>Hub Home</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Hub home: New household could not create the household; {0} reason</shortDescription>
+        <value>The household could not be created: {0}</value>
     </labels>
 </CustomLabels>

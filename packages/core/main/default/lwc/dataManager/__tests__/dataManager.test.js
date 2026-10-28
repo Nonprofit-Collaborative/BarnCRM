@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import DataManager from 'c/dataManager';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock('@salesforce/label/c.Core_DataManager_OpenAria', () => ({ default: 'Open {0}' }), {
   virtual: true
@@ -65,21 +66,77 @@ describe('c-data-manager', () => {
     jest.clearAllMocks();
   });
 
-  it('marks the bulk delete card destructive, with the Recycle Bin warning', async () => {
+  it('marks the bulk delete card destructive, with no warning bar on the page', async () => {
     const element = await render();
 
     const card = element.shadowRoot.querySelector('div[data-id="delete"]');
-    const warning = card.querySelector('[data-id="delete-warning"]');
-    expect(warning.textContent).toContain('c.Core_DataManager_DeleteWarning');
-    expect(warning.querySelector('lightning-icon').alternativeText).toBe(
-      'c.Core_DataManager_WarningAlt'
-    );
     expect(card.querySelector('lightning-button').variant).toBe('destructive-text');
+    expect(element.shadowRoot.querySelector('.slds-theme_warning')).toBeNull();
+    expect(element.shadowRoot.querySelector('lightning-icon')).toBeNull();
+    expect(element.shadowRoot.textContent).not.toContain('c.Core_DataManager_DeleteWarning');
 
-    // No other tool carries a warning or a red button.
-    expect(element.shadowRoot.querySelectorAll('[data-id="delete-warning"]')).toHaveLength(1);
+    // No other tool has a red button.
     const find = element.shadowRoot.querySelector('div[data-id="find"] lightning-button');
     expect(find.variant).toBe('neutral');
+  });
+
+  it('lists Delete Many Records as the last card', async () => {
+    const element = await render();
+
+    const keys = Array.from(element.shadowRoot.querySelectorAll('lightning-button[data-tab]')).map(
+      (button) => button.dataset.id
+    );
+    expect(keys).toEqual(['import', 'find', 'optimizer', 'delete']);
+  });
+
+  it('asks before opening the delete tool, and opens Find only on Continue', async () => {
+    const element = await render();
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
+
+    element.shadowRoot.querySelector('lightning-button[data-id="delete"]').click();
+    await flush();
+
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    expect(BarnConfirmModal.open.mock.calls[0][0]).toEqual({
+      size: 'small',
+      label: 'c.Core_DataManager_DeleteTitle',
+      message: 'c.Core_DataManager_DeleteWarning',
+      confirmLabel: 'c.Core_DataManager_DeleteContinue',
+      cancelLabel: 'c.Core_DataManager_DeleteCancel',
+      confirmVariant: 'destructive'
+    });
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' }
+    });
+  });
+
+  it('does nothing when the delete box is cancelled or closed', async () => {
+    const element = await render();
+    const button = element.shadowRoot.querySelector('lightning-button[data-id="delete"]');
+
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    button.click();
+    await flush();
+    BarnConfirmModal.open.mockResolvedValueOnce(undefined);
+    button.click();
+    await flush();
+
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(2);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('opens Find from its card without asking', async () => {
+    const element = await render();
+
+    element.shadowRoot.querySelector('lightning-button[data-id="find"]').click();
+    await flush();
+
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' }
+    });
   });
 
   it('says what an import template is above the list', async () => {
@@ -153,12 +210,14 @@ describe('c-data-manager', () => {
     const element = await render();
 
     element.shadowRoot.querySelector('lightning-button[data-id="import"]').click();
+    await flush();
     expect(mockNavigate).toHaveBeenLastCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Import' }
     });
 
     element.shadowRoot.querySelector('lightning-button[data-id="optimizer"]').click();
+    await flush();
     expect(mockNavigate.mock.calls[1][0].attributes.apiName).toBe('Data_Hygiene');
   });
 

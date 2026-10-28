@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: the standard admin tool page (header with icon, title, purpose line and actions,
+    collapsible About This Tool help, body, footer), one card level deep.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

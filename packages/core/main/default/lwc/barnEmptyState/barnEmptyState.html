@@ -1,0 +1,78 @@
+<template>
+    <div class={containerClass} data-id="empty-state">
+        <template lwc:if={isAllClear}>
+            <svg class="slds-illustration__svg" viewBox="0 0 160 100" aria-hidden="true" data-id="art-all-clear">
+                <ellipse class="slds-illustration__fill-secondary" cx="80" cy="90" rx="52" ry="6"></ellipse>
+                <circle
+                    class="slds-illustration__stroke-primary"
+                    cx="80"
+                    cy="46"
+                    r="34"
+                    fill="none"
+                    stroke-width="3"
+                ></circle>
+                <path
+                    class="slds-illustration__stroke-secondary"
+                    d="M64 47 L75 58 L97 35"
+                    fill="none"
+                    stroke-width="5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+            </svg>
+        </template>
+        <template lwc:elseif={isSetup}>
+            <svg class="slds-illustration__svg" viewBox="0 0 160 100" aria-hidden="true" data-id="art-setup">
+                <ellipse class="slds-illustration__fill-secondary" cx="80" cy="92" rx="52" ry="6"></ellipse>
+                <rect
+                    class="slds-illustration__stroke-primary"
+                    x="52"
+                    y="10"
+                    width="56"
+                    height="74"
+                    rx="4"
+                    fill="none"
+                    stroke-width="3"
+                ></rect>
+                <path
+                    class="slds-illustration__stroke-secondary"
+                    d="M61 30 l5 5 l9 -9 M61 50 l5 5 l9 -9 M82 31 h16 M82 51 h16 M64 70 h34"
+                    fill="none"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+            </svg>
+        </template>
+        <template lwc:else>
+            <svg class="slds-illustration__svg" viewBox="0 0 160 100" aria-hidden="true" data-id="art-no-data">
+                <ellipse class="slds-illustration__fill-secondary" cx="80" cy="92" rx="52" ry="6"></ellipse>
+                <path
+                    class="slds-illustration__stroke-primary"
+                    d="M40 40 L80 24 L120 40 L120 76 L80 90 L40 76 Z M40 40 L80 56 L120 40 M80 56 L80 90"
+                    fill="none"
+                    stroke-width="3"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    class="slds-illustration__stroke-secondary"
+                    d="M66 12 l4 6 M80 6 v8 M94 12 l-4 6"
+                    fill="none"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                ></path>
+            </svg>
+        </template>
+        <div class="slds-text-longform slds-var-m-top_small">
+            <div role="heading" aria-level={headingLevel} class="slds-text-heading_medium" data-id="heading">
+                {heading}
+            </div>
+            <template lwc:if={message}>
+                <p class="slds-text-body_regular" data-id="message">{message}</p>
+            </template>
+        </div>
+        <div class="slds-var-m-top_small" data-id="action">
+            <slot></slot>
+        </div>
+    </div>
+</template>

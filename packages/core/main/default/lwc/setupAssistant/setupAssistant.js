@@ -42,8 +42,9 @@ import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDa
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
 import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
+import { setupPath } from 'c/setupLinks';
 
-const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
+const CREATE_USER_URL = setupPath('users');
 // User access policies are created in Setup, not by a package (ADR-0095), so the step links to the guide.
 const AUTOMATIC_ACCESS_GUIDE =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';

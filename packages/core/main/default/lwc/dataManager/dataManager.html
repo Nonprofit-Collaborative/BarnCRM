@@ -10,18 +10,6 @@
                     <article class="slds-box slds-box_small">
                         <h3 class="slds-text-heading_small">{tool.title}</h3>
                         <p class="slds-var-m-vertical_x-small slds-text-body_small">{tool.text}</p>
-                        <template lwc:if={tool.warning}>
-                            <div class="slds-scoped-notification slds-theme_warning slds-var-m-bottom_x-small" role="note" data-id="delete-warning">
-                                <div class="slds-media slds-media_center">
-                                    <div class="slds-media__figure">
-                                        <lightning-icon icon-name="utility:warning" size="x-small" alternative-text={labels.warningAlt}></lightning-icon>
-                                    </div>
-                                    <div class="slds-media__body">
-                                        <p class="slds-text-body_small">{tool.warning}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
                         <lightning-button label={labels.open} aria-label={tool.openLabel} variant={tool.buttonVariant} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
                     </article>
                 </div>
@@ -61,7 +49,7 @@
             <ul class="slds-var-p-horizontal_medium" data-id="salesforce-links">
                 <template for:each={salesforceLinks} for:item="link">
                     <li key={link.key} class="slds-var-p-bottom_x-small">
-                        <a href={link.url} target="_blank">{link.label}</a>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
                     </li>
                 </template>
             </ul>

@@ -49,8 +49,9 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpecte
 import NO_ACCESS from '@salesforce/label/c.Core_Duplicates_NoSuggestionAccessNotice';
 import SHOWING_COUNT from '@salesforce/label/c.Core_Duplicates_ShowingCount';
 import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCountMore';
+import { setupPath } from 'c/setupLinks';
 
-const SETUP_DUPLICATE_RULES = '/lightning/setup/DuplicateRules/home';
+const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
 
 /**
  * The review list on the Duplicate Matching tab (C-20, ADR-0139).

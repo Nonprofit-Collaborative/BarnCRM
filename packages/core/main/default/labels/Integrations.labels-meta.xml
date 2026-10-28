@@ -145,14 +145,6 @@
         <value>Learn more</value>
     </labels>
     <labels>
-        <fullName>Core_Integrations_InstallLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: link to where a product is installed from</shortDescription>
-        <value>Install</value>
-    </labels>
-    <labels>
         <fullName>Core_Integrations_EmptyMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>

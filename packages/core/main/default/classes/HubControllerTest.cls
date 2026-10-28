@@ -16,6 +16,75 @@ private class HubControllerTest {
         return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davidh');
     }
 
+    /**
+     * New household: a staff member whose access comes only from BarnCRM Staff is offered the
+     * button and gets an empty household, named with the placeholder, of the Household record
+     * type, created in system mode (ADR-0141).
+     */
+    @IsTest
+    static void newHouseholdCreatesAnEmptyHouseholdForStaff() {
+        System.runAs(TestUsers.admin()) {
+            User staff = TestUsers.minimumAccessUserWith(
+                'Hubstaff',
+                new List<String>{ 'BarnCRM_Staff' }
+            );
+            Boolean offered;
+            Id householdId;
+
+            Test.startTest();
+            System.runAs(staff) {
+                offered = HubController.getHomeModel().canCreateHousehold;
+                householdId = HubController.createHousehold();
+            }
+            Test.stopTest();
+
+            Assert.isTrue(offered, 'The button is offered');
+            Account household = [
+                SELECT Name, RecordTypeId, Member_Count__c
+                FROM Account
+                WHERE Id = :householdId
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(
+                HouseholdService.householdRecordTypeId(),
+                household.RecordTypeId,
+                'A household'
+            );
+            Assert.areEqual(Label.Core_Households_NamePlaceholder, household.Name, 'Placeholder');
+            Assert.areEqual(0, household.Member_Count__c, 'Nobody in it yet');
+        }
+    }
+
+    /** Someone who cannot create accounts is not offered the button and is refused plainly. */
+    @IsTest
+    static void newHouseholdIsRefusedToSomeoneWhoCannotCreateAccounts() {
+        System.runAs(TestUsers.admin()) {
+            User reader = TestUsers.peopleReaderWith('Hubreader', new List<String>());
+            Integer before = [SELECT COUNT() FROM Account WITH SYSTEM_MODE];
+            Boolean offered;
+            String message;
+
+            Test.startTest();
+            System.runAs(reader) {
+                offered = HubController.getHomeModel().canCreateHousehold;
+                try {
+                    HubController.createHousehold();
+                } catch (AuraHandledException refused) {
+                    message = refused.getMessage();
+                }
+            }
+            Test.stopTest();
+
+            Assert.isFalse(offered, 'No button');
+            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(
+                before,
+                [SELECT COUNT() FROM Account WITH SYSTEM_MODE],
+                'Nothing was created'
+            );
+        }
+    }
+
     @IsTest
     static void tellsMariaWhatToDoNext() {
         System.runAs(TestUsers.admin()) {

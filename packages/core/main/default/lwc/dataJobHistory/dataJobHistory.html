@@ -150,7 +150,12 @@
                     </ul>
                 </template>
                 <template lwc:else>
-                    <p class="slds-text-body_small" data-id="no-jobs">{labels.empty}</p>
+                    <c-barn-empty-state
+                        data-id="no-jobs"
+                        illustration="no-data"
+                        heading={labels.empty}
+                        message={labels.emptyHint}
+                    ></c-barn-empty-state>
                 </template>
             </div>
         </lightning-card>

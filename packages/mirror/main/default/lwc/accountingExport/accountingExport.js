@@ -27,9 +27,6 @@ import markPostedLabel from '@salesforce/label/c.Mirror_AccountingExport_MarkPos
 import markPostedHelp from '@salesforce/label/c.Mirror_AccountingExport_MarkPostedHelp';
 import marked from '@salesforce/label/c.Mirror_AccountingExport_Marked';
 import markNeedsAllFunds from '@salesforce/label/c.Mirror_AccountingExport_MarkNeedsAllFunds';
-import noteWhat from '@salesforce/label/c.Mirror_SetupNote_Export_What';
-import noteWhy from '@salesforce/label/c.Mirror_SetupNote_Export_Why';
-import noteWhere from '@salesforce/label/c.Mirror_SetupNote_Export_Where';
 
 const BYTE_ORDER_MARK = '\uFEFF';
 const REVOKE_DELAY_MS = 1000;
@@ -44,9 +41,6 @@ const REVOKE_DELAY_MS = 1000;
  * always marks the file on screen, and the server builds it again and compares its digest.
  */
 export default class AccountingExport extends LightningElement {
-  /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
-  setupNotes = [{ key: 'exportAccess', what: noteWhat, why: noteWhy, where: noteWhere }];
-
   labels = {
     title,
     intro,
