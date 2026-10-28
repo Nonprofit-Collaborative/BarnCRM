@@ -8,9 +8,17 @@
  */
 @IsTest(testFor='ApexClass:VolunteersErasureExtension, ApexClass:VolunteerErasureSelector')
 private class VolunteersErasureExtensionTest {
+    /** The admin and the person erasing, created once and found again by every method. */
     @TestSetup
     static void makeUsers() {
         TestUsers.adminWith(VolunteersTestData.ADMIN);
+        TestUsers.withPermissionSets(
+            new List<String>{
+                TestUsers.CORE_ADMIN,
+                VolunteersTestData.ADMIN,
+                'BarnCRM_Erase_People'
+            }
+        );
     }
 
     private static User eraser() {

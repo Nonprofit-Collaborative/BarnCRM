@@ -1,20 +1,30 @@
 /**
  * Donation matching (G-24, canonical model R-DM1 to R-DM6): which scheduled payment an
  * imported gift pays, under each of the four behaviours. Run as Maria, who holds the admin
- * permission sets, because the payments are read in her own mode.
+ * permission sets, because the payments are read in her own mode. Maria is built once by the
+ * setup and found by her username wherever a test acts as her.
  */
 @IsTest(testFor='ApexClass:DonationMatcher')
 private class DonationMatcherTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
+            );
+        }
     }
 
+    /** Maria, built by the setup, found by the username TestUsers gives her last name. */
     private static User maria() {
-        return TestDataFactory.createUser(
-            'Maria',
-            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-        );
+        return [
+            SELECT Id
+            FROM User
+            WHERE Username LIKE 'barn-test.maria.%' AND LastName = 'Maria'
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
     }
 
     /** An active pledge of this person with a payment due on each of these days of March. */
