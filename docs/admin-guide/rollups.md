@@ -460,7 +460,8 @@ The Builder steers you away from choices it would refuse:
    instead it writes it for you: the exact Setup steps with the type, label and field name to
    enter, the field's source file to copy, and **Download Field Package** with the Salesforce
    CLI command to deploy it. A deployed field is visible to nobody until you give access to
-   it in Setup. When the field exists, click **Refresh Fields**: the Builder chooses it.
+   it in Setup. Read only is enough for most people; the person who sets up the rollup needs
+   Edit on the field, or the Builder refuses to save it. When the field exists, click **Refresh Fields**: the Builder chooses it.
 2. **What should be counted?** The records that feed the total and the field that links them
    to the record from step 1, in plain words: "Gift, by Donor" or "Opportunity, by Account
    ID". When the total lands on an account and the records point at a person, you can also
