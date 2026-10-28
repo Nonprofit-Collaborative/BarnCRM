@@ -31,6 +31,14 @@ jest.mock(
   () => ({ default: 'In Find, choose "{0}" from Saved queries.' }),
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/label/c.Core_DataHygiene_NeedsAttention',
+  () => ({ default: 'Needs Attention' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear', () => ({ default: 'All Clear' }), {
+  virtual: true
+});
 
 const CHECKS = [
   {
@@ -109,6 +117,32 @@ describe('c-data-hygiene-console', () => {
     ).toBe('More than 2,000');
   });
 
+  it('badges each count, and tells the page how many checks found records', async () => {
+    const summary = jest.fn();
+    const element = createElement('c-data-hygiene-console', { is: DataHygieneConsole });
+    element.addEventListener('summary', summary);
+    document.body.appendChild(element);
+    await flush();
+
+    expect(row(element, 'people_without_household').querySelector('[data-id="badge"]').label).toBe(
+      'Needs Attention'
+    );
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    expect(element.shadowRoot.querySelector('c-barn-help[data-id="help"]')).not.toBeNull();
+    // 214, more than 2,000 and 3 found records; the refused check has no count.
+    expect(summary).toHaveBeenCalledTimes(1);
+    expect(summary.mock.calls[0][0].detail).toEqual({ needsAttention: 3 });
+  });
+
+  it('badges a check that found nothing as All Clear', async () => {
+    getChecks.mockResolvedValue([{ ...CHECKS[0], count: 0, countLabel: '0' }]);
+    const element = await render();
+
+    expect(row(element, 'people_without_household').querySelector('[data-id="badge"]').label).toBe(
+      'All Clear'
+    );
+  });
+
   it('shows a refusal instead of a number, and no Find button', async () => {
     const element = await render();
 
@@ -132,7 +166,7 @@ describe('c-data-hygiene-console', () => {
   it('opens a check in Find with the tab and state key Apex returns', async () => {
     openInFind.mockResolvedValue({
       savedQueryId: 'a0X000000000001AAA',
-      savedQueryName: 'Data hygiene: People with no household',
+      savedQueryName: 'Data Quality: People with no household',
       findTabApiName: 'Find',
       stateKey: 'c__savedQueryId'
     });
@@ -150,7 +184,7 @@ describe('c-data-hygiene-console', () => {
     });
     expect(toasts).toHaveBeenCalledTimes(1);
     expect(toasts.mock.calls[0][0].label).toBe(
-      'In Find, choose "Data hygiene: People with no household" from Saved queries.'
+      'In Find, choose "Data Quality: People with no household" from Saved queries.'
     );
   });
 
@@ -178,7 +212,7 @@ describe('c-data-hygiene-console', () => {
   });
 
   it('shows the page error when the checks cannot be read', async () => {
-    getChecks.mockRejectedValue({ body: { message: 'Data hygiene needs the permission.' } });
+    getChecks.mockRejectedValue({ body: { message: 'Data Quality needs the permission.' } });
     const element = await render();
 
     expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(

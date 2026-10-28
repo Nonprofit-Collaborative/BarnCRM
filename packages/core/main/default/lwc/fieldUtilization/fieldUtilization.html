@@ -1,6 +1,7 @@
 <template>
-    <lightning-card title={labels.title} icon-name="standard:dashboard">
-        <div class="slds-var-p-horizontal_medium">
+    <div>
+        <div>
+            <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.title}</h2>
             <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
             <template lwc:if={errorMessage}>
@@ -150,5 +151,5 @@
                 </div>
             </template>
         </div>
-    </lightning-card>
+    </div>
 </template>

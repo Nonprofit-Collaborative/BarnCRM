@@ -14,12 +14,12 @@ opens quickly however large your database is.
 
 | Section | What it answers | Who sees it |
 |---|---|---|
-| **Overview** | What each section is for, with a button to open it. | Everyone who can open the page |
-| **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check has **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
+| **Overview** | A tile for each section, grouped under **Check Your Data** and **Check Your Setup**. A tile's badge gives its state at a glance (see below). Select a tile to open its section. | Everyone who can open the page |
+| **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check shows its count, a **Needs Attention** or **All Clear** badge, and **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
 | **Field Utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
-| **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
+| **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
 | **Unused Setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
@@ -27,6 +27,20 @@ opens quickly however large your database is.
 
 Org Optimizer never changes a record by itself. Every change is a button you press in a
 section, and each section's own page in this guide says what that button does.
+
+**Tile badges on Overview.** Opening the page runs no check, so a badge shows only what is
+already known:
+
+| Tile | Badge |
+|---|---|
+| **Errors** | **{n} New** when Error Log entries are unread, **All Clear** when none are. Read as the page opens (one small count). |
+| **Health Check** | The last full run: **{n} Errors**, **{n} Warnings**, **Passed**, or **Not Run Yet**. Updated when you come back to **Overview** after a run. |
+| **Data Quality** | **{n} Need Attention** (checks that found records) or **All Clear**, once you have opened the section. |
+| **Storage and Limits** | **Data Storage {n}%** once you have opened the section, in warning colors from 80%. |
+
+**About This Tool**, under the page header, explains the page. It is open on your first visit
+and closed after that; open it again whenever you like. Your choice is kept in your browser
+only.
 
 ## 2. How to Turn It On
 
@@ -48,9 +62,10 @@ the **Duplicate Matching** section of **BarnCRM Settings** opens.
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. Open the **Org Optimizer** tab. **Overview** lists the sections with one line each.
-2. Choose **Data Quality**. The ten checks count as the section opens. **People with no
-   household** says **0** on fresh sample data.
+1. Open the **Org Optimizer** tab. **Overview** shows a tile per section, each with one line.
+   The **Health Check** tile says **Not Run Yet** on a new org.
+2. Select the **Data Quality** tile. The ten checks count as the section opens. **People with
+   No Household** says **0** on fresh sample data, with an **All Clear** badge.
 3. Choose **Field Utilization**. In **Kind of Record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.
 4. Choose **Health Check** and press **Run Health Check**. The findings appear, most serious
@@ -60,6 +75,8 @@ Start from the sample data (see [Sample data](sample-data.md)).
 6. Choose **Unused Setup**. In a fresh org most lines say **0**; any with a count list the
    first five names, and **Open in Setup** takes you to the page where you can remove them.
 7. Go back to **Data Quality** and press **Recount**: the counts are fresh each time you ask.
+8. Choose **Overview**. The **Data Quality**, **Health Check** and **Storage and Limits** tiles
+   now carry badges for what you just looked at.
 
 ## 4. Why Sections Load Only When Opened
 
