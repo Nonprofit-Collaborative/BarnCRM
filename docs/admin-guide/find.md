@@ -6,13 +6,14 @@
 language. You pick one object (Households, Contacts, Gifts with the Giving module, or any
 other object you can see), choose the columns, add conditions such as "Status is one of
 Received, Pledged" or "Gift Date is in the last 90 days", choose a sort order and how many
-rows to show, and press **Run**. The results appear in a table. You can then:
+rows to show, and press **Run**. The results appear in a table, 25 rows at a time: press
+**Show More** under the table for the next 25. You can then:
 
-- **Export to CSV**: every matching record, not only the rows on screen, up to the export
+- **Export to CSV** (in the **Export** menu): every matching record, not only the rows on screen, up to the export
   limit set in BarnCRM Settings. The file is UTF-8 with a byte-order mark, so Excel opens
   names with accents correctly. The file is named for the object and today's date in your
   own time zone, for example `Gift__c-2026-10-13.csv`.
-- **Export to Excel**: the same rows as an Excel workbook (.xlsx).
+- **Export to Excel** (in the **Export** menu): the same rows as an Excel workbook (.xlsx).
 - **Save** the query under a name, to run it again next month.
 - **Share** a saved query, so everyone else who uses Find can open it.
 - **Summarize**: count, total, lowest or highest value, grouped by a field.
@@ -25,8 +26,8 @@ a field you cannot see, is not in the results and is not offered as a column or 
 shared query works the same way for the person who opens it: they see the records their own
 access allows, which may be fewer than you see.
 
-Below the conditions, Find shows the query it will run, in Salesforce's query language
-(SOQL), read only. You never need to read it. It is there so someone who knows SOQL can check
+Below the conditions, **Show Query** opens the query Find will run, in Salesforce's query
+language (SOQL), read only. It is closed until you open it, and you never need to read it. It is there so someone who knows SOQL can check
 exactly what Find does, or copy it into another tool. Someone who prefers typing can type a
 query in the same language instead of building it (section 7.4); Find reads it into the
 builder and checks it exactly as if it had been built by hand.
@@ -60,9 +61,9 @@ to send them a letter.
    **Springfield**. Add a second condition: **Primary Contact: more fields**, then **Email**,
    **is blank**.
 4. In **Sort by**, choose **Account Name**, **Ascending**. Leave **Rows to show** at 200.
-5. Press **Run**. The table shows the first 200 households. The line above it says how many
-   rows are shown.
-6. Press **Export to CSV**. Find reads every matching household, in pages, and downloads one
+5. Press **Run**. Find reads up to 200 households and the table shows the first 25; press
+   **Show More** for the next 25. The line above the table says how many rows were found.
+6. Open the **Export** menu and choose **Export to CSV**. Find reads every matching household, in pages, and downloads one
    file. If there are more than the export row limit, the file stops there and Find says so.
    A date and time is written as `2026-01-05 09:30:00` in your own Salesforce time zone, the
    time the table shows, and the workbook from **Export to Excel** uses the same clock. A text
@@ -102,11 +103,12 @@ a value; the operators offered depend on the field:
 ## 5. Saved and Shared Queries
 
 - **Save** stores the object, columns, conditions, sort and row count under a name. Saving
-  again with the same query open updates it; **Save as** makes a copy under a new name.
+  again with the same query open updates it; **Save As**, in the menu next to **Save**, makes
+  a copy under a new name.
 - **Show to everyone who uses Find** shares the query (read only) with every user in the org
   who can use Find. Untick it to stop sharing. Only the person who saved a query can change,
   share or delete it; anyone it is shared with can open it, run it, and save their own copy.
-- **Delete** asks first, naming the query: press **Delete** in the box to remove it, or **Keep
+- **Delete**, in the same menu, asks first, naming the query: press **Delete** in the box to remove it, or **Keep
   it** to leave it as it is. When the query is shared, the box says that deleting it removes
   it for everyone who uses Find. A deleted query cannot be brought back.
 - The SOQL box below the conditions updates when you pause typing, not on every key, so typing
@@ -260,10 +262,24 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 
 An export to Files runs once, when you press it: scheduled or recurring exports and sending a
 file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
-value at once, run a query and press **Bulk Update**, shown to people who also hold the Bulk
-Update Records permission. See [Bulk update](bulk-update.md). To delete every record a query
-returns, press **Bulk Delete**, shown only to people who hold the Bulk Delete Records
-permission. See [Bulk delete](bulk-delete.md).
+value at once, run a query, open the **Change Records** menu and choose **Bulk Update**,
+shown to people who also hold the Bulk Update Records permission. See
+[Bulk update](bulk-update.md). To delete every record a query returns, choose **Bulk Delete**
+in the same menu, shown only to people who hold the Bulk Delete Records permission. See
+[Bulk delete](bulk-delete.md).
+
+## 9. The Find Page
+
+- **About This Tool** at the top lists the steps. It is open on your first visit and closed
+  after that; open it again whenever you like.
+- Until you choose an object or a saved query, the page shows only those two lists and a
+  short prompt.
+- **Run** is the main button. **Export** holds the three exports, and **Change Records** holds
+  Bulk Update and Bulk Delete for people with those permissions. The bulk panel opens right
+  under these buttons, above the results.
+- The table shows 25 rows at a time, with **Show More** for the next 25, so a long result does
+  not run down the page. Every export still includes every matching record, up to the export
+  row limit, not only the rows shown.
 
 ## Field Reference
 

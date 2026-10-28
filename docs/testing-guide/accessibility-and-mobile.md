@@ -33,7 +33,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Open the **Find** tab in the **BarnCRM** app. Tab to the **Object** box. | Focus ring on **Object**, placeholder **Choose an object**. |
 | 2 | Press Enter or Down Arrow, use the arrow keys to reach **Households**, press Enter. | The **Columns** chooser, **Conditions**, **Sort by** and the **Query (read only)** box appear. |
 | 3 | Tab into **Columns**. In the available list use the arrow keys to pick a field, then Tab to the move right button and press Enter. | The field moves to the chosen list. |
-| 4 | Tab to **Run** and press Enter. | A line **N rows shown.** appears above the results table (N is a number), and the results table lists households. |
+| 4 | Tab to **Run** and press Enter. | A line **N rows found.** appears above the results table (N is a number), and the results table lists households. |
 | 5 | Tab to **Query name** and type `A11y check`. Tab to **Save** and press Enter. | A green notice reads **Saved A11y check.** The **Saved queries** box shows the query. |
 | 6 | Tab through the results table. | Focus enters the table and arrow keys move between cells. |
 
@@ -114,7 +114,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Tab onto the checkbox **Create a household automatically**. | The label and its description text are both read. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first **Make Primary** button. | Announced as **Make Harper Garcia the primary contact** (the member's own name), not just "Make Primary". |
 | 4 | Tab to a **Move to another household** button. | Announced as **Move** plus the member's name plus **to another household**. |
-| 5 | In Find, run any Households query. | The screen reader announces the **N rows shown.** line without you moving focus to it. |
+| 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
 | 6 | In Quick Gift Entry, press **Save** with **Donor** empty. | The error **Choose the person or organization who gave this gift.** is read together with the **Donor** field. |
 | 7 | In the Import wizard on **Check Columns**, move to the table. | The table is announced as **Check Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
 
