@@ -151,6 +151,32 @@ private class CorePostInstallTest {
     }
 
     @IsTest
+    static void installAndSourceDeployStoreTheOrganizationRecordTypeAndNeverReplaceIt() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            String afterInstall = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+            SettingsService.saveSystemValue(
+                AccountKinds.KEY_ORGANIZATION_RECORD_TYPE,
+                AccountKinds.NO_RECORD_TYPE
+            );
+            CorePostInstall.runAsSourceDeploy();
+            Test.stopTest();
+
+            Assert.areEqual(
+                AccountKinds.detectOrganizationRecordType(),
+                afterInstall,
+                'A new install stores the detected record type, so the setting is never blank'
+            );
+            Assert.areEqual(
+                AccountKinds.NO_RECORD_TYPE,
+                BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
+                'A source deploy never replaces a stored choice'
+            );
+        }
+    }
+
+    @IsTest
     static void anUpgradeKeepsASavedEditionAndANewInstallSavesNone() {
         System.runAs(TestUsers.admin()) {
             SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);

@@ -25,6 +25,7 @@ public with sharing class SettingsService {
     private static final String NUMBER_TYPE = 'Number';
     private static final String TEXT_TYPE = 'Text';
     public static final String RECORD = 'Record';
+    public static final String RECORD_TYPE = 'RecordType';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
     public static final String FIELD_LIST = 'FieldList';
 
@@ -440,6 +441,10 @@ public with sharing class SettingsService {
             checkRecord(definition, String.valueOf(newValue));
             return;
         }
+        if (RECORD_TYPE.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkRecordType(definition, String.valueOf(newValue));
+            return;
+        }
         if (RECORD_TYPE_LIST.equalsIgnoreCase(definition.Data_Type__c)) {
             checkRecordTypes(definition, String.valueOf(newValue));
             return;
@@ -512,6 +517,36 @@ public with sharing class SettingsService {
         if (expected == null || recordId.getSObjectType() != expected) {
             throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
         }
+    }
+
+    /**
+     * A Record Type row holds one of the record types it offers, or `Master` for "No record
+     * type" (ADR-0141). For Account that refuses a person record type and one named Household.
+     * A blank is not checked here: it means "not chosen", and the reader detects one.
+     */
+    private static void checkRecordType(Setting_Definition__mdt definition, String candidate) {
+        String name = candidate.trim();
+        if (String.isBlank(name) || AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(name)) {
+            return;
+        }
+        for (Schema.RecordTypeInfo info : recordTypeChoices(recordObjectType(definition))) {
+            if (info.getDeveloperName() == name) {
+                return;
+            }
+        }
+        throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+    }
+
+    /**
+     * The record types a Record Type row offers, besides "No record type": for Account, the
+     * organization candidates (AccountKinds, never a person or household type); for any other
+     * object, its active record types.
+     */
+    public static List<Schema.RecordTypeInfo> recordTypeChoices(Schema.SObjectType type) {
+        if (type == Account.SObjectType) {
+            return AccountKinds.candidateRecordTypes();
+        }
+        return recordTypes(type);
     }
 
     /** A Record Type List row names only record types its object has (ADR-0074). */

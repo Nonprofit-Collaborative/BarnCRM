@@ -42,6 +42,11 @@
         <label>Record</label>
       </value>
       <value>
+        <fullName>RecordType</fullName>
+        <default>false</default>
+        <label>Record Type</label>
+      </value>
+      <value>
         <fullName>RecordTypeList</fullName>
         <default>false</default>
         <label>Record Type List</label>
