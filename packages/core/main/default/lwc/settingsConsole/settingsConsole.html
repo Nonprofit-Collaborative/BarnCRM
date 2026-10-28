@@ -162,6 +162,24 @@
                                     data-key={row.key}
                                     data-kind="SetupValue"
                                 ></lightning-input>
+                                <template lwc:if={row.setupUrl}>
+                                    <a
+                                        class="slds-button slds-var-m-top_xx-small"
+                                        href={row.setupUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        data-id="open-setup"
+                                        data-key={row.key}
+                                    >
+                                        <lightning-icon
+                                            icon-name="utility:new_window"
+                                            size="xx-small"
+                                            class="slds-button__icon slds-button__icon_left"
+                                        ></lightning-icon>
+                                        {labels.openInSetup}
+                                        <span class="slds-assistive-text">{labels.newTab}</span>
+                                    </a>
+                                </template>
                             </template>
 
                             <template lwc:elseif={row.isComponent}>

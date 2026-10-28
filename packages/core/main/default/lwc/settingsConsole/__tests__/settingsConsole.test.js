@@ -770,6 +770,12 @@ describe('c-settings-console', () => {
     expect(inputs[0].value).toBe('Barn Rescue');
     expect(inputs[0].readOnly).toBe(true);
     expect(inputs[0].fieldLevelHelp).toBe('c.Core_Settings_FromSetupHelp');
+    // The value's own Setup page opens in a new tab; an editable row has no Setup link.
+    const links = element.shadowRoot.querySelectorAll('[data-id="open-setup"]');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('/lightning/setup/CompanyProfileInfo/home');
+    expect(links[0].getAttribute('target')).toBe('_blank');
+    expect(links[0].getAttribute('rel')).toBe('noopener noreferrer');
     expect(inputs[1].dataset.key).toBe('Organization_Legal_Name__c');
     expect(inputs[1].readOnly).toBeFalsy();
 

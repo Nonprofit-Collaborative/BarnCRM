@@ -327,13 +327,14 @@ so every setting is explained the same way however you use the page.
 ## Values That Come From Setup
 
 A few things BarnCRM needs are already held by Salesforce Setup. BarnCRM shows them on this
-page, read only, and keeps no copy that could drift from Setup. Each one says where in Setup it
-is changed; after you change it there, reload this page to see the new value.
+page, read only, and keeps no copy that could drift from Setup. Under each one, **Open in
+Setup** opens the Setup page that changes it in a new tab; after you change it there, reload
+this page to see the new value.
 
-| Section | Shown | Where to change it |
+| Section | Shown | Open in Setup opens |
 |---|---|---|
-| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Setup, Company Settings, Fiscal Year |
-| Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Setup, Company Settings, Company Information |
+| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Company Settings, Fiscal Year |
+| Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Company Settings, Company Information |
 
 BarnCRM follows the standard fiscal year: each year starts on the first day of the start month.
 If your org uses a custom fiscal year, Health Check says so, because reports then follow your
@@ -348,20 +349,25 @@ one, a note at the top of the section says, before any setting:
 
 - **what** to change in Setup,
 - **why** BarnCRM needs it, in one sentence,
-- **where** it is, as a path in plain words, for example "Setup, Apex Settings".
+- the **steps**, 2 to 4 numbered clicks once you are on the Setup page,
+- an **Open in Setup** button that opens that Setup page in a new tab, so this page stays open.
 
 Where BarnCRM can read the answer without any extra permission, the note also says whether it
-is already done: **Done** with a green tick, or **Not done yet** with a warning icon. Otherwise
-the note is an instruction only, and it stays there after you make the change, because BarnCRM
-cannot tell. Nothing on the note changes your org: you make the change in Setup yourself.
+is already done: **Done** with a green tick, or **Not done yet** with a warning icon, and a
+**Check Again** button reads it again once you have made the change. Otherwise the note is an
+instruction only, and it stays there after you make the change, because BarnCRM cannot tell.
+Nothing on the note changes your org: you make the change in Setup yourself.
 
-| Section | What to change in Setup | Checked by BarnCRM |
-|---|---|---|
-| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | No |
-| Duplicate Matching | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
-| Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
-| Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, are given on the page itself, under Extra Permissions, alongside the role. Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra Permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | No |
+Salesforce has no stable link to a single object, permission set or Lightning page, so for
+those the button opens the list and the first step says which one to click.
+
+| Section | What to change in Setup | Open in Setup opens | Checked by BarnCRM |
+|---|---|---|---|
+| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex**. The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | Apex Settings | No |
+| Duplicate Matching | To review duplicates: keep the standard duplicate rules active. The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | Duplicate Rules | No: the Duplicates panel shows each rule as On or Off |
+| Rollups | Create the field a new rollup writes to before you build it | Object Manager (click the object, then Fields & Relationships, New) | No |
+| Error Log | Allow the org to send email, or no digest is sent (Access level: All email) | Deliverability | Yes, with Check Again |
+| Access | Assign a module permission set this page does not list under Extra Permissions. Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, and Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | Permission Sets (click the set, then Manage Assignments) | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
@@ -369,16 +375,19 @@ instruction without Done or Not done yet.
 A module's own settings page, reached from its section here, carries its notes in the same
 form at the top of that page:
 
-| Page | What to change in Setup | Checked by BarnCRM |
-|---|---|---|
-| Giving, Acknowledgments | Add and verify the shared From address (Setup, Organization-Wide Addresses) | No |
-| Giving, Acknowledgments | Allow the org to send email (Setup, Deliverability, Access level: All email) | Yes |
-| Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
-| Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
-| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** on the **Access** page, under Extra Permissions | No |
-| Giving, Campaign Sync (BarnCRM Mirror) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
-| Giving, Opportunity Mirror (BarnCRM Mirror) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
-| Giving, Accounting Export (Mirror) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
+| Page | What to change in Setup | Open in Setup opens | Checked by BarnCRM |
+|---|---|---|---|
+| Giving, Acknowledgments | Add and verify the shared From address | Organization-Wide Addresses | No |
+| Giving, Acknowledgments | Allow the org to send email (Access level: All email) | Deliverability | Yes, with Check Again |
+| Giving, Acknowledgments | Write or change the thank you wording in an email template, folder BarnCRM Acknowledgments | Classic Email Templates | No |
+| Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app | Lightning App Builder (click Edit next to the page, then Activation) | No |
+| Giving, Campaign Sync (BarnCRM Mirror) | Campaign create and edit for the people who create appeals | Permission Sets (click the set, then Object Settings, Campaigns) | No |
+| Giving, Campaign Sync (BarnCRM Mirror) | **Marketing User** ticked on the user of each person who creates appeals | Users | No |
+| Giving, Opportunity Mirror (BarnCRM Mirror) | Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | Permission Sets (click the set, then Object Settings, Opportunities) | No |
+
+Giving Staff, Giving Admin and Giving Read Only, and Mirror's Campaign Sync, Opportunity Mirror
+and Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
+no note. Accounting Export has no Setup note.
 
 ## Common Mistakes
 

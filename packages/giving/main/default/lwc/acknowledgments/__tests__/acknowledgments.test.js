@@ -202,6 +202,13 @@ describe('c-acknowledgments', () => {
     ]);
     expect(notes.notes[0].what).toBe('c.Giving_SetupNote_FromAddress_What');
     expect(notes.notes[1].check).toBe('emailDeliverability');
+    // Each note opens its own Setup page (keys in Core's c/setupLinks) and lists its clicks.
+    expect(notes.notes.map((note) => note.link)).toEqual([
+      'orgWideAddresses',
+      'deliverability',
+      'emailTemplates'
+    ]);
+    expect(notes.notes[2].steps).toBe('c.Giving_SetupNote_Templates_Steps');
   });
 
   it('counts the queue by what each waiting gift would actually get', async () => {
