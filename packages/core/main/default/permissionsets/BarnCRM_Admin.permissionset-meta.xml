@@ -1600,10 +1600,6 @@
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <recordTypeVisibilities>
-    <recordType>Account.Household</recordType>
-    <visible>true</visible>
-  </recordTypeVisibilities>
-  <recordTypeVisibilities>
     <recordType>Account.Organization</recordType>
     <visible>true</visible>
   </recordTypeVisibilities>
@@ -1622,10 +1618,6 @@
   <tabSettings>
     <tab>Household_Member__c</tab>
     <visibility>Available</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Households</tab>
-    <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
     <tab>BarnCRM_Home</tab>
