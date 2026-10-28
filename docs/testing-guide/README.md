@@ -6,6 +6,8 @@ Manual, step-by-step test scripts for checking a build in a scratch org or sandb
 feature. Written for a tester: the project owner or a pilot org admin. Start with
 [Before you test](before-you-test.md).
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Test in a sandbox, a free Developer Edition org or a scratch org.
+
 **Report a bug or give feedback** through GitHub: open
 <https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose> and choose the bug report
 template. [SUPPORT.md](../../SUPPORT.md) says what to include, and

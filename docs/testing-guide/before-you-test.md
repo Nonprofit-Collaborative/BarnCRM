@@ -6,6 +6,8 @@ scripts in `scripts/org/`; for how they work, see
 
 ## Create a Test Org
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a scratch org, a sandbox or a free Developer Edition org.
+
 You need the Salesforce CLI (`sf`), a Dev Hub connected to it, and a clean checkout of `main`
 (see [Environment](../contributor-guide/environment.md)). Run every command from the
 repository root.

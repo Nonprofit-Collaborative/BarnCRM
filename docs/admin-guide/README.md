@@ -2,6 +2,8 @@
 
 Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
+
 ## Purpose
 
 One page per feature, written **before** the Lightning web component that implements it,
