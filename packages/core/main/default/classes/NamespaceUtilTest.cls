@@ -182,6 +182,33 @@ private class NamespaceUtilTest {
     }
 
     @IsTest
+    static void theOrgDescribeIsReadOnceAndAStubStillWins() {
+        NamespaceUtil.cachedPrefix = null;
+        NamespaceUtil.typesByName.clear();
+        NamespaceUtil.orgDescribe = null;
+
+        Assert.areEqual(
+            Contact.SObjectType,
+            NamespaceUtil.objectType('Contact'),
+            'Read from the org'
+        );
+        Assert.isNotNull(NamespaceUtil.orgDescribe, 'The describe is kept for the transaction');
+        Map<String, Schema.SObjectType> kept = NamespaceUtil.orgDescribe;
+        Assert.areEqual(Account.SObjectType, NamespaceUtil.objectType('Account'), 'A new name');
+        Assert.isTrue(
+            kept === NamespaceUtil.orgDescribe,
+            'The second name reuses the same describe'
+        );
+
+        stubDescribe(OWN, new Map<String, Schema.SObjectType>{ 'account' => User.SObjectType });
+        Assert.areEqual(
+            User.SObjectType,
+            NamespaceUtil.objectType('Account'),
+            'A stub set after the org was read still answers first'
+        );
+    }
+
+    @IsTest
     static void aClassIsFoundByNameAndAMissingOneIsNull() {
         NamespaceUtil.cachedPrefix = null;
 

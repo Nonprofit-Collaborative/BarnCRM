@@ -724,7 +724,70 @@ private class AddressServiceTest {
                 AddressSelector.selectDefaultsByOwnerIds(null, null).size(),
                 'No owners, no defaults.'
             );
+            Assert.areEqual(
+                0,
+                AddressSelector.selectStoredValues(Contact.SObjectType, null, null).size(),
+                'No records, no stored values.'
+            );
             Test.stopTest();
+        }
+    }
+
+    /**
+     * Copying an address onto standard fields that already hold it is not sent as a second
+     * save; a copy that changes any value, even only its case, still is.
+     */
+    @IsTest
+    static void onlyCopiesThatChangeAStoredValueAreWritten() {
+        System.runAs(TestUsers.admin()) {
+            Contact elena = new Contact(
+                FirstName = 'Elena',
+                LastName = 'Garcia',
+                MailingStreet = HOME_STREET,
+                MailingCity = HOME_CITY
+            );
+            insert as user elena;
+            Contact held = [
+                SELECT Id, MailingStreet, MailingCity
+                FROM Contact
+                WHERE Id = :elena.Id
+                WITH USER_MODE
+            ];
+            Contact same = new Contact(
+                Id = held.Id,
+                MailingStreet = held.MailingStreet,
+                MailingCity = held.MailingCity
+            );
+            Contact recased = new Contact(
+                Id = held.Id,
+                MailingStreet = held.MailingStreet.toUpperCase(),
+                MailingCity = held.MailingCity
+            );
+            Contact cleared = new Contact(Id = held.Id, MailingStreet = null);
+            Contact unknown = new Contact(
+                Id = Contact.SObjectType.getDescribe().getKeyPrefix() + '000000000000AAA',
+                MailingStreet = HOME_STREET
+            );
+
+            Test.startTest();
+            List<SObject> written = AddressService.withChanges(
+                new List<SObject>{ same, recased, cleared, unknown }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                3,
+                written.size(),
+                'Only the copy that matches what is stored is left out.'
+            );
+            Assert.isTrue(written[0] === recased, 'A change of case is a change.');
+            Assert.isTrue(written[1] === cleared, 'Clearing a value is a change.');
+            Assert.isTrue(written[2] === unknown, 'A record that is not found is still written.');
+            Assert.areEqual(
+                0,
+                AddressService.withChanges(null).size(),
+                'Nothing, nothing written.'
+            );
         }
     }
 
