@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-28 (landing/batch-8; main at #660, 2fa85483e; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
+Last verified 2026-10-28 (landing/batch-9; main at #666, d68cfcd9b; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
 
 ## Pointers
 
@@ -18,7 +18,7 @@ Last verified 2026-10-28 (landing/batch-8; main at #660, 2fa85483e; `mwdbdevsb` 
 - GitHub: `Nonprofit-Collaborative/BarnCRM`, default branch `main`.
 - Feature branch per feature ID (for example `feature/c-04-trigger-framework`), squash-merged to `main`; PRs under about 800 changed lines, stacked as `-1`, `-2` when larger.
 - Ruleset on `main` requires the status `Org tests (local)`, posted by `scripts/org/run-org-tests.sh`. Run it from a clean detached worktree at the pushed head, with `NODE_OPTIONS=--max-old-space-size=8192` (the sf CLI runs out of heap reading about 2,200 results).
-- Org gates run per landing batch (D-141), `barn-sales` and `oi-test` in parallel. Defaults: `POLL_SECONDS=5`, `TEST_POLL_SECONDS=15`, `DEPLOY_SHOW_COMPONENTS=0`. Gotcha: both gates post the same `Org tests (local)` status, so a success never replaces the other org's failure (Held).
+- Org gates (D-141, D-142): every landing batch runs the incremental gate on `barn-sales` (`run-org-tests.sh barn-sales`: relevant tests, no coverage floor); a version release runs `--release` on `barn-sales` and `oi-test` in parallel. `--light` is retired. Unchanged packages are skipped using a per-org deploy record `~/.local/state/barncrm/deploy-state/<org id>.json` (`DEPLOY_STATE_DIR`); use `--full-deploy` after hand changes in Setup. RunRelevantTests needs sf 2.153.5 or later. Defaults: `POLL_SECONDS=5`, `TEST_POLL_SECONDS=15`, `DEPLOY_SHOW_COMPONENTS=0`. Gotcha: both release gates post the same `Org tests (local)` status, so a success never replaces the other org's failure (Held).
 - Worktrees live under `~/worktrees/BarnCRM/<branch>`; the main checkout (in a synced folder) is not used for work.
 - Commits carry a DCO sign-off (`git commit -s`).
 
@@ -169,3 +169,14 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Import templates are listed by Name; the People card picks `generic_contact_list` by key (#658).
 - GitHub workflows run only on pull requests into `main`, so a stacked PR (for example #662 on #658) gets no CI until it is retargeted.
 - Lightning App Pages print the page name above the component, so the page shell passes title-hidden (#663); Lightning desktop at 390 px is not the mobile app (the console tab bar overflows).
+- `getAll()` on custom metadata truncates long text areas to 255 characters; use SOQL `WITH SYSTEM_MODE` when the full text matters (#665).
+- Parallel Apex testing is on in `barn-sales` and `oi-test`; only the `npsp` scratch def turns it off (#667).
+- Tab sync `AUDIENCE` includes `BarnCRM_Households`; a feature can carry an access set (Household Upkeep carries `BarnCRM_Households`); `tabSetsOn` covers every feature; the nightly sync removes the Households set from anyone outside Admin, Staff and Read Only. Deploying the role sets removes Household record type visibility (intended); the Households tab arrives through post-install or the nightly sync (#670).
+- `duplicateReview` pages client-side (10 per page) over `DuplicateController.MAX_SUGGESTIONS` = 50; paging past 50 needs server support (#671).
+- A tab motif's icon comes from its `CustomN` number only (the name after the colon is ignored): Custom20 Airplane, 25 Alarmclock, 48 Trophy, 53 Bell, 67 Gears; `test_core_navigation.py` enforces Core motifs (#673). Page shells under title-hidden carry no icon of their own: the tab icon in the App Page header is the page's icon.
+- In oi-test an update DML costs about 1 to 1.5 s platform time per 200 rows before triggers; inserts barely any. `sf apex run` forces its own log levels (use REST tooling `executeAnonymous` for trace flags). `oi-test` deploys from a worktree need `--ignore-conflicts` (#669).
+- The Org Optimizer tab has API name `Data_Hygiene` and permission set `BarnCRM_Tab_Data_Hygiene` (label "BarnCRM Tab: Org Optimizer"); the page runs no check on open (badges come from cheap reads or summary events). `CorePostInstall` renames "Data hygiene:" saved queries to "Data Quality:" on every run (`DataHygieneService.renameLegacySavedQueries`, keeps the newer one on collision) (#674, #675).
+- The UX kit has 10 components (`docs/contributor-guide/ux-kit.md`). CI runs only on PRs targeting `main`: a base change does not start CI, close and reopen does. `check-standard-objects.sh` flags the word "Case" in JS comments; write "title-style" (#672, #676).
+- An LWC that needs a page-state key gets it from Apex (`NamespaceUtil.stateKey`) because `check-namespace-readiness.py` refuses a literal `c__`; `DataManagerController.findToolStateKey` is Find's `__tool` key (#677, #678).
+- Anonymous Apex in `oi-test` needs Giving_Admin assigned to compile against Gift fields (assign for the run, then remove). Deploying a class to `oi-test` can overwrite an open PR's version (check `gh pr list` for overlapping files). Get the global describe only from `NamespaceUtil.globalDescribe()` (#679, #680).
+- `oi-test` had no "BarnCRM Tab Access Check" CronTrigger on 2026-10-28; verify after the release deploy.
