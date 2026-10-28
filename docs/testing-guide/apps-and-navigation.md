@@ -15,12 +15,12 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** are listed, each with the blue barn logo; the two admin apps' barn carries a navy gear badge. With the modules deployed, **Fundraising** shows the barn with a red heart badge and **BarnCRM Volunteers** with a green person badge. |
-| 2 | Open **BarnCRM**. | Standard navigation (tabs across the top, no workspace tabs). Tabs: **Home**, **Contacts**, **Households**, **Organizations**, **Find**. |
+| 2 | Open **BarnCRM**. | Standard navigation (tabs across the top, no workspace tabs). Tabs: **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**. **Find** is not in the navigation. |
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
-| 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Find**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**. |
+| 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
-| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Import**, **Bulk Update**, **Org Optimizer**, **Duplicate Matching**, **Error Log**. It opens on **BarnCRM Settings**. |
-| 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same seven tabs, opening as workspace tabs. |
+| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Error Log** (last). **Import** and **Bulk Update** are not in the navigation. It opens on **BarnCRM Settings**. |
+| 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same five tabs, opening as workspace tabs, with **Error Log** last. With a module deployed (for example the Rollup Builder), its admin tabs come before **Error Log**. |
 | 8 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM** and **BarnCRM Console** are listed. **BarnCRM Admin** and **BarnCRM Admin Console** are not. |
 | 9 | As admin, on **BarnCRM Settings**, **Access**, remove the staff user's role. Wait a minute; as staff, reload and open the App Launcher. | No BarnCRM app is listed. |
 

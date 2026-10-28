@@ -36,7 +36,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | 1 | Open the **BarnCRM** app. Choose **Standard Edition: the full core suite of BarnCRM tools**. | The **Set Up BarnCRM** window shows both questions. |
 | 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Household Upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
 | 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
-| 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** and **Find** are not listed. **Data Hygiene** is listed. |
+| 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Data Hygiene** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
 | 6 | Open **Modules**. | **Core** and **BarnCRM Rollup Builder** only (no nonprofit module is offered in the Standard Edition). |
 
@@ -182,7 +182,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. |
 | 2 | Open the **BarnCRM** app as the admin who deployed. | The **Set Up BarnCRM** window shows, as in T-SA-01. |
 | 3 | Choose **Standard Edition: the full core suite of BarnCRM tools**, keep **Turn on all the default core features**, and click **Finish setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
-| 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** and **Find** are listed. In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
+| 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** is listed (**Find** opens from it). In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
 | 5 | Open **BarnCRM Settings**, **Automation**. | The automation switches are listed. |
 | 6 | Run the deploy script from step 1 again. | It ends **== Every stage deployed ==**. In BarnCRM Settings, **Edition** still reads **Standard Edition**, every feature is still **On**, the setup window does not come back, and **Scheduled Jobs** still lists one **BarnCRM Tab Access Check**. |
 

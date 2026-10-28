@@ -53,7 +53,7 @@
   <tabs>standard-Contact</tabs>
   <tabs>Households</tabs>
   <tabs>Organizations</tabs>
-  <tabs>Find</tabs>
+  <tabs>Data_Manager</tabs>
   <tabs>Address__c</tabs>
   <tabs>Relationship__c</tabs>
   <tabs>Affiliation__c</tabs>
@@ -73,7 +73,7 @@
       <tab>Organizations</tab>
     </mappings>
     <mappings>
-      <tab>Find</tab>
+      <tab>Data_Manager</tab>
     </mappings>
     <mappings>
       <fieldName>Account__c</fieldName>
