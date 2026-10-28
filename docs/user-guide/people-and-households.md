@@ -114,7 +114,8 @@ the record can read it, so write accordingly.
 ## To Add an Organization
 
 1. Open the **Organizations** tab and open the list, then click **New**.
-2. If Salesforce asks for a record type, choose **Organization** (not **Household**).
+2. If Salesforce asks for a record type, choose the one your organization uses for
+   organizations (your admin can tell you; it is never **Household**).
 3. Fill in the name and details and click **Save**.
 
 You should see: the organization's page with **Details**, an **Addresses** card and an
@@ -143,6 +144,8 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: "The primary contact could not be changed. Check that you can edit this household
   and try again." Ask your admin for edit access.
 - Problem: the household name will not update. **Custom Name** is ticked. Untick it.
+- Problem: there is no **Households** tab, and **Household** is not offered as a record type.
+  Your organization has not turned households on yet. Ask your admin.
 - Problem: there is no **Merge or Split** button. You are on an organization, or outside the
   **BarnCRM** app.
 - Problem: "This person is in a household, so Account Name must stay a household, not an

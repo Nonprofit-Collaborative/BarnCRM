@@ -3,6 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-09-23
 **Source:** product owner decision (Brandon), plan Section 4 "Record types"
+**Amended by:** ADR-NEXT (D-134): Account keeps one packaged record type, Household; the
+  Organization record type is no longer shipped.
 
 ## Context
 

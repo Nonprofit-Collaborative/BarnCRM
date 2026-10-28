@@ -376,9 +376,13 @@ households with Custom Name set.
 
 ### Salesforce implementation
 
-- **Object:** Account, record type `Household`. Organizations use record type
-  `Organization`. Both record types ship with compact layouts and share one Lightning
-  record page built with Dynamic Forms and one fallback page layout (ADR-0043).
+- **Object:** Account, record type `Household`, which ships active with a compact layout.
+  Households share one Lightning record page built with Dynamic Forms and one fallback page
+  layout with organizations (Section 8; ADR-0043).
+- **Record type access (ADR-NEXT):** no role permission set grants the Household record type
+  or the Households tab. The packaged permission set `BarnCRM_Households` grants both, and
+  `TabAccessService` gives it to holders of the Admin, Staff and Read Only role sets while the
+  Household Upkeep feature is on, and to nobody while it is off.
 - **Standard fields used:** `Name` (the computed household name).
 - **Custom fields on Account:**
 
@@ -681,7 +685,8 @@ partner. Organizations are not households and never carry household naming or gr
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | The organization's legal or commonly used name, entered by staff and never computed. |
-| Record Type | picklist(Household, Organization) | yes | Always Organization for this entity. |
+| Record Type | reference(Account record type), or none | no | The organization record type the org chose (R-O4). An account is an organization exactly when its record type is that one, or, when the org chose "No record type", when it has none. |
+| Is Organization | boolean (computed) | yes | True when the account is an organization under R-O4. Read only; never written. |
 | Primary Contact | reference(Contact) | no | The person you deal with at this organization. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
@@ -706,9 +711,29 @@ uses; the field is shared across record types and its meaning differs by record 
 defined above. Member Count, Anniversary, the two greeting fields, and Custom Name are
 not shown for Organization records on the Account record page.
 
+**R-O4 Defined by the org's own record type (ADR-NEXT).** Core ships no Organization record
+type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
+type, by developer name, or holds `Master` for "No record type"; a person record type or one
+whose developer name or label contains Household is refused. One record type, never several.
+
+**R-O5 Detection.** When the setting is blank (a new install or source deploy stores the
+result), or names a record type that is gone or inactive, the organization record type is
+detected: the candidates are the active Account record types that are not person types and
+whose developer name or label does not contain Household; one already used by at least one
+account comes first; then the developer names Organization, Business_Account, Business and
+Default, in that order; then the first by label. With no candidate the result is `Master`.
+Detection never creates, activates or shows a record type.
+
 ### Salesforce implementation
 
-- **Object:** Account, record type `Organization`.
+- **Object:** Account, of the record type R-O4 names (or of none, for `Master`). One Core
+  resolver, `AccountKinds`, answers "is this an organization" and "which record type does a
+  new organization get" for Core and every module; nothing else names a record type for
+  organizations.
+- **Formula field:** `Is_Organization__c` (Checkbox), true when the account's record type
+  developer name equals `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`, or when the
+  setting is `Master` and the account has no record type. The Organizations list view and
+  every record page rule for organizations filter on it. Read access in the three role sets.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
   `Sample_Data_Key__c` (Text(20), shared with Household, holding the key the generated
@@ -1089,6 +1114,15 @@ a BarnCRM record.
 |---|---|---|---|
 | `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
 
+### Organization Record Type Key
+
+Added by ADR-NEXT (D-134). Shown in the console's General section, always, as **Record type
+for organizations**, a single choice (data type `RecordType`, Section 13).
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Organization_Record_Type__c` | text (80) | detected (R-O5) | The developer name of the Account record type whose accounts are organizations, or `Master` for "No record type" (R-O4). Stored on install and source deploy when blank, never overwritten there; the console shows the stored or detected value, never a blank. `SettingsService` refuses a value the object does not have, a person record type, or one named Household. |
+
 ### App Navigation Key
 
 Added with the four BarnCRM apps (ADR-0137).
@@ -1219,9 +1253,9 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example People and Households, Automation, Access, Health. A row naming a sub-section of People and Households (People, Households, Household Names and Greetings, Relationships) shows on that page. The console boxes each page's rows by sub-section (P1). |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, FieldList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). FieldList is a checkbox list of an object's custom fields and Name that the administrator can read, storing their API names separated by commas (R-AD10). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordType, RecordTypeList, FieldList, Component, SetupValue) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordType is a single choice of the active, non-person record types of an object plus "No record type", storing one developer name or `Master` (ADR-NEXT); RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). FieldList is a checkbox list of an object's custom fields and Name that the administrator can read, storing their API names separated by commas (R-AD10). SetupValue shows, read only, a value Salesforce Setup holds and BarnCRM never stores: `Settings_Object__c` is `Organization` and `Setting_Key__c` names one of the values `SetupValueSelector` reads (`Name`, `FiscalYearStartMonth`); the description says where in Setup to change it (ADR-0135). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
-| `Record_Object__c` | text (80) | The object a Record row picks from, whose record types a RecordTypeList row lists, or whose fields a FieldList row lists, by API name without a namespace prefix. Blank for every other data type. |
+| `Record_Object__c` | text (80) | The object a Record row picks from, whose record types a RecordType or RecordTypeList row lists, or whose fields a FieldList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
 | `Navigation_Target__c` | text (80) | The Lightning tab a module's own settings page lives on, used when the data type is Component and no component is named, because Core cannot import a component from a package that depends on it (Decision ADR-0020). |
 | `Navigation_Label__c` | text (80) | The name of the page `Navigation_Target__c` opens, as its tab shows it (for example Rollup Builder). The console names the button for it, "Open Rollup Builder"; blank falls back to "Open this page". |
@@ -2415,7 +2449,7 @@ organization's Salesforce record ID (`Contact1.Id`, `Contact2.Id`, `Organization
 and no rule is asked: the ID must be a valid record ID of the object the entity is stored on
 (Contact, or Account in Person Accounts mode, for a person; Account for an organization), the
 record must exist and be visible to the importing user, a person account must have a person
-record type and an organization the Organization record type. A row whose ID fails any of these
+record type and an organization must be an organization under R-O4. A row whose ID fails any of these
 is rejected with the reason, and nothing is created for it: an ID given but not found never
 creates a record. The ID itself is never written to a field. A blank ID cell is no ID, and the
 row is matched by its rule. A value for every row of a file may not give a person's ID (R-IB14).
@@ -2614,7 +2648,7 @@ fields the user may read and create that hold text, an email, a phone, a URL or 
 and passed to the platform's duplicate matcher, at most 50 records a call. Matches of another
 object are ignored. The matched identifiers are then read in user mode, keeping only records the
 user can see and, for accounts, of the entity's kind (a person record type for a person account,
-the Organization record type for an organization). One record kept matches; several follow
+an organization under R-O4 for an organization). One record kept matches; several follow
 Several Matches (R-IT9). A row whose two people are matched to one record is rejected. In a dry
 run an organization an earlier chunk would create is not asked about (the commit finds it by its
 key). A row matched this way has Matched By Duplicate Rule ticked (Section 17) and the run log
@@ -2872,7 +2906,7 @@ rows completes without the admin watching a spinner (plan Section 4.9).
 **R-IB3 Batch tagging.** Every record a batch creates carries a Created By Import Batch
 reference to it. This is what makes undo possible in v0.5 without journaling creations,
 and it is what lets an admin answer "where did these 400 households come from" today. The
-reference exists on Household and Organization (both Account record types), on Contact,
+reference exists on Household and Organization (both stored on Account), on Contact,
 and on Gift. A household is made by the household automation rather than by the import, so
 the import tags it straight afterwards, and only when the household was made for a person
 this import created: a household an existing person already had is never tagged.
@@ -3651,7 +3685,7 @@ text attribute Mirror adds to Gift, not a reference (Section 29C).
 **R-G11 Matching gift linkage (G-10).** An employer's matching gift is linked to the
 employee's gift through Matched Gift, which both records carry, so the link is visible
 from either side. The link is accepted only when the employer's gift has an Account donor
-whose record type is Organization and the employee's gift has a person donor, and, where
+that is an organization (R-O4) and the employee's gift has a person donor, and, where
 the employee's Employer is set, only when it names that same organization. Linking creates
 one automatic soft credit on the employer's gift, crediting the employee with Role Matched
 Donor and the employer gift's amount; unlinking clears both references and removes that
@@ -7785,7 +7819,8 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
   picklist for blank, so a value an admin adds is not covered), or Volunteer Hours Total is
   above zero, or the user holds
   `Manage_Volunteers` (so a coordinator can set the status of someone new). On Account the six
-  attributes carry a field visibility rule (record type neither Household nor Organization), and
+  attributes carry a field visibility rule (record type not Household and `Is_Organization__c`
+  false), and
   the Manage Volunteers clause applies only to that record type, so a household or
   organization shows only its totals, once it has hours.
 
@@ -9055,6 +9090,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-26 | DLRS and Rollup Helper detection (plan D-124 item 6, RB-C). No object or field added. New R-R16: DLRS (`dlrs`) and Rollup Helper (`rh2`) are detected by the namespace prefix of their objects, never referenced; the Rollup Builder, the Setup Assistant and the Modules page say each is a separate tool; BarnCRM never changes the other tool, and Rollup Helper's definitions are not read. |
 | v0.8 | 2026-10-26 | Same-field guard with DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "No shared target with DLRS": an active definition on a field an active DLRS definition fills is saved or switched on only after the administrator confirms the DLRS one will be switched off, recorded as a setting change; a file import refuses it; Health Check warns about pairs found later. |
 | v0.8 | 2026-10-26 | Import from DLRS (plan D-124 item 6, RB-C). No object or field added. R-R16 gains "Import from DLRS": each active DLRS definition maps to a definition saved switched off through the Builder's checks with Definition Key `DLRS_` and its name, or is refused with the reason; the mapping of each DLRS field is listed; a compare step writes nothing; switching a copy on needs the same-field confirmation; DLRS is never changed. |
+| v0.8 | 2026-10-28 | Account record types (ADR-NEXT, D-134). The Organization record type is no longer shipped: Section 8 gains R-O4 (organizations are the accounts of the record type the org chose, or of none) and R-O5 (detection), and the formula field `Account.Is_Organization__c` (Checkbox). `BarnCRM_Settings__c` gains `Organization_Record_Type__c` (text, Section 12). `Setting_Definition__mdt.Data_Type__c` gains RecordType. Section 5: the Household record type reaches users only through the new permission set `BarnCRM_Households`, given while Household Upkeep is on. Import (R-IT ID and matching rules) and matching gifts read R-O4 instead of a record type name. |
 
 ---
 ## 32. Entity ownership by package

@@ -232,7 +232,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-17: A Person in a Household Is Not Pointed at an Organization
 
 **Purpose:** in the simple way of belonging, changing a household member's Account Name to an organization is refused, while a person already at an organization can still be moved between organizations.
-**Prerequisites:** admin, the simple way of belonging. Two organizations (Organization record type) `Zztest Library` and `Zztest Trust`.
+**Prerequisites:** admin, the simple way of belonging. Two organizations (of the record type chosen in **Record type for organizations**) `Zztest Library` and `Zztest Trust`.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -254,3 +254,49 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | In Setup, try to create an account named **The Duptest Family** by hand. | Your duplicate rule blocks it, as before. |
 
 **Cleanup:** delete both contacts and their households, then deactivate the duplicate rule.
+
+## T-HH-18: Household Record Type and Tab Only While Household Upkeep Is On
+
+**Purpose:** a new install adds no record type anyone sees; turning Household Upkeep on gives the Household record type and the Households tab to BarnCRM role holders.
+**Prerequisites:** a fresh scratch org of the Platform-only shape (no Account record types) with Core deployed and first-run setup not finished; a staff user with the Staff role.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the **BarnCRM** app. | No **Households** tab. |
+| 2 | As the staff user, open Accounts and click **New**. | No record type choice; the new account form opens straight away. |
+| 3 | As admin, in Setup, open Object Manager, Account, Record Types. | **Household** is listed and active. No **Organization** record type. |
+| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation names the Household record type and says organizations keep using **No record type**. |
+| 5 | Wait a few minutes. As the staff user, reload the **BarnCRM** app. | The **Households** tab is there. |
+| 6 | As the staff user, open Accounts and click **New**. | A record type choice offers **Household** and the master record type; creating an account with the master record type still works. |
+| 7 | As admin, in Setup, open the staff user's permission set assignments. | **BarnCRM Households** is assigned. |
+
+**Cleanup:** none (Household Upkeep cannot be turned off).
+
+## T-HH-19: Record Type for Organizations Is Detected and Can Be Changed
+
+**Purpose:** BarnCRM picks the org's own record type for organizations and never adds one.
+**Prerequisites:** admin. Run once in a Person Accounts org (it has **Business Account**) and once in a Platform-only org.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Business Account** in the Person Accounts org and **No record type** in the Platform-only org; never blank. |
+| 2 | Open the dropdown. | It lists the org's active Account record types and **No record type**; no **Household** and no person account record type. |
+| 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
+| 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
+| 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
+| 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. |
+
+**Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
+
+## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
+
+**Purpose:** an upgrade or redeploy of an org that has BarnCRM's old Organization record type changes nothing users see.
+**Prerequisites:** admin; an org deployed before this change, with organizations of the **Organization** record type (for example the Sales Cloud shape gate org).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | After the deploy, open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Organization**. |
+| 2 | Open the **Organizations** tab and the **Households** tab. | Both list the same records as before. |
+| 3 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13). |
+
+**Cleanup:** none.

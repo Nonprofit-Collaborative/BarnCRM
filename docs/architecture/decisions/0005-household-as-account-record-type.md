@@ -3,6 +3,9 @@
 **Status:** Accepted
 **Date:** 2026-09-06
 **Source:** plan Section 12, decision D-05
+**Amended by:** ADR-NEXT (D-134): Core no longer ships an Organization record type;
+  organizations are the accounts of a record type the org already has, chosen in settings, and
+  the Household record type reaches users only while Households is on.
 
 ## Context
 

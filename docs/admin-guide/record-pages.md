@@ -17,9 +17,12 @@ another, and nobody has to maintain separate page layouts for them.
 
 There is nothing to turn on, and nothing to do in Salesforce Setup. The pages arrive with
 Core, and the **BarnCRM** app opens households, organizations and people on them, on the
-desktop and on the phone. A new install has two Account record types, **Household** and
-**Organization**, and Core ships no Contact record type, so it does not disturb any you
-already have.
+desktop and on the phone. Core ships one Account record type, **Household**, which no user has
+until Household Upkeep is on ([Households](households.md)), and no Contact record type, so it
+does not disturb any you already have. An account is an organization when it has the record
+type chosen in **Record type for organizations** on **General** (or, when **No record type** is
+chosen, no record type); the pages and the **Organizations** list read that through the
+**Is Organization** field, so they follow your choice without being edited.
 
 What ships:
 
@@ -104,3 +107,7 @@ packaged, and an upgrade can change it.
 
 **"The panel is missing on a person account."** BarnCRM ships no person account page. Add the
 panel as described above.
+
+**"An organization shows no Affiliations panel and is missing from the Organizations list."**
+Its record type is not the one chosen in **Record type for organizations** on **General**.
+Change the account's record type, or choose that record type in the setting.

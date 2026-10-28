@@ -25,8 +25,22 @@ is checked by your rules as usual.
 
 ## How to Turn It On
 
-Households work as soon as Core is installed. Everything you can change is on the
-BarnCRM Settings page, so nobody needs to open Salesforce Setup.
+Households belong to the **Household Upkeep** feature. Turn it on in first-run setup, or later
+with **Turn On** in its row on **General** in BarnCRM Settings. Everything you can change is on
+the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
+
+**The Household record type and the Households tab.** BarnCRM installs one Account record
+type, **Household**. Setup lists it on every install, because a package cannot leave out a
+record type it ships, but nobody has it until you turn Household Upkeep on: until then no one
+can pick it when creating an account, and the **Households** tab is hidden. Turning it on gives
+the record type and the tab to everyone with a BarnCRM role (Admin, Staff or Read Only),
+through the permission set **BarnCRM Households**, within a few minutes. The confirmation says
+so, and names the record type your organizations keep using. People without a BarnCRM role
+are not given it; add the permission set to them yourself if they create households.
+
+BarnCRM does not add an Organization record type. Organizations are the accounts of the
+record type you choose in **Record type for organizations** on **General** (see
+[BarnCRM Settings](barncrm-settings.md)), so your own business record type keeps working.
 
 1. Open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab.
 2. Click **People and Households** in the left navigation.
@@ -130,6 +144,16 @@ Everything else reads the same: the same member counts, the same names and greet
 the same Members panel. A household is still its own record, never a person.
 
 ## Common Mistakes
+
+**"There is no Households tab, and nobody can pick the Household record type."**
+Household Upkeep is off. Turn it on in **General**; the tab and the record type reach everyone
+with a BarnCRM role within a few minutes. Someone without a BarnCRM role needs the
+**BarnCRM Households** permission set added by hand.
+
+**"Since Households went on, people are asked for a record type when creating an account."**
+Salesforce shows the record type choice to anyone who has more than one. Pick **Household**
+only for a household; for anything else pick your usual record type. BarnCRM's own **New
+Household** button and household automation never ask.
 
 **"I added a person and no household appeared."**
 Either "create a household automatically" is off, or the person already belongs to a

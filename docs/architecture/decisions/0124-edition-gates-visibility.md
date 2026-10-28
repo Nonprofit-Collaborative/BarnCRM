@@ -6,6 +6,9 @@
 off-by-default one-way features and the Modules section); builds on ADR-0122 (edition names);
 amends ADR-0072 (suite choice is the first setup step), ADR-0062 (Giving installed offers every
 module) and ADR-0073 (Module Manager)
+**Amended by:** ADR-NEXT (D-134): a feature can carry an access set; Household Upkeep carries
+  `BarnCRM_Households` (the Household record type and the Households tab), so both stay hidden
+  while it is off.
 
 ## Context
 

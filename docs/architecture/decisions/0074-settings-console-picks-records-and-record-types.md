@@ -4,6 +4,8 @@
 **Date:** 2026-10-12
 **Source:** plan Section 2.3 ("no setting requires knowing an API name"), UI/UX review item 4;
 extends ADR-0017 and ADR-0020
+**Amended by:** ADR-NEXT (D-134): a `RecordType` data type picks one record type (with "No
+  record type" where the row allows it), beside the multi-select `RecordTypeList`.
 
 ## Context
 
