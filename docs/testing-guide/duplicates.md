@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Duplicate Matching** tab. | The **Review** area opens on the **Duplicates** panel. Under **Duplicate Rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
+| 1 | Open the **Duplicate Matching** tab. | The page header shows the merge icon and **Review possible duplicate people and households, and choose what pairs them.**, with no second **Duplicate Matching** title under the page name. The **Review** tab opens. Under **Duplicate Rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
 | 2 | Read the buttons and counts. | **Scan for Duplicates** and **Refresh** are enabled. **Dismissed pairs** shows a number. |
 | 3 | Click **Scan for Duplicates**. | **Scan started. It runs in the background, and suggestions appear here as they are found.** **Scan for Duplicates** is disabled and **A scan is running. Refresh the page in a minute to see what it found.** shows. |
 | 4 | Wait a minute and click **Refresh**. | **Last scan finished** with a date and time, and a line **Duplicate scan of ... finished: N new possible duplicates recorded.** in normal (not red) text. **Scan for Duplicates** is enabled again. |
@@ -29,7 +29,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | Create a contact: First Name `Harper`, Last Name `Garcia`, Email `harper.garcia1@example.org`. | Salesforce warns that a similar record exists. Save anyway. |
 | 2 | On **Duplicate Matching**, **Review**, click **Scan for Duplicates**, wait, click **Refresh**. | Under **Possible Duplicates** a pair of two **Harper Garcia** records, each with **Person:** and its detail. A grey line under them names the duplicate rule that found the pair. |
-| 3 | Read the pair's buttons. | No **Merge Households** button. The line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** and a **Not a Duplicate** button. |
+| 3 | Read the pair's buttons, and the line above the list. | The pair has a **Not a Duplicate** button on the right and no **Merge Households** button. The line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** is shown once, above the list, not on the pair. |
 | 4 | Click the new **Harper Garcia**'s name. On the **Potential Duplicates** card choose **View Duplicates**, then **Compare and merge**, keep the sample record as the master, and confirm. | Salesforce merges the two. |
 | 5 | Open the kept **Harper Garcia** and the **The Garcia Family** household. | Harper is still a member of **The Garcia Family**. The household made for the new contact still exists, now empty. |
 | 6 | Back on **Duplicates**, click **Refresh**. | The pair is gone. |
@@ -160,3 +160,16 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 3 | Choose **Try a value** on **Contact Point Email** (or **Address (person)** where there are no contact point objects), enter `Someone@Example.org` (for the address source, `1 Main St` and postal code `12345`), and choose **Try**. | A **Compared as:** line with the value as compared, then the matching records or a line saying nobody holds it. Nothing is saved. |
 
 **Cleanup:** Give yourself **BarnCRM Metadata Admin** again on the **Access** page.
+
+## T-DUP-11: A Long Review List
+
+**Purpose:** Confirm a long list shows a count and 10 pairs at a time, with one shared note, and an empty list shows the empty state.
+**Prerequisites:** admin; T-DUP-01 done with more than 10 pairs waiting (sample data on oi-test gives about 40). For step 5, an org with no pairs waiting (a fresh org before any scan).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Duplicate Matching**, **Review**. | **Possible Duplicates** has a badge with the number waiting (for example **40**, or **50+**). 10 pair cards, each with the reason, the records and the buttons on the right. Under them **Showing 10 of 40 suggestions, newest first.** and **Show More**. |
+| 2 | Count the line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** | Once, above the list (only when a shown pair is two people). |
+| 3 | With the keyboard, tab to **Show More** and press Enter. | 10 more pairs; focus is on the first new pair's first name; the line says **Showing 20 of 40**. Repeat until all show: **Show More** and the line go away (unless the badge reads **50+**). |
+| 4 | Click **Not a Duplicate** on the third pair, then **Cancel**. | The **Not a Duplicate** box opens inside the third pair's card, with focus on its heading; **Cancel** closes it. |
+| 5 | In the org with no pairs, open **Review**. | No badge. An illustration with **No Possible Duplicates** and **No possible duplicates are waiting. Scan again after a large import.** |

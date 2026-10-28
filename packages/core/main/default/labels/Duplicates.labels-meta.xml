@@ -369,6 +369,30 @@
         <value>Showing {0} of more than {1} suggestions, newest first.</value>
     </labels>
     <labels>
+        <fullName>Core_Duplicates_ShowMore</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: button that shows the next page of pairs</shortDescription>
+        <value>Show More</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_EmptyHeading</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: empty state heading</shortDescription>
+        <value>No Possible Duplicates</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_CountAlt</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: screen reader text for the count badge; {0} the count</shortDescription>
+        <value>{0} pairs waiting</value>
+    </labels>
+    <labels>
         <fullName>Core_Duplicates_SuggestionsHeading</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
