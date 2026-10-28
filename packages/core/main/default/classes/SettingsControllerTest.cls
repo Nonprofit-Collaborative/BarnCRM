@@ -854,7 +854,9 @@ private class SettingsControllerTest {
             Account account = new Account(Name = 'Riverside Test Trust');
             insert account;
             // A well formed Account Id that no record has.
-            String gone = Account.SObjectType.getDescribe().getKeyPrefix() + '000000000001';
+            String gone =
+                Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+                '000000000001';
             String stored = SettingsService.CORE_SETTINGS_OBJECT + '.Preferred_Account__c';
             insert new List<Setting_Change__c>{
                 new Setting_Change__c(
