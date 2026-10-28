@@ -521,7 +521,7 @@ public with sharing class SettingsService {
 
     /**
      * A Record Type row holds one of the record types it offers, or `Master` for "No record
-     * type" (ADR-NEXT). For Account that refuses a person record type and one named Household.
+     * type" (ADR-0141). For Account that refuses a person record type and one named Household.
      * A blank is not checked here: it means "not chosen", and the reader detects one.
      */
     private static void checkRecordType(Setting_Definition__mdt definition, String candidate) {

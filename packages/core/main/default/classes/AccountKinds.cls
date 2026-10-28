@@ -1,5 +1,5 @@
 /**
- * Tells which accounts are organizations (canonical model R-O4, R-O5, ADR-NEXT).
+ * Tells which accounts are organizations (canonical model R-O4, R-O5, ADR-0141).
  *
  * Core ships no Organization record type. Organizations are the accounts of one record type
  * the org already has, named by `BarnCRM_Settings__c.Organization_Record_Type__c` (a developer

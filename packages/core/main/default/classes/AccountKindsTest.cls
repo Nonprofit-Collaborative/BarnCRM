@@ -1,6 +1,6 @@
 /**
  * Tests for AccountKinds: which accounts are organizations, and how the record type for them
- * is detected and stored (canonical model R-O4, R-O5, ADR-NEXT).
+ * is detected and stored (canonical model R-O4, R-O5, ADR-0141).
  *
  * The detection order is tested on injected candidates, so it does not depend on which
  * record types the test org has. The rest reads the org's own record types and holds in any
