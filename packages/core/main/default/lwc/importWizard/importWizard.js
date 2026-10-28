@@ -127,8 +127,24 @@ import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrgan
 import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName';
 import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
 import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
-import loadObjectHeading from '@salesforce/label/c.Core_Import_LoadObjectHeading';
-import loadObjectHelp from '@salesforce/label/c.Core_Import_LoadObjectHelp';
+import stepKind from '@salesforce/label/c.Core_Import_StepKind';
+import changeKind from '@salesforce/label/c.Core_Import_ChangeKind';
+import useTemplate from '@salesforce/label/c.Core_Import_UseTemplate';
+import lastLoaded from '@salesforce/label/c.Core_Import_LastLoaded';
+import notLoadedYet from '@salesforce/label/c.Core_Import_NotLoadedYet';
+import noDeleteForObject from '@salesforce/label/c.Core_Import_NoDeleteForObject';
+import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
+import {
+  KIND_PEOPLE,
+  KIND_GIFTS,
+  KIND_RELATED,
+  KIND_DELETE,
+  KIND_TEMPLATES,
+  OBJECT_KINDS,
+  kindCards,
+  templatesOfKind,
+  createsText
+} from './importKinds';
 import loadObjectLabel from '@salesforce/label/c.Core_Import_LoadObjectLabel';
 import loadObjectNameLabel from '@salesforce/label/c.Core_Import_LoadObjectNameLabel';
 import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
@@ -266,6 +282,8 @@ export default class ImportWizard extends LightningElement {
   message;
   templates = [];
   templateId;
+  /** The first step's choice (D-136), or empty while the cards are shown. */
+  importKind;
   /** Whether the chosen mapping is for a file that arrives regularly, and its name (R-IT6). */
   isRecurring = false;
   sourceName = '';
@@ -410,8 +428,11 @@ export default class ImportWizard extends LightningElement {
     fileValueLabel,
     matchOnlyLabel,
     matchOnlyHelp,
-    loadObjectHeading,
-    loadObjectHelp,
+    stepKind,
+    changeKind,
+    useTemplate,
+    lastLoaded,
+    notLoadedYet,
     loadObjectLabel,
     loadObjectNameLabel,
     loadObjectCreateButton,
@@ -456,9 +477,6 @@ export default class ImportWizard extends LightningElement {
           accountRules: fields ? fields.accountRules : undefined,
           personAccountRules: fields ? fields.personAccountRules : undefined
         };
-        if (this.templates.length > 0) {
-          this.selectTemplate(this.templates[0].id);
-        }
       }
     } catch (error) {
       this.message = this.errorText(error);
@@ -475,8 +493,87 @@ export default class ImportWizard extends LightningElement {
   // Step one: which mapping
   // ---------------------------------------------------------------------------------------
 
+  /** The first step's choice cards, "What Are You Importing?" (D-136). */
+  get kindCards() {
+    return kindCards(this.templates, canBulkDelete);
+  }
+
+  get choosingKind() {
+    return !this.importKind;
+  }
+
+  get kindTitle() {
+    const card = this.kindCards.find((each) => each.key === this.importKind);
+    return card ? card.title : '';
+  }
+
+  /** People and Gifts pick from their own templates; the first is chosen for them. */
+  get picksFromKind() {
+    return this.importKind === KIND_PEOPLE || this.importKind === KIND_GIFTS;
+  }
+
+  get listsAllTemplates() {
+    return this.importKind === KIND_TEMPLATES;
+  }
+
+  get hasChosenTemplate() {
+    return Boolean(this.selectedTemplate) && !this.choosingObject;
+  }
+
+  get showTemplateNext() {
+    return this.isStepTemplate && !this.choosingKind;
+  }
+
+  /** Every active template, with what it creates and when it last loaded a file. */
+  get templateList() {
+    return this.templates.map((template) => ({
+      id: template.id,
+      name: template.name,
+      description: template.description,
+      creates: createsText(template),
+      lastImportDate: template.lastImportDate,
+      variant: template.id === this.templateId ? 'brand' : 'neutral'
+    }));
+  }
+
+  /** What the chosen template creates, with the operation chosen for it so far. */
+  get templateCreates() {
+    return createsText(this.selectedTemplate, this.loadOperation);
+  }
+
+  handleKindChoice(event) {
+    const kind = event.currentTarget.dataset.kind;
+    this.message = undefined;
+    this.importKind = kind;
+    this.templateId = undefined;
+    this.choosingObject = false;
+    if (this.picksFromKind) {
+      const offered = templatesOfKind(this.templates, kind);
+      if (offered.length > 0) {
+        this.selectTemplate(offered[0].id);
+      }
+    } else if (OBJECT_KINDS.includes(kind)) {
+      this.handleChooseObject();
+    }
+  }
+
+  handleChangeKind() {
+    this.message = undefined;
+    this.importKind = undefined;
+    this.templateId = undefined;
+    this.choosingObject = false;
+  }
+
+  handleUseTemplate(event) {
+    this.message = undefined;
+    this.selectTemplate(event.currentTarget.dataset.templateId);
+  }
+
   get templateOptions() {
-    return this.templates.map((template) => ({ label: template.name, value: template.id }));
+    return templatesOfKind(this.templates, this.importKind).map((template) => ({
+      label: template.name,
+      value: template.id
+    }));
   }
 
   get selectedTemplate() {
@@ -590,11 +687,30 @@ export default class ImportWizard extends LightningElement {
       });
       this.templates = this.templates.concat([created]);
       this.selectTemplate(created.id);
+      this.startWithKindOperation();
       this.choosingObject = false;
       this.newObjectName = undefined;
       this.newTemplateName = '';
     } catch (error) {
       this.message = this.errorText(error);
+    }
+  }
+
+  /**
+   * A new template made from the Related Records card starts on an operation that offers
+   * related records, and one made from the Delete card on Delete by record ID (D-136). The
+   * matching step still lets either be changed.
+   */
+  startWithKindOperation() {
+    const offered = this.loadOperations;
+    if (this.importKind === KIND_RELATED) {
+      this.loadOperation = offered.includes(UPSERT) ? UPSERT : UPDATE;
+    } else if (this.importKind === KIND_DELETE) {
+      if (offered.includes(DELETE)) {
+        this.loadOperation = DELETE;
+      } else {
+        this.message = noDeleteForObject;
+      }
     }
   }
 

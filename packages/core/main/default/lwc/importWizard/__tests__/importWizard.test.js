@@ -42,6 +42,22 @@ jest.mock(
   () => ({ default: 'Organization: {0}' }),
   { virtual: true }
 );
+// And for what a template creates (D-136).
+jest.mock(
+  '@salesforce/label/c.Core_Import_CreatesSummary',
+  () => ({ default: 'This file can create: {0}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_Import_LoadsSummary', () => ({ default: 'Loads: {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Import_DeletesSummary', () => ({ default: 'Deletes: {0}' }), {
+  virtual: true
+});
+// The Delete card is for holders of Bulk Delete Records; importKinds.test.js covers the others.
+jest.mock('@salesforce/customPermission/Bulk_Delete_Records', () => ({ default: true }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -200,6 +216,36 @@ function click(element, id) {
   element.shadowRoot.querySelector(`[data-id="${id}"]`).click();
 }
 
+/** Clicks one of the first step's choice cards (D-136). */
+async function chooseKind(element, kind) {
+  element.shadowRoot.querySelector(`[data-kind="${kind}"]`).click();
+  await flush();
+}
+
+/**
+ * Renders the wizard and chooses the first template, as the first step's dropdown used to:
+ * through People and Organizations when the first template is a people one, otherwise from
+ * Your Templates.
+ */
+async function open() {
+  const element = render();
+  await flush();
+  if (!element.shadowRoot.querySelector('[data-kind="people"]')) {
+    return element;
+  }
+  await chooseKind(element, 'people');
+  const templates = (await getTemplates.mock.results[0].value) || [];
+  const picker = element.shadowRoot.querySelector('[data-id="template"]');
+  if (templates.length > 0 && picker.value !== templates[0].id) {
+    click(element, 'change-kind');
+    await flush();
+    await chooseKind(element, 'templates');
+    element.shadowRoot.querySelector('[data-id="use-template"]').click();
+    await flush();
+  }
+  return element;
+}
+
 describe('the import wizard', () => {
   beforeEach(() => {
     canImport.mockResolvedValue(true);
@@ -235,11 +281,107 @@ describe('the import wizard', () => {
   });
 
   it('offers the templates it was given', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
       { label: 'Generic contact list', value: 'a01' }
     ]);
+  });
+
+  it('opens on the choice cards, without Gifts when no template loads gifts', async () => {
+    const element = render();
+    await flush();
+    const kinds = Array.from(element.shadowRoot.querySelectorAll('[data-id="kind"]')).map(
+      (card) => card.dataset.kind
+    );
+    expect(kinds).toEqual(['people', 'object', 'related', 'delete', 'templates']);
+    expect(element.shadowRoot.querySelector('[data-id="next"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="template"]')).toBeNull();
+  });
+
+  it('shows Gifts when a template maps a gift column, offering only the gift templates', async () => {
+    const giftTemplate = {
+      ...TEMPLATE,
+      id: 'a09',
+      name: 'Generic gift list',
+      mapping: JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Email', target: 'Contact1.Email' },
+          { source: 'Amount', target: 'Gift.Amount' }
+        ]
+      })
+    };
+    getTemplates.mockResolvedValue([TEMPLATE, giftTemplate]);
+    const element = render();
+    await flush();
+    await chooseKind(element, 'gifts');
+    expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
+      { label: 'Generic gift list', value: 'a09' }
+    ]);
+    expect(element.shadowRoot.querySelector('[data-id="template"]').value).toBe('a09');
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'This file can create: c.Core_Import_CreatesPeople, c.Core_Import_CreatesGifts.'
+    );
+    click(element, 'change-kind');
+    await flush();
+    await chooseKind(element, 'people');
+    expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
+      { label: 'Generic contact list', value: 'a01' }
+    ]);
+  });
+
+  it('says what a people template creates, linking people to organizations', async () => {
+    getTemplates.mockResolvedValue([
+      {
+        ...TEMPLATE,
+        mapping: JSON.stringify({
+          version: 1,
+          columns: [
+            { source: 'Email', target: 'Contact1.Email' },
+            { source: 'Partner Email', target: 'Contact2.Email' },
+            { source: 'Household', target: 'Household.Name' },
+            { source: 'Employer', target: 'Organization.Name' }
+          ]
+        })
+      }
+    ]);
+    const element = await open();
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'This file can create: c.Core_Import_CreatesPeople, c.Core_Import_CreatesSecondPerson, ' +
+        'c.Core_Import_CreatesHouseholds, c.Core_Import_CreatesOrganizations, ' +
+        'c.Core_Import_CreatesAffiliations.'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
+  });
+
+  it('lists every template under Your Templates with what it loads and when', async () => {
+    getTemplates.mockResolvedValue([
+      { ...TEMPLATE, lastImportDate: '2026-10-01' },
+      {
+        id: 'a07',
+        name: 'Volunteer hours',
+        description: 'Hours from a sign-in sheet.',
+        mapping: '{"version":1,"columns":[]}',
+        targetObject: 'Volunteer_Hours__c',
+        targetObjectLabel: 'Volunteer Hours',
+        loadOperation: 'Insert',
+        loadOperations: ['Insert']
+      }
+    ]);
+    const element = render();
+    await flush();
+    await chooseKind(element, 'templates');
+    const items = element.shadowRoot.querySelectorAll('[data-id="template-item"]');
+    expect(items).toHaveLength(2);
+    expect(items[0].querySelector('lightning-formatted-date-time').value).toBe('2026-10-01');
+    expect(items[1].textContent).toContain('Loads: Volunteer Hours');
+    expect(items[1].textContent).toContain('c.Core_Import_NotLoadedYet');
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(true);
+
+    items[1].querySelector('[data-id="use-template"]').click();
+    await flush();
+    expect(items[1].querySelector('[data-id="use-template"]').variant).toBe('brand');
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
   });
 
   it('asks for the templates, columns and match fields together, not one after another', async () => {
@@ -253,16 +395,14 @@ describe('the import wizard', () => {
 
   it('tells a user without the permission who to ask', async () => {
     canImport.mockResolvedValue(false);
-    const element = render();
-    await flush();
+    const element = await open();
     expect(element.shadowRoot.querySelector('[data-id="read-only"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="template"]')).toBeNull();
   });
 
   it('saves the recurring mark and its source name before leaving the first step', async () => {
     saveRecurring.mockResolvedValue(undefined);
-    const element = render();
-    await flush();
+    const element = await open();
     const box = element.shadowRoot.querySelector('[data-id="recurring"]');
     box.checked = true;
     box.dispatchEvent(new CustomEvent('change'));
@@ -283,8 +423,7 @@ describe('the import wizard', () => {
 
   it('stays on the first step and says why when the recurring mark is refused', async () => {
     saveRecurring.mockRejectedValue({ body: { message: 'Give this file a source name.' } });
-    const element = render();
-    await flush();
+    const element = await open();
     const box = element.shadowRoot.querySelector('[data-id="recurring"]');
     box.checked = true;
     box.dispatchEvent(new CustomEvent('change'));
@@ -297,24 +436,21 @@ describe('the import wizard', () => {
   });
 
   it('does not save anything when the recurring mark is left alone', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     expect(saveRecurring).not.toHaveBeenCalled();
   });
 
   it('shows the chosen template description so the choice can be checked', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     expect(element.shadowRoot.querySelector('[data-id="template-help"]').textContent).toContain(
       'A list of people'
     );
   });
 
   it('shows a row of the column picker for every column in the file', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -337,6 +473,7 @@ describe('the import wizard', () => {
       iconAlt: 'c.Core_Import_TabLabel'
     });
 
+    await chooseKind(element, 'people');
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -345,8 +482,7 @@ describe('the import wizard', () => {
   });
 
   it('shows the first values of each column beside the choice', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -355,8 +491,7 @@ describe('the import wizard', () => {
   });
 
   it('refuses a file with no rows under its heading', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'Last Name,Email');
@@ -369,8 +504,7 @@ describe('the import wizard', () => {
   });
 
   it('reads a file named .xlsx as a workbook, and says so when it is not one', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'not really a workbook', 'donors.xlsx');
@@ -381,8 +515,7 @@ describe('the import wizard', () => {
   });
 
   it('reads a semicolon file by its own separator and offers to change it', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'Last Name;Email;Notes\nRamirez;ana@example.org;vip', 'eu.csv');
@@ -394,8 +527,7 @@ describe('the import wizard', () => {
   });
 
   it('reads the file again when the separator is changed, and back', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -427,8 +559,7 @@ describe('the import wizard', () => {
         ['Last Name', 'Email'],
         ['Ramirez', 'ana@example.org']
       ]);
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'zip bytes', 'donors.xlsx');
@@ -457,8 +588,7 @@ describe('the import wizard', () => {
         ['Ramirez', 'ana@example.org']
       ])
       .mockResolvedValueOnce([['Last Name']]);
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'zip bytes', 'donors.xlsx');
@@ -475,8 +605,7 @@ describe('the import wizard', () => {
   });
 
   it('explains what the chosen matching rule risks', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -487,8 +616,7 @@ describe('the import wizard', () => {
   });
 
   it('writes nothing before the dry run', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -499,8 +627,7 @@ describe('the import wizard', () => {
   });
 
   it('stages the file in pages and then dry runs it', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -519,8 +646,7 @@ describe('the import wizard', () => {
   });
 
   it('sends the mapping the administrator settled on, not the suggestion alone', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -537,8 +663,7 @@ describe('the import wizard', () => {
   });
 
   it('commits only after the dry run has completed', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -556,8 +681,7 @@ describe('the import wizard', () => {
 
   it('leaves the commit button disabled while the dry run is still going', async () => {
     startDryRun.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Dry run', isFinished: false });
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -578,8 +702,7 @@ describe('the import wizard', () => {
   });
 
   it('goes back to the start without leaving the last run on the screen', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -597,8 +720,7 @@ describe('the import wizard', () => {
 
   /** Walks to the matching step with the default file. */
   async function toMatchingStep() {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -614,8 +736,7 @@ describe('the import wizard', () => {
   }
 
   it('offers the fixed columns the server lists, with its labels', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -629,8 +750,7 @@ describe('the import wizard', () => {
   });
 
   it('imports a file too large to keep without its original, and says so', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, FILE_TEXT, 'donors.csv', 3000000);
@@ -705,8 +825,7 @@ describe('the import wizard', () => {
         ]
       })
     );
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -734,8 +853,7 @@ describe('the import wizard', () => {
         ]
       })
     );
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -842,8 +960,7 @@ describe('the import wizard', () => {
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: [{ value: 'Charity_Number__c', label: 'Charity Number' }]
     });
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -872,8 +989,7 @@ describe('the import wizard', () => {
         { value: 'Name', label: 'Account Name' }
       ]
     });
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -1015,8 +1131,7 @@ describe('the import wizard', () => {
   });
 
   it('edits a column changes, shows how many, and sends them with the mapping', async () => {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -1062,8 +1177,7 @@ describe('the import wizard', () => {
         ]
       })
     );
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -1084,8 +1198,7 @@ describe('the import wizard', () => {
         uniqueBy: ['Email']
       })
     );
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -1549,8 +1662,7 @@ describe('the import wizard loading one object', () => {
   });
 
   async function toColumnsStep() {
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, SESSIONS, 'sessions.csv');
@@ -1618,8 +1730,7 @@ describe('the import wizard loading one object', () => {
     createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
     const element = render();
     await flush();
-    click(element, 'choose-object');
-    await flush();
+    await chooseKind(element, 'object');
     const object = element.shadowRoot.querySelector('[data-id="new-object"]');
     expect(object.options).toEqual([{ label: 'Program Session', value: 'Program_Session__c' }]);
     expect(element.shadowRoot.querySelector('[data-id="create-object-template"]').disabled).toBe(
@@ -1637,8 +1748,82 @@ describe('the import wizard loading one object', () => {
       name: 'Program sessions',
       objectName: 'Program_Session__c'
     });
-    expect(element.shadowRoot.querySelector('[data-id="template"]').value).toBe('a05');
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'Loads: Program Session'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
     expect(element.shadowRoot.querySelector('[data-id="new-object"]')).toBeNull();
+  });
+
+  it('starts a template made from the related records card on upsert', async () => {
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program_Session__c', label: 'Program Session' }
+    ]);
+    createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
+    getRelatedOptions.mockResolvedValue([]);
+    const element = render();
+    await flush();
+    await chooseKind(element, 'related');
+    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
+    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Sessions and attendees';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'create-object-template');
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, SESSIONS, 'sessions.csv');
+    click(element, 'next');
+    await flush();
+    expect(loadOptions(element).operation).toBe('Upsert by external ID');
+  });
+
+  it('starts a template made from the delete card on delete by record ID', async () => {
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program_Session__c', label: 'Program Session' }
+    ]);
+    createObjectTemplate.mockResolvedValue({
+      ...OBJECT_TEMPLATE,
+      id: 'a06',
+      loadOperations: [...OBJECT_TEMPLATE.loadOperations, 'Delete by record Id']
+    });
+    const element = render();
+    await flush();
+    await chooseKind(element, 'delete');
+    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
+    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Sessions to delete';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'create-object-template');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'Deletes: Program Session'
+    );
+  });
+
+  it('says so when the delete card makes a template for an object it may not delete', async () => {
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program_Session__c', label: 'Program Session' }
+    ]);
+    createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
+    const element = render();
+    await flush();
+    await chooseKind(element, 'delete');
+    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
+    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Sessions';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'create-object-template');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'c.Core_Import_NoDeleteForObject'
+    );
   });
 
   it('offers the object fields, and a lookup picker that keeps the saved choice', async () => {
@@ -1982,8 +2167,7 @@ describe('the import wizard loading one object', () => {
       canRetry: true,
       retrying: false
     });
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
@@ -2041,8 +2225,7 @@ describe('the import wizard loading one object', () => {
       isDryRun: false,
       canRetry: false
     });
-    const element = render();
-    await flush();
+    const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);

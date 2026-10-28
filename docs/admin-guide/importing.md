@@ -10,7 +10,26 @@ you say how a row should be matched against records you already have, and then y
 before anything is written. When the preview looks right you import it, and the results
 screen tells you what happened, row by row, including every row that failed and why.
 A file that describes one kind of record, such as program sessions or one of your own custom
-objects, loads through **Load One Object** (section 9).
+objects, loads through **One Kind of Record** (section 9).
+
+### What Are You Importing?
+
+The first step of the **Import** tab asks what the file holds. Each choice is a card that says
+what it creates; choose one, and **Choose Something Else** takes you back to the cards.
+
+| Card | What it loads | Where to read more |
+|---|---|---|
+| **People and Organizations** | People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A file of organizations only works too. You choose the template; the first one is chosen for you. | Sections 3, 4 and 8 |
+| **Gifts** | Gifts with the people and organizations who gave them. Shown only when one of your active templates loads gifts, which means the Giving module is installed. | [Importing gifts](gift-import.md) |
+| **One Kind of Record** | Creates, updates or upserts the records of any one object you may load, such as program sessions or one of your own objects. You choose the object and name a new template. | Section 9 |
+| **Records With Their Related Records** | One kind of record and its related records from the same rows, such as sessions and their attendees. As **One Kind of Record**, with **Update or create, matched by external ID** chosen for you (or **Update by record ID** where that is not offered), so the related records choice is open on the matching step. | Section 9, "Related Records in the Same File" |
+| **Delete the Records a File Lists** | Sends the records whose IDs the file lists to the Recycle Bin, after a preview and a confirmed count. Shown only to people with **Bulk Delete Records**. As **One Kind of Record**, with **Delete by record ID** chosen for you. | Section 9, "Deleting the records a file lists" |
+| **Your Templates** | Every active template in your org: the ones BarnCRM and your modules ship and the ones you made, each with its description, what it creates and when it last loaded a file. | Sections 2 and 6 |
+
+Once a template is chosen, the step shows what it creates, built from its columns: for
+example "This file can create: people, households, organizations, links between people and
+organizations", or for a template that loads one object, "Loads: Program Session (and Session
+Attendee)". A template still loads only what your file has columns for.
 
 Every record an import creates is tagged with the import it came from, so six months
 later you can still answer "where did these 400 households come from".
@@ -61,7 +80,8 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 You need a CSV file (or another text file whose columns are separated by semicolons, tabs or
 pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five or six rows.
 
-1. Open the **Import** tab. Select **Generic contact list**, then **Next**.
+1. Open the **Import** tab. Under **What Are You Importing?**, choose **People and
+   Organizations**. **Generic contact list** is chosen for you; select **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
    For a text file, **Columns are separated by** shows the separator BarnCRM found (commas,
@@ -616,18 +636,21 @@ records the first one created or updated.
 
 Not every file is people. A spreadsheet of program sessions, a corrected export of one of your
 own objects, or volunteer hours from a sign-in sheet each describe one kind of record. **Load
-one object** loads a file into a single object, including your org's own custom objects, with
+one object** (the **One Kind of Record** card) loads a file into a single object, including your org's own custom objects, with
 the same dry run, results, journal and undo as any import.
 
 A module can also ship a ready-made template that loads one object, such as a sheet of
-volunteer hours. It appears in the template list like any shipped template, but only in an org
+volunteer hours. It appears under **Your Templates** like any shipped template, but only in an org
 that has the object and every field it uses, and where the template's people (Contacts or
 person Accounts) match yours; otherwise it is left out, and the reason is on the Error Log
 (Health Check). You can edit it or switch it off like any other template.
 
-1. Open the **Import** tab and select **Load One Object**.
+1. Open the **Import** tab and choose **One Kind of Record** (or **Records With Their Related
+   Records**, or **Delete the Records a File Lists**). A template you made before is under
+   **Your Templates**.
 2. Choose the object from the list, give the template a name (for example "Program sessions"),
-   and select **Create**. The new template is chosen for you. Select **Next**.
+   and select **Create**. The new template is chosen for you, with what it loads shown under
+   it. Select **Next**.
 3. Upload the file. Each column is matched to the field whose label or API name is its heading;
    anything else is **Do not load**. Change any column from the picker, which lists the fields
    of that object you may create or edit.

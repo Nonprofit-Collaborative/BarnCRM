@@ -174,6 +174,12 @@ private class ImportControllerLoadTest {
                 );
                 Assert.isTrue(none.isEmpty(), 'Nothing for a field pointing elsewhere.');
                 Assert.areEqual(
+                    Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabel(),
+                    shown.relatedLabel,
+                    'The related object is named for what the template loads (D-136).'
+                );
+                Assert.areEqual(
                     'Affiliation__c.Organization__c',
                     shown.related,
                     'The saved choice is shown.'

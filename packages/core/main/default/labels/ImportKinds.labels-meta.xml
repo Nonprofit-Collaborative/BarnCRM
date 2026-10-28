@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_StepKind</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: heading of the first step's choice cards</shortDescription>
+        <value>What Are You Importing?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindPeopleTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the people and organizations card</shortDescription>
+        <value>People and Organizations</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindPeopleText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the people and organizations card loads</shortDescription>
+        <value>People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A list of organizations only works too.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindGiftsTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the gifts card</shortDescription>
+        <value>Gifts</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindGiftsText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the gifts card loads</shortDescription>
+        <value>Gifts, with the people and organizations who gave them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindObjectTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the one kind of record card</shortDescription>
+        <value>One Kind of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindObjectText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the one kind of record card loads</shortDescription>
+        <value>Create, update or upsert the records of any one object, such as program sessions or one of your own objects.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindRelatedTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the related records card</shortDescription>
+        <value>Records With Their Related Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindRelatedText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the related records card loads</shortDescription>
+        <value>Update or upsert one kind of record and create its related records from the same rows, such as sessions and their attendees.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindDeleteTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the delete by file card</shortDescription>
+        <value>Delete the Records a File Lists</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindDeleteText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the delete by file card does, with its warning</shortDescription>
+        <value>Sends the records whose IDs a file lists to the Recycle Bin. You see a preview and confirm the count before anything is deleted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindTemplatesTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the your templates card</shortDescription>
+        <value>Your Templates</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindTemplatesText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the your templates card lists</shortDescription>
+        <value>Every template in your org: the ones BarnCRM and your modules ship, and the ones you made.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangeKind</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button back to the first step's choice cards</shortDescription>
+        <value>Choose Something Else</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_UseTemplate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that chooses one template from the list</shortDescription>
+        <value>Use This Template</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LastLoaded</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: words before the date a template last loaded a file</shortDescription>
+        <value>Last loaded</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_NotLoadedYet</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a template that has never loaded a file</shortDescription>
+        <value>Not loaded yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesSummary</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a people template creates; {0} is the list of kinds</shortDescription>
+        <value>This file can create: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadsSummary</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a one-object template loads; {0} is the object</shortDescription>
+        <value>Loads: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadsRelatedSummary</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: {0} is the object a template loads, {1} its related object</shortDescription>
+        <value>Loads: {0} (and {1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DeletesSummary</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a delete by file template deletes; {0} is the object</shortDescription>
+        <value>Deletes: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesPeople</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>people</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesSecondPerson</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>a second person per row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesHouseholds</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>households</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesOrganizations</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>organizations</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesAffiliations</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>links between people and organizations</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesGifts</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>gifts</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesAllocations</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>fund allocations</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesSoftCredits</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>soft credits</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CreatesTributes</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: kind a template creates, in the creates list</shortDescription>
+        <value>tributes</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_NoDeleteForObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the chosen object cannot be deleted by file</shortDescription>
+        <value>This object's records cannot be deleted by file, so the template creates or updates them instead. Choose Something Else to pick another object.</value>
+    </labels>
+</CustomLabels>
