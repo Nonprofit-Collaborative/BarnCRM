@@ -44,7 +44,7 @@
 
     <template lwc:if={showPanels}>
         <div class="slds-var-m-bottom_small">
-            <h2 class="slds-text-heading_small" id="setup-assistant-heading">
+            <h2 class="slds-assistive-text" id="setup-assistant-heading">
                 {labels.heading}
             </h2>
             <p class="slds-text-body_small slds-text-color_weak">
@@ -59,8 +59,8 @@
                 role="group"
                 aria-labelledby="setup-assistant-heading"
             >
-                <p class="slds-text-body_small slds-text-color_weak" aria-live="polite">
-                    <span class="slds-assistive-text">{labels.stepCounter}</span>
+                <p class="slds-assistive-text" aria-live="polite">
+                    <span>{labels.stepCounter}</span>
                     {counterText}
                 </p>
                 <h3 class="slds-text-heading_x-small" data-id="step-label" tabindex="-1">

@@ -254,6 +254,19 @@ private class RollupServiceTest {
     }
 
     @IsTest
+    static void anOrgWithNoActiveRollupIsNotReportedAsOverdue() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            insert memberCount(RollupService.MODE_BOTH, false);
+
+            System.Assert.isNull(RollupService.lastCalculated(), 'Nothing has run');
+            System.Assert.isFalse(
+                RollupService.isStale(),
+                'A definition that is switched off has nothing to be overdue'
+            );
+        }
+    }
+
+    @IsTest
     static void anOrgThatHasNeverCalculatedIsReportedAsOverdue() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             insert memberCount(RollupService.MODE_BOTH, true);

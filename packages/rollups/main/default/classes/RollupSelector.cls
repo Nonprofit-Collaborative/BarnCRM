@@ -206,6 +206,16 @@ public with sharing class RollupSelector {
         return found.isEmpty() ? null : found[0];
     }
 
+    /** True when at least one definition is active, so there is something that should have run. */
+    public static Boolean hasActiveDefinition() {
+        for (Rollup_Definition__c definition : selectAll()) {
+            if (definition.Active__c == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The most recent completed calculation across the active definitions, for the Hub tile. */
     public static Datetime lastCalculatedAcrossActive() {
         Datetime latest;

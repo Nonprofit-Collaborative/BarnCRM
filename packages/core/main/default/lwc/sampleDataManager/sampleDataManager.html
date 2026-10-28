@@ -17,6 +17,11 @@
             </template>
 
             <template if:false={isLoadingStatus}>
+                <template if:true={statusFailed}>
+                    <p class="slds-text-color_weak slds-m-bottom_small" data-id="status-error" role="status">
+                        {labels.statusError}
+                    </p>
+                </template>
                 <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
                     <template for:each={tiles} for:item="tile">
                         <div

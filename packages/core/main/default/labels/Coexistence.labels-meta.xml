@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub home: the install and every upgrade finished without logging a problem</shortDescription>
-        <value>Setup completed.</value>
+        <value>The install and upgrades logged no problems. The number above counts every new error.</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_InstallProblems</fullName>
@@ -110,6 +110,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub home: unreviewed install or upgrade problems; {0} is the count</shortDescription>
-        <value>Setup finished with {0} problems, see the Error Log.</value>
+        <value>The install and upgrades logged {0} problems, and they are counted above. See the Error Log.</value>
     </labels>
 </CustomLabels>
