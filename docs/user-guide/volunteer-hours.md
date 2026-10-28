@@ -1,4 +1,4 @@
-# Volunteer hours, profiles and letters
+# Volunteer Hours, Profiles and Letters
 
 This page covers recording the time volunteers give, approving it, and what a person's record
 shows about their volunteering: their profile, readiness, skills and availability. It also
@@ -16,13 +16,13 @@ Only **Approved** hours count: in a person's totals, on reports and in letters. 
 organization requires approval (the usual setting), a new entry waits as **Submitted** until a
 coordinator approves it.
 
-## To log hours by attendance
+## To Log Hours by Attendance
 
-The quickest way: on the shift's **Sign-ups** panel, click **Attended** in the person's row.
+The quickest way: on the shift's **Sign-Ups** panel, click **Attended** in the person's row.
 BarnCRM records hours for the length of the shift. See
 [To mark attendance after a shift](volunteer-shifts.md#to-mark-attendance-after-a-shift).
 
-## To log hours by hand
+## To Log Hours by Hand
 
 Use this for work that was not on a shift, or a shift with no hours recorded.
 
@@ -39,7 +39,7 @@ change **Status** yourself; it moves only through approval.
 To see entries, use the list view menu on the **Volunteer Hours** tab: **All Hours** or
 **Awaiting Approval**.
 
-## To approve hours
+## To Approve Hours
 
 Needs **Manage Volunteers**.
 
@@ -55,7 +55,7 @@ in **Reviewed Date**.
 
 Use **Previous** and **Next** to move between pages.
 
-## To reject hours
+## To Reject Hours
 
 1. On **Approve Hours**, with **Show** on **Submitted**, tick the entries.
 2. Click **Reject**.
@@ -64,7 +64,7 @@ Use **Previous** and **Next** to move between pages.
 You should see: "Entries rejected: 1." The person who entered the hours sees your reason in
 **Rejection Reason** on the entry.
 
-## To reopen approved or rejected hours
+## To Reopen Approved or Rejected Hours
 
 An approved entry is locked. To correct or delete it, reopen it first.
 
@@ -74,7 +74,7 @@ An approved entry is locked. To correct or delete it, reopen it first.
 You should see: "Entries reopened: 1." The entries are back at **Submitted**, out of every total,
 and can be edited, deleted, or approved again.
 
-## To see a person's volunteering
+## To See a Person's Volunteering
 
 1. Open the person in the **BarnCRM Volunteers** app (for example from a sign-up, an hours
    entry, or global search).
@@ -90,14 +90,14 @@ your organization's fiscal year.
 The section shows once a person has a **Volunteer Status** or approved hours. Coordinators and
 admins always see it, so they can set the status of someone new.
 
-## To record availability
+## To Record Availability
 
 1. On the person, in **Volunteer Profile**, click the pencil next to **Availability Days**.
 2. Pick the days in **Availability Days** and the parts of the day in **Availability Times**
    (Morning, Afternoon, Evening).
 3. Click **Save**.
 
-## To add a skill or interest to a person
+## To Add a Skill or Interest to a Person
 
 1. On the person, find the **Volunteer Skills** list and click **New**. (If it is not on the
    page, ask your admin to add it: see
@@ -108,12 +108,12 @@ admins always see it, so they can set the status of someone new.
 
 The list of skills itself is kept on the **Skills** tab by coordinators and admins.
 
-## To check a volunteer's readiness
+## To Check a Volunteer's Readiness
 
 Needs the Coordinator or Admin role.
 
 1. Open the person in the **BarnCRM Volunteers** app.
-2. Find the **Volunteer readiness** card.
+2. Find the **Volunteer Readiness** card.
 
 You should see: each onboarding step (for example Application, Background check, Orientation)
 with its status, completed date and expiry, and **Current** or **Not current**. A step with no
@@ -121,12 +121,12 @@ record says **Not started**. Click a step to open it. After adding a step, click
 
 The card only informs: it never stops a sign-up or hours.
 
-## To make an hours letter or certificate
+## To Make an Hours Letter or Certificate
 
 Needs **Manage Volunteers**.
 
 1. Open the person in the **BarnCRM Volunteers** app.
-2. Click **Volunteer letter** in the actions at the top of the record.
+2. Click **Volunteer Letter** in the actions at the top of the record.
 3. Choose the **Template** (an hours letter or a certificate).
 4. Check **From** and **To**. They start at 1 January this year and today.
 5. Click **Preview** to read the letter, then **Generate**.
@@ -137,7 +137,7 @@ You should see: "The letter is saved as a PDF in this person's Files." The lette
 To make letters for a whole list of people at once, ask your admin: see
 [Hour letters and certificates](../admin-guide/volunteers.md#hour-letters-and-certificates).
 
-## Common problems
+## Common Problems
 
 - Problem: someone else's hours are missing from **Volunteer Hours**. Why and what to do: hours
   are private. A Team Member sees only the hours they entered; a coordinator sees them all.

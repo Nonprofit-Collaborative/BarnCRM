@@ -1,4 +1,4 @@
-# Read-only access
+# Read-Only Access
 
 The Read Only role is for board members, auditors and anyone who should look but not change
 anything. This page lists what you can see with it, what you cannot do, and what BarnCRM says
@@ -9,18 +9,18 @@ Volunteers module, the role brings **Volunteers Read Only** automatically. With 
 module, your admin gives **Giving Read Only** separately, if you should see gifts. See
 [Access](../admin-guide/access.md).
 
-## What you can and cannot do
+## What You Can and Cannot Do
 
-### Core (BarnCRM app)
+### Core (BarnCRM App)
 
 | Area | You can | You cannot |
 |---|---|---|
 | People, households, organizations | Open and read them, their list views and global search | Create, edit or delete |
 | Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set as primary, make primary, remove (the cards do not show these buttons) |
 | Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
-| Household merge and split | Open **Merge or split** and read it | Merge or split |
-| Home tab | **What's new in BarnCRM**, the welcome and **Quick links** | Use **New household** (it is hidden) |
-| BarnCRM Settings | Read every setting and its **Learn more** link | Change anything |
+| Household merge and split | Open **Merge or Split** and read it | Merge or split |
+| Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New household** (it is hidden) |
+| BarnCRM Settings | Read every setting and its **Learn More** link | Change anything |
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
 | Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |
 
@@ -45,7 +45,7 @@ queries over everything you can read. You still cannot change records.
 | Giving reports and dashboards | Run them and view dashboards | Create or change reports and dashboards |
 
 The gift panels on a record still load, so you can read them; their actions are not for you.
-A commitment's **Payment schedule** card shows no **Pause**, **Resume**, **Mark complete** or
+A commitment's **Payment Schedule** card shows no **Pause**, **Resume**, **Mark complete** or
 **Cancel commitment**, and **Refund or Write Off** and **Start Stewardship Plan** open a window
 that says you cannot record a refund or start a plan.
 
@@ -58,7 +58,7 @@ that says you cannot record a refund or start a plan.
 | A person's volunteer totals | Read them on the person | Change them |
 | Volunteer Requirements, Volunteer Letter Templates, Approve Hours | Nothing: these are not given | Anything |
 
-## To check what you can see
+## To Check What You Can See
 
 1. Open the App Launcher and choose **BarnCRM** (or **Fundraising**, or **BarnCRM
    Volunteers**).
@@ -67,15 +67,15 @@ that says you cannot record a refund or start a plan.
 You should see: the record with its cards. Salesforce's **Edit** and **Delete** buttons are
 not offered, or say you do not have access.
 
-## What you see when you try something you cannot do
+## What You See When You Try Something You Cannot Do
 
 - On **BarnCRM Settings**: "You can read these settings but not change them. Ask your
   administrator for the Manage BarnCRM Settings permission."
-- On **Merge or split**: "You can see this household but not change it, so merging and
+- On **Merge or Split**: "You can see this household but not change it, so merging and
   splitting are switched off. Ask whoever manages access for edit access to both households."
 - On the **Addresses**, **Relationships**, **Affiliations** and **Members** cards: nothing to
-  try. **Add address**, **Set as Primary**, **Add relationship**, **Remove**, **Add
-  affiliation**, **Make primary**, **Add member** and **Move to another household** are not
+  try. **Add Address**, **Set as Primary**, **Add Relationship**, **Remove**, **Add
+  affiliation**, **Make Primary**, **Add member** and **Move to another household** are not
   shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.
   Ask your administrator to assign you the BarnCRM Find and Export permission set."
@@ -90,7 +90,7 @@ not offered, or say you do not have access.
 
 None of these change anything. Nothing is saved when an action is refused.
 
-## Common problems
+## Common Problems
 
 - Problem: the **Add** buttons on the cards are shown, but saving fails. The cards show the
   buttons to everyone; your role does not allow the save. This is expected.

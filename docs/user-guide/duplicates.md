@@ -11,7 +11,7 @@ the **Duplicate Matching** tab and its **Review** list. Dismissing and merging f
 and running the scan, also need the admin role (**BarnCRM Admin Group** on the Access page).
 Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 
-## To review a possible duplicate person
+## To Review a Possible Duplicate Person
 
 1. Open the person. On the right of the page, the **Potential Duplicates** card names any
    record Salesforce thinks is the same person.
@@ -22,9 +22,9 @@ Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 You should see: one person. This is Salesforce's own merge: it keeps the activities and files
 of both (and, with Giving, their gifts). Salesforce lets you merge people only if you may
 delete people. The staff roles do not include that on purpose, so if you cannot, ask your
-admin. Merging two households with **Merge or split** needs no such permission.
+admin. Merging two households with **Merge or Split** needs no such permission.
 
-## What BarnCRM tidies after a person merge
+## What BarnCRM Tidies After a Person Merge
 
 Within a minute or so, without you doing anything:
 
@@ -38,31 +38,31 @@ Within a minute or so, without you doing anything:
 A household the other person leaves empty is kept, not deleted, because records can still
 point at it. Merge it into the kept person's household (below).
 
-## To merge two households that are the same family
+## To Merge Two Households That Are the Same Family
 
-1. Open the household you want to keep and click **Merge or split**.
+1. Open the household you want to keep and click **Merge or Split**.
 2. On the **Merge** tab, find and pick the other household, choose the values to keep, and
-   click **Merge**, then **Merge households**.
+   click **Merge**, then **Merge Households**.
 
 You should see: "Merged. The household you kept now holds everyone from both." Always merge
 households this way, never with Salesforce's own account merge. The full steps are in
 [People and households](people-and-households.md#to-merge-two-households).
 
-## To work through the Duplicates list (admins)
+## To Work Through the Duplicates List (Admins)
 
 1. Open the **Duplicate Matching** tab. The **Review** list opens.
-2. Under **Possible duplicates**, read each pair. It is marked **Person** or **Household**, and
+2. Under **Possible Duplicates**, read each pair. It is marked **Person** or **Household**, and
    says why it was suggested (see below). Press **Refresh** to see the latest.
 3. For two people, open either one and use **Compare and merge**, as above. The list reminds
    you: "To merge two people, open either one and use Compare and merge on the Potential
    Duplicates card."
-4. For two households, click **Merge households**. In **Merge two households**, choose the
+4. For two households, click **Merge Households**. In **Merge Two Households**, choose the
    **Household to keep** and click **Merge these two**. To choose field by field, use **Merge
    or split** on the household instead.
 
 You should see: "The two households are now one." Merged pairs leave the list.
 
-## Why a pair is suggested
+## Why a Pair Is Suggested
 
 Each pair shows a short reason:
 
@@ -78,9 +78,9 @@ purpose: a value shared by more than ten people or households (such as an office
 number), and a phone or address shared by people in the same household, since that is what
 living together looks like. A shared email still pairs them.
 
-## To mark a pair as not a duplicate (admins)
+## To Mark a Pair as Not a Duplicate (Admins)
 
-1. On the pair, click **Not a duplicate**.
+1. On the pair, click **Not a Duplicate**.
 2. In **Reason**, type why, for the next person who wonders (for example "Twin sisters at one
    address").
 3. Confirm.
@@ -89,7 +89,7 @@ You should see: "Noted. This pair will not be suggested again." It stays off the
 later scans, too. A suggestion with three or more records is dismissed as a whole, so merge
 any real duplicates in it first.
 
-## Common problems
+## Common Problems
 
 - Problem: "Suggestions need access to duplicate record sets, which Salesforce gives only to
   Sales Cloud and Service Cloud licenses. ..." You do not have the BarnCRM Duplicate Review
@@ -97,7 +97,7 @@ any real duplicates in it first.
   review.
 - Problem: "You can see this list. Scanning, dismissing and merging here need the Manage
   BarnCRM Settings permission." Only admins act from the list. Merge people from their own
-  page and households with **Merge or split**.
+  page and households with **Merge or Split**.
 - Problem: there is no **Duplicate Matching** tab, or no **Duplicates** section on **Org
   Optimizer** where you used to find it. The list moved to the **Duplicate Matching** tab, which
   is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or use the

@@ -1,10 +1,10 @@
-# Pledges and recurring gifts
+# Pledges and Recurring Gifts
 
 A commitment is a promise to give. A **Pledge** is a fixed total paid over time; a **Recurring** gift is the same amount on a schedule with no end. BarnCRM lays out the expected payments (installments), so you can see what is due, what is overdue and what is left to pay.
 
 Before you start: open the **Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set).
 
-## To record a pledge
+## To Record a Pledge
 
 1. Open **Commitments** and click **New**.
 2. Set **Type** to **Pledge**.
@@ -15,9 +15,9 @@ Before you start: open the **Fundraising** app, **Commitments** tab. You need th
 7. Set the **Start Date**. Leave **Day of Month** empty to use the day of the start date.
 8. Choose a **Fund** and **Appeal** if they apply, and click **Save**.
 
-You should see: the commitment page with a **Payment schedule** card listing every payment (**Number**, **Due date**, **Expected**, **Paid**, **Status**) and a **Total expected** line. **Balance** equals the total, because nothing is paid yet.
+You should see: the commitment page with a **Payment Schedule** card listing every payment (**Number**, **Due Date**, **Expected**, **Paid**, **Status**) and a **Total expected** line. **Balance** equals the total, because nothing is paid yet.
 
-## To record a recurring gift
+## To Record a Recurring Gift
 
 1. Open **Commitments** and click **New**.
 2. Set **Type** to **Recurring**.
@@ -25,11 +25,11 @@ You should see: the commitment page with a **Payment schedule** card listing eve
 4. Leave **Expected Total** empty. A recurring gift has no total.
 5. Click **Save**.
 
-You should see: about a year of payments on the **Payment schedule** card. More are added as time goes on.
+You should see: about a year of payments on the **Payment Schedule** card. More are added as time goes on.
 
 If the card says "No payments have been generated for this commitment yet.", click **Generate now**.
 
-## To see what is overdue or coming up
+## To See What Is Overdue or Coming Up
 
 The payments are Installment records. They are not a tab in the Fundraising app.
 
@@ -40,12 +40,12 @@ You should see: each payment with its commitment and what was expected. A paymen
 
 To see whole commitments, open **Commitments** and choose **Active Pledges** or **Active Recurring Gifts**.
 
-## To pay an installment
+## To Pay an Installment
 
 When a payment arrives, enter it as a gift and link it to the payment.
 
 1. Open [Quick Gift Entry](gifts.md#to-pay-a-scheduled-payment) and choose the donor.
-2. Type the **Amount** and **Gift date**.
+2. Type the **Amount** and **Gift Date**.
 3. In **Pays a scheduled payment**, check the chosen payment, or pick the right one. Choose **None: a new gift on its own** if the gift is not for the pledge.
 4. Click **Save**.
 
@@ -53,28 +53,28 @@ You should see: on the commitment, the payment's **Status** turns **Paid** (or *
 
 On the **Gifts** tab's **New** form, set **Commitment** to the pledge and **Installment** to the payment instead. Leave **Installment** empty and BarnCRM links the gift to the oldest unpaid payment, if your admin left that setting on.
 
-## To pause or resume a recurring gift
+## To Pause or Resume a Recurring Gift
 
 1. Open the commitment.
-2. On the **Payment schedule** card, click **Pause**.
+2. On the **Payment Schedule** card, click **Pause**.
 
 You should see: "The commitment was updated." **Status** is **Paused**, no new payments are added, and the card now offers **Resume**. Click **Resume** when the donor starts again; the missing payments are filled back in.
 
-## To end a commitment
+## To End a Commitment
 
 1. Open the commitment.
-2. On the **Payment schedule** card, click **Mark complete** for one that is finished, or **Cancel commitment** for one the donor has stopped.
+2. On the **Payment Schedule** card, click **Mark complete** for one that is finished, or **Cancel commitment** for one the donor has stopped.
 
 You should see: **Status** is **Completed** or **Cancelled**. Cancelling marks the unpaid payments **Skipped** and deletes nothing. Gifts already received are not touched.
 
-## To change the amount or schedule
+## To Change the Amount or Schedule
 
 1. Open the commitment and click **Edit**.
 2. Change **Amount**, **Frequency**, **Day of Month** or **End Date**, and click **Save**.
 
 You should see: the unpaid payments rebuilt; paid and partly paid ones are left alone. Log an activity on the commitment saying why, so the next person knows why the numbers moved.
 
-## Common problems
+## Common Problems
 
 - Twelve payments of 1,200 on a 1,200 pledge. The total was typed in **Amount**. Change **Amount** to what is expected each time and save.
 - "Choose one donor for this commitment, either a person or an account, not both." Clear **Donor** or **Donor Account**.

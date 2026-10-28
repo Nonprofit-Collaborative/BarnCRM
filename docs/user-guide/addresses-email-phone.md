@@ -1,4 +1,4 @@
-# Addresses, email and phone
+# Addresses, Email and Phone
 
 BarnCRM keeps every address a household, organization or person uses, and marks one as the
 primary. The primary is copied into the standard address fields, so letters and reports always
@@ -10,19 +10,19 @@ Member, Coordinator, Fundraising Staff or Admin role. The **Addresses** card app
 admin has turned on the Addresses feature. Ask your admin; see
 [Addresses](../admin-guide/addresses.md).
 
-## To add an address
+## To Add an Address
 
 1. Open the household, organization or person. Find the **Addresses** card.
-2. Click **Add address**. The **New address** form opens.
+2. Click **Add Address**. The **New Address** form opens.
 3. Choose a **Type**: Home, Work, Mailing, Seasonal or Other.
 4. Fill in **Street**, **City**, **State**, **Postal Code** and **Country**.
 5. Tick **Primary** only if this is where they moved to (see "To Record a Move").
-6. Click **Add address** at the foot of the form.
+6. Click **Add Address** at the foot of the form.
 
 You should see: "Address saved." The first address a record gets is made the primary
 automatically and carries a **Primary** badge.
 
-## To choose household or personal
+## To Choose Household or Personal
 
 - An address you add on a **household** belongs to the whole household.
 - An address you add on a **person** belongs to that person only. The rest of the household
@@ -50,9 +50,9 @@ addresses someone still uses, such as a home and a work address. To record a mov
 
 ## To Record a Move
 
-1. On the **Addresses** card, click **Add address** and fill in the new address.
+1. On the **Addresses** card, click **Add Address** and fill in the new address.
 2. Tick **Primary**.
-3. Click **Add address** at the foot of the form.
+3. Click **Add Address** at the foot of the form.
 
 You should see: the new address at the top with the **Primary** badge and "Since" today's date.
 The old address moves into **Former Addresses**, with the day it started (when known) to today.
@@ -110,21 +110,21 @@ address on their card, without the **Primary** badge.
 
 If you cannot see either button, you can read addresses but not change them. Ask your admin.
 
-## To add a seasonal address
+## To Add a Seasonal Address
 
 Use this for a household that spends part of each year somewhere else.
 
-1. Click **Add address** and choose **Type** Seasonal.
+1. Click **Add Address** and choose **Type** Seasonal.
 2. Fill in the address.
 3. Fill in **Seasonal Start Month** and **Seasonal Start Day** (when it takes over) and
    **Seasonal End Month** and **Seasonal End Day** (when it stops). Months are 1 to 12.
-4. Click **Add address**.
+4. Click **Add Address**.
 
 You should see: the address on the card with its dates, for example "Used from January 1 to
 March 31". A nightly job makes it the primary when the season starts and puts the previous
 address back when it ends. You do not move it by hand.
 
-## To change or delete an address
+## To Change or Delete an Address
 
 The card has no Edit or Delete button. Change the address on its own record:
 
@@ -134,7 +134,7 @@ The card has no Edit or Delete button. Change the address on its own record:
 
 You should see: the change on the record's **Addresses** card without a reload.
 
-## To set a person's email addresses
+## To Set a Person's Email Addresses
 
 Each person has **Personal Email**, **Work Email** and **Alternate Email**, and **Preferred
 Email** to choose between them. They are in the **Reaching This Person** section of the
@@ -148,7 +148,7 @@ person.
 You should see: the ordinary **Email** field now holds the address you chose. Every mailing
 and list view uses it. To switch, change **Preferred Email**; you never retype the address.
 
-## To set a person's preferred phone
+## To Set a Person's Preferred Phone
 
 1. Edit the person. In the **Reaching This Person** section, fill in the numbers you have:
    **Home Phone**, **Mobile**, **Work Phone** or **Other Phone**.
@@ -159,7 +159,7 @@ You should see: the ordinary **Phone** field now holds the number you chose. Hom
 Salesforce's **Home Phone**, Mobile to **Mobile**, Other to **Other Phone**, and Work to
 BarnCRM's **Work Phone**.
 
-## Common problems
+## Common Problems
 
 - Problem: "A seasonal address needs a start month, a start day, an end month, and an end day
   so we know when to use it." Fill in all four seasonal fields.
@@ -176,7 +176,7 @@ BarnCRM's **Work Phone**.
   edit addresses ..." Ask your admin for edit access.
 - Problem: "The address status could not be saved. You may not have access to change it." Ask
   your admin for edit access to addresses. A card with no status menu means the same.
-- Problem: the **Addresses** card has no **Add address** or **Set as Primary** button. Your
+- Problem: the **Addresses** card has no **Add Address** or **Set as Primary** button. Your
   access lets you read addresses but not change them (the Read Only role, for example). Ask
   your admin.
 - Problem: "The Work email address is empty, so there is nothing to put in the ordinary Email

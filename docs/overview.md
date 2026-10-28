@@ -1,8 +1,8 @@
-# BarnCRM overview
+# BarnCRM Overview
 
 Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main.
 
-## What BarnCRM is
+## What BarnCRM Is
 
 BarnCRM is a free, open source suite of apps that installs into your organization's Salesforce account and turns it into a working database for people, households, gifts and more. It is built for small and medium organizations with one to ten Salesforce users and no full-time Salesforce administrator. The person who sets it up is an operations manager, development director or executive director who is comfortable with spreadsheets.
 
@@ -16,7 +16,7 @@ Every setting an administrator needs lives on a page inside the app (BarnCRM Set
 
 BarnCRM is in development. No package version exists yet and nothing is installable from a listing, so this page describes what is built on the main branch of the source code.
 
-## Two editions
+## Two Editions
 
 Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo, Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
 
@@ -27,7 +27,7 @@ Both editions include the full core suite of tools: people, households, relation
 
 You choose the edition once, in the Setup Assistant. You can change it later: see [Editions](admin-guide/editions.md). A module you never install leaves nothing behind in your org.
 
-## Packages and their state on main
+## Packages and Their State on Main
 
 | Package | What it holds | State on main |
 |---|---|---|
@@ -43,7 +43,7 @@ You choose the edition once, in the Setup Assistant. You can change it later: se
 
 The feature-by-feature list, with the status of each item, is the [feature catalog](barncrm-features.md).
 
-## What an org gets today
+## What an Org Gets Today
 
 Install Core and run the Setup Assistant, and you can:
 
@@ -56,7 +56,7 @@ Add Giving and you can also record and receipt gifts, run appeals and stewardshi
 
 BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit.
 
-## Coming next
+## Coming Next
 
 This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are not promised.
 
@@ -68,7 +68,7 @@ This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are 
 - **Scheduled imports and connections.** On hold until the owner starts the next version.
 - **Hardening, beta and listing.** Security review, scale testing, a beta with real organizations, then the Salesforce AppExchange listing and version 1.0.
 
-## Where to read next
+## Where to Read Next
 
 | If you want to | Read |
 |---|---|
@@ -78,6 +78,6 @@ This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are 
 | See every feature and its status | [Feature catalog](barncrm-features.md) |
 | Build or contribute | [Contributor guide](contributor-guide/environment.md) |
 
-## Report a bug or give feedback
+## Report a Bug or Give Feedback
 
 Open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](../SUPPORT.md) for which template to use and what to include, and never post personal or donor data. Report security problems privately, as described in [SECURITY.md](../SECURITY.md).
