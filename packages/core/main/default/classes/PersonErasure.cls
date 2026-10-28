@@ -705,7 +705,7 @@ public with sharing class PersonErasure {
             ? described.getName().removeEnd('__c') + '__History'
             : described.getName() + 'History';
         String parentField = described.isCustom() ? 'ParentId' : described.getName() + 'Id';
-        Schema.SObjectType history = Schema.getGlobalDescribe().get(historyName);
+        Schema.SObjectType history = NamespaceUtil.globalDescribe().get(historyName);
         if (history == null) {
             return;
         }
@@ -1045,7 +1045,7 @@ public with sharing class PersonErasure {
 
     /** The person's Individual record, where the org has the object and the person a link. */
     private static SObject individualOf(SObject person) {
-        Schema.SObjectType type = Schema.getGlobalDescribe().get(INDIVIDUAL_OBJECT);
+        Schema.SObjectType type = NamespaceUtil.globalDescribe().get(INDIVIDUAL_OBJECT);
         String link = INDIVIDUAL_LINK.get(person.getSObjectType()).toLowerCase();
         if (type == null || !fieldsOf(person.getSObjectType()).containsKey(link)) {
             return null;

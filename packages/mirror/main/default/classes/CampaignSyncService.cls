@@ -86,7 +86,7 @@ public with sharing class CampaignSyncService {
             return null;
         }
         if (!typeResolved) {
-            resolvedType = Schema.getGlobalDescribe().get(CAMPAIGN_OBJECT);
+            resolvedType = NamespaceUtil.globalDescribe().get(CAMPAIGN_OBJECT);
             typeResolved = true;
         }
         return resolvedType;

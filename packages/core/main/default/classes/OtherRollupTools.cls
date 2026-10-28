@@ -63,7 +63,7 @@ public with sharing class OtherRollupTools {
     private static Set<String> installed() {
         if (found == null) {
             found = new Set<String>();
-            for (String objectName : Schema.getGlobalDescribe().keySet()) {
+            for (String objectName : NamespaceUtil.globalDescribe().keySet()) {
                 String name = objectName.toLowerCase();
                 for (String namespace : NAMESPACES) {
                     if (name.startsWith(namespace + '__')) {

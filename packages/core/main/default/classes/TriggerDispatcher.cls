@@ -97,6 +97,7 @@ public with sharing class TriggerDispatcher {
         if (String.isBlank(objectApiName) || context == null) {
             return;
         }
+        PauseCheck pause = new PauseCheck();
         for (
             Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(
                 objectApiName
@@ -104,7 +105,7 @@ public with sharing class TriggerDispatcher {
         ) {
             TriggerHandler handler = instantiate(entry, objectApiName);
             if (handler != null) {
-                run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true);
+                run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true, pause);
             }
         }
     }
@@ -116,7 +117,22 @@ public with sharing class TriggerDispatcher {
         }
         // A handler run directly, without a registry row, is an ordinary switchable automation:
         // only a shipped registry record can say that an automation always runs.
-        run(handler, context, handler.getName(), false);
+        run(handler, context, handler.getName(), false, new PauseCheck());
+    }
+
+    /**
+     * Whether all automation is paused, asked once per trigger run and only when a handler that
+     * can be paused gets that far, rather than once for each of its handlers.
+     */
+    private class PauseCheck {
+        private Boolean paused;
+
+        Boolean isPaused() {
+            if (this.paused == null) {
+                this.paused = AutomationControl.isPaused();
+            }
+            return this.paused;
+        }
     }
 
     private static Context currentContext() {
@@ -139,7 +155,8 @@ public with sharing class TriggerDispatcher {
         TriggerHandler handler,
         Context context,
         String registeredName,
-        Boolean alwaysRuns
+        Boolean alwaysRuns,
+        PauseCheck pause
     ) {
         if (handler == null || context == null || context.operation == null) {
             return;
@@ -149,7 +166,7 @@ public with sharing class TriggerDispatcher {
             if (AutomationControl.isBypassed(automationName)) {
                 return;
             }
-            if (AutomationControl.isPaused()) {
+            if (pause.isPaused()) {
                 return;
             }
             if (!AutomationControl.isEnabled(automationName)) {
