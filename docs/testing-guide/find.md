@@ -12,13 +12,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Find** tab. | The card **Find** with the line "Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows." **Saved queries** and **Object** pickers are shown. |
+| 1 | Open the **Find** tab. | Under the page header: "Find records, then export them, save the query, or change them all at once." and **New Query**. On a first visit **About This Tool** is open with "Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows." and **Learn More**. **Object** and **Saved queries** pickers, and an empty state **Choose What to Find**: "Pick an object, or open a saved query, to start." |
 | 2 | In **Object**, choose **Contact**. | **Columns** (with **Available fields** and **Columns, in order**), **Add fields from**, **Conditions**, **Sort by** and **Rows to show** appear. **Conditions** reads "No conditions yet, so every record matches." |
 | 3 | In **Columns**, move **First Name**, **Last Name** and **Email** to **Columns, in order**. | The three fields are listed in that order. |
 | 4 | Under **Conditions**, select **Add condition**. Choose **Last Name**, **equals**, and type `Garcia`. | The condition is complete; no message under it. |
-| 5 | Read **Query (read only)**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
-| 6 | In **Sort by**, choose **First Name**; in **Direction**, **Ascending**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. The line above it reads "N rows shown." with N the number of rows. |
-| 7 | Change the condition value to `Nobodyzz` and select **Run**. | "No records match these conditions." |
+| 5 | Open **Show Query** (closed until you open it). Read **Query (read only)**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
+| 6 | In **Sort by**, choose **First Name**; in **Direction**, **Ascending**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. Under **Results**, the line above it reads "N rows found." with N the number of rows. |
+| 7 | Change the condition value to `Nobodyzz` and select **Run**. | An empty state **No Matching Records**: "No records match these conditions." |
 
 **Cleanup:** none. Keep the page open for T-FIND-02 if you like.
 
@@ -62,11 +62,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Find**, choose **Contact**, add **First Name**, **Last Name** and **Email**, no conditions. Set **Rows to show** to `10` and select **Run**. | Ten rows. The line above reads "Showing the first 10 rows. Export to get every matching record." |
-| 2 | Select **Export to CSV**. | "Exporting: N rows so far." while it reads, then "Exported N rows." with N the total number of contacts (about 440 with sample data), not 10. A CSV downloads, named for the object and today's date. |
+| 1 | Open **Find**, choose **Contact**, add **First Name**, **Last Name** and **Email**, no conditions. Set **Rows to show** to `10` and select **Run**. | Ten rows. The line above reads "Found the first 10 matching rows. Export to get every matching record." |
+| 2 | Open the **Export** menu and choose **Export to CSV**. | "Exporting: N rows so far." while it reads, then "Exported N rows." with N the total number of contacts (about 440 with sample data), not 10. A CSV downloads, named for the object and today's date. |
 | 3 | Open the CSV in a spreadsheet. | A header row of the three column labels and N data rows. Accented names (if any) read correctly. |
 | 4 | Edit one sample contact's **Title** to `=1+1` and save. Export again and open the file. | That cell reads `'=1+1` (a leading single quote), so the spreadsheet does not calculate it. |
-| 5 | Select **Export to Excel**. | An .xlsx file downloads with the same rows and a header row. |
+| 5 | In the **Export** menu, choose **Export to Excel**. | An .xlsx file downloads with the same rows and a header row. |
 
 **Cleanup:** clear the Title you set in step 4.
 
@@ -78,7 +78,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Run a Contact query with no conditions and three columns, as in T-FIND-04. | Rows are shown. |
-| 2 | Select **Export to Files**. | "Export to Files started. You can leave this page: BarnCRM tells you when the files are ready." Then "Exporting: X of Y chunks done." |
+| 2 | In the **Export** menu, choose **Export to Files**. | "Export to Files started. You can leave this page: BarnCRM tells you when the files are ready." Then "Exporting: X of Y chunks done." |
 | 3 | Wait until it finishes. | "Ready: 1 CSV files in your Files (Owned by Me). Delete them there once downloaded." and **Files:** with a link to the file. A bell notification arrives. |
 | 4 | Open **Files**, **Owned by Me**. | The CSV is there, named for the object, the date and the part. It holds every contact. |
 
@@ -93,14 +93,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, build the T-FIND-01 query. Type `Test Garcias` in **Query name** and select **Save**. | "Saved Test Garcias." |
-| 2 | Select **New query**, then open **Test Garcias** from **Saved queries**. | The object, columns, condition and sort come back as saved. |
-| 3 | Select **Save as**, name it `Test Garcias copy`. | "Saved Test Garcias copy." Both are listed in **Saved queries**. |
+| 2 | Select **New Query**, then open **Test Garcias** from **Saved queries**. | The object, columns, condition and sort come back as saved. |
+| 3 | Type `Test Garcias copy` in **Query name**, open the **More Query Actions** menu next to **Save**, and choose **Save As**. | "Saved Test Garcias copy." Both are listed in **Saved queries**. |
 | 4 | Open **Test Garcias**, tick **Show to everyone who uses Find**, and select **Save**. | Saved. |
 | 5 | Log in as staff, open **Find**, and open **Saved queries**. | **Test Garcias** is listed as "Test Garcias (shared by" plus the admin's name. **Test Garcias copy** is not listed. |
-| 6 | As staff, open the shared query and select **Run**. | The same Garcia rows. **Save** and **Delete** are disabled for it; **Save as** is enabled. |
-| 7 | As admin, open **Test Garcias** and select **Delete**. | A dialog "Delete this saved query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
+| 6 | As staff, open the shared query and select **Run**. | The same Garcia rows. **Save** and, in the menu next to it, **Delete** are disabled for it; **Save As** is enabled. |
+| 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete this saved query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
 | 8 | Select **Keep it**. | The dialog closes; the query is still listed. |
-| 9 | Select **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved queries** for admin and staff. |
+| 9 | Choose **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved queries** for admin and staff. |
 
 **Cleanup:** delete **Test Garcias copy**; remove **BarnCRM Find and Export** from staff.
 
@@ -126,7 +126,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Build the T-FIND-01 query (Contact, Last Name equals Garcia) and **Run** it. Note the row count. | "N rows shown." |
+| 1 | Build the T-FIND-01 query (Contact, Last Name equals Garcia) and **Run** it. Note the row count. | "N rows found." |
 | 2 | Under **Summarize**, choose **Count of records** in **Summary**, **No grouping (one line)** in **Group by**, and select **Summarize**. | A table with **Group** and **Result**: one line whose result is N. |
 | 3 | Choose **Group by** **First Name** and select **Summarize**. | One line per first name; the results add up to N. |
 | 4 | Change the condition to Last Name equals `Nobodyzz` and select **Summarize**. | "No records match, so there is nothing to summarize." |
@@ -143,8 +143,23 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Log in as read-only. Search the App Launcher for "Find". | No BarnCRM **Find** tab. |
 | 2 | Log in as staff and repeat. | No **Find** tab. |
 | 3 | As admin, on BarnCRM Settings, **Access**, give staff **BarnCRM Find and Export** under **Extra Permissions**. Log in as staff again. | The **Find** and **Data Manager** tabs are available. |
-| 4 | As staff, run a Contact query. | Results show. **Run**, **Export to CSV**, **Export to Excel**, **Export to Files** and **Summarize** are offered; **Bulk Update** and **Bulk Delete** are not. Cells show no edit pencil. |
+| 4 | As staff, run a Contact query. | Results show. **Run**, the **Export** menu (**Export to CSV**, **Export to Excel**, **Export to Files**) and **Summarize** are offered; there is no **Change Records** menu (no **Bulk Update** or **Bulk Delete**). Cells show no edit pencil. |
 | 5 | As staff, open an object staff cannot read (if your org has one), or ask admin to note a field staff cannot see. | That object is not offered, and that field is not offered as a column or a condition. |
 | 6 | As admin, remove **BarnCRM Find and Export** from staff. Log in as staff. | **Find** is gone again. |
 
 **Cleanup:** none (step 6 resets staff).
+
+## T-FIND-10: Show More and the Change Records Menu
+
+**Purpose:** confirm long results show 25 rows at a time while exports keep every row, and that Bulk Update and Bulk Delete sit in one Change Records menu.
+**Prerequisites:** admin with **BarnCRM Bulk Delete** (BarnCRM Settings, **Access**, **Extra Permissions**); sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Find**, choose **Contact**, add **First Name** and **Last Name**, no conditions, leave **Rows to show** at 200, and select **Run**. | "Found the first 200 matching rows. Export to get every matching record." The table shows 25 rows, and under it "Showing 25 of 200 rows." with **Show More**. The page is not thousands of pixels long. |
+| 2 | Select **Show More** twice. | 75 rows; the line reads "Showing 75 of 200 rows." |
+| 3 | In the **Export** menu, choose **Export to CSV** and open the file. | Every contact (about 440 with sample data), not 75 or 200. |
+| 4 | Open the **Change Records** menu. | **Bulk Update** and, last, **Bulk Delete**. |
+| 5 | Choose **Bulk Update**. | The **Bulk Update** panel opens right under the buttons, above **Results**. Select **Close**; nothing changed. |
+
+**Cleanup:** none (nothing was changed or deleted).

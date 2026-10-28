@@ -269,16 +269,16 @@
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Line above the results. {0}: rows shown.</shortDescription>
-        <value>{0} rows shown.</value>
+        <shortDescription>Line above the results. {0}: rows found.</shortDescription>
+        <value>{0} rows found.</value>
     </labels>
     <labels>
         <fullName>Core_Find_ResultsCapped</fullName>
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Line when results reached rows to show. {0}: rows shown.</shortDescription>
-        <value>Showing the first {0} rows. Export to get every matching record.</value>
+        <shortDescription>Line when results reached rows to show. {0}: rows read.</shortDescription>
+        <value>Found the first {0} matching rows. Export to get every matching record.</value>
     </labels>
     <labels>
         <fullName>Core_Find_NoResults</fullName>
@@ -341,8 +341,8 @@
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that saves a copy of the query under a new name.</shortDescription>
-        <value>Save as</value>
+        <shortDescription>Menu item that saves a copy of the query under a new name.</shortDescription>
+        <value>Save As</value>
     </labels>
     <labels>
         <fullName>Core_Find_Delete</fullName>
@@ -358,7 +358,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that clears Find to start a new query.</shortDescription>
-        <value>New query</value>
+        <value>New Query</value>
     </labels>
     <labels>
         <fullName>Core_Find_SavedNotice</fullName>
@@ -431,5 +431,125 @@
         <protected>false</protected>
         <shortDescription>Assistive text while Find works.</shortDescription>
         <value>Working</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Purpose</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One-line purpose under the Find page header.</shortDescription>
+        <value>Find records, then export them, save the query, or change them all at once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_GuideUrl</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Learn More link in the Find help: the admin guide page.</shortDescription>
+        <value>https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/find.md</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EmptyHeading</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Empty state heading before an object is chosen.</shortDescription>
+        <value>Choose What to Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EmptyMessage</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Empty state line before an object is chosen.</shortDescription>
+        <value>Pick an object, or open a saved query, to start.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_NoResultsHeading</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Empty state heading when a query matched nothing.</shortDescription>
+        <value>No Matching Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ShowQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Collapsed section holding the read-only SOQL and Type a Query.</shortDescription>
+        <value>Show Query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Results</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading over the Find results table.</shortDescription>
+        <value>Results</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ShowMore</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button under the results that shows the next rows.</shortDescription>
+        <value>Show More</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ShowingOf</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Line beside Show More. {0}: rows on screen, {1}: rows found.</shortDescription>
+        <value>Showing {0} of {1} rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportMenu</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Menu holding Export to CSV, Excel and Files.</shortDescription>
+        <value>Export</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChangeRecords</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Menu holding Bulk Update and Bulk Delete.</shortDescription>
+        <value>Change Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SaveHeading</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading over the save query fields.</shortDescription>
+        <value>Save This Query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_MoreQueryActions</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Screen reader name of the menu next to Save (Save As, Delete).</shortDescription>
+        <value>More Query Actions</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_StartUpdate</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Note when Find opens from the Update Many Records card.</shortDescription>
+        <value>Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_StartDelete</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Note when Find opens from the Delete Many Records card.</shortDescription>
+        <value>Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete.</value>
     </labels>
 </CustomLabels>
