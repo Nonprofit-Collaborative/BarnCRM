@@ -2354,7 +2354,7 @@ Maria load the same payment processor export every month without rebuilding the 
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Name | text | yes | The template's name as the admin sees it, for example "Generic contact list". |
+| Name | text | yes | The template's name as the admin sees it, for example "People and Organizations List" ("Generic contact list" in an org installed before D-136). |
 | Description | long text | no | What kind of file this template reads, with an example of its columns. |
 | Template Key | text | yes | The stable identifier of this template, matching the shipped default it came from; unique. |
 | Column Mapping | long text | yes | The mapping from source column names to canonical targets, held as a mapping document (see R-IT1). |
@@ -2756,7 +2756,15 @@ the mapping loads a gift; an empty value means the org's default (ADR-0052). A c
 read them: it runs under the values its dry run recorded on the batch (R-IB11, R-DM7), so a
 template edited after the dry run changes the next dry run, not the commit.
 
-**R-IT5 What ships.** Core ships the generic contact list template (v0.2); Giving ships the
+**R-IT5 What ships.** Core ships three people templates: the generic contact list (v0.2; key
+`generic_contact_list`, named "People and Organizations List" since D-136, a name only a new
+materialization takes, so an existing copy keeps its name), `organization_list` (organizations
+only, matched by name) and `couples_and_households` (Contact 1 and Contact 2 columns with a
+household name), both added at install and on upgrade (D-55, D-136). An admin starts another
+people or gift template from an existing one ("Start a New Template From This One", D-136):
+a new row, `Template_Key__c` `copy_` and a random number, with the source's mapping, default
+values, matching, duplicate rule and payment matching fields copied, not shipped, not
+recurring, never loaded; a one-object template is not copied. Giving ships the
 generic gift list template. The migration templates (v0.5) are rows of the same type, and
 all of them ship from Giving, the way Giving ships its rollup definition defaults, so they
 are created only in an org that has Giving. That includes the two that load only people,
@@ -9101,6 +9109,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-28 | Account record types (ADR-0141, D-134). The Organization record type is no longer shipped: Section 8 gains R-O4 (organizations are the accounts of the record type the org chose, or of none) and R-O5 (detection), and the formula field `Account.Is_Organization__c` (Checkbox). `BarnCRM_Settings__c` gains `Organization_Record_Type__c` (text, Section 12). `Setting_Definition__mdt.Data_Type__c` gains RecordType. Section 5: no user is given the Household record type; households are created only by `HouseholdWriter` in system mode, and the new permission set `BarnCRM_Households` carries only the Households tab, given while Household Upkeep is on. Import (R-IT ID and matching rules) and matching gifts read R-O4 instead of a record type name. |
 | v0.11 | 2026-10-28 | Security review fixes (Core, owner-approved 2026-10-28). No object or field added. BarnCRM Read Only loses Read and Create on `Merge_Settlement_Ready__e`; its subscriber settles only the records the event's publisher (`CreatedById`) may edit. `ErrorLogEventHandler` sets `Error_Log__c.User__c` from the event's `CreatedById`, not the payload's `User_Id__c`. |
 | v0.8 | 2026-10-28 | Integrations page shows no install links (owner decision). The Install URL field removed from `Integration_App__mdt` (Section 13) and from its shipped records; nothing else read it. The Module Manager's install links are unchanged. |
+| v0.8 | 2026-10-28 | Import templates (plan D-136). No object or field added. R-IT5: Core ships `organization_list` and `couples_and_households`; the shipped `generic_contact_list` is labelled "People and Organizations List" for new materializations only; a people or gift template can be copied under a new name with key `copy_` and a random number. |
 
 ---
 ## 32. Entity ownership by package

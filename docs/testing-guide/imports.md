@@ -4,7 +4,7 @@ Scripts for the Import wizard: templates, preview, commit, rejected rows, row ru
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
-The Import tab opens from the **Data Manager** tab: on the **Import a File** card, select **Open**. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
+The Import tab opens from the **Data Manager** tab: on the **Import a File** card, select **Open**. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
 
 `import-test-1.csv` (5 rows: 3 new people, 1 existing sample person, 1 row with no last name):
 
@@ -244,3 +244,52 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | 12 | Select **Choose Something Else**. | The cards show again and **Next** is not shown. |
 
 **Cleanup:** none (the test templates may stay; they change nothing on their own).
+
+## T-IMP-13: Start a New Template From This One
+
+**Purpose:** confirm a people template can be copied from the first step, the copy is chosen for you, and the source and one-object templates are unaffected.
+**Prerequisites:** admin; the one-object template `Test cards account` from T-IMP-12 (or any one-object template in **Your Templates**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab and choose **People and Organizations**. | The first template is chosen and **Start a New Template From This One** shows under it. |
+| 2 | Select **Start a New Template From This One**. | **New template name** shows prefilled "Copy of" plus the chosen template's name, with **Create**. |
+| 3 | Clear the name. | **Create** is disabled. |
+| 4 | Enter `Test event sign-ups` and select **Create**. | The new template is chosen under **Template**, **Next** is enabled and the line under it matches the source's ("This file can create: ..."). |
+| 5 | Select **Choose Something Else**, then **Your Templates**. | **Test event sign-ups** is listed with **Not loaded yet**. |
+| 6 | Select **Choose Something Else**, choose **People and Organizations** and pick the source template again. | The source is unchanged: same name, description and creates line, and it is not marked recurring. |
+| 7 | Select **Choose Something Else**, then **Your Templates**, and select **Use This Template** on `Test cards account`. | It is chosen and **Start a New Template From This One** does not show. |
+
+**Cleanup:** from the **Import Template** record list, deactivate or delete `Test event sign-ups`.
+
+## T-IMP-14: Shipped People Templates
+
+**Purpose:** confirm the three shipped people templates exist, import what they say, and keep their names on an upgraded org.
+**Prerequisites:** admin; a new install or fresh scratch org for steps 1 to 4 (an org installed before 2026-10-28 for step 5); no real data. Save the two files below as UTF-8 CSV.
+
+`import-test-orgs.csv` (3 organizations):
+
+```
+Organization Name,Street,City,State,Postal Code,Country,Phone,Website
+Riverbend Food Pantry,10 Mill Rd,Springfield,IL,62701,United States,555-0201,https://riverbend.example.org
+Oak Street Library Friends,22 Oak St,Springfield,IL,62702,United States,555-0202,https://oakfriends.example.org
+Harbor Youth Club,5 Pier Ave,Springfield,IL,62703,United States,555-0203,https://harboryouth.example.org
+```
+
+`import-test-couples.csv` (2 rows):
+
+```
+Contact 1 First Name,Contact 1 Last Name,Contact 1 Email,Contact 1 Phone,Contact 2 First Name,Contact 2 Last Name,Contact 2 Email,Contact 2 Phone,Household Name,Street,City,State,Postal Code,Country
+Mira,Tolliver,mira.tolliver@example.org,555-0301,Dean,Tolliver,dean.tolliver@example.org,555-0302,Tolliver Household,7 Elm Ct,Springfield,IL,62704,United States
+Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555-0304,Ashby Household,9 Elm Ct,Springfield,IL,62704,United States
+```
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab and choose **People and Organizations**. | **People and Organizations List** is chosen first, with its creates line ("This file can create: people, households, organizations, links between people and organizations."). |
+| 2 | Open the **Template** picker. | It also lists **Organization List** and **Couples and Households**. Choosing **Organization List** shows "This file can create: organizations."; choosing **Couples and Households** shows "This file can create: people, a second person per row, households." |
+| 3 | Choose **Organization List**, select **Next**, upload `import-test-orgs.csv`, select **Next** through the column check, then **Preview**. Import. | The preview shows **would create** 3 and **would be rejected** 0. After the import, the three organizations exist with the street, city, state, postal code and country in the billing address, plus phone and website, and no new people or households. |
+| 4 | Select **Import Another File**, choose **People and Organizations**, then **Couples and Households**, upload `import-test-couples.csv`, preview and import. | The preview shows **would create** 2 (one per row) and **would be rejected** 0. After the import, **Tolliver Household** holds Mira and Dean Tolliver and **Ashby Household** holds Nell and Omar Ashby: one household with two members per row. |
+| 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Import tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
+
+**Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).

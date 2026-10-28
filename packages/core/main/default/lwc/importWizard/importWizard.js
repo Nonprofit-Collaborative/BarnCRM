@@ -133,6 +133,10 @@ import useTemplate from '@salesforce/label/c.Core_Import_UseTemplate';
 import lastLoaded from '@salesforce/label/c.Core_Import_LastLoaded';
 import notLoadedYet from '@salesforce/label/c.Core_Import_NotLoadedYet';
 import noDeleteForObject from '@salesforce/label/c.Core_Import_NoDeleteForObject';
+import copyTemplateButton from '@salesforce/label/c.Core_Import_CopyTemplateButton';
+import copyTemplateNameLabel from '@salesforce/label/c.Core_Import_CopyTemplateNameLabel';
+import copyTemplateDefaultName from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
+import copyTemplate from '@salesforce/apex/ImportController.copyTemplate';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import {
   KIND_PEOPLE,
@@ -143,6 +147,7 @@ import {
   OBJECT_KINDS,
   kindCards,
   templatesOfKind,
+  firstTemplateOfKind,
   createsText
 } from './importKinds';
 import loadObjectLabel from '@salesforce/label/c.Core_Import_LoadObjectLabel';
@@ -284,6 +289,9 @@ export default class ImportWizard extends LightningElement {
   templateId;
   /** The first step's choice (D-136), or empty while the cards are shown. */
   importKind;
+  /** A new template being started from the chosen one (D-136), and its name. */
+  copyingTemplate = false;
+  copyName = '';
   /** Whether the chosen mapping is for a file that arrives regularly, and its name (R-IT6). */
   isRecurring = false;
   sourceName = '';
@@ -433,6 +441,8 @@ export default class ImportWizard extends LightningElement {
     useTemplate,
     lastLoaded,
     notLoadedYet,
+    copyTemplateButton,
+    copyTemplateNameLabel,
     loadObjectLabel,
     loadObjectNameLabel,
     loadObjectCreateButton,
@@ -547,10 +557,11 @@ export default class ImportWizard extends LightningElement {
     this.importKind = kind;
     this.templateId = undefined;
     this.choosingObject = false;
+    this.copyingTemplate = false;
     if (this.picksFromKind) {
-      const offered = templatesOfKind(this.templates, kind);
-      if (offered.length > 0) {
-        this.selectTemplate(offered[0].id);
+      const first = firstTemplateOfKind(this.templates, kind);
+      if (first) {
+        this.selectTemplate(first.id);
       }
     } else if (OBJECT_KINDS.includes(kind)) {
       this.handleChooseObject();
@@ -562,11 +573,44 @@ export default class ImportWizard extends LightningElement {
     this.importKind = undefined;
     this.templateId = undefined;
     this.choosingObject = false;
+    this.copyingTemplate = false;
   }
 
   handleUseTemplate(event) {
     this.message = undefined;
     this.selectTemplate(event.currentTarget.dataset.templateId);
+  }
+
+  /** People and gift templates can be started again under a new name (D-136). */
+  get canCopyTemplate() {
+    return this.hasChosenTemplate && !this.loadsOneObject;
+  }
+
+  get cannotCreateCopy() {
+    return !String(this.copyName || '').trim();
+  }
+
+  handleStartCopy() {
+    this.message = undefined;
+    this.copyingTemplate = true;
+    this.copyName = copyTemplateDefaultName.replace('{0}', this.selectedTemplate.name);
+  }
+
+  handleCopyNameChange(event) {
+    this.copyName = event.target.value;
+  }
+
+  /** Copies the chosen template, adds it to the list and chooses it. */
+  async handleCreateCopy() {
+    this.message = undefined;
+    try {
+      const created = await copyTemplate({ templateId: this.templateId, name: this.copyName });
+      this.templates = this.templates.concat([created]);
+      this.selectTemplate(created.id);
+      this.copyingTemplate = false;
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
   }
 
   get templateOptions() {
@@ -590,6 +634,7 @@ export default class ImportWizard extends LightningElement {
 
   selectTemplate(templateId) {
     this.templateId = templateId;
+    this.copyingTemplate = false;
     const template = this.selectedTemplate;
     if (template && template.matchingRule) {
       this.matchingRule = template.matchingRule;

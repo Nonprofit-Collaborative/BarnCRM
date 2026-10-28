@@ -24,6 +24,7 @@ import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 import openRetry from '@salesforce/apex/ImportController.openRetry';
+import copyTemplate from '@salesforce/apex/ImportController.copyTemplate';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
 
@@ -133,6 +134,14 @@ jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: 
 jest.mock('@salesforce/apex/ImportController.openRetry', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/ImportController.copyTemplate', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_Import_CopyTemplateDefaultName',
+  () => ({ default: 'Copy of {0}' }),
+  { virtual: true }
+);
 // The workbook reader runs for real (jsdom has no DecompressionStream, so a real workbook
 // cannot be opened here); a test that needs sheets gives their contents once.
 jest.mock('../xlsx', () => {
@@ -352,6 +361,50 @@ describe('the import wizard', () => {
         'c.Core_Import_CreatesAffiliations.'
     );
     expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
+  });
+
+  it('starts People and Organizations on the general template, whatever its name', async () => {
+    getTemplates.mockResolvedValue([
+      { ...TEMPLATE, id: 'a10', name: 'Couples and Households', templateKey: 'couples' },
+      { ...TEMPLATE, name: 'People and Organizations List', templateKey: 'generic_contact_list' }
+    ]);
+    const element = render();
+    await flush();
+    await chooseKind(element, 'people');
+    expect(element.shadowRoot.querySelector('[data-id="template"]').value).toBe('a01');
+  });
+
+  it('starts a new people template from the chosen one and chooses it', async () => {
+    copyTemplate.mockResolvedValue({ ...TEMPLATE, id: 'a11', name: 'Event sign-ups' });
+    const element = await open();
+    click(element, 'start-copy');
+    await flush();
+    const name = element.shadowRoot.querySelector('[data-id="copy-name"]');
+    expect(name.value).toBe('Copy of Generic contact list');
+    name.value = 'Event sign-ups';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'create-copy');
+    await flush();
+
+    expect(copyTemplate).toHaveBeenCalledWith({ templateId: 'a01', name: 'Event sign-ups' });
+    const picker = element.shadowRoot.querySelector('[data-id="template"]');
+    expect(picker.value).toBe('a11');
+    expect(picker.options.map((option) => option.value)).toEqual(['a01', 'a11']);
+    expect(element.shadowRoot.querySelector('[data-id="copy-name"]')).toBeNull();
+  });
+
+  it('says why a new template could not be started, and stays put', async () => {
+    copyTemplate.mockRejectedValue({ body: { message: 'Give the template a name.' } });
+    const element = await open();
+    click(element, 'start-copy');
+    await flush();
+    click(element, 'create-copy');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'Give the template a name.'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="copy-name"]')).not.toBeNull();
   });
 
   it('lists every template under Your Templates with what it loads and when', async () => {
@@ -1753,6 +1806,8 @@ describe('the import wizard loading one object', () => {
     );
     expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
     expect(element.shadowRoot.querySelector('[data-id="new-object"]')).toBeNull();
+    // One Kind of Record makes a new one-object template; there is nothing to copy.
+    expect(element.shadowRoot.querySelector('[data-id="start-copy"]')).toBeNull();
   });
 
   it('starts a template made from the related records card on upsert', async () => {

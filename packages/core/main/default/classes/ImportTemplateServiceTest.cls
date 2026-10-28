@@ -543,4 +543,91 @@ private class ImportTemplateServiceTest {
             );
         }
     }
+
+    private static Map<String, Import_Template__c> templatesByKey() {
+        Map<String, Import_Template__c> byKey = new Map<String, Import_Template__c>();
+        for (Import_Template__c template : [
+            SELECT Id, Name, Template_Key__c, Column_Mapping_JSON__c
+            FROM Import_Template__c
+        ]) {
+            byKey.put(template.Template_Key__c, template);
+        }
+        return byKey;
+    }
+
+    private static Set<String> targetsOf(Import_Template__c template) {
+        Set<String> targets = new Set<String>();
+        for (
+            ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c)
+                .getColumns()
+        ) {
+            targets.add(column.target);
+        }
+        return targets;
+    }
+
+    @IsTest
+    static void aNewInstallShipsTheThreePeopleTemplatesUnderTheirNames() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            ImportTemplateService.materializeDefaults();
+            Test.stopTest();
+
+            Map<String, Import_Template__c> byKey = templatesByKey();
+            Assert.areEqual(
+                'People and Organizations List',
+                byKey.get('generic_contact_list').Name,
+                'The general people template has its new name on a new install (D-136).'
+            );
+            Import_Template__c organizations = byKey.get('organization_list');
+            Assert.areEqual('Organization List', organizations.Name, 'Organization List ships.');
+            Assert.isTrue(
+                targetsOf(organizations).contains('Organization.Name') &&
+                targetsOf(organizations).contains('Organization.BillingStreet'),
+                'It reads organization columns: ' + targetsOf(organizations)
+            );
+            Assert.isFalse(
+                targetsOf(organizations).contains('Contact1.LastName'),
+                'And no person columns.'
+            );
+            Import_Template__c couples = byKey.get('couples_and_households');
+            Assert.areEqual('Couples and Households', couples.Name, 'Couples ships.');
+            Assert.isTrue(
+                targetsOf(couples).contains('Contact2.FirstName') &&
+                targetsOf(couples).contains('Household.Name'),
+                'It reads a second person and the household name: ' + targetsOf(couples)
+            );
+        }
+    }
+
+    @IsTest
+    static void anUpgradeAddsTheNewTemplatesAndNeverRenamesTheOldOne() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c existing = ImportTestDataFactory.template(
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            existing.Template_Key__c = 'generic_contact_list';
+            existing.Name = 'Generic contact list';
+            existing.Is_Package_Default__c = true;
+            update existing;
+
+            Test.startTest();
+            ImportTemplateService.materializeDefaults();
+            Test.stopTest();
+
+            Map<String, Import_Template__c> byKey = templatesByKey();
+            Assert.areEqual(existing.Id, byKey.get('generic_contact_list').Id, 'No second copy.');
+            Assert.areEqual(
+                'Generic contact list',
+                byKey.get('generic_contact_list').Name,
+                'The rename is for new installs only (D-136).'
+            );
+            Assert.isTrue(byKey.containsKey('organization_list'), 'Organization List is added.');
+            Assert.isTrue(
+                byKey.containsKey('couples_and_households'),
+                'Couples and Households is added.'
+            );
+        }
+    }
 }
