@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: templates column, the recurring source name</shortDescription>
-        <value>Arrives regularly as</value>
+        <value>Arrives Regularly As</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ColumnLastLoaded</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: templates column, the last import date</shortDescription>
-        <value>Last loaded</value>
+        <value>Last Loaded</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_LoadsPeople</fullName>

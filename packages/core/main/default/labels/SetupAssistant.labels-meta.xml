@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: link to the guide for giving new users a role automatically</shortDescription>
-        <value>Set up automatic access</value>
+        <value>Set Up Automatic Access</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_BackButton</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: heading of the Hub tile shown once setup is finished</shortDescription>
-        <value>Setup complete</value>
+        <value>Setup Complete</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ConfirmButton</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that puts the chosen coexistence mode in force</shortDescription>
-        <value>Confirm and continue</value>
+        <value>Confirm and Continue</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_CreateUserLink</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: link to the Setup page where a Salesforce user is created</shortDescription>
-        <value>Create a user in Setup</value>
+        <value>Create a User in Setup</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_DoneBadge</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that gives the chosen person the chosen role</shortDescription>
-        <value>Give access</value>
+        <value>Give Access</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Heading</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the checklist heading</shortDescription>
-        <value>Setup checklist</value>
+        <value>Setup Checklist</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ImportButton</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the Import tab</shortDescription>
-        <value>Import a spreadsheet</value>
+        <value>Import a Spreadsheet</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ImportMissingNotice</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the sample data panel</shortDescription>
-        <value>Load the sample data</value>
+        <value>Load the Sample Data</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModeNonprofitCloud</fullName>
@@ -270,7 +270,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: link to where a step's answers live in Settings</shortDescription>
-        <value>Where this lives in Settings</value>
+        <value>Where This Lives in Settings</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ProgressFormat</fullName>
@@ -310,7 +310,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the finished assistant again</shortDescription>
-        <value>Reopen setup</value>
+        <value>Reopen Setup</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_RoleLabel</fullName>
@@ -390,7 +390,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that moves past a step without finishing it</shortDescription>
-        <value>Skip for now</value>
+        <value>Skip for Now</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SkippedBadge</fullName>
@@ -406,7 +406,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that forgets recorded progress and runs setup again</shortDescription>
-        <value>Start setup again</value>
+        <value>Start Setup Again</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step1Description</fullName>

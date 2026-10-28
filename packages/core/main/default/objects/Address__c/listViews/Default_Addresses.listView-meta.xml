@@ -15,5 +15,5 @@
     <operation>equals</operation>
     <value>1</value>
   </filters>
-  <label>Addresses In Use</label>
+  <label>Addresses in Use</label>
 </ListView>

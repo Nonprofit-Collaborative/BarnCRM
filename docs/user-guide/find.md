@@ -1,4 +1,4 @@
-# Finding people and records
+# Finding People and Records
 
 Most days you only need to find one person or one household. Global search and list views
 do that. When you need a precise list (everyone in one city with no email, every household
@@ -11,7 +11,7 @@ feature. Ask your admin. See [Find and export](../admin-guide/find.md).
 Whatever you search or export, you only ever see records and fields your own access allows.
 A colleague may see more or fewer rows than you for the same query.
 
-## To find one record with global search
+## To Find One Record with Global Search
 
 1. Click the search box at the top of any Salesforce page.
 2. Type part of a name, an email address or a phone number.
@@ -19,7 +19,7 @@ A colleague may see more or fewer rows than you for the same query.
 
 You should see: the record open in its own tab (in the **BarnCRM** app).
 
-## To use a list view
+## To Use a List View
 
 1. Open the **Households**, **Organizations** or **Contacts** tab.
 2. On **Households** and **Organizations**, the tab shows the list of that name. On
@@ -30,7 +30,7 @@ You should see: the **Households** list with the household name, **Member Count*
 **Informal Greeting** and **Custom Name**; the **Organizations** list with the name, phone and
 **Primary Contact**.
 
-## To build and run a query in Find
+## To Build and Run a Query in Find
 
 1. Open the **Find** tab.
 2. In **Object**, choose what to look for, for example **Contact** or **Account**.
@@ -49,7 +49,7 @@ match, the line says "Showing the first 200 rows. Export to get every matching r
 
 **Query (read only)** under the conditions shows the query in SOQL. You never need to read it.
 
-## To keep only records that have (or lack) related records
+## To Keep Only Records That Have (or Lack) Related Records
 
 1. Under **Related records**, press **Add related records**.
 2. Choose **Has related records** or **Has no related records**.
@@ -58,9 +58,9 @@ match, the line says "Showing the first 200 rows. Export to get every matching r
 5. Press **Run**.
 
 You should see: only the records that match. To show related records in a column instead,
-use **Related record columns** and **Add a related record column**.
+use **Related Record Columns** and **Add a Related Record Column**.
 
-## To count or total instead of listing
+## To Count or Total Instead of Listing
 
 1. Build the query, then press **Summarize**.
 2. In **Summary**, choose **Count of records**, **Total of**, **Lowest** or **Highest**, and
@@ -70,7 +70,7 @@ use **Related record columns** and **Add a related record column**.
 
 You should see: a table with one line per group. Blank values show as "(blank)".
 
-## To save and share a query
+## To Save and Share a Query
 
 1. Run the query, type a **Query name**.
 2. Optional: tick **Show to everyone who uses Find** to share it.
@@ -80,7 +80,7 @@ You should see: "Saved" followed by the name. To open it later, choose it in **S
 queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
 (shared by Maria Lopez)". Only the person who saved a query can change, share or delete it.
 
-## To delete a saved query
+## To Delete a Saved Query
 
 1. Open the query from **Saved queries** and press **Delete**.
 2. In "Delete this saved query?", press **Delete**, or **Keep it** to leave it.
@@ -88,7 +88,7 @@ queries**. Queries shared with you show the sharer's name, for example "Springfi
 You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
 removed for everyone.
 
-## To export the results
+## To Export the Results
 
 1. Run the query.
 2. Press **Export to CSV** or **Export to Excel**. Every matching record is exported, not only
@@ -100,7 +100,7 @@ to Files started. You can leave this page: BarnCRM tells you when the files are 
 it finishes, the page lists the files and the bell shows a notification. The files are in
 Salesforce **Files**, **Owned by Me**. Delete them there once downloaded.
 
-## To type a query instead (optional)
+## To Type a Query Instead (Optional)
 
 1. Press **Type a query**.
 2. Type or paste a query in **Query (SOQL)** (SELECT, FROM, WHERE, ORDER BY and LIMIT).
@@ -108,7 +108,7 @@ Salesforce **Files**, **Owned by Me**. Delete them there once downloaded.
 
 You should see: the builder filled in from your text, ready to run.
 
-## Common problems
+## Common Problems
 
 - Problem: "Find needs the Find and Export Records permission. Ask your administrator to
   assign you the BarnCRM Find and Export permission set." You do not have the add-on. Ask your

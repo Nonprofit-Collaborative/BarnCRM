@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: heading and button of the one-object mapping section</shortDescription>
-        <value>Load one object</value>
+        <value>Load One Object</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadObjectHelp</fullName>

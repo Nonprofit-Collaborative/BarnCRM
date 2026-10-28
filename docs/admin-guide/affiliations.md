@@ -1,6 +1,6 @@
 # Affiliations
 
-## What it does
+## What It Does
 
 Affiliations records a person's connection to an organization: where someone works, which
 board they sit on, the club they belong to, or the school where they teach. One person can be connected to as many organizations as they really are, each with
@@ -11,10 +11,10 @@ The point of keeping this as its own record is that a person who works at a comp
 in their own household. Their history, their letters, and everything else you hold about them
 are unchanged; you have simply written down where they work.
 
-## How to turn it on
+## How to Turn It On
 
 Affiliations is part of Core, but on a new install it is off until you turn it on. In
-**BarnCRM Settings**, **General**, choose **Turn on** in the **Affiliations** row (or leave
+**BarnCRM Settings**, **General**, choose **Turn On** in the **Affiliations** row (or leave
 it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
 to install and no Setup step, and no setting to choose once it is on: an affiliation means
 the same thing in every organization, so there is nothing to configure.
@@ -41,7 +41,7 @@ affiliation, or finds the one they already have (see [Importing](importing.md), 
 To let your team see and manage affiliations, make sure they have one of the packaged access
 levels (BarnCRM Admin, Team Member, Coordinator, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them: the Affiliations
-card shows them no **Add affiliation** or **Make primary** button.
+card shows them no **Add Affiliation** or **Make Primary** button.
 
 The upkeep does not depend on what the person saving can see or edit. Someone who may add an
 affiliation but cannot edit the person it belongs to, or cannot see that person's other
@@ -57,10 +57,10 @@ they are chiefly associated with, which you can put on a list view or a mail mer
 
 The card reads and saves affiliations as the person using it, through Salesforce's own record
 service, so it shows exactly what their object and field access allows. An affiliation
-edited elsewhere on the page shows on the card without a reload, and after **Make primary**
+edited elsewhere on the page shows on the card without a reload, and after **Make Primary**
 the person's **Primary Affiliation** field refreshes too.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are Maria. A colleague is planning an outreach to local employers and needs to know who
 among your contacts works where. Start from the sample data.
@@ -69,23 +69,23 @@ among your contacts works where. Start from the sample data.
    choose **Harper Garcia**.
 2. Scroll to the **Affiliations** card. It is empty, and it says "No affiliations on file
    yet."
-3. Choose **Add affiliation**. Fill in:
+3. Choose **Add Affiliation**. Fill in:
    - **Organization**: Bayview Hardware
    - **Role**: Store Manager
    - **Status**: leave it as Current
    - **Primary**: select it
    - **Start date**: January 1 of last year
-   Choose **Add affiliation** in the form.
+   Choose **Add Affiliation** in the form.
 4. The card shows one line: Bayview Hardware, Store Manager, with a **Primary** badge on
    it. A current affiliation carries no status badge. Look at the top of Harper's record: **Primary Affiliation** now
    reads Bayview Hardware. You did not fill that in.
 5. Open **Bayview Hardware** from the **Organizations** tab. Its **Affiliations** card
    shows Harper Garcia, Store Manager. The same record, read from the organization's side.
-6. Go back to Harper and choose **Add affiliation** again:
+6. Go back to Harper and choose **Add Affiliation** again:
    - **Organization**: Heritage Rotary Club
    - **Role**: Club president
    - **Primary**: select it
-   Choose **Add affiliation** in the form. The card now shows two lines, and the **Primary** badge has moved to
+   Choose **Add Affiliation** in the form. The card now shows two lines, and the **Primary** badge has moved to
    Heritage Rotary Club. The Bayview Hardware line is still there, still Current, and is no
    longer primary. **Primary Affiliation** at the top of the record now reads Heritage
    Rotary Club. Only one organization can be primary at a time, and you never have to clear
@@ -99,7 +99,7 @@ among your contacts works where. Start from the sample data.
 8. Check the Households tab. Harper is still in The Garcia Family, exactly where she was.
    Nothing about an affiliation moves a person.
 
-## List views and what ships ready to use
+## List Views and What Ships Ready to Use
 
 The **Affiliations** tab opens with four list views: **All Affiliations**, **Current
 Affiliations**, **Former Affiliations** (with the end date) and **My Affiliations** (the ones you
@@ -109,7 +109,7 @@ There is no list of roles to set up: **Role** is free text, so a new org can add
 straight away, with no sample data. Affiliations themselves are not shipped, because they
 connect your own people and organizations.
 
-## Common mistakes
+## Common Mistakes
 
 **Expecting an affiliation to move the person to the organization.** It does not, and that
 is the whole reason affiliations exist as records. In systems that put a person "at" a

@@ -1,4 +1,4 @@
-# Moving Rollups from Rollup Helper
+# Moving Rollups From Rollup Helper
 
 Rollup Helper (by Passage Technology, managed namespace `rh2`) is a separate rollup tool. When
 it is installed, the **Rollup Builder** tab says so under **Other Rollup Tools**, and so do the

@@ -2,7 +2,7 @@
 
 Applies to: BarnCRM main as of 2026-10-26 (commit 0566375b). Pre-release: no package version exists yet; this tracks the newest code on main.
 
-## Who this is for
+## Who This Is For
 
 This guide is for staff who use BarnCRM every day: you look people up, keep households and addresses current, enter gifts, sign volunteers up for shifts and log their hours. You are not the person who installs or configures BarnCRM.
 
@@ -12,12 +12,12 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ## Pages
 
-### Getting started
+### Getting Started
 
 - [Getting around BarnCRM](getting-around.md): the apps, tabs, Home, What's new, in-app tips and notifications.
 - [Read only access](read-only-access.md): what a person with the Read Only role can and cannot do.
 
-### People and households
+### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
@@ -42,7 +42,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
 
-## Report a bug or give feedback
+## Report a Bug or Give Feedback
 
 If something in BarnCRM or in this guide is wrong or unclear, open an issue on GitHub: [github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose](https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose). Pick **Bug report** for something that does not work as described, or **Feature request** for an idea.
 
@@ -52,7 +52,7 @@ If something in BarnCRM or in this guide is wrong or unclear, open an issue on G
 
 BarnCRM is self-service open source software: issues are read by the project, but no response or fix time is promised.
 
-## Related guides
+## Related Guides
 
 - [Overview](../overview.md): what BarnCRM is and what is built now.
 - [Admin Guide](../admin-guide/README.md): setting up and running BarnCRM.

@@ -1,6 +1,6 @@
 # Setup Assistant
 
-## What it does
+## What It Does
 
 The Setup Assistant is the guided path from "I just installed BarnCRM" to "we are
 working with real records", in under thirty minutes, without opening Salesforce Setup and
@@ -26,7 +26,7 @@ Core features to turn on; a feature cannot be turned off once on, and one left o
 turned on later in BarnCRM Settings, General (see
 [BarnCRM Settings, Features](barncrm-settings.md#features-general)).
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on. The Setup Assistant is the BarnCRM home page until you
 finish it.
@@ -35,8 +35,8 @@ finish it.
 2. Type `BarnCRM` and choose **BarnCRM**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
-When every step is done, the assistant collapses to a small **Setup complete** tile that
-shows how many steps you finished. The tile has a **Reopen setup** button, so the assistant
+When every step is done, the assistant collapses to a small **Setup Complete** tile that
+shows how many steps you finished. The tile has a **Reopen Setup** button, so the assistant
 is always one click away, and it opens straight back on the first step rather than on the
 completion screen.
 
@@ -55,13 +55,13 @@ Two things sit outside the assistant, because Salesforce does not let an app do 
   to what each one does. You click through Salesforce's install screens yourself: BarnCRM
   never installs anything for you.
 
-## A five-minute walkthrough, and then the nine steps
+## A Five-Minute Walkthrough, and Then the Nine Steps
 
 Maria has just installed BarnCRM Core and the Giving module in her organization's
 Salesforce org. That org has Person Accounts turned on, which matters in step two and
 nowhere else. She has half an hour before her next meeting.
 
-### Before you start
+### Before You Start
 
 Have these to hand. Every one of them is optional, and every one of them is faster to have
 ready than to go and find:
@@ -72,7 +72,7 @@ ready than to go and find:
 - With Giving: your logo, as a PNG or JPG file.
 - With Giving: a scan of the signature that goes on receipt letters, if you use one.
 
-### Step 1: Choose your edition
+### Step 1: Choose Your Edition
 
 BarnCRM comes in two editions built from the same parts, and both include the full core suite of tools. Any organization can choose either
 one. You choose once: the edition decides which modules BarnCRM shows and offers everywhere
@@ -85,7 +85,7 @@ org where no edition was ever saved and the window was not shown.
 - **Nonprofit Edition**: everything in the Standard Edition, plus the nonprofit tools, starting with the Giving
   module for gifts, funds and receipts. Giving is a separate package.
 
-Choose one and click **Confirm and continue**.
+Choose one and click **Confirm and Continue**.
 
 - **Standard Edition:** the assistant moves on to step two.
 - **Nonprofit Edition, Giving already installed:** the step says "Giving is installed. Its
@@ -113,12 +113,12 @@ General section of BarnCRM Settings, shows the same choice; to change it later, 
 [Editions](editions.md).
 
 **What Maria sees:** both editions, with **Nonprofit Edition** already selected because Giving
-is installed in her org. She clicks **Confirm and continue**, reads "Giving is installed",
+is installed in her org. She clicks **Confirm and Continue**, reads "Giving is installed",
 and clicks **Next**.
 
 **What she decides:** which edition fits her organization.
 
-### Step 2: Confirm how BarnCRM fits your org
+### Step 2: Confirm How BarnCRM Fits Your Org
 
 The step reads: "If your org uses Person Accounts, household membership uses the flexible way
 of belonging, with one membership record per person, so that what you already have keeps
@@ -156,7 +156,7 @@ in your org. A mode you saved earlier is always in the list, so your choice is n
 hidden. The **Coexistence mode** setting, in the General section of BarnCRM Settings,
 offers the same list. See [Coexistence mode](coexistence-mode.md).
 
-Read the recommendation, then click **Confirm and continue**. If you know something the
+Read the recommendation, then click **Confirm and Continue**. If you know something the
 detection cannot see, choose a different mode from the list first and then confirm.
 
 **What Maria sees:** the sentence about Person Accounts, **Standalone** already selected,
@@ -164,7 +164,7 @@ and one button. She clicks it. Two seconds.
 
 **What she decides:** nothing, unless she disagrees with the detection.
 
-### Step 3: Confirm how households are named
+### Step 3: Confirm How Households Are Named
 
 The assistant opens the household naming settings inside the step, with the live preview.
 Choose the pattern for the household name, the formal greeting, and the informal greeting,
@@ -181,7 +181,7 @@ default, and puts it back.
 **What she decides:** whether her households are a Family or a Household. That is genuinely
 the whole decision.
 
-### Step 4: Pick your default fund and appeal (Giving)
+### Step 4: Pick Your Default Fund and Appeal (Giving)
 
 This step comes with the **Giving** module, which is a separate package. Without Giving the
 step is not there at all, and the assistant goes straight from naming to access.
@@ -203,9 +203,9 @@ pickers. She picks the appeal and clicks **Save**.
 
 **What she decides:** where a gift goes when nobody says.
 
-### Step 5: Give your colleagues access
+### Step 5: Give Your Colleagues Access
 
-Pick one person, pick a role, and click **Give access**. The step confirms with "Access
+Pick one person, pick a role, and click **Give Access**. The step confirms with "Access
 given. Add another person, or continue.", and the person box clears so you can do the next
 one. Give access to as many colleagues as you like, one at a time. The roles are:
 
@@ -218,9 +218,9 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 | Read Only | Tom and Jen: see everything, change nothing |
 
 The person has to exist as a Salesforce user first. If someone is missing from the list,
-click **Create a user in Setup**, create them there, come back, and refresh the step.
+click **Create a User in Setup**, create them there, come back, and refresh the step.
 
-If you add people often, the step's **Set up automatic access** link opens
+If you add people often, the step's **Set Up Automatic Access** link opens
 [Automatic access](automatic-access.md): a Salesforce user access policy, created once in
 Setup, that gives each new user with your staff profile a role without this step.
 
@@ -230,12 +230,12 @@ Staff role and Tom the Read Only role. The step marks itself done.
 **What she decides:** who gets to change settings. Give that to as few people as the work
 allows: settings change how the whole org behaves.
 
-### Step 6: Set your organization's identity
+### Step 6: Set Your Organization's Identity
 
 This is the form the "before you start" list was for. Core asks for two things:
 
 - **Legal name**, exactly as on your official filings, not your nickname.
-- **Organization address**, as you want it printed, in one block laid out like a Salesforce
+- **Organization Address**, as you want it printed, in one block laid out like a Salesforce
   address: **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then
   **Country**. You can leave the whole address blank. Once you fill in any part, **Street**,
   **City**, **State** and **Zip Code** are required and are marked as required; **Street 2**
@@ -267,7 +267,7 @@ once they are uploaded. The tax identification number box says what one looks li
 **What she decides:** which name is the legal one. If you have a "doing business as" name,
 the legal name goes here and your everyday name goes on the letter text later.
 
-### Step 7: Choose which modules to turn on
+### Step 7: Choose Which Modules to Turn On
 
 A list of the BarnCRM packages that fit your org. Each says **Present** or **Not
 installed**, with a **What this module does** link to that package's description (its README on
@@ -300,14 +300,14 @@ Click **Next** when you have read it. The step marks itself done.
 **What Maria sees:** all seven packages, Core and Giving present, the other four not
 installed. She makes a note to read about Volunteers this afternoon.
 
-### Step 8: Bring in your data
+### Step 8: Bring in Your Data
 
 Two buttons, and you may use either, both, or neither:
 
-- **Load the sample data** puts about two hundred realistic households, people, and
+- **Load the Sample Data** puts about two hundred realistic households, people, and
   organizations in your org so you can practise on something that is not your real data.
   You can remove it again from the same panel.
-- **Import a spreadsheet** opens the Import tab, where you upload your file, map your
+- **Import a Spreadsheet** opens the Import tab, where you upload your file, map your
   columns, run a preview, and see what would happen before anything is created.
 
 If the Import tab is not in your org yet, the step says so rather than sending you to a
@@ -318,10 +318,10 @@ still being cleaned up.
 
 **What she decides:** practise first, or go straight to the real thing. Practise first.
 
-### Step 9: Check that everything works
+### Step 9: Check That Everything Works
 
 Follow the short walkthrough: add a person and see their household appear. With the Giving
-module installed, the step also has **Enter your first gift**, which opens the Giving
+module installed, the step also has **Enter Your First Gift**, which opens the Giving
 module's own gift entry screen: enter one gift, save it, and you have proved the whole chain
 works, from donor to household to gift. Come back to the home page afterwards and click
 **Finish**.
@@ -330,12 +330,12 @@ Click **Finish**. The assistant shows the completion screen: every step with its
 and how long setup took, measured from the first change you made.
 
 **What Maria sees:** "You are ready", her nine steps, and "Time taken: 21 minutes". Two buttons sit
-under the summary: **Reopen setup** walks the steps again with her answers intact, and
-**Start setup again** forgets the progress it recorded so the checklist starts from the
+under the summary: **Reopen Setup** walks the steps again with her answers intact, and
+**Start Setup Again** forgets the progress it recorded so the checklist starts from the
 first step. Neither of them empties a setting: a step whose answer is already saved stays
 finished, because it is.
 
-## Common mistakes
+## Common Mistakes
 
 - **Treating Skip for now as done.** Skipping moves you on without marking the step
   finished, on purpose. A skipped step shows a **Skipped** badge, not **Done**, and the next time you open

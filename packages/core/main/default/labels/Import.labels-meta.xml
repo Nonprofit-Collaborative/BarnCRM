@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import page: card heading</shortDescription>
-        <value>Import a spreadsheet</value>
+        <value>Import a Spreadsheet</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepTemplate</fullName>
@@ -446,7 +446,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: step three heading</shortDescription>
-        <value>Check the columns</value>
+        <value>Check the Columns</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepMatching</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: button that commits the import</shortDescription>
-        <value>Import these rows</value>
+        <value>Import These Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_StartOverButton</fullName>
@@ -518,7 +518,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: button that starts a new import</shortDescription>
-        <value>Import another file</value>
+        <value>Import Another File</value>
     </labels>
     <labels>
         <fullName>Core_Import_DownloadExceptionsButton</fullName>
@@ -526,7 +526,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: button that downloads the rejected rows</shortDescription>
-        <value>Download rejected rows</value>
+        <value>Download Rejected Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_UploadLabel</fullName>
@@ -550,7 +550,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: column of the picker showing the file's headings</shortDescription>
-        <value>Column in your file</value>
+        <value>Column in Your File</value>
     </labels>
     <labels>
         <fullName>Core_Import_TargetHeader</fullName>
@@ -558,7 +558,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: column of the picker showing what it becomes</shortDescription>
-        <value>What it means</value>
+        <value>What It Means</value>
     </labels>
     <labels>
         <fullName>Core_Import_SampleHeader</fullName>
@@ -566,7 +566,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: column of the picker showing sample values</shortDescription>
-        <value>First values</value>
+        <value>First Values</value>
     </labels>
     <labels>
         <fullName>Core_Import_DoNotLoad</fullName>
@@ -686,7 +686,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: heading above the run log</shortDescription>
-        <value>What happened</value>
+        <value>What Happened</value>
     </labels>
     <labels>
         <fullName>Core_Import_RejectedHeading</fullName>
@@ -694,7 +694,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: heading above the table of failed rows</shortDescription>
-        <value>Rows that were rejected</value>
+        <value>Rows That Were Rejected</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowNumberHeader</fullName>
@@ -958,7 +958,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import history: card title</shortDescription>
-        <value>Recent imports</value>
+        <value>Recent Imports</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoConfirmHeading</fullName>
@@ -1006,7 +1006,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import history: the button that starts the undo</shortDescription>
-        <value>Undo this import</value>
+        <value>Undo This Import</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoStarted</fullName>
@@ -1142,7 +1142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: control totals heading</shortDescription>
-        <value>Control totals (optional)</value>
+        <value>Control Totals (Optional)</value>
     </labels>
     <labels>
         <fullName>Core_Import_ControlTotalsHelp</fullName>
@@ -1190,7 +1190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: payment matching heading</shortDescription>
-        <value>Scheduled payments</value>
+        <value>Scheduled Payments</value>
     </labels>
     <labels>
         <fullName>Core_Import_PaymentMatchingHelp</fullName>
@@ -1414,7 +1414,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: values for every row heading</shortDescription>
-        <value>Values for every row</value>
+        <value>Values for Every Row</value>
     </labels>
     <labels>
         <fullName>Core_Import_FileValuesHelp</fullName>
@@ -1430,7 +1430,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: add a value for every row</shortDescription>
-        <value>Add a value</value>
+        <value>Add a Value</value>
     </labels>
     <labels>
         <fullName>Core_Import_RemoveFileValueLabel</fullName>

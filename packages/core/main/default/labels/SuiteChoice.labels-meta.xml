@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the link to the Giving installer</shortDescription>
-        <value>Open the Giving installer</value>
+        <value>Open the Giving Installer</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_InstallHelp</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Assistive text: a link opens in a new tab</shortDescription>
-        <value>(opens in a new tab)</value>
+        <value>(Opens in a New Tab)</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ModuleInstallLink</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Link to the admin guide page on changing the edition</shortDescription>
-        <value>How to change it later</value>
+        <value>How to Change It Later</value>
     </labels>
     <labels>
         <fullName>Core_Edition_NotChosen</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Edition change confirmation: heading</shortDescription>
-        <value>Change the edition?</value>
+        <value>Change the Edition?</value>
     </labels>
     <labels>
         <fullName>Core_Edition_ConfirmToNonprofit</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Edition change confirmation: the button that saves the change</shortDescription>
-        <value>Change edition</value>
+        <value>Change Edition</value>
     </labels>
     <labels>
         <fullName>Core_Edition_CancelButton</fullName>

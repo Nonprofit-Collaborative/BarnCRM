@@ -1,6 +1,6 @@
 # Editions
 
-## What it does
+## What It Does
 
 BarnCRM is one suite of tools that comes in two editions. Both have the full core suite of
 tools: people, households, relationships, addresses, imports with undo, Find and bulk update,
@@ -30,7 +30,7 @@ BarnCRM Settings both show until an administrator finishes it (see
 Setup Assistant's first step shows the edition you chose and no longer offers the choice,
 because changing it later is rare and changes what everyone sees.
 
-## What each edition shows
+## What Each Edition Shows
 
 These are the places that depend on the edition.
 
@@ -52,19 +52,19 @@ settings sections, Setup Assistant steps, Health Check findings, What's New note
 tabs stay, and its automation keeps running. If a module was installed by mistake, turn it off
 or uninstall it from the [Module Manager](module-manager.md); changing the edition does not.
 
-## How to change the edition later
+## How to Change the Edition Later
 
 You need the **Manage BarnCRM Settings** permission (BarnCRM Admin has it). There are two
 ways, and they do the same thing.
 
-### In BarnCRM Settings (recommended)
+### In BarnCRM Settings (Recommended)
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin**.
 2. Click **BarnCRM Settings**, then **General** in the left navigation.
 3. Find **Edition**. It shows the edition in force, for example "Standard Edition".
-4. Click **Change edition** under it. It opens a short explanation and a button for the other
+4. Click **Change Edition** under it. It opens a short explanation and a button for the other
    edition, for example **Switch to the Nonprofit Edition**.
-5. Click that button. A confirmation says what changes. Click **Change edition** to confirm,
+5. Click that button. A confirmation says what changes. Click **Change Edition** to confirm,
    or **Cancel** to leave it as it is.
 
 The change is saved at once and listed under **Recent Changes** at the bottom of BarnCRM
@@ -86,7 +86,7 @@ Recent Changes, so prefer **BarnCRM Settings, General** (above). Setting the edi
 before first-run setup does not skip it: the setup window still shows, with that edition
 already selected, so that you choose the features too.
 
-## Common mistakes
+## Common Mistakes
 
 - **Expecting the Nonprofit Edition to install BarnCRM Giving.** It only offers it. Install it from
   the Setup Assistant's first step or from the Module Manager.

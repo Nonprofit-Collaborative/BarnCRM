@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: heading of the rows to load</shortDescription>
-        <value>Rows to load</value>
+        <value>Rows to Load</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesHelp</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: heading of the skip rules</shortDescription>
-        <value>Skip rows where</value>
+        <value>Skip Rows Where</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesAddRule</fullName>

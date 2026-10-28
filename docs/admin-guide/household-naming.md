@@ -1,10 +1,10 @@
-# Household names and greetings
+# Household Names and Greetings
 
 **Feature:** C-02 Household naming and greetings
 **Package:** Core
 **Iteration:** v0.1
 
-## What it does
+## What It Does
 
 Every household gets a name and two greetings, written for you and kept up to date: the
 household name for lists and reports ("The Garcia Family"), a formal greeting for letters
@@ -17,10 +17,10 @@ they check one box and the product stops touching it. When the last person leave
 household that is kept, it keeps the name and greetings it had last, so reports still show
 which family it was.
 
-## How to turn it on
+## How to Turn It On
 
-Naming belongs to the **Household upkeep** feature, which on a new install is off until you
-turn it on: choose **Turn on** in the **Household upkeep** row in **BarnCRM Settings**,
+Naming belongs to the **Household Upkeep** feature, which on a new install is off until you
+turn it on: choose **Turn On** in the **Household Upkeep** row in **BarnCRM Settings**,
 **General** (or leave it ticked in first-run setup); see
 [BarnCRM Settings](barncrm-settings.md). Once it is on, the patterns work out of the box.
 To change them:
@@ -49,7 +49,7 @@ To change them:
 You need the "Manage BarnCRM Settings" permission to change these. Without it the page
 opens read only and says so.
 
-### Patterns and tokens
+### Patterns and Tokens
 
 A pattern is a sentence with blanks in it. The blanks are filled in from each person.
 
@@ -79,7 +79,7 @@ other way:
 - A name or greeting holds at most 255 characters. In a very large household the list
   names as many people as fit and counts the rest: "Garcia, Lee and 28 others Household".
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does steps 1 to 5. David does step 6.
 
@@ -103,7 +103,7 @@ Maria does steps 1 to 5. David does step 6.
    that household: adding a member, a recompute, and a pattern change all leave his wording
    alone.
 
-## If your org stores people as accounts
+## If Your Org Stores People as Accounts
 
 Names and greetings are written the same way when a person is stored as an account rather
 than as a contact, and a household can hold both kinds of person at once. The details that
@@ -111,7 +111,7 @@ feed the wording (preferred name, title, whether the person has died, and the tw
 boxes) sit on the person's own record wherever that record lives, so put them where you
 enter the person.
 
-## Common mistakes
+## Common Mistakes
 
 **"I changed the pattern and nothing changed."**
 An existing household keeps its old name only until something touches it: naming reads the
@@ -142,7 +142,7 @@ Salesforce in another language does not rename households into theirs. Where Bar
 translation for that language, the words stay in English. Your patterns are used exactly as
 you typed them.
 
-## Field reference
+## Field Reference
 
 For report builders only.
 

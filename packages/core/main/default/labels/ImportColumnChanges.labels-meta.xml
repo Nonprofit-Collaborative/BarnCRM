@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the button that opens a column&apos;s changes</shortDescription>
-        <value>Change values</value>
+        <value>Change Values</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesButtonCount</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Column change: the other columns added</shortDescription>
-        <value>Columns to add</value>
+        <value>Columns to Add</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesSeparator</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the before and after of the first rows</shortDescription>
-        <value>The first values, before and after</value>
+        <value>The First Values, Before and After</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesBefore</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: the values a dry run changed</shortDescription>
-        <value>Changed values (first rows)</value>
+        <value>Changed Values (First Rows)</value>
     </labels>
     <labels>
         <fullName>Core_Import_DuplicateRulesLabel</fullName>

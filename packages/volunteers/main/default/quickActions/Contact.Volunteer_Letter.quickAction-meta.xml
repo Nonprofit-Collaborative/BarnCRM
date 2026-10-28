@@ -5,7 +5,7 @@
     Save a volunteer hours letter or certificate for this person as a PDF in their Files. Needs
     Manage Volunteers.
   </description>
-  <label>Volunteer letter</label>
+  <label>Volunteer Letter</label>
   <lightningWebComponent>volunteerLetter</lightningWebComponent>
   <optionsCreateFeedItem>false</optionsCreateFeedItem>
   <type>LightningWebComponent</type>

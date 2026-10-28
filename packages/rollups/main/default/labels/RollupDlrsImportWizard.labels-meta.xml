@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder button that opens Import from DLRS</shortDescription>
-        <value>Import from DLRS</value>
+        <value>Import From DLRS</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportTitle</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS wizard title</shortDescription>
-        <value>Import from DLRS</value>
+        <value>Import From DLRS</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportIntro</fullName>

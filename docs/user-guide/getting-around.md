@@ -1,14 +1,14 @@
-# Getting around BarnCRM
+# Getting Around BarnCRM
 
 BarnCRM lives inside Salesforce as a few apps. This page shows you how to open them, how
 records open in tabs, what the home page shows you, and where to look when BarnCRM tells you
-something (a tip, a "Learn more" link, or a notification under the bell).
+something (a tip, a "Learn More" link, or a notification under the bell).
 
 Before you start: you need a BarnCRM role (Team Member, Coordinator, Fundraising Staff, Read
 Only or Admin). If you cannot find the apps, ask your admin. See
 [Access](../admin-guide/access.md).
 
-## The apps
+## The Apps
 
 | App | What it is for | How it looks |
 |---|---|---|
@@ -50,7 +50,7 @@ Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts*
 **Volunteer Hours**, at the end of the navigation menu. The **Rollup Builder** is in the admin
 apps; anyone else who may view it opens it by typing its name in the App Launcher.
 
-## To open an app
+## To Open an App
 
 1. Click the App Launcher (the grid of dots at the top left).
 2. Type `BarnCRM` (or `Fundraising`) and choose the app.
@@ -58,7 +58,7 @@ apps; anyone else who may view it opens it by typing its name in the App Launche
 
 You should see: the app's first tab. In **BarnCRM** and **BarnCRM Console** that is **Home**.
 
-## To work with records in console tabs
+## To Work with Records in Console Tabs
 
 In the **BarnCRM Console** and **BarnCRM Volunteers** apps, records stay open side by side.
 
@@ -74,20 +74,20 @@ and **BarnCRM Settings** name their tab for what is on screen, for example "Find
 
 On a phone, the Salesforce mobile app shows BarnCRM Console as an ordinary app without tabs.
 
-## To use the home page
+## To Use the Home Page
 
 Open the **BarnCRM** app and choose **Home**. As a staff member you see:
 
-- **What's new in BarnCRM**: what changed in the latest upgrade, with a headline and a few
+- **What's New in BarnCRM**: what changed in the latest upgrade, with a headline and a few
   lines for each change. Read it, then click **Dismiss**. It comes back only when a later
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
   in the tabs above."
 - **New household**: opens a new household with a placeholder name. The name is replaced
   automatically once you add a member. You see this button only if you can create households.
-- **Quick links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
+- **Quick Links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
   going back to the App Launcher.
-- **Files that arrive regularly**: shown only if you can read import templates and a file is
+- **Files That Arrive Regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
 If someone has paused automation (for example during a large import), a banner under the
@@ -97,7 +97,7 @@ until it resumes." It goes away by itself.
 Admins also see the setup checklist, Health Check and a few status tiles. See
 [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
-## To read in-app tips
+## To Read In-App Tips
 
 The first time you open some BarnCRM pages, Salesforce shows a short tip:
 
@@ -112,16 +112,16 @@ The first time you open some BarnCRM pages, Salesforce shows a short tip:
 You should see: the tip close for good. Each tip shows once per person, and Salesforce waits
 a day between tips in the same app, so you may see the next one on a later visit.
 
-## To open a "Learn more" link
+## To Open a "Learn more" Link
 
-On the **BarnCRM Settings** tab, many settings have a **Learn more** link beside them.
+On the **BarnCRM Settings** tab, many settings have a **Learn More** link beside them.
 
-1. Click **Learn more** next to the setting.
+1. Click **Learn More** next to the setting.
 
 You should see: the matching Admin Guide page open in a new browser tab. Everyone can read
 the settings; only admins can change them.
 
-## To check a job notification
+## To Check a Job Notification
 
 When you start a long job yourself (an export to Files from **Find**, a bulk update, an
 undo), BarnCRM tells you when it is done.
@@ -133,7 +133,7 @@ undo), BarnCRM tells you when it is done.
 You should see: the job's own record or page, with what finished and how it went. Only the
 person who started the job is told. Nightly jobs send nothing.
 
-## To use the Data Manager tab
+## To Use the Data Manager Tab
 
 You see **Data Manager** if you have the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
 or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
@@ -141,8 +141,8 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 | Card | Opens |
 |---|---|
 | **Find and Export Records** | The **Find** tab |
-| **Update Many Records** | **Find**: run a query, then press **Bulk update** (no file needed) |
-| **Delete Many Records** | **Find**: run a query, then press **Bulk delete** (no file needed) |
+| **Update Many Records** | **Find**: run a query, then press **Bulk Update** (no file needed) |
+| **Delete Many Records** | **Find**: run a query, then press **Bulk Delete** (no file needed) |
 | **Tidy and Check Your Data** | The **Org Optimizer** tab |
 
 Deleted records go to the Recycle Bin, not away for good: the **Delete Many Records** card says
@@ -157,7 +157,7 @@ it can still be undone. **Import a File**, **Import Templates** and **Salesforce
 are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 
-## Common problems
+## Common Problems
 
 - Problem: you cannot find the **BarnCRM** app. You have no BarnCRM role yet. Ask your admin.
 - Problem: a tab such as **Find** or **Data Manager** is missing. Those tabs appear only once

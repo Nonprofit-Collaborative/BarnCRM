@@ -1,38 +1,38 @@
-# Receipts and acknowledgments
+# Receipts and Acknowledgments
 
 A receipt is the numbered tax document for a gift; an acknowledgment is the thank-you. They are separate on purpose: the thank-you is yours to word, the receipt is not. This page also covers year-end statements, stewardship plans and the gift's **Posting** panel.
 
 Before you start: you need the **Fundraising Staff** role. Its **Giving Staff** permission set carries the **Issue Receipts** and **Send Acknowledgments** permissions. With **Giving Read Only** you can read receipts and open their PDFs, but not issue or send. The letters, the thank-you rules and receipt numbering are set up by your admin ([Receipts](../admin-guide/receipts.md), [Acknowledgments](../admin-guide/acknowledgments.md)).
 
-## To issue a receipt for a gift
+## To Issue a Receipt for a Gift
 
 1. Open a received gift.
-2. In the **Receipts** panel, click **Issue receipt**.
+2. In the **Receipts** panel, click **Issue Receipt**.
 
 You should see: "Receipt ... has been issued. Click View PDF beside it to open the file." The panel lists the receipt with its **Number**, **Status**, **Amount** and **Issued** date, and the gift's **Receipt Number** is filled in. Click **View PDF** to open the document.
 
 From then on the gift's amount, date, donor and in-kind description are locked, because the donor holds a document that states them.
 
-## To void and reissue a receipt
+## To Void and Reissue a Receipt
 
 Use this when the receipt is wrong, for example the amount was entered wrongly.
 
 1. Open the gift.
 2. In the **Receipts** panel, type **Why is this receipt being voided?**
-3. Click **Void and reissue**.
+3. Click **Void and Reissue**.
 
 You should see: "Receipt ... has been voided and reissued as .... The original file is unchanged." The old receipt shows status Void with your reason, and a new receipt with the next number sits beside it. Nobody can delete a receipt or its file.
 
 To change the gift's amount itself, void and reissue is not enough: record a refund ([Refunds and write-offs](refunds.md)).
 
-## To find a donor's receipts
+## To Find a Donor's Receipts
 
 Receipt PDFs are attached to the **Receipt** record and, for a single gift receipt, to the gift. They are not in the donor's or household's Files list.
 
 1. Open the donor and use their **Receipts** list, or open the gift and use its **Receipts** panel, or
 2. Open the **Receipts** tab and use the list views **All Receipts**, **Year End Statements** or **Voided Receipts**.
 
-## To run year-end statements
+## To Run Year-End Statements
 
 A year-end statement lists a donor's gifts for the year in one document. With the **Issue Receipts** permission you can start a run.
 
@@ -46,7 +46,7 @@ You should see: "Year end statements are being generated." A row for the run wit
 
 Enter all the year's gifts first. A donor who already has a statement for the year is skipped on a second run; to correct one, void that donor's statement and run again. Editing the letter wording on the other tab needs your admin.
 
-## To send thank-yous
+## To Send Thank-Yous
 
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
@@ -60,7 +60,7 @@ You should see: each run under **Recent Runs** with **Status**, **Sent** and **E
 
 Only your admin can add or change rules, or turn on **Send emails nightly**. The **Gifts to Acknowledge** list view on **Gifts** shows every gift still waiting.
 
-## To thank a donor again, or not at all
+## To Thank a Donor Again, or Not at All
 
 1. Open the gift and click **Edit**.
 2. Set **Acknowledgment Status** to **To acknowledge** to queue it again, or **Do not acknowledge** to leave it out.
@@ -68,7 +68,7 @@ Only your admin can add or change rules, or turn on **Send emails nightly**. The
 
 You should see: the gift back in the queue, or out of it. BarnCRM never re-queues an acknowledged gift on its own.
 
-## To work a stewardship plan
+## To Work a Stewardship Plan
 
 A stewardship plan lays out follow-up tasks (a thank-you call, a welcome packet, a check-in) when a gift or pledge arrives. Your admin writes the plans and switches them on; the tasks land in your ordinary task list.
 
@@ -79,17 +79,17 @@ A stewardship plan lays out follow-up tasks (a thank-you call, a welcome packet,
 
 You should see: the plan leave **Running Plans**. BarnCRM does not close a plan when its last task closes, and cancelling a plan leaves its tasks alone.
 
-## To start a stewardship plan by hand
+## To Start a Stewardship Plan by Hand
 
 Use this for a donor who should get a plan that no gift started, for example after a meeting. Any plan your admin has turned on can be started by hand ([Stewardship plans](../admin-guide/stewardship-plans.md)).
 
 1. In the Fundraising app, open the person, household or organization.
 2. Click **Start Stewardship Plan** and choose the plan in **Plan**. Its description shows under the list.
-3. Click **Start plan**.
+3. Click **Start Plan**.
 
 You should see: the plan in the donor's **Stewardship Plans** list with **Status** Running, and its tasks in the task lists of the people they are assigned to. The same plan does not start twice on a donor while it is running.
 
-## To read the Posting panel
+## To Read the Posting Panel
 
 The **Posting** panel on a gift says whether the bookkeeper has exported it:
 
@@ -100,9 +100,9 @@ The **Posting** panel on a gift says whether the bookkeeper has exported it:
 
 Marking gifts posted, and unposting, need the **Post Gifts** permission, which only **Giving Admin** carries. See [Posting and closed periods](../admin-guide/posting-and-closed-periods.md).
 
-## Common problems
+## Common Problems
 
-- **Issue receipt** is missing. The gift already has a receipt (use **Void and reissue**), or you lack **Issue Receipts**.
+- **Issue Receipt** is missing. The gift already has a receipt (use **Void and Reissue**), or you lack **Issue Receipts**.
 - "You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role."
 - "This gift has already been receipted. To correct the receipt, void it and reissue it."
 - "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first."

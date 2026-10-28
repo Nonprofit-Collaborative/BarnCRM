@@ -1,6 +1,6 @@
 # Relationships
 
-## What it does
+## What It Does
 
 Relationships records how the people in your database are connected to each other: who is
 married to whom, whose child is at the same school, which two board members are siblings,
@@ -12,10 +12,10 @@ Because the other side is kept in step, editing or ending a relationship on one 
 changes it on the other person at the same moment, and there is never a record that says a
 connection is current while the matching record says it ended two years ago.
 
-## How to turn it on
+## How to Turn It On
 
 Relationships is part of Core, but on a new install it is off until you turn it on. In
-**BarnCRM Settings**, **General**, choose **Turn on** in the **Relationships** row (or leave
+**BarnCRM Settings**, **General**, choose **Turn On** in the **Relationships** row (or leave
 it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing
 to install and no Setup step.
 
@@ -46,7 +46,7 @@ To let your team see and manage relationships, make sure they have one of the pa
 access levels (BarnCRM Admin, Team Member, or Coordinator, or Fundraising Staff
 with Giving) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them: the
-Relationships card shows them no **Add relationship** or **Remove** button.
+Relationships card shows them no **Add Relationship** or **Remove** button.
 
 Keeping the other side in step does not depend on what the person saving can see or edit.
 Someone who may save a relationship but cannot see or edit the other person's side of it (for
@@ -62,7 +62,7 @@ The card reads and removes relationships as the person using it, through Salesfo
 record service, so it shows exactly what their object and field access allows, and a
 relationship edited elsewhere on the page shows on the card without a reload.
 
-### The types you can choose, and what the other side becomes
+### The Types You Can Choose, and What the Other Side Becomes
 
 The list ships ready to use, and none of it depends on anyone's gender.
 
@@ -82,7 +82,7 @@ The list ships ready to use, and none of it depends on anyone's gender.
 
 To add your own types, such as Mentor and Mentee, see [Custom metadata](custom-metadata.md).
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are Maria. Your Executive Director wants to know which of your members are related to
 each other before the gala seating is decided, and the Garcia family keeps coming up. Start
@@ -92,12 +92,12 @@ from the sample data.
    choose the person named **Harper Garcia**.
 2. Scroll to the **Relationships** card. It is empty, and it says "No relationships on file
    yet."
-3. Choose **Add relationship**. Fill in:
+3. Choose **Add Relationship**. Fill in:
    - **Related person**: Luis Garcia
    - **Type**: Spouse
    - **Status**: leave it as Current
    - **Start date**: leave it empty
-   Choose **Add relationship** in the form.
+   Choose **Add Relationship** in the form.
 4. The card now shows one line: Luis Garcia, Spouse. A current relationship carries no
    badge. Nothing else was asked of you.
 5. Open **Luis Garcia**. His **Relationships** card already shows Harper Garcia, Spouse.
@@ -108,7 +108,7 @@ from the sample data.
    the Luis line now carries a **Former** badge.
 7. Open **Luis Garcia** again. His line carries **Former** too, and his record has the same
    end date. The two records can never disagree.
-8. Now add a second one from Harper: choose **Add relationship**, pick **Diego Garcia**,
+8. Now add a second one from Harper: choose **Add Relationship**, pick **Diego Garcia**,
    type **Child**, and save. Harper's card reads "Diego Garcia, Child", because the type
    says what the other person is to the person whose record you are on. Open **Diego
    Garcia** and his card reads "Harper Garcia, Parent", the same fact from his side.
@@ -118,7 +118,7 @@ from the sample data.
 
 That is the whole feature: enter one side, get both, and never clean up after yourself.
 
-## List views and what ships ready to use
+## List Views and What Ships Ready to Use
 
 The **Relationships** tab opens with four list views: **All Relationships**, **Current
 Relationships**, **Former Relationships** (with the end date) and **My Relationships** (the
@@ -128,7 +128,7 @@ The 11 relationship types in the table above ship with BarnCRM as custom metadat
 (Relationship Type), so a new org can add relationships straight away, with no sample data.
 Relationships between people are not shipped, because they describe your own people.
 
-## Common mistakes
+## Common Mistakes
 
 **Reading the type from the wrong side.** The type says what the **other person** is in
 relation to the person whose record you are on. On Harper's record, a line reading "Diego

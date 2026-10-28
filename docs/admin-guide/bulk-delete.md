@@ -1,12 +1,12 @@
-# Bulk delete
+# Bulk Delete
 
-## 1. What it does
+## 1. What It Does
 
-**Bulk delete** deletes every record a [Find](find.md) query returns, in one go. It is for
+**Bulk Delete** deletes every record a [Find](find.md) query returns, in one go. It is for
 clearing out what should not be there: a test load, a list of contacts a partner sent twice,
 last year's event sign-ups.
 
-To delete the records a file lists by their record IDs instead, use **Load one object** with
+To delete the records a file lists by their record IDs instead, use **Load One Object** with
 **Delete by record ID** on the Import tab ([Importing](importing.md), section 9). It needs
 **Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
 
@@ -34,7 +34,7 @@ A bulk delete acts with your own access. It deletes only records you may delete,
 organization's automation runs on every record, as it does on any delete. A record that is
 refused is listed with the reason; the rest are still deleted.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 1. Bulk delete needs two permissions: **Bulk Delete Records**, and **Find and Export Records**,
    because every bulk delete starts from a Find query. **Bulk Delete Records is in no role, not
@@ -50,14 +50,14 @@ refused is listed with the reason; the rest are still deleted.
 3. **Days an import can be undone**, on the same page, is also how long a bulk delete can be
    undone, up to 15 days.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 A volunteer loaded the spring gala sign-up sheet twice, and Maria wants the second copy gone.
 Every record of the second copy has the description `Gala sign-up, copy 2`.
 
 1. Open **Find**. Choose **Contact**, add the column **Name**, and add the condition
    **Description**, **equals**, `Gala sign-up, copy 2`. Press **Run**, and check the results.
-2. Press **Bulk delete**. The bulk delete panel opens below the results. It uses the query as
+2. Press **Bulk Delete**. The bulk delete panel opens below the results. It uses the query as
    it is now; changing the query closes the panel.
 3. Press **Preview**. BarnCRM says how many records match, for example 112, shows the first five
    by name, and lists what is deleted with each one (for a contact, for example, its
@@ -80,7 +80,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
    shows your own bulk deletes. Someone who manages BarnCRM Settings can tick **Show everyone's
    jobs** to see and undo anyone's.
 
-## 4. What can and cannot be deleted
+## 4. What Can and Cannot Be Deleted
 
 - **Every matching record, not only the rows shown.** Find's **Rows to show** and sort order
   only shape the results table. A bulk delete covers every record the object and conditions
@@ -102,7 +102,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 - **Locked records** (for example a posted gift or an issued receipt) are refused by their own
   rules, listed with the reason, and stay.
 
-## 5. Common mistakes
+## 5. Common Mistakes
 
 - **"More records match now than the 112 you confirmed."** Somebody added or changed records
   between your preview and your confirmation. Nothing was deleted. Press **Preview** again and
@@ -126,7 +126,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 - **Undo is refused in Import.** A bulk delete is undone from the bulk delete history, which
   brings the records back from the Recycle Bin; the import's own Undo refuses it.
 
-## Field reference
+## Field Reference
 
 | Where | Field | What it holds |
 |---|---|---|

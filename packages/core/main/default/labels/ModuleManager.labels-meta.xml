@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: button that turns a module off</shortDescription>
-        <value>Turn off</value>
+        <value>Turn Off</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_TurnOnButton</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: button that turns a module on</shortDescription>
-        <value>Turn on</value>
+        <value>Turn On</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_ReportButton</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: button that shows the uninstall report</shortDescription>
-        <value>What an uninstall deletes</value>
+        <value>What an Uninstall Deletes</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_ReportIntro</fullName>

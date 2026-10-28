@@ -1,6 +1,6 @@
 # Integrations
 
-## What it does
+## What It Does
 
 The Integrations page in BarnCRM Settings is a roadmap of other products BarnCRM plans to work
 with. It lists each one with what it does, who maintains it, what it costs, a link to it, and a
@@ -12,7 +12,7 @@ integrated with BarnCRM yet, and BarnCRM has not tested these products with itse
 product's note says so. BarnCRM does not depend on any of them, and installing or removing one
 changes nothing in BarnCRM. The page exists to show the direction and to collect interest.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on.
 
@@ -21,7 +21,7 @@ There is nothing to turn on.
 
 Everyone who can open BarnCRM Settings sees the page. It has no settings to change.
 
-## What the page shows
+## What the Page Shows
 
 Products are grouped:
 
@@ -40,7 +40,7 @@ Each product shows:
 - A one-line description, who maintains it, and its cost and license.
 - **Compatibility with BarnCRM**: what is known about using the two together, written
   honestly. Where it says "not yet tested", it means exactly that.
-- **Learn more**, and **Install** where the product publishes an installer. Links open in a
+- **Learn More**, and **Install** where the product publishes an installer. Links open in a
   new tab.
 
 Some notes carry details to read before you try a product. For example, an event registration
@@ -51,15 +51,15 @@ up with care, and review what a guest user can see.
 
 At the bottom of the page:
 
-- **Request an integration** opens a form on GitHub where you name a product you use and what
+- **Request an Integration** opens a form on GitHub where you name a product you use and what
   you would want it to do with BarnCRM. Do not post personal or donor data: the form is public.
-- **Propose an integration for your product** is for people who build or maintain a product. It
-  opens a second form. **How an integration is built** explains the rules a provider follows.
+- **Propose an Integration for Your Product** is for people who build or maintain a product. It
+  opens a second form. **How an Integration Is Built** explains the rules a provider follows.
 
 BarnCRM is self-service. A request is a public suggestion that helps shape the roadmap. It is
 not a support ticket, and nothing on the page promises a reply, support or a date.
 
-## Add or change a listing
+## Add or Change a Listing
 
 The list is custom metadata, so a new product needs only a new record of the type **Integration
 App**, with no code. Open Setup, **Custom Metadata Types**, **Integration App**, **Manage

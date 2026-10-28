@@ -1,6 +1,6 @@
 # Health Check
 
-## What it does
+## What It Does
 
 Health Check looks at your org and tells you, in plain language, whether BarnCRM is set
 up the way it should be. It reports what it found in your org (what else is installed, which
@@ -15,10 +15,10 @@ button works** below).
 
 Run it after you install, after you add people, and any time something feels wrong.
 
-## How to turn it on
+## How to Turn It On
 
 Health Check belongs to the **Org Optimizer and Health Check** feature, which on a new
-install is off until you turn it on: choose **Turn on** in that row in **BarnCRM Settings**,
+install is off until you turn it on: choose **Turn On** in that row in **BarnCRM Settings**,
 **General** (or leave it ticked in first-run setup); see
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
@@ -26,15 +26,15 @@ nothing to configure.
 1. Open the **BarnCRM Admin** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-run** whenever you want a fresh look. On this page Health Check reads your
+4. Click **Re-Run** whenever you want a fresh look. On this page Health Check reads your
    org each time it opens.
 
 An administrator also finds Health Check on the BarnCRM home page, under the setup
 checklist. Home does not run every check each time it opens, because a full run reads a lot
 of your org and Home is the page everyone opens first. Instead it shows the last result: when
 Health Check last ran in full for an administrator, and how many findings it had to fix, to
-be aware of and for your information. Click **Run now** to run it in full there and see the
-whole report. Until Health Check has run once, Home says so and offers **Run now**. A run by
+be aware of and for your information. Click **Run Now** to run it in full there and see the
+whole report. Until Health Check has run once, Home says so and offers **Run Now**. A run by
 someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
 because it skips the access checks.
 
@@ -49,7 +49,7 @@ BarnCRM Admin role, who holds the Override Receipt Lock permission (asked only w
 nobody has read. In their place you get one line, **Only a BarnCRM Admin can see the
 access checks**.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria has just installed BarnCRM into her organization's Salesforce org. Person Accounts
 are on, and nothing else that keeps households is installed. She has not set anything up
@@ -63,13 +63,13 @@ yet.
 3. Below the card, the findings are grouped: **Your Org**, **Licenses**, **Access**, and
    **Settings**. Each finding has an icon: a red circle for something that needs fixing, an
    amber triangle for something to be aware of, a blue dot for information.
-4. The first finding is blue, **Your org at a glance**, and it repeats what was found in a
+4. The first finding is blue, **Your Org at a Glance**, and it repeats what was found in a
    sentence, adds that BarnCRM supports this org shape directly, and says that Shield
    Platform Encryption cannot be detected from inside the app. If her org uses it, she should
    say so before she loads data.
 5. The next finding is amber: **Coexistence mode is not confirmed yet**. It explains which
-   mode BarnCRM recommends for what it found. There is a button, **Use recommended mode**.
-6. Maria clicks **Use recommended mode**. The page saves Standalone and re-runs. The amber
+   mode BarnCRM recommends for what it found. There is a button, **Use Recommended Mode**.
+6. Maria clicks **Use Recommended Mode**. The page saves Standalone and re-runs. The amber
    finding is replaced by a blue one: **Coexistence mode matches your org**. If household
    membership were still set to the person's account, the red finding **Household
    membership does not fit Person Accounts** would offer its own one-click fix.
@@ -79,7 +79,7 @@ yet.
 8. Another finding is amber: **4 users cannot see the app**. Four active users have a
    Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to
    them. She clicks **Open the Access page** again and assigns roles.
-9. She clicks **Re-run**. The red finding is gone, the amber ones are gone, and what is left
+9. She clicks **Re-Run**. The red finding is gone, the amber ones are gone, and what is left
    is blue: her org shape, the mode, and **Automation is running normally**.
 
 Total time: about five minutes, most of it assigning roles.
@@ -87,13 +87,13 @@ Total time: about five minutes, most of it assigning roles.
 **Only if your org has NPSP or Nonprofit Cloud.** With the Nonprofit Success Pack, step 2
 reads **NPSP detected** and the recommendation is **NPSP coexistence**. With Nonprofit Cloud,
 step 2 reads **Nonprofit Cloud objects detected**, the recommendation is **Nonprofit Cloud
-coexistence**, and **Use recommended mode** switches household membership to the flexible way of belonging, with one membership record per person,
+coexistence**, and **Use Recommended Mode** switches household membership to the flexible way of belonging, with one membership record per person,
 with it. If that org has Nonprofit Cloud gift objects and the Mirror module is not
 installed, there is also a blue finding, **The Gift Transaction mirror is in the Mirror
 module**: install Mirror if you want Nonprofit Cloud's own summaries to keep working.
 Nothing is broken today.
 
-## What Health Check looks at
+## What Health Check Looks At
 
 | Group | What it checks |
 |---|---|
@@ -132,14 +132,14 @@ unposted gifts in a closed period (all with Giving), and the stalled Opportunity
 Mirror). Each one is a quiet problem, where nothing looks broken and the cost arrives months
 later, so each is explained in full below.
 
-## The four quiet findings
+## The Four Quiet Findings
 
 | Finding | What it means | Why it matters | What to do |
 |---|---|---|---|
 | **Someone can override the receipt lock** (with Giving) | One or more active people hold the **Override Receipt Lock** permission. BarnCRM ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
 | **Receipts failed to generate** (with Giving) | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
 | **Gifts in a closed period are not posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
-| **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop nightly run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
+| **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop Nightly Run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
 
 With Rollup Builder in an org that also runs DLRS, Health Check warns **BarnCRM and DLRS fill
 the same field** when an active BarnCRM rollup and an active DLRS rollup write the same field,
@@ -147,7 +147,7 @@ naming each field and both rollups, with **Open the Rollup Builder**. Switch one
 off. See
 [When BarnCRM and DLRS Fill the Same Field](rollups.md#when-barncrm-and-dlrs-fill-the-same-field).
 
-## How a fix button works
+## How a Fix Button Works
 
 Most buttons open a page. A button that changes something in your org works like this:
 
@@ -191,10 +191,10 @@ should be a BarnCRM Admin when nobody is, whether paused automation should resum
 to do about errors in the Error Log, and what should become of a person with no household or
 a household with nobody in it.
 
-## People with no household, and households with nobody in them
+## People with No Household, and Households with Nobody in Them
 
 Health Check finds these and links them; it never changes them. To see every one of them, and
-other record checks such as addresses with parts missing, use **Data quality** on the **Org Optimizer** tab, which
+other record checks such as addresses with parts missing, use **Data Quality** on the **Org Optimizer** tab, which
 opens each list in Find (see [Data hygiene](data-hygiene.md), which also says how the two
 pages differ). Health Check is about whether BarnCRM is set up right; Data hygiene is about
 the records themselves.
@@ -218,7 +218,7 @@ two household checks are shown only to them too, for the reason given above.
 If one check cannot run, the rest still run. The check that failed appears as its own finding
 saying so, and the details are written to the Error Log.
 
-## Relationships and affiliations with no person
+## Relationships and Affiliations with No Person
 
 When a person is deleted (not merged), the relationships that named them are left with nobody on that side, and their affiliations are left with no person. Merging two people moves these records to the kept person, so they are only left blank by a delete. Health Check finds them and links the first five; it never changes or deletes them.
 
@@ -229,7 +229,7 @@ When a person is deleted (not merged), the relationships that named them are lef
 
 Each finding counts up to 1,000 and then says **More than 1,000**. Both are shown only to people with the Manage BarnCRM Settings permission.
 
-## Common mistakes
+## Common Mistakes
 
 **Treating an amber finding as a failure.** Amber means "be aware of this", not "broken".
 Multi-currency, for example, is amber forever if your org uses more than one currency: BarnCRM will not break, it simply does not do currency conversion yet, and there is nothing

@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Column heading for the source of a rollup.</shortDescription>
-        <value>What it counts</value>
+        <value>What It Counts</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_CountsSeparatedBy</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Column heading for the time a rollup last completed.</shortDescription>
-        <value>Last calculated</value>
+        <value>Last Calculated</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_RecalculateAll</fullName>
@@ -318,7 +318,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Target column heading</shortDescription>
-        <value>Where it shows</value>
+        <value>Where It Shows</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_NeverCalculated</fullName>

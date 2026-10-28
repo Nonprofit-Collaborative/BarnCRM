@@ -22,29 +22,29 @@ The page is also part of the definition of done (plan Section 7.4) and part of r
 the reviewer must try the feature as Maria with only this page as instructions (plan
 Section 9.2).
 
-## Required page structure
+## Required Page Structure
 
 Every feature page has these four sections, in this order (plan Section 7.4):
 
-### 1. What it does
+### 1. What It Does
 
 Two or three sentences in plain language that fits the reader's organization. What problem
 it solves, and for whom. No architecture, no object names.
 
-### 2. How to turn it on
+### 2. How to Turn It On
 
 The exact steps to enable and configure the feature, all of them inside the app. If a
 step requires Salesforce Setup, say why it cannot be avoided and link to the Setup
 Assistant step that deep-links there. A feature that needs Setup for normal use has not
 met the definition of done.
 
-### 3. A five-minute walkthrough
+### 3. A Five-Minute Walkthrough
 
 A numbered path from nothing to a working result, with the sample data as the starting
 point, that a person can complete in five minutes. This doubles as the manual acceptance
 script Brandon runs before an iteration is promoted (plan Section 7.3).
 
-### 4. Common mistakes
+### 4. Common Mistakes
 
 The three or four things that actually go wrong, each with how to recognize it and how to
 fix it. Write these from what the tests and the walkthrough surfaced, not from
@@ -64,7 +64,7 @@ these pages, so that everyone is talking about the same person.
 | **Jen** | Board Treasurer or Bookkeeper: reconciles with accounting |
 | **Sam** | Contributor: open source developer or administrator who contributes |
 
-## Style rules
+## Style Rules
 
 - **Plain language, not Salesforce language.** Use the words the reader's organization
   uses: "household" and "person", not "Account" and "Contact record". A Core page is
@@ -98,7 +98,7 @@ Every page in this folder is listed once, below, grouped by what you are trying 
 
 The Package column says what has to be installed for the page to apply. BarnCRM Core on its own is the Standard Edition, the full core suite of tools for any organization, so a Core page describes only what every organization has: its wording is neutral, and anything about gifts, donors or receipts on a Core page is marked as coming from Giving (C-29), and anything about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
 
-### Set up BarnCRM
+### Set Up BarnCRM
 
 | Feature | Page | Package |
 |---|---|---|
@@ -116,7 +116,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
 
-### People, households and relationships
+### People, Households and Relationships
 
 | Feature | Page | Package |
 |---|---|---|
@@ -134,7 +134,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core |
 | Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) |
 
-### Data tools
+### Data Tools
 
 | Feature | Page | Package |
 |---|---|---|
@@ -148,7 +148,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 
-### Automation, totals and health
+### Automation, Totals and Health
 
 | Feature | Page | Package |
 |---|---|---|
@@ -185,7 +185,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
 | G-23, G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Giving |
 
-### Mirror (connections to other systems)
+### Mirror (Connections to Other Systems)
 
 | Feature | Page | Package |
 |---|---|---|
@@ -200,7 +200,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | V-01 to V-08 Volunteers: install, roles, settings, jobs, shifts, sign-ups, hours, skills, requirements, recurring shifts, letters, dashboard | [volunteers.md](volunteers.md) | BarnCRM Volunteers |
 
-### Moving from another system
+### Moving From Another System
 
 | Feature | Page | Package |
 |---|---|---|
@@ -209,6 +209,6 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Moving rollups from Rollup Helper by hand | [moving-from-rollup-helper.md](moving-from-rollup-helper.md) | BarnCRM Rollup Builder |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package |
 
-## Report a bug or give feedback
+## Report a Bug or Give Feedback
 
 If a page here is wrong, missing or unclear, or a feature does not behave as described, open an issue at https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose (a free GitHub account is needed). Issues are read and may shape the roadmap. See [SUPPORT.md](../../SUPPORT.md) for which template to use and what to include, and never post personal or donor data. Report security problems privately, as described in [SECURITY.md](../../SECURITY.md).

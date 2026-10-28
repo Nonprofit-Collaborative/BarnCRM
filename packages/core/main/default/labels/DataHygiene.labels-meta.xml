@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data hygiene checks: card title in Org Optimizer's Data quality section.</shortDescription>
-        <value>Data quality</value>
+        <value>Data Quality</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_Intro</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: people with no household.</shortDescription>
-        <value>People with no household</value>
+        <value>People with No Household</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_PeopleContactDetail</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: households with nobody in them.</shortDescription>
-        <value>Households with nobody in them</value>
+        <value>Households with Nobody in Them</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_HouseholdsDetail</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: memberships that name nobody.</shortDescription>
-        <value>Memberships that name nobody</value>
+        <value>Memberships That Name Nobody</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_MembershipsDetail</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: addresses that belong to nobody.</shortDescription>
-        <value>Addresses that belong to nobody</value>
+        <value>Addresses That Belong to Nobody</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_OwnerlessDetail</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: primary addresses with parts missing.</shortDescription>
-        <value>Primary addresses with parts missing</value>
+        <value>Primary Addresses with Parts Missing</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_IncompleteDetail</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: people nobody can reach.</shortDescription>
-        <value>People with no way to reach them</value>
+        <value>People with No Way to Reach Them</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_UnreachableDetail</fullName>
@@ -262,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: deceased people who can still be emailed.</shortDescription>
-        <value>Deceased people who can still be emailed</value>
+        <value>Deceased People Who Can Still Be Emailed</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_DeceasedDetail</fullName>

@@ -1,9 +1,9 @@
-# Preferred phone
+# Preferred Phone
 
 **Feature:** C-43 Preferred phone on a person (R-C6a)
 **Package:** Core
 
-## What it does
+## What It Does
 
 A person often has a home number, a mobile, a work number and another number. Salesforce
 lists, dialers and reports read the ordinary **Phone** box. BarnCRM adds a **Work Phone** box
@@ -11,7 +11,7 @@ and one choice, **Preferred Phone**: Home, Mobile, Work or Other. Whatever you c
 person is saved, the same way **Preferred Email** fills the ordinary Email box (see
 [Emails](emails.md)).
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to set up in Salesforce Setup. **Preferred Phone** arrives with Core and sits
 on the person's page next to the ordinary Phone box, in the **Reaching This Person** section
@@ -20,7 +20,7 @@ with **Home Phone**, **Mobile**, **Other Phone** and **Work Phone**.
 If you never choose a preferred phone, nothing changes: the ordinary Phone box keeps whatever
 you type in it. The copying only starts on a person once you choose one.
 
-The copy belongs to the **Preferred email and phone** feature (BarnCRM Settings, General) and has
+The copy belongs to the **Preferred Email and Phone** feature (BarnCRM Settings, General) and has
 its own switch on the Automation page: **Copy preferred phone on a person**. It is on by default
 and separate from household upkeep. Switch it off only if you want the ordinary Phone box left
 exactly as typed.
@@ -34,7 +34,7 @@ exactly as typed.
 Preferred Phone is on people held as contacts. People held as accounts in an org that uses
 person accounts are not touched, because their phone numbers live on fields only some orgs have.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 1. Open the **BarnCRM** app, click the **Contacts** tab, and open a person.
 2. Type a number into **Home Phone** and a different one into **Mobile**. Click **Save**. The
@@ -46,7 +46,7 @@ person accounts are not touched, because their phone numbers live on fields only
 5. Try the mistake on purpose: set **Preferred Phone** to **Other** while **Other Phone** is
    empty. The save is refused and the message names the empty number.
 
-## Common mistakes
+## Common Mistakes
 
 **"It will not let me save."** You chose a number that is empty. Fill that number in, or choose
 another. BarnCRM will not empty the ordinary Phone box for you.
@@ -63,7 +63,7 @@ Phone, Mobile or Other Phone instead, or clear Preferred Phone to type into Phon
 **"I cleared Preferred Phone and the Phone box still has the old number."** Clearing the choice
 stops the copying, it does not undo it. Type over it if you want a different number.
 
-## Field reference
+## Field Reference
 
 | Where | Field label | Purpose |
 |---|---|---|

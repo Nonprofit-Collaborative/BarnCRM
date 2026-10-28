@@ -17,7 +17,7 @@
     <targetPageKey1>BarnCRM_Settings</targetPageKey1>
     <targetPageType>standard__navItemPage</targetPageType>
     <timesToDisplay>1</timesToDisplay>
-    <title>Getting around BarnCRM Settings</title>
+    <title>Getting Around BarnCRM Settings</title>
     <userAccess>Everyone</userAccess>
     <userProfileAccess>Everyone</userProfileAccess>
     <versionNumber>1</versionNumber>

@@ -1,6 +1,6 @@
-# Tributes: gifts in honor and in memory
+# Tributes: Gifts in Honor and in Memory
 
-## What it does
+## What It Does
 
 A tribute records that a gift was given in honor of someone or in memory of someone, and
 who should be told about it. It is what turns a memorial gift into the letter a family
@@ -11,7 +11,7 @@ no family is missed.
 A tribute never states the amount. The letter to a bereaved family says that a gift was
 made in memory of their mother, not what it was worth.
 
-## How to turn it on
+## How to Turn It On
 
 Nothing to turn on. Tributes are part of the Giving module.
 
@@ -33,7 +33,7 @@ Two choices are worth making once, as a team:
 - **Who marks the notification as sent.** Whoever posts the letters. The date is stamped
   for you when they do.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David. Start from the sample data.
 
@@ -65,7 +65,7 @@ You are David. Start from the sample data.
    recipient. Save. BarnCRM refuses with: **This gift is in memory of the person you
    have chosen to notify. Choose a family member or friend as the notification recipient.**
 
-## Common mistakes
+## Common Mistakes
 
 - **Naming the honoree as the person to notify.** It is one line down in the form, and it
   is the mistake that would send a letter to a family about the person they have just
@@ -86,7 +86,7 @@ You are David. Start from the sample data.
   cleared by automation once set, because they are a record of what your organization did.
   If it was set in error, clear the checkbox on the tribute yourself and note why.
 
-## Fields, for report builders
+## Fields, for Report Builders
 
 | What you see | Field |
 |---|---|

@@ -1,6 +1,6 @@
 # Gifts
 
-## What it does
+## What It Does
 
 A gift is one transaction that arrived: money, stock or goods, from one donor, on one date.
 David enters the gift, and BarnCRM fills in the rest: the household it should be
@@ -16,7 +16,7 @@ It works differently in two ways that catch people out: its amount is always zer
 worth goes in **Fair market value**, and its receipt describes what arrived without stating
 what it was worth. [In-kind gifts](in-kind-gifts.md) is the page for that.
 
-## How to turn it on
+## How to Turn It On
 
 Gifts arrive with the Giving module. Before David enters his first gift, do two things
 once:
@@ -35,7 +35,7 @@ beside the person's role: the BarnCRM Admin and Read Only roles carry what Core 
 do not include a module's permission sets. The Module Manager also gives you **Giving
 Admin** when you turn Giving on there.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David, and a check from Maria's neighbour arrived this morning.
 
@@ -66,12 +66,12 @@ You are David, and a check from Maria's neighbour arrived this morning.
    in your fund reports is never more or less than the money you received.
 10. Now refund part of the gift: follow the Refunds page from step 1.
 
-## What the gift page shows
+## What the Gift Page Shows
 
 In the Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
 carries **Edit**, **Refund or Write Off** and **Delete**. **Refund or Write Off** shows only
 while the gift's **Status** is `Received`, because only a received gift can be refunded. The
-**Gift Allocations** list (largest first), the **Refunds and Write-offs** list (newest
+**Gift Allocations** list (largest first), the **Refunds and Write-Offs** list (newest
 first), the **Tributes** list (with **New**) and the **Acknowledgments** list are part of the
 page itself, so they look the same whichever page layout your profiles use. A gift that pays
 a pledge or recurring gift shows it in **Commitment** and **Installment**, both of which you
@@ -84,7 +84,7 @@ Gift page layout alone does not put it on this page: the layout is what Salesfor
 when a gift is opened outside the Fundraising app, or on a record page your organization
 built that still uses the related list component.
 
-## Lifting the receipt lock
+## Lifting the Receipt Lock
 
 Sooner or later an organization holds a receipted gift that is wrong in a way that voiding
 and reissuing cannot reach, for example a receipt number issued against the wrong donor.
@@ -139,12 +139,12 @@ when money went back (see [Refunds](refunds.md)), and correcting a receipt is th
 answer when the document itself is wrong. The override is for the case where neither
 reaches the problem.
 
-## List views
+## List Views
 
 **Gifts** has **All Gifts**, **My Gifts** (the gifts you entered), **Pending Gifts**, **Gifts to
-Acknowledge** and **Refunds and Write-offs**.
+Acknowledge** and **Refunds and Write-Offs**.
 
-## Common mistakes
+## Common Mistakes
 
 - **Filling in both Donor Contact and Donor Account.** The save is refused with "Enter a
   donor contact or a donor account, not both. A gift has exactly one donor." Use the account
@@ -166,7 +166,7 @@ Acknowledge** and **Refunds and Write-offs**.
   number is issued by BarnCRM when it creates the receipt, and cannot be filled in by
   hand." A number that BarnCRM did not issue belongs to no receipt, locks the gift, can be
   handed out again later to somebody's year-end statement, and stops that gift ever being
-  receipted. Click **Issue receipt** on the gift instead. Importing historical gifts that
+  receipted. Click **Issue Receipt** on the gift instead. Importing historical gifts that
   carry receipt numbers from an old system is the one real case, and it needs the override
   below, deliberately.
 - **Pausing automation to get around the lock.** It does not work, and that is deliberate.

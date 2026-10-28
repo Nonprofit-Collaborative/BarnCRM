@@ -7,5 +7,5 @@
   <columns>Account__c</columns>
   <columns>Status__c</columns>
   <filterScope>Everything</filterScope>
-  <label>All Sign-ups</label>
+  <label>All Sign-Ups</label>
 </ListView>

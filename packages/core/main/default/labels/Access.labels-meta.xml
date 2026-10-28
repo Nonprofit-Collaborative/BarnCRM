@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: button that gives the chosen person the chosen role</shortDescription>
-        <value>Give access</value>
+        <value>Give Access</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnAddButton</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: button that gives the chosen person an extra permission</shortDescription>
-        <value>Give permission</value>
+        <value>Give Permission</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnAssignSuccess</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: link that opens the automatic access guide page</shortDescription>
-        <value>Set up automatic access</value>
+        <value>Set Up Automatic Access</value>
     </labels>
     <labels>
         <fullName>Core_Access_CancelButton</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading of the confirmation shown before a role is given</shortDescription>
-        <value>Give access</value>
+        <value>Give Access</value>
     </labels>
     <labels>
         <fullName>Core_Access_ConfirmRemoveMessage</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading of the confirmation shown before a role is removed</shortDescription>
-        <value>Remove access</value>
+        <value>Remove Access</value>
     </labels>
     <labels>
         <fullName>Core_Access_CreateUserHelp</fullName>
@@ -254,7 +254,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: link that opens the Users page in Setup</shortDescription>
-        <value>Create a user in Setup</value>
+        <value>Create a User in Setup</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorGroupNotReady</fullName>

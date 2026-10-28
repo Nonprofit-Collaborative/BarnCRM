@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: button that opens the new address form</shortDescription>
-        <value>Add address</value>
+        <value>Add Address</value>
     </labels>
     <labels>
         <fullName>Core_Address_AddFormTitle</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: heading above the new address form</shortDescription>
-        <value>New address</value>
+        <value>New Address</value>
     </labels>
     <labels>
         <fullName>Core_Address_CancelButton</fullName>

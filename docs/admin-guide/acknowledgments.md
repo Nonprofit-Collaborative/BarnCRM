@@ -1,6 +1,6 @@
 # Acknowledgments
 
-## What it does
+## What It Does
 
 Acknowledgments are the thank yous. You write the rules once, in the language you already
 use ("gifts over $1,000 get the director's letter, everything else gets the standard email,
@@ -16,7 +16,7 @@ An acknowledgment is not a receipt. A receipt is the tax document with a number 
 is [receipts.md](receipts.md). A donor usually gets both, and they are separate on purpose:
 the thank you is yours to write and rewrite, and the receipt is not.
 
-## How to turn it on
+## How to Turn It On
 
 Everything is in the app, with one exception noted at step 3.
 
@@ -50,7 +50,7 @@ Everything is in the app, with one exception noted at step 3.
    it off if you would rather look at the queue first, which is what most organizations do
    for the first month.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
@@ -61,7 +61,7 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 3. Choose **New rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
    amount `1000`. Save. You now have two rules: gifts of $1,000 and up get a letter,
    everything else gets an email.
-4. Enter a gift for $50 from one of the sample households, using **Quick gift entry**. Enter
+4. Enter a gift for $50 from one of the sample households, using **Quick Gift Entry**. Enter
    a second gift for $2,500 from another one.
 5. Go back to the Acknowledgments page. The queue now reads **1 email** and **1 letter**,
    plus whatever the sample gifts added.
@@ -73,14 +73,14 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
    print, and then press **Mark as sent** on the run. Until you press it the gifts stay in
    the letter queue, because BarnCRM cannot tell whether you printed anything.
 
-## List views
+## List Views
 
 **Acknowledgments** has **All Acknowledgments**, **Queued Acknowledgments** and **Failed
 Acknowledgments**. **Acknowledgment Rules** has **All Acknowledgment Rules**, **Active
 Acknowledgment Rules** and **Inactive Acknowledgment Rules**. **Acknowledgment Runs** has **All
 Acknowledgment Runs**.
 
-## Common mistakes
+## Common Mistakes
 
 **Two rules that both match, in the wrong order.** A rule with no minimum and no maximum
 matches everything, so if it sits above your major gift rule, your major donors get the

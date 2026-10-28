@@ -1,8 +1,8 @@
-# Migrating from NPSP
+# Migrating From NPSP
 
 **Package:** Core and Giving | **Iteration:** v0.5
 
-## 1. What it does
+## 1. What It Does
 
 If your donors and gifts are in the Nonprofit Success Pack (NPSP), BarnCRM ships three
 ready-made import templates that read NPSP's own exports: your contacts, and the payments your
@@ -12,7 +12,7 @@ file, with a preview first and an undo afterwards.
 
 The templates only name columns. Nothing in BarnCRM depends on NPSP being installed.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
 Each package adds its templates when it is installed, and an upgrade adds any template a later
@@ -23,7 +23,7 @@ it off instead if you do not want it in the list.
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
 1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
-2. The report opens (click **Re-run** if it is from earlier). A finding reads "3 shipped
+2. The report opens (click **Re-Run** if it is from earlier). A finding reads "3 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
 3. Select **Restore import templates**. Your own templates, and any shipped template you have
@@ -35,7 +35,7 @@ Before loading gifts, create in BarnCRM every appeal the gifts name, with the sa
 as your NPSP campaigns (see [Appeals](appeals.md)), and a default fund (see [Funds](funds.md)).
 A gift naming an appeal BarnCRM does not have is rejected in the preview, naming it.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 The three sample files in [samples](samples/) are small exports in exactly the shape the steps
 in section 4 produce. Create a default fund called **General Fund** and an appeal called
@@ -58,7 +58,7 @@ in section 4 produce. Create a default fund called **General Fund** and an appea
 6. Import `npsp-organization-payments.csv` with **NPSP: organization payments**. Hillside Rotary
    Club is created as an organization and gives one gift of 500.00.
 
-## 4. Moving everything, step by step
+## 4. Moving Everything, Step by Step
 
 Do it in this order. People come before gifts because the contacts file carries each person's
 full details (address, phones, preferences), which a gift file does not. A donor the gift file
@@ -147,7 +147,7 @@ them with the people query, its last line changed to
 `AND npe01__Opportunity__r.AccountId = null`, and load that file with **NPSP: opportunities
 and payments** as well.
 
-## 5. Why three templates and not one
+## 5. Why Three Templates and Not One
 
 A template remembers the columns of the last file loaded with it, so one template serves one
 file shape. The shapes differ in ways that matter:
@@ -160,14 +160,14 @@ file shape. The shapes differ in ways that matter:
 - **Payments from organizations have their own file** because a column that makes the donor an
   organization would make every person in the same file an organization too.
 
-## 6. What does not come across yet
+## 6. What Does Not Come Across Yet
 
 These are not loaded by the three templates. Each has what to do in the meantime.
 
 | Not loaded | What to do meanwhile |
 |---|---|
 | Households and who is in them | Each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
-| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load One Object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
 | General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
 | Soft credits (contact roles, partial and account soft credits) | A soft credit loads only on the same row as a new gift, and NPSP exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
@@ -177,7 +177,7 @@ These are not loaded by the three templates. Each has what to do in the meantime
 | An organization's details | A payment file creates an organization with its name only. Add its address and phone by hand. |
 | In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the template a default payment method." Load them with the **Generic gift list**, the value mapped to **Gift: fair market value** and no amount. |
 
-## 7. Common mistakes
+## 7. Common Mistakes
 
 **Rows rejected with "The tribute type Honor is not one BarnCRM knows".** The tribute type
 column still has NPSP's words. Replace them (section 4, step 5) and load the file again: rows
@@ -212,7 +212,7 @@ even after you have set them to **Do not load**. The contacts template leaves th
 out on purpose, because it would create an organization for every household. Check the column
 step on every load, or delete the column from the file.
 
-## Column reference
+## Column Reference
 
 Each template reads the columns its query in section 4 exports. The headings match whatever
 their capitals.

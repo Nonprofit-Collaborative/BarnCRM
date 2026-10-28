@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: heading of the org limits list</shortDescription>
-        <value>Your org's limits</value>
+        <value>Your Org's Limits</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitUsage</fullName>
@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: heading of BarnCRM's own storage list</shortDescription>
-        <value>What BarnCRM stores</value>
+        <value>What BarnCRM Stores</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_OwnIntro</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: storage column, the kind of record</shortDescription>
-        <value>Kind of record</value>
+        <value>Kind of Record</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_ColumnRecords</fullName>

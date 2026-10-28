@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Pause button</shortDescription>
-        <value>Pause all automation</value>
+        <value>Pause All Automation</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_PauseLength</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Resume button</shortDescription>
-        <value>Resume automation</value>
+        <value>Resume Automation</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_RunsOn</fullName>

@@ -1,6 +1,6 @@
 # Module Manager
 
-## What it does
+## What It Does
 
 The Module Manager is one list of the BarnCRM modules your org is offered, with what each one
 is doing and the one thing you can do next with it: install it, turn it on, turn it off, or
@@ -16,7 +16,7 @@ list starts with **Other Rollup Tools**: one line per tool, saying it is a separ
 whose rollups BarnCRM does not manage. See
 [DLRS and Rollup Helper in the Same Org](rollups.md#dlrs-and-rollup-helper-in-the-same-org).
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on.
 
@@ -54,7 +54,7 @@ still show in BarnCRM Settings for now; they move to the module's app in a later
 features are turned on in General instead (see
 [BarnCRM Settings, Features](barncrm-settings.md#features-general)).
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria's org has Core and Giving installed. She wants to see the list, pause Giving while she
 cleans up her data, and check what removing a module would cost.
@@ -75,17 +75,17 @@ cleans up her data, and check what removing a module would cost.
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
    first: Salesforce refuses Giving, Volunteers, Funders and Mirror until BarnCRM Rollup Builder is
    installed, and Funders and Mirror until Giving is too.
-3. On the **Giving** row, click **Turn off**. The row says **Installed and off**. Giving's
+3. On the **Giving** row, click **Turn Off**. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted
    gift, keeps running. Your records stay exactly as they are.
-4. Click **Turn on**. The row says **Installed** again, Giving's automation runs again with every switch on
+4. Click **Turn On**. The row says **Installed** again, Giving's automation runs again with every switch on
    the Automation page as you left it, and you are given the module's administrator access
    (for Giving, the Giving Admin permission set) if you did not have it. Giving it takes
    Salesforce's Assign Permission Sets permission, which a system administrator has and a
    BarnCRM Admin gets from **BarnCRM Access Manager** (see [Access](access.md)); without it
    the module still turns on and an administrator assigns the set in Setup.
-5. On the **Giving** row, click **What an uninstall deletes**. A short report lists each kind
+5. On the **Giving** row, click **What an Uninstall Deletes**. A short report lists each kind
    of record the module owns and how many of each your org has, for example `Gift: 1,204`.
    A count with a `+`, for example `2,300+`, means at least that many: Salesforce lets one
    page read only 50,000 records in total, so the report shares that between the kinds of
@@ -114,7 +114,7 @@ recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the 
 Finish Setup is a recovery step for an org built from copied source, not a way to install
 BarnCRM: install the packages.
 
-## Common mistakes
+## Common Mistakes
 
 - **Expecting Show Nonprofit Modules to remove or pause anything.** It only hides rows. A
   hidden module that is installed keeps working, and it is counted in the line under the
@@ -134,7 +134,7 @@ BarnCRM: install the packages.
   off stops every rollup at once, Giving's gift totals included: no save, Flow, queue run,
   nightly run or Recalculate updates a total while it is **Installed and off**, a
   recalculation already running stops, and nothing is processed while it is off. The values
-  already on your records stay. **Turn on** puts every total right: it starts the totals that
+  already on your records stay. **Turn On** puts every total right: it starts the totals that
   waited and a recalculation of every active rollup in the background. The check on a
   rollup's save (**Check rollups before saving**) pauses with the module; a rollup saved while
   it is off that cannot be calculated is skipped by that recalculation and logged in the Error

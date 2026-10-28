@@ -1,6 +1,6 @@
-# In-app tips
+# In-App Tips
 
-## What it does
+## What It Does
 
 BarnCRM ships four short tips that Salesforce shows the first time someone opens a BarnCRM
 page where a pointer saves them a search through this guide. They use Salesforce's own
@@ -22,12 +22,12 @@ Nobody needs a licence for these tips. They are single prompts, not walkthroughs
 not count toward Salesforce's limit of three active walkthroughs in an org without the
 Enablement add-on, and Salesforce sets no limit today on prompts installed with a package.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on. The tips are active as soon as BarnCRM is installed.
 
 - **Who sees them:** anyone who opens the page in the BarnCRM Console app, including a page
-  opened there from the Home tab's **Quick links** or the app launcher. A person who cannot open a
+  opened there from the Home tab's **Quick Links** or the app launcher. A person who cannot open a
   tab (for example Import without the BarnCRM Admin role) never sees its tip.
 - **How often:** once per person per tip. Salesforce also waits 24 hours between any two tips
   in the same app, counting your organization's own prompts, so someone who opens Settings and
@@ -37,17 +37,17 @@ There is nothing to turn on. The tips are active as soon as BarnCRM is installed
   and BarnCRM Admin Console among them), and in the Salesforce
   mobile app, which does not show in-app guidance.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 1. As a person who has never opened BarnCRM Settings, open the **BarnCRM Console** app and,
-   under **Quick links** on the Home tab, **BarnCRM Settings**. Result: a docked panel opens at the bottom right, headed "BarnCRM
+   under **Quick Links** on the Home tab, **BarnCRM Settings**. Result: a docked panel opens at the bottom right, headed "BarnCRM
    tips", with three short paragraphs.
 2. Minimize the panel. Result: it closes. It does not come back on your next visit.
 3. The next day, open the **Find** tab. Result: a small floating tip titled "Find exactly the
    records you need" appears.
 4. Choose **Got it**. Result: the tip closes for good.
 
-## Turning the tips off
+## Turning the Tips Off
 
 The tips are managed in Salesforce Setup, not in BarnCRM Settings, because they are
 Salesforce In-App Guidance: Salesforce gives an app no supported way to switch its prompts on
@@ -64,7 +64,7 @@ or off for you, and Setup is where your organization's own prompts are managed t
 
 After a BarnCRM upgrade, check that the tips you turned off are still off.
 
-## Common mistakes
+## Common Mistakes
 
 - **"Nobody sees the Import tip."** Salesforce shows at most one tip per app per day. If your
   organization has its own prompts in the BarnCRM app, they share that allowance.

@@ -16,7 +16,7 @@
     <field>Type</field>
     <literalValue>Meeting</literalValue>
   </fieldOverrides>
-  <label>Log an interaction</label>
+  <label>Log an Interaction</label>
   <optionsCreateFeedItem>false</optionsCreateFeedItem>
   <quickActionLayout>
     <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>

@@ -1,6 +1,6 @@
-# Refunds and write-offs
+# Refunds and Write-Offs
 
-## What it does
+## What It Does
 
 Sometimes money goes back: a card is charged twice, a donor asks for a gift to be returned,
 or a check recorded as received bounces and finance writes it off. BarnCRM never
@@ -15,7 +15,7 @@ Refunds and write-offs are for money you received. A **Pending** gift that will 
 such as a pledge payment that never came, is not written off: you set its **Status** to
 **Cancelled** (see [Cancelling a Pending gift](#cancelling-a-pending-gift) below).
 
-## What a refund does to the donor's totals
+## What a Refund Does to the Donor's Totals
 
 The negative gift and the gift it reverses cancel each other, so nothing has to be adjusted
 by hand. Ana gave 250 and asked for 100 back:
@@ -49,7 +49,7 @@ returned leaves them recognized for 300, and the link between the two gifts stay
 You do not have to unlink the pair first. Refunding the employee's own gift does not change
 the match, because the company's money is still money you are holding.
 
-## How to turn it on
+## How to Turn It On
 
 Refunds and write-offs arrive with the Giving module. There is nothing to configure.
 
@@ -58,7 +58,7 @@ Staff** or **Giving Admin** permission set. It asks which of the two you are rec
 there is one button rather than two that look unrelated. **Giving Read Only** users can see
 the result but cannot record one.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David. The 250 check from the Gifts page walkthrough was partly a mistake: 100 of it
 was meant for another organization, and the donor has asked for it back.
@@ -75,7 +75,7 @@ was meant for another organization, and the donor has asked for it back.
 5. Look at that refund gift's allocations: one allocation for minus 100 against `General`,
    mirroring the original's designation, so the fund's total corrects itself.
 6. Go back to `G-000001`. It still shows 250 and its **Status** is still `Received`, because
-   only part of it came back. The refund is visible in its **Refunds and Write-offs** list.
+   only part of it came back. The refund is visible in its **Refunds and Write-Offs** list.
 7. Now refund the rest: click **Refund or Write Off** on `G-000001` again. The amount starts
    at 150, which is what is left. Give a reason and click **Record it**. This time the
    original's **Status** changes to `Refunded`, because the whole gift has now gone back,
@@ -88,7 +88,7 @@ was meant for another organization, and the donor has asked for it back.
    edit it and set **Status** to `Cancelled`. It saves, and no negative gift is created. Your
    donor's totals and the accounting export never counted it, and still do not.
 
-## Cancelling a Pending gift
+## Cancelling a Pending Gift
 
 A Pending gift is money you expect. If it will never arrive, edit the gift and set **Status**
 to **Cancelled**. Nothing else changes: no negative gift is created, and a Cancelled gift is in
@@ -100,7 +100,7 @@ installment for the next gift. If the money turns up after all, set the gift bac
 Cancelled gift moves only back to Pending. Each change is written to the Error Log, with who
 made it.
 
-## Common mistakes
+## Common Mistakes
 
 - **Editing the gift amount instead of refunding.** If a receipt has been issued the save is
   refused outright, and if it has not, you have quietly restated a period Tom already
@@ -119,7 +119,7 @@ made it.
   **Status** to **Cancelled** instead. On a page your organization built, the action is
   there but refused with "Only a received gift can be refunded or written off".
 - **Refunding more than is left.** The action is refused with "This refund is larger than
-  the amount left on the gift." Check the gift's **Refunds and Write-offs** list: part of it
+  the amount left on the gift." Check the gift's **Refunds and Write-Offs** list: part of it
   may have gone back already.
 - **Typing a negative gift by hand instead of using the action.** You cannot: **Original
   Gift** and **Refund Reason** are filled in by the action and are read only on the page. The

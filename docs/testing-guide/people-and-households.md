@@ -1,10 +1,10 @@
-# People and households
+# People and Households
 
 Scripts for people, households, the Members and Household panels, names and greetings, merge and split, preferred phone, interaction notes and the record pages. Setup detail: [Households](../admin-guide/households.md), [Household members](../admin-guide/household-members.md), [Household names and greetings](../admin-guide/household-naming.md), [Merging and splitting households](../admin-guide/household-merge-split.md), [Preferred phone](../admin-guide/preferred-phone.md), [Interaction notes](../admin-guide/interaction-notes.md), [Record pages](../admin-guide/record-pages.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household upkeep** and **Preferred email and phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **People and Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household Upkeep** and **Preferred Email and Phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **People and Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
 
-## T-HH-01: A new person gets a household
+## T-HH-01: A New Person Gets a Household
 
 **Purpose:** saving a person with no household creates and names one, and both panels show it.
 **Prerequisites:** admin. **Create a household automatically** is on (ships on).
@@ -19,7 +19,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** keep Ada and The Testwell Family for T-HH-02 to T-HH-07.
 
-## T-HH-02: Add member and automatic naming (simple way)
+## T-HH-02: Add Member and Automatic Naming (Simple Way)
 
 **Purpose:** Add member creates a person in the household and the name and greetings follow the members.
 **Prerequisites:** admin, simple way, T-HH-01 done. Use T-HH-03 instead in the flexible way.
@@ -35,14 +35,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Wei Lee.
 
-## T-HH-03: Add member (flexible way)
+## T-HH-03: Add Member (Flexible Way)
 
 **Purpose:** in the flexible way Add member offers search and create.
 **Prerequisites:** admin, flexible way, T-HH-01 done.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Testwell Family, select **Add member**. | The panel shows **Add someone already in Salesforce** with a search box (placeholder **Search by name**) and **Or add someone new** with Salutation, First name and Last name. |
+| 1 | On The Testwell Family, select **Add member**. | The panel shows **Add Someone Already in Salesforce** with a search box (placeholder **Search by name**) and **Or Add Someone New** with Salutation, First name and Last name. |
 | 2 | Type `zzqq` in the search box. | **No matches. Keep typing, or add them as a new person below.** |
 | 3 | Leave Last name empty and select **Save**. | **Enter at least a last name before saving.** Nothing is created. |
 | 4 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | A toast confirms the add; Ben is listed; after refresh Member Count is **2** and Informal Greeting **Ada and Ben**. |
@@ -52,22 +52,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Diego's ended membership record.
 
-## T-HH-04: Make primary
+## T-HH-04: Make Primary
 
 **Purpose:** Make primary moves the primary contact and the Primary Contact field follows.
 **Prerequisites:** admin, The Testwell Family with Ada and Ben.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Ben's row select **Make primary**. | A toast reads **Ben Testwell is now the primary contact.** The **Primary** badge moves to Ben; **Make primary** now shows on Ada's row and not on Ben's. |
+| 1 | On Ben's row select **Make Primary**. | A toast reads **Ben Testwell is now the primary contact.** The **Primary** badge moves to Ben; **Make Primary** now shows on Ada's row and not on Ben's. |
 | 2 | Refresh. | Primary Contact reads **Ben Testwell**. |
 | 3 | Simple way: edit the household and set Primary Contact to **Harper Garcia**. | Refused: **The Primary Contact has to be somebody in this household. Choose one of its members, or move the person into the household first.** |
 | 4 | Flexible way: edit the household and change Primary Contact to Ada. | Refused with a message starting **In this org a household's Primary Contact follows the member marked primary.** |
-| 5 | Select **Make primary** on Ada to put it back. | Badge and Primary Contact return to Ada. |
+| 5 | Select **Make Primary** on Ada to put it back. | Badge and Primary Contact return to Ada. |
 
 **Cleanup:** None.
 
-## T-HH-05: Greetings: deceased, preferred name, exclusions, custom name
+## T-HH-05: Greetings: Deceased, Preferred Name, Exclusions, Custom Name
 
 **Purpose:** person-level boxes change the greetings and Custom Name locks them.
 **Prerequisites:** admin, The Testwell Family with Ada and Ben, **Include people who have died in names** off (ships off).
@@ -83,7 +83,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Cy Testwell; clear Ben's Preferred Name.
 
-## T-HH-06: Naming patterns, preview and recompute
+## T-HH-06: Naming Patterns, Preview and Recompute
 
 **Purpose:** the naming panel previews, saves and recomputes, and is read only without the permission.
 **Prerequisites:** admin; read-only user for step 6.
@@ -100,7 +100,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** pattern back to `The {LastName} Family`.
 
-## T-HH-07: Merge two households (with cancel)
+## T-HH-07: Merge Two Households (with Cancel)
 
 **Purpose:** merge combines two households after a warning, and cancel leaves both untouched.
 **Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (Organization record type).
@@ -109,30 +109,30 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Create a contact `Cara` `Testwell` with no account. | A second household named **The Testwell Family** is created for her. |
-| 2 | Open the first Testwell household (Ada's) and select **Merge or split** in the action bar. | A window titled **Merge or split households** opens on the **Merge** tab with **Pick a household to see the two side by side.** |
-| 3 | Type `Testwell` in **Find the other household** and pick Cara's household. | The comparison shows **Field**, **This household**, **The other household**; differing values offer **Keep this one** or **Keep the other one**. **Members after the merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
+| 2 | Open the first Testwell household (Ada's) and select **Merge or Split** in the action bar. | A window titled **Merge or Split Households** opens on the **Merge** tab with **Pick a household to see the two side by side.** |
+| 3 | Type `Testwell` in **Find the other household** and pick Cara's household. | The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep this one** or **Keep the other one**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
 | 4 | Select **Merge**. | A dialog headed **This cannot be undone** says Cara's household will be combined into this one. |
 | 5 | Select **Cancel**. | Nothing changes: both households still exist with their members. |
-| 6 | Select **Merge**, then **Merge households**. | Toast **Merged. The household you kept now holds everyone from both.** The window closes and the page refreshes: Member Count **3**, Cara in **Members**. Cara's old household no longer exists. |
+| 6 | Select **Merge**, then **Merge Households**. | Toast **Merged. The household you kept now holds everyone from both.** The window closes and the page refreshes: Member Count **3**, Cara in **Members**. Cara's old household no longer exists. |
 | 7 | Type `Bayview` in **Find the other household**. | **No households match what you typed.** Organizations are never offered. |
 
 **Cleanup:** keep the merged household for T-HH-08.
 
-## T-HH-08: Split and reverse a split
+## T-HH-08: Split and Reverse a Split
 
 **Purpose:** split moves people to a new household, and a second split to an existing household reverses it.
 **Prerequisites:** admin, The Testwell Family with Ada, Ben and Cara.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Select **Merge or split**, then the **Split** tab. | **Choose who moves out** lists the three members; **Split** is disabled until someone is ticked. |
+| 1 | Select **Merge or Split**, then the **Split** tab. | **Choose Who Moves Out** lists the three members; **Split** is disabled until someone is ticked. |
 | 2 | Tick Cara, leave **A new household**, and select **Split**. | A dialog headed **Split this household?** opens. |
 | 3 | Select **Split** in the dialog. | Toast **Moved. Both household names and member counts are up to date.** Cara's new household **The Testwell Family** has Member Count **1**; the original has **2**. |
-| 4 | Undo: on Cara's new household, **Merge or split**, **Split**, tick Cara, choose **An existing household**, search `Testwell`, pick the original, and split. | Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete a household once it is empty** ships off. |
+| 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, search `Testwell`, pick the original, and split. | Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete a household once it is empty** ships off. |
 
 **Cleanup:** delete the empty household.
 
-## T-HH-09: Household settings
+## T-HH-09: Household Settings
 
 **Purpose:** delete-empty and the way-of-belonging guard work from the console.
 **Prerequisites:** admin, sample data loaded.
@@ -147,7 +147,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Dee Testempty.
 
-## T-HH-10: Read-only user on people and households
+## T-HH-10: Read-Only User on People and Households
 
 **Purpose:** a read-only user sees households but cannot change BarnCRM membership or settings.
 **Prerequisites:** read-only user, with the Salesforce **Read Only** profile as [Before you test](before-you-test.md#test-users) says (a profile that can edit accounts and contacts would show the buttons below).
@@ -155,13 +155,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Households** tab and The Garcia Family. | The **Members** panel and **Name and Greetings** show. |
-| 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add member**, **Move to another household** or **Make primary** button. |
+| 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add member**, **Move to another household** or **Make Primary** button. |
 | 3 | Open the **Household Members** tab (from the navigation menu if it is not shown). | It opens and lists membership records (none in the simple way of belonging); no **New** button. |
 | 4 | Open **BarnCRM Settings**, **People and Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
 
 **Cleanup:** None.
 
-## T-HH-11: Preferred phone
+## T-HH-11: Preferred Phone
 
 **Purpose:** Preferred Phone copies the chosen number into Phone and refuses an empty choice.
 **Prerequisites:** admin; **Copy preferred phone on a person** on (Automation page, ships on). Home Phone, Mobile, Other Phone, Work Phone and Preferred Phone are in the person page's **Reaching This Person** section.
@@ -176,34 +176,34 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-HH-12: Log an interaction
+## T-HH-12: Log an Interaction
 
 **Purpose:** Log an interaction saves a completed activity on the person and the household.
 **Prerequisites:** staff user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open Harper Garcia and select **Log an interaction**. | A window opens with Subject, the date (defaults to today), Type (**Meeting**), Name, Assigned To and Comments. |
+| 1 | Open Harper Garcia and select **Log an Interaction**. | A window opens with Subject, the date (defaults to today), Type (**Meeting**), Name, Assigned To and Comments. |
 | 2 | Enter Subject `Coffee test`, change the date to last Friday, and save. | The note appears under past activity on Harper, dated last Friday, completed. |
 | 3 | Clear Subject and try to save a second note. | The window refuses the save until Subject is filled. |
-| 4 | Open The Garcia Family and select **Log an interaction**, choose **Luis Garcia** in Name, and save. | The note shows on the household and on Luis. |
+| 4 | Open The Garcia Family and select **Log an Interaction**, choose **Luis Garcia** in Name, and save. | The note shows on the household and on Luis. |
 
 **Cleanup:** delete both notes.
 
-## T-HH-13: Record pages by record type
+## T-HH-13: Record Pages by Record Type
 
 **Purpose:** the shipped pages show the right sections and actions per record.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open The Garcia Family. | Sections **Details** and **Name and Greetings**; panels **Members** and **Addresses**; actions **Edit**, **Log an interaction**, **Merge or split**, **Delete**. |
-| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** with Website; **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or split**. |
-| 3 | Open Harper Garcia. | Sections **Person**, **Household**, **Reaching This Person**; panels **Household**, **Relationships**, **Affiliations**, **Addresses**; no **Merge or split**. |
+| 1 | Open The Garcia Family. | Sections **Details** and **Name and Greetings**; panels **Members** and **Addresses**; actions **Edit**, **Log an Interaction**, **Merge or Split**, **Delete**. |
+| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** with Website; **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or Split**. |
+| 3 | Open Harper Garcia. | Sections **Person**, **Household**, **Reaching This Person**; panels **Household**, **Relationships**, **Affiliations**, **Addresses**; no **Merge or Split**. |
 
 **Cleanup:** None.
 
-## T-HH-14: Person account gets a household
+## T-HH-14: Person Account Gets a Household
 
 **Purpose:** a person stored as an account gets a household in the flexible way.
 **Prerequisites:** admin, Person Accounts org shape, flexible way, **Household of Person** added to the person account page ([Household members](../admin-guide/household-members.md)).
@@ -216,20 +216,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Pat Testaccount and the household.
 
-## T-HH-15: Staff merge households without Delete on Account
+## T-HH-15: Staff Merge Households Without Delete on Account
 
 **Purpose:** a Team Member who cannot delete accounts can still merge two households they can edit, and cannot merge one they cannot edit.
 **Prerequisites:** admin; a second user `Merge Tester` on the **Minimum Access - Salesforce** profile (the Standard User profile gives Delete on Account, which would hide the problem), given the **Team Member** role on **BarnCRM Settings**, **Access**. Two households `The Mergetest Family`, each created by admin by adding one contact (Maria Mergetest and Wei Mergetest, each in their own household) and then given to Merge Tester with **Change Owner**, and a third household `The Otherowner Family` owned by admin that Merge Tester can read but not edit (only in an org whose account sharing is Private or Public Read Only).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Log in as Merge Tester. Open the first Mergetest household and select **Merge or split**. | The **Merge** tab opens. There is no notice that changes are switched off. |
-| 2 | Pick the second Mergetest household, select **Merge**, then **Merge households**. | Toast **Merged. The household you kept now holds everyone from both.** The other household no longer exists, and both Maria and Wei are members of the kept one. |
-| 3 | On the kept household, select **Merge or split** and pick The Otherowner Family, then **Merge**, **Merge households**. | Refused with **You need edit access to both households to merge them.** Both households are unchanged. |
+| 1 | Log in as Merge Tester. Open the first Mergetest household and select **Merge or Split**. | The **Merge** tab opens. There is no notice that changes are switched off. |
+| 2 | Pick the second Mergetest household, select **Merge**, then **Merge Households**. | Toast **Merged. The household you kept now holds everyone from both.** The other household no longer exists, and both Maria and Wei are members of the kept one. |
+| 3 | On the kept household, select **Merge or Split** and pick The Otherowner Family, then **Merge**, **Merge Households**. | Refused with **You need edit access to both households to merge them.** Both households are unchanged. |
 
 **Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
 
-## T-HH-17: A person in a household is not pointed at an organization
+## T-HH-17: A Person in a Household Is Not Pointed at an Organization
 
 **Purpose:** in the simple way of belonging, changing a household member's Account Name to an organization is refused, while a person already at an organization can still be moved between organizations.
 **Prerequisites:** admin, the simple way of belonging. Two organizations (Organization record type) `Zztest Library` and `Zztest Trust`.
@@ -243,7 +243,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Hana, Omar, The Hhsixteen Family and both organizations.
 
-## T-HH-16: A blocking Account duplicate rule does not stop a new person
+## T-HH-16: A Blocking Account Duplicate Rule Does Not Stop a New Person
 
 **Purpose:** households BarnCRM creates are saved past the org's Account duplicate rules, so adding a person never fails over a look-alike household.
 **Prerequisites:** admin; in Setup, an active Account duplicate rule on the standard account matching rule with **Action On Create** set to **Block**. Contact `Ana Duptest` already saved, with her household **The Duptest Family**.

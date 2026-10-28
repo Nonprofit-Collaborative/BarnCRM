@@ -190,7 +190,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: column, why it was voided</shortDescription>
-    <value>Void reason</value>
+    <value>Void Reason</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ColumnFile</fullName>
@@ -214,7 +214,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: button, issue a receipt</shortDescription>
-    <value>Issue receipt</value>
+    <value>Issue Receipt</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_VoidReasonField</fullName>
@@ -230,7 +230,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: button, void and reissue</shortDescription>
-    <value>Void and reissue</value>
+    <value>Void and Reissue</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_VoidNote</fullName>

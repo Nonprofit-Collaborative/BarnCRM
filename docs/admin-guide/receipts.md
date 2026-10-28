@@ -1,6 +1,6 @@
-# Receipts and year-end statements
+# Receipts and Year-End Statements
 
-## What it does
+## What It Does
 
 BarnCRM produces the numbered PDF a donor needs at tax time: one receipt for one gift,
 or one consolidated statement listing everything a donor gave in a year. Each document
@@ -15,11 +15,11 @@ document does this donor actually hold".
 The required tax wording is written by BarnCRM, not by you. You write the letter around
 it.
 
-## How to turn it on
+## How to Turn It On
 
 Everything is on one page: **BarnCRM, then BarnCRM Settings, then Receipts**.
 
-### 1. Check your organization details
+### 1. Check Your Organization Details
 
 The Organization section of BarnCRM Settings holds your legal name, your tax
 identification number, your address, your logo, your signature image, and the name and
@@ -33,7 +33,7 @@ tax identification number prints at the bottom. That letterhead is not part of t
 edit: BarnCRM prints it from these settings, so a receipt can never go out without your
 organization on it. To change it, change the settings, not the letter.
 
-### 2. Set your numbering
+### 2. Set Your Numbering
 
 In the Receipts section:
 
@@ -54,7 +54,7 @@ record page of its own, add the **Receipts** component to that page instead. Thi
 one-time assignment the soft credits and tributes panels need, so if you have already done it
 for those, the Receipts panel is there too.
 
-### 3. Choose how your logo prints
+### 3. Choose How Your Logo Prints
 
 Still in the Receipts section:
 
@@ -68,7 +68,7 @@ Still in the Receipts section:
   BarnCRM support try another route without waiting for a new version. Its dropdown offers
   the three routes: File download, Embedded image and Document server.
 
-### 4. Write your two letters
+### 4. Write Your Two Letters
 
 Also in the Receipts section, **Receipt Letters and Year End Statements** opens the Receipt
 Letters page (the **Receipt Letters** tab), which has two tabs. It opens as its own page rather than inside the settings console,
@@ -79,7 +79,7 @@ BarnCRM ships one letter of each kind:
 - **Consolidated statement**, for a donor's whole year.
 
 Both letters are created when the package is installed. If the list is empty, that step did
-not finish: click **Restore the shipped letters** and the two come back. Restoring is safe to
+not finish: click **Restore the Shipped Letters** and the two come back. Restoring is safe to
 run at any time, and it never touches a letter you have already edited.
 
 Pick a letter and edit the wording in the editor, the way you would in an email: bold,
@@ -91,7 +91,7 @@ logo) is not in the editor, because BarnCRM prints it on every document.
 Click **Preview** to see the letter filled in for a sample gift from a sample donor, with the
 tax sentences and signature BarnCRM adds. The preview is the wording, not the printed page:
 to check the PDF layout, issue a receipt for a test gift. Then click **Save**. If the letter
-you edited is not the one in use, **Use this letter** switches it on and switches the other
+you edited is not the one in use, **Use This Letter** switches it on and switches the other
 one of its kind off. Only one letter of each kind is in use at a time.
 
 If you edited a letter before this editor existed and gave it your own header, the next time
@@ -102,7 +102,7 @@ wrote yourself is not, and your name would then print twice. Delete it and save.
 them to every document regardless of what the letter says. That is deliberate: those
 sentences are what makes the document a valid receipt.
 
-### 5. Give people access
+### 5. Give People Access
 
 On the Access page, **Giving Staff** and **Giving Admin** can issue, void and reissue
 receipts and start a run. Everyone with any Giving permission set can read receipts and open
@@ -127,7 +127,7 @@ letters all need the Manage BarnCRM Settings permission, exactly like every othe
 BarnCRM Settings. Issuing receipts does not: that is day to day work and needs only Giving
 Staff.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start from the sample data.
 
@@ -136,7 +136,7 @@ Start from the sample data.
 2. Open **Receipt Letters and Year End Statements**, and on the **Receipt Templates** tab
    check that a letter of each kind is in use. If one is not, pick it and click **Use this
    letter**.
-3. Open any gift from the sample data. Click **Issue receipt** on the **Receipts** panel. A
+3. Open any gift from the sample data. Click **Issue Receipt** on the **Receipts** panel. A
    Pending or Cancelled gift is refused ("A pending or cancelled gift cannot be receipted,
    because no money has arrived"): mark it Received first. Year-end statements leave those two
    statuses out too.
@@ -150,7 +150,7 @@ Start from the sample data.
 5. Now break it on purpose. Try to change the gift's amount. The save is refused with "This
    gift has a receipt number, so its amount, date, donor and in-kind description cannot
    change. Void the receipt and reissue it, or record a refund."
-6. On the gift, click **Void and reissue**. Type a reason, for example "Amount was entered
+6. On the gift, click **Void and Reissue**. Type a reason, for example "Amount was entered
    wrongly". You get a second receipt with the next number, the first one is marked Void with
    your reason and today's date, and **the original PDF is still there, untouched**. Open
    both files and compare them.
@@ -167,7 +167,7 @@ Start from the sample data.
 That is the whole feature. Steps 5 and 6 are the ones worth doing twice, because they are
 what makes the rest trustworthy.
 
-## Common mistakes
+## Common Mistakes
 
 **Changing the prefix or the counter after you have issued receipts.** The numbering
 sequence is created the first time a receipt of a given kind is issued in a given year, and
@@ -189,7 +189,7 @@ cannot be filled in by hand." A number typed in belongs to no receipt, so there 
 nothing to send; it locks the gift's amount, date and donor as if a donor were holding a
 document; the same number can still come out of the counter later and land on somebody's
 year-end statement; and the gift itself can never be receipted afterwards, because BarnCRM
-sees a number already there. Use **Issue receipt** on the gift instead. If a gift in your org
+sees a number already there. Use **Issue Receipt** on the gift instead. If a gift in your org
 already carries a number that no receipt matches, see "Lifting the receipt lock" in
 [Gifts](gifts.md): clearing the number there puts the gift back in reach of Issue receipt.
 **Looking for a receipt in the Files list on a donor's household.** It is not there, and it
@@ -220,7 +220,7 @@ amount is on a cash gift, because it is printed on the document the donor holds;
 market value stays editable, because it is on no document. See
 [In-kind gifts](in-kind-gifts.md).
 
-## Three things to know before you rely on this
+## Three Things to Know Before You Rely on This
 
 Recorded here rather than hidden, because each may change what you see:
 
@@ -243,7 +243,7 @@ Recorded here rather than hidden, because each may change what you see:
    thousands of donors, run your statements early in January rather than the night before you
    want to post them, and watch the Receipt Run record.
 
-## Fields, for a report builder
+## Fields, for a Report Builder
 
 | What you want to report on | Object |
 |---|---|

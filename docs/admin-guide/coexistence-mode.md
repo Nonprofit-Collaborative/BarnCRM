@@ -1,6 +1,6 @@
-# Coexistence mode
+# Coexistence Mode
 
-## What it does
+## What It Does
 
 BarnCRM can be the only system in your Salesforce org that keeps households, or it can sit
 alongside one that is already there. Coexistence mode is the one setting that records
@@ -14,7 +14,7 @@ Most organizations have nothing else in the org, and BarnCRM runs on its own: th
 time you open the Setup Assistant or the Health Check, proposes the matching mode, and asks
 you to confirm it. You can change it later, and nothing about it is permanent.
 
-## The modes
+## The Modes
 
 BarnCRM offers only the modes that fit your org:
 
@@ -38,7 +38,7 @@ BarnCRM recommends Nonprofit Cloud coexistence when it finds Nonprofit Cloud obj
 otherwise NPSP coexistence when it finds NPSP, otherwise Standalone. If you are not sure,
 take the mode BarnCRM proposes. It reads your org, it does not guess.
 
-## How to turn it on
+## How to Turn It On
 
 Coexistence mode is always on: every org has a mode. What you do is confirm or change it.
 
@@ -56,7 +56,7 @@ Everyone with the BarnCRM Admin role has it.
 
 There is nothing to do in Salesforce Setup. Detection happens inside the app.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria has just installed BarnCRM into her organization's Salesforce org. Person Accounts
 are on, because that is how the org was set up for her two years ago, and nothing else that
@@ -67,8 +67,8 @@ keeps households is installed.
 2. Health Check runs. The first card is **What We Found in Your Org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
 4. Below the card there is a finding titled **Coexistence mode is not confirmed yet**, with
-   the button **Use recommended mode**.
-5. Maria clicks **Use recommended mode**. The page saves Standalone, re-runs itself, and the
+   the button **Use Recommended Mode**.
+5. Maria clicks **Use Recommended Mode**. The page saves Standalone, re-runs itself, and the
    finding is replaced by **Coexistence mode matches your org**. Household membership is a
    separate setting: because her org has Person Accounts, BarnCRM proposes a membership
    record for each person, and never overwrites a membership choice already made.
@@ -84,7 +84,7 @@ coexistence**; household membership is left as it is. With Nonprofit Cloud the c
 **Nonprofit Cloud objects detected** and the recommendation is **Nonprofit Cloud
 coexistence**, which switches household membership to junction mode at the same time.
 
-## Common mistakes
+## Common Mistakes
 
 **Expecting the mode to sort out Person Accounts.** What matters in a Person Accounts org
 is the household membership setting, not the mode. Confirming Nonprofit Cloud coexistence

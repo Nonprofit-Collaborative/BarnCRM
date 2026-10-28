@@ -1,6 +1,6 @@
 # Volunteers
 
-## What it does
+## What It Does
 
 The BarnCRM Volunteers module keeps track of the work volunteers do: the **jobs** your
 organization needs help with, the dated **shifts** of each job, who **signed up** for a shift,
@@ -30,10 +30,10 @@ creates no hours and nothing catches up later: enter those hours by hand. There 
 portal: volunteers do not log in.
 
 This page covers installing the module, who gets which access, its settings, the volunteer
-totals, the coordinator dashboard, the **Sign-ups** panel on a shift, the **Approve Hours**
+totals, the coordinator dashboard, the **Sign-Ups** panel on a shift, the **Approve Hours**
 screen and recurring shifts.
 
-## Before you install
+## Before You Install
 
 - Volunteers is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs the **BarnCRM Rollup Builder** module installed first: the volunteer totals are
@@ -66,10 +66,10 @@ from today with places left) and **Past Shifts Still Open** (shifts that ended m
 are still Open); **All Hours** and **Awaiting Approval**; **All Requirements** and
 **Not Current**; **All Skills**, **Active Skills** and **Inactive Skills**; **All Volunteer Letter
 Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates**; and
-**All Sign-ups** (on the **Volunteer Sign-ups** tab, after Shifts). Pick one from the list view
+**All Sign-Ups** (on the **Volunteer Sign-ups** tab, after Shifts). Pick one from the list view
 menu at the top left.
 
-## Roles and permission sets
+## Roles and Permission Sets
 
 You never assign the Volunteers permission sets by hand. Give people their BarnCRM role on the
 [Access](access.md) page as usual, and the module gives each role its Volunteers set:
@@ -100,7 +100,7 @@ themselves; a Coordinator or Admin sees everyone's. A Read Only user enters none
 hours entries at all. The totals on a person count every approved entry whoever entered it, and
 everyone who can see the person sees them.
 
-## Skills and interests
+## Skills and Interests
 
 The module keeps your own list of skills and interests, for example "Spanish", "Forklift
 licence" or "Working with children". It ships none: you write the list.
@@ -134,7 +134,7 @@ Admins, Coordinators and Team Members all add and remove a job's skills.
 Finding volunteers for a shift by skill and availability arrives with a later part of the
 module; until then the records are the data it will use.
 
-## Onboarding requirements
+## Onboarding Requirements
 
 Each onboarding step a volunteer goes through is one **Volunteer Requirement** on the person (a
 Contact, or an Account where your people are person accounts): an **Application**, a
@@ -165,7 +165,7 @@ requirements list's rows, whatever the layout shows.
 
 **Readiness at a glance.** In the BarnCRM Volunteers app, a person opens on the **Volunteers
 Contact Record Page** (or the **Volunteers Account Record Page** for a person account): BarnCRM
-Core's person page plus a **Volunteer readiness** card. The card lists every requirement type
+Core's person page plus a **Volunteer Readiness** card. The card lists every requirement type
 (Application, Background check, Orientation and any you added) with the person's most recently
 added row for it: its status, completed date and expiry, and **Current** or **Not current**. A
 type the person has no row for says **Not started**. Click a type to open its row. The card
@@ -224,7 +224,7 @@ settings, and each saves as you change it.
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
 
-## Recurring shifts
+## Recurring Shifts
 
 Most volunteer work repeats. Instead of adding each Saturday's shift by hand, add a **shift
 schedule** to the job: on the job, in the **Shift Schedules** list, click **New** and fill in:
@@ -281,7 +281,7 @@ Read Only users see schedules and change nothing.
 "Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule all nightly jobs** fix. While Volunteers is turned
 off, no shifts are created; the first night after you turn it back on catches up.
 
-## Hour letters and certificates
+## Hour Letters and Certificates
 
 A coordinator can give a volunteer a PDF letter stating their hours (for a school service
 requirement, court ordered service or an employer's matching program) or a certificate of
@@ -319,18 +319,18 @@ made before its template was renamed or deleted is no longer recognized: erasing
 keeps it, listed as **Kept** with their other files, for you to delete by hand (see Erasing a
 volunteer below).
 
-**One person.** The **Volunteer letter** action is already on the **Volunteers Contact Record
+**One person.** The **Volunteer Letter** action is already on the **Volunteers Contact Record
 Page** and the **Volunteers Account Record Page** (the pages the BarnCRM Volunteers app uses), in
 the actions at the top of the record. On a record page of your own, or in another app, add it
 yourself. If the page lists its own actions, open it in the Lightning App Builder, select the
-highlights panel and add **Volunteer letter** to its actions. Otherwise, in Setup go to **Object
+highlights panel and add **Volunteer Letter** to its actions. Otherwise, in Setup go to **Object
 Manager**, **Contact**, **Page Layouts**, open each layout your people use, choose **Mobile &
-Lightning Actions** in the palette, and drag **Volunteer letter** into the **Salesforce Mobile
+Lightning Actions** in the palette, and drag **Volunteer Letter** into the **Salesforce Mobile
 and Lightning Experience Actions** section (click **override the predefined actions** first if
 that section says its actions are predefined). If your people are held as person accounts, do
 the same under **Object Manager**, **Person Account**, **Page Layouts**.
 
-On a person, click **Volunteer letter**, choose the template and the period, click **Preview**
+On a person, click **Volunteer Letter**, choose the template and the period, click **Preview**
 to read it, then **Generate**. The action offers the active template of each type, so make a
 new template active to try it. A person with no approved hours in the period gets no letter,
 and the action says so. On a household or organization account the action says that letters
@@ -351,9 +351,9 @@ approved hours in the period), and how many failed; for failures it points to th
 [Error Log](error-log.md). It is the BarnCRM job notification, so the **Tell people when their long jobs finish**
 option in BarnCRM Settings turns it off.
 
-## Signing people up for a shift
+## Signing People Up for a Shift
 
-Open a shift (from **Volunteer Shifts**, or from its job). The **Sign-ups** panel at the top
+Open a shift (from **Volunteer Shifts**, or from its job). The **Sign-Ups** panel at the top
 of the page shows how many **volunteers are needed**, how many **slots are filled** and how many
 **remain**, and lists who is signed up. A cancelled sign-up frees its slot; slots remaining goes
 below zero when more people are booked than were asked for, which is allowed.
@@ -368,7 +368,7 @@ below zero when more people are booked than were asked for, which is allowed.
   creates hours** is on, marking someone Attended records their hours for the length of the
   shift, waiting for approval like any other entry, and the panel says so. Marking attendance a
   second time records nothing more, and changing it back deletes nothing.
-- Click a person's name to open their sign-up record. The shift page also has a **Sign-ups**
+- Click a person's name to open their sign-up record. The shift page also has a **Sign-Ups**
   related list below the details: use it to edit a sign-up's **Notes** (row menu, **Edit**) or to
   remove one (row menu, **Delete**, which asks you to confirm). To keep the record but free the
   slot, set its **Status** to Cancelled instead of deleting it.
@@ -376,7 +376,7 @@ below zero when more people are booked than were asked for, which is allowed.
 A message under the figures, also shown as a toast, says what changed. Read Only users see the
 panel without the button, pickers or attendance buttons.
 
-## Approving hours
+## Approving Hours
 
 Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
 Hours** tab of the BarnCRM Volunteers app. It lists hours entries oldest first, 50 to a page,
@@ -406,7 +406,7 @@ permission, and the list without the buttons. Read Only users see no hours at al
 Approving here is the only way an entry's status changes: editing the Status field on the record
 is refused, for everyone.
 
-## Volunteer totals
+## Volunteer Totals
 
 The module adds totals of approved hours to people, households, jobs and shifts. They are
 ordinary rollups on the **Rollups** page (see [Rollups](rollups.md)), created at install, each
@@ -440,7 +440,7 @@ does not move any total at once. The nightly run still brings every volunteer to
 on or off, so they catch up by the next morning. To bring them up to date at once, open the
 **Rollups** page and click **Recalculate all**.
 
-## The Volunteers dashboard and reports
+## The Volunteers Dashboard and Reports
 
 The module ships one dashboard, **Volunteers**, and four reports it reads, in folders named
 **BarnCRM Volunteers**. Nothing has to be built: open the **BarnCRM Volunteers** app, choose
@@ -478,7 +478,7 @@ activate the page for the BarnCRM Volunteers app.
 **Subscribing.** With the dashboard open, choose **Subscribe** to have it emailed to you on a
 schedule you pick.
 
-## Health Check findings
+## Health Check Findings
 
 With Volunteers installed, [Health Check](health-check.md) also asks five questions about it.
 They are asked only of someone who may manage BarnCRM Settings, and not at all while Volunteers
@@ -492,7 +492,7 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
-## Erasing a volunteer
+## Erasing a Volunteer
 
 When someone asks to be forgotten, [Erasing a person](erase-a-person.md) anonymizes their record.
 With Volunteers installed it also does this, all in the same step and all undone together if
@@ -513,7 +513,7 @@ Admin** or **Volunteers Coordinator** when the person has any volunteer records:
 nothing is erased, and the message says "To erase a volunteer you also need Volunteers Admin or
 Volunteers Coordinator." A person with no volunteer records can be erased without them.
 
-## Households and volunteer hours
+## Households and Volunteer Hours
 
 Hours are credited to the household the person was in when the hours were saved, and stay there
 when the person moves (as gifts do). So a household that hours point at is never deleted by the
@@ -526,13 +526,13 @@ Merging two households moves every hours entry of the household merged away to t
 keep, approved ones included. That household's volunteer totals catch up at the next nightly
 run, or at once with **Recalculate all** on the Rollups page.
 
-## Turning it off
+## Turning It Off
 
 Turning Volunteers off in Module Manager stops its automations; the records stay. Hours and
 sign-ups saved while it is off are counted in the totals at the next nightly run, or when you
 click **Recalculate all** on the Rollups page. No Volunteers set is given while it is off.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Maria, who holds the Admin role, with a second user, Priya, who has none yet.
 
@@ -543,7 +543,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.
    **Shift Name** is required, so type one, for example "Saturday sort".
-5. Open the shift. In the **Sign-ups** panel click **Add sign-up**, choose any person in your
+5. Open the shift. In the **Sign-Ups** panel click **Add sign-up**, choose any person in your
    sample data and click **Save**. **Slots filled** is 1 and **Slots remaining** is 2.
 6. Click **Attended** on that sign-up's row. The panel says an hours entry was recorded. On
    **Volunteer Hours**, a 3-hour entry for that person on that shift now exists. It is
@@ -558,15 +558,15 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
    **Submitted**. Tick it, click **Reject**, type "Wrong date" as the reason and confirm.
 10. Open **BarnCRM Settings**, **Volunteers**, and read the three settings. Leave them as they are.
 
-## Importing volunteer hours
+## Importing Volunteer Hours
 
 To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
-Volunteer Hours record per row, using the Core import's **Load one object** (see
+Volunteer Hours record per row, using the Core import's **Load One Object** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
 all work as they do for any import.
 
-### The columns
+### The Columns
 
 Use these headings in the first row of a CSV or Excel file. Order does not matter.
 
@@ -593,7 +593,7 @@ repeat; the hours still count toward the job.
 2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
 3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
 4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
-   **rejected** and named in the table with the reason; select **Download rejected rows**, correct
+   **rejected** and named in the table with the reason; select **Download Rejected Rows**, correct
    those rows in your spreadsheet and import them again. An email shared by several people is
    handled by the **Several matches** choice (**Reject the row** unless you change it).
 5. Select **Import**. Open **Volunteer Hours** to see the new entries.
@@ -611,7 +611,7 @@ To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volu
 that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
 own permissions.
 
-## Common mistakes
+## Common Mistakes
 
 **Importing hours twice.** Each row becomes a new entry whether or not an identical one exists.
 Check **Volunteer Hours** before re-running a file, or undo the first import.

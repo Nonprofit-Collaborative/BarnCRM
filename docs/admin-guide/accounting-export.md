@@ -1,6 +1,6 @@
 # Accounting Export
 
-## What it does
+## What It Does
 
 Jen, who keeps the books, needs the month's gifts in the accounting system with each one
 against the right fund. The accounting export gives her a spreadsheet file (CSV) of the
@@ -40,7 +40,7 @@ marked and the page asks her to download again. Ticking **Only gifts
 not yet posted** leaves posted gifts out of the file, so a gift entered late into a month she
 already exported turns up in her next file instead of being missed.
 
-## How to turn it on
+## How to Turn It On
 
 The Mirror module has to be installed. Then give the person who runs the export the
 **Accounting Export** permission set, next to a Giving permission set that lets them see
@@ -64,13 +64,13 @@ permission set as well if they run the export.
 It also includes **Post Gifts**, which shows the **Mark these
 gifts posted** button and lets Jen unpost a single gift from its page.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Jen, with the sample data loaded.
 
 1. Open the App Launcher, search for `Accounting Export` and open it.
 2. Set **From** to the first day of last month and **To** to the last day of last month.
-   Leave **Fund** and **Payment method** empty.
+   Leave **Fund** and **Payment Method** empty.
 3. Click **Download file**. A file named like
    `accounting-export-2026-08-01-to-2026-08-31.csv` downloads, and the page says how many
    rows and gifts it holds and the net total.
@@ -79,16 +79,16 @@ Do this as Jen, with the sample data loaded.
    showed.
 5. Back on the page, choose **Building Fund** in **Fund** and download again. Every row now
    says Building Fund and accounting code 4100.
-6. Choose **Check** in **Payment method** as well and download again. Only checks to the
+6. Choose **Check** in **Payment Method** as well and download again. Only checks to the
    Building Fund remain.
 7. Set a range with no gifts, such as a week next year, and click **Download file**. No file
    downloads and the page says `No gifts in this range.`
-8. Set last month again, empty **Fund** and **Payment method**, and download. Click **Mark
+8. Set last month again, empty **Fund** and **Payment Method**, and download. Click **Mark
    these gifts posted**. The page says how many gifts it marked.
 9. Tick **Only gifts not yet posted** and download again. The page says
    `No gifts in this range.`: the month is in the books.
 
-## Common mistakes
+## Common Mistakes
 
 **The total is lower than the same export run by the administrator.** The person running
 the export cannot see every gift. Give them visibility of all gifts (see How to turn it on) and run it again.

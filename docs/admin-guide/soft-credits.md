@@ -1,6 +1,6 @@
-# Soft credits
+# Soft Credits
 
-## What it does
+## What It Does
 
 A soft credit is recognition for a gift someone influenced but did not legally give: a
 spouse who shares the household's giving, the board member who asked, the honoree a
@@ -13,7 +13,7 @@ of a household, every other current member of that household is soft credited
 automatically, so a phone call to Luis Garcia about "your family's giving" is never a
 surprise to him.
 
-## How to turn it on
+## How to Turn It On
 
 1. Open **BarnCRM Settings** and choose **Giving**.
 2. Find **Automatic household soft credits**. It is on when you install BarnCRM.
@@ -22,7 +22,7 @@ surprise to him.
 
 That is the whole setting. Nothing here needs Salesforce Setup.
 
-One piece of first-time setup does: the **Soft credits** panel lives on a gift's record
+One piece of first-time setup does: the **Soft Credits** panel lives on a gift's record
 page, and BarnCRM ships a page called **Gift Record Page** with the panel already on
 it. Assign it once, as your org default for Gift, and every gift shows the panel from then
 on. If your organization has built a gift record page of its own, add the **Gift Soft
@@ -50,7 +50,7 @@ Two things to know about how the automatic credits behave:
   went back, so a match of 500 with 200 returned leaves them recognized for 300. See
   `matching-gifts.md`.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David, the development director. Start from the sample data, which includes the
 Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
@@ -58,11 +58,11 @@ Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
 1. Click the **Gifts** tab and press **New**.
 2. Enter a gift from **Harper Garcia** for **500**, dated today, type **Check**, status
    **Received**. Save.
-3. On the gift you just saved, look at **Soft credits**. Luis Garcia and Diego Garcia are
+3. On the gift you just saved, look at **Soft Credits**. Luis Garcia and Diego Garcia are
    already there, each with the role **Household member**, the amount **500**, and an
    **Automatic** badge. Every other current member of the household is credited, not just
    the spouse, and you did nothing to make that happen.
-4. Now add the solicitor. In the **Soft credits** panel press **Add credit**, pick the
+4. Now add the solicitor. In the **Soft Credits** panel press **Add credit**, pick the
    person who asked for the gift, choose the role **Solicitor**, leave the amount at 500,
    and press **Save**. The new credit appears with no Automatic badge, because you entered
    it.
@@ -75,7 +75,7 @@ Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
 7. Remove the solicitor credit with the **Remove** button beside it. The automatic credits
    for Luis and Diego have no Remove button: it belongs to the gift, and it goes when the gift goes.
 
-## Common mistakes
+## Common Mistakes
 
 - **Expecting soft credits to add up to the gift.** They do not, and they are not meant
   to. Two people can each be recognized for the whole of a gift. If a total looks too
@@ -96,7 +96,7 @@ Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
   the next time that gift is saved, so your reporting history does not change under you
   the moment somebody flips a checkbox.
 
-## Fields, for report builders
+## Fields, for Report Builders
 
 | What you see | Field |
 |---|---|

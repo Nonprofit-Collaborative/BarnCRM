@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What's new card: heading.</shortDescription>
-        <value>What's new in BarnCRM</value>
+        <value>What's New in BarnCRM</value>
     </labels>
     <labels>
         <fullName>Core_WhatsNew_Intro</fullName>

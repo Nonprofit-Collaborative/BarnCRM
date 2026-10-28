@@ -1,6 +1,6 @@
 # Gift Batches
 
-## What it does
+## What It Does
 
 A gift batch is how a stack of checks gets typed in one sitting. You start a batch with the
 total from the deposit slip (the **control total**) and the things every gift in the stack
@@ -20,7 +20,7 @@ Gifts from a batch are ordinary gifts. They count in the giving totals, get thei
 and their fund, can be receipted and acknowledged, and appear on the dashboard, exactly as a
 gift entered on Quick Gift Entry does.
 
-## How to turn it on
+## How to Turn It On
 
 Nothing to install and no Setup step. Gift batches arrive with the Giving package.
 
@@ -34,7 +34,7 @@ Nothing to install and no Setup step. Gift batches arrive with the Giving packag
 
 There are no settings for batches themselves.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as David, with the Tuesday mail: three checks and a deposit slip that says 350.00.
 
@@ -46,7 +46,7 @@ Do this as David, with the Tuesday mail: three checks and a deposit slip that sa
    350.00**, **Entered 0.00**, and a line saying the lines add up to 350.00 less than the
    control total.
 4. Click **Add line**. Leave the donor type on **Person**, search for `Garcia` and pick Harper
-   Garcia. Type `100` in **Amount** and `1042` in **Check number**.
+   Garcia. Type `100` in **Amount** and `1042` in **Check Number**.
 5. Click **Add line** again. Choose **Organization**, pick The Summit Foundation, type
    `200`, and in **Fund** pick Building Fund, because their letter says so. This one line
    now goes to the Building Fund; the others still follow the batch.
@@ -60,7 +60,7 @@ Do this as David, with the Tuesday mail: three checks and a deposit slip that sa
 9. Click the first gift link. It is dated today, type Check, appeal Spring Appeal, check
    number 1042, with one allocation to your default fund.
 
-## Checks that pay a pledge
+## Checks That Pay a Pledge
 
 A check is often a pledge payment. Each line has a **Pays** column for that. Once a line has
 a donor, **Pays** lists that donor's payments still owed: scheduled, overdue or partly paid,
@@ -85,12 +85,12 @@ stops the post and names the line, and nothing is created.
 Two lines can pay the same payment, for example two checks that each pay half of it. The
 payment counts both, and shows Partially paid until they add up to what it expects.
 
-## List views
+## List Views
 
 **Gift Batches** has **All Gift Batches**, **Open Batches** and **My Gift Batches** (the batches
 you created).
 
-## Common mistakes
+## Common Mistakes
 
 **The batch does not balance.** The message says how far out it is and in which direction:
 **the lines add up to 25.00 less than the control total** means a check is missing or an

@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>First-run setup: window heading</shortDescription>
-        <value>Set up BarnCRM</value>
+        <value>Set Up BarnCRM</value>
     </labels>
     <labels>
         <fullName>Core_FirstRun_Intro</fullName>

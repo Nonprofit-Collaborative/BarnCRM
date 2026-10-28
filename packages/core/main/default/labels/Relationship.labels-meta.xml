@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: button that opens the new relationship form</shortDescription>
-        <value>Add relationship</value>
+        <value>Add Relationship</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_AddFormTitle</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: heading above the new relationship form</shortDescription>
-        <value>New relationship</value>
+        <value>New Relationship</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_CancelButton</fullName>

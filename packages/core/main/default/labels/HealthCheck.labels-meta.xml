@@ -590,7 +590,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the org shape finding, which sits under the card of the same subject.</shortDescription>
-        <value>Your org at a glance</value>
+        <value>Your Org at a Glance</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrphansFirstListed</fullName>
@@ -678,7 +678,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that runs Health Check again.</shortDescription>
-        <value>Re-run</value>
+        <value>Re-Run</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SalesObjectsDetected</fullName>
@@ -774,7 +774,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that applies the recommended coexistence mode.</shortDescription>
-        <value>Use recommended mode</value>
+        <value>Use Recommended Mode</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_UseRecommendedFix</fullName>
@@ -870,7 +870,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that runs every check where the panel showed the last result.</shortDescription>
-        <value>Run now</value>
+        <value>Run Now</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RelationshipsNoPersonTitle</fullName>

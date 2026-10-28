@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: button that opens the new affiliation form</shortDescription>
-        <value>Add affiliation</value>
+        <value>Add Affiliation</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_AddFormTitle</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: heading above the new affiliation form</shortDescription>
-        <value>New affiliation</value>
+        <value>New Affiliation</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_CancelButton</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: button that makes one affiliation the primary one</shortDescription>
-        <value>Make primary</value>
+        <value>Make Primary</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimaryFailed</fullName>

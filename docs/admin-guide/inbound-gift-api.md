@@ -1,6 +1,6 @@
 # Inbound Gift API
 
-## What it does
+## What It Does
 
 Your online giving page, payment processor or integration tool can record gifts in BarnCRM by itself, instead of somebody typing them from an emailed report. It sends each gift
 with the donor's email address or record, the amount, how it was paid and, if it wants, the
@@ -23,7 +23,7 @@ BarnCRM never creates a donor from a gift. If nobody matches, the gift is refuse
 the refusal is written to the Error Log, so a gift from someone new needs the person added
 first (by hand or with [Importing](importing.md)) and then the gift sent again.
 
-## How to turn it on
+## How to Turn It On
 
 The Mirror module has to be installed. The Flow action needs nothing else.
 
@@ -54,7 +54,7 @@ the processor's support team.
 
 There are no settings for the API.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Maria, with the sample data loaded, in Flow Builder. It shows the one thing that
 matters most: sending the same gift twice records it once.
@@ -76,7 +76,7 @@ matters most: sending the same gift twice records it once.
    id after `/lightning/r/` in the address bar). It is Luis Garcia's, 25.00, type Card, today,
    with one allocation to the Building Fund. Close the flow without activating it.
 
-## Common mistakes
+## Common Mistakes
 
 **`donor_not_found` for a new donor.** Expected: the API never creates people. Add the
 person, then send the gift again with the same external id. The Error Log entry for the

@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refund screen: heading</shortDescription>
-        <value>Record money going back</value>
+        <value>Record Money Going Back</value>
     </labels>
     <labels>
         <fullName>Giving_RefundGift_ModeRefund</fullName>

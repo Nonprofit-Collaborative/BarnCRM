@@ -13,7 +13,7 @@ template. [SUPPORT.md](../../SUPPORT.md) says what to include, and
 script. Never include donor or other personal data. Report a security problem privately, as
 [SECURITY.md](../../SECURITY.md) describes.
 
-## How this relates to the automated tests
+## How This Relates to the Automated Tests
 
 Two layers check every build.
 
@@ -60,7 +60,7 @@ page, even if that puts it out of reading order.
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
-## Smoke list (every build, about one hour)
+## Smoke List (Every Build, About One Hour)
 
 Run these in this order on one Person Accounts org set up as in
 [Before you test](before-you-test.md), all modules deployed and sample data loaded. Some later
@@ -106,7 +106,7 @@ steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 T-ERASE-02 and T-REF-01 change sample data that other scripts name; if you go on to the full
 list in the same org, run them last or refresh the org first.
 
-## Full regression list
+## Full Regression List
 
 Every script on every page above, before a release or after a change that touches many areas.
 Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
@@ -121,7 +121,7 @@ Two scripts change org state that other scripts are hard to run after: closing a
 period (T-GIFT-10) blocks removing sample data, and erasing a person (T-ERASE pages) cannot be
 undone. Each page notes this where it applies.
 
-## Keeping this guide current
+## Keeping This Guide Current
 
 The guide tracks main. A pull request that adds or changes a feature visible in the UI updates
 the matching page here in the same pull request, as it does the

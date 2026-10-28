@@ -1,6 +1,6 @@
 # Giving Dashboard
 
-## What it does
+## What It Does
 
 The Giving dashboard answers the four questions a board asks, without anybody building a
 report: how much came in this month, which funds it went to, which appeals produced it,
@@ -12,7 +12,7 @@ The reports underneath it are ordinary Salesforce reports in a shared folder. An
 open one, change a filter, and save a copy of their own without affecting what everyone
 else sees.
 
-## How to turn it on
+## How to Turn It On
 
 1. Open the **Fundraising** app from the app launcher. Tap **Dashboards**, open the
    **BarnCRM Giving** folder, and open **Giving Overview**.
@@ -34,7 +34,7 @@ else sees.
 
 Nothing here requires Salesforce Setup.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Tom, from the sample data, after at least a few gifts exist.
 
@@ -62,7 +62,7 @@ Do this as Tom, from the sample data, after at least a few gifts exist.
    all on it, because the answer to "did that gift arrive?" sometimes is "it arrived and
    then it went back". The status column tells you which is which.
 
-## Common mistakes
+## Common Mistakes
 
 **The dashboard shows an error instead of numbers.** The message is "The running user for
 this dashboard doesn't have permission to run reports." The dashboard reads as whoever is

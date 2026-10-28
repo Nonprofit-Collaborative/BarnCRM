@@ -1,6 +1,6 @@
 # Funds
 
-## What it does
+## What It Does
 
 A fund is the designation or restriction on money you receive: your general fund, a
 building fund, a scholarship fund, a restricted grant. Every gift is designated to one or
@@ -10,7 +10,7 @@ bookkeeper a total per fund without a spreadsheet.
 One fund is marked as the default. Any gift entered without a designation goes there, so
 fund reporting stays complete even when David is entering checks quickly at an event.
 
-## How to turn it on
+## How to Turn It On
 
 Funds arrive with the Giving module. There is nothing to install separately.
 
@@ -31,7 +31,7 @@ at any time.
 
 No Salesforce Setup step is needed.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David, and you are setting up funds before your first gift entry session.
 
@@ -53,12 +53,12 @@ You are David, and you are setting up funds before your first gift entry session
    Raised** shows the gift and **Rollups Last Calculated** shows when the number was worked
    out.
 
-## List views
+## List Views
 
 **Funds** has **All Funds**, **Active Funds** and **Inactive Funds**. Only the starting
 **General Fund** ships; every other fund, and its accounting code, is your decision.
 
-## Common mistakes
+## Common Mistakes
 
 - **No fund is marked as the default.** A gift entered without a designation then fails to
   save with "No default fund is set. Open BarnCRM Settings, choose Giving, and pick the

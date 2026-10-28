@@ -1,6 +1,6 @@
 # Opportunity Mirror
 
-## What it does
+## What It Does
 
 BarnCRM records money received as gifts. Salesforce's own sales object, the Opportunity,
 is what NPSP, many fundraising apps and many online giving tools use for the same thing. The
@@ -58,7 +58,7 @@ In Opportunities to Gifts, the next run makes a new gift from an Opportunity tha
 so close it as lost or delete it if the gift should stay gone. Turning the mirror off leaves
 every Opportunity and gift where it is.
 
-## How to turn it on
+## How to Turn It On
 
 You need the Mirror module and a Salesforce edition with Opportunities (Sales Cloud, Service
 Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has none, and the
@@ -71,7 +71,7 @@ Opportunity mirror page says so.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of
    Opportunities does not create, and thank donors for, a gift for every one of them.
 3. Still in **Giving**, open **Opportunity Mirror** (the row shows only to someone with the
-   permission set). Click **Run now** once, to copy what you already have, and **Schedule
+   permission set). Click **Run Now** once, to copy what you already have, and **Schedule
    nightly run**, so the mirror catches up every night at 1:30 AM, in your organization's time zone. The page shows when the last run
    completed and what it did, and Health Check warns if two days pass without one.
 
@@ -97,16 +97,16 @@ unspent, because your own Opportunity automation runs inside the same save. When
 the gifts save without their Opportunities and one Warning says so. The next run copies them. A load of 200 rows at a time, as Data Loader and the importer send, is
 copied as usual.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as Maria, in an org that has Opportunities, with the sample data loaded.
 
 1. In **BarnCRM Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to
    Opportunities** and save.
-2. Open **Opportunity Mirror** and click **Run now**. Wait a minute, then open the
+2. Open **Opportunity Mirror** and click **Run Now**. Wait a minute, then open the
    **Reconciliation** section, choose this year, and click **Compare**. The gift count and total
    match the won Opportunity count and total, and there are no differences.
-3. Enter a gift of 100 from Luis Garcia with **Quick gift entry**. Open the App Launcher,
+3. Enter a gift of 100 from Luis Garcia with **Quick Gift Entry**. Open the App Launcher,
    search for **Opportunities**, and open the newest: Amount 100, Stage Closed Won, Close Date
    today, Luis as the primary contact.
 4. Change the gift's amount to 150 and save. Reload the Opportunity: its Amount is 150.
@@ -114,16 +114,16 @@ Do this as Maria, in an org that has Opportunities, with the sample data loaded.
    gift and its Opportunity are listed with "Amount differs". Click **Copy these gifts again**;
    when it finishes, the Opportunity is back to 150.
 6. Set the direction to **Opportunities to Gifts**, set the start date to today, and save. Create
-   a won Opportunity of 60 for Luis, closed today, and click **Run now**. A gift of 60 for Luis
+   a won Opportunity of 60 for Luis, closed today, and click **Run Now**. A gift of 60 for Luis
    appears on his record, and the gift's **Opportunity ID** names that Opportunity.
 
-## Common mistakes
+## Common Mistakes
 
 **A gift has no Opportunity.** The reconciliation lists it. Most often the person who entered it
 cannot create Opportunities (see Whose access the copy uses): the next run copies it. Otherwise a
 rule on Opportunity refused it, such as a validation rule or a required field your organization
 added. The Error Log has a Warning with the platform's message and the gifts it refused. Fix the
-cause, then click **Run now**.
+cause, then click **Run Now**.
 
 **The Opportunity was changed by hand.** The next time the gift changes, its values replace
 yours. Edit the gift instead. Fields that are not copied, such as Description, Next Step or your

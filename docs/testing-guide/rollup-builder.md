@@ -8,7 +8,7 @@ Every script after T-RB-02 uses the rollup T-RB-02 builds, **Test children per h
 
 The **Records to count** option in step 2 is named from your org's object and field labels, in the form "Contact, by Account ID". If your org renamed either label, pick the option that counts people by their household account.
 
-## T-RB-01: Open the Rollup Builder and schedule the nightly run
+## T-RB-01: Open the Rollup Builder and Schedule the Nightly Run
 
 **Purpose:** confirm the app, tab and list open and the nightly run can be scheduled and stopped.
 **Prerequisites:** admin user (see [Test users](before-you-test.md#test-users)).
@@ -25,7 +25,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** leave the nightly run scheduled.
 
-## T-RB-02: Build a rollup in five steps
+## T-RB-02: Build a Rollup in Five Steps
 
 **Purpose:** build a rollup with a condition, preview it on a real record and save it with its first calculation.
 **Prerequisites:** admin user; sample data loaded. In Setup, on **Account**, create a Number field labelled **Test Children Count** (API name `Test_Children_Count__c`, 18 digits, 0 decimals), visible to your profile and added to the household page layout.
@@ -43,14 +43,14 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 8 | In **See it on a record**, pick **The Garcia Family**. | "Calculated: 1. On the record now: (empty)." |
 | 9 | In **Name**, type `Test children per household`. In **What this number means**, type `Children in the household`. Leave **Mode** on its default and **Active** on. | The fields hold what you typed. **Mode** shows the org's default rollup mode (**Both (recommended)** unless it was changed). |
 | 10 | Click **Save and calculate now**. | The Builder closes. A green notice reads "Rollup saved, and its recalculation has started." |
-| 11 | Find **Test children per household** in the list. | The row is under the **Account** heading and shows **Children in the household** under the name, a **What it counts** sentence of the form "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", the mode you saved, and **Active** on. |
-| 12 | Wait a minute and refresh the page. | The row's **Last calculated** shows a time from a moment ago, not **Not calculated yet**. |
+| 11 | Find **Test children per household** in the list. | The row is under the **Account** heading and shows **Children in the household** under the name, a **What It Counts** sentence of the form "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", the mode you saved, and **Active** on. |
+| 12 | Wait a minute and refresh the page. | The row's **Last Calculated** shows a time from a moment ago, not **Not calculated yet**. |
 | 13 | Open **The Garcia Family** household. | **Test Children Count** shows 1. |
 | 14 | Open any household with no person whose role is Child (for example a single-person household). | **Test Children Count** shows 0, not blank. |
 
 **Cleanup:** keep the rollup and field; later scripts use them.
 
-## T-RB-03: A change to a counted record updates the total
+## T-RB-03: A Change to a Counted Record Updates the Total
 
 **Purpose:** confirm a saved change on a source record moves the total on the target record without any manual recalculation.
 **Prerequisites:** admin user; T-RB-02 done; **Test children per household** in **Both (recommended)** or **Instantly** mode and active; **When instant totals are calculated** at its default.
@@ -66,25 +66,25 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None (Diego is back to **Child**).
 
-## T-RB-04: Recalculate one rollup and recalculate all
+## T-RB-04: Recalculate One Rollup and Recalculate All
 
 **Purpose:** confirm single and full recalculation start, show their messages and offer the estimate and Run tonight.
 **Prerequisites:** admin user; T-RB-02 done; nightly run scheduled (T-RB-01).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, note the **Last calculated** time of **Test children per household**. Click **Recalculate** on its row. | A green notice reads "Recalculation started. This page updates as it finishes." |
-| 2 | Wait a minute and refresh. | The row's **Last calculated** time has moved on. |
+| 1 | On the **Rollup Builder** tab, note the **Last Calculated** time of **Test children per household**. Click **Recalculate** on its row. | A green notice reads "Recalculation started. This page updates as it finishes." |
+| 2 | Wait a minute and refresh. | The row's **Last Calculated** time has moved on. |
 | 3 | Click **Recalculate all**. | Nothing starts yet. A box shows "About N records, roughly M minutes." with **Cancel**, **Start now** and **Run tonight**. Between 8 AM and 6 PM on a weekday it also says "People are working now. A long run competes with them saving records, so consider running it tonight." |
 | 4 | Click **Cancel**. | The box closes and no notice appears. |
 | 5 | Click **Recalculate all**, then **Run tonight**. | The notice reads "The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now." |
 | 6 | Click **Recalculate all**, then **Start now**. | The notice reads "Recalculation started. This page updates as it finishes." **Needs attention** shows a line starting "A full run is going:" or, once done, "Last full run:". |
 | 7 | Straight away, click **Recalculate** on any row. | If the full run is still going, the red message reads "A full recalculation is already running. Its totals will be on the records when it finishes, so try again after that." |
-| 8 | When the full run has finished, refresh. | Every active row's **Last calculated** time is recent. **The Garcia Family** still shows **Test Children Count** 1. |
+| 8 | When the full run has finished, refresh. | Every active row's **Last Calculated** time is recent. **The Garcia Family** still shows **Test Children Count** 1. |
 
 **Cleanup:** None.
 
-## T-RB-05: Edit a rollup, change its mode and copy it
+## T-RB-05: Edit a Rollup, Change Its Mode and Copy It
 
 **Purpose:** confirm Edit reopens a saved rollup with its values, the list's Mode control saves, and Copy cannot write a field the original already fills.
 **Prerequisites:** admin user; T-RB-02 done.
@@ -103,7 +103,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None.
 
-## T-RB-06: Bad input is refused
+## T-RB-06: Bad Input Is Refused
 
 **Purpose:** confirm each step and the save refuse incomplete or impossible rollups with the message from code.
 **Prerequisites:** admin user; T-RB-02 done.
@@ -123,7 +123,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None.
 
-## T-RB-07: Switch a rollup off and back on
+## T-RB-07: Switch a Rollup Off and Back On
 
 **Purpose:** confirm a switched off rollup keeps the values it already wrote and stops updating them, and that switching it on and recalculating catches up.
 **Prerequisites:** admin user; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
@@ -140,7 +140,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None. To remove the test rollup for good, use **Delete** (T-RB-24) once the other scripts are done.
 
-## T-RB-08: Staff and read-only users see the Builder read only
+## T-RB-08: Staff and Read-Only Users See the Builder Read Only
 
 **Purpose:** confirm only a user with the Manage BarnCRM Settings permission can change rollups, and what everyone else sees.
 **Prerequisites:** staff and read-only users (see [Test users](before-you-test.md#test-users)); each holds **Rollup Builder User** (BarnCRM gives it to holders of **BarnCRM Staff** and **BarnCRM Read Only** at install, at each Turn on and with each nightly run; assign it in Setup if it is missing); T-RB-02 done.
@@ -150,7 +150,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 1 | Log in as the staff user. In the App Launcher, search for "Rollup" and open the **Rollup Builder** tab. | The **Rollup Builder** tab opens. |
 | 2 | Look at the top of the list. | A grey notice reads "You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission." |
 | 3 | Look at the buttons and rows. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
-| 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last calculated** time. |
+| 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last Calculated** time. |
 | 5 | Look below the list. | No **Needs attention** section is shown. |
 | 6 | Log in as the read-only user and repeat steps 1 to 5. | Same results as the staff user. |
 | 7 | As admin, in Setup remove **Rollup Builder User** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | The **Rollup Builder** tab is not offered. |
@@ -158,7 +158,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** assign **Rollup Builder User** to the read-only user again.
 
-## T-RB-09: Default rollup mode decides how a new rollup starts
+## T-RB-09: Default Rollup Mode Decides How a New Rollup Starts
 
 **Purpose:** confirm the Rollups section of BarnCRM Settings shows the shipped defaults on a fresh org and changes the mode a new rollup starts with.
 **Prerequisites:** admin user. For step 1, a fresh org or a source-deployed one where nobody has saved these two settings yet.
@@ -189,7 +189,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** delete **Test open tasks** (or set it inactive) and the two test tasks.
 
-## T-RB-11: Instantly Alone Is Refused for Records With No Instant Updates
+## T-RB-11: Instantly Alone Is Refused for Records with No Instant Updates
 
 **Purpose:** confirm a rollup that counts records with no rollup trigger cannot be Instantly only, in the Builder or from the list (ADR-0136).
 **Prerequisites:** admin user; T-RB-10 done up to step 6 (**Test open tasks** saved).
@@ -241,7 +241,8 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Click **Back** twice. In **Separate the values with**, choose **Custom**. | A **Custom delimiter** box appears. |
 | 4 | Leave **Custom delimiter** empty and click **Next**. | The step does not move on and says "Type the characters that go between the values in Custom delimiter, or choose another delimiter." |
 | 5 | In **Custom delimiter**, type `/`. Click **Next** twice and pick **The Garcia Family**. | "Calculated: Diego/Harper/Luis. On the record now: (empty)." |
-| 6 | Click **Cancel**. | Nothing is saved. |
+| 6 | Click **Back** twice. In **Custom delimiter**, replace the text with a space, a hyphen and a space (` - `). Click **Next** twice and pick **The Garcia Family**. | "Calculated: Diego - Harper - Luis. On the record now: (empty)." The spaces are kept. |
+| 7 | Click **Cancel**. | Nothing is saved. |
 
 ## T-RB-15: Include Deleted and Archived Records
 
@@ -305,7 +306,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** edit the rollup and clear **Skip for people with this custom permission (optional)**; set Diego's **Household Role** back to **Child** and check the total returns to 1; remove the **Test Data Migration** permission set assignment.
 
-## T-RB-20: Recalculate Totals on This Record from a Flow
+## T-RB-20: Recalculate Totals on This Record From a Flow
 
 **Purpose:** confirm the Flow action recalculates a record's totals, every rollup or the one named, and logs a name that matches nothing.
 **Prerequisites:** admin user; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
@@ -320,7 +321,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** set the rollup's mode back to **Both (recommended)**; delete the **Test recalculate totals** flow.
 
-## T-RB-21: Recalculate a Record's Totals from Apex
+## T-RB-21: Recalculate a Record's Totals From Apex
 
 **Purpose:** confirm the global Apex entry point recalculates a record's totals.
 **Prerequisites:** admin user with permission to run anonymous Apex; T-RB-02 done; **The Garcia Family** shows **Test Children Count** 1.
@@ -394,7 +395,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** delete `not-rollups.json`.
 
-## T-RB-30: Turn On Instant Totals for an Object BarnCRM Does Not Own
+## T-RB-30: Turn on Instant Totals for an Object BarnCRM Does Not Own
 
 **Purpose:** confirm the Builder generates a trigger and test for another object, that the steps deploy them, and that its state is read from the org.
 **Prerequisites:** admin user with Manage BarnCRM Settings, in a sandbox, scratch or Developer Edition org (the steps create Apex there). In Setup, create a custom object **Shift** (`Shift__c`) with a lookup **Volunteer** to Contact and a number field **Hours**, and a number field **Test shift hours** on Contact.
@@ -412,7 +413,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** keep the rollup and trigger for T-RB-31.
 
-## T-RB-31: Turn Instant Totals Off and Back On, and Remove the Trigger
+## T-RB-31: Turn Instant Totals Off and Back on, and Remove the Trigger
 
 **Purpose:** confirm instant totals turn off with no deploy, turn back on, and that removal gives the right package and steps.
 **Prerequisites:** T-RB-30 done.
@@ -444,7 +445,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** None.
 
-## T-RB-33: Turning On a Rollup That DLRS Also Fills Asks First, and the Answer Is Recorded
+## T-RB-33: Turning on a Rollup That DLRS Also Fills Asks First, and the Answer Is Recorded
 
 **Purpose:** confirm the same-field guard in the Builder, in the list and in Import from a file, and that BarnCRM never changes DLRS.
 **Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** on Account. In DLRS, create and activate a rollup **Test child count** on Account: child object Account, relationship field `ParentId`, Count, aggregate result field **Test child count**, calculation mode Realtime (deploy its trigger as DLRS asks).
@@ -476,15 +477,15 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** delete the BarnCRM rollup, the DLRS rollup (and its trigger, as DLRS describes) and the **Test child count** field.
 
-## T-RB-35: Import from DLRS Copies Switched Off, Compares, and Finishes Only When Every Copy Is On
+## T-RB-35: Import From DLRS Copies Switched Off, Compares, and Finishes Only When Every Copy Is On
 
 **Purpose:** confirm the Import from DLRS wizard copies what BarnCRM can hold, says why for the rest, compares values, asks before turning each copy on, and never changes DLRS.
 **Prerequisites:** the org with DLRS from T-RB-32; admin user with Manage BarnCRM Settings. In Setup, create a number field **Test child count** and a text field **Test child names** (255) on Account. In DLRS, create and activate three rollups on Account, child object Account, relationship field `ParentId`, calculation mode Realtime: **Test child count** (Count into **Test child count**); **Test child names** (Concatenate of Name into **Test child names**, delimiter `; `); **Test unreadable** (Count into **Test child count** with Relationship Criteria `CALENDAR_YEAR(CreatedDate) = 2024`, kept inactive until step 1, then active). Run DLRS's Calculate once so the fields hold DLRS's values. Create a parent account with two child accounts.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Rollup Builder** tab. | **Other Rollup Tools** has an **Import from DLRS** button. |
-| 2 | Click **Import from DLRS**. | The list is hidden. **Choose** lists **Test child count** and **Test child names** under **Can Be Copied**, both ticked, each with "Fills Account.... DLRS operation: ...". **Test unreadable** is under **Stays in DLRS** with "BarnCRM cannot read this part of the Relationship Criteria: CALENDAR_YEAR ( CreatedDate ) = 2024...". |
+| 1 | Open the **Rollup Builder** tab. | **Other Rollup Tools** has an **Import From DLRS** button. |
+| 2 | Click **Import From DLRS**. | The list is hidden. **Choose** lists **Test child count** and **Test child names** under **Can Be Copied**, both ticked, each with "Fills Account.... DLRS operation: ...". **Test unreadable** is under **Stays in DLRS** with "BarnCRM cannot read this part of the Relationship Criteria: CALENDAR_YEAR ( CreatedDate ) = 2024...". |
 | 3 | Untick both. Tick them again. Click **Next**. | **Next** is unavailable with nothing ticked. **Review** says "Becomes a BarnCRM Count, filling Account.Test_child_count__c, switched off." and "Becomes a BarnCRM Text list, filling Account.Test_child_names__c, switched off." |
 | 4 | Click **Copy Switched Off**. | **Compare** shows **Copied, switched off.** for both. In another tab, the rollup list shows both copies switched off, each described "Imported from the DLRS rollup ...". |
 | 5 | Click **Compare** on **Test child count**. | Up to five accounts: the parent shows 2 under **Value Now (DLRS)** and **BarnCRM Value**, **Result** **Same**. Nothing on the accounts changes. |
@@ -493,7 +494,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 8 | Click **Turn On** on each copy and **OK** each time. | Each reads **Turned on.** **Finish** becomes available. **Recent Changes** has one row per copy. |
 | 9 | Click **Finish**. | The list is back with the notice "Import from DLRS finished: 2 copies turned on. Switch their DLRS rollups off in DLRS." |
 | 10 | In DLRS, open the three rollups. | Each is exactly as before: BarnCRM changed nothing. |
-| 11 | Click **Import from DLRS** again. | Both copies are under **Stays in DLRS** with "Already copied and turned on in BarnCRM." |
+| 11 | Click **Import From DLRS** again. | Both copies are under **Stays in DLRS** with "Already copied and turned on in BarnCRM." |
 
 **Cleanup:** delete both BarnCRM copies; deactivate and delete the three DLRS rollups (and their triggers, as DLRS describes); delete the two fields and the test accounts.
 
@@ -504,7 +505,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Rollup Builder** tab. | The list has a heading row per object, such as **Account (1)**, in alphabetical order. **Test children per household** is under **Account**, and its **What it counts** column reads "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", with `Count on Contact: Account.Test_Children_Count__c` in small grey text below. |
+| 1 | Open the **Rollup Builder** tab. | The list has a heading row per object, such as **Account (1)**, in alphabetical order. **Test children per household** is under **Account**, and its **What It Counts** column reads "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", with `Count on Contact: Account.Test_Children_Count__c` in small grey text below. |
 | 2 | In **Search rollups**, type `children`. | Only **Test children per household** is listed. |
 | 3 | Type `Test_Children_Count__c`. | The same rollup is listed. Type `zzz`: "No rollup matches your search." Clear the box: every rollup is back. |
 
@@ -541,7 +542,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 **Cleanup:** none.
 
-## T-RB-43: Preview With Sample Records and the Records Read
+## T-RB-43: Preview with Sample Records and the Records Read
 
 **Purpose:** confirm step 5 picks sample records, calculates each without saving, and lists the records read for one record as counted or left out with the reason.
 **Prerequisites:** T-RB-02 done.

@@ -1,6 +1,6 @@
-# Stewardship plans
+# Stewardship Plans
 
-## What it does
+## What It Does
 
 A stewardship plan is a sequence of follow-up work your organization repeats. Somebody gives
 for the first time, and three things should happen: a thank-you call this week, a welcome
@@ -24,7 +24,7 @@ Three things to hold on to, because they are the questions people ask first:
   Complete or Cancelled, **Completed Date** fills in as today unless you typed one, and it
   clears if you set the plan back to Running.
 
-## How to set one up
+## How to Set One Up
 
 Everything is in the app. You never open Setup.
 
@@ -60,23 +60,23 @@ copies of it are running right now, and whether it is switched on.
    - a **priority**;
    - **comments**, optional, which become the task's description.
 4. Use **Move up** and **Move down** to put the steps in the order they should happen.
-5. Choose **Turn on** in the plan's row when the steps are right.
+5. Choose **Turn On** in the plan's row when the steps are right.
 
 The page says it where you will read it, and it is worth repeating: editing a plan changes
-what starts next. The number in **Running now** is how many copies of that plan are already
+what starts next. The number in **Running Now** is how many copies of that plan are already
 laid out, and none of them changes when you edit it.
 
-## Starting a plan by hand
+## Starting a Plan by Hand
 
 In the Fundraising app, open the person, household or organization and choose **Start
 Stewardship Plan**. The window lists every plan that is turned on, whatever starts it, and
-shows the description of the one chosen. Choose **Start plan**. The plan is laid out at once
+shows the description of the one chosen. Choose **Start Plan**. The plan is laid out at once
 and appears in the donor's **Stewardship Plans** list. A plan already running on that donor
 does not start a second time, and the window says so. Starting a plan needs create access to
 stewardship plans (Giving Staff or Giving Admin); a Giving Read Only user is told so and
-offered no **Start plan**.
+offered no **Start Plan**.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 1. Open **BarnCRM Settings**, **Giving**, **Stewardship Plans**, and choose **New plan**.
    Call it "First gift welcome", started by **First gift**, no
@@ -85,19 +85,19 @@ offered no **Start plan**.
    - "Call to say thank you", 1 day after start, Record owner, High;
    - "Send the welcome packet", 7 days after start, Record owner, Normal;
    - "Check in and ask what drew them to us", 30 days after start, Record owner, Normal.
-3. Choose **Turn on** in the plan's row.
+3. Choose **Turn On** in the plan's row.
 4. Record a gift for a donor who has never given before.
 5. Open that donor. Under **Stewardship Plans** you will see one running plan, and three
    tasks now sit in the record owner's list, due tomorrow, next week, and next month.
 6. Go back to the page. The plan now says **1** under Running now.
 
-## List views
+## List Views
 
 **Stewardship Plans** has **All Stewardship Plans**, **Running Plans** and **My Stewardship
 Plans**. **Stewardship Plan Templates** has **All Plan Templates**, **Active Plan Templates**,
 **Inactive Plan Templates** and **Automatic Plan Templates**.
 
-## Common mistakes
+## Common Mistakes
 
 - **Steps added after the plan started.** They do not appear on plans already running.
   Add the step, and the next plan to start gets it.
@@ -120,7 +120,7 @@ Plans**. **Stewardship Plan Templates** has **All Plan Templates**, **Active Pla
   running, and the same plan does not run twice on one donor. Mark the first one complete
   or cancelled if you want the sequence laid out again.
 
-## What this does not do yet
+## What This Does Not Do Yet
 
 - **BarnCRM does not close a plan for you.** When the last task on a plan closes, the
   plan stays Running until somebody marks it Complete. Closing it automatically would need

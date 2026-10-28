@@ -750,7 +750,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Create a Field step: field access and layouts.</shortDescription>
-        <value>Make it visible to the people who should see the total (read only is enough for most), add it to the page layouts where they look, and click Save.</value>
+        <value>Make it visible to the people who should see the total (read only is enough for most; the person who sets up the rollup needs Edit, or the Builder refuses to save it), add it to the page layouts where they look, and click Save.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_FieldStepBack</fullName>

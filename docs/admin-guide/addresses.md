@@ -1,6 +1,6 @@
 # Addresses
 
-## What it does
+## What It Does
 
 Addresses gives every household, organization, and person one place to keep all of the
 places they receive mail, instead of a single set of address boxes that gets overwritten
@@ -27,10 +27,10 @@ and what it did, in two places you can see without leaving the app: the BarnCRM 
 page and the Addresses page of BarnCRM Settings. A nightly job you cannot see is a nightly
 job you cannot trust, which is why the last run is shown rather than assumed.
 
-## How to turn it on
+## How to Turn It On
 
 Addresses is part of Core, but on a new install it is off until you turn it on. In
-**BarnCRM Settings**, **General**, choose **Turn on** in the **Addresses** row (or leave it
+**BarnCRM Settings**, **General**, choose **Turn On** in the **Addresses** row (or leave it
 ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). There is nothing to
 install and no Setup step. Once it is on, two things are worth setting once.
 
@@ -65,7 +65,7 @@ Then turn on the seasonal address swap, which is off until you turn it on.
    Before you turned the switch on, it read "Seasonal Addresses is off, so seasonal
    addresses will not move on their own."
 7. Choose **Run the swap now** once, so you do not have to wait until tomorrow to see that it
-   works. Refresh the page after a minute: **Seasonal addresses last swapped** shows the time
+   works. Refresh the page after a minute: **Seasonal Addresses Last Swapped** shows the time
    it finished and a sentence saying how many addresses moved.
 
 Saving **Seasonal Addresses** on again when the job is already scheduled changes nothing, so
@@ -97,7 +97,7 @@ To let your team see and manage addresses, make sure they have one of the packag
 levels (BarnCRM Admin, Team Member, or Coordinator, or Fundraising Staff with
 Giving) on the **Access** page in
 BarnCRM Settings. Read Only users can see addresses and cannot change them: the Addresses
-card shows them no **Add address** or **Set as Primary** button.
+card shows them no **Add Address** or **Set as Primary** button.
 
 Addresses appear in two places once you are set up: an **Addresses** card on every
 household, organization, and person record, and an **Addresses** tab in the BarnCRM
@@ -108,7 +108,7 @@ service, so it shows exactly what their object and field access allows and nothi
 address edited elsewhere on the page shows on the card without a reload, and after **Set as
 Primary** the record's own address boxes refresh too.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are Maria. The Garcia household spends January to March in Arizona and the rest of the
 year at home, and letters have been going to the wrong place. Start from the sample data.
@@ -118,7 +118,7 @@ year at home, and letters have been going to the wrong place. Start from the sam
    **Home**, with a **Primary** badge on it. BarnCRM created it from the address that
    was already in the household's standard address boxes when the household was created,
    so nothing you had was lost.
-3. Choose **Add address** on the card. Fill in:
+3. Choose **Add Address** on the card. Fill in:
    - **Type**: Seasonal
    - **Street**: 4120 East Camelback Road
    - **City**: Phoenix
@@ -127,7 +127,7 @@ year at home, and letters have been going to the wrong place. Start from the sam
    - **Country**: United States
    - **Seasonal Start Month**: 1, **Seasonal Start Day**: 1
    - **Seasonal End Month**: 3, **Seasonal End Day**: 31
-   Choose **Add address** in the form (it carries the same name as the button that opened
+   Choose **Add Address** in the form (it carries the same name as the button that opened
    it). The new card appears with its dates shown as "January 1 to March 31".
 4. Choose **Set as Primary** on the Arizona card. The **Primary** badge moves to it, and
    the badge disappears from the home address. Scroll up: the household's address boxes at
@@ -210,7 +210,7 @@ left is the one that becomes **Former**, and it still goes to the winter address
 **Undeliverable is your call.** Staff mark an address **Undeliverable** from its card (the
 status menu) when mail comes back; BarnCRM never sets or clears it. An undeliverable primary
 address is flagged in red on the card, and the **Primary Addresses Marked Undeliverable** check
-in **Org Optimizer**, **Data quality** lists every household, organization and person whose
+in **Org Optimizer**, **Data Quality** lists every household, organization and person whose
 primary is marked that way, with **Open in Find** (see [Data hygiene](data-hygiene.md)).
 
 **A Former address stays out of use.** The seasonal swap skips a **Former** seasonal address
@@ -235,7 +235,7 @@ included, and the address number. Nothing is ticked on a new install, so the car
 its usual fields. A field someone cannot see is left out for them, and a field the card
 already shows is not repeated.
 
-## A five-minute walkthrough for the seasonal swap
+## A Five-Minute Walkthrough for the Seasonal Swap
 
 Still the Garcia household, and still five minutes. This time you are proving to yourself
 that the nightly job really works, before the winter mailing goes out.
@@ -249,7 +249,7 @@ that the nightly job really works, before the winter mailing goes out.
    Month** and **Seasonal Start Day** to yesterday's month and day, and the end month and day
    to a date next month. Save.
 4. Go back to **BarnCRM Settings**, **Addresses**, and choose **Run the swap now**.
-5. Wait a minute and refresh the page. **Seasonal addresses last swapped** now shows a time a
+5. Wait a minute and refresh the page. **Seasonal Addresses Last Swapped** now shows a time a
    minute ago and reads "1 moved to a seasonal address, 0 moved back, 0 could not be changed."
 6. Open **The Garcia Family** again. The **Primary** badge is on the Arizona address, the
    household's address boxes at the top of the record read Phoenix, and every member of the
@@ -259,7 +259,7 @@ that the nightly job really works, before the winter mailing goes out.
 7. Now set the Arizona address's end date to yesterday, save, and choose **Run the swap now**
    again. The summary reads "0 moved to a seasonal address, 1 moved back", the badge is back
    on the home address, and the household's address boxes read Springfield again.
-8. Open the **BarnCRM** home page. The **Seasonal addresses last swapped** tile shows
+8. Open the **BarnCRM** home page. The **Seasonal Addresses Last Swapped** tile shows
    the same time and the same sentence. That tile is where you will notice, on an ordinary
    morning, if the job has stopped running.
 
@@ -267,7 +267,7 @@ A range that crosses New Year works the same way and is entered as one range. No
 March 31 means the household is in Arizona on November 1, on Christmas Day, and on March 31,
 and back home on April 1. Do not split it into two addresses.
 
-## Common mistakes
+## Common Mistakes
 
 **Editing the standard address boxes directly.** BarnCRM treats the address records as the
 truth and copies the primary into the standard address boxes, but an edit typed into the
