@@ -220,7 +220,10 @@ gifts](gift-import.md), section 6).
    the date each one can be undone until.
 2. Select **Undo** beside the import. BarnCRM counts what it would remove (people,
    households and organizations, and gifts with Giving) and how many changed values it would put back, and shows
-   you the numbers with the import's name and file name. Nothing has changed yet.
+   you the numbers with the import's name and file name. Nothing has changed yet. The
+   numbers count the records the import created from your file. Undo also removes the
+   households and gift allocations BarnCRM created automatically for those rows, so the
+   total removed can be higher.
 3. Read the numbers. If they are what you expect, select **Undo This Import**. If somebody
    has added or removed a record since you looked, the undo refuses and counts again, so you
    only ever confirm a number that is still true.
