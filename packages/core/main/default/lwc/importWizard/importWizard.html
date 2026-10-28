@@ -110,6 +110,33 @@
                             <p class="slds-text-body_small slds-var-m-top_x-small" data-id="template-creates">
                                 {templateCreates}
                             </p>
+                            <template lwc:if={canCopyTemplate}>
+                                <template lwc:if={copyingTemplate}>
+                                    <lightning-input
+                                        data-id="copy-name"
+                                        label={labels.copyTemplateNameLabel}
+                                        value={copyName}
+                                        max-length="80"
+                                        onchange={handleCopyNameChange}
+                                    ></lightning-input>
+                                    <lightning-button
+                                        class="slds-var-m-top_x-small"
+                                        label={labels.loadObjectCreateButton}
+                                        data-id="create-copy"
+                                        disabled={cannotCreateCopy}
+                                        onclick={handleCreateCopy}
+                                    ></lightning-button>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-button
+                                        class="slds-var-m-top_x-small"
+                                        variant="base"
+                                        label={labels.copyTemplateButton}
+                                        data-id="start-copy"
+                                        onclick={handleStartCopy}
+                                    ></lightning-button>
+                                </template>
+                            </template>
                             <lightning-input
                                 class="slds-var-m-top_medium"
                                 type="checkbox"

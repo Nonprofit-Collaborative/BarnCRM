@@ -241,6 +241,38 @@
         <value>tributes</value>
     </labels>
     <labels>
+        <fullName>Core_Import_CopyTemplateButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that starts a new template from the chosen one</shortDescription>
+        <value>Start a New Template From This One</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CopyTemplateNameLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: name box of the new template copied from another</shortDescription>
+        <value>New template name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_CopyTemplateDefaultName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: starting name of a copied template; {0} is its source</shortDescription>
+        <value>Copy of {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorCopyOneObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a one-object template cannot be copied</shortDescription>
+        <value>A template that loads one object cannot be copied. Choose One Kind of Record to make a new one.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_NoDeleteForObject</fullName>
         <categories>Import</categories>
         <language>en_US</language>

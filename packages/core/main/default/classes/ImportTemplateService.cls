@@ -139,6 +139,46 @@ public with sharing class ImportTemplateService {
         return template;
     }
 
+    /**
+     * Starts a new people or gift template from an existing one (D-136): its columns, values
+     * for every row, row rules, matching and payment matching are copied under the new name,
+     * so two differently shaped files each keep their own. The copy is the administrator's
+     * own: not a shipped template, not recurring, never loaded. A one-object template is
+     * refused, because One Kind of Record already makes a new one.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c copyTemplate(Id sourceId, String name) {
+        if (String.isBlank(name)) {
+            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+        }
+        Import_Template__c source = existing(sourceId);
+        if (String.isNotBlank(source.Target_Object__c)) {
+            throw new ImportException(Label.Core_Import_ErrorCopyOneObject);
+        }
+        Import_Template__c copy = new Import_Template__c(
+            Name = name.trim().abbreviate(80),
+            Description__c = source.Description__c,
+            Template_Key__c = 'copy_' + String.valueOf(Math.abs(Crypto.getRandomLong())).left(18),
+            Column_Mapping_JSON__c = source.Column_Mapping_JSON__c,
+            Default_Values_JSON__c = source.Default_Values_JSON__c,
+            Matching_Rule__c = source.Matching_Rule__c,
+            Person_Match_Field__c = source.Person_Match_Field__c,
+            Organization_Matching_Rule__c = source.Organization_Matching_Rule__c,
+            Organization_Match_Field__c = source.Organization_Match_Field__c,
+            Several_Matches__c = source.Several_Matches__c,
+            Use_Duplicate_Rules__c = source.Use_Duplicate_Rules__c,
+            Person_Mode__c = source.Person_Mode__c,
+            Payment_Matching__c = source.Payment_Matching__c,
+            Match_Date_Window_Days__c = source.Match_Date_Window_Days__c,
+            Match_Amount_Tolerance__c = source.Match_Amount_Tolerance__c,
+            Is_Package_Default__c = false,
+            Is_Recurring__c = false,
+            Active__c = true
+        );
+        Database.insert(copy, AccessLevel.USER_MODE);
+        return copy;
+    }
+
     /** What a one-object template does with each row, as the wizard sends it (R-IT12). */
     @NamespaceAccessible
     public class LoadChoices {

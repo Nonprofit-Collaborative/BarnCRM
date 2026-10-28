@@ -43,6 +43,8 @@ export const KIND_TEMPLATES = 'templates';
 export const OBJECT_KINDS = [KIND_OBJECT, KIND_RELATED, KIND_DELETE];
 
 const GIFT_ENTITY = 'Gift';
+/** The shipped people template every org has, whatever an admin has renamed it. */
+const GENERAL_PEOPLE_KEY = 'generic_contact_list';
 
 /** What each row entity creates, in the order the summary lists them. */
 const ENTITY_KINDS = [
@@ -91,6 +93,12 @@ export function templatesOfKind(templates, kind) {
     return templates.filter(isGiftTemplate);
   }
   return templates;
+}
+
+/** The template a choice starts on: the general people template, else the first offered. */
+export function firstTemplateOfKind(templates, kind) {
+  const offered = templatesOfKind(templates, kind);
+  return offered.find((each) => each.templateKey === GENERAL_PEOPLE_KEY) || offered[0];
 }
 
 /**

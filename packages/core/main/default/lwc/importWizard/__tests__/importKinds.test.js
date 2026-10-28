@@ -1,4 +1,10 @@
-import { kindCards, templatesOfKind, createsText, isGiftTemplate } from '../importKinds';
+import {
+  kindCards,
+  templatesOfKind,
+  firstTemplateOfKind,
+  createsText,
+  isGiftTemplate
+} from '../importKinds';
 
 jest.mock(
   '@salesforce/label/c.Core_Import_CreatesSummary',
@@ -77,6 +83,14 @@ describe('the first step of the import wizard (D-136)', () => {
     expect(templatesOfKind(all, 'gifts')).toEqual([GIFTS]);
     expect(templatesOfKind(all, 'templates')).toEqual(all);
     expect(isGiftTemplate({ ...SESSIONS, mapping: mapping('Gift.Amount') })).toBe(false);
+  });
+
+  it('starts People on the general template, else the first offered', () => {
+    const general = { ...PEOPLE, id: 'a09', templateKey: 'generic_contact_list' };
+    expect(firstTemplateOfKind([ORGANIZATIONS, general, GIFTS], 'people')).toBe(general);
+    expect(firstTemplateOfKind([ORGANIZATIONS, GIFTS], 'people')).toBe(ORGANIZATIONS);
+    expect(firstTemplateOfKind([PEOPLE, GIFTS], 'gifts')).toBe(GIFTS);
+    expect(firstTemplateOfKind([PEOPLE], 'gifts')).toBeUndefined();
   });
 
   it('says what each template creates from its mapping', () => {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Couples and Households</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">couples_and_households</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Two people on each row who share a household and an address: Contact 1 and Contact 2 columns, and optionally the household name. Both people go into one household. Start here for a list of couples or families.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "Contact 1 First Name", "target": "Contact1.FirstName"}, {"source": "Contact 1 Last Name", "target": "Contact1.LastName"}, {"source": "Contact 1 Email", "target": "Contact1.Email"}, {"source": "Contact 1 Phone", "target": "Contact1.Phone"}, {"source": "Contact 2 First Name", "target": "Contact2.FirstName"}, {"source": "Contact 2 Last Name", "target": "Contact2.LastName"}, {"source": "Contact 2 Email", "target": "Contact2.Email"}, {"source": "Contact 2 Phone", "target": "Contact2.Phone"}, {"source": "Household Name", "target": "Household.Name"}, {"source": "Street", "target": "Contact1.MailingStreet"}, {"source": "City", "target": "Contact1.MailingCity"}, {"source": "State", "target": "Contact1.MailingState"}, {"source": "Postal Code", "target": "Contact1.MailingPostalCode"}, {"source": "Country", "target": "Contact1.MailingCountry"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
