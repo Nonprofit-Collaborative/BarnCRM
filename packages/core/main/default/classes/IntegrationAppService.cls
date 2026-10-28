@@ -49,8 +49,6 @@ public with sharing class IntegrationAppService {
         @AuraEnabled
         public String linkUrl;
         @AuraEnabled
-        public String installUrl;
-        @AuraEnabled
         public String relatedModule;
         @AuraEnabled
         public String compatibility;
@@ -84,7 +82,6 @@ public with sharing class IntegrationAppService {
             info.maintainer = row.Maintainer__c;
             info.licenseCost = row.License_Cost__c;
             info.linkUrl = row.Link_Url__c;
-            info.installUrl = row.Install_Url__c;
             info.relatedModule = row.Related_Module__c;
             info.compatibility = row.Compatibility__c;
             info.migrationPath = row.Migration_Path__c;
