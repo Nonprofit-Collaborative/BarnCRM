@@ -73,4 +73,51 @@ describe('c-barn-confirm-modal', () => {
 
     expect(closed.mock.calls.map((call) => call[0].detail)).toEqual([true, false]);
   });
+
+  it('story: no type-to-confirm field unless asked for', async () => {
+    const element = render({
+      label: 'Sure?',
+      message: 'Go',
+      confirmLabel: 'Go',
+      cancelLabel: 'No'
+    });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="type-to-confirm"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="confirm"]').disabled).toBe(false);
+  });
+
+  it('story: type the count before a destructive confirm works', async () => {
+    const element = render({
+      label: 'Delete 1250 records?',
+      message: 'They go to the Recycle Bin.',
+      confirmLabel: 'Delete 1250 Records',
+      cancelLabel: 'Cancel',
+      confirmVariant: 'destructive',
+      typeToConfirm: '1250',
+      typeToConfirmLabel: 'Type 1250 to delete these records'
+    });
+    await flush();
+    const closed = jest.fn();
+    element.addEventListener('close', closed);
+    const root = element.shadowRoot;
+    const field = root.querySelector('[data-id="type-to-confirm"]');
+    const confirm = root.querySelector('[data-id="confirm"]');
+    expect(field.label).toBe('Type 1250 to delete these records');
+    expect(confirm.disabled).toBe(true);
+
+    confirm.click();
+    expect(closed).not.toHaveBeenCalled();
+
+    field.value = '125';
+    field.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(confirm.disabled).toBe(true);
+
+    field.value = ' 1250 ';
+    field.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(confirm.disabled).toBe(false);
+    confirm.click();
+    expect(closed.mock.calls[0][0].detail).toBe(true);
+  });
 });

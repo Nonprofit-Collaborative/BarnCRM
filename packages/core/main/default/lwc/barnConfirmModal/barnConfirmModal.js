@@ -19,6 +19,27 @@ export default class BarnConfirmModal extends LightningModal {
   @api cancelLabel;
   /** 'brand' (default) or 'destructive'. */
   @api confirmVariant;
+  /**
+   * For a large or lasting change: text the person types before the confirm button works,
+   * such as the record count ("1250"). Compared after trimming spaces.
+   */
+  @api typeToConfirm;
+  /** The field label for that text, such as "Type 1250 to delete these records". */
+  @api typeToConfirmLabel;
+
+  typed = '';
+
+  get asksToType() {
+    return Boolean(this.typeToConfirm);
+  }
+
+  get confirmDisabled() {
+    return this.asksToType && this.typed.trim() !== String(this.typeToConfirm).trim();
+  }
+
+  handleTyped(event) {
+    this.typed = event.target.value || '';
+  }
 
   get detailLines() {
     return (this.details || [])
@@ -35,6 +56,9 @@ export default class BarnConfirmModal extends LightningModal {
   }
 
   handleConfirm() {
+    if (this.confirmDisabled) {
+      return;
+    }
     this.close(true);
   }
 }

@@ -1,0 +1,12 @@
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  text-align: center;
+}
+
+.stat__value {
+  color: var(--slds-g-color-on-surface-3, #181818);
+}
