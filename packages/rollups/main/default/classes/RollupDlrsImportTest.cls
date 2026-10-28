@@ -290,6 +290,17 @@ private class RollupDlrsImportTest {
                         }
                     ),
                     dlrs(
+                        'Names_Dash',
+                        'Concatenate',
+                        TEXT_FIELD,
+                        new Map<String, Object>{
+                            'FieldToAggregate__c' => 'Name',
+                            'FieldToOrderBy__c' => 'Name',
+                            // " - ": the Builder keeps the spaces as tokens, so it is importable.
+                            'ConcatenateDelimiter__c' => 'SP()-SP()'
+                        }
+                    ),
+                    dlrs(
                         'Names_Plain',
                         'Concatenate',
                         TEXT_FIELD,
@@ -364,6 +375,16 @@ private class RollupDlrsImportTest {
             Assert.isTrue(slash.importable, 'Copied');
             Assert.areEqual(RollupPlanner.CUSTOM_DELIMITER, slash.draft.delimiter, 'Custom');
             Assert.areEqual('/ \tx', slash.draft.customDelimiter, 'SP() a space, TB() a tab');
+
+            RollupDlrsImport.Candidate dash = found.get('Names_Dash');
+            Assert.isTrue(dash.importable, String.valueOf(dash.reasons));
+            Assert.areEqual(RollupPlanner.CUSTOM_DELIMITER, dash.draft.delimiter, 'Custom');
+            Assert.areEqual(' - ', dash.draft.customDelimiter, 'Spaces at both ends are kept');
+            Assert.areEqual(
+                'SP()-SP()',
+                RollupPlanner.encodeDelimiter(dash.draft.customDelimiter),
+                'Stored as DLRS stores it'
+            );
 
             RollupDlrsImport.Candidate plain = found.get('Names_Plain');
             Assert.areEqual(
@@ -454,16 +475,6 @@ private class RollupDlrsImportTest {
                         }
                     ),
                     dlrs(
-                        'Spaced_Delimiter',
-                        'Concatenate',
-                        TEXT_FIELD,
-                        new Map<String, Object>{
-                            'FieldToAggregate__c' => 'Name',
-                            // " - ": the Custom Delimiter would be trimmed to "-" on save.
-                            'ConcatenateDelimiter__c' => 'SP()-SP()'
-                        }
-                    ),
-                    dlrs(
                         'No_Path',
                         'Concatenate',
                         TEXT_FIELD,
@@ -491,7 +502,6 @@ private class RollupDlrsImportTest {
                 'Blanks_First' => Label.Core_RollupBuilder_DlrsReasonOrder,
                 'Limited_Last' => Label.Core_RollupBuilder_DlrsReasonRowLimit,
                 'Long_Delimiter' => Label.Core_RollupBuilder_DlrsReasonDelimiter,
-                'Spaced_Delimiter' => Label.Core_RollupBuilder_DlrsReasonDelimiter,
                 'No_Path' => Label.Core_RollupBuilder_DlrsReasonPath,
                 'Filled' => Label.Core_RollupBuilder_DlrsReasonFilled,
                 'Wrong_Type' => Label.Core_Rollups_ErrorTextTarget

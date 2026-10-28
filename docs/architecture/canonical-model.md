@@ -1958,8 +1958,9 @@ from the DLRS definition. The mapping:
 - Concatenate Delimiter: BR(), SP() and TB() are read as a new line, a space and a tab first
   (DLRS writes them because Salesforce trims a text value's spaces on save). Then `, `, `; `,
   ` | ` and a new line become Comma, Semicolon, Pipe and New line; blank becomes Comma;
-  anything else becomes Custom when it fits ten characters on one line with no space at
-  either end (the Custom Delimiter is trimmed on save too), otherwise it is refused.
+  anything else becomes Custom when it fits ten characters on one line (spaces and tabs at
+  either end included: the Custom Delimiter is stored with them as tokens, below), otherwise
+  it is refused.
 - Aggregate All Rows becomes Include Deleted; Bypass Permission is kept.
 - Calculation Mode: Realtime, Developer and Process Builder become Both; Scheduled stays
   Scheduled. Sharing mode User is not kept: definitions run in system mode.
@@ -1984,7 +1985,7 @@ only with the confirmation above, recorded the same way. DLRS is read, never cha
 | Relationship Path | `Relationship_Path__c` | Text |
 | Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT (labels Sum, Count, Minimum, Maximum, First, Last, Average, Count distinct, Any, None, Text list, Text list, each value once) |
 | Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line, Pipe, Custom (default Comma) |
-| Custom Delimiter | `Custom_Delimiter__c` | Text (10) |
+| Custom Delimiter | `Custom_Delimiter__c` | Text (40). Up to 10 characters as typed; Salesforce trims a text value, so whitespace at either end is stored as tokens (SP() a space, TB() a tab, BR() a new line, as DLRS does), encoded on save and decoded wherever the delimiter is used or shown (`RollupPlanner.encodeDelimiter` and `decodeDelimiter`). A value saved without tokens reads as it is |
 | Include Deleted | `Include_Deleted__c` | Checkbox (default false) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |

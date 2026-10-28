@@ -404,16 +404,12 @@ public with sharing class RollupDlrsImport {
             candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteNoDelimiter);
             return;
         }
-        // DLRS writes these tokens because Salesforce trims a text value's spaces on save.
-        String text = raw.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
+        // DLRS writes these tokens because Salesforce trims a text value's spaces on save. The
+        // Builder stores the Custom Delimiter the same way, so spaces at either end are kept.
+        String text = RollupPlanner.decodeDelimiter(raw);
         if (DELIMITER_BY_TEXT.containsKey(text)) {
             draft.delimiter = DELIMITER_BY_TEXT.get(text);
-        } else if (
-            text.contains('\n') ||
-            text.length() > CUSTOM_DELIMITER_LENGTH ||
-            // The Custom Delimiter is trimmed on save too, so a space at either end is lost.
-            text != text.trim()
-        ) {
+        } else if (text.contains('\n') || text.length() > CUSTOM_DELIMITER_LENGTH) {
             reason(candidate, Label.Core_RollupBuilder_DlrsReasonDelimiter, raw);
         } else {
             draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;

@@ -190,9 +190,46 @@ public with sharing class RollupPlanner {
             definition.isSet(Rollup_Definition__c.Custom_Delimiter__c) &&
             String.isNotEmpty(definition.Custom_Delimiter__c)
         ) {
-            return definition.Custom_Delimiter__c;
+            return decodeDelimiter(definition.Custom_Delimiter__c);
         }
         return separatorFor(definition.Delimiter__c);
+    }
+
+    /**
+     * Salesforce trims a text value's spaces on save, so the Custom Delimiter is stored with
+     * whitespace at either end as tokens, the way DLRS does: SP() a space, TB() a tab, BR() a
+     * new line. Inner whitespace stays as typed. The admin never sees the tokens.
+     */
+    public static String encodeDelimiter(String typed) {
+        if (String.isEmpty(typed)) {
+            return typed;
+        }
+        Integer first = 0;
+        Integer last = typed.length();
+        while (first < last && isWhitespace(typed.substring(first, first + 1))) {
+            first++;
+        }
+        while (last > first && isWhitespace(typed.substring(last - 1, last))) {
+            last--;
+        }
+        return tokens(typed.substring(0, first)) +
+            typed.substring(first, last) +
+            tokens(typed.substring(last));
+    }
+
+    /** What the delimiter writes: SP(), TB() and BR() read back; a value stored without tokens as it is. */
+    public static String decodeDelimiter(String stored) {
+        return stored == null
+            ? null
+            : stored.replace('BR()', '\n').replace('SP()', ' ').replace('TB()', '\t');
+    }
+
+    private static Boolean isWhitespace(String character) {
+        return character == ' ' || character == '\t' || character == '\n';
+    }
+
+    private static String tokens(String whitespace) {
+        return whitespace.replace(' ', 'SP()').replace('\t', 'TB()').replace('\n', 'BR()');
     }
 
     /** Why this delimiter cannot be saved (R-R10): Custom with nothing to write. */

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Custom_Delimiter__c</fullName>
-    <description>The characters written between the values of a text list when Delimiter is Custom, exactly as stored; required then (ADR-0136).</description>
+    <description>The characters written between the values of a text list when Delimiter is Custom, exactly as typed; required then (ADR-0136). Salesforce trims a text value's spaces, so whitespace at either end is stored as the tokens SP(), TB() and BR(), read back wherever the delimiter is used, which is why the length is 40.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Up to 10 characters, written between the values exactly as typed. Used only when Delimiter is Custom.</inlineHelpText>
+    <inlineHelpText>Up to 10 characters, written between the values exactly as typed, spaces included. Used only when Delimiter is Custom.</inlineHelpText>
     <label>Custom Delimiter</label>
-    <length>10</length>
+    <length>40</length>
     <required>false</required>
     <trackHistory>false</trackHistory>
     <type>Text</type>

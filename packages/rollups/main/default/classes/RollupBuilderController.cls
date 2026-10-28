@@ -1107,7 +1107,7 @@ public with sharing class RollupBuilderController {
             ? null
             : definition.Row_Limit__c.intValue();
         draft.delimiter = definition.Delimiter__c;
-        draft.customDelimiter = definition.Custom_Delimiter__c;
+        draft.customDelimiter = RollupPlanner.decodeDelimiter(definition.Custom_Delimiter__c);
         draft.includeDeleted = definition.Include_Deleted__c;
         draft.filterJson = definition.Filter_JSON__c;
         draft.targetFilterJson = definition.Target_Filter_JSON__c;
@@ -1137,7 +1137,7 @@ public with sharing class RollupBuilderController {
             Row_Limit__c = draft.rowLimit,
             Delimiter__c = String.isBlank(draft.delimiter) ? null : draft.delimiter,
             Custom_Delimiter__c = draft.delimiter == RollupPlanner.CUSTOM_DELIMITER
-                ? draft.customDelimiter
+                ? RollupPlanner.encodeDelimiter(draft.customDelimiter)
                 : null,
             Include_Deleted__c = draft.includeDeleted == true,
             Filter_JSON__c = String.isBlank(draft.filterJson) ? null : draft.filterJson,
