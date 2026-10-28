@@ -221,13 +221,31 @@ async function chooseFile(element, text = FILE_TEXT, name = 'donors.csv', size =
   await flush();
 }
 
+/**
+ * Clicks a control by its data-id. Back lives in the step flow's footer, and a results
+ * download is an item of the Download menu, which fires select on the menu.
+ */
 function click(element, id) {
-  element.shadowRoot.querySelector(`[data-id="${id}"]`).click();
+  const root = element.shadowRoot;
+  if (id === 'back') {
+    root.querySelector('c-barn-step-flow').shadowRoot.querySelector('[data-id="back"]').click();
+    return;
+  }
+  const node = root.querySelector(`[data-id="${id}"]`);
+  if (node.tagName === 'LIGHTNING-MENU-ITEM') {
+    root
+      .querySelector('[data-id="download-menu"]')
+      .dispatchEvent(new CustomEvent('select', { detail: { value: node.value } }));
+    return;
+  }
+  node.click();
 }
 
-/** Clicks one of the first step's choice cards (D-136). */
+/** Chooses one of the first step's cards on the visual picker (D-136, D-140). */
 async function chooseKind(element, kind) {
-  element.shadowRoot.querySelector(`[data-kind="${kind}"]`).click();
+  element.shadowRoot
+    .querySelector('[data-id="kind-picker"]')
+    .dispatchEvent(new CustomEvent('change', { detail: { value: kind } }));
   await flush();
 }
 
@@ -239,15 +257,13 @@ async function chooseKind(element, kind) {
 async function open() {
   const element = render();
   await flush();
-  if (!element.shadowRoot.querySelector('[data-kind="people"]')) {
+  if (!element.shadowRoot.querySelector('[data-id="kind-picker"]')) {
     return element;
   }
   await chooseKind(element, 'people');
   const templates = (await getTemplates.mock.results[0].value) || [];
   const picker = element.shadowRoot.querySelector('[data-id="template"]');
   if (templates.length > 0 && picker.value !== templates[0].id) {
-    click(element, 'change-kind');
-    await flush();
     await chooseKind(element, 'templates');
     element.shadowRoot.querySelector('[data-id="use-template"]').click();
     await flush();
@@ -299,12 +315,44 @@ describe('the import wizard', () => {
   it('opens on the choice cards, without Gifts when no template loads gifts', async () => {
     const element = render();
     await flush();
-    const kinds = Array.from(element.shadowRoot.querySelectorAll('[data-id="kind"]')).map(
-      (card) => card.dataset.kind
-    );
-    expect(kinds).toEqual(['people', 'object', 'related', 'delete', 'templates']);
+    const kindPicker = element.shadowRoot.querySelector('[data-id="kind-picker"]');
+    expect(kindPicker.label).toBe('c.Core_Import_StepKind');
+    expect(kindPicker.value).toBeUndefined();
+    expect(kindPicker.options.map((option) => option.value)).toEqual([
+      'people',
+      'object',
+      'related',
+      'delete',
+      'templates'
+    ]);
+    expect(kindPicker.options.find((option) => option.value === 'delete').warning).toBe(true);
+    expect(kindPicker.options.every((option) => option.iconName && option.label)).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="next"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="template"]')).toBeNull();
+  });
+
+  it('shows the six steps on the path, Back only from step two', async () => {
+    const element = await open();
+    const flow = element.shadowRoot.querySelector('[data-id="flow"]');
+    expect(flow.steps.map((step) => step.label)).toEqual([
+      'c.Core_Import_StepFileType',
+      'c.Core_Import_StepUpload',
+      'c.Core_Import_StepColumns',
+      'c.Core_Import_StepMatching',
+      'c.Core_Import_StepPreview',
+      'c.Core_Import_StepResults'
+    ]);
+    expect(flow.currentStep).toBe('1');
+    expect(flow.canGoBack).toBe(false);
+    // The picker stays on screen with the choice, and the kind's templates show below it.
+    expect(element.shadowRoot.querySelector('[data-id="kind-picker"]').value).toBe('people');
+    click(element, 'next');
+    await flush();
+    expect(flow.currentStep).toBe('2');
+    expect(flow.canGoBack).toBe(true);
+    click(element, 'back');
+    await flush();
+    expect(flow.currentStep).toBe('1');
   });
 
   it('shows Gifts when a template maps a gift column, offering only the gift templates', async () => {
@@ -331,8 +379,6 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
       'This file can create: c.Core_Import_CreatesPeople, c.Core_Import_CreatesGifts.'
     );
-    click(element, 'change-kind');
-    await flush();
     await chooseKind(element, 'people');
     expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
       { label: 'Generic contact list', value: 'a01' }
@@ -1062,6 +1108,19 @@ describe('the import wizard', () => {
     const names = picker.options.filter((option) => option.value === 'Organization.Name');
     expect(names).toHaveLength(1);
     expect(names[0].label).toBe('Organization: name');
+  });
+
+  it('keeps values, totals and payments under More Options, open once one is set', async () => {
+    const element = await toMatchingStep();
+    const more = element.shadowRoot.querySelector('[data-id="more-options"]');
+    expect(more.activeSectionName).toBe('');
+    expect(more.querySelector('[data-id="add-file-value"]')).not.toBeNull();
+    expect(more.querySelector('[data-id="expected-count"]')).not.toBeNull();
+    const count = element.shadowRoot.querySelector('[data-id="expected-count"]');
+    count.value = '3';
+    count.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(more.activeSectionName).toBe('more');
   });
 
   it('sends Match only when ticked, and never offers a person ID as a value for every row', async () => {

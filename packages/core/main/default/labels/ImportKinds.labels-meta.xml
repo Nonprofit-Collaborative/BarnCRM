@@ -105,14 +105,6 @@
         <value>Every template in your org: the ones BarnCRM and your modules ship, and the ones you made.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangeKind</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: button back to the first step's choice cards</shortDescription>
-        <value>Choose Something Else</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_UseTemplate</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -278,6 +270,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the chosen object cannot be deleted by file</shortDescription>
-        <value>This object's records cannot be deleted by file, so the template creates or updates them instead. Choose Something Else to pick another object.</value>
+        <value>This object's records cannot be deleted by file, so the template creates or updates them instead. To pick another object, choose another card, then this one again.</value>
     </labels>
 </CustomLabels>

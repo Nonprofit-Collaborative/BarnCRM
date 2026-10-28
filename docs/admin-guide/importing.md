@@ -14,8 +14,13 @@ objects, loads through **One Kind of Record** (section 9).
 
 ### What Are You Importing?
 
-The first step of the **Import** tab asks what the file holds. Each choice is a card that says
-what it creates; choose one, and **Choose Something Else** takes you back to the cards.
+A path across the top of the **Import** tab shows its six steps: **Choose File Type**, **Upload
+File**, **Check Columns**, **Match Rows**, **Preview** and **Results**. **Back** is always at the
+bottom left and the step's main button at the bottom right.
+
+The first step asks what the file holds. Each choice is a card that says what it creates.
+Choose one and its templates show below the cards; choose another card to change your mind.
+The cards work like radio buttons: Tab reaches them and the arrow keys move between them.
 
 | Card | What it loads | Where to read more |
 |---|---|---|
@@ -116,12 +121,13 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    different people who share a name at one address as the same person. If the file has
    organizations, choose how they are matched too (**Name exact** unless the file has an ID
    for them), and what happens when more than one record matches a row (**Reject the row**
-   unless you have a reason to change it). On the same step, **Values for Every Row** lets
+   unless you have a reason to change it). On the same step, under **More Options** (open by
+   itself once anything in it is set), **Values for Every Row** lets
    you give a value the whole file shares, for example a city missing from every row; a row
    with its own value keeps it. Tick **Match only** when the file should update records you
    already have and never add new ones, and **Also match with my duplicate rules** to let your
    org's duplicate rules find people the rule missed. Section 8 explains every choice.
-5. Optionally, under **Control totals**, type how many rows the file should have (and, with
+5. Optionally, under **More Options**, **Control Totals (Optional)**, type how many rows the file should have (and, with
    Giving, for a gift file, what its amounts should add up to). The preview checks them and the import is
    refused while they do not match.
 6. Select **Preview**. Nothing is written. When it finishes you see four counts, "would
@@ -152,7 +158,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    undo removes both parts. If they are wrong, undo the import (section 5), fix the file or the
    template, and upload it again. An import whose trial has run cannot be previewed again.
 9. The results screen shows the same four counts for what actually happened, the run log,
-   and links to the records. Select **Download Results** to get every row of the file back as
+   and links to the records. Select **Download**, then **Download Results**, to get every row of the file back as
    a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
    the Salesforce record IDs it resulted in (person, second person, household, organization,
    and a gift or other record a module loaded), the reason for a rejected row, and the row's
@@ -161,7 +167,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    100,000 rows in one download; for a larger import the screen says how many it holds.
 
 **Fixing the rejected rows.** You do not need a new import for the rows that were rejected.
-Select **Download Rejected Rows**, fix those rows in your spreadsheet (keep the same column
+Select **Download Rejected Rows** (on the results screen it is under **Download**), fix those rows in your spreadsheet (keep the same column
 headings; the Row and Reason columns are ignored), and save the file. Then, still on the
 results screen, choose the fixed file under **Retry Fixed Rows**. BarnCRM previews only
 those rows, against the same template, and shows the counts for them; select **Import these
