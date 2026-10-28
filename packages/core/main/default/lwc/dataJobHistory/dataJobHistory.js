@@ -14,6 +14,7 @@ import { startPolling } from 'c/jobPoller';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import HEADING from '@salesforce/label/c.Core_DataJobs_Heading';
 import EMPTY from '@salesforce/label/c.Core_DataJobs_Empty';
+import EMPTY_HINT from '@salesforce/label/c.Core_DataJobs_EmptyHint';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import SHOW_ALL from '@salesforce/label/c.Core_DataJobs_ShowAll';
 import SHOW_IMPORTS from '@salesforce/label/c.Core_DataJobs_ShowImports';
@@ -144,6 +145,7 @@ export default class DataJobHistory extends LightningElement {
   labels = {
     show: SHOW,
     empty: EMPTY,
+    emptyHint: EMPTY_HINT,
     refresh: REFRESH,
     undo: UNDO,
     undoUntil: UNDO_UNTIL,

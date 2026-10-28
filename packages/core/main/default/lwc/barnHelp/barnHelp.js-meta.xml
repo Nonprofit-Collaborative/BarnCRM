@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: an info popover plus an optional Learn More link that opens a new tab safely, in
+    place of a visible paragraph of help.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
