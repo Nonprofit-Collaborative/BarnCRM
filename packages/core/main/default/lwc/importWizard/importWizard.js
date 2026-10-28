@@ -51,7 +51,6 @@ import stepMatching from '@salesforce/label/c.Core_Import_StepMatching';
 import stepPreview from '@salesforce/label/c.Core_Import_StepPreview';
 import stepResults from '@salesforce/label/c.Core_Import_StepResults';
 import nextButton from '@salesforce/label/c.Core_Import_NextButton';
-import backButton from '@salesforce/label/c.Core_Import_BackButton';
 import dryRunButton from '@salesforce/label/c.Core_Import_DryRunButton';
 import commitButton from '@salesforce/label/c.Core_Import_CommitButton';
 import startOverButton from '@salesforce/label/c.Core_Import_StartOverButton';
@@ -128,7 +127,9 @@ import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName
 import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
 import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
 import stepKind from '@salesforce/label/c.Core_Import_StepKind';
-import changeKind from '@salesforce/label/c.Core_Import_ChangeKind';
+import stepFileType from '@salesforce/label/c.Core_Import_StepFileType';
+import moreOptions from '@salesforce/label/c.Core_Import_MoreOptions';
+import downloadMenu from '@salesforce/label/c.Core_Import_DownloadMenu';
 import useTemplate from '@salesforce/label/c.Core_Import_UseTemplate';
 import lastLoaded from '@salesforce/label/c.Core_Import_LastLoaded';
 import notLoadedYet from '@salesforce/label/c.Core_Import_NotLoadedYet';
@@ -390,13 +391,13 @@ export default class ImportWizard extends LightningElement {
     blankClearsLabel,
     cardTitle,
     stepTemplate,
+    stepFileType,
     stepUpload,
     stepColumns,
     stepMatching,
     stepPreview,
     stepResults,
     nextButton,
-    backButton,
     dryRunButton,
     commitButton,
     startOverButton,
@@ -437,7 +438,8 @@ export default class ImportWizard extends LightningElement {
     matchOnlyLabel,
     matchOnlyHelp,
     stepKind,
-    changeKind,
+    moreOptions,
+    downloadMenu,
     useTemplate,
     lastLoaded,
     notLoadedYet,
@@ -508,6 +510,17 @@ export default class ImportWizard extends LightningElement {
     return kindCards(this.templates, canBulkDelete);
   }
 
+  /** The cards as visual picker options; the picker stays on screen after a choice (D-140). */
+  get kindOptions() {
+    return this.kindCards.map((card) => ({
+      value: card.key,
+      label: card.title,
+      description: card.text,
+      iconName: card.iconName,
+      warning: card.warning
+    }));
+  }
+
   get choosingKind() {
     return !this.importKind;
   }
@@ -552,7 +565,7 @@ export default class ImportWizard extends LightningElement {
   }
 
   handleKindChoice(event) {
-    const kind = event.currentTarget.dataset.kind;
+    const kind = event.detail.value;
     this.message = undefined;
     this.importKind = kind;
     this.templateId = undefined;
@@ -566,14 +579,6 @@ export default class ImportWizard extends LightningElement {
     } else if (OBJECT_KINDS.includes(kind)) {
       this.handleChooseObject();
     }
-  }
-
-  handleChangeKind() {
-    this.message = undefined;
-    this.importKind = undefined;
-    this.templateId = undefined;
-    this.choosingObject = false;
-    this.copyingTemplate = false;
   }
 
   handleUseTemplate(event) {
@@ -1979,6 +1984,38 @@ export default class ImportWizard extends LightningElement {
       this.changedValues = [];
     }
     this.step = Math.max(this.step - 1, 1);
+  }
+
+  /** The six steps on the path across the top (barnStepFlow, D-140). */
+  get stepPath() {
+    const labels = this.labels;
+    return [
+      labels.stepFileType,
+      labels.stepUpload,
+      labels.stepColumns,
+      labels.stepMatching,
+      labels.stepPreview,
+      labels.stepResults
+    ].map((label, index) => ({ value: String(index + 1), label }));
+  }
+
+  get currentStepValue() {
+    return String(this.step);
+  }
+
+  /** More Options on the matching step starts open once anything in it is set. */
+  get moreOptionsSection() {
+    const anySet =
+      this.fileValues.length > 0 || Boolean(this.expectedCount) || Boolean(this.expectedAmount);
+    return anySet ? 'more' : '';
+  }
+
+  handleDownloadMenu(event) {
+    if (event.detail.value === 'results') {
+      this.handleDownloadResults();
+    } else {
+      this.handleDownloadExceptions();
+    }
   }
 
   get isStepTemplate() {

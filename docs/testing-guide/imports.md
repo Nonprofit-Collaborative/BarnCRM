@@ -35,17 +35,17 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a Spreadsheet**, step heading **What Are You Importing?**, with the choice cards. **Next** is not shown yet. A **Recent Imports** list shows below the wizard. |
-| 2 | Under **What Are You Importing?**, choose **People and Organizations**, then in **Template** choose **Generic contact list**. | Its description appears under the picker ("A list of people with their contact details...") and the line "This file can create: people, households, organizations, links between people and organizations." **Next** is enabled. |
-| 3 | Select **Next**. | Heading **Upload the file**, with an **Upload file** control. |
-| 4 | Upload `import-test-1.csv`. | Heading **Check the Columns**. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
-| 5 | Select **Next**. | Heading **Choose how rows are matched**. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
-| 6 | Select **Preview**. | Heading **Preview**. Counts: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 5 (Dee) with a reason naming the missing last name ("Required value missing: last name..."). |
+| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a Spreadsheet**. A path across the top shows **Choose File Type**, **Upload File**, **Check Columns**, **Match Rows**, **Preview** and **Results**, with **Choose File Type** current. Below it, **What Are You Importing?** with the choice cards, each with an icon. **Next** and **Back** are not shown yet. A **Recent Imports** list shows below the wizard. |
+| 2 | Under **What Are You Importing?**, choose **People and Organizations**, then in **Template** choose **Generic contact list**. | The cards stay, with **People and Organizations** marked as chosen and its name as a heading below them. The template's description appears under the picker ("A list of people with their contact details...") and the line "This file can create: people, households, organizations, links between people and organizations." **Next** is enabled, at the bottom right. |
+| 3 | Select **Next**. | **Upload File** is current on the path, with an **Upload file** control. **Back** shows at the bottom left. |
+| 4 | Upload `import-test-1.csv`. | **Check Columns** is current on the path. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
+| 5 | Select **Next**. | **Match Rows** is current on the path. A collapsed **More Options** section sits below the matching choices. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
+| 6 | Select **Preview**. | **Preview** is current on the path. Counts as big numbers: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 5 (Dee) with a reason naming the missing last name ("Required value missing: last name..."). |
 | 7 | Search the org for "Testa Rivera". | No record found: the preview wrote nothing. |
-| 8 | Back on the Import tab, select **Import These Rows**. | "Working through the file. This page updates as it goes." shows, then heading **Results** with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
+| 8 | Back on the Import tab, select **Import These Rows**. | "Working through the file. This page updates as it goes." shows, then **Results** is current on the path, with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
 | 9 | Open the new contact Testa Rivera from global search, then open their household. | The household exists and its **Created By Import Batch** field links to this import. |
 | 10 | Open Harper Garcia. | Unchanged: the matched row created nothing and cleared nothing (empty cells never clear a person's fields). |
-| 11 | Back on the Import tab, select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 1 to 3 read Created, row 4 Matched, row 5 Rejected with its reason. |
+| 11 | Back on the Import tab, open the **Download** menu (beside **Import Another File**, the main button) and select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 1 to 3 read Created, row 4 Matched, row 5 Rejected with its reason. |
 
 **Cleanup:** keep the import for T-IMP-02 and T-IMP-03; T-IMP-03 undoes it.
 
@@ -56,7 +56,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Results** step, select **Download Rejected Rows**. | A CSV downloads with one data row (Dee), with the file's columns plus Row and Reason. |
+| 1 | On the **Results** step, open the **Download** menu and select **Download Rejected Rows**. | A CSV downloads with one data row (Dee), with the file's columns plus Row and Reason. |
 | 2 | In the downloaded file, delete the **Email** column, save it as `retry-bad.csv`. Under **Retry Fixed Rows**, upload it as **File of fixed rows**. | Refused with "The fixed rows file is missing these columns of the original file: Email". Nothing is previewed. |
 | 3 | Open the downloaded file again, type `Nolast` into Dee's Last Name cell, save it as `retry-good.csv`, and upload it under **Retry Fixed Rows**. | A preview of that one row: **Would create** 1, **Would be rejected** 0. |
 | 4 | Select **Import These Rows**. | Results for the retry: **Created** 1. The import's rejected count is now 0. |
@@ -107,9 +107,9 @@ Cy,Dupe,cy.dupe@example.org,Active
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
-| 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with **Control Totals (Optional)** and **Rows in the file**. |
-| 3 | Type `6` in **Rows in the file** and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import These Rows** is disabled. |
-| 4 | Select **Back** to the matching step, change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import These Rows** is enabled. |
+| 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with a collapsed **More Options** section. |
+| 3 | Open **More Options**, type `6` in **Rows in the file** under **Control Totals (Optional)**, and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import These Rows** is disabled. |
+| 4 | Select **Back** to the matching step (**More Options** is already open, since a control total is set), change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import These Rows** is enabled. |
 
 **Cleanup:** none (nothing was imported). Select **Import Another File** or leave the page.
 
@@ -230,18 +230,19 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab. | Heading **What Are You Importing?** with a card for **People and Organizations**, **One Kind of Record**, **Records With Their Related Records** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. **Next** is not shown. |
+| 1 | Open the Import tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Records With Their Related Records** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
-| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. **Choose Something Else** goes back to the cards. |
+| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. |
+| 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
 | 5 | Log in as an admin without **Bulk Delete Records** and open the Import tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
 | 6 | Choose **One Kind of Record**. | **Object**, **Template name** and **Create** show. **Next** is not shown until a template is created. Choose **Account**, name it `Test cards account`, select **Create**: the template is chosen and the line reads "Loads: Account". |
-| 7 | Select **Choose Something Else**, then **Records With Their Related Records**, choose **Account**, name it `Test cards related`, select **Create**, then **Next**, upload any CSV and go to the matching step. | **What each row does** shows **Update by record ID** (an account offers no upsert; an object with an External ID field starts on **Update or create, matched by external ID**), and the **Related records** picker is shown, listing Affiliation. |
-| 8 | Select **Choose Something Else**, then **Delete the Records a File Lists** (as the holder of **Bulk Delete Records**), choose **Contact**, name it `Test cards delete`, select **Create**. | The template is chosen and the line reads "Deletes: Contact". On the matching step **Delete by record ID** is chosen. |
-| 9 | Select **Choose Something Else**, choose **Delete the Records a File Lists**, and choose an object whose records you may create or edit but not delete (for example a custom object your permission sets give Read, Create and Edit but not Delete). | "This object's records cannot be deleted by file, so the template creates or updates them instead. Choose Something Else to pick another object." |
-| 10 | Select **Choose Something Else**, then **Your Templates**. | Every active template shows with its description, what it creates, and **Last loaded** with a date or **Not loaded yet**. Each has a **Use This Template** button. |
+| 7 | Choose **Records With Their Related Records**, choose **Account**, name it `Test cards related`, select **Create**, then **Next**, upload any CSV and go to the matching step. | **What each row does** shows **Update by record ID** (an account offers no upsert; an object with an External ID field starts on **Update or create, matched by external ID**), and the **Related records** picker is shown, listing Affiliation. |
+| 8 | Select **Back** to the first step, then choose **Delete the Records a File Lists** (as the holder of **Bulk Delete Records**), choose **Contact**, name it `Test cards delete`, select **Create**. | The template is chosen and the line reads "Deletes: Contact". On the matching step **Delete by record ID** is chosen. |
+| 9 | Choose **One Kind of Record**, then **Delete the Records a File Lists** again, and choose an object whose records you may create or edit but not delete (for example a custom object your permission sets give Read, Create and Edit but not Delete). | "This object's records cannot be deleted by file, so the template creates or updates them instead. To pick another object, choose another card, then this one again." |
+| 10 | Choose **Your Templates**. | Every active template shows with its description, what it creates, and **Last loaded** with a date or **Not loaded yet**. Each has a **Use This Template** button. |
 | 11 | Select **Use This Template** on **Generic contact list**. | It is chosen, **Next** is enabled and the line reads "This file can create: people, households, organizations, links between people and organizations." |
-| 12 | Select **Choose Something Else**. | The cards show again and **Next** is not shown. |
+| 12 | Choose **One Kind of Record**. | **Your Templates** is no longer chosen, the template list is gone, and **Next** is not shown until a template is created. |
 
 **Cleanup:** none (the test templates may stay; they change nothing on their own).
 
@@ -256,9 +257,9 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | 2 | Select **Start a New Template From This One**. | **New template name** shows prefilled "Copy of" plus the chosen template's name, with **Create**. |
 | 3 | Clear the name. | **Create** is disabled. |
 | 4 | Enter `Test event sign-ups` and select **Create**. | The new template is chosen under **Template**, **Next** is enabled and the line under it matches the source's ("This file can create: ..."). |
-| 5 | Select **Choose Something Else**, then **Your Templates**. | **Test event sign-ups** is listed with **Not loaded yet**. |
-| 6 | Select **Choose Something Else**, choose **People and Organizations** and pick the source template again. | The source is unchanged: same name, description and creates line, and it is not marked recurring. |
-| 7 | Select **Choose Something Else**, then **Your Templates**, and select **Use This Template** on `Test cards account`. | It is chosen and **Start a New Template From This One** does not show. |
+| 5 | Choose **Your Templates**. | **Test event sign-ups** is listed with **Not loaded yet**. |
+| 6 | Choose **People and Organizations** and pick the source template again. | The source is unchanged: same name, description and creates line, and it is not marked recurring. |
+| 7 | Choose **Your Templates** and select **Use This Template** on `Test cards account`. | It is chosen and **Start a New Template From This One** does not show. |
 
 **Cleanup:** from the **Import Template** record list, deactivate or delete `Test event sign-ups`.
 

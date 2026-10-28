@@ -31,20 +31,27 @@ describe('the import results view', () => {
     }
   });
 
-  it('shows the four counts', () => {
+  it('shows the four counts as stat tiles', () => {
     const element = render({ batch: DRY_RUN, rejectedRows: [] });
+    const tiles = Array.from(element.shadowRoot.querySelectorAll('c-barn-stat-tile'));
+    expect(tiles.map((tile) => tile.dataset.id)).toEqual([
+      'created',
+      'updated',
+      'matched',
+      'rejected'
+    ]);
     const values = Array.from(
       element.shadowRoot.querySelectorAll('[data-id="created"], [data-id="rejected"]')
-    ).map((node) => node.querySelector('p').textContent);
-    expect(values).toEqual(['6', '1']);
+    ).map((node) => node.value);
+    expect(values).toEqual([6, 1]);
   });
 
   it('says "would" on a dry run and not on a commit', () => {
     const preview = render({ batch: DRY_RUN, rejectedRows: [] });
-    expect(preview.shadowRoot.querySelector('[data-id="created"]').textContent).toContain('Would');
+    expect(preview.shadowRoot.querySelector('[data-id="created"]').label).toContain('Would');
 
     const done = render({ batch: COMMITTED, rejectedRows: [] });
-    expect(done.shadowRoot.querySelector('[data-id="created"]').textContent).not.toContain('Would');
+    expect(done.shadowRoot.querySelector('[data-id="created"]').label).not.toContain('Would');
   });
 
   it('lists every rejected row with its reason', () => {
@@ -125,6 +132,6 @@ describe('the import results view', () => {
 
   it('renders with no batch at all', () => {
     const element = render({ batch: undefined, rejectedRows: [] });
-    expect(element.shadowRoot.querySelector('[data-id="created"]').textContent).toContain('0');
+    expect(element.shadowRoot.querySelector('[data-id="created"]').value).toBe(0);
   });
 });

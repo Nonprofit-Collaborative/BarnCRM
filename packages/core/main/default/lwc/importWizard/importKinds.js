@@ -106,16 +106,20 @@ export function firstTemplateOfKind(templates, kind) {
  * of Bulk Delete Records.
  */
 export function kindCards(templates, canDelete) {
-  const cards = [{ key: KIND_PEOPLE, title: kindPeopleTitle, text: kindPeopleText }];
+  const card = (key, title, text, iconName) => ({ key, title, text, iconName });
+  const cards = [card(KIND_PEOPLE, kindPeopleTitle, kindPeopleText, 'standard:household')];
   if (templates.some(isGiftTemplate)) {
-    cards.push({ key: KIND_GIFTS, title: kindGiftsTitle, text: kindGiftsText });
+    cards.push(card(KIND_GIFTS, kindGiftsTitle, kindGiftsText, 'standard:currency'));
   }
-  cards.push({ key: KIND_OBJECT, title: kindObjectTitle, text: kindObjectText });
-  cards.push({ key: KIND_RELATED, title: kindRelatedTitle, text: kindRelatedText });
+  cards.push(card(KIND_OBJECT, kindObjectTitle, kindObjectText, 'standard:record'));
+  cards.push(card(KIND_RELATED, kindRelatedTitle, kindRelatedText, 'standard:related_list'));
   if (canDelete) {
-    cards.push({ key: KIND_DELETE, title: kindDeleteTitle, text: kindDeleteText, warning: true });
+    cards.push({
+      ...card(KIND_DELETE, kindDeleteTitle, kindDeleteText, 'utility:delete'),
+      warning: true
+    });
   }
-  cards.push({ key: KIND_TEMPLATES, title: kindTemplatesTitle, text: kindTemplatesText });
+  cards.push(card(KIND_TEMPLATES, kindTemplatesTitle, kindTemplatesText, 'standard:template'));
   return cards;
 }
 

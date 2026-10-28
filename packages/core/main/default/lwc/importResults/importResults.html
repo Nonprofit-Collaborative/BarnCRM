@@ -14,13 +14,12 @@
 
         <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium" aria-live="polite" data-id="counts">
             <template for:each={counts} for:item="count">
-                <div
-                    key={count.key}
-                    class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-text-align_center"
-                    data-id={count.key}
-                >
-                    <p class="slds-text-heading_medium">{count.value}</p>
-                    <p class="slds-text-body_small">{count.label}</p>
+                <div key={count.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                    <c-barn-stat-tile
+                        label={count.label}
+                        value={count.value}
+                        data-id={count.key}
+                    ></c-barn-stat-tile>
                 </div>
             </template>
         </div>

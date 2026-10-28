@@ -15,53 +15,25 @@
             </template>
 
             <template lwc:if={showWizard}>
+                <c-barn-step-flow
+                    steps={stepPath}
+                    current-step={currentStepValue}
+                    can-go-back={canGoBack}
+                    data-id="flow"
+                    onback={handleBack}
+                >
                 <template lwc:if={isStepTemplate}>
-                    <template lwc:if={choosingKind}>
-                        <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                            {labels.stepKind}
-                        </h2>
-                        <div class="slds-grid slds-wrap slds-gutters_x-small">
-                            <template for:each={kindCards} for:item="card">
-                                <div
-                                    key={card.key}
-                                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-p-bottom_small"
-                                >
-                                    <button
-                                        type="button"
-                                        class="slds-box slds-box_link slds-show slds-size_full slds-text-align_left"
-                                        data-id="kind"
-                                        data-kind={card.key}
-                                        onclick={handleKindChoice}
-                                    >
-                                        <span class="slds-text-heading_small slds-show">
-                                            <template lwc:if={card.warning}>
-                                                <lightning-icon
-                                                    class="slds-var-m-right_x-small"
-                                                    icon-name="utility:warning"
-                                                    variant="warning"
-                                                    size="x-small"
-                                                ></lightning-icon>
-                                            </template>
-                                            {card.title}
-                                        </span>
-                                        <span class="slds-text-body_regular slds-show slds-var-m-top_xx-small">
-                                            {card.text}
-                                        </span>
-                                    </button>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <template lwc:else>
-                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-bottom_small">
-                            <h2 class="slds-text-heading_small" data-id="kind-title">{kindTitle}</h2>
-                            <lightning-button
-                                variant="base"
-                                label={labels.changeKind}
-                                data-id="change-kind"
-                                onclick={handleChangeKind}
-                            ></lightning-button>
-                        </div>
+                    <c-barn-visual-picker
+                        label={labels.stepKind}
+                        options={kindOptions}
+                        value={importKind}
+                        data-id="kind-picker"
+                        onchange={handleKindChoice}
+                    ></c-barn-visual-picker>
+                    <template lwc:if={showTemplateNext}>
+                        <h3 class="slds-text-heading_small slds-var-m-vertical_small" data-id="kind-title">
+                            {kindTitle}
+                        </h3>
                         <template lwc:if={picksFromKind}>
                             <lightning-combobox
                                 data-id="template"
@@ -184,9 +156,6 @@
                 </template>
 
                 <template lwc:if={isStepUpload}>
-                    <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                        {labels.stepUpload}
-                    </h2>
                     <lightning-input
                         type="file"
                         data-id="file"
@@ -203,9 +172,6 @@
                 </template>
 
                 <template lwc:if={isStepColumns}>
-                    <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                        {labels.stepColumns}
-                    </h2>
                     <template lwc:if={isDelimitedFile}>
                         <lightning-combobox
                             data-id="delimiter"
@@ -312,9 +278,6 @@
                 </template>
 
                 <template lwc:if={isStepMatching}>
-                    <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                        {labels.stepMatching}
-                    </h2>
                     <template lwc:if={loadsOneObject}>
                         <c-import-load-options
                             data-id="load-options"
@@ -431,7 +394,14 @@
                             </p>
                         </template>
                     </template>
-                    <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
+                    <lightning-accordion
+                        class="slds-var-m-top_medium"
+                        allow-multiple-sections-open
+                        active-section-name={moreOptionsSection}
+                        data-id="more-options"
+                    >
+                    <lightning-accordion-section name="more" label={labels.moreOptions}>
+                    <h3 class="slds-text-heading_x-small">
                         {labels.fileValuesHeading}
                     </h3>
                     <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.fileValuesHelp}</p>
@@ -529,13 +499,11 @@
                             onchange={handleMatchToleranceChange}
                         ></lightning-input>
                     </template>
+                    </lightning-accordion-section>
+                    </lightning-accordion>
                 </template>
 
                 <template lwc:if={showResults}>
-                    <h2 class="slds-text-heading_small slds-var-m-bottom_small">
-                        <template lwc:if={isStepPreview}>{labels.stepPreview}</template>
-                        <template lwc:else>{labels.stepResults}</template>
-                    </h2>
                     <template lwc:if={storeFileError}>
                         <p class="slds-text-body_small slds-var-m-bottom_small" data-id="original-not-kept">
                             {storeFileError}
@@ -549,10 +517,14 @@
                     ></c-import-results>
                     <template lwc:if={showTrialChoice}>
                         <div class="slds-box slds-var-m-top_small" data-id="trial">
-                            <h3 class="slds-text-heading_small">{labels.trialHeading}</h3>
-                            <p class="slds-text-body_small slds-var-m-bottom_x-small">
-                                {labels.trialHelp}
-                            </p>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <h3 class="slds-text-heading_small">{labels.trialHeading}</h3>
+                                <lightning-helptext
+                                    class="slds-var-m-left_xx-small"
+                                    content={labels.trialHelp}
+                                    data-id="trial-help"
+                                ></lightning-helptext>
+                            </div>
                             <lightning-input
                                 type="number"
                                 data-id="trial-rows"
@@ -601,17 +573,18 @@
                     </div>
                 </template>
 
-                <div class="slds-var-m-top_medium">
-                    <template lwc:if={canGoBack}>
-                        <lightning-button
-                            label={labels.backButton}
-                            data-id="back"
-                            onclick={handleBack}
-                        ></lightning-button>
-                    </template>
+                <template lwc:if={showDeleteConfirm}>
+                    <c-bulk-delete
+                        class="slds-show slds-var-m-top_medium"
+                        batch-id={batch.id}
+                        data-id="delete-by-file"
+                        onclose={handleStartOver}
+                    ></c-bulk-delete>
+                </template>
+
+                <div slot="actions">
                     <template lwc:if={showTemplateNext}>
                         <lightning-button
-                            class="slds-var-m-left_x-small"
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
@@ -621,7 +594,6 @@
                     </template>
                     <template lwc:if={isStepColumns}>
                         <lightning-button
-                            class="slds-var-m-left_x-small"
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
@@ -631,7 +603,6 @@
                     </template>
                     <template lwc:if={isStepMatching}>
                         <lightning-button
-                            class="slds-var-m-left_x-small"
                             variant="brand"
                             label={labels.dryRunButton}
                             data-id="dry-run"
@@ -640,16 +611,14 @@
                         ></lightning-button>
                     </template>
                     <template lwc:if={isStepPreview}>
-                        <template lwc:if={showDeleteConfirm}>
-                            <c-bulk-delete
-                                class="slds-show slds-var-m-bottom_small"
-                                batch-id={batch.id}
-                                data-id="delete-by-file"
-                                onclose={handleStartOver}
-                            ></c-bulk-delete>
-                        </template>
+                        <lightning-button
+                            label={labels.downloadExceptionsButton}
+                            data-id="download"
+                            onclick={handleDownloadExceptions}
+                        ></lightning-button>
                         <template lwc:if={showCommit}>
                             <lightning-button
+                                class="slds-var-m-left_x-small"
                                 variant="brand"
                                 label={labels.commitButton}
                                 data-id="commit"
@@ -657,33 +626,36 @@
                                 onclick={handleCommit}
                             ></lightning-button>
                         </template>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            label={labels.downloadExceptionsButton}
-                            data-id="download"
-                            onclick={handleDownloadExceptions}
-                        ></lightning-button>
                     </template>
                     <template lwc:if={isStepResults}>
+                        <lightning-button-menu
+                            label={labels.downloadMenu}
+                            alternative-text={labels.downloadMenu}
+                            menu-alignment="auto"
+                            data-id="download-menu"
+                            onselect={handleDownloadMenu}
+                        >
+                            <lightning-menu-item
+                                value="rejected"
+                                label={labels.downloadExceptionsButton}
+                                data-id="download"
+                            ></lightning-menu-item>
+                            <lightning-menu-item
+                                value="results"
+                                label={labels.downloadResultsButton}
+                                data-id="download-results"
+                            ></lightning-menu-item>
+                        </lightning-button-menu>
                         <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="brand"
                             label={labels.startOverButton}
                             data-id="start-over"
                             onclick={handleStartOver}
                         ></lightning-button>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            label={labels.downloadExceptionsButton}
-                            data-id="download"
-                            onclick={handleDownloadExceptions}
-                        ></lightning-button>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            label={labels.downloadResultsButton}
-                            data-id="download-results"
-                            onclick={handleDownloadResults}
-                        ></lightning-button>
                     </template>
                 </div>
+                </c-barn-step-flow>
             </template>
 
             <template lwc:if={showReadOnlyNotice}>
