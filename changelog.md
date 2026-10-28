@@ -20,6 +20,12 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main (newest first)
 
+- #650 (squash 0079c1ed): v0.11 scale test, 25,000-row Import wizard run on tier 1 `oi-test`, passed; results in `docs/release-notes/v0.11-draft-scale-test.md`.
+  - Dry run 185 s, commit 354 s (about 4,240 rows a minute), 0 failed rows, no chunk over 70% of any limit (largest commit chunk CPU 1,428 of 60,000 ms), 0 Error Log rows during the run. Rollup queue empty 5 min 9 s after commit.
+  - Undo (ImportUndoBatch) completed in 584 s, 704 of 704 items, counts back to pre-import exactly.
+  - Tier 1 was loaded with `--gifts 15000` (not 30,000) because of scratch org storage; households and contacts at full size. The CLI user had Giving_Admin for the run and it was removed after. Driven headlessly through ImportController calls.
+  - Finding (not a defect): the undo preview and run log count only the records the import tagged (33,333); undo also removes the automatic households and gift allocations created for those rows (about 66,700 in total).
+  - The 250,000-row run stays later, in a tier 2 sandbox (D-90).
 - #648 (squash 52909176): production-org notice (do not install pilot or testing versions in a production org) in the README, SUPPORT, overview, admin guide README, testing guide README and Before You Test, and moving-to-managed-packages.
 - #647 (squash 9a10ef84, gates `oi-test` 3,934 of 3,934 and `barn-sales` 3,934 of 3,934, both coverage 93%, 0 classes under the floor): landing batch 14, merging #639, #640 to #644 (TC2 stack), #646 and the root docs of #645, plus one commit (cb4e49ef).
   - Rollup Builder keeps spaces at either end of a Custom Delimiter (stored as SP()/TB()/BR() tokens, decoded in the engine and Builder); DLRS import accepts such delimiters; Custom_Delimiter__c length 10 to 40 (#639).
