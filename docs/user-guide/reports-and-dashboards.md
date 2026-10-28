@@ -1,4 +1,4 @@
-# Reports and dashboards
+# Reports and Dashboards
 
 BarnCRM ships ready-made reports and dashboards for giving and for volunteering, so you can
 answer common questions without building anything. This page lists what each one shows and how
@@ -17,7 +17,7 @@ people can open the same dashboard and see different numbers if their access dif
 example, volunteer hours are private: a Team Member's charts count only the hours they can open,
 while a coordinator's count everyone's.
 
-## What ships
+## What Ships
 
 **Giving** (folder **BarnCRM Giving**, dashboard **Giving Overview**):
 
@@ -55,7 +55,7 @@ donors, this year**. The retention reports are not on it: open them from the fol
 The **Volunteers** dashboard shows one chart for each: **Approved hours this year, by job**,
 **Hours awaiting approval**, **Unfilled shifts, next 14 days** and **Lapsing volunteers**.
 
-## To open a dashboard
+## To Open a Dashboard
 
 1. Open the **Fundraising** app (giving) or the **BarnCRM Volunteers** app (volunteering).
 2. Click the **Dashboards** tab.
@@ -68,7 +68,7 @@ name. Click a chart to open the report behind it.
 
 To have the dashboard emailed to you on a schedule, click **Subscribe** on the open dashboard.
 
-## To open a report
+## To Open a Report
 
 1. In the same app, click the **Reports** tab.
 2. Open the **BarnCRM Giving** or **BarnCRM Volunteers** folder (under **All Folders**).
@@ -76,7 +76,7 @@ To have the dashboard emailed to you on a schedule, click **Subscribe** on the o
 
 You should see: the report, already filtered. Click a record name in a row to open it.
 
-## To change a filter and save your own copy
+## To Change a Filter and Save Your Own Copy
 
 The shipped reports and dashboards belong to BarnCRM. Never edit them: everyone shares them, and
 an upgrade can replace them. Save a copy instead.
@@ -94,7 +94,7 @@ else.
 To try a filter without saving, change it from the **Filters** pane while viewing the report
 and do not save.
 
-## To read the totals on a record
+## To Read the Totals on a Record
 
 **Giving totals.** In the **Fundraising** app, a person, household or organization has a
 **Giving** section: **Total Giving**, **Gift Count**, **First Gift Date**, **Last Gift Date**,
@@ -112,7 +112,7 @@ These totals are read only for everyone. They update when a gift or hours entry 
 again every night. "This year" and "last year" on a record follow your organization's fiscal
 year.
 
-## To see how a total is worked out
+## To See How a Total Is Worked Out
 
 If your admin shows you **Explain These Totals** on the record page (it starts out shown to
 admins only):
@@ -131,7 +131,7 @@ The counts and the list include only the records you can open; the total include
 You need the **Rollup Builder User** permission set to see the card; ask your admin. If a
 total still looks wrong, tell your admin: they also see what it would be if recalculated now.
 
-## Common problems
+## Common Problems
 
 - Problem: the dashboard shows "The running user for this dashboard doesn't have permission to
   run reports." Why and what to do: you lack report or gift access. Ask your admin (see

@@ -1,6 +1,6 @@
-# Importing gifts
+# Importing Gifts
 
-## 1. What it does
+## 1. What It Does
 
 Importing gifts loads a spreadsheet of gifts, with the donor on each row, through the same
 **Import** tab you use for people. Each row becomes an ordinary gift: the donor is found or
@@ -12,7 +12,7 @@ When a gift pays a pledge or a monthly gift the donor already has, BarnCRM can f
 scheduled payment it pays and link the two, so the pledge balance goes down on its own. This
 is **donation matching** (section 5).
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 Nothing to turn on once the Giving module is installed. You need the **Manage BarnCRM
 Settings** permission to import, and the Giving admin role to create gifts; the **Access**
@@ -36,7 +36,7 @@ gifts exported from Nonprofit Cloud or NPSP, use the templates in [Migrating fro
 Cloud](migrating-from-nonprofit-cloud.md) or [Migrating from NPSP](migrating-from-npsp.md)
 instead.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 Start with a small file: five gifts, each with a donor name, an email, an amount, a date
 (for example `2026-03-15`) and a fund name you already have.
@@ -56,12 +56,12 @@ Start with a small file: five gifts, each with a donor name, an email, an amount
    payment.
 6. If a row is rejected (a fund name spelled differently, a date BarnCRM cannot read),
    fix the file and preview again.
-7. Select **Import these rows**. Open one of the donors: the new gift is on their record, allocated to
+7. Select **Import These Rows**. Open one of the donors: the new gift is on their record, allocated to
    the fund you named, and its **Created By Import Batch** links back to the import.
 8. Load the same file again and preview it. Every row now says it matches a gift you already
    have, because of the external ID column. Nothing would be created twice.
 
-## 4. What a row can say
+## 4. What a Row Can Say
 
 A row is one gift. Besides the donor, it can carry:
 
@@ -95,7 +95,7 @@ A row's gift and everything that comes with it is saved together or not at all. 
 credit cannot be saved, the gift is not kept either, and the row is rejected with the reason.
 The donor, if the import created them, stays, and is matched when you load the corrected row.
 
-## 5. Donation matching
+## 5. Donation Matching
 
 Donation matching decides what happens when a gift in the file pays something the donor
 already owes: a pledge payment or this month's recurring gift.
@@ -127,7 +127,7 @@ The import matches under the choice, window and allowed difference the preview u
 change them on the template, or in **BarnCRM Settings**, after a preview, run the preview
 again: the import keeps to what the last preview showed you.
 
-## 6. Undoing a gift import
+## 6. Undoing a Gift Import
 
 Undo removes the gifts the import created, with their allocations, soft credits and
 tributes, and then the people, households and organizations it created, exactly as section 5
@@ -147,7 +147,7 @@ A removed gift that paid a scheduled payment stops paying it: the payment is owe
 pledge that gift had completed is active again. A pledge you marked complete yourself stays
 complete.
 
-## 7. Common mistakes
+## 7. Common Mistakes
 
 **`The books are closed through...` on a row.** The row's gift is dated in a closed accounting
 period, and the preview refuses it as the import would. Date it after the close date, or ask
@@ -180,7 +180,7 @@ donor.
 created every gift again. Undo the second import, and map the processor's transaction number
 to **Gift: external ID** from now on.
 
-## Column reference
+## Column Reference
 
 | Picker label | Loads into |
 |---|---|

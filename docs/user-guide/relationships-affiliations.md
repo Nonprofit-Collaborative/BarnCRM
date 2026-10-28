@@ -1,4 +1,4 @@
-# Relationships and affiliations
+# Relationships and Affiliations
 
 A relationship connects two people: spouses, a parent and child, friends, colleagues. An
 affiliation connects a person to an organization: an employer, a board, a congregation. You
@@ -10,16 +10,16 @@ Before you start: open the **BarnCRM** app. Adding, changing and removing these 
 Member, Coordinator, Fundraising Staff or Admin role. The **Relationships** card is on every
 person; the **Affiliations** card is on every person and organization.
 
-## To add a relationship
+## To Add a Relationship
 
 1. Open the person. Find the **Relationships** card.
-2. Click **Add relationship**. The **New relationship** form opens.
+2. Click **Add Relationship**. The **New Relationship** form opens.
 3. In **Related Person**, choose the other person.
 4. Choose a **Type**: what the other person is to this person. Choose from Spouse, Partner,
    Parent, Child, Sibling, Grandparent, Grandchild, Friend, Colleague, Employer contact or
    Other.
 5. Leave **Status** as Current. Optional: **Start Date** and **Description**.
-6. Click **Add relationship** at the foot of the form.
+6. Click **Add Relationship** at the foot of the form.
 
 You should see: "Relationship saved, and the other person's record now shows it too." The
 card shows the other person and the type. Open the other person: their card shows you, from
@@ -28,7 +28,7 @@ their side. If you entered Child on a parent, the child's card reads Parent.
 Read the type from the record you are on. "Diego Garcia, Child" on Harper's record means Diego
 is Harper's child.
 
-## To change or end a relationship
+## To Change or End a Relationship
 
 The card has no Edit button. Change a relationship on its own record:
 
@@ -41,7 +41,7 @@ The card has no Edit button. Change a relationship on its own record:
 You should see: the line on the card now carries a **Former** badge. The other person's
 side changes with it, so both records always agree.
 
-## To remove a relationship
+## To Remove a Relationship
 
 1. On the **Relationships** card, click **Remove** on the line.
 
@@ -49,39 +49,39 @@ You should see: "Relationship removed from both people." There is no confirmatio
 the line first. If the relationship was real but has ended, set an **End Date** instead, so
 the history stays.
 
-## To add an affiliation
+## To Add an Affiliation
 
 1. Open the person (or the organization). Find the **Affiliations** card.
-2. Click **Add affiliation**. The **New affiliation** form opens.
+2. Click **Add Affiliation**. The **New Affiliation** form opens.
 3. Choose the **Organization** (or, on an organization, the **Person**).
 4. Fill in **Role** in your own words, for example Board chair.
 5. Leave **Status** as Current. Tick **Primary** if this is the organization the person is
    chiefly associated with. Optional: **Start Date**, **End Date**, **Description**.
-6. Click **Add affiliation** at the foot of the form.
+6. Click **Add Affiliation** at the foot of the form.
 
 You should see: "Affiliation saved." The card shows the organization and role, with a
 **Primary** badge if you ticked it. **Primary Affiliation** at the top of the person shows
 that organization.
 
-## To change the primary affiliation
+## To Change the Primary Affiliation
 
-1. On the person's **Affiliations** card, click **Make primary** on the line you want.
+1. On the person's **Affiliations** card, click **Make Primary** on the line you want.
 
 You should see: "Primary affiliation updated." The **Primary** badge moves, and the old one is
 cleared for you. Only one current affiliation per person is primary.
 
-## To end or change an affiliation
+## To End or Change an Affiliation
 
 1. Open the **Affiliations** tab from the navigation menu, and open the affiliation.
 2. Click **Edit**. To end it, fill in **End Date**. Click **Save**.
 
 You should see: a **Former** badge on the line. A former affiliation is never primary, so if it
-was primary, the person's **Primary Affiliation** becomes empty. Click **Make primary** on
+was primary, the person's **Primary Affiliation** becomes empty. Click **Make Primary** on
 another line to fill it again.
 
 An affiliation never moves a person between households.
 
-## Common problems
+## Common Problems
 
 - Problem: "... already has this relationship with .... Open ... to change it." The
   relationship exists. Open the record named and change that one.
@@ -101,7 +101,7 @@ An affiliation never moves a person between households.
 - Problem: "BarnCRM could not remove that relationship. Check that you can delete
   relationships ..." or "BarnCRM could not make that the primary affiliation ..." Ask your admin
   for access.
-- Problem: the card has no **Add relationship**, **Remove**, **Add affiliation** or **Make
+- Problem: the card has no **Add Relationship**, **Remove**, **Add Affiliation** or **Make
   primary** button. Your access lets you read these records but not change them (the Read Only
   role, for example). Ask your admin.
 - Problem: **Primary Affiliation** went empty. The primary affiliation was ended. Make another

@@ -1,6 +1,6 @@
-# Automatic access: give people their BarnCRM role without assigning it by hand
+# Automatic Access: Give People Their BarnCRM Role Without Assigning It by Hand
 
-## What it does
+## What It Does
 
 On the [Access](access.md) page you give a colleague a role by name. That works well for a
 handful of people. If your organization adds staff often, or you have many users already, you
@@ -23,7 +23,7 @@ There are two kinds of policy on this page:
 The second kind fills the gap described on the Access page: a role carries what Core
 provides, and nothing a module adds.
 
-## How to turn it on
+## How to Turn It On
 
 User access policies are a Salesforce feature, available in Enterprise and Unlimited
 editions. They are off until you turn them on, and you need the **Manage User Access
@@ -35,10 +35,10 @@ Policies** permission (System Administrators have it).
 3. In the Quick Find box, type `User Access Policies` and open it. This is where you create
    the policies below.
 
-The **Set up automatic access** link on the Access page in BarnCRM Settings, and on the
+The **Set Up Automatic Access** link on the Access page in BarnCRM Settings, and on the
 access step of the Setup Assistant, opens this page.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria's organization takes on new staff every few months. Every new hire gets the
 "Team User" profile. She wants each one to have the Team Member role on their first day.
@@ -57,13 +57,13 @@ If your org has Giving, Maria also creates Policy 2, then clicks **Apply Policy*
 applies it to every user it lists. Everyone who already holds BarnCRM Admin now also holds
 Giving Admin.
 
-## The policy definitions
+## The Policy Definitions
 
 Create each policy with **New** on the User Access Policies page, using exactly these values.
 The names in the Action and Filter columns are what you pick in the lists; the API names
 are in brackets.
 
-### Policy 1: new staff get a role
+### Policy 1: New Staff Get a Role
 
 | Field | Value |
 |---|---|
@@ -82,7 +82,7 @@ Staff** (`Fundraising_Staff`). With Giving, add a second action to the same poli
 user gets the module's permission set at the same time, for example Grant, Permission Set,
 **Giving Staff** (`Giving_Staff`) alongside Fundraising Staff. One policy per staff profile.
 
-### Policies 2 to 4: module access follows the role (with Giving)
+### Policies 2 to 4: Module Access Follows the Role (with Giving)
 
 These apply only when the Giving module is installed.
 
@@ -98,7 +98,7 @@ trigger to **when a user is created or updated**.
 Then, on each policy, click **Apply Policy** once and apply it to all the users it lists.
 That is the step that reaches the people who already hold a role.
 
-### For admins who deploy with the CLI: the same policies as metadata
+### For Admins Who Deploy with the CLI: The Same Policies as Metadata
 
 The folder
 [`docs/admin-guide/samples/user-access-policies`](samples/user-access-policies) holds
@@ -113,7 +113,7 @@ active), so nothing changes until an administrator automates or applies them. If
 BarnCRM packages were installed with a namespace, put the namespace prefix in front of each
 permission set and group name in the files first.
 
-## Things to know
+## Things to Know
 
 - **A policy runs when a user record is created or updated, not when a role is given.**
   Giving someone BarnCRM Admin on the Access page does not edit their user record, so
@@ -134,7 +134,7 @@ permission set and group name in the files first.
   of profile, role, permission set or group, package license, public group or queue, plus up
   to ten user fields.
 
-## Common mistakes
+## Common Mistakes
 
 **The new user did not get the role.** Check that the policy is automated (not still in
 Design), that its trigger includes "created", that the user's profile is the one in Filter 1,

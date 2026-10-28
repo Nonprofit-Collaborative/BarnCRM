@@ -1,6 +1,6 @@
 # Posting and Closed Periods
 
-## What it does
+## What It Does
 
 Once Jen has put last month's gifts into the accounting system, those gifts have to stay the
 way they were when she took them. BarnCRM gives her two controls:
@@ -25,7 +25,7 @@ the matching gift link.
 A gift batch that has been **Posted** is a different thing: it means the batch's lines became
 gifts. Those gifts are not in the books until Jen exports them and marks them posted.
 
-## How to turn it on
+## How to Turn It On
 
 Posting and closed periods arrive with the Giving module. Nothing is locked until someone marks
 a gift posted or closes a period.
@@ -44,7 +44,7 @@ The rules above cannot be switched off on the Automation page, and pausing all a
 not suspend them, for the same reason the receipt lock cannot be: they protect a record rather
 than fill something in. See [Automation control](automation-control.md).
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You need the sample data, Jen with the **Accounting Export** and **Giving Read Only** permission
 sets, and David with **Giving Staff**.
@@ -70,10 +70,10 @@ sets, and David with **Giving Staff**.
 9. As Jen, open the posted gift from step 4 and click **Unpost** on the Posting card. Type a
    reason and confirm. The card now says the gift is not posted, and that it is still locked
    because it is dated in a closed period.
-10. As Maria, try to set **Books closed through** to an earlier date. The page refuses: reopening
+10. As Maria, try to set **Books Closed Through** to an earlier date. The page refuses: reopening
     a closed period is not something the settings page can do (see Common mistakes).
 
-## Common mistakes
+## Common Mistakes
 
 **`This gift has been posted to accounting...` when fixing a typo.** The books already hold the
 gift as it is. If the money is wrong, record a refund (or a refund and a new gift) so the change
@@ -116,7 +116,7 @@ really has to happen, for example an auditor's adjustment:
 
 1. In Setup, create a permission set that includes the **Override Posting Lock** custom
    permission, and assign it to yourself.
-2. Make the change: move **Books closed through** back, or edit, delete or add the gift.
+2. Make the change: move **Books Closed Through** back, or edit, delete or add the gift.
 3. Remove the permission set assignment again.
 
 Every change made that way is written to the Error Log, naming the gift and what changed, so the

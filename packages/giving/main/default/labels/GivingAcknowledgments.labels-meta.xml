@@ -470,7 +470,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the error count column</shortDescription>
-    <value>Did not go</value>
+    <value>Did Not Go</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnFinished</fullName>

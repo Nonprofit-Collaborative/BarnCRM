@@ -1,6 +1,6 @@
-# Custom metadata
+# Custom Metadata
 
-## What it does
+## What It Does
 
 Some of the lists BarnCRM works from are kept as custom metadata, the part of Salesforce
 that travels with the app. The **Custom Metadata** page in BarnCRM Settings lets you add
@@ -21,7 +21,7 @@ The entries BarnCRM ships are shown on the same page, marked **Shipped with Barn
 and cannot be changed. Upgrades keep them up to date, and they never overwrite what you
 added.
 
-## How to turn it on
+## How to Turn It On
 
 The page is for administrators who can already change the org in Setup, because saving an
 entry changes the org's metadata.
@@ -43,7 +43,7 @@ Add the choice there first, then add the type here. The page checks this and tel
 the choice is missing. The **Reciprocal Type** field on a relationship needs nothing: BarnCRM
 fills it in from your type, so it accepts any type you have added to **Type**.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria's organization runs a mentoring program and wants to record who mentors whom. Each
 mentor's record should say who they mentor, and each mentee's record should say who mentors
@@ -75,7 +75,7 @@ them.
 7. Scroll to **Recent Changes** at the bottom of the page. Each save is listed with your name and the
    values before and after.
 
-## Common mistakes
+## Common Mistakes
 
 - **Adding the type here before adding the choice in Setup.** The save is refused with
   "Mentor is not a choice in the Type list on Relationship. Add it in Setup (Object
@@ -99,14 +99,14 @@ them.
   its API name in Setup, for example `Org_Mentor_k3x9`, so the second add never overwrites
   the first. You may end up with two entries: archive the one you do not want.
 
-## Match sources
+## Match Sources
 
 Match sources are no longer on this page. They are listed, added, deactivated and tried out
 in the **Matching Logic** area of the **Duplicate Matching** tab; see
 [Duplicates](duplicates.md#matching-logic). The **BarnCRM Metadata Admin** permission set
 and the Setup step above apply there too.
 
-## Which lists can be extended
+## Which Lists Can Be Extended
 
 | List | Here | Why |
 |---|---|---|

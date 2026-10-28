@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the Giving package's gift entry screen</shortDescription>
-        <value>Enter your first gift</value>
+        <value>Enter Your First Gift</value>
     </labels>
     <labels>
         <fullName>Giving_SetupAssistant_IdentityDescription</fullName>

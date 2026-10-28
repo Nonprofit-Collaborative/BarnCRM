@@ -1,6 +1,6 @@
-# Matching gifts
+# Matching Gifts
 
-## What it does
+## What It Does
 
 Many employers match the gifts their staff make. The match arrives weeks later, as a check
 from the company, and it is easy to lose the connection between the two. Linking them in
@@ -16,7 +16,7 @@ BarnCRM does not tell you which employers match. That information comes from a
 matching gift database and is out of scope: this feature records the match you have
 received.
 
-## How to turn it on
+## How to Turn It On
 
 Nothing to turn on. Linking is available on every gift.
 
@@ -30,7 +30,7 @@ for companies that match. Open the person in the **Fundraising** app and set **E
 the employer's check arrives, BarnCRM checks the link you are making against it and
 warns you if the two do not agree.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David. Start from the sample data, which includes Harper Garcia and the
 organization Founders Consulting Group.
@@ -43,7 +43,7 @@ organization Founders Consulting Group.
    today, status **Received**. Save. This is the employer's match.
 4. On the employer's gift, set **Matched Gift** to Harper's gift. Save.
 5. Look at what happened on the employer's gift: **Matched Gift** names Harper's gift, and
-   in **Soft credits** Harper Garcia appears with the role **Matched donor** and the amount
+   in **Soft Credits** Harper Garcia appears with the role **Matched donor** and the amount
    500, marked automatic.
 6. Open **Harper Garcia's gift**. Its own **Matched Gift** now names the Founders gift. The
    link reads correctly from both sides, and you only entered it once.
@@ -60,7 +60,7 @@ organization Founders Consulting Group.
    with: **That gift is from someone whose employer is a different organization. Check the
    employer on the person's record, or clear it if you are not sure.**
 
-## What a refund does to the match
+## What a Refund Does to the Match
 
 If the company reverses its check, the recognition reverses with it. You do not have to
 unlink anything and you do not have to edit a soft credit.
@@ -85,7 +85,7 @@ Three things follow, and they surprise people the first time:
   still money you are holding, and the employee still caused it. Only a refund of the
   company's gift reverses the matched donor credit.
 
-## Common mistakes
+## Common Mistakes
 
 - **Linking two gifts that are both from people.** One gift of the pair has to come from an
   organization, because a match is what a company pays. If the save is refused with **The
@@ -104,7 +104,7 @@ Three things follow, and they surprise people the first time:
   matched donor credit that the link created, and any negative credit that was reversing it,
   because they exist only to record the link. A credit you entered by hand stays.
 
-## Fields, for report builders
+## Fields, for Report Builders
 
 | What you see | Field |
 |---|---|

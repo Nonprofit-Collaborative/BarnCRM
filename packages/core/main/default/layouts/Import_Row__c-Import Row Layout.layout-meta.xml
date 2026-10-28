@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>This row</label>
+    <label>This Row</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -37,7 +37,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>What it resolved to</label>
+    <label>What It Resolved To</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>

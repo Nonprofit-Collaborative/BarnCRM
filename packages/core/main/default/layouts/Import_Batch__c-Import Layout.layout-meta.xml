@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>What was loaded</label>
+    <label>What Was Loaded</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -33,7 +33,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>What happened</label>
+    <label>What Happened</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -66,7 +66,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>When and by whom</label>
+    <label>When and by Whom</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>

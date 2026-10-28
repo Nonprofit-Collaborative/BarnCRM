@@ -1,6 +1,6 @@
-# A donor's giving on their record
+# A Donor's Giving on Their Record
 
-## What it does
+## What It Does
 
 When David opens a person, a household or an organization in the **Fundraising** app, the
 record shows what they gave: a **Giving** section with their totals, their donor level and
@@ -12,7 +12,7 @@ the donor already filled in.
 Nothing here is calculated on the page. The totals are the rollups BarnCRM keeps (see
 [Rollups](rollups.md)), and **Rollups Last Calculated** says how fresh they are.
 
-## How to turn it on
+## How to Turn It On
 
 Nothing to do: it arrives with the Giving module. BarnCRM Giving ships two record pages,
 **Giving Contact Record Page** and **Giving Account Record Page**, and the Fundraising app
@@ -32,7 +32,7 @@ Two things to know:
   and add the giving fields from the field list, and the **Dynamic Related List - Single**
   component for Gifts, Commitments, Soft Credits, Receipts and Stewardship Plans.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
@@ -49,7 +49,7 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
    household, from any member.
 7. Open an organization that gave. Its **Gifts** list shows the gifts it gave in its own name.
 
-## Common mistakes
+## Common Mistakes
 
 - **"I see no Giving section."** The record was opened outside the Fundraising app, or your
   organization assigned its own record page. Switch to the Fundraising app, or follow the

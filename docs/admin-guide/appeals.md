@@ -1,6 +1,6 @@
 # Appeals
 
-## What it does
+## What It Does
 
 An appeal is a fundraising effort you can name: a spring appeal, a year-end mailing, a
 gala, a giving day. Recording the appeal a gift responded to is what lets David say which
@@ -10,7 +10,7 @@ An appeal carries a goal, what it cost to run, its dates, and an optional parent
 a gala can sit inside a larger capital campaign. Total raised and gift count are calculated
 from the gifts themselves, so nobody keeps a running total by hand.
 
-## How to turn it on
+## How to Turn It On
 
 Appeals arrive with the Giving module. There is nothing to install separately.
 
@@ -22,7 +22,7 @@ Appeals arrive with the Giving module. There is nothing to install separately.
 
 No Salesforce Setup step is needed.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 You are David, and the spring letter goes out on Monday.
 
@@ -41,11 +41,11 @@ You are David, and the spring letter goes out on Monday.
    Appeal** to `Spring appeal`, so the phone effort is reported inside the campaign it
    belongs to.
 
-## List views
+## List Views
 
 **Appeals** has **All Appeals**, **Active Appeals** and **Inactive Appeals**.
 
-## Common mistakes
+## Common Mistakes
 
 - **Making an appeal its own parent, or a loop.** BarnCRM refuses the save with "An
   appeal cannot be its own parent appeal." Choose the larger effort instead, or leave

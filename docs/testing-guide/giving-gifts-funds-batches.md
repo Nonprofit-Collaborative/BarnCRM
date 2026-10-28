@@ -1,10 +1,10 @@
-# Giving: gifts, funds and batches
+# Giving: Gifts, Funds and Batches
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
-## T-GIFT-01: Funds and the default fund
+## T-GIFT-01: Funds and the Default Fund
 
 **Purpose:** confirm one fund is the default, the flag moves when a second fund takes it, and a fund with gifts cannot be deleted.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
@@ -22,7 +22,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** keep **General Fund** as the default; every later script needs it.
 
-## T-GIFT-02: Enter a gift on the Gifts tab
+## T-GIFT-02: Enter a Gift on the Gifts Tab
 
 **Purpose:** confirm a gift gets its household and a default allocation, and allocations must total the gift.
 **Prerequisites:** staff; General Fund is the default (T-GIFT-01).
@@ -41,7 +41,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** none; T-GIFT-03 and other pages reuse the gift.
 
-## T-GIFT-03: Gift rules that refuse a save, and cancelling a Pending gift
+## T-GIFT-03: Gift Rules That Refuse a Save, and Cancelling a Pending Gift
 
 **Purpose:** confirm the donor, amount and status rules, and that a cancel can be reversed only back to Pending.
 **Prerequisites:** admin; the gift from T-GIFT-02.
@@ -67,17 +67,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Quick Gift Entry** tab. | Card **Quick gift entry**. **Who gave this gift** is on **Person**; **Gift date** is today; **Appeal** shows Annual Fund; **Fund** shows General Fund. |
-| 2 | In **Donor** type `Garc` and pick **Luis Garcia**. Enter **Amount** `50`, **Payment method** `Check`, **Check or reference number** `1042`. | Values stay as typed. No **Pays a scheduled payment** list appears (Luis owes no pledge payment). |
-| 3 | Click **Save and new**. | "Gift G-... saved" with an **Open this gift** link. The donor, amount, payment method and check number clear; the date, appeal and fund stay. |
-| 4 | Switch to **Organization**, pick **Founders Consulting Group**, **Amount** `25`, **Payment method** `Cash`. Click **Save**. | Saved message with link. **Save** and **Save and new** are now greyed out. |
-| 5 | Change the amount to `30`. | **Save** and **Save and new** are enabled again. Do not save. |
-| 6 | Click **Open this gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
+| 1 | Open the **Quick Gift Entry** tab. | Card **Quick Gift Entry**. **Who gave this gift** is on **Person**; **Gift Date** is today; **Appeal** shows Annual Fund; **Fund** shows General Fund. |
+| 2 | In **Donor** type `Garc` and pick **Luis Garcia**. Enter **Amount** `50`, **Payment Method** `Check`, **Check or reference number** `1042`. | Values stay as typed. No **Pays a scheduled payment** list appears (Luis owes no pledge payment). |
+| 3 | Click **Save and New**. | "Gift G-... saved" with an **Open This Gift** link. The donor, amount, payment method and check number clear; the date, appeal and fund stay. |
+| 4 | Switch to **Organization**, pick **Founders Consulting Group**, **Amount** `25`, **Payment Method** `Cash`. Click **Save**. | Saved message with link. **Save** and **Save and New** are now greyed out. |
+| 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
+| 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
 | 7 | Open the utility bar at the bottom of any Fundraising page. | **Quick Gift Entry** opens there over the page. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
 
-## T-GIFT-05: Quick Gift Entry refusals and in-kind fields
+## T-GIFT-05: Quick Gift Entry Refusals and In-Kind Fields
 
 **Purpose:** confirm messages sit on the field they concern, and In-kind swaps the amount for description and value.
 **Prerequisites:** staff.
@@ -85,16 +85,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Quick Gift Entry**, leave **Donor** empty, click **Save**. | Under **Donor**: "Choose the person or organization who gave this gift." Nothing is saved. |
-| 2 | Pick **Harper Garcia**, enter **Amount** `-20`, **Payment method** `Cash`, click **Save**. | Under **Amount**: "Enter an amount greater than zero. A refund is entered from the original gift, not here." |
-| 3 | Clear **Payment method** (choose **Choose one**) and amount `20`, click **Save**. | Under **Payment method**: "Choose a payment method." |
-| 4 | Choose **Payment method** `In-kind`. | **Amount** and **Pays a scheduled payment** disappear. **What was given** and **Fair market value** appear, with "For your reporting only. It is never printed on the receipt..." under the value. |
+| 2 | Pick **Harper Garcia**, enter **Amount** `-20`, **Payment Method** `Cash`, click **Save**. | Under **Amount**: "Enter an amount greater than zero. A refund is entered from the original gift, not here." |
+| 3 | Clear **Payment Method** (choose **Choose one**) and amount `20`, click **Save**. | Under **Payment Method**: "Choose a payment method." |
+| 4 | Choose **Payment Method** `In-kind`. | **Amount** and **Pays a scheduled payment** disappear. **What was given** and **Fair market value** appear, with "For your reporting only. It is never printed on the receipt..." under the value. |
 | 5 | Leave **What was given** empty, click **Save**. | Under **What was given**: "Describe what was given. This text is the donor's receipt, so a gift of goods cannot be saved without it." |
 | 6 | Type `Sixteen folding tables, used`, **Fair market value** `-5`, click **Save**. | "Fair market value cannot be negative. Leave it empty if you do not have a figure yet." |
-| 7 | Set **Fair market value** `800`, click **Save**, then **Open this gift**. | **Amount** 0.00, **In-kind Description** and **Fair Market Value** 800.00 show in the in-kind section. |
+| 7 | Set **Fair market value** `800`, click **Save**, then **Open This Gift**. | **Amount** 0.00, **In-kind Description** and **Fair Market Value** 800.00 show in the in-kind section. |
 
 **Cleanup:** none; T-GIFT-06 uses the in-kind gift.
 
-## T-GIFT-06: In-kind rules on the gift record
+## T-GIFT-06: In-Kind Rules on the Gift Record
 
 **Purpose:** confirm the in-kind validation rules and that in-kind value stays out of total giving.
 **Prerequisites:** admin; the in-kind gift from T-GIFT-05.
@@ -123,7 +123,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** none.
 
-## T-GIFT-08: Gift batch: enter, balance and post
+## T-GIFT-08: Gift Batch: Enter, Balance and Post
 
 **Purpose:** confirm a batch tracks the control total, saves lines, posts all lines as gifts once balanced, and locks after posting.
 **Prerequisites:** staff; General Fund is the default.
@@ -132,7 +132,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Gift Batches** tab, click **New**. **Description** `Tuesday mail`, **Control Total** `350`, **Default Appeal** `Annual Fund`; leave **Default Fund** empty. Save. | **Default Gift Date** is today and **Default Payment Method** is Check. The batch opens with the **Lines** card: **Control total** $350.00, **Entered** $0.00, "No lines yet. Click Add line and type the first check." |
-| 2 | Click **Add line**. Pick **Harper Garcia**, **Amount** `100`, **Check number** `1042`. | Status line: "This batch does not balance: the lines add up to 250.00 less than the control total..." **Post batch** is disabled. |
+| 2 | Click **Add line**. Pick **Harper Garcia**, **Amount** `100`, **Check Number** `1042`. | Status line: "This batch does not balance: the lines add up to 250.00 less than the control total..." **Post batch** is disabled. |
 | 3 | **Add line**, switch it to **Organization**, pick **The Summit Foundation**, **Amount** `200`, **Fund** `Building Fund`. | Other cells show **As the batch**. Status: 50.00 less. |
 | 4 | **Add line**, a person (Luis Garcia), **Amount** `75`. | Status: "...25.00 more than the control total..." |
 | 5 | Change that amount to `50`. | Status: "Balanced: the lines add up to the control total." |
@@ -143,7 +143,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** none.
 
-## T-GIFT-09: Gift batch refusals and read-only access
+## T-GIFT-09: Gift Batch Refusals and Read-Only Access
 
 **Purpose:** confirm unfinished lines stop a post, nothing is created on failure, and a read-only user cannot change a batch.
 **Prerequisites:** staff, then read-only.
@@ -160,18 +160,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** as admin, delete batch `Bad lines` (staff cannot delete a batch).
 
-## T-GIFT-10: Closed accounting periods
+## T-GIFT-10: Closed Accounting Periods
 
 **Purpose:** confirm a closed period refuses gifts dated in it, still allows refunds and non-money edits, and cannot be reopened from the app.
 **Prerequisites:** admin. Run this near the end of a test cycle: a closed period cannot be reopened without the **Override Posting Lock** permission, and sample gifts in a closed period cannot be removed. Posting gifts to accounting is tested in [Mirror](mirror.md) (T-MIR-09).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books closed through** and "No period is closed." |
-| 2 | Set **Books closed through** to today, click **Save**. | Refused: "The books can be closed through the day before yesterday at the latest..." |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books Closed Through** and "No period is closed." |
+| 2 | Set **Books Closed Through** to today, click **Save**. | Refused: "The books can be closed through the day before yesterday at the latest..." |
 | 3 | Set it to the last day of last month (on the 1st or 2nd, the month before), click **Save**. | "Saved. The books are closed through the date shown." |
-| 4 | On **Quick Gift Entry**, enter a gift for Harper Garcia, 20, Cash, **Gift date** in last month. Save. | Not saved; the message starts "The books are closed through", naming the date. |
-| 5 | Change **Gift date** to today and save. | Saved. |
+| 4 | On **Quick Gift Entry**, enter a gift for Harper Garcia, 20, Cash, **Gift Date** in last month. Save. | Not saved; the message starts "The books are closed through", naming the date. |
+| 5 | Change **Gift Date** to today and save. | Saved. |
 | 6 | Open a Received sample gift dated last month. Its **Posting** card says it is dated in a closed period. Edit **Amount**, save. | Refused: "This gift is dated in a closed accounting period (the books are closed through ...), so its date, amount, donor, payment method, reference and funds cannot change..." |
 | 7 | Cancel, edit **Acknowledgment Status** instead, save. | Saved. |
 | 8 | Click **Refund or Write Off**, refund `10` with a reason. | Recorded; the refund gift is dated today. |
@@ -179,7 +179,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** to reopen, follow "Reopening a period" in [Posting and closed periods](../admin-guide/posting-and-closed-periods.md) (a temporary permission set with **Override Posting Lock**), clear the date, then remove the assignment.
 
-## T-GIFT-11: Import gifts with the generic gift list
+## T-GIFT-11: Import Gifts with the Generic Gift List
 
 **Purpose:** confirm a gift file previews, imports into existing and new donors, rejects a bad fund, does not duplicate on reload, and undoes.
 **Prerequisites:** admin; Data Manager on (see [Imports](imports.md)). Save `gift-import-test.csv`, using a date in the current month:
@@ -193,17 +193,17 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab from **Data Manager**, choose **Generic gift list**, **Next**, upload the file. | **Check the columns** maps the first eight columns to person and gift targets (for example **Gift: amount**, **Gift: fund**). |
+| 1 | Open the Import tab from **Data Manager**, choose **Generic gift list**, **Next**, upload the file. | **Check the Columns** maps the first eight columns to person and gift targets (for example **Gift: amount**, **Gift: fund**). |
 | 2 | Map **Transaction ID** to **Gift: external ID**. **Next**. | The matching step shows **Email exact** and **Matching gifts to scheduled payments** on **Match or create**. |
-| 3 | Under **Control totals (optional)** enter **Rows in the file** `3`, **Total of the gift amounts** `145`. Select **Preview**. | 2 rows would create a gift, 1 would be rejected: "No fund is named Genral Fund, or has it as its accounting code." Run log: "Control total: the file has 3 rows, as expected." |
-| 4 | Select **Import these rows**. | Results: 2 gifts created, 1 rejected. |
+| 3 | Under **Control Totals (Optional)** enter **Rows in the file** `3`, **Total of the gift amounts** `145`. Select **Preview**. | 2 rows would create a gift, 1 would be rejected: "No fund is named Genral Fund, or has it as its accounting code." Run log: "Control total: the file has 3 rows, as expected." |
+| 4 | Select **Import These Rows**. | Results: 2 gifts created, 1 rejected. |
 | 5 | Open Harper Garcia's newest gift. | 75.00, **Payment Method** Check ("cheque" understood), General Fund, **Created By Import Batch** links to the import. Gia Testgift exists with a Card gift to Building Fund. |
 | 6 | Load the same file again and preview. | The two loaded rows match the gifts you already have; nothing would be created. Cancel. |
-| 7 | Undo the first import (**Undo this import**, confirm). | The two gifts and the contact Gia Testgift are removed. Harper Garcia stays. |
+| 7 | Undo the first import (**Undo This Import**, confirm). | The two gifts and the contact Gia Testgift are removed. Harper Garcia stays. |
 
 **Cleanup:** none after undo.
 
-## T-GIFT-12: Giving access by permission set
+## T-GIFT-12: Giving Access by Permission Set
 
 **Purpose:** confirm what staff and read-only users can and cannot do with gifts and funds.
 **Prerequisites:** staff, then read-only; any sample gift.
@@ -213,12 +213,12 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 1 | As staff, open the **Fundraising** app. | Tabs include **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches**, **Funds** and **Appeals**. |
 | 2 | As staff, open a gift. | **Edit** and **Refund or Write Off** show; **Delete** does not. |
 | 3 | As read-only, open the **Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
-| 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft credits** panel's **Add credit** is disabled. |
+| 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
 
 **Cleanup:** none.
 
-## T-GIFT-14: A new org starts with a default fund
+## T-GIFT-14: A New Org Starts with a Default Fund
 
 **Purpose:** a freshly deployed Giving org already has one default fund, so the first gift works without any setup.
 **Prerequisites:** a new org deployed with `scripts/org/deploy-packages.sh` (default settings) or installed as packages, with no fund created by hand and no sample data loaded. Admin user.
@@ -234,14 +234,14 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none (or delete the gift from step 4 and the fund).
 
-## T-GIFT-13: List views for gifts, funds, appeals, donor levels and batches
+## T-GIFT-13: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
 
 **Purpose:** each giving object opens with an All view and the status views an admin expects.
 **Prerequisites:** staff user, sample data loaded (the Inactive views are empty until you switch something off).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Gifts** tab and the list view menu. | **All Gifts**, **My Gifts**, **Pending Gifts**, **Gifts to Acknowledge** and **Refunds and Write-offs** are listed. |
+| 1 | Open the **Gifts** tab and the list view menu. | **All Gifts**, **My Gifts**, **Pending Gifts**, **Gifts to Acknowledge** and **Refunds and Write-Offs** are listed. |
 | 2 | Enter a gift as yourself, then choose **My Gifts**. | The new gift shows. Gifts the sample loader created do not, unless you own them. |
 | 3 | Open the **Funds** tab. | **All Funds**, **Active Funds** and **Inactive Funds** are listed. Untick **Active** on a sample fund that has no gifts: it moves to **Inactive Funds** and leaves **Active Funds**. Tick it again. |
 | 4 | Open **Appeals** and **Donor Levels** and open each list view menu. | **All Appeals**, **Active Appeals**, **Inactive Appeals**; **All Donor Levels**, **Active Donor Levels**, **Inactive Donor Levels**. |
@@ -249,7 +249,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none.
 
-## T-GIFT-15: Sample data reuses the org's default fund
+## T-GIFT-15: Sample Data Reuses the Org's Default Fund
 
 **Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
 **Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-14), no sample data loaded.
@@ -259,7 +259,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Giving installed. | The load finishes. |
 | 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
 | 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
-| 4 | Select **Remove sample data** and confirm. | The removal finishes. |
+| 4 | Select **Remove Sample Data** and confirm. | The removal finishes. |
 | 5 | Open **All Funds**. | **General Fund** is still there and still the default. The seven sample funds and the sample gifts are gone. |
 
 **Cleanup:** none.

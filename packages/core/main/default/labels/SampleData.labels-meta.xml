@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load Sample Data button</shortDescription>
-        <value>Load sample data</value>
+        <value>Load Sample Data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmBody</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load confirmation dialog title</shortDescription>
-        <value>Load sample data?</value>
+        <value>Load Sample Data?</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadError</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Remove Sample Data button</shortDescription>
-        <value>Remove sample data</value>
+        <value>Remove Sample Data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RemoveConfirmBody</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Remove confirmation dialog title</shortDescription>
-        <value>Remove sample data?</value>
+        <value>Remove Sample Data?</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RemoveError</fullName>

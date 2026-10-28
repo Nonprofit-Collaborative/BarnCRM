@@ -1,6 +1,6 @@
 # Quick Gift Entry
 
-## What it does
+## What It Does
 
 Quick Gift Entry is a one screen form for recording a gift the moment it arrives: at an
 event, at the front desk, or from the mail pile. It asks for the donor, the amount, the
@@ -12,7 +12,7 @@ Every gift entered here is a normal gift: it counts in the giving totals, it can
 receipted, and it appears in the Giving dashboard the next time the numbers are
 calculated.
 
-## How to turn it on
+## How to Turn It On
 
 Nothing to install and no Setup step. Quick Gift Entry arrives with the Giving package.
 
@@ -36,7 +36,7 @@ open that page in the Lightning App Builder (from the page's setup gear, Edit Pa
 starts with that record already chosen as the donor, and Save and new keeps it, so a page
 of gifts from one donor goes in without picking the donor each time.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this as David, on a phone, starting from the sample data.
 
@@ -46,13 +46,13 @@ Do this as David, on a phone, starting from the sample data.
 3. Tap the donor box and type the first few letters of a donor's last name, for example
    `Mar`. Tap the right person in the list. Their name stays in the box.
 4. In **Amount**, type `50`.
-5. Leave **Gift date** as today.
-6. In **Payment method**, choose **Check**.
+5. Leave **Gift Date** as today.
+6. In **Payment Method**, choose **Check**.
 7. In **Check or reference number**, type the number printed on the check, for example
    `1042`. This is the field Jen uses when she reconciles with the bank, so it is worth
    the two seconds.
 8. Confirm **Appeal** says Spring Appeal. If it does not, tap it and pick Spring Appeal.
-9. Tap **Save and new**. A message says **Gift G-000123 saved**, with the gift's name as
+9. Tap **Save and New**. A message says **Gift G-000123 saved**, with the gift's name as
    a link, and the form clears itself for the next gift while keeping today's date, the
    appeal, and the fund. You are ready for the next check with one tap.
 10. Enter a second gift the same way: a different donor, `25`, Cash, no check number.
@@ -63,10 +63,10 @@ Do this as David, on a phone, starting from the sample data.
 
 Five gifts take about a minute once the rhythm is there. Nothing here needs a laptop.
 
-## Paying a pledge or a recurring gift
+## Paying a Pledge or a Recurring Gift
 
 When the donor you pick still owes payments on a pledge or a recurring gift, a list called
-**Pays a scheduled payment** appears under **Gift date**. It holds that donor's payments that
+**Pays a scheduled payment** appears under **Gift Date**. It holds that donor's payments that
 are scheduled, overdue or partly paid, on pledges and recurring gifts that are active or
 paused, including the ones made in the name of the donor's household. Each choice names the
 pledge, the payment's due date and the amount expected.
@@ -97,7 +97,7 @@ amount and due date of its next payment. Enter a gift from that donor, of that a
 that day. The list chooses that payment and says it was suggested. Save, open the pledge
 again, and the payment is Paid and the balance has gone down.
 
-## Common mistakes
+## Common Mistakes
 
 **The donor is not in BarnCRM yet.** Common at an event. Leave the donor toggle on
 **Person** and tap **Not in the list? Add a new person** under the donor box. The standard
@@ -153,7 +153,7 @@ different person or an organization is not there either: pick that donor instead
 **"That payment is no longer open" after Save.** Someone paid it, or the pledge was closed,
 while the form was open. Nothing was saved. Choose again from the refreshed list, or None.
 
-## Field reference
+## Field Reference
 
 For the person building a report later, these are the fields the form writes.
 

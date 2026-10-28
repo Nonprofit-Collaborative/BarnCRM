@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Volunteer letter action heading</shortDescription>
-        <value>Volunteer letter</value>
+        <value>Volunteer Letter</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_Template</fullName>
@@ -334,7 +334,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Approve Hours screen title</shortDescription>
-        <value>Approve volunteer hours</value>
+        <value>Approve Volunteer Hours</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Show</fullName>
@@ -430,7 +430,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Rejection reason column heading</shortDescription>
-        <value>Rejection reason</value>
+        <value>Rejection Reason</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Select</fullName>
@@ -598,7 +598,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Sign-ups panel title</shortDescription>
-        <value>Sign-ups</value>
+        <value>Sign-Ups</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_Needed</fullName>
@@ -798,7 +798,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Title of the readiness card on a person</shortDescription>
-        <value>Volunteer readiness</value>
+        <value>Volunteer Readiness</value>
     </labels>
     <labels>
         <fullName>Volunteers_Readiness_NotStarted</fullName>

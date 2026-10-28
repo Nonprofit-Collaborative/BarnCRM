@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: download every row with its outcome and record IDs</shortDescription>
-        <value>Download results</value>
+        <value>Download Results</value>
     </labels>
     <labels>
         <fullName>Core_Import_ResultsCapped</fullName>

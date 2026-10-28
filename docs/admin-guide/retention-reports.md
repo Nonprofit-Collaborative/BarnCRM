@@ -1,6 +1,6 @@
 # Retention Reports
 
-## What it does
+## What It Does
 
 Four reports answer the four questions a fundraiser asks about donor loyalty, and each one
 says in writing exactly who it counts.
@@ -20,7 +20,7 @@ The reports count donors, not gifts. One row is one household, one organization,
 person account, so the record count at the bottom of a group is a number of donors you can
 put in a board paper.
 
-## The definitions, in plain language
+## The Definitions, in Plain Language
 
 Read this section once. It is the part of the feature that matters, because a retention
 report you cannot explain is a report nobody acts on.
@@ -81,7 +81,7 @@ twelve and twenty four months to give again, and the older cohort has had longer
 cohort with the same cohort a year later rather than comparing the two cohorts to each other,
 because they have not had the same amount of time.
 
-## How to turn it on
+## How to Turn It On
 
 1. **Check the fiscal year.** In BarnCRM Settings, open the **General** section and read
    **Fiscal year start month**, shown read only from Setup. If it is not the month your
@@ -101,7 +101,7 @@ because they have not had the same amount of time.
 Nothing else in Setup is required. There is no new setting to configure: the reports carry
 their own definitions.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Do this after the sample data is loaded, or in an org with a couple of years of gifts.
 
@@ -130,7 +130,7 @@ Do this after the sample data is loaded, or in an org with a couple of years of 
 7. Choose **Save As** on any of these before you change a filter, so your version does not
    overwrite the shared one.
 
-## Common mistakes
+## Common Mistakes
 
 **A donor who gives goods every year never appears on any of these reports.** That is
 correct, and it is worth knowing before somebody reports it as a bug. These reports are

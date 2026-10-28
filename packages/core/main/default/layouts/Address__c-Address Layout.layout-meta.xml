@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>false</detailHeading>
     <editHeading>true</editHeading>
-    <label>Who this address belongs to</label>
+    <label>Who This Address Belongs To</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -31,7 +31,7 @@
     <customLabel>true</customLabel>
     <detailHeading>false</detailHeading>
     <editHeading>true</editHeading>
-    <label>The address</label>
+    <label>The Address</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Required</behavior>
@@ -66,7 +66,7 @@
     <customLabel>true</customLabel>
     <detailHeading>false</detailHeading>
     <editHeading>true</editHeading>
-    <label>When this address is used</label>
+    <label>When This Address Is Used</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Edit</behavior>

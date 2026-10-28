@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: link for an organization to request an integration</shortDescription>
-        <value>Request an integration</value>
+        <value>Request an Integration</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_RequestUrl</fullName>
@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: link for a solution provider to propose an integration</shortDescription>
-        <value>Propose an integration for your product</value>
+        <value>Propose an Integration for Your Product</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_PartnerUrl</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: link to how an integration is built</shortDescription>
-        <value>How an integration is built</value>
+        <value>How an Integration Is Built</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_GuideUrl</fullName>

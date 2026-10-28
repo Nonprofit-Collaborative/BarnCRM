@@ -1,6 +1,6 @@
-# Automation control
+# Automation Control
 
-## What it does
+## What It Does
 
 BarnCRM does small pieces of work for you in the background: it creates a household
 for a new person, keeps household names and greetings up to date, and so on. Automation
@@ -18,7 +18,7 @@ listed here, so you can find them and
 read what they do, but their switch is off, greyed out, and carries a line explaining that
 the automation always runs. See "Automations that always run" below.
 
-## How to turn it on
+## How to Turn It On
 
 Automation control is on as soon as BarnCRM is installed. There is nothing to enable
 and nothing to install: installing or upgrading each package creates the switch for every
@@ -37,7 +37,7 @@ comes with the BarnCRM Admin role. If you do not have it, the page still opens a
 can read everything, but the switches are greyed out and a message names the permission
 you need to ask for.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria is about to load a spreadsheet of 400 people from a partner organization. She wants
 the records in first and the automatic housekeeping to happen afterwards, so nothing runs
@@ -47,7 +47,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
 2. In the left navigation, click **Automation**. You see a list of every piece of
    automation BarnCRM ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click
-   **Pause all automation**. The page now shows a yellow bar: "Automation is paused until
+   **Pause All Automation**. The page now shows a yellow bar: "Automation is paused until
    3:40 PM. Paused by Maria Lopez. It turns itself back on then." Every switch in the list
    is still where you left it: pausing does not change anything you have chosen.
 4. Click **Home**. The same banner appears at the top of the Hub, so anyone else working
@@ -67,7 +67,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
 That is the whole feature: one switch per automation, one switch for all of them, and it
 expires by itself.
 
-## How long a pause lasts
+## How Long a Pause Lasts
 
 You choose the length when you pause: 1, 2, 4, 8 or 24 hours. Two hours is already
 selected, because most spreadsheet loads are done in less. There is no longer choice and no
@@ -76,18 +76,18 @@ selected, because most spreadsheet loads are done in less. There is no longer ch
 When the time is up, automation starts again at that moment, whether or not anybody has the
 page open. BarnCRM also writes the end of the pause into the list of recent changes at the
 bottom of BarnCRM Settings, with the time it ended and the name of the person who paused, as
-if they had clicked **Resume automation** themselves. So the list always shows every pause
+if they had clicked **Resume Automation** themselves. So the list always shows every pause
 with its start and its end.
 
-Clicking **Resume automation** early, or pausing again to get more time, replaces the
+Clicking **Resume Automation** early, or pausing again to get more time, replaces the
 scheduled end: the new length counts from the moment you click.
 
 If Health Check says **Automation is paused with no automatic resume**, a pause is in effect
 that nothing is set to end: usually one started before this version of BarnCRM, or one
-set somewhere other than this page. Open this page, click **Resume automation**, and pause
+set somewhere other than this page. Open this page, click **Resume Automation**, and pause
 again for a set time if you still need to.
 
-## Automations that always run
+## Automations That Always Run
 
 Pause stops BarnCRM filling things in for you. It never stops BarnCRM refusing
 something. An automation whose job is to refuse a change, rather than to save you typing,
@@ -114,7 +114,7 @@ not on this page. It is the Override Receipt Lock permission, described under "L
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
 
-## Running your own version instead
+## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your
 change. Switch ours off here and run your own copy. For most of the automations a flow can
@@ -122,7 +122,7 @@ do, BarnCRM ships a flow template you copy and change: see
 [Your own version of an automation](flow-templates.md). That page also lists the automations
 with no template, and why.
 
-## Common mistakes
+## Common Mistakes
 
 - **Expecting the pause to last longer than 24 hours.** It cannot. For a load that runs
   over several days, pause again each morning, or switch off only the automation that is

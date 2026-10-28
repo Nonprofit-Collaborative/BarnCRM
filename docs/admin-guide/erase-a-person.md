@@ -1,8 +1,8 @@
-# Erase a person
+# Erase a Person
 
-## 1. What it does
+## 1. What It Does
 
-**Erase person** removes what your organization holds about one person when they ask you to
+**Erase Person** removes what your organization holds about one person when they ask you to
 (the right to be forgotten under GDPR and several state privacy laws). It is one action on the
 person's record page, and **it cannot be undone**.
 
@@ -49,7 +49,7 @@ requirements and skills are deleted. See [Volunteers](volunteers.md#erasing-a-vo
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 1. Erasing needs the **Erase People** permission, which is **in no role, not even BarnCRM
    Admin**. Assign the **BarnCRM Erase People** permission set to the one or two people who handle
@@ -60,15 +60,15 @@ and each record that changed with the fields that were emptied. It never holds a
    Admin, with Giving Admin or Giving Staff, has it.
 3. Optional, recommended: give them the Salesforce system permission **Delete From Field
    History** (in a permission set of your own), so field history is erased too.
-4. **Erase person** is on the person record pages BarnCRM ships. On a page of your own, add the
-   **Erase person** action.
+4. **Erase Person** is on the person record pages BarnCRM ships. On a page of your own, add the
+   **Erase Person** action.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 Jordan Lee emailed asking to be forgotten. Maria checked it was really Jordan, and logged the
 request as ticket PR-2041.
 
-1. Open Jordan Lee's record and choose **Erase person**.
+1. Open Jordan Lee's record and choose **Erase Person**.
 2. Press **Preview**. BarnCRM works through the whole erasure and then takes it back, and lists
    exactly what would change: each record, what happens to it (emptied, ended, deleted, kept),
    and which fields. Nothing has changed yet.
@@ -80,7 +80,7 @@ request as ticket PR-2041.
 6. The page shows what was done and links to the **Erasure** record, whose Details keep the
    same list in the same words.
 
-## 4. What stays, and what you still have to do
+## 4. What Stays, and What You Still Have to Do
 
 - **Gifts and receipts (Giving).** Gifts, soft credits, pledges and their payments keep their
   amounts, dates and funds, credited to the anonymous record. The one exception: the person's
@@ -107,7 +107,7 @@ request as ticket PR-2041.
 - **Health Check** and the data hygiene console do not count an erased person as a person with
   no household: erasing them took them out of it on purpose.
 
-## 5. Common mistakes
+## 5. Common Mistakes
 
 - **"You can't edit ..."** The erasure stopped before changing anything: you cannot edit a record
   or a field that holds a value. Ask your administrator for access, or ask them to erase.
@@ -118,7 +118,7 @@ request as ticket PR-2041.
   refused a change. Nothing was erased: the whole erasure is taken back. The message names the
   record and the reason.
 
-## Field reference
+## Field Reference
 
 | Where | Field | What it holds |
 |---|---|---|

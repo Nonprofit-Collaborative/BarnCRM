@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>Who is recognized</label>
+    <label>Who Is Recognized</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -29,7 +29,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>Why and how much</label>
+    <label>Why and How Much</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Required</behavior>

@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Members panel: heading over the search box, flexible membership mode</shortDescription>
-        <value>Add someone already in Salesforce</value>
+        <value>Add Someone Already in Salesforce</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_AddExistingPlaceholder</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Members panel: heading over the new person form, flexible membership mode</shortDescription>
-        <value>Or add someone new</value>
+        <value>Or Add Someone New</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_Salutation</fullName>

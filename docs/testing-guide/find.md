@@ -4,7 +4,7 @@ Scripts for the Find tab: building and running queries, conditions, related reco
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. Run, save and export only queries whose conditions match the fixture (for example **Last Name equals Zztest**); an export of a broader query would copy real people. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts. Editing in the results table is tested in [Bulk update and delete](bulk-update-and-delete.md).
 
-## T-FIND-01: Build and run a query
+## T-FIND-01: Build and Run a Query
 
 **Purpose:** confirm a query built from lists runs and shows the matching records.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
@@ -22,7 +22,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** none. Keep the page open for T-FIND-02 if you like.
 
-## T-FIND-02: Conditions that are refused
+## T-FIND-02: Conditions That Are Refused
 
 **Purpose:** confirm incomplete conditions, bad values and bad condition logic are marked and the query does not run.
 **Prerequisites:** admin; Find open on **Contact** with at least one column chosen.
@@ -39,7 +39,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** none.
 
-## T-FIND-03: Related fields and related records
+## T-FIND-03: Related Fields and Related Records
 
 **Purpose:** confirm columns from a related record, related-records conditions and related record columns.
 **Prerequisites:** admin.
@@ -49,7 +49,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Find**, choose **Account**, and add **Account Name** to the columns. | Shown in **Columns, in order**. |
 | 2 | Under **Related records**, select **Add related records**. Choose **Has related records** in **Which records**, and the Contacts option in **Kind of related record**. | **Conditions on the related records (none means any related record)** appears. |
 | 3 | Add a related condition **First Name**, **equals**, `Harper`, and select **Run**. | The results include **The Garcia Family** and no household without a Harper. |
-| 4 | Under **Related record columns**, select **Add a related record column**. Choose the Contacts option and add **First Name** to **Fields to show (up to 5)**. Select **Run**. | A new column lists each household's contacts' first names in one cell, for example Harper and Luis on The Garcia Family. |
+| 4 | Under **Related Record Columns**, select **Add a Related Record Column**. Choose the Contacts option and add **First Name** to **Fields to show (up to 5)**. Select **Run**. | A new column lists each household's contacts' first names in one cell, for example Harper and Luis on The Garcia Family. |
 | 5 | Change **Which records** to **Has no related records**, remove the related condition, and select **Run**. | Only accounts with no contacts are listed (for example sample organizations with no people); The Garcia Family is not listed. |
 
 **Cleanup:** none.
@@ -84,7 +84,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the exported file from Files.
 
-## T-FIND-06: Save, share and delete a query
+## T-FIND-06: Save, Share and Delete a Query
 
 **Purpose:** confirm saved queries, Save as, sharing, and the delete confirmation.
 **Prerequisites:** admin and staff; staff given **BarnCRM Find and Export** on BarnCRM Settings, **Access**, **Extra Permissions** (see [Access](../admin-guide/access.md)).
@@ -104,7 +104,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete **Test Garcias copy**; remove **BarnCRM Find and Export** from staff.
 
-## T-FIND-07: Type a query
+## T-FIND-07: Type a Query
 
 **Purpose:** confirm a typed query is read into the builder and unsupported text is refused.
 **Prerequisites:** admin.
@@ -143,7 +143,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Log in as read-only. Search the App Launcher for "Find". | No BarnCRM **Find** tab. |
 | 2 | Log in as staff and repeat. | No **Find** tab. |
 | 3 | As admin, on BarnCRM Settings, **Access**, give staff **BarnCRM Find and Export** under **Extra Permissions**. Log in as staff again. | The **Find** and **Data Manager** tabs are available. |
-| 4 | As staff, run a Contact query. | Results show. **Run**, **Export to CSV**, **Export to Excel**, **Export to Files** and **Summarize** are offered; **Bulk update** and **Bulk delete** are not. Cells show no edit pencil. |
+| 4 | As staff, run a Contact query. | Results show. **Run**, **Export to CSV**, **Export to Excel**, **Export to Files** and **Summarize** are offered; **Bulk Update** and **Bulk Delete** are not. Cells show no edit pencil. |
 | 5 | As staff, open an object staff cannot read (if your org has one), or ask admin to note a field staff cannot see. | That object is not offered, and that field is not offered as a column or a condition. |
 | 6 | As admin, remove **BarnCRM Find and Export** from staff. Log in as staff. | **Find** is gone again. |
 

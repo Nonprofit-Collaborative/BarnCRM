@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Organization address: heading of the grouped address block</shortDescription>
-        <value>Organization address</value>
+        <value>Organization Address</value>
     </labels>
     <labels>
         <fullName>Core_OrganizationAddress_Hint</fullName>

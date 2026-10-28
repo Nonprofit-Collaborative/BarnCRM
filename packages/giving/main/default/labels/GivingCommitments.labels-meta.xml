@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Schedule preview column heading.</shortDescription>
-        <value>Due date</value>
+        <value>Due Date</value>
     </labels>
     <labels>
         <fullName>Giving_SchedulePreview_ColumnPaid</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading of the schedule preview card.</shortDescription>
-        <value>Payment schedule</value>
+        <value>Payment Schedule</value>
     </labels>
     <labels>
         <fullName>Giving_SchedulePreview_Total</fullName>

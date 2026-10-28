@@ -1,4 +1,4 @@
-# Volunteer jobs, shifts and sign-ups
+# Volunteer Jobs, Shifts and Sign-Ups
 
 This page covers the everyday side of scheduling volunteers: the jobs your organization needs
 help with, the dated shifts of each job, and who signed up for each shift. Logging and approving
@@ -13,7 +13,7 @@ Read Only). If the app is missing, ask your admin (see the
 [Volunteers admin guide](../admin-guide/volunteers.md#roles-and-permission-sets)). Read Only
 users can look at jobs, shifts and sign-ups but change nothing.
 
-## To find a job or a shift
+## To Find a Job or a Shift
 
 1. Click the **Volunteer Jobs** tab, or the **Volunteer Shifts** tab.
 2. Open the list view menu at the top left and pick a list:
@@ -21,12 +21,12 @@ users can look at jobs, shifts and sign-ups but change nothing.
    - Shifts: **All Shifts**, **Shifts Needing Volunteers** (open shifts from today that still
      have places left) or **Past Shifts Still Open** (shifts that ended more than 7 days ago
      and were never closed).
-3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-ups** tab, list view **All Sign-ups**.
+3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-ups** tab, list view **All Sign-Ups**.
 
 You should see: a job page with its details and the **Shifts**, **Shift Schedules** and
-**Job Skills** lists, or a shift page with the **Sign-ups** panel at the top.
+**Job Skills** lists, or a shift page with the **Sign-Ups** panel at the top.
 
-## To create a job
+## To Create a Job
 
 1. On the **Volunteer Jobs** tab, click **New**.
 2. Fill in **Job Name**, and if you like **Description**, **Location** and **Coordinator**.
@@ -38,7 +38,7 @@ until someone's hours on it are approved.
 
 To stop offering a job, clear **Active** rather than deleting it.
 
-## To create a single shift
+## To Create a Single Shift
 
 1. Open the job and find the **Shifts** list.
 2. Click **New**.
@@ -52,7 +52,7 @@ You should see: the shift in the job's **Shifts** list, and **Slots Remaining** 
 A shift needs both a start and an end time: marking someone **Attended** uses them to work out
 the hours.
 
-## To set up a shift that repeats
+## To Set Up a Shift That Repeats
 
 Work that happens every week is set up once, as a shift schedule on the job, and BarnCRM creates
 the dated shifts for you. Coordinators and Team Members can do this; only an admin deletes a
@@ -76,7 +76,7 @@ those by hand: they still have the old times.
 
 **To end a schedule**, clear **Active** or set an earlier **End Date**.
 
-## To take one day off a schedule
+## To Take One Day Off a Schedule
 
 1. Open that day's shift.
 2. Click **Edit**, set **Status** to **Cancelled**, and click **Save**.
@@ -84,9 +84,9 @@ those by hand: they still have the old times.
 Do not delete the shift: a deleted shift comes back the next time the schedule is changed, a
 cancelled one does not.
 
-## To sign someone up for a shift
+## To Sign Someone Up for a Shift
 
-1. Open the shift. The **Sign-ups** panel at the top shows **Volunteers needed**, **Slots
+1. Open the shift. The **Sign-Ups** panel at the top shows **Volunteers needed**, **Slots
    filled** and **Slots remaining**, and lists who is signed up.
 2. Click **Add sign-up**.
 3. Choose the **Person**. Leave **Status** as **Signed up**, or pick another status.
@@ -98,16 +98,16 @@ filled** up by one.
 More people than **Volunteers needed** can be signed up: **Slots remaining** then goes below
 zero.
 
-## To change a sign-up's status
+## To Change a Sign-Up's Status
 
-1. On the shift's **Sign-ups** panel, find the person's row.
+1. On the shift's **Sign-Ups** panel, find the person's row.
 2. Pick the new status in the **Status** column: **Signed up**, **Confirmed**, **Attended**,
    **No show** or **Cancelled**.
 
 You should see: the change saved at once, and a message naming the person and the new status.
 A **Cancelled** sign-up frees its slot.
 
-## To mark attendance after a shift
+## To Mark Attendance After a Shift
 
 1. Open the shift.
 2. In each person's row, under **Attendance**, click **Attended** or **No show**.
@@ -119,16 +119,16 @@ for this attendance." BarnCRM creates their hours for the length of the shift, w
 approval like any other entry (if your admin has this turned on). Marking someone **Attended**
 a second time records nothing more, and changing the status back deletes nothing.
 
-## To edit a sign-up's notes or remove a sign-up
+## To Edit a Sign-Up's Notes or Remove a Sign-Up
 
-1. On the shift page, scroll to the **Sign-ups** related list below the details.
+1. On the shift page, scroll to the **Sign-Ups** related list below the details.
 2. Open the row menu and choose **Edit** to change **Notes**, or **Delete** to remove the
    sign-up (Salesforce asks you to confirm).
 
 To free the place but keep a record that the person had signed up, set the status to
 **Cancelled** instead of deleting.
 
-## Common problems
+## Common Problems
 
 - Problem: "This person is already signed up for ..." when you add a sign-up. Why and what to
   do: a person can be signed up only once per shift. Change the status of the sign-up that is
@@ -147,10 +147,10 @@ To free the place but keep a record that the person had signed up, set the statu
   admin: the nightly job that creates shifts may not be running.
 - Problem: "This job has shifts or volunteer hours, so it cannot be deleted ..." Why and what to
   do: clear **Active** on the job instead.
-- Problem: the **Sign-ups** panel has no **Add sign-up** button or attendance buttons. Why and
+- Problem: the **Sign-Ups** panel has no **Add sign-up** button or attendance buttons. Why and
   what to do: you have read only access. Ask your admin if you need to sign people up.
 - Problem: "Showing the first ... sign-ups." Why and what to do: the panel shows a limited
-  number of rows. Use the **Sign-ups** related list below the details to see them all.
+  number of rows. Use the **Sign-Ups** related list below the details to see them all.
 
 ## Related
 

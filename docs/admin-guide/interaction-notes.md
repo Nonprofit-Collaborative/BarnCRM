@@ -1,10 +1,10 @@
-# Interaction notes
+# Interaction Notes
 
 **Feature:** C-39 Interaction notes
 **Package:** Core
 **Iteration:** v0.9
 
-## What it does
+## What It Does
 
 When you meet someone, call them or visit them, the useful part is what was said, and it is
 usually written down a few days later, if at all. An interaction note records it on the
@@ -16,11 +16,11 @@ Tasks and Events reports, so you can see who your team met last month.
 An interaction note is an ordinary completed activity. There is no new tab, no new record to
 learn, and nothing to keep in step: if your team already logs calls, notes appear beside them.
 
-## How to turn it on
+## How to Turn It On
 
 Interaction notes work as soon as Core is installed. There is nothing to switch on.
 
-**Where the button is.** **Log an interaction** sits in the action bar at the top of the
+**Where the button is.** **Log an Interaction** sits in the action bar at the top of the
 packaged person page and the packaged household and organization page, in the **BarnCRM**
 app and, with Giving installed, the **Fundraising** app, on the desktop and on the phone. If
 you do not see it, you are probably looking at the record outside those apps, or somebody
@@ -40,12 +40,12 @@ package cannot change: Setup, **Activity Settings**, **Allow Users to Relate Mul
 Contacts to Tasks and Events**. It is on in most orgs. Without it, a note names one person;
 log it from the household or organization page to cover everyone there.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does this from the sample data.
 
 1. Open the **BarnCRM** app, click the **Contacts** tab, and open any sample person.
-2. Click **Log an interaction** in the action bar. A window opens with **Date** set to today
+2. Click **Log an Interaction** in the action bar. A window opens with **Date** set to today
    and **Type** set to **Meeting**. The note is saved as completed, so it is history, not a
    to-do.
 3. Type a **Subject**, for example `Coffee to talk about the spring project`. Change **Date** to
@@ -57,7 +57,7 @@ Maria does this from the sample data.
 5. Click **Save**. The note appears under **Past Activity** in the activity timeline on the
    right, dated last Friday.
 6. Open the person's household. The same note is in the household's activity timeline.
-7. On the household, click **Log an interaction**, choose a member of the household in
+7. On the household, click **Log an Interaction**, choose a member of the household in
    **Name**, and save a second note. It appears on the household and on that person.
 8. To see everything your team logged: open **Reports**, click **New Report**, choose
    **Tasks and Events**, and filter on **Status** equals Completed and **Type** equals Meeting
@@ -66,7 +66,7 @@ Maria does this from the sample data.
 9. If the meeting needs a follow-up, use **New Task** in the activity panel. A next step is
    an open task with a due date, not a line in the note, so it lands in someone's task list.
 
-## Common mistakes
+## Common Mistakes
 
 - **The note is dated today, not the day of the meeting.** The date defaults to today so a
   note written right after a call needs no change. When you write it later, change **Date**
@@ -83,7 +83,7 @@ Maria does this from the sample data.
 - **Somebody read a note they should not have.** Notes follow the record. Edit the note to
   remove what should not be there, and keep sensitive matters out of notes.
 
-## Field reference
+## Field Reference
 
 For a report builder only. An interaction note is a Task.
 

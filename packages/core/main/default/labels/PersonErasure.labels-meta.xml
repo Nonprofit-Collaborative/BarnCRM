@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase person action: title</shortDescription>
-        <value>Erase person</value>
+        <value>Erase Person</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_Warning</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase person action: column heading</shortDescription>
-        <value>What happens</value>
+        <value>What Happens</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_ColumnObject</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase person action: column heading</shortDescription>
-        <value>How many</value>
+        <value>How Many</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_ColumnFields</fullName>

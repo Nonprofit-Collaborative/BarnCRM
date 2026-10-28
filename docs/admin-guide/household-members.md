@@ -1,10 +1,10 @@
-# Household members and the primary contact
+# Household Members and the Primary Contact
 
 **Feature:** C-01 Household model (Members panel)
 **Package:** Core
 **Iteration:** v0.1
 
-## What it does
+## What It Does
 
 Every household record carries a **Members** panel that lists the people in it,
 says which one is the primary contact, and lets you change that with one click. A person's
@@ -15,15 +15,15 @@ The primary contact is the person letters are addressed to when only one person 
 Mail merges read it (and, with Giving, receipts and acknowledgments), so a household with the wrong primary
 contact sends its mail to the wrong person.
 
-## How to turn it on
+## How to Turn It On
 
 Both panels are there as soon as Core is installed and the BarnCRM app is in use.
 There is nothing to switch on.
 
 **Who can do what.** Anyone who can see a household sees its members. The Members panel offers
 each action only to someone whose access allows it, so a Read Only user sees the list with no
-**Add member**, **Move to another household** or **Make primary** button. In the simple way of
-belonging, **Make primary** needs edit access on households, **Move to another household** edit
+**Add member**, **Move to another household** or **Make Primary** button. In the simple way of
+belonging, **Make Primary** needs edit access on households, **Move to another household** edit
 access on contacts, and **Add member** create access on contacts; in the flexible way, all three
 need access to household memberships (create to add, edit to move or make primary). Someone
 who has that access but cannot edit this particular household (sharing) still sees the button,
@@ -35,13 +35,13 @@ both of which the BarnCRM app uses. If either is missing, you are most
 likely looking at the record outside the **BarnCRM** app, or somebody has overridden
 the page assignment in the Lightning App Builder.
 
-## The Members panel
+## The Members Panel
 
 Each row on the panel names one person and their role in the household, followed by a
 **Primary** badge on the primary contact and a **Deceased** badge on anyone who has died.
 Two actions sit on each row:
 
-- **Make primary** turns that person into the household's primary contact. It is hidden on
+- **Make Primary** turns that person into the household's primary contact. It is hidden on
   the person who already is.
 - **Move to another household** takes that person out of this household and into one you
   choose. In the flexible way of belonging only their membership in this household ends:
@@ -66,11 +66,11 @@ An **Add member** button sits below the list.
   Where your org stores people as accounts (person accounts) and you can create one, the new
   person is created as a person account; otherwise as a contact.
 
-### The primary contact in the simple way of belonging
+### The Primary Contact in the Simple Way of Belonging
 
 In the simple way (one household per person, the shipped default), the primary contact is
 the **Primary Contact** field on the household itself. The panel reads that field and badges
-the matching person. **Make primary** writes that field, using your own access to the
+the matching person. **Make Primary** writes that field, using your own access to the
 household, so it succeeds exactly when you could have edited the field by hand.
 
 The primary contact has to be in the household. Typing somebody from another household into
@@ -78,10 +78,10 @@ the field is refused with "The Primary Contact has to be somebody in this househ
 Clearing the field is always allowed. A household BarnCRM creates for a new person names that
 person its primary contact.
 
-### The primary contact in the flexible way of belonging
+### The Primary Contact in the Flexible Way of Belonging
 
 In the flexible way, each person's membership is a record of its own, and the primary
-contact is the membership marked primary. **Make primary** marks the person you chose and
+contact is the membership marked primary. **Make Primary** marks the person you chose and
 unmarks everyone else in that household, again using your own access, so you need to be
 able to edit the membership records of that household.
 
@@ -90,10 +90,10 @@ layout and thank-you emails all see the same person. A person your org stores as
 (a person account) appears in that field under their own name, as the contact record
 Salesforce keeps behind every person account. Because the field follows the membership
 records, you cannot type a different Primary Contact on a household in this way of
-belonging: the save is refused with a message pointing you back to **Make primary**. An
+belonging: the save is refused with a message pointing you back to **Make Primary**. An
 organization's Primary Contact is yours to set by hand either way.
 
-## The Household panel on a person
+## The Household Panel on a Person
 
 Open any person and the **Household** panel shows the household's name as a link, how many
 people are in it, and the formal greeting, so you can check how a letter to that household
@@ -122,15 +122,15 @@ household yet**. In the simple way that means the person has no household filled
 account they point at is an organization rather than a household. In the flexible way it
 means no current membership record names them.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does this from the sample data.
 
 1. Open the **BarnCRM** app and click the **Households** tab, then open **The Garcia
    Family**. The **Members** panel lists Harper, Luis and Diego Garcia, with a
    **Primary** badge on one of them.
-2. On Luis's row, click **Make primary**. The badge moves to Luis and the message "Luis
-   Garcia is now the primary contact." appears. The **Make primary** button disappears from
+2. On Luis's row, click **Make Primary**. The badge moves to Luis and the message "Luis
+   Garcia is now the primary contact." appears. The **Make Primary** button disappears from
    his row and appears on the person who used to be primary.
 3. Click Luis's name to open his record. The **Household** panel names **The Garcia
    Family**, says how many members it has, and shows the formal greeting.
@@ -141,7 +141,7 @@ Maria does this from the sample data.
    His **Household** panel names **The Lee Family**, the household that was created for him,
    with one member.
 
-## Common mistakes
+## Common Mistakes
 
 **"There is no Primary badge on anyone."**
 The household has no primary contact yet. Nothing chooses one for you: click **Make
@@ -157,7 +157,7 @@ manages access, or ask them to make the change.
 
 **"The household will not let me change its Primary Contact."**
 Your org uses the flexible way of belonging, where the field follows whoever is marked
-primary on the household's members. Use **Make primary** on the **Members** panel
+primary on the household's members. Use **Make Primary** on the **Members** panel
 instead; the field updates on its own.
 
 **"A membership record I made by hand, or loaded, was refused."**
@@ -169,11 +169,11 @@ have instead. An ended membership beside a current one is history and is kept.
 
 **"Ticking Primary Member on a membership was refused."**
 A household has one primary member. Saving a membership record that would give it a second
-one is refused with "This household already has a primary member." Use **Make primary** on
+one is refused with "This household already has a primary member." Use **Make Primary** on
 the **Members** panel, which moves the mark in one step. A load of many records
 (Data Loader, an import) is not refused: if it leaves a household with two primaries, the
 first in member order is used as the Primary Contact and nothing else is changed, so you
-can choose with **Make primary** afterward.
+can choose with **Make Primary** afterward.
 
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
@@ -198,7 +198,7 @@ a household rather than an organization. In the flexible way, check that their m
 has no end date in the past: somebody whose membership has ended is no longer in that
 household, and the panel says so.
 
-## Field reference
+## Field Reference
 
 For report builders only.
 
