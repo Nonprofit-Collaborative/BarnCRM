@@ -68,7 +68,11 @@ private class RollupChangeDetectionTest {
     private static Set<Id> definitionIds(RollupChanges.Marked result) {
         Set<Id> ids = new Set<Id>();
         List<Rollup_Definition__c> named = result.definitionsFor('Account');
-        for (Rollup_Definition__c definition : named == null ? new List<Rollup_Definition__c>() : named) {
+        for (
+            Rollup_Definition__c definition : named == null
+                ? new List<Rollup_Definition__c>()
+                : named
+        ) {
             ids.add(definition.Id);
         }
         return ids;
