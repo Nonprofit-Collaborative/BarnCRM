@@ -16,6 +16,8 @@ Every setting an administrator needs lives on a page inside the app (BarnCRM Set
 
 BarnCRM is in development. No package version exists yet and nothing is installable from a listing, so this page describes what is built on the main branch of the source code.
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
+
 ## Two Editions
 
 Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo, Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.

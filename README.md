@@ -16,6 +16,8 @@ Three things matter more to us than shipping features fast. First, the numbers h
 
 BarnCRM is in development. Core is nearing its pilot, but nothing is installable yet: no package versions exist, and the namespace is not registered. Everything here is source code, a detailed product plan, and architecture decisions in the open. If you run a nonprofit and this sounds like what you need, the most useful thing you can do right now is watch the repository, open an issue describing how your organization works and what has been painful, and tell us which of the four Salesforce setups above you are on. If you write code or administer Salesforce, see the contributor guide below.
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
+
 ## Status
 
 - Phase 0 (planning and repository setup) complete.

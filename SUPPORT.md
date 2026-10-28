@@ -2,6 +2,8 @@
 
 BarnCRM is built in the open, and GitHub is the one place to report a bug, ask whether it fits your organization, point out a documentation problem, or suggest a feature. Issues are read and may shape the roadmap. BarnCRM is a free, self-service project with no support service, so there is no promised response time.
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
+
 ## How to report
 
 1. Sign in to GitHub. A free account is enough (create one at https://github.com/signup).

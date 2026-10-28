@@ -1,5 +1,7 @@
 # Moving a Pilot to the Managed Packages
 
+> **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org. This page is for a pilot that is already installed.
+
 ## 1. What It Does
 
 Organizations that piloted BarnCRM before its AppExchange listing run an early edition of
