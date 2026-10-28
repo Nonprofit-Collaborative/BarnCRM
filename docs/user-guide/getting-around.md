@@ -83,8 +83,9 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
   in the tabs above."
-- **New household**: opens a new household with a placeholder name. The name is replaced
-  automatically once you add a member. You see this button only if you can create households.
+- **New household**: creates a household with a placeholder name and opens it. The name is
+  replaced automatically once you add a member. You see this button only if you can create
+  and edit accounts.
 - **Quick Links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
   going back to the App Launcher.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is

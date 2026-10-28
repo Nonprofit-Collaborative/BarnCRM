@@ -19,7 +19,10 @@
  *
  * - Only these fields are written here, and only on the Household record type.
  * - No value written here comes from user input: every one is computed by
- *   HouseholdNamingService or counted by HouseholdService.
+ *   HouseholdNamingService or counted by HouseholdService. The one exception is
+ *   createHouseholdsForUser, a household a person asked for, which exists because no user is
+ *   given the Household record type (ADR-0141); it checks the access user mode would
+ *   have checked before it saves anything.
  * - Deleting an emptied household, and removing or restoring a membership row, are NOT
  *   covered by the exception: those remove or bring back a record rather than compute a
  *   value, so they run with the user's own access and are logged rather than thrown when
@@ -57,6 +60,130 @@ public with sharing class HouseholdWriter {
         if (households == null || households.isEmpty()) {
             return new List<Database.SaveResult>();
         }
+        return insertHouseholds(households, householdSaveOptions());
+    }
+
+    /**
+     * The package's own bookkeeping on a household: computed, never typed, so a person creating
+     * a household is not asked for field access on them (see the class header).
+     */
+    private static final Set<Schema.SObjectField> BOOKKEEPING_FIELDS = new Set<Schema.SObjectField>{
+        Account.RecordTypeId,
+        Account.Custom_Name__c,
+        Account.Member_Count__c,
+        Account.Household_Formal_Greeting__c,
+        Account.Household_Informal_Greeting__c
+    };
+
+    /**
+     * Creates households a person asked for: New Household on BarnCRM Home, a split into a new
+     * household, sample data, and an import of accounts of the Household record type.
+     *
+     * No user is given the Household record type (ADR-0141), so the platform refuses
+     * a user mode insert of one. These inserts therefore run in system mode, and the checks user
+     * mode would have made are made here instead, before anything is saved. The running user
+     * must be able to create and edit accounts, must be able to create every field set on the
+     * records other than the package's bookkeeping fields, and must have edit access to every
+     * existing household in `touchedHouseholdIds` (the households the same change edits, such
+     * as the one a split takes people out of). Otherwise a HouseholdException is thrown and
+     * nothing is created.
+     *
+     * Every record is of the Household record type: one with no record type is given it, and
+     * one of another record type is refused. Answers one save result per record, in order.
+     */
+    public static List<Database.SaveResult> createHouseholdsForUser(
+        List<Account> households,
+        Set<Id> touchedHouseholdIds
+    ) {
+        return createHouseholdsForUser(households, touchedHouseholdIds, householdSaveOptions());
+    }
+
+    /** The same, saved with the caller's options (an import's duplicate rules, all or none). */
+    public static List<Database.SaveResult> createHouseholdsForUser(
+        List<Account> households,
+        Set<Id> touchedHouseholdIds,
+        Database.DMLOptions options
+    ) {
+        if (households == null || households.isEmpty()) {
+            return new List<Database.SaveResult>();
+        }
+        checkCreateAccess(households, touchedHouseholdIds);
+        return insertHouseholds(households, options);
+    }
+
+    /**
+     * True when the running user passes the object checks of createHouseholdsForUser (create
+     * and edit on Account) and the org has the Household record type, so a New Household
+     * button can be offered.
+     */
+    public static Boolean canCreateHouseholds() {
+        Schema.DescribeSObjectResult account = Schema.SObjectType.Account;
+        return account.isCreateable() &&
+            account.isUpdateable() &&
+            HouseholdService.householdRecordTypeId() != null;
+    }
+
+    private static void checkCreateAccess(List<Account> households, Set<Id> touchedHouseholdIds) {
+        Id recordTypeId = HouseholdService.householdRecordTypeId();
+        if (recordTypeId == null) {
+            throw new HouseholdException(Label.Core_Households_ErrorRecordTypeMissing);
+        }
+        Schema.DescribeSObjectResult account = Schema.SObjectType.Account;
+        if (!account.isCreateable() || !account.isUpdateable()) {
+            throw new HouseholdException(Label.Core_Households_ErrorCreateNoAccess);
+        }
+        Map<String, Schema.SObjectField> fields = account.fields.getMap();
+        Set<String> checked = new Set<String>();
+        for (Account household : households) {
+            if (household.RecordTypeId == null) {
+                household.RecordTypeId = recordTypeId;
+            } else if (household.RecordTypeId != recordTypeId) {
+                throw new HouseholdException(Label.Core_Households_ErrorNotAHousehold);
+            }
+            for (String name : household.getPopulatedFieldsAsMap().keySet()) {
+                if (!checked.add(name.toLowerCase())) {
+                    continue;
+                }
+                Schema.SObjectField field = fields.get(name);
+                if (
+                    field != null &&
+                    !BOOKKEEPING_FIELDS.contains(field) &&
+                    !field.getDescribe().isCreateable()
+                ) {
+                    throw new HouseholdException(Label.Core_Households_ErrorCreateNoAccess);
+                }
+            }
+        }
+        Set<Id> touched = touchedHouseholdIds == null
+            ? new Set<Id>()
+            : new Set<Id>(touchedHouseholdIds);
+        touched.remove(null);
+        if (editableCount(touched) != touched.size()) {
+            throw new HouseholdException(Label.Core_Households_ErrorCreateNoHouseholdAccess);
+        }
+    }
+
+    /** How many of these records the running user can edit, asked 200 at a time. */
+    private static Integer editableCount(Set<Id> recordIds) {
+        Integer editable = 0;
+        Set<Id> batch = new Set<Id>();
+        for (Id recordId : recordIds) {
+            batch.add(recordId);
+            if (batch.size() == 200) {
+                editable += HouseholdSelector.getEditableIds(batch).size();
+                batch.clear();
+            }
+        }
+        if (!batch.isEmpty()) {
+            editable += HouseholdSelector.getEditableIds(batch).size();
+        }
+        return editable;
+    }
+
+    private static List<Database.SaveResult> insertHouseholds(
+        List<Account> households,
+        Database.DMLOptions options
+    ) {
         if (refuseCreatesForTest) {
             Integer tooLong = Account.Name.getDescribe().getLength() + 1;
             for (Account household : households) {
@@ -65,7 +192,7 @@ public with sharing class HouseholdWriter {
         }
         List<Database.SaveResult> saves = Database.insert(
             households,
-            householdSaveOptions(),
+            options,
             AccessLevel.SYSTEM_MODE
         );
         logFailures(saves, Label.Core_Households_ErrorContextMembership);

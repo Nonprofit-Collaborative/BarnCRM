@@ -57,6 +57,9 @@ public with sharing class HubController {
         public Boolean seasonalAddressStale;
         @AuraEnabled
         public List<RecurringSource> recurringSources;
+        /** True when this person may create a household, so New household is shown. */
+        @AuraEnabled
+        public Boolean canCreateHousehold;
     }
 
     /** One file that arrives regularly, and when it was last imported (R-IT6). */
@@ -81,8 +84,32 @@ public with sharing class HubController {
         }
     }
 
+    /**
+     * New household: creates an empty household and answers its Id, for the page to open.
+     * Staff are never given the Household record type (ADR-0141), so the standard
+     * New form cannot create one; the household is created by HouseholdWriter, which checks
+     * the person's access to accounts first.
+     */
+    @AuraEnabled
+    public static Id createHousehold() {
+        try {
+            return HouseholdService.createEmptyHousehold();
+        } catch (HouseholdException e) {
+            throw asAuraException(e.getMessage());
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            throw asAuraException(
+                String.format(
+                    System.Label.Core_HubHomeActions_NewHouseholdFailed,
+                    new List<Object>{ e.getMessage() }
+                )
+            );
+        }
+    }
+
     private static HomeModel buildModel() {
         HomeModel model = new HomeModel();
+        model.canCreateHousehold = HouseholdWriter.canCreateHouseholds();
         model.canEdit = BarnCRMPermissions.canManageSettings();
         model.automationPaused = readAutomationPaused();
         model.recurringSources = readRecurringSources();
