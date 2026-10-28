@@ -7416,7 +7416,7 @@ without them.
   Records again in user mode: a record gone or hidden since the dry run is counted as no longer
   matching. Deleting, journaling, Rows Deleted and the undo are as R-BD3 and R-BD5.
 
-**R-BD8 Download these records first.** Before the count is typed, the panel offers a download
+**R-BD8 Download a Backup First.** Before the count is typed, the panel offers a download
 of every record the delete would delete: the query's matches, or a delete by file's Matched
 rows' records. The browser reads them page by page, 200 records a page in Id order after the
 last Id read, each page read in user mode with every field the person may read (describe's

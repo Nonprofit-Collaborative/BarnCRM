@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk Update tab: what the page is for.</shortDescription>
-        <value>Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.</value>
+        <value>A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_PanelIntro</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk update panel: what it does.</shortDescription>
-        <value>Change up to five fields on every record this query returns, with your own access. Nothing changes until you preview and confirm the number of records.</value>
+        <value>Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_Changes</fullName>
@@ -334,7 +334,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: add another change.</shortDescription>
-        <value>Add a change</value>
+        <value>Add a Change</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_Preview</fullName>
@@ -599,5 +599,45 @@
         <protected>false</protected>
         <shortDescription>Step input: the fields of the same record to add.</shortDescription>
         <value>Fields to add</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_PathChanges</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk update path: the step where changes are chosen.</shortDescription>
+        <value>Choose Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_PathPreview</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete path: the step before the preview.</shortDescription>
+        <value>Preview</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_PathConfirm</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk update and delete path: preview shown, count typed.</shortDescription>
+        <value>Confirm</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_PathRun</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk update and delete path: the job running or done.</shortDescription>
+        <value>Run</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_OpenFind</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk Update page button that opens Find, where a bulk update starts.</shortDescription>
+        <value>Open Find</value>
     </labels>
 </CustomLabels>

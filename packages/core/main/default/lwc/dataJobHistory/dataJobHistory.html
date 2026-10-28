@@ -7,7 +7,15 @@
                     <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
                 </template>
                 <template lwc:if={showIntro}>
-                    <p class="slds-var-m-bottom_small" data-id="intro">{introText}</p>
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_small">
+                        <p class="slds-col slds-var-m-right_small" data-id="intro">{introText}</p>
+                        <lightning-button
+                            data-id="open-find"
+                            label={labels.openFind}
+                            icon-name="utility:search"
+                            onclick={handleOpenFind}
+                        ></lightning-button>
+                    </div>
                 </template>
 
                 <template lwc:if={hasError}>

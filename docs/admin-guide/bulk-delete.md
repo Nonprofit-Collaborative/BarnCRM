@@ -57,12 +57,15 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 
 1. Open **Find**. Choose **Contact**, add the column **Name**, and add the condition
    **Description**, **equals**, `Gala sign-up, copy 2`. Press **Run**, and check the results.
-2. Press **Bulk Delete**. The bulk delete panel opens below the results. It uses the query as
-   it is now; changing the query closes the panel.
+2. Open the **Change Records** menu and choose **Bulk Delete**. The bulk delete panel opens
+   right under the buttons, with its steps along the top: **Preview**, **Confirm**, **Run**.
+   It uses the query as it is now; changing the query closes the panel.
 3. Press **Preview**. BarnCRM says how many records match, for example 112, shows the first five
-   by name, and lists what is deleted with each one (for a contact, for example, its
-   household memberships if your org deletes them with the contact).
-4. Optional, and recommended: press **Download these records first**. BarnCRM reads all 112
+   by name, and lists what is deleted with each one, one badge per kind of related record
+   (for a contact, for example, its household memberships if your org deletes them with the
+   contact).
+4. Optional, and recommended: press **Download a Backup First** (the info icon beside it says
+   what the file holds). BarnCRM reads all 112
    records, with every field you can see, and saves them as a CSV file (the same format as
    Find's export). Nothing is deleted. Keep the file: it is your copy if a record is ever needed
    after the Recycle Bin has emptied. Related records deleted with them are not in it.

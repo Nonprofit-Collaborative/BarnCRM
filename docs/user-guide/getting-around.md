@@ -142,9 +142,9 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 | Card | Opens |
 |---|---|
 | **Find and Export Records** | The **Find** tab |
-| **Update Many Records** | **Find**: run a query, then press **Bulk Update** (no file needed) |
+| **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
 | **Org Optimizer** | The **Org Optimizer** tab |
-| **Delete Many Records** (last) | **Find**: run a query, then press **Bulk Delete** (no file needed) |
+| **Delete Many Records** (last) | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 
 Deleted records go to the Recycle Bin, not away for good: choosing **Open** on **Delete Many
 Records** first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to

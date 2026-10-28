@@ -46,7 +46,7 @@ page, even if that puts it out of reading order.
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 14 | Import wizard, templates, row rules, matching (including match sources), undo |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
-| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 9 | Bulk update, bulk delete, edit in Find, undo |
+| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 10 | Bulk update, bulk delete, edit in Find, undo, the bulk path |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
 | [Duplicates](duplicates.md) | DUP | 10 | Duplicate scan, review and merge, match sources |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
