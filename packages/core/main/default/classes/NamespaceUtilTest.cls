@@ -208,6 +208,33 @@ private class NamespaceUtilTest {
         );
     }
 
+    /**
+     * The describe is filtered by the running user's licences (ADR-0130), so a test that runs as
+     * someone else reads it afresh, and every class that asks gets the same map.
+     */
+    @IsTest
+    static void anotherRunningUserReadsTheDescribeAfresh() {
+        User someoneElse = TestUsers.standardUser('Describe');
+        NamespaceUtil.orgDescribe = null;
+
+        Map<String, Schema.SObjectType> mine = NamespaceUtil.globalDescribe();
+        Assert.isTrue(mine === NamespaceUtil.globalDescribe(), 'Kept for the transaction');
+        Map<String, Schema.SObjectType> theirs;
+        System.runAs(someoneElse) {
+            theirs = NamespaceUtil.globalDescribe();
+        }
+        Map<String, Schema.SObjectType> mineAgain = NamespaceUtil.globalDescribe();
+
+        Assert.isTrue(mine.containsKey('contact'), 'The org describe');
+        Assert.isFalse(theirs === mine, 'Another running user reads it afresh');
+        Assert.isTrue(theirs.containsKey('contact'), 'Their describe');
+        Assert.isFalse(mineAgain === theirs, 'Back as the first user, read afresh again');
+        Assert.isTrue(
+            mineAgain === NamespaceUtil.globalDescribe(),
+            'And kept again while the user stays the same'
+        );
+    }
+
     @IsTest
     static void aClassIsFoundByNameAndAMissingOneIsNull() {
         NamespaceUtil.cachedPrefix = null;

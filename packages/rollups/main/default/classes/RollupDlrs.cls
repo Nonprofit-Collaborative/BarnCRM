@@ -272,7 +272,7 @@ public with sharing class RollupDlrs {
         String source
     ) {
         List<Definition> found = new List<Definition>();
-        Schema.SObjectType type = Schema.getGlobalDescribe().get(prefix + localName);
+        Schema.SObjectType type = NamespaceUtil.globalDescribe().get(prefix + localName);
         if (type == null) {
             return found;
         }

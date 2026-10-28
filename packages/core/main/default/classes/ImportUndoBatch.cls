@@ -612,7 +612,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         if (!fieldMaps.containsKey(key)) {
             fieldMaps.put(
                 key,
-                Schema.getGlobalDescribe()
+                NamespaceUtil.globalDescribe()
                     .get(objectName)
                     .getDescribe(SObjectDescribeOptions.DEFERRED)
                     .fields.getMap()

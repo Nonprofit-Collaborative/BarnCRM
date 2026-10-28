@@ -45,7 +45,7 @@ public with sharing class FieldUtilizationService {
     /** Every object the person may count, by the rule Find offers objects by (R-FU1). */
     public static List<Schema.DescribeSObjectResult> offeredObjects() {
         List<Schema.DescribeSObjectResult> offered = new List<Schema.DescribeSObjectResult>();
-        for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
+        for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             );

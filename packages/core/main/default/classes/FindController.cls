@@ -93,7 +93,7 @@ public with sharing class FindController {
         try {
             requirePermission();
             Map<String, Option> byLabel = new Map<String, Option>();
-            for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
+            for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
                 Schema.DescribeSObjectResult objectDescribe = type.getDescribe(
                     SObjectDescribeOptions.DEFERRED
                 );

@@ -111,7 +111,7 @@ public with sharing class OpportunityMirrorContext {
 
     private static void resolveTypes() {
         if (!typesResolved) {
-            Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
+            Map<String, Schema.SObjectType> globals = NamespaceUtil.globalDescribe();
             resolvedOpportunity = globals.get(OPPORTUNITY_OBJECT);
             resolvedRole = globals.get(ROLE_OBJECT);
             typesResolved = true;

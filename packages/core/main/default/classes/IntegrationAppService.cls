@@ -128,7 +128,7 @@ public with sharing class IntegrationAppService {
             return objectNamesOverride;
         }
         if (objectNames == null) {
-            objectNames = Schema.getGlobalDescribe().keySet();
+            objectNames = NamespaceUtil.globalDescribe().keySet();
         }
         return objectNames;
     }

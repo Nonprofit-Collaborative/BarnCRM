@@ -567,7 +567,7 @@ public with sharing class HouseholdSelector {
     private static Boolean objectDescribed(String objectName) {
         return describedObjectNamesOverride != null
             ? describedObjectNamesOverride.contains(objectName)
-            : Schema.getGlobalDescribe().containsKey(objectName);
+            : NamespaceUtil.globalDescribe().containsKey(objectName);
     }
 
     /**

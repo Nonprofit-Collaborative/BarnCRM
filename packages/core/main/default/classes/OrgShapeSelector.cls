@@ -126,7 +126,7 @@ public with sharing class OrgShapeSelector {
         if (nativeHouseholdGroupCountOverride != null) {
             return true;
         }
-        return Schema.getGlobalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
+        return NamespaceUtil.globalDescribe().containsKey(NATIVE_HOUSEHOLD_GROUP);
     }
 
     private static Integer probeNativeHouseholdGroups(Boolean anyIsEnough) {
@@ -139,7 +139,7 @@ public with sharing class OrgShapeSelector {
             }
             Schema.SObjectType groupType = nativeHouseholdGroupTypeOverride != null
                 ? nativeHouseholdGroupTypeOverride
-                : Schema.getGlobalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
+                : NamespaceUtil.globalDescribe().get(NATIVE_HOUSEHOLD_GROUP);
             if (groupType == null) {
                 // Not in this org: a known none, not an unknown (ADR-0130).
                 return 0;

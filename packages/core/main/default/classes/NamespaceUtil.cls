@@ -87,12 +87,24 @@ public with sharing class NamespaceUtil {
     @TestVisible
     private static Map<String, Schema.SObjectType> orgDescribe;
 
-    private static Map<String, Schema.SObjectType> globalDescribe() {
+    /** The user `orgDescribe` was read as (a test's `System.runAs` changes it). */
+    private static Id orgDescribeUserId;
+
+    /**
+     * The org's global describe, the same map `Schema.getGlobalDescribe()` returns, read once per
+     * transaction and running user: the describe is filtered by the running user's licences
+     * (ADR-0130), so a test's `System.runAs` reads it afresh. Every class asks here rather than
+     * calling `Schema.getGlobalDescribe()` itself. Callers read the map and never change it.
+     */
+    @NamespaceAccessible
+    public static Map<String, Schema.SObjectType> globalDescribe() {
         if (describeOverride != null) {
             return describeOverride;
         }
-        if (orgDescribe == null) {
+        Id runningUserId = UserInfo.getUserId();
+        if (orgDescribe == null || orgDescribeUserId != runningUserId) {
             orgDescribe = Schema.getGlobalDescribe();
+            orgDescribeUserId = runningUserId;
         }
         return orgDescribe;
     }
