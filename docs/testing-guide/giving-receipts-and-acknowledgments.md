@@ -1,4 +1,4 @@
-# Giving: receipts and acknowledgments
+# Giving: Receipts and Acknowledgments
 
 Scripts for gift receipts, year-end statements, the receipt lock, receipt letters, thank-you acknowledgments, donor levels and stewardship plans. Setup detail: [Receipts and year-end statements](../admin-guide/receipts.md), [Acknowledgments](../admin-guide/acknowledgments.md), [Donor levels](../admin-guide/donor-levels.md), [Stewardship plans](../admin-guide/stewardship-plans.md), [Email addresses](../admin-guide/emails.md).
 
@@ -8,10 +8,10 @@ For every script on this page:
 
 - Open gifts from the **Fundraising** app, so they open on the packaged **Gift Record Page** with its **Receipts** panel. Outside that app, assign the page as the org default for Gift first ([Receipts](../admin-guide/receipts.md), step 2).
 - In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
-- "Enter a gift" means: in the **Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment method** to **Check** and **Fund** to **General Fund**, then select **Save**. A **Gift saved** toast names the new gift number.
+- "Enter a gift" means: in the **Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**. A **Gift saved** toast names the new gift number.
 - **Rosa Hall** and **Susan Ortiz** have no gifts in the sample data, so their totals start empty.
 
-## T-RCPT-01: Set receipt numbering and check the shipped letters
+## T-RCPT-01: Set Receipt Numbering and Check the Shipped Letters
 
 **Purpose:** Confirm the Receipts settings save and both shipped letters exist.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)). No receipt issued yet in this org.
@@ -26,7 +26,7 @@ For every script on this page:
 
 **Cleanup:** None. Later scripts use the `TEST` prefix.
 
-## T-RCPT-02: Issue a receipt for a gift
+## T-RCPT-02: Issue a Receipt for a Gift
 
 **Purpose:** Confirm a staff user can issue a numbered PDF receipt from the gift.
 **Prerequisites:** staff. T-RCPT-01 done.
@@ -34,16 +34,16 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Enter a gift from **Rosa Hall** for 125. Open the gift. | The **Receipts** panel reads "No receipt has been issued for this gift yet." and shows **Issue receipt**. |
-| 2 | Select **Issue receipt**. | Toast **Receipt issued**: "Receipt TEST-<this year>-000001 has been issued. Click View PDF beside it to open the file." |
-| 3 | Read the panel row. | **Number** TEST-<this year>-000001, **Status** Issued, **Amount** 125.00, **Issued** today, and a **View PDF** link. **Issue receipt** is gone; a **Why is this receipt being voided?** box and **Void and reissue** button show instead. |
+| 1 | Enter a gift from **Rosa Hall** for 125. Open the gift. | The **Receipts** panel reads "No receipt has been issued for this gift yet." and shows **Issue Receipt**. |
+| 2 | Select **Issue Receipt**. | Toast **Receipt issued**: "Receipt TEST-<this year>-000001 has been issued. Click View PDF beside it to open the file." |
+| 3 | Read the panel row. | **Number** TEST-<this year>-000001, **Status** Issued, **Amount** 125.00, **Issued** today, and a **View PDF** link. **Issue Receipt** is gone; a **Why is this receipt being voided?** box and **Void and Reissue** button show instead. |
 | 4 | Refresh the page and read **Receipt Number** on the gift. | It holds the same number. |
 | 5 | Select **View PDF**. | The file preview opens. The PDF shows the organization's name and address at the top, the amount 125.00, the gift date, the tax ID, and the sentence "No goods or services were provided in exchange for this contribution." |
-| 6 | Enter a gift from **Rosa Hall** for 40 with **Status** Pending. Open it and select **Issue receipt**. | Refused: "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first." No receipt number is added. Set **Status** to Received and select **Issue receipt**: it is issued. |
+| 6 | Enter a gift from **Rosa Hall** for 40 with **Status** Pending. Open it and select **Issue Receipt**. | Refused: "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first." No receipt number is added. Set **Status** to Received and select **Issue Receipt**: it is issued. |
 
 **Cleanup:** None. T-RCPT-03 and T-RCPT-04 use the 125 gift.
 
-## T-RCPT-03: The receipt lock refuses changes to a receipted gift
+## T-RCPT-03: The Receipt Lock Refuses Changes to a Receipted Gift
 
 **Purpose:** Confirm amount, date and donor cannot change once a gift carries a receipt number.
 **Prerequisites:** staff, then admin for step 5. The receipted gift from T-RCPT-02.
@@ -58,7 +58,7 @@ For every script on this page:
 
 **Cleanup:** None.
 
-## T-RCPT-04: Void and reissue a receipt
+## T-RCPT-04: Void and Reissue a Receipt
 
 **Purpose:** Confirm a void needs a reason, keeps the original, and issues the next number.
 **Prerequisites:** staff, then admin for steps 5 to 6. The receipted gift from T-RCPT-02.
@@ -66,9 +66,9 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the gift, leave **Why is this receipt being voided?** empty and select **Void and reissue**. | Toast **Reason needed**: "Say why this receipt is being voided. A void needs a reason and a date." Nothing changes in the panel. |
-| 2 | Type `Amount was entered wrongly` and select **Void and reissue**. | Toast **Receipt reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
-| 3 | Read the panel. | Two rows: 000001 with **Status** Void and **Void reason** "Amount was entered wrongly"; 000002 with **Status** Issued. Each row has **View PDF**. |
+| 1 | On the gift, leave **Why is this receipt being voided?** empty and select **Void and Reissue**. | Toast **Reason needed**: "Say why this receipt is being voided. A void needs a reason and a date." Nothing changes in the panel. |
+| 2 | Type `Amount was entered wrongly` and select **Void and Reissue**. | Toast **Receipt reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
+| 3 | Read the panel. | Two rows: 000001 with **Status** Void and **Void Reason** "Amount was entered wrongly"; 000002 with **Status** Issued. Each row has **View PDF**. |
 | 4 | Open **View PDF** on each row. | Both files open; the first is the original PDF, unchanged. |
 | 5 | As admin, open the **Receipts** tab in the Fundraising app and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
 | 6 | On 000002 select **Edit**, change **Issue Date** to yesterday, select **Save**. | The save is refused: "A receipt cannot be changed once it exists. Void it and issue a new one instead." |
@@ -76,7 +76,7 @@ For every script on this page:
 
 **Cleanup:** None.
 
-## T-RCPT-05: Generate year-end statements
+## T-RCPT-05: Generate Year-End Statements
 
 **Purpose:** Confirm a statement run issues one consolidated statement per donor and skips donors on a rerun.
 **Prerequisites:** admin. T-RCPT-01 done (statement year is last year). Sample data loaded at least a few weeks ago, or in a month after January, so last year holds gifts.
@@ -92,7 +92,7 @@ For every script on this page:
 
 **Cleanup:** None. Statements cannot be deleted.
 
-## T-RCPT-06: Edit a receipt letter, and only an admin may
+## T-RCPT-06: Edit a Receipt Letter, and Only an Admin May
 
 **Purpose:** Confirm the letter editor saves and previews for admins and is read only for others.
 **Prerequisites:** admin for steps 1 to 4; staff and read-only for step 5.
@@ -107,14 +107,14 @@ For every script on this page:
 
 **Cleanup:** Step 4 restores the wording.
 
-## T-RCPT-07: Who can issue and who can open receipt files
+## T-RCPT-07: Who Can Issue and Who Can Open Receipt Files
 
 **Purpose:** Confirm read-only users cannot issue, and users without a Giving permission set cannot open receipt files.
 **Prerequisites:** read-only, admin and staff. The gift from T-RCPT-02 (with two receipts).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open the gift. | The **Receipts** panel lists both receipts with **View PDF**, and shows no **Issue receipt**, no void reason box and no **Void and reissue**. |
+| 1 | As read-only, open the gift. | The **Receipts** panel lists both receipts with **View PDF**, and shows no **Issue Receipt**, no void reason box and no **Void and Reissue**. |
 | 2 | Select **View PDF** on 000002. | The PDF opens: Giving Read Only may read receipts. |
 | 3 | As admin, open receipt 000002 from **Receipts** and copy its browser address. Open **Rosa Hall**'s household and look at its **Files**. | The receipt PDF is not in the household's files. |
 | 4 | As admin, in Setup, **Users**, open the staff user, **Permission Set Assignments**, and remove **Giving Staff**. | The staff user now holds BarnCRM Staff only. |
@@ -123,7 +123,7 @@ For every script on this page:
 
 **Cleanup:** Give the staff user **Giving Staff** again.
 
-## T-RCPT-08: Acknowledgment rules and an emailed thank you
+## T-RCPT-08: Acknowledgment Rules and an Emailed Thank You
 
 **Purpose:** Confirm rules queue a gift, an email send records the thank you, and it goes to the preferred email.
 **Prerequisites:** admin for steps 1 to 4, staff for steps 5 to 8. Setup, **Deliverability**, **Access level** set to **All email**. A scratch org sends only a few emails a day, so the rules below match only the test amounts.
@@ -137,12 +137,12 @@ For every script on this page:
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
 | 5 | As staff, enter a gift from **Susan Ortiz** for 7777. Open the gift. | **Acknowledgment Status** is **To acknowledge**. |
 | 6 | Open the **Acknowledgments** page (**Acknowledgment Queue** tab in the Fundraising app). | **Emails ready to send** is at least 1. |
-| 7 | Select **Send emails now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent Runs** with **Sent** 1 and **Did not go** 0. |
+| 7 | Select **Send emails now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent Runs** with **Sent** 1 and **Did Not Go** 0. |
 | 8 | Open the gift again, then the newest row in its **Acknowledgments** list. | The gift's **Acknowledgment Status** is **Acknowledged** with today's **Acknowledgment Date**. The acknowledgment has **Status** Sent, **Recipient Email** `susan.work@example.org`. |
 
 **Cleanup:** On the rules list, **Edit** `Test email` and clear **Active**. Leave the gift (T-RCPT-10 uses Susan Ortiz).
 
-## T-RCPT-09: Letter thank yous, no double thanks, and who may send
+## T-RCPT-09: Letter Thank Yous, No Double Thanks, and Who May Send
 
 **Purpose:** Confirm the letter file and Mark as sent, that a sent gift is never queued again, and the permission split.
 **Prerequisites:** admin for step 1; staff for steps 2 to 6; read-only for step 7. T-RCPT-08 done.
@@ -159,7 +159,7 @@ For every script on this page:
 
 **Cleanup:** As admin, **Edit** `Test letter` and clear **Active**.
 
-## T-RCPT-10: Donor levels place a donor and follow a refund down
+## T-RCPT-10: Donor Levels Place a Donor and Follow a Refund Down
 
 **Purpose:** Confirm the ladder assigns levels from total giving and moves a donor down after a refund.
 **Prerequisites:** admin. **Susan Ortiz** holds only the 7777 gift from T-RCPT-08 (or enter it now).
@@ -177,18 +177,18 @@ For every script on this page:
 
 **Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Donor levels** off. Clear **Active** on the three test levels.
 
-## T-RCPT-11: A stewardship plan lays out tasks on a first gift
+## T-RCPT-11: A Stewardship Plan Lays Out Tasks on a First Gift
 
 **Purpose:** Confirm a First gift plan creates its tasks once, and the save checks on plans and steps.
 **Prerequisites:** admin. A donor with no gifts (for example **Valentina Singh**).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New plan**: **Plan name** `First gift welcome`, **What starts it** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
-| 2 | Change **What starts it** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running now** 0. |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
+| 2 | Change **What Starts It** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running Now** 0. |
 | 3 | Select the plan, then **Add step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
 | 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move up** and **Move down** reorder them. |
-| 5 | Select **Turn on** in the plan's row. | **On** reads On. |
+| 5 | Select **Turn On** in the plan's row. | **On** reads On. |
 | 6 | Enter a gift from **Valentina Singh** for 50. | **Gift saved**. |
 | 7 | Open **Stewardship Plans** in the Fundraising app, list view **Running Plans**. Open the new plan. | **Plan Template** `First gift welcome`, **Status** Running, **Started Date** today, **Contact** Valentina Singh. Its activity shows two open tasks due tomorrow and in 7 days, assigned to the contact's owner. |
 | 8 | Enter a second gift from Valentina Singh for 50. Reopen **Running Plans**. | Still one plan for her: the same plan does not start twice while running. |
@@ -197,26 +197,26 @@ For every script on this page:
 | 11 | As the admin, open the running plan, select **Edit**, set **Status** to **Complete** and leave **Completed Date** empty. **Save**. | Saved, with no error. **Completed Date** is today. |
 | 12 | Edit the plan again and set **Status** back to **Running**. **Save**. | Saved. **Completed Date** is empty. |
 
-**Cleanup:** Set the plan's **Status** to Cancelled (its tasks stay). Select **Turn off** on `First gift welcome`.
+**Cleanup:** Set the plan's **Status** to Cancelled (its tasks stay). Select **Turn Off** on `First gift welcome`.
 
-## T-RCPT-12: Start a stewardship plan by hand
+## T-RCPT-12: Start a Stewardship Plan by Hand
 
 **Purpose:** Confirm staff can start a plan on a person or organization, the same plan does not start twice, and a read-only user cannot start one.
 **Prerequisites:** admin for step 1; staff for steps 2 to 6; read-only for step 7.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New plan**: `After a meeting`, **What starts it** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn on**. | The plan is listed with **On** On. |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
 | 2 | As staff, open **Harper Garcia** in the Fundraising app and select **Start Stewardship Plan**. | The **Start a Stewardship Plan** window lists the plans that are on, including `After a meeting`. |
-| 3 | Select **Start plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
-| 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
+| 3 | Select **Start Plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
+| 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start Plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
 | 5 | Refresh Harper Garcia. | Her **Stewardship Plans** list shows the plan, **Status** Running. Start the same plan again: toast says it is already running for her. |
 | 6 | Open **The Summit Foundation** and start `After a meeting` there. | Started; the organization's **Stewardship Plans** list shows it. |
-| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start plan** button. |
+| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start Plan** button. |
 
-**Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn off** on `After a meeting`.
+**Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn Off** on `After a meeting`.
 
-## T-RCPT-13: List views for acknowledgments, rules, plans and templates
+## T-RCPT-13: List Views for Acknowledgments, Rules, Plans and Templates
 
 **Purpose:** the acknowledgment and stewardship objects open with All, status and (where it applies) My views.
 **Prerequisites:** staff user.

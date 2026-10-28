@@ -4,7 +4,7 @@ Scripts for jobs, shifts, sign-ups, hours approval, skills and Volunteers access
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Volunteers deployed and sample data loaded unless a script says otherwise. Volunteers is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave **Hours require approval** and **Attendance creates hours** on (the defaults) unless a script says otherwise.
 
-## T-VOL-01: Open the Volunteers app
+## T-VOL-01: Open the Volunteers App
 
 **Purpose:** confirm the app, its tabs and its list views load for an admin.
 **Prerequisites:** admin user (see [Test users](before-you-test.md#test-users)); sample data loaded.
@@ -15,13 +15,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
-| 3a | Open **Volunteer Sign-ups**, list view **All Sign-ups**. | The sample sign-ups are listed with their shift, person and status. |
+| 3a | Open **Volunteer Sign-ups**, list view **All Sign-Ups**. | The sample sign-ups are listed with their shift, person and status. |
 | 4 | Open **Volunteer Hours**, list view **Awaiting Approval**. | Four sample entries with Status **Submitted** are listed. |
 | 5 | Open **Skills**, list view **All Skills**. | **First aid**, **Spanish**, **Forklift** and **Gardening** are listed, each **Active**. |
 
 **Cleanup:** None.
 
-## T-VOL-02: Create a job and a shift
+## T-VOL-02: Create a Job and a Shift
 
 **Purpose:** confirm staff can set up a job and a dated shift, and a shift that ends before it starts is refused.
 **Prerequisites:** staff user.
@@ -35,7 +35,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** keep "Test sorting" and "Test shift" for T-VOL-03 to T-VOL-07.
 
-## T-VOL-03: Sign people up and cancel a sign-up
+## T-VOL-03: Sign People Up and Cancel a Sign-Up
 
 **Purpose:** confirm the Sign-ups panel adds people, refuses a second sign-up for the same person, and frees a slot on cancel.
 **Prerequisites:** staff user; "Test shift" from T-VOL-02.
@@ -43,7 +43,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open "Test shift". | The **Sign-ups** card shows **Volunteers needed** 2, **Slots filled** 0, **Slots remaining** 2 and "Nobody is signed up for this shift yet." |
+| 1 | Open "Test shift". | The **Sign-Ups** card shows **Volunteers needed** 2, **Slots filled** 0, **Slots remaining** 2 and "Nobody is signed up for this shift yet." |
 | 2 | Click **Add sign-up**. | A form shows a **Person** picker, a **Status** box set to **Signed up**, and **Save** and **Cancel**. **Save** is disabled until a person is chosen. |
 | 3 | Choose a sample person from **The Garcia Family** and click **Save**. | "Sign-up added." shows under the figures and as a toast. **Slots filled** is 1, **Slots remaining** 1. The table **Sign-ups for Test shift** lists the person with Status **Signed up** and **Attended** and **No show** buttons. |
 | 4 | Click **Add sign-up**, choose the same person again and click **Save**. | Refused: "This person is already signed up for Test shift. Change the sign-up that is there instead of adding another." **Slots filled** stays 1. |
@@ -54,7 +54,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** keep both sign-ups for T-VOL-04.
 
-## T-VOL-04: Mark attendance and get hours
+## T-VOL-04: Mark Attendance and Get Hours
 
 **Purpose:** confirm marking a sign-up Attended writes one Submitted hours entry for the shift's length.
 **Prerequisites:** staff user; "Test shift" (9:00 AM to 12:00 PM) with two sign-ups from T-VOL-03.
@@ -68,7 +68,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** keep the 3-hour entry for T-VOL-06.
 
-## T-VOL-05: Enter hours by hand, bad input refused
+## T-VOL-05: Enter Hours by Hand, Bad Input Refused
 
 **Purpose:** confirm hand-entered hours start Submitted and the validation rules refuse bad entries.
 **Prerequisites:** staff user; job "Test sorting".
@@ -83,7 +83,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** keep the 2-hour entry for T-VOL-06.
 
-## T-VOL-06: Approve, reject and reopen hours
+## T-VOL-06: Approve, Reject and Reopen Hours
 
 **Purpose:** confirm the Approve Hours tab filters, approves, rejects with a required reason, and reopens.
 **Prerequisites:** admin user; the Submitted entries from T-VOL-04 and T-VOL-05.
@@ -91,19 +91,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Approve Hours**. | The card **Approve volunteer hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked** and **Hours**. **Approve** and **Reject** are disabled. |
+| 1 | Open **Approve Hours**. | The card **Approve Volunteer Hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked** and **Hours**. **Approve** and **Reject** are disabled. |
 | 2 | Set **From** to today and **To** to yesterday. | The field says "From must be on or before To." and the list does not change. |
 | 3 | Clear both dates. In **Job**, choose "Test sorting". | Only the two "Test sorting" entries are listed. |
 | 4 | Tick the 3-hour entry and click **Approve**. | "Entries approved: 1." shows under the buttons and as a toast. The entry leaves the list. |
 | 5 | Tick the 2-hour entry and click **Reject**. Leave **Reason for rejecting** empty and click **Reject selected**. | Nothing is rejected; the field says "Say why these hours are rejected, so the person who entered them knows what to fix." |
 | 6 | Type "Wrong date" and click **Reject selected**. | "Entries rejected: 1." The list says "No hours match these filters." |
-| 7 | Set **Show** to **Rejected**. | The 2-hour entry is listed with **Rejection reason** "Wrong date". Only **Reopen** shows. |
+| 7 | Set **Show** to **Rejected**. | The 2-hour entry is listed with **Rejection Reason** "Wrong date". Only **Reopen** shows. |
 | 8 | Tick it and click **Reopen**. | "Entries reopened: 1." It is back under **Submitted**. |
 | 9 | Open the job "Test sorting". | **Total Hours** is 3 (only the Approved entry counts). |
 
 **Cleanup:** keep the Approved 3-hour entry for T-VOL-07.
 
-## T-VOL-07: Approved hours are locked
+## T-VOL-07: Approved Hours Are Locked
 
 **Purpose:** confirm an Approved entry cannot be edited or deleted until reopened, and its status moves only through Approve Hours.
 **Prerequisites:** admin user; the Approved 3-hour entry from T-VOL-06.
@@ -119,7 +119,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** reopen and delete the hours entries, delete the sign-ups, "Test shift" and "Test sorting" (or leave them for T-VOL-11).
 
-## T-VOL-08: Hours without approval
+## T-VOL-08: Hours Without Approval
 
 **Purpose:** confirm turning **Hours require approval** off makes new hours Approved at once, and back on restores Submitted.
 **Prerequisites:** admin user.
@@ -133,7 +133,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** reopen the Approved entry on **Approve Hours**, then delete both entries. Confirm **Hours require approval** is on.
 
-## T-VOL-09: Skills, and retiring a skill
+## T-VOL-09: Skills, and Retiring a Skill
 
 **Purpose:** confirm skills are given to people and jobs, a retired skill cannot be given, and a held skill cannot be deleted.
 **Prerequisites:** admin user.
@@ -150,7 +150,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** delete both volunteer skills, then delete "Test driving" (it deletes once nobody holds it).
 
-## T-VOL-10: Coordinator role gives approval
+## T-VOL-10: Coordinator Role Gives Approval
 
 **Purpose:** confirm a Team Member cannot approve hours, and giving the Coordinator role gives Volunteers Coordinator with approval.
 **Prerequisites:** staff user and admin user; at least one Submitted entry the staff user did not enter (sample data has four).
@@ -159,14 +159,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | As staff, open **BarnCRM Volunteers**. | No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates** tab. |
 | 2 | Open **Volunteer Hours**, list view **All Hours**. | Only entries the staff user entered show; the sample entries do not. |
-| 3 | As admin, open **BarnCRM Settings**, **Access**. Find the staff user in **Find a person**, choose **Coordinator** and click **Give access**, then confirm. | The staff user shows on the Coordinator card, still also on Team Member. |
+| 3 | As admin, open **BarnCRM Settings**, **Access**. Find the staff user in **Find a person**, choose **Coordinator** and click **Give Access**, then confirm. | The staff user shows on the Coordinator card, still also on Team Member. |
 | 4 | Wait a minute. In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
 | 5 | As staff, reload the app and open **Approve Hours**. | The tab shows with **Approve** and **Reject**; the four sample Submitted entries are listed. |
 | 6 | Tick one and click **Approve**. | "Entries approved: 1." |
 
 **Cleanup:** as staff, reopen that entry. As admin, click **Remove** for the staff user on the Coordinator card, then remove **Volunteers Coordinator** in Setup (the module never takes a set away).
 
-## T-VOL-11: Read-only user sees and changes nothing
+## T-VOL-11: Read-Only User Sees and Changes Nothing
 
 **Purpose:** confirm Volunteers Read Only shows jobs, shifts and sign-ups with no way to change them, and no hours.
 **Prerequisites:** read-only user; sample data loaded.
@@ -175,13 +175,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | Open **BarnCRM Volunteers**. | Tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Hours** and **Skills** show. No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates**. |
 | 2 | Open **Volunteer Jobs**. | Jobs list; no **New** button. Opening a job shows no **Edit**. |
-| 3 | Open an upcoming **Front desk** shift. | The **Sign-ups** card shows the figures and the people with their status as plain text. No **Add sign-up**, no status boxes, no **Attendance** column. |
+| 3 | Open an upcoming **Front desk** shift. | The **Sign-Ups** card shows the figures and the people with their status as plain text. No **Add sign-up**, no status boxes, no **Attendance** column. |
 | 4 | Open **Volunteer Hours**, list view **All Hours**. | No entries are listed (hours are private, and this user entered none). |
 | 5 | Open **Skills**. | Skills list; no **New** button. |
 
 **Cleanup:** None.
 
-## T-VOL-12: A job in use cannot be deleted
+## T-VOL-12: A Job in Use Cannot Be Deleted
 
 **Purpose:** confirm a job with shifts or hours is refused on delete and can be deactivated instead.
 **Prerequisites:** admin user; sample data loaded.
@@ -194,7 +194,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** None (step 3 restores the job).
 
-## T-VOL-13: Inactive list views for jobs, skills and letter templates
+## T-VOL-13: Inactive List Views for Jobs, Skills and Letter Templates
 
 **Purpose:** jobs, skills and letter templates open with All, Active and Inactive views.
 **Prerequisites:** volunteer coordinator or admin, sample data loaded.

@@ -27,7 +27,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 Cy,Dupe,cy.dupe@example.org,Active
 ```
 
-## T-IMP-01: Preview and import a contact list
+## T-IMP-01: Preview and Import a Contact List
 
 **Purpose:** confirm the main path: choose a template, upload, check columns, preview, import and read the results.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); `import-test-1.csv`.
@@ -35,36 +35,36 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a spreadsheet**, step heading **Choose what kind of file this is**. A **Recent imports** list shows below the wizard. |
+| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a Spreadsheet**, step heading **Choose what kind of file this is**. A **Recent Imports** list shows below the wizard. |
 | 2 | In **Choose what kind of file this is**, choose **Generic contact list**. | Its description appears under the picker ("A list of people with their contact details..."). **Next** is enabled. |
 | 3 | Select **Next**. | Heading **Upload the file**, with an **Upload file** control. |
-| 4 | Upload `import-test-1.csv`. | Heading **Check the columns**. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in your file**, **What it means** and **First values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
+| 4 | Upload `import-test-1.csv`. | Heading **Check the Columns**. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
 | 5 | Select **Next**. | Heading **Choose how rows are matched**. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
-| 6 | Select **Preview**. | Heading **Preview**. Counts: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows that were rejected** lists row 5 (Dee) with a reason naming the missing last name ("Required value missing: last name..."). |
+| 6 | Select **Preview**. | Heading **Preview**. Counts: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 5 (Dee) with a reason naming the missing last name ("Required value missing: last name..."). |
 | 7 | Search the org for "Testa Rivera". | No record found: the preview wrote nothing. |
-| 8 | Back on the Import tab, select **Import these rows**. | "Working through the file. This page updates as it goes." shows, then heading **Results** with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What happened**. |
+| 8 | Back on the Import tab, select **Import These Rows**. | "Working through the file. This page updates as it goes." shows, then heading **Results** with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
 | 9 | Open the new contact Testa Rivera from global search, then open their household. | The household exists and its **Created By Import Batch** field links to this import. |
 | 10 | Open Harper Garcia. | Unchanged: the matched row created nothing and cleared nothing (empty cells never clear a person's fields). |
-| 11 | Back on the Import tab, select **Download results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 1 to 3 read Created, row 4 Matched, row 5 Rejected with its reason. |
+| 11 | Back on the Import tab, select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 1 to 3 read Created, row 4 Matched, row 5 Rejected with its reason. |
 
 **Cleanup:** keep the import for T-IMP-02 and T-IMP-03; T-IMP-03 undoes it.
 
-## T-IMP-02: Download rejected rows and retry the fixed rows
+## T-IMP-02: Download Rejected Rows and Retry the Fixed Rows
 
 **Purpose:** confirm a rejected row can be fixed and loaded into the same import.
 **Prerequisites:** admin; the finished import from T-IMP-01, still on its **Results** step (or reopen it from the same browser session).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Results** step, select **Download rejected rows**. | A CSV downloads with one data row (Dee), with the file's columns plus Row and Reason. |
-| 2 | In the downloaded file, delete the **Email** column, save it as `retry-bad.csv`. Under **Retry fixed rows**, upload it as **File of fixed rows**. | Refused with "The fixed rows file is missing these columns of the original file: Email". Nothing is previewed. |
-| 3 | Open the downloaded file again, type `Nolast` into Dee's Last Name cell, save it as `retry-good.csv`, and upload it under **Retry fixed rows**. | A preview of that one row: **Would create** 1, **Would be rejected** 0. |
-| 4 | Select **Import these rows**. | Results for the retry: **Created** 1. The import's rejected count is now 0. |
+| 1 | On the **Results** step, select **Download Rejected Rows**. | A CSV downloads with one data row (Dee), with the file's columns plus Row and Reason. |
+| 2 | In the downloaded file, delete the **Email** column, save it as `retry-bad.csv`. Under **Retry Fixed Rows**, upload it as **File of fixed rows**. | Refused with "The fixed rows file is missing these columns of the original file: Email". Nothing is previewed. |
+| 3 | Open the downloaded file again, type `Nolast` into Dee's Last Name cell, save it as `retry-good.csv`, and upload it under **Retry Fixed Rows**. | A preview of that one row: **Would create** 1, **Would be rejected** 0. |
+| 4 | Select **Import These Rows**. | Results for the retry: **Created** 1. The import's rejected count is now 0. |
 | 5 | Search the org for "Dee Nolast". | The contact exists, in a household of its own. |
 
 **Cleanup:** none; T-IMP-03 undoes both runs together.
 
-## T-IMP-03: Undo an import
+## T-IMP-03: Undo an Import
 
 **Purpose:** confirm undo removes what an import created, keeps what it only matched, and asks before acting.
 **Prerequisites:** admin; the import from T-IMP-01 and T-IMP-02, not yet undone. The counts below assume both ran (T-IMP-02 adds Dee Nolast). If you ran only T-IMP-01, read **People to remove** 3, **Households to remove** 3, and "6 records deleted" in step 8, and skip Dee Nolast in step 6.
@@ -72,10 +72,10 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and an **Undo** button. |
-| 2 | Select **Undo** beside it. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo this import**. Nothing has changed yet. |
+| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent Imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and an **Undo** button. |
+| 2 | Select **Undo** beside it. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo This Import**. Nothing has changed yet. |
 | 3 | Select **Cancel**. | The box closes. The import is unchanged and **Undo** is still offered. |
-| 4 | Select **Undo** again, then **Undo this import**. | "The undo has started. The import shows Undone when it has finished; refresh the page to check." |
+| 4 | Select **Undo** again, then **Undo This Import**. | "The undo has started. The import shows Undone when it has finished; refresh the page to check." |
 | 5 | Wait a minute and select **Refresh**. | The import row reads **Undone**. **Undo** is no longer offered. |
 | 6 | Search the org for Testa Rivera, Ben Okoro, Cara Lind and Dee Nolast. | None is found. Their households are gone too (they are in the Recycle Bin). |
 | 7 | Open Harper Garcia. | Still there, in **The Garcia Family**: undo never deletes a record the import only matched. |
@@ -83,7 +83,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 **Cleanup:** none.
 
-## T-IMP-04: Undo keeps a record somebody edited
+## T-IMP-04: Undo Keeps a Record Somebody Edited
 
 **Purpose:** confirm undo does not delete a created record that was edited after the import.
 **Prerequisites:** admin; `import-test-1.csv`.
@@ -92,14 +92,14 @@ Cy,Dupe,cy.dupe@example.org,Active
 |---|---|---|
 | 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1. |
 | 2 | Open the contact Ben Okoro, edit **Title** to `Edited after import`, and save. | Saved. |
-| 3 | Open the Import tab. Select **Undo** beside the import, then **Undo this import**. | The undo starts. |
+| 3 | Open the Import tab. Select **Undo** beside the import, then **Undo This Import**. | The undo starts. |
 | 4 | Select **Refresh** until the import reads **Undone**. | **Undone**. |
 | 5 | Search for Testa Rivera, Cara Lind and Ben Okoro. | Testa Rivera and Cara Lind are gone. Ben Okoro is still there, with his household. |
 | 6 | Read the Data Job's **Run Log**. | The undo line counts records kept (more than 0), and the import journal lists Ben Okoro as kept with "Kept: somebody changed this record, or logged an activity on it, after the import." |
 
 **Cleanup:** delete Ben Okoro and his household by hand.
 
-## T-IMP-05: Control totals and a file BarnCRM cannot read
+## T-IMP-05: Control Totals and a File BarnCRM Cannot Read
 
 **Purpose:** confirm a control total that does not match blocks the import, and an unreadable file is refused.
 **Prerequisites:** admin; `import-test-1.csv`; a plain text file renamed to `broken.xlsx`.
@@ -107,29 +107,29 @@ Cy,Dupe,cy.dupe@example.org,Active
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab, choose **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
-| 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with **Control totals (optional)** and **Rows in the file**. |
-| 3 | Type `6` in **Rows in the file** and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import these rows** is disabled. |
-| 4 | Select **Back** to the matching step, change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import these rows** is enabled. |
+| 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with **Control Totals (Optional)** and **Rows in the file**. |
+| 3 | Type `6` in **Rows in the file** and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import These Rows** is disabled. |
+| 4 | Select **Back** to the matching step, change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import These Rows** is enabled. |
 
-**Cleanup:** none (nothing was imported). Select **Import another file** or leave the page.
+**Cleanup:** none (nothing was imported). Select **Import Another File** or leave the page.
 
-## T-IMP-06: Try the first rows, then the rest
+## T-IMP-06: Try the First Rows, Then the Rest
 
 **Purpose:** confirm a trial import saves only the first rows and the rest join the same import with one undo.
 **Prerequisites:** admin; `import-test-1.csv`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Run `import-test-1.csv` through **Generic contact list** to the **Preview** step. | The four preview counts as in T-IMP-01, and a **Try the first rows** section with **Rows to try** (25 by default). |
-| 2 | Set **Rows to try** to `2` and select **Import the first rows**. | "The first 2 rows were imported. Check them above, then import the remaining 3 rows into the same import. If they are wrong, undo the import from Recent imports instead." |
+| 1 | Run `import-test-1.csv` through **Generic contact list** to the **Preview** step. | The four preview counts as in T-IMP-01, and a **Try the First Rows** section with **Rows to try** (25 by default). |
+| 2 | Set **Rows to try** to `2` and select **Import the First Rows**. | "The first 2 rows were imported. Check them above, then import the remaining 3 rows into the same import. If they are wrong, undo the import from Recent imports instead." |
 | 3 | Search for Testa Rivera and Cara Lind. | Testa Rivera exists (row 1); Cara Lind (row 3) does not yet. |
-| 4 | Select **Import the remaining rows**. | Results for the whole file: **Created** 3, **Matched, nothing changed** 1, **Rejected** 1. |
-| 5 | Open **Recent imports**. | One import for the file, not two. |
-| 6 | Select **Undo**, then **Undo this import**, and **Refresh** until **Undone**. | **People to remove** was 3. Testa Rivera, Ben Okoro and Cara Lind are all gone. |
+| 4 | Select **Import the Remaining Rows**. | Results for the whole file: **Created** 3, **Matched, nothing changed** 1, **Rejected** 1. |
+| 5 | Open **Recent Imports**. | One import for the file, not two. |
+| 6 | Select **Undo**, then **Undo This Import**, and **Refresh** until **Undone**. | **People to remove** was 3. Testa Rivera, Ben Okoro and Cara Lind are all gone. |
 
 **Cleanup:** none.
 
-## T-IMP-07: Row rules and value changes
+## T-IMP-07: Row Rules and Value Changes
 
 **Purpose:** confirm Skip rows, One row per and Change values work and are shown in the preview.
 **Prerequisites:** admin; `import-test-2.csv`.
@@ -137,17 +137,17 @@ Cy,Dupe,cy.dupe@example.org,Active
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab, choose **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
-| 2 | Beside **Email**, select **Change values**. Select **Add a change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The first values, before and after**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
+| 2 | Beside **Email**, select **Change Values**. Select **Add a change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The First Values, Before and After**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
 | 3 | Select **Done**. Beside **Last Name**, add **Capitalize each word** the same way and select **Done**. | The buttons now read **Change values (1)**. |
-| 4 | Under **Rows to load**, **Skip rows where**, select **Add a rule**: **Column** Status, **Test** **equals**, **Text** `cancelled`. | The rule is listed. |
+| 4 | Under **Rows to Load**, **Skip Rows Where**, select **Add a rule**: **Column** Status, **Test** **equals**, **Text** `cancelled`. | The rule is listed. |
 | 5 | Under **One row per**, choose **Email**. | Email is chosen. |
 | 6 | Select **Next**, then **Preview**. | **Would create** 2, **Would be rejected** 0. The run log says "2 rows were skipped by Skip rows or One row per. They are listed with the file's rows, not as rejected." |
-| 7 | Read **Changed values (first rows)**. | Row 1 shows `ANA.RT@EXAMPLE.ORG` before and `ana.rt@example.org` after, and `RAMIREZ-TEST` before and `Ramirez-Test` after. |
-| 8 | Select **Import these rows**, then undo the import from **Recent imports**. | **Created** 2. After the undo, Ana Ramirez-Test and Cy Dupe are gone. |
+| 7 | Read **Changed Values (First Rows)**. | Row 1 shows `ANA.RT@EXAMPLE.ORG` before and `ana.rt@example.org` after, and `RAMIREZ-TEST` before and `Ramirez-Test` after. |
+| 8 | Select **Import These Rows**, then undo the import from **Recent Imports**. | **Created** 2. After the undo, Ana Ramirez-Test and Cy Dupe are gone. |
 
 **Cleanup:** the changes and rules are saved with the **Generic contact list** template. Upload `import-test-2.csv` with it again, remove both changes and the skip and one-row-per rules, and select **Preview**; then leave the page without importing.
 
-## T-IMP-08: Matching choices
+## T-IMP-08: Matching Choices
 
 **Purpose:** confirm Match only refuses new people, and the duplicate-rule option explains itself.
 **Prerequisites:** admin; `import-test-1.csv`.
@@ -162,7 +162,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 **Cleanup:** none (nothing was imported).
 
-## T-IMP-09: Matching through match sources
+## T-IMP-09: Matching Through Match Sources
 
 **Purpose:** confirm a person known only by a related address record is matched when first and last names agree, and not matched when either differs (a relative at the same address is never loaded into the person).
 **Prerequisites:** admin; the shipped match source **Address (person)** active (**Duplicate Matching** tab, **Matching Logic**, see [Matching Logic](../admin-guide/duplicates.md#matching-logic)). Setup data: create a contact **Mara Stone** with no email and no mailing address, then on the **Addresses** tab create an address with **Person** Mara Stone, **Street** `77 Match Lane`, **City** Springfield, **Postal Code** `62702`.
@@ -181,15 +181,15 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | 1 | Open the Import tab, choose **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
 | 2 | Leave **Also match with my duplicate rules** unticked and select **Preview**. | **Would create** 3: by email alone, nobody matches any row. |
 | 3 | Select **Back**, tick **Also match with my duplicate rules**, and select **Preview**. | **Would create** 2, **Would update** 1. Row 1 (Mara Stone) matches the existing Mara Stone through her address record, because the first and last names agree. Row 2 (Lee Brook, same address, different last name) and row 3 (Jana Stone, same address and last name, different first name) are not matched and would be created. |
-| 4 | Select **Import these rows**. | **Created** 2, **Updated** 1. |
+| 4 | Select **Import These Rows**. | **Created** 2, **Updated** 1. |
 | 5 | Open the existing Mara Stone. | **Email** is now `mara.stone.new@example.org`; **First Name** is still Mara. There is still only one Mara Stone. |
 | 6 | Open the import's Data Job record and its **Import Row** for row 1. | **Matched By Duplicate Rule** is ticked. On the rows for Lee Brook and Jana Stone it is not. |
 | 7 | Search for Lee Brook and Jana Stone. | Each is a new contact, not loaded into Mara Stone. |
-| 8 | Undo the import from **Recent imports** (**Undo**, **Undo this import**, **Refresh** until **Undone**). | **Changed values to put back** was 1. Lee Brook and Jana Stone are gone; Mara Stone remains, with no email. |
+| 8 | Undo the import from **Recent Imports** (**Undo**, **Undo This Import**, **Refresh** until **Undone**). | **Changed values to put back** was 1. Lee Brook and Jana Stone are gone; Mara Stone remains, with no email. |
 
 **Cleanup:** delete Mara Stone, her household and her address record.
 
-## T-IMP-10: Load one object, update by record ID, and undo
+## T-IMP-10: Load One Object, Update by Record ID, and Undo
 
 **Purpose:** confirm a one-object template can be created, updates a record, appears in the template list, and its undo puts the value back.
 **Prerequisites:** admin; the sample organization **Bayview Hardware**. Note its **Phone** value and copy its record ID from the address bar.
@@ -197,15 +197,15 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Save a CSV `org-phone.csv` with the heading `Id,Phone` and one row: the record ID, then `555-0199`. | Saved. |
-| 2 | Open the Import tab. Under **Load one object**, select **Load one object**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
+| 2 | Open the Import tab. Under **Load One Object**, select **Load One Object**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
 | 3 | Choose **Account** as **Object**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Choose what kind of file this is**. |
 | 4 | Select **Next** and upload `org-phone.csv`. | The columns step. If **Id** is not already **Salesforce record ID**, choose it; **Phone** maps to the Phone field. Each column has an **Empty cells clear the field (update and upsert)** box. |
 | 5 | Select **Next**. | **What each row does** offers update choices only, for example **Update by record ID** and **Update by a field you choose**; **Create new records** is not offered for accounts. |
 | 6 | Choose **Update by record ID** and select **Preview**. | **Would update** 1, **Would be rejected** 0. |
-| 7 | Select **Import these rows**. Open Bayview Hardware. | **Phone** reads `555-0199`. |
+| 7 | Select **Import These Rows**. Open Bayview Hardware. | **Phone** reads `555-0199`. |
 | 8 | Open the **Data Manager** tab. | **Import Templates** lists **Test org phone update**. **Data Jobs** lists the import first. |
 | 9 | In **Data Jobs**, select **Undo** beside the import. | The box shows **Changed values to put back** 1 and 0 people, households and organizations to remove. |
-| 10 | Select **Undo this import**, then **Refresh** until the job reads **Undone**. Open Bayview Hardware. | **Phone** is back to the value you noted. |
+| 10 | Select **Undo This Import**, then **Refresh** until the job reads **Undone**. Open Bayview Hardware. | **Phone** is back to the value you noted. |
 
 **Cleanup:** none (the test template may stay; it changes nothing on its own).
 

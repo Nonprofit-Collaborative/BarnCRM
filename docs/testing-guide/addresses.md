@@ -6,7 +6,7 @@ A script that changes a household's billing address, or adds a new primary at a 
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. The **Addresses** feature must be on (BarnCRM Settings, **General**). The Garcia Family's sample address is 6830 Sunset Ln, Springfield, IL 62756.
 
-## T-ADDR-01: Addresses card and adding a seasonal address
+## T-ADDR-01: Addresses Card and Adding a Seasonal Address
 
 **Purpose:** the card shows the primary address and adds a new one.
 **Prerequisites:** staff user.
@@ -15,8 +15,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **The Garcia Family**. | The **Addresses** card shows one **Home** address, 6830 Sunset Ln, Springfield IL 62756, with a **Primary** badge and no **Set as Primary** button. |
-| 2 | Select **Add address** on the card. | A **New address** form opens with a **Primary** tick box (unticked), Type, Street, City, State, Postal Code, Country and the four seasonal boxes. |
-| 3 | Enter Type **Seasonal**, Street `4120 East Camelback Road`, City `Phoenix`, State `AZ`, Postal Code `85018`, Country `United States`, Seasonal Start Month `1`, Start Day `1`, End Month `3`, End Day `31`. Select **Add address** in the form. | Toast **Address saved.** A second card reads **Used from January 1 to March 31**, with a **Set as Primary** button and no badge. |
+| 2 | Select **Add Address** on the card. | A **New Address** form opens with a **Primary** tick box (unticked), Type, Street, City, State, Postal Code, Country and the four seasonal boxes. |
+| 3 | Enter Type **Seasonal**, Street `4120 East Camelback Road`, City `Phoenix`, State `AZ`, Postal Code `85018`, Country `United States`, Seasonal Start Month `1`, Start Day `1`, End Month `3`, End Day `31`. Select **Add Address** in the form. | Toast **Address saved.** A second card reads **Used from January 1 to March 31**, with a **Set as Primary** button and no badge. |
 | 4 | Open the **Addresses** tab. | Both Garcia addresses are listed. |
 
 **Cleanup:** keep the Phoenix address for T-ADDR-02 to T-ADDR-07.
@@ -35,14 +35,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-ADDR-03: Bad input is refused
+## T-ADDR-03: Bad Input Is Refused
 
 **Purpose:** address validation messages appear and nothing is saved.
 **Prerequisites:** admin, The Garcia Family.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **Add address** with Type **Seasonal** and Street `1 Test St`, no seasonal dates. Submit with **Add address** in the form. | Refused: **A seasonal address needs a start month, a start day, an end month, and an end day so we know when to use it.** |
+| 1 | **Add Address** with Type **Seasonal** and Street `1 Test St`, no seasonal dates. Submit with **Add Address** in the form. | Refused: **A seasonal address needs a start month, a start day, an end month, and an end day so we know when to use it.** |
 | 2 | Set Start Month `4`, Start Day `31`, End Month `5`, End Day `1`. Submit again. | Refused: **A seasonal day is a day its month has: 1 to 31, or 1 to 30 in April, June, September and November, or 1 to 29 in February.** |
 | 3 | Set Start Month `13`, Start Day `1`. Submit again. | Refused: **A seasonal month is a number from 1 (January) to 12 (December).** |
 | 4 | Set Start Month `11`, Start Day `1`, End Month `3`, End Day `31`. Submit again. | Saved, shown as **Used from November 1 to March 31** (one range across New Year). |
@@ -51,7 +51,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the November to March address.
 
-## T-ADDR-04: A person's address edit moves the household
+## T-ADDR-04: A Person's Address Edit Moves the Household
 
 **Purpose:** with the default setting, editing a member's mailing address moves everyone and keeps history.
 **Prerequisites:** admin, setting **Everyone in the household moves together**. Mailing Address is in the person page's **Reaching This Person** section.
@@ -65,7 +65,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the 12 New Test Rd address.
 
-## T-ADDR-05: A person's address edit gives a personal address
+## T-ADDR-05: A Person's Address Edit Gives a Personal Address
 
 **Purpose:** with **Only that person moves**, the edit stays with one person.
 **Prerequisites:** admin.
@@ -80,7 +80,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Diego's personal address and set his Mailing Street back to 6830 Sunset Ln.
 
-## T-ADDR-06: Turn on Seasonal Addresses and run the seasonal swap
+## T-ADDR-06: Turn on Seasonal Addresses and Run the Seasonal Swap
 
 **Purpose:** turning on Seasonal Addresses schedules the nightly swap with no other step, and the swap runs and swaps a seasonal address in.
 **Prerequisites:** admin, T-ADDR-01 done, **Seasonal Addresses** not ticked and the swap not scheduled.
@@ -88,18 +88,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the swap now** and no **Schedule nightly run** or **Stop nightly run** button. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the swap now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
 | 2 | Tick **Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
 | 2a | Untick **Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
 | 4 | Select **Run the swap now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
-| 5 | Wait a minute and refresh. | **Seasonal addresses last swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
+| 5 | Wait a minute and refresh. | **Seasonal Addresses Last Swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
 | 6 | Open The Garcia Family. | **Primary** is on Phoenix; Billing Address reads Phoenix; the Home address record has **Replaced By Seasonal** ticked. |
-| 7 | Open **Home**. | The **Seasonal addresses last swapped** tile shows the same time and sentence. |
+| 7 | Open **Home**. | The **Seasonal Addresses Last Swapped** tile shows the same time and sentence. |
 
 **Cleanup:** keep **Seasonal Addresses** on for T-ADDR-07.
 
-## T-ADDR-07: The season ends and the address moves back
+## T-ADDR-07: The Season Ends and the Address Moves Back
 
 **Purpose:** the swap puts the replaced address back when a season ends.
 **Prerequisites:** admin, T-ADDR-06 done.
@@ -127,7 +127,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Ada Testaddr, the household and its addresses.
 
-## T-ADDR-09: Read-only user
+## T-ADDR-09: Read-Only User
 
 **Purpose:** a read-only user sees addresses and the swap status but changes nothing.
 **Prerequisites:** read-only user.
@@ -136,25 +136,25 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
 | 2 | Look at a non-primary address. | It shows no **Set as Primary** button. The **Primary** badge still shows on the primary one. |
-| 3 | Look at the card header. | There is no **Add address** button. |
+| 3 | Look at the card header. | There is no **Add Address** button. |
 | 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Seasonal Addresses** and **Run the swap now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
 
-## T-ADDR-10: State and country codes with State and Country Picklists on
+## T-ADDR-10: State and Country Codes with State and Country Picklists On
 
 **Purpose:** an address typed with codes reaches the standard address fields in an org with State and Country Picklists.
 **Prerequisites:** staff user, in an org where Setup, **State and Country/Territory Picklists** are turned on. The Garcia Family with Harper Garcia as a member.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Garcia Family, select **Add address**. Enter Type **Home**, Street `55 Lake Street`, City `Chicago`, State `IL`, Postal Code `60601`, Country `US`. Select **Add address** in the form, then **Set as Primary** on the new card. | Toast **This is now the primary address, and it has been copied to the standard address fields.** |
+| 1 | On The Garcia Family, select **Add Address**. Enter Type **Home**, Street `55 Lake Street`, City `Chicago`, State `IL`, Postal Code `60601`, Country `US`. Select **Add Address** in the form, then **Set as Primary** on the new card. | Toast **This is now the primary address, and it has been copied to the standard address fields.** |
 | 2 | Look at the household's **Details**. | Billing Address reads Chicago, Illinois 60601, United States. |
 | 3 | Open Harper Garcia. | Her mailing address reads Chicago, Illinois, United States. |
 
 **Cleanup:** set the previous address as the primary again and delete the Chicago address.
 
-## T-ADDR-11: Editing a household's billing address moves the household
+## T-ADDR-11: Editing a Household's Billing Address Moves the Household
 
 **Purpose:** a billing address typed on the household after it was created becomes its primary address and reaches its members.
 **Prerequisites:** staff user, The Garcia Family on its Sunset Ln Home address.
@@ -169,14 +169,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete the 27 Billing Test Ave address.
 
-## T-ADDR-12: A person with an address of their own stays put when the household moves
+## T-ADDR-12: A Person with an Address of Their Own Stays Put When the Household Moves
 
 **Purpose:** a household's address change, by any route, leaves a member who has their own primary address where they are, and still moves everyone else.
 **Prerequisites:** admin, T-ADDR-01 done (the Phoenix seasonal address exists).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | It is his first address, so it carries **Primary**. His mailing street reads 9 Dorm Test Hall. |
+| 1 | On Diego Garcia, select **Add Address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add Address** in the form. | It is his first address, so it carries **Primary**. His mailing street reads 9 Dorm Test Hall. |
 | 2 | On The Garcia Family, **Set as Primary** on the Phoenix card. | Harper and Luis read Phoenix. Diego still reads **9 Dorm Test Hall**. |
 | 3 | **Set as Primary** on the Sunset Ln card. | Harper and Luis read Sunset Ln. Diego still reads 9 Dorm Test Hall. |
 | 4 | On the household's **Details**, change Billing Street to `27 Billing Test Ave` and save. | Harper and Luis read 27 Billing Test Ave. Diego still reads 9 Dorm Test Hall. |
@@ -207,7 +207,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Diego Garcia, select **Add address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add address** in the form. | His card carries **Primary** and a **Use for Whole Household** button. A seasonal address of his own would show no such button. |
+| 1 | On Diego Garcia, select **Add Address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add Address** in the form. | His card carries **Primary** and a **Use for Whole Household** button. A seasonal address of his own would show no such button. |
 | 2 | Select **Use for Whole Household**. | A confirmation opens: **Make This the Household's Primary Address?**, with **Cancel** and **Use for Whole Household**. With one household there is no **Which household?** choice. |
 | 3 | Select **Cancel**. | The confirmation closes; nothing changed. |
 | 4 | Select **Use for Whole Household** again, then **Use for Whole Household** in the confirmation. | Toast **The household now uses this address.** |
@@ -243,8 +243,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **The Garcia Family** and select **Add address**. | The form has a **Primary** tick box. |
-| 2 | Enter Type **Home**, Street `55 Move Test Rd`, City `Tucson`, tick **Primary**, and select **Add address** in the form. | 55 Move Test Rd is at the top with **Primary** and **Since** today's date. Billing Address reads 55 Move Test Rd. |
+| 1 | Open **The Garcia Family** and select **Add Address**. | The form has a **Primary** tick box. |
+| 2 | Enter Type **Home**, Street `55 Move Test Rd`, City `Tucson`, tick **Primary**, and select **Add Address** in the form. | 55 Move Test Rd is at the top with **Primary** and **Since** today's date. Billing Address reads 55 Move Test Rd. |
 | 3 | Look below the addresses in use. | A closed group **Former Addresses (1)**. The Sunset Ln card is not shown. |
 | 4 | Select **Former Addresses (1)**. | The group opens and shows the Sunset Ln card, reading **Until** today's date (it has no start date: it was on file before statuses existed, or was added without one). Select the heading again: the group closes. |
 | 5 | Open the Sunset Ln address record (Addresses related list). | **Status** is **Former** and **End Date** is today, in the **History** section. |
@@ -262,7 +262,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | On The Garcia Family, open the status menu (the arrow) on the Sunset Ln card. | **Mark as Undeliverable** only: the primary cannot be marked Former. |
 | 2 | Choose **Mark as Undeliverable**. | Toast **The address status is saved.** The card has an **Undeliverable** badge and a red line: **Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.** |
-| 3 | As the admin, open **Org Optimizer**, **Data quality**. | **Primary Addresses Marked Undeliverable** shows **1** or more. |
+| 3 | As the admin, open **Org Optimizer**, **Data Quality**. | **Primary Addresses Marked Undeliverable** shows **1** or more. |
 | 4 | Select **Open in Find** on that check. | Find opens the saved query **Data hygiene: Primary Addresses Marked Undeliverable**, already run, and the Garcia Sunset Ln address is listed. |
 | 5 | Back on the household, open the status menu on the Phoenix card and choose **Mark as Former**. | Phoenix moves into **Former Addresses**, reading **Until** today's date. |
 | 6 | Open **Former Addresses** and choose **Mark as Current** on Phoenix. | Phoenix is back with the addresses in use, with no dates shown. |
@@ -292,7 +292,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | In the **Address Card** box, **Address Card Fields** is a list of tick boxes (the address fields, including **Address Number** and **Verification Status**), none ticked, with no "Default, not yet saved." note and no **Keep this setting** button. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | In the **Address Card** box, **Address Card Fields** is a list of tick boxes (the address fields, including **Address Number** and **Verification Status**), none ticked, with no "Default, not yet saved." note and no **Keep This Setting** button. |
 | 2 | Open The Garcia Family. | The cards show only type, street, city, country, dates and badges. |
 | 3 | In **Address Card Fields** tick **Verification Status** and **Address Number** and choose **Save**. | **Your settings are saved.** |
 | 4 | Open The Garcia Family again (refresh the page). | Every address card shows **Verification Status** and **Address Number** with their values. |

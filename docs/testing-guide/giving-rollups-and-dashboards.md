@@ -1,4 +1,4 @@
-# Giving: rollups and dashboards
+# Giving: Rollups and Dashboards
 
 Scripts for the giving totals on donors, funds and appeals, the Giving Overview dashboard and the retention reports. Setup detail: [Rollups](../admin-guide/rollups.md), [Giving dashboard](../admin-guide/giving-dashboard.md), [Retention reports](../admin-guide/retention-reports.md).
 
@@ -7,11 +7,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 For every script on this page:
 
 - In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
-- "Enter a gift" means: in the **Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment method** to **Check** and **Fund** to **General Fund**, then select **Save**.
+- "Enter a gift" means: in the **Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**.
 - Totals are recalculated a few seconds after a save. Refresh the record page before reading a total.
 - Sample data: **The Garcia Family** holds three gifts from Harper Garcia (250, 55 and 80, all Received). **Sofia Ali** and her household have no gifts. **Charlotte Williams** gave once (1,450) and all of it was refunded.
 
-## T-GRD-01: Recalculate every giving total
+## T-GRD-01: Recalculate Every Giving Total
 
 **Purpose:** Confirm the shipped giving totals are listed and Recalculate all fills them in.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
@@ -21,13 +21,13 @@ For every script on this page:
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Rollups**. On the **Rollups** row select **Open Rollup Builder**. | The Rollup Builder opens with one row per total, including **Household total giving**, **Account total giving**, **Contact total giving**, **Fund total raised** and **Appeal total raised**. Each shipped giving row shows mode **Both (recommended)** and is active. |
 | 2 | Select **Recalculate all**. | A box reads "About N records, roughly M minutes." with **Cancel**, **Start now** and **Run tonight**. |
-| 3 | Select **Start now**. | "Recalculation started. This page updates as it finishes." When it finishes, **Rollups last completed** shows a time a moment ago. |
+| 3 | Select **Start now**. | "Recalculation started. This page updates as it finishes." When it finishes, **Rollups Last Completed** shows a time a moment ago. |
 | 4 | Open **The Garcia Family**. Read the Giving section. | **Total Giving** 385.00, **Gift Count** 3, **Largest Gift** 250.00. **First Gift Date** and **Last Gift Date** are filled in. **Rollups Last Calculated** is recent. |
 | 5 | Open **Harper Garcia**. | The same **Total Giving** 385.00 and **Gift Count** 3. |
 
 **Cleanup:** None.
 
-## T-GRD-02: A gift moves the donor's totals on save
+## T-GRD-02: A Gift Moves the Donor's Totals on Save
 
 **Purpose:** Confirm donor totals update shortly after a gift is saved, with no recalculation.
 **Prerequisites:** staff. T-GRD-01 done.
@@ -43,7 +43,7 @@ For every script on this page:
 
 **Cleanup:** None. T-GRD-03 uses these gifts.
 
-## T-GRD-03: Refunds, pending gifts and soft credits in the totals
+## T-GRD-03: Refunds, Pending Gifts and Soft Credits in the Totals
 
 **Purpose:** Confirm a refund leaves the total but keeps the count, and pending gifts and soft credits stay out of total giving.
 **Prerequisites:** staff. T-GRD-02 done.
@@ -58,7 +58,7 @@ For every script on this page:
 
 **Cleanup:** Edit the Pending gift and set **Status** to Cancelled.
 
-## T-GRD-04: Fund and appeal totals
+## T-GRD-04: Fund and Appeal Totals
 
 **Purpose:** Confirm a gift and its refund move a fund's and an appeal's totals.
 **Prerequisites:** staff.
@@ -73,7 +73,7 @@ For every script on this page:
 
 **Cleanup:** None.
 
-## T-GRD-05: Giving Overview dashboard
+## T-GRD-05: Giving Overview Dashboard
 
 **Purpose:** Confirm the packaged dashboard opens with its six components and counts a new gift.
 **Prerequisites:** admin.
@@ -90,7 +90,7 @@ For every script on this page:
 
 **Cleanup:** None.
 
-## T-GRD-06: Dashboard and reports as staff and read-only
+## T-GRD-06: Dashboard and Reports as Staff and Read-Only
 
 **Purpose:** Confirm the dashboard runs as the viewer and the shared folder is read only.
 **Prerequisites:** staff, read-only, then admin and staff for steps 5 to 6.
@@ -106,7 +106,7 @@ For every script on this page:
 
 **Cleanup:** Give the staff user **Giving Staff** again.
 
-## T-GRD-07: Retention reports
+## T-GRD-07: Retention Reports
 
 **Purpose:** Confirm the four retention reports run, count donors, and treat a refund correctly.
 **Prerequisites:** admin. T-GRD-01 done. The reports and the donor totals both follow the org's fiscal year in Setup, shown read only as **Fiscal year start month** in **BarnCRM Settings**, **General**.

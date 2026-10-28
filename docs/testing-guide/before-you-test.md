@@ -1,10 +1,10 @@
-# Before you test
+# Before You Test
 
 Set up a test org once, then run the scripts in this guide against it. Everything here uses the
 scripts in `scripts/org/`; for how they work, see
 [Scratch orgs](../contributor-guide/scratch-orgs.md).
 
-## Create a test org
+## Create a Test Org
 
 You need the Salesforce CLI (`sf`), a Dev Hub connected to it, and a clean checkout of `main`
 (see [Environment](../contributor-guide/environment.md)). Run every command from the
@@ -33,7 +33,7 @@ data and never gets every module. Follow
 [Core-only real-org sandbox](#core-only-real-org-sandbox) below instead of the scratch org
 steps.
 
-## Core-only real-org sandbox
+## Core-Only Real-Org Sandbox
 
 For testing Core in a sandbox copy of a real nonprofit org (for example `mwdbdevsb`): Core
 only, people stored as regular Contacts and Accounts (no Person Accounts), no sample data, and
@@ -42,7 +42,7 @@ Do these in order.
 
 1. **Deploy Core only.** `scripts/org/deploy-packages.sh <alias> --core-only`. Never run it
    without `--core-only`, and never run `create-scratch-org.sh`, `seed-sample-data.sh` or script
-   T-SA-08. Skip the "Deploy the modules", "Load sample data" and "Test users" steps below.
+   T-SA-08. Skip the "Deploy the modules", "Load Sample Data" and "Test users" steps below.
    Core alone runs on Contacts and Accounts.
 2. **Work in the BarnCRM apps.** The BarnCRM Contact and Account record pages apply only in the
    four BarnCRM apps (App Launcher, **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** or
@@ -55,7 +55,7 @@ Do these in order.
    the org's own layouts elsewhere and the full list in the BarnCRM list views.
 3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open
    **BarnCRM Settings**, **Access**, find yourself in **Find a person**, choose **BarnCRM
-   Admin Group** and select **Give access** (see [Access](../admin-guide/access.md)). That role
+   Admin Group** and select **Give Access** (see [Access](../admin-guide/access.md)). That role
    already carries Find and Export and Bulk Update. Add these under **Extra Permissions** only
    while a script needs them, and remove them afterwards:
 
@@ -84,7 +84,7 @@ Do these in order.
    | Contact | **Harper Zztest**, email `harper.zztest1@example.org`, no account (this makes the household **The Zztest Family**) |
    | Contact | **Luis Zztest**, added with **Add member** on The Zztest Family's **Members** panel; then edit the contact and set email `luis.zztest2@example.org` |
    | Contact | **Diego Zztest**, added with **Add member** the same way |
-   | Address | On The Zztest Family, **Add address** on the **Addresses** card: Type **Home**, `6830 Sunset Ln`, Springfield, IL, 62756, United States |
+   | Address | On The Zztest Family, **Add Address** on the **Addresses** card: Type **Home**, `6830 Sunset Ln`, Springfield, IL, 62756, United States |
 
    The household then reads **3** members. **Wherever a
    script says Garcia, read Zztest**: The Garcia Family is The Zztest Family,
@@ -111,7 +111,7 @@ Do these in order.
    extra permission you gave and put back any setting you changed. If a record that is not
    yours changed, record it in the issue and refresh the sandbox.
 
-## Deploy the modules
+## Deploy the Modules
 
 `create-scratch-org.sh` deploys Core only. To deploy every module (Rollup Builder, Giving,
 Volunteers, Mirror) on top:
@@ -130,7 +130,7 @@ To test Core alone (the Standard Edition with nothing else installed), skip this
 separate org. In a real-org sandbox, never run it: follow
 [Core-only real-org sandbox](#core-only-real-org-sandbox).
 
-## Load sample data
+## Load Sample Data
 
 Scratch orgs only. Never in a real-org sandbox: use the fixture in
 [Core-only real-org sandbox](#core-only-real-org-sandbox).
@@ -151,7 +151,7 @@ Then, with Giving installed, open **BarnCRM Settings**, **Rollups**, and select
 Sample data detail and the names in it (for example **The Garcia Family** and the **Staff
 Household**): [Sample data](../admin-guide/sample-data.md).
 
-## Test users
+## Test Users
 
 Run each script as the user its **Prerequisites** line names. Your login user is the
 **admin**. Create the other two once per org.
@@ -183,7 +183,7 @@ Steps:
    ```
 
 2. Give the roles in the app, which also tests the Access page: open **BarnCRM Settings**,
-   **Access**, find each user in **Find a person**, choose the role, and select **Give access**.
+   **Access**, find each user in **Find a person**, choose the role, and select **Give Access**.
    Add the Giving set under the extra permissions on the same page. The Volunteers and Rollup
    Builder sets are not listed there: they follow the role, given automatically when the role
    is given on this page (and by the nightly access check). See
@@ -221,7 +221,7 @@ duplicates), use one of these:
   Sets not listed there (BarnCRM Access Manager and the tab sets) are removed in Setup, Users,
   your user, **Permission Set Assignments**, and added back the same way.
 
-## Edition modes
+## Edition Modes
 
 BarnCRM has two editions: the **Standard Edition** (Core, no nonprofit modules offered) and the
 **Nonprofit Edition** (Core plus Giving and the other nonprofit modules). The edition is chosen
@@ -231,9 +231,9 @@ installs or removes anything. See [Editions](../admin-guide/editions.md).
 - Most scripts assume the **Nonprofit Edition**. Choose it the first time you open the app
   (script T-SA-01 in [Setup Assistant](setup-assistant.md)).
 - Scripts that check what the Standard Edition hides say so in their prerequisites. Switch with
-  **BarnCRM Settings**, **General**, **Edition**, **Change edition**, and switch back afterwards.
+  **BarnCRM Settings**, **General**, **Edition**, **Change Edition**, and switch back afterwards.
 
-## Record results
+## Record Results
 
 Copy this table into a file or spreadsheet per test run. One row per script.
 
@@ -254,14 +254,14 @@ Build: main at <short sha>    Org: <alias>, shape <shape>    Tester: <name>    D
 
 Get the short sha with `git rev-parse --short HEAD` on the checkout you deployed.
 
-## Report a failure
+## Report a Failure
 
 Report bugs and give feedback through GitHub: open
 <https://github.com/Nonprofit-Collaborative/BarnCRM/issues/new/choose> and choose the **Bug
 report** template (or the feature request template for feedback). [SUPPORT.md](../../SUPPORT.md)
 says what to include. Fill the bug report in like this:
 
-- **What happened**: the actual result, word for word where there is a message. Add a
+- **What Happened**: the actual result, word for word where there is a message. Add a
   screenshot.
 - **What you expected**: the expected result from the script.
 - **Steps to reproduce**: the script ID and failing step number (for example "T-GIFT-04, step
