@@ -516,6 +516,27 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('shows Save and Discard Changes to an editor everywhere but on Integrations', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [...model(true).sections, { name: 'Integrations', settings: [] }]
+    });
+    const element = build();
+    await settle();
+
+    const labels = () =>
+      Array.from(element.shadowRoot.querySelectorAll('lightning-button')).map((b) => b.label);
+    expect(labels()).toEqual(
+      expect.arrayContaining(['c.Core_Settings_SaveButton', 'c.Core_Settings_DiscardButton'])
+    );
+
+    openSection('Integrations');
+    await settle();
+
+    expect(labels()).not.toContain('c.Core_Settings_SaveButton');
+    expect(labels()).not.toContain('c.Core_Settings_DiscardButton');
+  });
+
   it('opens the section a search result points at', async () => {
     const element = build();
     await settle();

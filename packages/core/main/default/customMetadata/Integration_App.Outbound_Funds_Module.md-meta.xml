@@ -27,10 +27,6 @@
     <value xsi:type="xsd:string">https://github.com/SalesforceFoundation/OutboundFundsModule</value>
   </values>
   <values>
-    <field>Install_Url__c</field>
-    <value xsi:nil="true" />
-  </values>
-  <values>
     <field>Detection_Objects__c</field>
     <value xsi:type="xsd:string">outfunds.Funding_Request__c</value>
   </values>

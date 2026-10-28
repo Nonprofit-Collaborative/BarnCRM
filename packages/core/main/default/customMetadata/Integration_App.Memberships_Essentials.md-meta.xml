@@ -27,10 +27,6 @@
     <value xsi:type="xsd:string">https://github.com/SFDO-Community-Sprints/Membership-Essentials-App</value>
   </values>
   <values>
-    <field>Install_Url__c</field>
-    <value xsi:nil="true" />
-  </values>
-  <values>
     <field>Detection_Objects__c</field>
     <value xsi:type="xsd:string">Membership__c</value>
   </values>

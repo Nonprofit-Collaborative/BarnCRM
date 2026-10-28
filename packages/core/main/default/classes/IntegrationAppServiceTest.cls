@@ -160,7 +160,6 @@ private class IntegrationAppServiceTest {
     static void aRowCarriesItsTextAndLinksToThePage() {
         System.runAs(TestUsers.admin()) {
             Integration_App__mdt row = product('Carrier', 'Complement', null, 1);
-            row.Install_Url__c = 'https://example.invalid/install';
             row.Related_Module__c = 'BarnCRM Something';
             row.Migration_Path__c = 'Later';
             IntegrationAppService.catalogOverride = new List<Integration_App__mdt>{ row };
@@ -173,7 +172,6 @@ private class IntegrationAppServiceTest {
             Assert.areEqual('A maintainer', info.maintainer, 'Maintainer');
             Assert.areEqual('Free', info.licenseCost, 'Cost and license');
             Assert.areEqual('https://example.invalid/Carrier', info.linkUrl, 'Link');
-            Assert.areEqual('https://example.invalid/install', info.installUrl, 'Install link');
             Assert.areEqual('BarnCRM Something', info.relatedModule, 'Related module');
             Assert.areEqual('Not tested', info.compatibility, 'Compatibility note');
             Assert.areEqual('Later', info.migrationPath, 'Migration path');

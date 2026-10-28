@@ -42,6 +42,8 @@ const SECTION_STATE = '__section';
 const RECENT_LIMIT = 10;
 /** The stored name of the General section (SettingSections.GENERAL), not a display label. */
 const GENERAL_SECTION = 'General';
+/** The stored name of the Integrations section: a read-only page with nothing to save. */
+const INTEGRATIONS_SECTION = 'Integrations';
 
 // The three household naming patterns are edited in the naming panel (a Component row), which
 // saves them. Their plain rows are hidden while that panel is in the section so a pattern has
@@ -292,6 +294,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   get isDirty() {
     return Object.keys(this.pending).length > 0;
+  }
+
+  /** Save and Discard Changes show to editors, except on the Integrations page. */
+  get showSaveBar() {
+    return this.canEdit && this.selectedSection !== INTEGRATIONS_SECTION;
   }
 
   get saveDisabled() {

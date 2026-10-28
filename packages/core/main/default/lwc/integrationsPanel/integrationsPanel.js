@@ -27,7 +27,6 @@ import RELATED_MODULE from '@salesforce/label/c.Core_Integrations_RelatedModule'
 import COMPATIBILITY_HEADING from '@salesforce/label/c.Core_Integrations_CompatibilityHeading';
 import MIGRATION_PATH from '@salesforce/label/c.Core_Integrations_MigrationPath';
 import LEARN_MORE from '@salesforce/label/c.Core_Integrations_LearnMore';
-import INSTALL_LINK from '@salesforce/label/c.Core_Integrations_InstallLink';
 import EMPTY from '@salesforce/label/c.Core_Integrations_EmptyMessage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Integrations_LoadErrorMessage';
 import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
@@ -143,7 +142,6 @@ export default class IntegrationsPanel extends LightningElement {
       relatedModuleText: app.relatedModule ? fill(RELATED_MODULE, app.relatedModule) : null,
       migrationPathText: app.migrationPath ? fill(MIGRATION_PATH, app.migrationPath) : null,
       learnMore: LEARN_MORE,
-      installLink: INSTALL_LINK,
       newTab: NEW_TAB
     };
   }

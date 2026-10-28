@@ -19,7 +19,7 @@ There is nothing to turn on.
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
 2. Click **BarnCRM Settings**, then **Integrations** in the left navigation.
 
-Everyone who can open BarnCRM Settings sees the page. It has no settings to change.
+Everyone who can open BarnCRM Settings sees the page. It has no settings to change, so it shows no **Save** or **Discard Changes** buttons.
 
 ## What the Page Shows
 
@@ -40,8 +40,8 @@ Each product shows:
 - A one-line description, who maintains it, and its cost and license.
 - **Compatibility with BarnCRM**: what is known about using the two together, written
   honestly. Where it says "not yet tested", it means exactly that.
-- **Learn More**, and **Install** where the product publishes an installer. Links open in a
-  new tab.
+- **Learn More**, which opens the product's own page in a new tab. The page has no install
+  links: find and install a product from its own page.
 
 Some notes carry details to read before you try a product. For example, an event registration
 app that publishes public pages needs a Salesforce Site, which runs as a guest user: set that

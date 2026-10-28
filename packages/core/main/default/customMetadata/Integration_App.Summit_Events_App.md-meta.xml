@@ -27,10 +27,6 @@
     <value xsi:type="xsd:string">https://sfdo-community-sprints.github.io/summit-events-app-documentation/</value>
   </values>
   <values>
-    <field>Install_Url__c</field>
-    <value xsi:type="xsd:string">https://install.salesforce.org/products/SummitEventsApp/latest</value>
-  </values>
-  <values>
     <field>Detection_Objects__c</field>
     <value xsi:type="xsd:string">summit.Summit_Events__c</value>
   </values>
