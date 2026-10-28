@@ -765,7 +765,8 @@ private class AddressServiceTest {
             );
             Contact cleared = new Contact(Id = held.Id, MailingStreet = null);
             Contact unknown = new Contact(
-                Id = Contact.SObjectType.getDescribe().getKeyPrefix() + '000000000000AAA',
+                Id = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getKeyPrefix() + '000000000000AAA',
                 MailingStreet = HOME_STREET
             );
 
