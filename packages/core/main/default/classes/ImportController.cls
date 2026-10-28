@@ -75,6 +75,9 @@ public with sharing class ImportController {
         /** The related records each row also creates, `Object.Field`, or null (R-IT17). */
         @AuraEnabled
         public String related;
+        /** The related object's label, for what the template loads (D-136), or null. */
+        @AuraEnabled
+        public String relatedLabel;
     }
 
     /** One field a column of a one-object template can be mapped to (R-IT12). */
@@ -566,6 +569,10 @@ public with sharing class ImportController {
         view.related = ImportObjectSchema.loadsRelated(template)
             ? template.Related_Object__c + '.' + template.Related_Parent_Field__c
             : null;
+        Schema.SObjectType relatedType = ImportObjectSchema.relatedTypeOf(template);
+        view.relatedLabel = relatedType == null
+            ? null
+            : relatedType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */
