@@ -1,10 +1,10 @@
-# Merging and splitting households
+# Merging and Splitting Households
 
 **Feature:** C-09 Household merge and split
 **Package:** Core
 **Iteration:** v0.1
 
-## What it does
+## What It Does
 
 Imports and busy weeks leave you with the same family twice, or with two people who no
 longer share a household. Merge combines two households into one: everybody ends up in the
@@ -15,7 +15,7 @@ you already have.
 Both are buttons on the household record page. Neither one needs Salesforce Setup, a data
 loader, or a consultant.
 
-## How to turn it on
+## How to Turn It On
 
 Merging and splitting work as soon as Core is installed. There is nothing to switch on.
 
@@ -58,18 +58,18 @@ record outside the **BarnCRM** app (another app can carry its own record page
 assignment), or that somebody has since overridden the assignment in the Lightning App
 Builder.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does this from the sample data, after an import left her with the Garcia family twice.
 
-### Merging two households
+### Merging Two Households
 
 1. Open the **BarnCRM** app and click the **Households** tab.
 2. Open **The Garcia Family**. Note that Harper, Luis and Diego Garcia are its members.
    The sample data ships one Garcia household, so to follow the merge make a second one
    first: a household named Garcia with a member or two in it, standing in for the
    duplicate an import would have left.
-3. Click **Merge or split**, then stay on the **Merge** tab.
+3. Click **Merge or Split**, then stay on the **Merge** tab.
 4. In the search box, type `Garcia`. Pick **Garcia Household**, the duplicate the import
    created. Two columns appear side by side: the household you started from on the left, the
    one you picked on the right.
@@ -78,13 +78,13 @@ Maria does this from the sample data, after an import left her with the Garcia f
    anniversary, and each line of the billing address. In the flexible way of belonging the
    primary contact is not offered: the household you keep keeps its primary member, and the
    other household's primary member stays primary only when the one you keep has none.
-   Where they agree, the value is simply shown. Under the comparison, the **Members after the merge** list shows everyone who will
+   Where they agree, the value is simply shown. Under the comparison, the **Members After the Merge** list shows everyone who will
    be in the household when you are done.
 6. Choose the values you want to keep. Take the name **The Garcia Family**, the anniversary
    from the duplicate (the import brought it in and the original never had one), and the
    left-hand address.
 7. Click **Merge**. A dialog opens saying which household survives, which one goes away, and
-   that a merge cannot be undone. Read it, then click **Merge households** (or **Cancel** or
+   that a merge cannot be undone. Read it, then click **Merge Households** (or **Cancel** or
    the Escape key to go back without merging).
 8. The window closes and the surviving household refreshes in place. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
@@ -93,9 +93,9 @@ Maria does this from the sample data, after an import left her with the Garcia f
    having a custom name, so naming stops rewriting its name and greetings. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
-### Splitting a member out
+### Splitting a Member Out
 
-9. Still on the Garcia household, click **Merge or split** again and choose the
+9. Still on the Garcia household, click **Merge or Split** again and choose the
    **Split** tab.
 10. Tick **Diego Garcia** in the member list.
 11. Leave **A new household** selected and click **Split**. A dialog headed **Split this
@@ -110,7 +110,7 @@ in step 11 and search for it by name.
 That is the whole job: two families become one, one person becomes their own household, and
 nobody typed a name.
 
-## Common mistakes
+## Common Mistakes
 
 **"I merged the wrong households. How do I undo it?"**
 You cannot. A merge is permanent: the household you merged away is deleted and its records
@@ -148,14 +148,14 @@ The person you moved was the last one in it, and "Delete a household when the la
 leaves" is on. Turn that setting off in BarnCRM Settings if you would rather keep empty
 households and their giving history.
 
-## Where the record of a merge lives
+## Where the Record of a Merge Lives
 
 Salesforce records account merges itself. The surviving household's history shows the merge
 and who did it, and the records that moved carry their own history, so a merge is auditable
 without BarnCRM writing a second log of its own. BarnCRM does not add an Error Log
 entry for a successful merge, only for one that fails.
 
-## Field reference
+## Field Reference
 
 For report builders only. Maria never needs this to use the feature.
 

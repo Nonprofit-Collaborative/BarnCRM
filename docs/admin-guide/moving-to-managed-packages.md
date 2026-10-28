@@ -1,6 +1,6 @@
-# Moving a pilot to the managed packages
+# Moving a Pilot to the Managed Packages
 
-## 1. What it does
+## 1. What It Does
 
 Organizations that piloted BarnCRM before its AppExchange listing run an early edition of
 the packages (unlocked packages). Salesforce has no way to switch an installed package to the
@@ -13,7 +13,7 @@ You do this once. It takes an afternoon on a test copy of your org, then the sam
 the real one. People, households and organizations themselves are never removed: only what
 BarnCRM added to them, and BarnCRM's own records, are copied off and put back.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 This is the one BarnCRM task done from a computer's command line rather than inside the app,
 because removing and installing packages happens outside any package. Your Salesforce
@@ -34,7 +34,7 @@ whole procedure. Whoever runs it needs:
    rehearsal. Do every step below there first. Do not run it on your real org until the
    rehearsal's check step (step 12) reports no differences.
 
-## 3. A five-minute walkthrough
+## 3. A Five-Minute Walkthrough
 
 The steps below are the whole move. On a sandbox with the sample data, steps 6 to 12 take
 about five minutes; on a real org, the export and the reload take longer, a few minutes for
@@ -59,7 +59,7 @@ had none).
    With Rollup Builder, on the **Rollup Builder** tab of **BarnCRM Admin**, click **Stop the nightly
    recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal Address Swap**, stop the nightly
    swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Mirror, on
-   **Opportunity Mirror**, click **Stop nightly run**. If automation is paused, click **Resume
+   **Opportunity Mirror**, click **Stop Nightly Run**. If automation is paused, click **Resume
    automation**.
 6. **Check the kit can read everything.** Run
    `python3 scripts/migration/migrate.py check --org pilot --mapping mapping.json --namespace <old-ns>`.
@@ -106,7 +106,7 @@ had none).
     BarnCRM. If the namespace changed, their references to BarnCRM fields need the new names.
 16. **Delete the export folder** from the computer and from any backup of it.
 
-## 4. Common mistakes
+## 4. Common Mistakes
 
 - **Skipping the rehearsal.** The first run always finds something particular to your org: a
   validation rule of your own, a required field you added, a flow that fires on save. Find it on

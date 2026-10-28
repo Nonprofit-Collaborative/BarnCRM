@@ -1,8 +1,8 @@
-# Migrating from Nonprofit Cloud
+# Migrating From Nonprofit Cloud
 
 **Package:** Core and Giving | **Iteration:** v0.5
 
-## 1. What it does
+## 1. What It Does
 
 If your donors and gifts are in Salesforce Nonprofit Cloud, BarnCRM
 ships four ready-made import templates that read Nonprofit Cloud's own exports: your people, and
@@ -14,7 +14,7 @@ The templates only name columns. Nothing in BarnCRM depends on Nonprofit Cloud b
 installed, so they work the same whether you are moving to a new org or loading into the org
 Nonprofit Cloud is in.
 
-## 2. How to turn it on
+## 2. How to Turn It On
 
 BarnCRM brings the person accounts template, and the Giving module brings the three gift
 templates. Each package adds its templates when it is installed, and an upgrade adds any template
@@ -25,7 +25,7 @@ upgrade: switch it off instead if you do not want it in the list.
 If one is missing (an install that logged a problem, for example), add it from Health Check:
 
 1. Open the **BarnCRM Admin** app, click **BarnCRM Settings** and choose **Health**.
-2. The report opens (click **Re-run** if it is from earlier). A finding reads "4 shipped
+2. The report opens (click **Re-Run** if it is from earlier). A finding reads "4 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
 3. Select **Restore import templates**. Your own templates, and any shipped template you have
@@ -39,7 +39,7 @@ names they have in Nonprofit Cloud (see [Funds](funds.md) and [Appeals](appeals.
 one fund as the default. A gift naming a fund or appeal BarnCRM does not have is rejected
 in the preview, naming it.
 
-## 3. A five-minute walkthrough (as Maria)
+## 3. A Five-Minute Walkthrough (as Maria)
 
 The four sample files in [samples](samples/) are small exports in exactly the shape the steps
 in section 4 produce. Create a default fund called **General Fund**, a fund called
@@ -68,7 +68,7 @@ in section 4 produce. Create a default fund called **General Fund**, a fund call
    already have: the gift transaction's record ID is each gift's external ID, so nothing is
    created twice.
 
-## 4. Moving everything, step by step
+## 4. Moving Everything, Step by Step
 
 Do it in this order. People come before gifts because the people file carries each person's
 full details (address, phones, preferences), which a gift file does not. A donor the gift file
@@ -156,7 +156,7 @@ CSV**. Before the full export, add `LIMIT 5` to a query and compare the rows wit
 they came from: the field names above come from Salesforce's documentation, and an org can
 differ.
 
-## 5. Why four templates and not one
+## 5. Why Four Templates and Not One
 
 A template remembers the columns of the last file loaded with it, so one template serves one
 file shape. The shapes differ in ways that matter:
@@ -173,14 +173,14 @@ file shape. The shapes differ in ways that matter:
   the parts then do not add up to the gift, and the line is rejected where you can see it,
   rather than loaded as a gift to one fund only.
 
-## 6. What does not come across yet
+## 6. What Does Not Come Across Yet
 
 These are not loaded by the four templates. Each has what to do in the meantime.
 
 | Not loaded | What to do meanwhile |
 |---|---|
 | Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). |
-| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load one object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **Load One Object** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | Tributes | Same: add them by hand to the gift ([Tributes](tributes.md)). |
@@ -190,7 +190,7 @@ These are not loaded by the four templates. Each has what to do in the meantime.
 | An organization's details | A gift file creates an organization with its name only. Add its address and phone by hand. |
 | In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic gift list**, the value mapped to **Gift: fair market value**. |
 
-## 7. Loading into the org Nonprofit Cloud is in
+## 7. Loading Into the Org Nonprofit Cloud Is In
 
 If BarnCRM is installed in the same org, your people are already there as person accounts.
 Skip step 3 of section 4: the gift files find each donor by email. Two things differ in an org
@@ -204,7 +204,7 @@ that keeps people as person accounts:
   A business account of another record type gets a new BarnCRM organization of the same
   name. Check the preview's "would create" count for organizations before you import.
 
-## 8. Common mistakes
+## 8. Common Mistakes
 
 **Every line of a split gift is rejected with "The split adds up to ..., not the gift amount of
 ...".** The gift has more than one designation. Combine its lines into one row (section 4, step
@@ -236,7 +236,7 @@ recognises some export headings on its own, for example a donor's name, and sugg
 after you have set them to **Do not load**. Check the column step on every load, or delete the
 column from the file.
 
-## Column reference
+## Column Reference
 
 Each template reads the columns its query in section 4 exports. The headings match whatever
 their capitals.

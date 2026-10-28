@@ -4,7 +4,7 @@
 **Package:** Core
 **Iteration:** v0.1
 
-## What it does
+## What It Does
 
 A household is the group of people you treat as one: one mailing, one letter, one shared
 history. BarnCRM creates a household for every new person you add,
@@ -23,7 +23,7 @@ and BarnCRM's duplicate review lists them like any other account, so you can mer
 duplicates there. A household account saved directly, from the Accounts tab or a data loader,
 is checked by your rules as usual.
 
-## How to turn it on
+## How to Turn It On
 
 Households work as soon as Core is installed. Everything you can change is on the
 BarnCRM Settings page, so nobody needs to open Salesforce Setup.
@@ -49,7 +49,7 @@ each way keeps its own record of who belongs where, and the other way cannot see
 once people are in households BarnCRM refuses the switch and tells you how many people
 it would affect. Moving them across is a migration, which BarnCRM does not do yet.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria does this from the sample data.
 
@@ -93,7 +93,7 @@ BarnCRM still points at, even when the setting is on and nobody is left in it. I
 leaves that household alone and writes an Info entry in the Error Log naming it, so you
 can look at it and decide for yourself.
 
-## If your org stores people as accounts
+## If Your Org Stores People as Accounts
 
 Some orgs store each person as an account (Salesforce calls this Person Accounts) rather
 than as a contact. Households work there too, with one difference:
@@ -129,7 +129,7 @@ tell you the state you are in, so it is a choice rather than a surprise.
 Everything else reads the same: the same member counts, the same names and greetings, and
 the same Members panel. A household is still its own record, never a person.
 
-## Common mistakes
+## Common Mistakes
 
 **"I added a person and no household appeared."**
 Either "create a household automatically" is off, or the person already belongs to a
@@ -199,7 +199,7 @@ is simply absent from it.
 **"The primary contact went blank when I moved someone out."**
 That is deliberate. The primary contact has to be somebody who is still in the household,
 so when that person leaves, BarnCRM clears the field rather than leaving a name that no
-longer belongs there. It does not choose a replacement for you: click **Make primary**
+longer belongs there. It does not choose a replacement for you: click **Make Primary**
 on the right person in the household's **Members** panel. In the flexible way of
 belonging the field always follows the member marked primary, so that panel is the only
 place to change it.
@@ -211,7 +211,7 @@ households and their history. A household left with nobody in it but with gifts 
 records credited to it, such as volunteer hours, is kept, even when "Delete a household once
 it is empty" is on, so that history always has a household to belong to.
 
-## Field reference
+## Field Reference
 
 For report builders only. Maria never needs this to use the feature.
 

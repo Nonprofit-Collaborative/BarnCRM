@@ -1,10 +1,10 @@
-# Record pages
+# Record Pages
 
 **Feature:** C-08 Dynamic Forms record pages
 **Package:** Core
 **Iteration:** v0.1
 
-## What it does
+## What It Does
 
 BarnCRM ships the pages that open when you click a household, an organization or a person in
 the **BarnCRM** app. They show the right fields for the kind of record, put the actions you
@@ -13,7 +13,7 @@ affiliations, addresses), so you do not build any of it yourself. Because the pa
 what to show by the record, a household and an organization share one page and a person has
 another, and nobody has to maintain separate page layouts for them.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on, and nothing to do in Salesforce Setup. The pages arrive with
 Core, and the **BarnCRM** app opens households, organizations and people on them, on the
@@ -41,9 +41,9 @@ What changes with the record:
   [Relationships](relationships.md).
 - **Every record** shows the addresses panel. See [Addresses](addresses.md).
 
-The action bar holds **Edit**, **Log an interaction** ([Interaction notes](interaction-notes.md)),
-**Delete**, and two more that depend on the record: **Merge or split** on households only
-([Household merge and split](household-merge-split.md)), and **Erase person** on a person for
+The action bar holds **Edit**, **Log an Interaction** ([Interaction notes](interaction-notes.md)),
+**Delete**, and two more that depend on the record: **Merge or Split** on households only
+([Household merge and split](household-merge-split.md)), and **Erase Person** on a person for
 anyone with the permission to erase people ([Erase a person](erase-a-person.md)).
 
 **Where the pages are used.** They are assigned to the **BarnCRM** app, so a record opened
@@ -67,18 +67,18 @@ person accounts, BarnCRM ships no page for them, because the person account page
 org's. Add the panel yourself. The steps are in
 [Household members](household-members.md), under "The Household panel on a person".
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start with the sample data loaded ([Sample data](sample-data.md)).
 
 1. Open the **BarnCRM** app and choose the **Households** tab. Open **The Garcia Family**.
    The page has the **Details** section, the **Members** panel, and **Name and
    Greetings**, with the formal and informal greetings.
-2. Look at the action bar at the top. **Merge or split** is there, because this is a
+2. Look at the action bar at the top. **Merge or Split** is there, because this is a
    household.
 3. Click a member's name to open the person. The page now has **Person**, **Household** and
    **Reaching This Person** sections, and the **Household** panel names the household you
-   came from. **Merge or split** is gone, because a person is not a household.
+   came from. **Merge or Split** is gone, because a person is not a household.
 4. Go back and open an organization from the **Organizations** tab. There is no **Name and
    Greetings** section and no **Members** panel; the **Affiliations** panel and
    the website show instead. The page is the same one the household used: it chose what to
@@ -87,7 +87,7 @@ Start with the sample data loaded ([Sample data](sample-data.md)).
    Page**. Change it, then save and choose **Activation** to assign it. BarnCRM leaves it
    alone from then on.
 
-## Common mistakes
+## Common Mistakes
 
 **"The Members panel, the Household panel or the Merge or split button is missing."** You are
 most likely looking at the record outside the **BarnCRM** app, or somebody assigned a

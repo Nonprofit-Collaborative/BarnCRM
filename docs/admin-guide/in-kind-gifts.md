@@ -1,6 +1,6 @@
-# In-kind gifts
+# In-Kind Gifts
 
-## What it does
+## What It Does
 
 An in-kind gift is a gift of goods or services rather than money: a donated minibus, a case
 of wine for the auction, a lawyer's afternoon, twenty turkeys at Thanksgiving. BarnCRM
@@ -25,7 +25,7 @@ substantiating what donated property was worth, and a charity that prints a doll
 its own letterhead has handed the donor a problem and taken on one of its own. Record the
 fair market value for your board and your auditor; it never reaches the donor's receipt.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on and no setting to choose. In-kind is one of the gift types the
 package has always shipped, and everything on this page works as soon as Giving is installed.
@@ -49,12 +49,12 @@ reports folder. It lists each gift with its description, its fair market value a
 which is the list a finance team asks for at year end. It counts gifts in the books only:
 Pending and Cancelled gifts are left out.
 
-### Recording one
+### Recording One
 
 1. Create a gift the way you record any other, from the **Gifts** tab or from **Quick Gift
    Entry**.
 2. Set the payment method to **In-kind**. The field is **Payment Method** on the Gifts tab
-   and **Payment method** on Quick Gift Entry. On Quick Gift Entry the amount box
+   and **Payment Method** on Quick Gift Entry. On Quick Gift Entry the amount box
    disappears, because an in-kind gift has none; on the Gifts tab, leave **Amount** at zero.
 3. Describe what was given, written the way the donor should read it on their receipt. The
    field is **In-kind Description** on the Gifts tab and **What was given** on Quick Gift
@@ -74,7 +74,7 @@ BarnCRM refuses the entries that would produce a wrong record or a wrong receipt
 - A negative fair market value, because goods are worth nothing or something, never less than
   nothing.
 
-### What the donor sees
+### What the Donor Sees
 
 Issue the receipt from the gift the usual way (see [Receipts and year-end
 statements](receipts.md)). On the document:
@@ -91,7 +91,7 @@ statements](receipts.md)). On the document:
 - Your organization's name and address are at the top and your tax identification number is
   at the bottom, exactly as on a cash receipt.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Start from the sample data (see `sample-data.md`), which includes about twenty in-kind gifts.
 
@@ -104,7 +104,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    different questions.
 3. Now enter one yourself. Open **Quick Gift Entry** (it is on the BarnCRM app, and on
    every household and person page).
-4. Choose the donor, leave the date at today, and set **Payment method** to **In-kind**. The
+4. Choose the donor, leave the date at today, and set **Payment Method** to **In-kind**. The
    amount box disappears and two boxes take its place.
 5. In **What was given**, type what actually arrived, in the words you would be comfortable
    seeing on the donor's receipt: `Sixteen folding tables, used, delivered to the community
@@ -114,7 +114,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    yet; you can add it later.
 7. Save. Open the gift. Amount is 0.00, and the description and value you typed are on the
    record.
-8. From the gift, choose **Issue receipt**. Open the PDF. It names your organization, the
+8. From the gift, choose **Issue Receipt**. Open the PDF. It names your organization, the
    donor, the date and the receipt number; where a cash receipt would print an amount it says
    that no value is stated; and it carries the sentence describing what you received and
    saying that your organization has not placed a value on it. There is no `$800` anywhere on
@@ -126,7 +126,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
 Steps 5, 8 and 9 are the ones worth reading closely: they are what an auditor or an
 accountant would look at.
 
-## Common mistakes
+## Common Mistakes
 
 **Typing the value into Amount.** The most common one, and the app will stop you: an in-kind
 gift with an amount that is not zero is refused with a message saying where the value goes.
@@ -166,7 +166,7 @@ the receipt first; the description on a receipted in-kind gift is locked, exactl
 amount is on a cash one, because it is printed on a document the donor is holding. The fair
 market value stays editable at all times, because it is on no document.
 
-## Fields, for a report builder
+## Fields, for a Report Builder
 
 | What you want to report on | Object | Field |
 |---|---|---|

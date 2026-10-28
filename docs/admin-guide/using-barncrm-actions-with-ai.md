@@ -1,6 +1,6 @@
-# Using BarnCRM actions with your own AI assistant
+# Using BarnCRM Actions with Your Own AI Assistant
 
-## What it does
+## What It Does
 
 If your organization already uses an AI assistant inside Salesforce, it can call BarnCRM's
 actions the same way a flow does. You might ask your assistant "which household is Maria
@@ -43,7 +43,7 @@ Both need a Salesforce edition that includes them (Enterprise or above at the ti
 writing). If your organization does not have either, there is nothing to set up and nothing
 in BarnCRM changes: BarnCRM installs and works the same with or without Agentforce.
 
-## How to turn it on
+## How to Turn It On
 
 The four Core actions are there as soon as BarnCRM is installed. Record Inbound Gift needs the
 Mirror module. Everything below is in Salesforce Setup, because agents and MCP servers belong
@@ -86,7 +86,7 @@ to Salesforce, not to BarnCRM.
 
 There are no BarnCRM settings for this.
 
-### Start from the example topic
+### Start From the Example Topic
 
 BarnCRM's source code has a folder, `examples/agentforce`, with a ready-made Agentforce topic,
 **BarnCRM People and Households**, that holds the four Core actions and instructions such as
@@ -103,7 +103,7 @@ Then open Agent Builder, add the topic to your agent, and change its instruction
 organization. Without the CLI, build the same topic by hand in Agent Builder: its description,
 scope and instructions are in the file `BarnCRM_People_And_Households.genAiPlugin-meta.xml`.
 
-### What the assistant can and cannot do
+### What the Assistant Can and Cannot Do
 
 - **It sees only what its user sees.** Every action finds people, households, data jobs,
   donors, funds and appeals only among the records its user can see, and creates records only
@@ -130,7 +130,7 @@ scope and instructions are in the file `BarnCRM_People_And_Households.genAiPlugi
   organization's Salesforce allowances or credits, and the AI app your staff use has its own
   pricing. BarnCRM adds none.
 
-## A five-minute walkthrough: people and households
+## A Five-Minute Walkthrough: People and Households
 
 Do this as Maria, with the sample data loaded, in an org that has Agentforce and an agent you
 can edit. It shows the assistant looking before it creates, and a new person landing in the
@@ -152,7 +152,7 @@ right household.
 7. Delete Sofia if you are not keeping her, and remove the actions from the agent if you are
    not keeping them.
 
-## A five-minute walkthrough: recording a gift
+## A Five-Minute Walkthrough: Recording a Gift
 
 Do this as Maria, with the sample data loaded and the Mirror module installed, in an org that
 has Agentforce and an agent you can edit. It shows the one thing that matters most: asking
@@ -176,7 +176,7 @@ twice records the gift once.
    25.00, type Card, today, with one allocation to the Building Fund, exactly as if David had
    typed it. Remove the action from the agent if you are not keeping it.
 
-## Common mistakes
+## Common Mistakes
 
 **The assistant does not offer the action.** Its user has none of the BarnCRM permission sets
 that include the action (see step 2; Read Only has no Create Person or Get Data Job Status),

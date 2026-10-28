@@ -1,6 +1,6 @@
-# What's new
+# What's New
 
-## What it does
+## What It Does
 
 After BarnCRM is upgraded, everyone who opens the BarnCRM home page sees a short **What's new
 in BarnCRM** card at the top: a headline and a few lines for each change worth knowing about.
@@ -10,7 +10,7 @@ until the next upgrade brings something new.
 Nobody has to read release notes on a website or remember to tell the team what changed: the
 notes come with the upgrade itself.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on. The card is part of the BarnCRM home page as soon as BarnCRM is
 installed, and it fills itself from the notes each release ships.
@@ -27,10 +27,10 @@ installed, and it fills itself from the notes each release ships.
   appear, so a Standard Edition org without nonprofit modules sees Core's notes alone. The
   edition is chosen once in the Setup Assistant; [Editions](editions.md) explains it.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 1. Open the **BarnCRM** app and the **Home** tab. Result: at the top of the page, a card
-   headed "What's new in BarnCRM" lists the notes for the current release under "Version" and
+   headed "What's New in BarnCRM" lists the notes for the current release under "Version" and
    the release number.
 2. Read the first note. Result: a bold headline, and under it a line for each detail.
 3. Click **Dismiss**. Result: the card disappears.
@@ -39,7 +39,7 @@ installed, and it fills itself from the notes each release ships.
 5. Ask a colleague with a BarnCRM role to open the home page. Result: they still see the card,
    because each person dismisses it for themselves.
 
-## Common mistakes
+## Common Mistakes
 
 - **"I dismissed it by accident and want to read it again."** A dismissed card does not come
   back until the next release. The same notes are in the release notes published with each

@@ -1,9 +1,9 @@
-# Households you already have in Nonprofit Cloud
+# Households You Already Have in Nonprofit Cloud
 
 This page applies only to an org with Salesforce Nonprofit Cloud. In any other org, BarnCRM
 shows nothing described here.
 
-## What it does
+## What It Does
 
 Salesforce Nonprofit Cloud has its own way of grouping people into a household, and BarnCRM has its own way. If your org is already using the Nonprofit Cloud way, both kinds of
 household can end up on the same record, pulling in different directions. BarnCRM looks
@@ -15,7 +15,7 @@ BarnCRM household for someone already grouped by Nonprofit Cloud.
 Nothing is moved, merged, or taken over. Each guard only ever leaves a record alone; none of
 them changes what Nonprofit Cloud already has.
 
-## How to turn it on
+## How to Turn It On
 
 There is nothing to turn on. The guards run automatically, every time the naming batch runs,
 every time a household's membership changes, every time an address is saved, and every time a
@@ -57,7 +57,7 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
   imported household that still has such relationships. Check these and delete any you no
   longer need.
 
-## A five-minute walkthrough
+## A Five-Minute Walkthrough
 
 Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two
 years. Her colleagues have been grouping families there the whole time.
@@ -77,7 +77,7 @@ years. Her colleagues have been grouping families there the whole time.
 
 Total time: about five minutes, and the only real work is step 3.
 
-## Common mistakes
+## Common Mistakes
 
 **Expecting BarnCRM to take the households over.** It does not. An account that already
 carries a Nonprofit Cloud household is left to Nonprofit Cloud: BarnCRM will not name it,
