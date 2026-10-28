@@ -53,6 +53,13 @@ when they merge households, even on the Minimum Access profile. Merging two peop
 own **Compare and merge**, which Salesforce allows only to people who can delete them, so
 staff ask an admin for that.
 
+BarnCRM Admin also gives **View All** and **Modify All** on accounts and contacts, so the data
+tools an admin runs (Find and export, Bulk Update, Bulk Delete, Duplicate Matching, Erase a
+Person, merges) see and change every person and household, not only the ones your sharing
+settings show them. That reaches every account and contact in the org, so give the role only to
+people you trust with all of them. To hold it back from someone, add a muting permission set to
+the role in Setup.
+
 ## Who Can Read a Donor's Receipts and Tax Statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
