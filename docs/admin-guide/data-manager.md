@@ -42,8 +42,8 @@ Each card and each kind of job is shown only to people who may use it:
 use **Update Many Records** (a Find query, then **Bulk Update**). To change records from a
 spreadsheet, each row with its own values, use **Import a File**. To delete records, use
 **Delete Many Records** (a Find query, then **Bulk Delete**); to delete the records a
-spreadsheet lists by record ID, an administrator uses **Import a File**, **Load One Object**,
-then **Delete by record ID** in **What each row does** ([Bulk delete](bulk-delete.md)).
+spreadsheet lists by record ID, an administrator who also has **Bulk Delete Records** uses
+**Import a File**, then the **Delete the Records a File Lists** card ([Bulk delete](bulk-delete.md)).
 
 **Delete Many Records** is marked as destructive: its **Open** button is red, and a warning box
 on the card reads "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data
@@ -53,8 +53,8 @@ by file, go to the Recycle Bin, and **Undo** brings them back (section 4).
 **Import Templates.** A template remembers how a file's columns match BarnCRM fields, so every
 file with the same layout (for example, a monthly donations export) opens already matched.
 BarnCRM ships some (the **Generic contact list**, and with Giving the gift and migration
-templates). To make your own, open **Import a File** and use **Load One Object** in the first
-step (**Choose what kind of file this is**): choose the object, type a **Template name**, and
+templates). To make your own, open **Import a File** and choose **One Kind of Record** in the
+first step (**What Are You Importing?**): choose the object, type a **Template name**, and
 select **Create** ([Importing](importing.md), section 9). There is no separate save step: the
 column matches, changes and row rules you settle on are saved to the template each time you
 import with it.
