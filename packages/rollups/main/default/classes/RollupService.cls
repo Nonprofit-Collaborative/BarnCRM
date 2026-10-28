@@ -988,10 +988,16 @@ public with sharing class RollupService {
         return RollupSelector.lastCalculatedAcrossActive();
     }
 
-    /** True when the rollups have not completed inside the freshness window. */
+    /**
+     * True when rollups are defined (at least one active) and have not completed inside the
+     * freshness window. An org with no active rollup has nothing to be overdue.
+     */
     @NamespaceAccessible
     public static Boolean isStale() {
         Datetime latest = lastCalculated();
-        return latest == null || latest < Datetime.now().addHours(-STALE_AFTER_HOURS);
+        if (latest == null) {
+            return RollupSelector.hasActiveDefinition();
+        }
+        return latest < Datetime.now().addHours(-STALE_AFTER_HOURS);
     }
 }

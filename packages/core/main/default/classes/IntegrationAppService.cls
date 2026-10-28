@@ -135,9 +135,30 @@ public with sharing class IntegrationAppService {
 
     /** The shipped catalog, lowest Sort Order first, then by name. */
     private static List<Integration_App__mdt> catalog() {
+        // A query, not getAll(): getAll() cuts every long text area to 255 characters, which clipped
+        // the Compatibility notes mid-word.
         List<Integration_App__mdt> rows = catalogOverride != null
             ? catalogOverride
-            : Integration_App__mdt.getAll().values();
+            : [
+                  SELECT
+                      DeveloperName,
+                      MasterLabel,
+                      Category__c,
+                      Status__c,
+                      Description__c,
+                      Maintainer__c,
+                      License_Cost__c,
+                      Link_Url__c,
+                      Install_Url__c,
+                      Related_Module__c,
+                      Compatibility__c,
+                      Migration_Path__c,
+                      Detection_Objects__c,
+                      Show_Only_When_Installed__c,
+                      Sort_Order__c
+                  FROM Integration_App__mdt
+                  WITH SYSTEM_MODE
+              ];
         List<Integration_App__mdt> sorted = new List<Integration_App__mdt>();
         for (Integration_App__mdt row : rows) {
             Integer at = sorted.size();

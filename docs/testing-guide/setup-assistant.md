@@ -50,7 +50,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card with progress "{n} of 9". The assistant opens on the first step not done (usually step 2, because the edition is already saved). The counter reads "{step} / 9". |
+| 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card with progress "{n} of 9". The assistant opens on the first step not done (usually step 2, because the edition is already saved). **Setup Checklist** shows once, as the card title, and the only visible count is "{n} of 9" (a screen reader also hears the step number). |
 | 2 | Click **Back** until step 1, **Choose your edition**. | "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." **Back** is disabled. |
 | 3 | Click **Next**. | Step 2, **Confirm how BarnCRM fits your existing org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |

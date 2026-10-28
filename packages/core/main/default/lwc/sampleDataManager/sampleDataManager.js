@@ -29,6 +29,7 @@ import loadSuccess from '@salesforce/label/c.Core_SampleData_LoadSuccess';
 import removeSuccess from '@salesforce/label/c.Core_SampleData_RemoveSuccess';
 import loadError from '@salesforce/label/c.Core_SampleData_LoadError';
 import removeError from '@salesforce/label/c.Core_SampleData_RemoveError';
+import statusError from '@salesforce/label/c.Core_SampleData_StatusError';
 import cancelButtonLabel from '@salesforce/label/c.Core_SampleData_CancelButton';
 import confirmButtonLabel from '@salesforce/label/c.Core_SampleData_ConfirmButton';
 import junctionModeNote from '@salesforce/label/c.Core_SampleData_JunctionModeNote';
@@ -69,7 +70,8 @@ export default class SampleDataManager extends LightningElement {
     loadSuccess,
     removeSuccess,
     loadError,
-    removeError
+    removeError,
+    statusError
   };
 
   householdCount = 0;
@@ -89,6 +91,7 @@ export default class SampleDataManager extends LightningElement {
   junctionMembership;
   canManage = false;
   isLoadingStatus = true;
+  statusFailed = false;
   isBusy = false;
 
   pollTimer;
@@ -116,8 +119,11 @@ export default class SampleDataManager extends LightningElement {
     try {
       const result = await getStatus();
       this.applyStatus(result);
-    } catch (error) {
-      this.showToast(this.labels.loadError, this.reduceError(error), 'error');
+      this.statusFailed = false;
+    } catch {
+      // Only the status read failed, not a load, so no toast: an inline note says so, and the
+      // server has already logged the failure.
+      this.statusFailed = true;
     } finally {
       this.isLoadingStatus = false;
     }
