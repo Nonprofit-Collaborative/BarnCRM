@@ -8,11 +8,25 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- `mwdbdevsb` deployed (Brandon approved) at main 9a10ef84, Core and Rollups:
+  - First validation 0AfWF00000H52x30AB failed: 499 "schedulable class has jobs pending" errors from the BarnCRM Tab Access Check cron, plus cascades. The Tab Access Check CronTrigger was aborted (no org setting changed).
+  - Second validation 0AfWF00000H53WX0AZ succeeded: 4,723 components, 2,484 of 2,484 tests (`RunLocalTests`). It included a post-destructive removal of the Rollup_Settings tab and flexipage and the BarnCRM_Rollup_Builder app. Volunteer_Settings was never deployed there, so nothing was removed for it.
+  - Quick deploy 0AfWF00000H5G3x0AF: 4,723 components.
+  - Module tabs stage (`module-app-tabs.py rollups`: BarnCRM_Admin_Standard, BarnCRM_Admin_Console): validated, then deployed as 0AfWF00000H5GTl0AN.
+  - Post-install ran OK: `CorePostInstall.runAsSourceDeploy`, `TabAccessService.requestSync`, `RollupsPostInstall.carryOverCoreSettings`, `RollupService.ensureDefaults`, `RollupAccessSync.requestSync`. Tab Access Check rescheduled (next run 2026-10-29 06:00 UTC). Jobs completed with 0 errors; Error Log has 0 rows today.
+- Website barncrm.com deployed to prod (Brandon approved); see the website project's `changelog.md`.
 - `barn-sales`: DLRS 2.25.0.2 installed for coexistence QA; 6 QA_* DLRS rollups and 2 legacy rows left in place; Giving_Admin assigned to the admin user. `barn-sales` is now the "DLRS present" test org.
 - Batch 13 fix: Explain These Totals no longer fails when the person cannot open the record or it was deleted.
 
 ### Merged to main (newest first)
 
+- #648 (squash 52909176): production-org notice (do not install pilot or testing versions in a production org) in the README, SUPPORT, overview, admin guide README, testing guide README and Before You Test, and moving-to-managed-packages.
+- #647 (squash 9a10ef84, gates `oi-test` 3,934 of 3,934 and `barn-sales` 3,934 of 3,934, both coverage 93%, 0 classes under the floor): landing batch 14, merging #639, #640 to #644 (TC2 stack), #646 and the root docs of #645, plus one commit (cb4e49ef).
+  - Rollup Builder keeps spaces at either end of a Custom Delimiter (stored as SP()/TB()/BR() tokens, decoded in the engine and Builder); DLRS import accepts such delimiters; Custom_Delimiter__c length 10 to 40 (#639).
+  - Title Case sweep (TC2): 195 custom label values, 36 layout section headings, 7 quick actions, 4 tip titles, 3 list views and 942 doc headings across the admin, user and testing guides and the overview now use Title Case; quoted UI labels in the docs synced (#640 to #644).
+  - Added OpportunityMirrorSelectorTest, lifting OpportunityMirrorSelector coverage on `barn-sales` from 71% to 81% (`oi-test` 98%) (#646).
+  - Rollup Builder's Create a Field steps and the admin guide now say the person who sets up a rollup needs Edit on its field, or the Builder refuses to save.
+  - Fixed three Custom Delimiter tests from #639 (ignore the org's DLRS rollups, let the queued real-time total run, model a pre-token delimiter as the trimmed value); no product change.
 - #638 (squash 8b0b01d6, gate `oi-test` 3,923 of 3,923, coverage 93%; merged 2026-10-28 13:57 UTC): landing batch 13, Rollup Builder DLRS coexistence (RB-C) and ease of use, merging #621, #623, #627, #628, #630, #622, #625, #626, #629, #631, #633, #634, #635, #636, #637. On `barn-sales` every test passed but OpportunityMirrorSelector was at 71% coverage, under the 75% floor; a coverage fix follows in batch 14.
   - #621 (RB-C PR 1): BarnCRM detects DLRS (`dlrs`) and Rollup Helper (`rh2`) with no dependency and names them under Other Rollup Tools on the Rollup Builder tab, Setup Assistant and Modules page; admin guide page for moving Rollup Helper rollups by hand.
   - #623 (RB-C PR 2): the Rollup Builder reads DLRS rollups (never changes them); turning on a rollup whose field an active DLRS rollup fills asks first in the Builder and the list and records the answer in Recent Changes, a file import refuses it, and Health Check warns when BarnCRM and DLRS fill the same field.
