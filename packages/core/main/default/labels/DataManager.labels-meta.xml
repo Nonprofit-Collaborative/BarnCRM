@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the import card does</shortDescription>
-        <value>Needs a file. Add new records and update existing ones from a spreadsheet (CSV or Excel): people and organizations, or one kind of record. A dry run shows what would change before anything is saved.</value>
+        <value>People and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindTitle</fullName>

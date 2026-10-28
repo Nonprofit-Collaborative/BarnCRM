@@ -28,7 +28,7 @@ is shown only to people who may use it:
 
 | Card | Needs a file? | Opens | Who sees it |
 |---|---|---|---|
-| **Import a File** | Yes | The **Import** tab: add new records and update existing ones from a spreadsheet (people and organizations, gifts with Giving, or one object), with a dry run first | Administrators |
+| **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
 | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
 | **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
 | **Tidy and Check Your Data** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |

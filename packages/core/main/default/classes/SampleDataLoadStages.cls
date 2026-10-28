@@ -51,7 +51,8 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
      */
     public static Map<String, Id> loadHouseholdsAndOrganizations(SampleDataSet data) {
         Id householdRecordTypeId = recordTypeId(Account.SObjectType, 'Household');
-        Id organizationRecordTypeId = recordTypeId(Account.SObjectType, 'Organization');
+        // Organizations use the record type the org chose (ADR-0141): null means none.
+        Id organizationRecordTypeId = AccountKinds.organizationRecordTypeId();
 
         List<Account> householdAccounts = new List<Account>();
         List<String> householdKeys = new List<String>();

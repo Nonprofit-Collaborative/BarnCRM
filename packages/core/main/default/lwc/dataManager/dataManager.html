@@ -49,7 +49,7 @@
             <ul class="slds-var-p-horizontal_medium" data-id="salesforce-links">
                 <template for:each={salesforceLinks} for:item="link">
                     <li key={link.key} class="slds-var-p-bottom_x-small">
-                        <a href={link.url} target="_blank">{link.label}</a>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
                     </li>
                 </template>
             </ul>
