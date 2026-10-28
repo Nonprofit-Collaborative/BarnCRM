@@ -255,7 +255,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-ADDR-17: Undeliverable and the Status Menu
 
-**Purpose:** staff mark an address Former, Undeliverable or Current from the card; an undeliverable primary is flagged and counted by the Data quality check, which opens in Find.
+**Purpose:** staff mark an address Former, Undeliverable or Current from the card; an undeliverable primary is flagged and counted by the Data Quality check, which opens in Find.
 **Prerequisites:** staff user and an admin, T-ADDR-01 done (the Phoenix seasonal address exists), the Garcia household on Sunset Ln.
 
 | Step | Action | Expected result |
@@ -263,7 +263,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | On The Garcia Family, open the status menu (the arrow) on the Sunset Ln card. | **Mark as Undeliverable** only: the primary cannot be marked Former. |
 | 2 | Choose **Mark as Undeliverable**. | Toast **The address status is saved.** The card has an **Undeliverable** badge and a red line: **Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.** |
 | 3 | As the admin, open **Org Optimizer**, **Data Quality**. | **Primary Addresses Marked Undeliverable** shows **1** or more. |
-| 4 | Select **Open in Find** on that check. | Find opens the saved query **Data hygiene: Primary Addresses Marked Undeliverable**, already run, and the Garcia Sunset Ln address is listed. |
+| 4 | Select **Open in Find** on that check. | Find opens the saved query **Data Quality: Primary Addresses Marked Undeliverable**, already run, and the Garcia Sunset Ln address is listed. |
 | 5 | Back on the household, open the status menu on the Phoenix card and choose **Mark as Former**. | Phoenix moves into **Former Addresses**, reading **Until** today's date. |
 | 6 | Open **Former Addresses** and choose **Mark as Current** on Phoenix. | Phoenix is back with the addresses in use, with no dates shown. |
 | 7 | On Sunset Ln choose **Mark as Current**. | The badge and the red line go. |

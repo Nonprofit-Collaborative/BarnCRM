@@ -31,7 +31,7 @@ is shown only to people who may use it:
 | **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
 | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
 | **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
-| **Tidy and Check Your Data** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
+| **Org Optimizer** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
 | **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
 | **Import Templates** | | The templates you import with, and when each recurring file was last loaded | Administrators |
 | **Data Jobs** | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |

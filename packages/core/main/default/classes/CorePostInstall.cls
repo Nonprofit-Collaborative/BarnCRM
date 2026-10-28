@@ -70,6 +70,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
     private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
     private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
+    private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
 
     /** Test seam: true lets a test see the nightly tab access check scheduled. */
     @TestVisible
@@ -188,6 +189,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
         alignSeasonalAddresses(isUpgrade);
+        renameDataQualityQueries();
         ModuleSetups.markRan(ModuleSetups.CORE);
         if (installerId == null) {
             return;
@@ -275,6 +277,18 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
             CoexistenceService.applyRecommendedIfUnset();
         } catch (Exception e) {
             ErrorLogger.log(e, MODE_CONTEXT);
+        }
+    }
+
+    /**
+     * Renames the saved queries "Open in Find" made before the tool was named Data Quality, so
+     * it keeps updating them (D-140). Finds nothing on a second run. Never throws.
+     */
+    private void renameDataQualityQueries() {
+        try {
+            DataHygieneService.renameLegacySavedQueries();
+        } catch (Exception e) {
+            ErrorLogger.log(e, SAVED_QUERY_CONTEXT);
         }
     }
 

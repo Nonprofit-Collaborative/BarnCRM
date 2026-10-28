@@ -36,7 +36,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | 1 | Open the **BarnCRM** app. Choose **Standard Edition: the full core suite of BarnCRM tools**. | The **Set Up BarnCRM** window shows both questions. |
 | 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Household Upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
 | 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
-| 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Data Hygiene** is listed. |
+| 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Org Optimizer** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
 | 6 | Open **Modules**. | **Core** and **BarnCRM Rollup Builder** only (no nonprofit module is offered in the Standard Edition). |
 

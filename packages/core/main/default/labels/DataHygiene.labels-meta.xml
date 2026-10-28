@@ -5,7 +5,7 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data hygiene checks: card title in Org Optimizer's Data quality section.</shortDescription>
+        <shortDescription>Data Quality checks: heading of Org Optimizer's Data Quality section.</shortDescription>
         <value>Data Quality</value>
     </labels>
     <labels>
@@ -13,7 +13,7 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data hygiene page introduction.</shortDescription>
+        <shortDescription>Data Quality section introduction.</shortDescription>
         <value>Records that need tidying up, counted with your own access. Open a check in Find to read, export or change its records. Nothing here changes a record.</value>
     </labels>
     <labels>
@@ -21,7 +21,7 @@
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>How data hygiene differs from Health Check.</shortDescription>
+        <shortDescription>How Data Quality differs from Health Check.</shortDescription>
         <value>Health Check says whether BarnCRM is set up right. This page is about the records themselves.</value>
     </labels>
     <labels>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal without the Find and Export Records permission.</shortDescription>
-        <value>Data hygiene needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
+        <value>Data Quality needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_PeopleAccountsNotListed</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal for a check key the page does not know.</shortDescription>
-        <value>That check does not exist. Reload the Data Hygiene page and try again.</value>
+        <value>That check does not exist. Reload the Org Optimizer page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_SavedQueryName</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the saved query a check opens, {0} is the check title.</shortDescription>
-        <value>Data hygiene: {0}</value>
+        <value>Data Quality: {0}</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_MoreThan</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: primary addresses that failed verification.</shortDescription>
-        <value>Primary addresses that failed verification</value>
+        <value>Primary Addresses That Failed Verification</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_FailedDetail</fullName>
@@ -278,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: people not changed for years; {0} is the years.</shortDescription>
-        <value>People not changed in {0} years</value>
+        <value>People Not Changed in {0} Years</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_NotUpdatedDetail</fullName>

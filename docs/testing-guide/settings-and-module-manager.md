@@ -205,7 +205,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open **Home**. | **Errors to Review** shows a count of at least 1, with **Open the Error Log**. |
-| 2 | Open the **Data Hygiene** tab (titled **Org Optimizer**) and its **Errors** tab. | An **Error Log** card with a badge "{n} new" lists **Testing guide entry** with **Testing guide** and the time, **Open this entry** and **Mark acknowledged**. |
+| 2 | Open the **Org Optimizer** tab and its **Errors** tab. | An **Error Log** card with a badge "{n} new" lists **Testing guide entry** with **Testing guide** and the time, **Open this entry** and **Mark acknowledged**. |
 | 3 | Click **Open this entry**. | The Error Log record opens (as a subtab in the console). **Status** is **New**. |
 | 4 | Back on the tile, click **Mark acknowledged**. | The badge count drops by one (the entry stays in the recent list). The record's **Status** reads **Acknowledged**. On **Home**, **Errors to Review** drops by one after a reload. |
 | 5 | As staff, open the **Error Log** tab and the entry. | The entry is readable. **Status** cannot be edited and **Technical Detail** is not shown. |

@@ -1,13 +1,13 @@
-# Data Hygiene
+# Data Quality
 
-**Feature:** C-28 Data hygiene console
+**Feature:** C-28 Data Quality checks (in Org Optimizer)
 **Package:** Core
 **Iteration:** v0.7
 
 ## 1. What It Does
 
-**Data hygiene** is the **Data Quality** section of [Org Optimizer](org-optimizer.md). It
-answers "which of my records need tidying up?" It runs a
+**Data Quality** is the section of [Org Optimizer](org-optimizer.md) that checks your records.
+It answers "which of my records need tidying up?" It runs a
 short list of checks over your data, shows how many records each one finds, and for each
 check offers **Open in Find**, which opens the matching records in Find so you can read them,
 export them, or change them.
@@ -19,23 +19,23 @@ export them, or change them.
 | **Memberships That Name Nobody** | Household membership records whose person was deleted. |
 | **Addresses That Belong to Nobody** | Address records whose household, organization or person was deleted. |
 | **Primary Addresses with Parts Missing** | The address each household, organization or person is mailed at, missing a street, a city or a postal code. |
-| **Primary addresses that failed verification** | The address each one is mailed at, marked **Failed** by an address verification app. |
+| **Primary Addresses That Failed Verification** | The address each one is mailed at, marked **Failed** by an address verification app. |
 | **Primary Addresses Marked Undeliverable** | The address each one is mailed at, marked **Undeliverable** by someone because mail came back. |
 | **People with No Way to Reach Them** | Living people with no email, phone, mobile or mailing address. |
 | **Deceased People Who Can Still Be Emailed** | People marked Deceased who have an email and are not opted out of email. |
-| **People not changed in 5 years** | People nobody has changed for the number of years you set (5 unless you change it). |
+| **People Not Changed in 5 Years** | People nobody has changed for the number of years you set (5 unless you change it). |
 
-Data hygiene never changes a record. The counts, like everything in Find, are read with your
+Data Quality never changes a record. The counts, like everything in Find, are read with your
 own access: a record you cannot open is not counted, and a check whose object or field you
 cannot see says so instead of showing a number.
 
 ## 2. How to Turn It On
 
-1. Data hygiene uses the same permission as Find: **Find and Export Records**. The
+1. Data Quality uses the same permission as Find: **Find and Export Records**. The
    **BarnCRM Admin** role has it, and so does the **BarnCRM Find and Export** permission set
    (see [Find and export](find.md)).
-2. Open the **Org Optimizer** tab in the BarnCRM app (it used to be called **Data Hygiene**)
-   and choose **Data Quality**. The checks run as the section opens.
+2. Open the **Org Optimizer** tab in the BarnCRM app and choose **Data Quality** (the tile on
+   **Overview**, or the tab on the left). The checks run as the section opens.
 3. Press **Recount** whenever you want fresh numbers. Nothing is saved between visits.
 
 There is one setting: **Years before a person is not changed**, in the **Org Optimizer**
@@ -52,7 +52,7 @@ paused for the load. She wants to know what the load left behind.
    with no household** says **214**. **Primary Addresses with Parts Missing** says **38**. The
    others say **0**.
 2. Next to **People with No Household** she presses **Open in Find**. The Find tab opens with a
-   new saved query of hers, **Data hygiene: People with no household**, already open.
+   new saved query of hers, **Data Quality: People with No Household**, already open.
 3. The query is filled in: object Contact, columns Name and Created Date, one condition
    (**Account ID is blank**), sorted oldest first, and it has already run. She reads the list.
    They are all from last month's load.
@@ -71,11 +71,11 @@ paused for the load. She wants to know what the load left behind.
 | **Memberships That Name Nobody** | Household membership records with neither a contact nor an account: the person was deleted while automation was switched off. | Such a record counts for nobody, but it still sits on the household's related list. | Delete them. They hold nothing but the household and the dates. |
 | **Addresses That Belong to Nobody** | Address records with no household, organization or person: the record they belonged to was deleted. | They are kept on purpose (an address is history), but nobody will ever see them from a record page. | Delete them, or set an owner if the address should be kept. |
 | **Primary Addresses with Parts Missing** | Primary addresses (the one copied to the standard address fields) with no street, no city, or no postal code. | A letter to that address will not arrive. | Fill in the missing part on the address card. Only the primary address is checked: older addresses are the record of where mail went, and are left as they are. |
-| **Primary addresses that failed verification** | Primary addresses whose **Verification Status** is **Failed**. BarnCRM never sets this field; an address verification app does. | The verification app could not confirm the address. | Check the address with the person, then correct it. Without a verification app this check always says 0. |
+| **Primary Addresses That Failed Verification** | Primary addresses whose **Verification Status** is **Failed**. BarnCRM never sets this field; an address verification app does. | The verification app could not confirm the address. | Check the address with the person, then correct it. Without a verification app this check always says 0. |
 | **Primary Addresses Marked Undeliverable** | Primary addresses whose **Status** is **Undeliverable**. Only a person sets it, from the address card's status menu or the address record (see [Addresses](addresses.md), "Address History"). | Mail sent there comes back, so every letter and receipt to that household, organization or person is wasted. | Find the new address and add it on the card with **Primary** ticked (the old one becomes **Former**), or choose **Set as Primary** on another address they have. |
 | **People with No Way to Reach Them** | Contacts (people) not marked **Deceased** with no **Email**, **Phone** or **Mobile**, and no **Mailing City** or **Mailing Postal Code**. The mailing fields are where the primary address is copied. | Nothing you send reaches them, and they still count in your totals. | Find a way to reach them, or decide whether to keep them. Another email field (personal, work) is not looked at. |
 | **Deceased People Who Can Still Be Emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Bulk update can do it from the Find query). |
-| **People not changed in N years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
+| **People Not Changed in N Years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
 
 In an org that uses membership records, **Open in Find** for **People with No Household** lists
 the contacts that have no current membership (Find's **Has no related records**, see
@@ -93,24 +93,27 @@ shows at once. Find's export reads every matching record.
 ## 5. How Open in Find Works
 
 1. Press **Open in Find** next to a check. BarnCRM saves the check's query as one of your own
-   saved queries, named **Data hygiene:** followed by the check's name, not shared with anyone,
-   and opens the Find tab.
+   saved queries, named **Data Quality:** followed by the check's name, not shared with anyone,
+   and opens the Find tab. (Queries saved before the rename, named **Data hygiene:**, are
+   renamed **Data Quality:** when BarnCRM is upgraded. If you already have a **Data Quality:**
+   query of the same name, that newer one is kept and the old one is left as it was, for you to
+   delete in Find if you like.)
 2. Find opens that query with its object, columns, conditions and sort filled in, and runs it.
    The list is ready to read, **Export to CSV**, or change. The query also stays under
    **Saved queries** for next time.
 3. Pressing **Open in Find** again later puts that saved query back to the check's own query,
-   so your copy always matches what the console counted. To keep a version you changed, use
+   so your copy always matches what Data Quality counted. To keep a version you changed, use
    **Save as** in Find and give it another name.
 
 Every query is built for your org when you press the button: its field names, its membership
 mode and its record type are read from the org at that moment, so it never goes out of date.
 Nothing about the checks is stored in the package as a record you could edit or delete.
 
-## 6. Data Hygiene and Health Check
+## 6. Data Quality and Health Check
 
 They answer different questions:
 
-| | Health Check | Data hygiene |
+| | Health Check | Data Quality |
 |---|---|---|
 | Asks | Is BarnCRM set up the way it should be? | Which records need tidying up? |
 | Looks at | Settings, access, automation, schedules, what is installed, plus two headline data findings (people with no household, empty households). | Your records only, with more checks, including addresses and membership records. |
@@ -119,16 +122,16 @@ They answer different questions:
 
 The two counts for people with no household are the same question asked the same way, but
 Health Check reports it only while **Create a household automatically** is on, and Data
-hygiene reports it always. For empty households, Health Check reads the memberships themselves
-and Data hygiene reads **Member Count**, so that the check can open in Find. They disagree
+Quality reports it always. For empty households, Health Check reads the memberships themselves
+and Data Quality reads **Member Count**, so that the check can open in Find. They disagree
 only when a Member Count is out of date, for example after a load with automation paused, and
 saving the household again puts it right.
 
 ## 7. Common Mistakes
 
-- **Expecting the console to fix things.** It finds and lists. Deciding what a person with no
+- **Expecting Data Quality to fix things.** It finds and lists. Deciding what a person with no
   household should become is a question only your organization can answer.
-- **Editing the Data hygiene query and expecting it to stay.** **Open in Find** puts it back to
+- **Editing a Data Quality query and expecting it to stay.** **Open in Find** puts it back to
   the check's own query. Use **Save as** for your own version.
 - **A check says "You cannot see" a field or an object.** The counts use your own access. Ask
   whoever manages access in your org, or run it as a BarnCRM Admin.
@@ -140,7 +143,7 @@ saving the household again puts it right.
   because its members are kept by Nonprofit Cloud. Deleting it deletes its Nonprofit Cloud
   household group too. Leave it to Nonprofit Cloud's own tools.
 
-## 8. What Data Hygiene Does Not Do (Yet)
+## 8. What Data Quality Does Not Do (Yet)
 
 Checking that an email address is well formed is left to Salesforce: an Email field refuses
 an address that is not one. Checking that a household's **Member Count** is up to date needs
@@ -155,5 +158,5 @@ again, which is not a question a query can ask; it is not offered. Checks on rel
 
 ## Field Reference
 
-Data hygiene adds no object and no field. It reads the fields named above and writes one
+Data Quality adds no object and no field. It reads the fields named above and writes one
 **Saved Query** per check you open, owned by you (see [Find and export](find.md)).

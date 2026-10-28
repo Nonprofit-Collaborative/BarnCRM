@@ -117,7 +117,7 @@ a value; the operators offered depend on the field:
 - A shared query that names a field someone cannot see opens for them with that column left
   out, and a notice names it; a condition on such a field opens marked, and the query does not
   run for them until it is removed from their copy.
-- Another page, such as the Data Hygiene console, can open Find on a saved query. Find opens
+- Another page, such as Org Optimizer's Data Quality section, can open Find on a saved query. Find opens
   that query and runs it straight away, as if you had chosen it from the list and pressed
   **Run**. A query you cannot open (deleted, or not shared with you) is simply not opened.
 
