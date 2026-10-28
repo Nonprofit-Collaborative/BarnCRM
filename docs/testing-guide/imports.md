@@ -1,6 +1,6 @@
 # Imports
 
-Scripts for the Import wizard: templates, preview, commit, rejected rows, row rules, value changes, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
+Scripts for the Import wizard: templates, preview, commit, rejected rows, row rules, value changes, the first-step cards, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
@@ -35,8 +35,8 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a Spreadsheet**, step heading **Choose what kind of file this is**. A **Recent Imports** list shows below the wizard. |
-| 2 | In **Choose what kind of file this is**, choose **Generic contact list**. | Its description appears under the picker ("A list of people with their contact details..."). **Next** is enabled. |
+| 1 | Open the **Data Manager** tab. On the **Import a File** card, select **Open**. | The **Import** tab opens on the card **Import a Spreadsheet**, step heading **What Are You Importing?**, with the choice cards. **Next** is not shown yet. A **Recent Imports** list shows below the wizard. |
+| 2 | Under **What Are You Importing?**, choose **People and Organizations**, then in **Template** choose **Generic contact list**. | Its description appears under the picker ("A list of people with their contact details...") and the line "This file can create: people, households, organizations, links between people and organizations." **Next** is enabled. |
 | 3 | Select **Next**. | Heading **Upload the file**, with an **Upload file** control. |
 | 4 | Upload `import-test-1.csv`. | Heading **Check the Columns**. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
 | 5 | Select **Next**. | Heading **Choose how rows are matched**. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
@@ -106,7 +106,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
+| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
 | 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with **Control Totals (Optional)** and **Rows in the file**. |
 | 3 | Type `6` in **Rows in the file** and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import These Rows** is disabled. |
 | 4 | Select **Back** to the matching step, change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import These Rows** is enabled. |
@@ -136,7 +136,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
+| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
 | 2 | Beside **Email**, select **Change Values**. Select **Add a change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The First Values, Before and After**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
 | 3 | Select **Done**. Beside **Last Name**, add **Capitalize each word** the same way and select **Done**. | The buttons now read **Change values (1)**. |
 | 4 | Under **Rows to Load**, **Skip Rows Where**, select **Add a rule**: **Column** Status, **Test** **equals**, **Text** `cancelled`. | The rule is listed. |
@@ -178,7 +178,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
+| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
 | 2 | Leave **Also match with my duplicate rules** unticked and select **Preview**. | **Would create** 3: by email alone, nobody matches any row. |
 | 3 | Select **Back**, tick **Also match with my duplicate rules**, and select **Preview**. | **Would create** 2, **Would update** 1. Row 1 (Mara Stone) matches the existing Mara Stone through her address record, because the first and last names agree. Row 2 (Lee Brook, same address, different last name) and row 3 (Jana Stone, same address and last name, different first name) are not matched and would be created. |
 | 4 | Select **Import These Rows**. | **Created** 2, **Updated** 1. |
@@ -197,8 +197,8 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Save a CSV `org-phone.csv` with the heading `Id,Phone` and one row: the record ID, then `555-0199`. | Saved. |
-| 2 | Open the Import tab. Under **Load One Object**, select **Load One Object**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
-| 3 | Choose **Account** as **Object**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Choose what kind of file this is**. |
+| 2 | Open the Import tab. Under **What Are You Importing?**, choose **One Kind of Record**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
+| 3 | Choose **Account** as **Object**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Template**, and the line under it reads "Loads: Account". |
 | 4 | Select **Next** and upload `org-phone.csv`. | The columns step. If **Id** is not already **Salesforce record ID**, choose it; **Phone** maps to the Phone field. Each column has an **Empty cells clear the field (update and upsert)** box. |
 | 5 | Select **Next**. | **What each row does** offers update choices only, for example **Update by record ID** and **Update by a field you choose**; **Create new records** is not offered for accounts. |
 | 6 | Choose **Update by record ID** and select **Preview**. | **Would update** 1, **Would be rejected** 0. |
@@ -222,3 +222,25 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | 4 | Still as staff, search the App Launcher for "Import". | No Import tab. |
 
 **Cleanup:** as admin, remove **BarnCRM Find and Export** from staff on the **Access** page.
+
+## T-IMP-12: What Are You Importing?
+
+**Purpose:** confirm each card on the first step opens what it should, the Gifts and Delete cards show only where they apply, and the line under a template says what it creates.
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Bulk Update and Delete](bulk-update-and-delete.md)).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab. | Heading **What Are You Importing?** with a card for **People and Organizations**, **One Kind of Record**, **Records With Their Related Records** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. **Next** is not shown. |
+| 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
+| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. **Choose Something Else** goes back to the cards. |
+| 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
+| 5 | Log in as an admin without **Bulk Delete Records** and open the Import tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
+| 6 | Choose **One Kind of Record**. | **Object**, **Template name** and **Create** show. **Next** is not shown until a template is created. Choose **Account**, name it `Test cards account`, select **Create**: the template is chosen and the line reads "Loads: Account". |
+| 7 | Select **Choose Something Else**, then **Records With Their Related Records**, choose **Account** (or another object with a related object), name it `Test cards related`, select **Create**, then **Next**, upload any CSV and go to the matching step. | **What each row does** shows **Update or create, matched by external ID** (or **Update by record ID** where upsert is not offered), and the **Related records** picker is open. |
+| 8 | Select **Choose Something Else**, then **Delete the Records a File Lists** (as the holder of **Bulk Delete Records**), choose **Contact**, name it `Test cards delete`, select **Create**. | The template is chosen and the line reads "Deletes: Contact". On the matching step **Delete by record ID** is chosen. |
+| 9 | Select **Choose Something Else**, choose **Delete the Records a File Lists**, and choose an object that cannot be deleted by file. | "This object's records cannot be deleted by file, so the template creates or updates them instead. Choose Something Else to pick another object." |
+| 10 | Select **Choose Something Else**, then **Your Templates**. | Every active template shows with its description, what it creates, and **Last loaded** with a date or **Not loaded yet**. Each has a **Use This Template** button. |
+| 11 | Select **Use This Template** on **Generic contact list**. | It is chosen, **Next** is enabled and the line reads "This file can create: people, households, organizations, links between people and organizations." |
+| 12 | Select **Choose Something Else**. | The cards show again and **Next** is not shown. |
+
+**Cleanup:** none (the test templates may stay; they change nothing on their own).
