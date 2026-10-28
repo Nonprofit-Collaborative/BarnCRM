@@ -22,6 +22,10 @@
  * `0125-rollup-builder-module.md`, D2), or through `giveToGroupHolders`, naming the roles
  * themselves (ADR-0131 `0131-module-access-sync-by-role.md`); Core names no module set.
  *
+ * The Households tab follows the same way: `BarnCRM_Households` shows that tab and nothing
+ * else (no record type, ADR-0141), is carried by the Household Upkeep feature, and goes to
+ * every BarnCRM role while the feature is on.
+ *
  * The four BarnCRM apps follow the same way (ADR-0137): each has a BarnCRM App set that shows that app
  * and nothing else, its audience is every BarnCRM role (the admin apps: BarnCRM Admin only), and
  * the App Navigation Style setting says which style's sets are on.
@@ -34,6 +38,9 @@ public with sharing class TabAccessService {
     public static final String BULK_UPDATE_TAB = 'BarnCRM_Tab_Bulk_Update';
     public static final String DATA_HYGIENE_TAB = 'BarnCRM_Tab_Data_Hygiene';
     public static final String DUPLICATE_MATCHING_TAB = 'BarnCRM_Tab_Duplicate_Matching';
+
+    /** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
+    public static final String HOUSEHOLDS_SET = 'BarnCRM_Households';
 
     public static final String STANDARD_APP = 'BarnCRM_App_Standard';
     public static final String CONSOLE_APP = 'BarnCRM_App_Console';
@@ -67,6 +74,7 @@ public with sharing class TabAccessService {
         BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
         DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
         DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
+        HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
         STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
         CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
         ADMIN_STANDARD_APP => new List<String>{ ADMIN },
