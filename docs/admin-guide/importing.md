@@ -438,7 +438,8 @@ report export is the safest source) and that you have access to it, then load th
 
 **"The ID ... is not a person" (or "not an organization").** The ID belongs to another kind
 of record, for example a household's ID in a person's ID column, or a contact's ID in the
-organization's. Map the column to the right one, or fix the ID.
+organization's. Map the column to the right one, or fix the ID. An account whose record type
+is not the one chosen in **Record type for organizations** is "not an organization" too.
 
 **"Nothing matches this row, and this file only matches".** The file was marked **Match only**,
 so a row whose person or organization is not already in Salesforce is rejected instead of
@@ -477,7 +478,10 @@ Under every rule a row with a first name finds only a person with that first nam
 **Organizations are matched by** **Name exact** (the same name, ignoring capitals and extra
 spaces) or **External ID**. Name exact treats two organizations with one name, such as two
 branches called "First Baptist Church", as one. Only organizations are searched: a household
-or a person with the same name or ID is never taken for one.
+or a person with the same name or ID is never taken for one. An organization is an account of
+the record type chosen in **Record type for organizations** on **General** in BarnCRM Settings
+(or with no record type, when **No record type** is chosen), and a new organization is created
+with that record type. An account of another record type with the same name is not matched.
 
 **Choosing an ID field.** With **External ID**, choose the field from the list beside the
 rule. It lists the fields your org marks **External ID** or **Unique** that hold text or an
