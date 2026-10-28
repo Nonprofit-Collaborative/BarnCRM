@@ -104,6 +104,13 @@
 # DATA_MODEL_STAGES=per-object bring back the old behaviour: see docs/contributor-guide/ci.md,
 # "Faster deploys".
 #
+# Batch testing (D-141, 2026-10-28) made two more cuts that cost no coverage. Reports are polled
+# every 5 seconds, not 15: a stage of a handful of components finished in a few seconds but was
+# not seen as done until the first report, so every small stage cost about 17 seconds. And a
+# stage that succeeded is no longer followed by a second, human-readable report call that lists
+# every component (about 1 MB of log per run and one more CLI round trip per stage);
+# DEPLOY_SHOW_COMPONENTS=1 brings it back. A failed stage still prints its full report.
+#
 # Exit codes: 0 = every stage deployed, non-zero = the first stage that failed.
 
 set -uo pipefail
@@ -111,7 +118,8 @@ set -uo pipefail
 STAGE_PAUSE_SECONDS="${STAGE_PAUSE_SECONDS:-0}"
 DATA_MODEL_STAGES="${DATA_MODEL_STAGES:-combined}"
 STALL_SECONDS="${STALL_SECONDS:-300}"
-POLL_SECONDS="${POLL_SECONDS:-15}"
+POLL_SECONDS="${POLL_SECONDS:-5}"
+DEPLOY_SHOW_COMPONENTS="${DEPLOY_SHOW_COMPONENTS:-0}"
 DEPLOY_WAIT_MINUTES="${DEPLOY_WAIT_MINUTES:-30}"
 REPORT_TIMEOUT_SECONDS="${REPORT_TIMEOUT_SECONDS:-60}"
 REPORT_FAILURE_LIMIT="${REPORT_FAILURE_LIMIT:-20}"
@@ -346,7 +354,9 @@ deploy_stage() {
     return "$status"
   fi
 
-  sf project deploy report --job-id "$JOB_ID" --target-org "$ALIAS" || true
+  if [[ "$DEPLOY_SHOW_COMPONENTS" == "1" ]]; then
+    sf project deploy report --job-id "$JOB_ID" --target-org "$ALIAS" || true
+  fi
   if [[ "${#stalled[@]}" -gt 0 ]]; then
     STALLS_RECOVERED=$(( STALLS_RECOVERED + ${#stalled[@]} ))
     echo "== Recovered: ${label} deployed on resubmission after stalled job ${stalled[*]} =="
