@@ -27,7 +27,7 @@ administrators only.
 
 **BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Data
 Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships**,
-**Affiliations** and **Household Members** at the end of its navigation menu. The admin apps
+**Affiliations** and **Household Members** just before **Data Manager**. The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Bulk Update** are not in the navigation: open them from their cards on the

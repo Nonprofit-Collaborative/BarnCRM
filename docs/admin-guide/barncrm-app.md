@@ -8,7 +8,7 @@ standard navigation and console navigation.
 | App | For | Navigation | Tabs |
 |---|---|---|---|
 | **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Data Manager |
-| **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Data Manager, Addresses, Relationships, Affiliations, Household Members |
+| **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Addresses, Relationships, Affiliations, Household Members, Data Manager |
 | **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Org Optimizer, Duplicate Matching, Error Log |
 | **BarnCRM Admin Console** | The BarnCRM Admin role only | Console | The same as BarnCRM Admin |
 
@@ -18,7 +18,15 @@ your organizations. The admin apps hold every BarnCRM tool and setting in one pl
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
 **Import**, **Find** and **Bulk Update** are not in any app's navigation: open them from the
 cards on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
-after any pages a module adds.
+after any pages a module adds. In the everyday apps, **Data Manager** is the last Core tab and
+a module's pages follow it.
+
+Each page's icon matches what it does, and the page header and its console tab show the same
+one: a gear for **BarnCRM Settings**, building blocks for **Data Manager**, a stethoscope for
+**Org Optimizer**, scales for **Duplicate Matching**, a bell for **Error Log**, a telescope for
+**Find** and a form for **Import**. **Households** show people, **Organizations** a building,
+**Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
+page name appears once, in the page header, and the tool below it starts with what it is for.
 
 If you have ever installed something in Salesforce and then wondered where to start, this
 is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
@@ -137,7 +145,8 @@ they keep the records you are working on open side by side in tabs across the to
   the record opens in its own tab instead.
 - **Pages such as Data Manager and BarnCRM Settings open as tabs too.** Choose them from the
   navigation menu (the arrow next to the app name). In **BarnCRM Console**, Addresses,
-  Relationships, Affiliations and Household Members are at the end of that menu. In **BarnCRM
+  Relationships, Affiliations and Household Members follow Organizations, and Data Manager
+  ends the Core part of that menu. In **BarnCRM
   Admin Console** the menu holds BarnCRM Settings, Data Manager, Org Optimizer, Duplicate
   Matching and Error Log. Find and Import open as tabs from their Data Manager cards.
 - **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
