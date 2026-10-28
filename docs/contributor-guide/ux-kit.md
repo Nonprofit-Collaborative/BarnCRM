@@ -26,5 +26,7 @@ Notes:
 - The About This Tool region opens on a person's first visit and stays closed after that. With `help-storage-key` the person's own choice is remembered in their browser only; it is a convenience, not a setting.
 - A disabled tile stays focusable so a screen reader reads why it is disabled.
 - Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers.
+- A hub page that must open without running anything (Org Optimizer) badges a tile only from what is cheap or already known, and lets a section report its own result with a `summary` event once it has been opened.
+- A component placed inside the shell drops its own `lightning-card` and opens with an `h2` and its actions, unless it is also exposed for Home or record pages, where it keeps its card.
 
 Each component has Jest tests written as stories (one case per variant a screen uses). Add a story when you add a variant. Part 2 (step flow, visual picker, stat tile) and the save bar follow in later pull requests.
