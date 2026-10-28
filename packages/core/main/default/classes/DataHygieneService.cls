@@ -168,6 +168,59 @@ public with sharing class DataHygieneService {
             .left(80);
     }
 
+    /** The name prefix "Open in Find" used before the tool was named Data Quality (D-140). */
+    @TestVisible
+    private static final String LEGACY_QUERY_PREFIX = 'Data hygiene: ';
+
+    /**
+     * Renames each saved query "Data hygiene: <check>" to "Data Quality: <check>", so "Open in
+     * Find" keeps updating it after the rename (D-140). Run by CorePostInstall on every install,
+     * upgrade and source deploy; running it again finds nothing to rename. When the owner already
+     * has a "Data Quality: <check>" query, that newer one is kept and the old one is left as it is.
+     * Names compare without case, as SOQL does. Returns how many were renamed.
+     */
+    public static Integer renameLegacySavedQueries() {
+        String prefix = System.Label.Core_DataHygiene_SavedQueryName.substringBefore('{0}');
+        String pattern = LEGACY_QUERY_PREFIX + '%';
+        List<Saved_Query__c> legacy = [
+            SELECT Id, Name, OwnerId
+            FROM Saved_Query__c
+            WHERE Name LIKE :pattern
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate
+            LIMIT 10000
+        ];
+        if (legacy.isEmpty()) {
+            return 0;
+        }
+        Set<String> targets = new Set<String>();
+        Set<Id> owners = new Set<Id>();
+        for (Saved_Query__c query : legacy) {
+            targets.add(prefix + query.Name.substring(LEGACY_QUERY_PREFIX.length()));
+            owners.add(query.OwnerId);
+        }
+        Set<String> taken = new Set<String>();
+        for (Saved_Query__c existing : [
+            SELECT Name, OwnerId
+            FROM Saved_Query__c
+            WHERE Name IN :targets AND OwnerId IN :owners
+            WITH SYSTEM_MODE
+        ]) {
+            taken.add(existing.OwnerId + '|' + existing.Name.toLowerCase());
+        }
+        List<Saved_Query__c> renamed = new List<Saved_Query__c>();
+        for (Saved_Query__c query : legacy) {
+            String name = prefix + query.Name.substring(LEGACY_QUERY_PREFIX.length());
+            // add() is false when the owner already has that name, or an earlier old query
+            // of theirs just took it.
+            if (taken.add(query.OwnerId + '|' + name.toLowerCase())) {
+                renamed.add(new Saved_Query__c(Id = query.Id, Name = name));
+            }
+        }
+        Database.update(renamed, AccessLevel.SYSTEM_MODE);
+        return renamed.size();
+    }
+
     /**
      * Counts a document as the running user, up to COUNT_CAP + 1. The document is compiled the
      * way Find compiles it first, so a column or sort the user cannot see is refused here too.
