@@ -2,7 +2,7 @@
  * The one-time rename of "Data hygiene: <check>" saved queries to "Data Quality: <check>"
  * (D-140), run by CorePostInstall on every install, upgrade and source deploy.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataHygieneService, ApexClass:CorePostInstall')
 private class DataHygieneSavedQueryRenameTest {
     private static final String CHECK = 'People with No Household';
 
