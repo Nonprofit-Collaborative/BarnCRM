@@ -241,7 +241,8 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Click **Back** twice. In **Separate the values with**, choose **Custom**. | A **Custom delimiter** box appears. |
 | 4 | Leave **Custom delimiter** empty and click **Next**. | The step does not move on and says "Type the characters that go between the values in Custom delimiter, or choose another delimiter." |
 | 5 | In **Custom delimiter**, type `/`. Click **Next** twice and pick **The Garcia Family**. | "Calculated: Diego/Harper/Luis. On the record now: (empty)." |
-| 6 | Click **Cancel**. | Nothing is saved. |
+| 6 | Click **Back** twice. In **Custom delimiter**, replace the text with a space, a hyphen and a space (` - `). Click **Next** twice and pick **The Garcia Family**. | "Calculated: Diego - Harper - Luis. On the record now: (empty)." The spaces are kept. |
+| 7 | Click **Cancel**. | Nothing is saved. |
 
 ## T-RB-15: Include Deleted and Archived Records
 

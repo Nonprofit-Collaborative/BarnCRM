@@ -405,6 +405,118 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    private static RollupBuilderController.Draft namesList(String customDelimiter) {
+        RollupBuilderController.Draft draft = childCount();
+        draft.name = 'Contact last names';
+        draft.targetField = 'Description';
+        draft.sourceObject = 'Contact';
+        draft.relationshipPath = 'AccountId';
+        draft.aggregate = 'TEXT_LIST';
+        draft.sourceField = 'LastName';
+        draft.orderByField = 'LastName';
+        draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;
+        draft.customDelimiter = customDelimiter;
+        draft.mode = RollupService.MODE_REAL_TIME;
+        return draft;
+    }
+
+    /** Salesforce trims a text value's spaces on save, so " - " is stored with tokens. */
+    @IsTest
+    static void aCustomDelimiterWithSpacesSurvivesTheSaveTheEngineAndTheBuilder() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.SaveResult result;
+            Test.startTest();
+            System.runAs(maria()) {
+                result = RollupBuilderController.save(namesList(' - '), false);
+            }
+            Test.stopTest();
+
+            Rollup_Definition__c stored = [
+                SELECT Delimiter__c, Custom_Delimiter__c
+                FROM Rollup_Definition__c
+                WHERE Id = :result.recordId
+            ];
+            System.Assert.areEqual(
+                'SP()-SP()',
+                stored.Custom_Delimiter__c,
+                'Spaces kept as tokens'
+            );
+            System.Assert.areEqual(
+                ' - ',
+                RollupPlanner.separatorOf(stored),
+                'The engine writes it'
+            );
+            System.Assert.areEqual(
+                ' - ',
+                RollupBuilderController.getDraft(result.recordId).customDelimiter,
+                'The Builder shows what was typed'
+            );
+
+            Account family = new Account(Name = 'Delimiter Family');
+            insert family;
+            insert new List<Contact>{
+                new Contact(LastName = 'Baker', AccountId = family.Id),
+                new Contact(LastName = 'Ames', AccountId = family.Id)
+            };
+            System.Assert.areEqual(
+                'Ames - Baker',
+                [SELECT Description FROM Account WHERE Id = :family.Id].Description,
+                'The concatenated value uses the spaces'
+            );
+        }
+    }
+
+    @IsTest
+    static void aTabAtEitherEndOfACustomDelimiterRoundTrips() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            RollupBuilderController.SaveResult result;
+            Test.startTest();
+            System.runAs(maria()) {
+                result = RollupBuilderController.save(namesList('\t;\t'), false);
+            }
+            Test.stopTest();
+
+            Rollup_Definition__c stored = [
+                SELECT Delimiter__c, Custom_Delimiter__c
+                FROM Rollup_Definition__c
+                WHERE Id = :result.recordId
+            ];
+            System.Assert.areEqual('TB();TB()', stored.Custom_Delimiter__c, 'Tabs kept as tokens');
+            System.Assert.areEqual('\t;\t', RollupPlanner.separatorOf(stored), 'The engine');
+            System.Assert.areEqual(
+                '\t;\t',
+                RollupBuilderController.getDraft(result.recordId).customDelimiter,
+                'The Builder'
+            );
+            System.Assert.areEqual('SP()SP()', RollupPlanner.encodeDelimiter('  '), 'Only spaces');
+            System.Assert.areEqual('a b', RollupPlanner.encodeDelimiter('a b'), 'Inner stays');
+        }
+    }
+
+    @IsTest
+    static void aDelimiterSavedBeforeTokensExistedStillWorks() {
+        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+            Rollup_Definition__c old = existing('Old delimiter', null);
+            old.Aggregate__c = 'TEXT_LIST';
+            old.Source_Object__c = 'Contact';
+            old.Relationship_Path__c = 'AccountId';
+            old.Source_Field__c = 'LastName';
+            old.Target_Field__c = 'Description';
+            old.Delimiter__c = RollupPlanner.CUSTOM_DELIMITER;
+            old.Custom_Delimiter__c = ' / ';
+            insert old;
+
+            System.Assert.areEqual(' / ', RollupPlanner.separatorOf(old), 'Used as it is');
+            System.Assert.areEqual(
+                ' / ',
+                RollupBuilderController.getDraft(old.Id).customDelimiter,
+                'Shown as it is'
+            );
+            System.Assert.areEqual('/', RollupPlanner.decodeDelimiter('/'), 'No token, no change');
+            System.Assert.isNull(RollupPlanner.decodeDelimiter(null), 'Nothing stays nothing');
+        }
+    }
+
     /** ADR-0136: the sum of the 5 largest, saved and read back for editing. */
     @IsTest
     static void aRowLimitAndItsDirectionAreSavedAndReadBack() {

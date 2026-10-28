@@ -266,7 +266,8 @@ What to know about them:
 - **A text list is separated by a comma, a semicolon, a new line, a pipe, or your own
   characters.** Choose one with **Separate the values with**; a comma is used when you choose
   nothing. **Pipe** writes ` | ` between the values. **Custom** writes what you type in
-  **Custom delimiter** (up to 10 characters, spaces included) exactly as typed, and cannot be
+  **Custom delimiter** (up to 10 characters, spaces included, such as ` - ` with a space on
+  each side) exactly as typed, and cannot be
   saved empty. A value that contains the separator is not changed, so if your values contain
   commas (for example "Smith, Jane"), choose a semicolon, a new line or a pipe so the list
   still reads clearly. A new line suits a long text field.
@@ -950,7 +951,7 @@ How each DLRS setting is copied:
 | Relationship Criteria | The filter, when it compares fields with values (equals, not equals, greater or less, blank or not, in a list, starts with, contains, this year, last year, last n days), joined by AND, OR and NOT |
 | Field to Order By | One field, ascending or descending. A descending First becomes Last, and the other way round. BarnCRM lists blank values last |
 | Row Limit | Kept for Sum, Avg, Min, Max and the text lists; left out of First, where it changes nothing |
-| Concatenate Delimiter | Comma, Semicolon, Pipe or New line when it is one of those; otherwise Custom, up to 10 characters. Blank becomes Comma |
+| Concatenate Delimiter | Comma, Semicolon, Pipe or New line when it is one of those; otherwise Custom, up to 10 characters, a space at either end kept (DLRS's SP() and TB()). Blank becomes Comma |
 | Aggregate All Rows | **Include deleted and archived records** |
 | Bypass Permission | Kept |
 | Calculation Mode | Realtime, Developer and Process Builder become **Both** (updated as records change and every night); Scheduled stays **Scheduled** |
