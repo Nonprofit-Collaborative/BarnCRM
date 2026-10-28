@@ -254,7 +254,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 |---|---|---|
 | 1 | Open the Import tab and choose **People and Organizations**. | The first template is chosen and **Start a New Template From This One** shows under it. |
 | 2 | Select **Start a New Template From This One**. | **New template name** shows prefilled "Copy of" plus the chosen template's name, with **Create**. |
-| 3 | Clear the name and select **Create** (it may be disabled). | Nothing is created. If the button is enabled, the message "Give the template a name." shows. |
+| 3 | Clear the name. | **Create** is disabled. |
 | 4 | Enter `Test event sign-ups` and select **Create**. | The new template is chosen under **Template**, **Next** is enabled and the line under it matches the source's ("This file can create: ..."). |
 | 5 | Select **Choose Something Else**, then **Your Templates**. | **Test event sign-ups** is listed with **Not loaded yet**. |
 | 6 | Select **Choose Something Else**, choose **People and Organizations** and pick the source template again. | The source is unchanged: same name, description and creates line, and it is not marked recurring. |
@@ -288,8 +288,8 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 |---|---|---|
 | 1 | Open the Import tab and choose **People and Organizations**. | **People and Organizations List** is chosen first, with its creates line ("This file can create: people, households, organizations, links between people and organizations."). |
 | 2 | Open the **Template** picker. | It also lists **Organization List** and **Couples and Households**. Choosing **Organization List** shows "This file can create: organizations."; choosing **Couples and Households** shows "This file can create: people, a second person per row, households." |
-| 3 | Choose **Organization List**, select **Next**, upload `import-test-orgs.csv`, select **Next** through the column check, then **Preview**. Import. | The preview shows 3 organizations to create and no people. After the import, the three organizations exist with the street, city, state, postal code and country in the billing address, plus phone and website, and no new people or households. |
-| 4 | Select **Import Another File**, choose **People and Organizations**, then **Couples and Households**, upload `import-test-couples.csv`, preview and import. | The preview shows 4 people and 2 households. After the import, **Tolliver Household** holds Mira and Dean Tolliver and **Ashby Household** holds Nell and Omar Ashby: one household with two members per row. |
+| 3 | Choose **Organization List**, select **Next**, upload `import-test-orgs.csv`, select **Next** through the column check, then **Preview**. Import. | The preview shows **would create** 3 and **would be rejected** 0. After the import, the three organizations exist with the street, city, state, postal code and country in the billing address, plus phone and website, and no new people or households. |
+| 4 | Select **Import Another File**, choose **People and Organizations**, then **Couples and Households**, upload `import-test-couples.csv`, preview and import. | The preview shows **would create** 2 (one per row) and **would be rejected** 0. After the import, **Tolliver Household** holds Mira and Dean Tolliver and **Ashby Household** holds Nell and Omar Ashby: one household with two members per row. |
 | 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Import tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).
