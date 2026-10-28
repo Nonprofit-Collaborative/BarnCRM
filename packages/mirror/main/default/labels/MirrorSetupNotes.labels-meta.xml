@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
+    <fullName>Mirror_SetupNote_CampaignSync_Steps</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Setup note, Campaign sync: clicks in Setup, separated by |</shortDescription>
+    <value>Click the permission set those people have (or open Profiles for their profile).|Click Object Settings, then Campaigns, then Edit.|Tick Read, Create and Edit, then click Save.</value>
+  </labels>
+  <labels>
     <fullName>Mirror_SetupNote_CampaignSync_What</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Setup note, Campaign sync: what to change</shortDescription>
-    <value>Give yourself Campaign Sync. For the people who create appeals, tick Marketing User on their user and let their profile or a permission set create and edit Campaigns.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_SetupNote_CampaignSync_Where</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Setup note, Campaign sync: Setup path</shortDescription>
-    <value>Setup, Users, the person: Marketing User, Permission Set Assignments</value>
+    <value>Let the people who create appeals create and edit Campaigns, through their profile or a permission set. Give yourself Campaign Sync on the Access page, under Extra Permissions.</value>
   </labels>
   <labels>
     <fullName>Mirror_SetupNote_CampaignSync_Why</fullName>
@@ -22,31 +22,39 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Setup note, Campaign sync: why it needs Setup</shortDescription>
-    <value>A Campaign is created with the access of the person saving the appeal, and Salesforce keeps that access in Setup. Without it the appeal still saves, and Sync all appeals catches it up.</value>
+    <value>A Campaign is created with the access of the person saving the appeal; without it the appeal still saves, and Sync all appeals catches it up.</value>
   </labels>
   <labels>
-    <fullName>Mirror_SetupNote_Export_What</fullName>
+    <fullName>Mirror_SetupNote_MarketingUser_Steps</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Setup note, Accounting export: what to change</shortDescription>
-    <value>Give the person who runs the export Accounting Export, with a Giving permission set that lets them see gifts (Giving Read Only is enough).</value>
+    <shortDescription>Setup note, Campaign sync Marketing User: clicks, separated by |</shortDescription>
+    <value>Click Edit next to the person.|Tick Marketing User.|Click Save.</value>
   </labels>
   <labels>
-    <fullName>Mirror_SetupNote_Export_Where</fullName>
+    <fullName>Mirror_SetupNote_MarketingUser_What</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Setup note, Accounting export: Setup path</shortDescription>
-    <value>Setup, Users, the person, Permission Set Assignments</value>
+    <shortDescription>Setup note, Campaign sync Marketing User: what to change</shortDescription>
+    <value>Tick Marketing User on the user of each person who creates appeals.</value>
   </labels>
   <labels>
-    <fullName>Mirror_SetupNote_Export_Why</fullName>
+    <fullName>Mirror_SetupNote_MarketingUser_Why</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Setup note, Accounting export: why it needs Setup</shortDescription>
-    <value>A module's permission set can be assigned only in Setup for now.</value>
+    <shortDescription>Setup note, Campaign sync Marketing User: why it needs Setup</shortDescription>
+    <value>Salesforce lets only a Marketing User create Campaigns, and that box is on the user in Setup.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_SetupNote_Mirror_Steps</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Setup note, Opportunity mirror: clicks in Setup, separated by |</shortDescription>
+    <value>Click the permission set your fundraising staff have (or open Profiles for their profile).|Click Object Settings, then Opportunities, then Edit.|Tick Read, Create and Edit, then click Save.</value>
   </labels>
   <labels>
     <fullName>Mirror_SetupNote_Mirror_What</fullName>
@@ -54,15 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Setup note, Opportunity mirror: what to change</shortDescription>
-    <value>Give yourself Opportunity Mirror. Give fundraising staff Opportunity create and edit access if each gift should get its Opportunity at once.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_SetupNote_Mirror_Where</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Setup note, Opportunity mirror: Setup path</shortDescription>
-    <value>Setup, Users, the person, Permission Set Assignments</value>
+    <value>If each gift should get its Opportunity at once, let fundraising staff create and edit Opportunities through their profile or a permission set. Give yourself Opportunity Mirror on the Access page, under Extra Permissions.</value>
   </labels>
   <labels>
     <fullName>Mirror_SetupNote_Mirror_Why</fullName>
@@ -70,6 +70,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Setup note, Opportunity mirror: why it needs Setup</shortDescription>
-    <value>Opportunities are written with the access of the person saving the gift, which only Setup grants. Without it the nightly run catches them up instead.</value>
+    <value>Opportunities are written with the access of the person saving the gift; without it the nightly run catches them up instead.</value>
   </labels>
 </CustomLabels>

@@ -48,7 +48,7 @@ import noLastRun from '@salesforce/label/c.Mirror_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Mirror_OpportunityMirror_Loading';
 import noteWhat from '@salesforce/label/c.Mirror_SetupNote_Mirror_What';
 import noteWhy from '@salesforce/label/c.Mirror_SetupNote_Mirror_Why';
-import noteWhere from '@salesforce/label/c.Mirror_SetupNote_Mirror_Where';
+import noteSteps from '@salesforce/label/c.Mirror_SetupNote_Mirror_Steps';
 
 const GIFTS_TO_OPPORTUNITIES = 'GiftsToOpportunities';
 const OFF = 'Off';
@@ -72,7 +72,15 @@ function isoDate(date) {
  */
 export default class OpportunityMirror extends LightningElement {
   /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
-  setupNotes = [{ key: 'opportunityAccess', what: noteWhat, why: noteWhy, where: noteWhere }];
+  setupNotes = [
+    {
+      key: 'opportunityAccess',
+      what: noteWhat,
+      why: noteWhy,
+      steps: noteSteps,
+      link: 'permissionSets'
+    }
+  ];
 
   labels = {
     loading,

@@ -7,7 +7,7 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">General</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">SetupValue</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts, as Salesforce Setup holds it. Totals for this year, last year and two years ago, and reports by fiscal year, all follow it. To change it, open Setup, Company Settings, Fiscal Year, then recalculate rollups.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts, as Salesforce Setup holds it. Totals for this year, last year and two years ago, and reports by fiscal year, all follow it. To change it, click Open in Setup (Company Settings, Fiscal Year), choose the start month and save, then recalculate rollups.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">barncrm-settings.md</value></values>
 </CustomMetadata>
