@@ -49,7 +49,7 @@ Status as of 2026-10-28 (main at #660, squash 2fa85483e; last full gate `oi-test
 19. Import redesign (D-136; #658 and #662 in `landing/batch-8`): R1 to R4 built (What Are You Importing? cards and creates summary; Start a New Template From This One; Organization List and Couples and Households templates; People and Organizations List rename for new installs); R5 (Affiliation and Relationship templates) later, after an org check of reciprocal relationship automation and affiliation primary rules under bulk load.
 20. Setup links (D-137; #659 in `landing/batch-8`): Open in Setup, numbered steps and Check Again on every "Needs a Change in Setup" note, one shared `c/setupLinks` module; six Setup paths still to verify in a browser during batch QA (T-SET-20).
 21. Core UX plan (D-140; Brandon, 2026-10-28): twelve Core UX PRs: 1 UX kit 1, 2 Admin navigation (high impact), 3 Data Manager, 4 UX kit 2 and Import, 5 Org Optimizer, 6 Settings console, 7 Setup Checklist and first run, 8 Find and Bulk tools, 9 Duplicate Matching (ahead of 8), 10 copy and accessibility sweep, 11 Home hub, 12 Record panels; PR 1 (#663) in `landing/batch-8`; module screens come later. Org Optimizer is the one name for the data-quality tool, its section Data Quality.
-22. Batch testing (D-141): feature PRs run no org gate; the integrator merges them into `landing/batch-N` and runs the full gates on `barn-sales` and `oi-test` once per batch.
+22. Batch testing (D-141): feature PRs run no org gate; the integrator merges them into `landing/batch-N` and runs the full gates on `barn-sales` and `oi-test` once per batch. Landed process in #664. Six test-speed proposals await Brandon.
 
 | ID | Platform feature (Core quality pass, D-39) | Status |
 |---|---|---|

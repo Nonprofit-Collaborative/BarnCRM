@@ -18,6 +18,7 @@ Last verified 2026-10-28 (landing/batch-8; main at #660, 2fa85483e; `mwdbdevsb` 
 - GitHub: `Nonprofit-Collaborative/BarnCRM`, default branch `main`.
 - Feature branch per feature ID (for example `feature/c-04-trigger-framework`), squash-merged to `main`; PRs under about 800 changed lines, stacked as `-1`, `-2` when larger.
 - Ruleset on `main` requires the status `Org tests (local)`, posted by `scripts/org/run-org-tests.sh`. Run it from a clean detached worktree at the pushed head, with `NODE_OPTIONS=--max-old-space-size=8192` (the sf CLI runs out of heap reading about 2,200 results).
+- Org gates run per landing batch (D-141), `barn-sales` and `oi-test` in parallel. Defaults: `POLL_SECONDS=5`, `TEST_POLL_SECONDS=15`, `DEPLOY_SHOW_COMPONENTS=0`. Gotcha: both gates post the same `Org tests (local)` status, so a success never replaces the other org's failure (Held).
 - Worktrees live under `~/worktrees/BarnCRM/<branch>`; the main checkout (in a synced folder) is not used for work.
 - Commits carry a DCO sign-off (`git commit -s`).
 

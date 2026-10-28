@@ -8,8 +8,9 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Landing batch 8 (PR pending, branch `landing/batch-8`; org gates not yet run; more PRs may follow)
 
-Merges #657, #654, #655, #653, #658, #662, #659, #661 and #663.
+Merges #657, #654, #655, #653, #658, #662, #659, #661, #663 and #664.
 
+- #664 (batch testing, D-141; plan 7.4, 9.6 and D-131 amended): batch process docs, parallel-gate Held rule, 5 s deploy polling, 15 s test polling, component listing opt-in.
 - #661 (RT2a, D-134, ADR-0141): households a person asks for (New household on Home, split into a new household, sample data) are created in system mode by `HouseholdWriter.createHouseholdsForUser` with explicit checks (Account create and edit, field create access, edit on each touched household); New household creates in Apex and opens the record.
 - #663 (UX kit part 1, D-140): `barnPageShell`, `barnToolTile`, `barnToolGrid`, `barnEmptyState`, `barnHelp`; Data Jobs empty state ("No Data Jobs Yet") on the kit. Baseline UX screenshots of `oi-test` captured read-only.
 - #658 and #662 (Import redesign, D-136): Import "What Are You Importing?" cards and a creates summary per template (#658); Start a New Template From This One, Organization List and Couples and Households templates, and the People and Organizations List rename for new installs (#662, stacked on #658).
