@@ -24,10 +24,14 @@ from the **Household** card or the **Households** tab.
 ## To Start From a Household
 
 1. On the **Home** tab, click **New household**.
-2. Save. Then add people with **Add member** (below).
+2. The household is created and opens. Add people with **Add member** (below).
 
 You should see: a household with a placeholder name, renamed automatically once it has a
 member.
+
+**New household** is the only way to start a household by hand. The **New** button on the
+**Households** tab or on Accounts never offers **Household**, and an account can't be changed
+into a household.
 
 ## To Add a Member to a Household
 
@@ -114,7 +118,8 @@ the record can read it, so write accordingly.
 ## To Add an Organization
 
 1. Open the **Organizations** tab and open the list, then click **New**.
-2. If Salesforce asks for a record type, choose **Organization** (not **Household**).
+2. If Salesforce asks for a record type, choose the one your organization uses for
+   organizations (your admin can tell you; it is never **Household**).
 3. Fill in the name and details and click **Save**.
 
 You should see: the organization's page with **Details**, an **Addresses** card and an
@@ -143,6 +148,10 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: "The primary contact could not be changed. Check that you can edit this household
   and try again." Ask your admin for edit access.
 - Problem: the household name will not update. **Custom Name** is ticked. Untick it.
+- Problem: there is no **Households** tab. Your organization has not turned households on
+  yet. Ask your admin.
+- Problem: **Household** is not offered when you click **New**. That is expected: use **New
+  household** on the **Home** tab.
 - Problem: there is no **Merge or Split** button. You are on an organization, or outside the
   **BarnCRM** app.
 - Problem: "This person is in a household, so Account Name must stay a household, not an

@@ -263,6 +263,29 @@ line. In a letter's body, the `{{OrganizationAddress}}` token (receipts) and
 `{OrganizationAddress}` token (volunteer letters) put the whole address on one line, with the
 parts separated by commas.
 
+### Record Type for Organizations
+
+**General** always shows **Record type for organizations**, whether or not Household Upkeep is
+on, because import, addresses and Giving use organizations either way. Accounts of the record
+type chosen here are your organizations: they appear on the **Organizations** tab, get the
+organization parts of the record page, are matched as organizations by import, and an import
+creates new organizations with it. Choose **No record type** when your org has no Account
+record types; then every account without one is an organization.
+
+BarnCRM never adds an Organization record type. On install it picks one you already have and
+saves it, so the row is never blank:
+
+1. A record type your accounts already use comes first.
+2. Among those (or among all, when none is used), **Organization**, then **Business
+   Account**, then **Business**, then **Default**, by the name in Setup; otherwise the first
+   by name.
+3. A household or person account record type is never offered or picked.
+4. With none left, **No record type**.
+
+Change it if the guess is wrong. Saving a person account record type or one named Household
+is refused. Accounts already saved keep their record type; only which accounts count as
+organizations changes.
+
 ## You Never Type an Identifier
 
 No setting asks you for a record ID, an API name or a developer name. Where a setting points
@@ -274,6 +297,8 @@ at something, you choose it:
 - **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
+- **One record type**, such as **Record type for organizations**, is a dropdown of your active
+  record types by the name you see in Setup, plus **No record type**.
 - **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
 
 Every setting shows its default until you change it. A dropdown, a number or a text setting
