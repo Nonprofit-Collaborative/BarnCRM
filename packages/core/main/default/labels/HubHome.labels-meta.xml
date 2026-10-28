@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: heading above the setup checklist</shortDescription>
-        <value>Setup checklist</value>
+        <value>Setup Checklist</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_ErrorTileHeading</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: heading of the tile counting unreviewed errors</shortDescription>
-        <value>Errors to review</value>
+        <value>Errors to Review</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_ErrorTileLinkLabel</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: heading above the quick links</shortDescription>
-        <value>Quick links</value>
+        <value>Quick Links</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_WelcomeHeading</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub home: title of the regular imports tile</shortDescription>
-        <value>Files that arrive regularly</value>
+        <value>Files That Arrive Regularly</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_RecurringNever</fullName>

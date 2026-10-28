@@ -118,7 +118,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: column, what starts the plan</shortDescription>
-    <value>What starts it</value>
+    <value>What Starts It</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ColumnSteps</fullName>
@@ -134,7 +134,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: column, how many plans are running</shortDescription>
-    <value>Running now</value>
+    <value>Running Now</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ColumnActive</fullName>
@@ -414,7 +414,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Start plan action: the button that starts the plan</shortDescription>
-    <value>Start plan</value>
+    <value>Start Plan</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartNone</fullName>

@@ -974,7 +974,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: what went wrong column</shortDescription>
-        <value>What went wrong</value>
+        <value>What Went Wrong</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnWhen</fullName>
@@ -1142,7 +1142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import table column: what happens to each rollup</shortDescription>
-        <value>What happens</value>
+        <value>What Happens</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportApply</fullName>

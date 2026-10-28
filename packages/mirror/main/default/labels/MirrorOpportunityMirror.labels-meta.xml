@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: name of the Opportunity mirror nightly job</shortDescription>
-    <value>Opportunity mirror, 1:30 AM</value>
+    <value>Opportunity Mirror, 1:30 AM</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_MirrorNotRunTitle</fullName>
@@ -598,7 +598,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: gift amount</shortDescription>
-    <value>Gift amount</value>
+    <value>Gift Amount</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnGiftDate</fullName>
@@ -606,7 +606,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: gift date</shortDescription>
-    <value>Gift date</value>
+    <value>Gift Date</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnOpportunity</fullName>
@@ -622,7 +622,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: Opportunity amount</shortDescription>
-    <value>Opportunity amount</value>
+    <value>Opportunity Amount</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnCloseDate</fullName>
@@ -630,7 +630,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: close date</shortDescription>
-    <value>Close date</value>
+    <value>Close Date</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnDifference</fullName>

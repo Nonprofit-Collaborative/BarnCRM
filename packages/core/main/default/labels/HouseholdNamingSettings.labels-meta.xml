@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Preview column heading</shortDescription>
-        <value>Formal greeting</value>
+        <value>Formal Greeting</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_ColumnInformal</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Preview column heading</shortDescription>
-        <value>Informal greeting</value>
+        <value>Informal Greeting</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_ColumnMembers</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Preview column heading</shortDescription>
-        <value>Household name</value>
+        <value>Household Name</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_Confirm</fullName>

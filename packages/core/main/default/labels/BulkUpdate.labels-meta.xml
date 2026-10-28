@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Card title and Find's button: Bulk update.</shortDescription>
-        <value>Bulk update</value>
+        <value>Bulk Update</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_TabIntro</fullName>
@@ -462,7 +462,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: confirm the undo.</shortDescription>
-        <value>Undo bulk update</value>
+        <value>Undo Bulk Update</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_UndoStarted</fullName>

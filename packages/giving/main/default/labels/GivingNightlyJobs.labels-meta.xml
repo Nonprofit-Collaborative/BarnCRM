@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the top up job and when it runs</shortDescription>
-    <value>Installment top up, 1:15 AM</value>
+    <value>Installment Top Up, 1:15 AM</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_TopUpDescription</fullName>
@@ -38,7 +38,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the overdue pass and when it runs</shortDescription>
-    <value>Overdue pass, 1:45 AM</value>
+    <value>Overdue Pass, 1:45 AM</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_OverdueDescription</fullName>
@@ -54,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the donor level pass and when it runs</shortDescription>
-    <value>Donor levels, 3:00 AM</value>
+    <value>Donor Levels, 3:00 AM</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_LevelsDescription</fullName>
@@ -110,7 +110,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: last run column heading</shortDescription>
-    <value>Last run</value>
+    <value>Last Run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_NextRunHeading</fullName>
@@ -118,7 +118,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: next run heading</shortDescription>
-    <value>Next run</value>
+    <value>Next Run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_ScheduleActive</fullName>
@@ -142,7 +142,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that schedules the jobs</shortDescription>
-    <value>Schedule nightly run</value>
+    <value>Schedule Nightly Run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_StopButton</fullName>
@@ -150,7 +150,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that stops the jobs</shortDescription>
-    <value>Stop nightly run</value>
+    <value>Stop Nightly Run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_RunNow</fullName>

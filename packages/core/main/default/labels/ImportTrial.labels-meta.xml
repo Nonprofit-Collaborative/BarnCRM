@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import preview: heading of the trial import choice</shortDescription>
-        <value>Try the first rows</value>
+        <value>Try the First Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_TrialHelp</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import preview: button that imports only the first rows</shortDescription>
-        <value>Import the first rows</value>
+        <value>Import the First Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_RemainingButton</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import results: button that imports the rows after a trial</shortDescription>
-        <value>Import the remaining rows</value>
+        <value>Import the Remaining Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_TrialDone</fullName>

@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: last run heading.</shortDescription>
-        <value>Last run</value>
+        <value>Last Run</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_NeverRun</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: schedule button.</shortDescription>
-        <value>Schedule daily run</value>
+        <value>Schedule Daily Run</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_StopButton</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: stop button.</shortDescription>
-        <value>Stop daily run</value>
+        <value>Stop Daily Run</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_SendNow</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: who receives it.</shortDescription>
-        <value>Goes to</value>
+        <value>Goes To</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_ToAdministrators</fullName>

@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: not a duplicate button</shortDescription>
-        <value>Not a duplicate</value>
+        <value>Not a Duplicate</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_DismissHeading</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismiss dialog heading</shortDescription>
-        <value>Not a duplicate</value>
+        <value>Not a Duplicate</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_DismissReasonLabel</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: merge two households button</shortDescription>
-        <value>Merge households</value>
+        <value>Merge Households</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_MergeConfirm</fullName>
@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: merge dialog heading</shortDescription>
-        <value>Merge two households</value>
+        <value>Merge Two Households</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_MergeKeepLabel</fullName>
@@ -310,7 +310,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: rules heading</shortDescription>
-        <value>Duplicate rules</value>
+        <value>Duplicate Rules</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ScanButton</fullName>
@@ -318,7 +318,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: scan button</shortDescription>
-        <value>Scan for duplicates</value>
+        <value>Scan for Duplicates</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ScanFinished</fullName>
@@ -374,7 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: suggestions heading</shortDescription>
-        <value>Possible duplicates</value>
+        <value>Possible Duplicates</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Title</fullName>

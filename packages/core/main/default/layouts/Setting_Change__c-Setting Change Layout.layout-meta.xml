@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>What changed</label>
+    <label>What Changed</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -29,7 +29,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>Who changed it</label>
+    <label>Who Changed It</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>

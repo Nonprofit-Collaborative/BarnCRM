@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: page heading</shortDescription>
-        <value>Quick gift entry</value>
+        <value>Quick Gift Entry</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_DonorKindLabel</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: save and start another button</shortDescription>
-        <value>Save and new</value>
+        <value>Save and New</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_SavingMessage</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: link to the gift just saved</shortDescription>
-        <value>Open this gift</value>
+        <value>Open This Gift</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorTitle</fullName>

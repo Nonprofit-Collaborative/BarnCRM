@@ -366,7 +366,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading: related record columns.</shortDescription>
-        <value>Related record columns</value>
+        <value>Related Record Columns</value>
     </labels>
     <labels>
         <fullName>Core_Find_AddRelatedColumn</fullName>
@@ -374,7 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: add a related record column.</shortDescription>
-        <value>Add a related record column</value>
+        <value>Add a Related Record Column</value>
     </labels>
     <labels>
         <fullName>Core_Find_RelatedFields</fullName>

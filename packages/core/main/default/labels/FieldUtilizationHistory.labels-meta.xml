@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: history saved by column</shortDescription>
-        <value>Saved by</value>
+        <value>Saved By</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_HistoryColFields</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: history average column</shortDescription>
-        <value>Average fill rate</value>
+        <value>Average Fill Rate</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_HistoryCompare</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: snapshot rows kind of record column</shortDescription>
-        <value>Kind of record</value>
+        <value>Kind of Record</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ViewColFillRate</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: snapshot rows fill rate column</shortDescription>
-        <value>Fill rate</value>
+        <value>Fill Rate</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_DeleteTitle</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: delete confirm button</shortDescription>
-        <value>Delete snapshot</value>
+        <value>Delete Snapshot</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_DeleteCancel</fullName>

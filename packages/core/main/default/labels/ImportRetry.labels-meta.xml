@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import retry: heading over the retry box on the results step</shortDescription>
-        <value>Retry fixed rows</value>
+        <value>Retry Fixed Rows</value>
     </labels>
     <labels>
         <fullName>Core_Import_RetryHelp</fullName>

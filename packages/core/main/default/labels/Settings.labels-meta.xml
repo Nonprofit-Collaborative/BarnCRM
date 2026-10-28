@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: recent changes column for when the change was saved</shortDescription>
-        <value>Changed at</value>
+        <value>Changed At</value>
     </labels>
     <labels>
         <fullName>Core_Settings_ColumnChangedBy</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: recent changes column for who made the change</shortDescription>
-        <value>Changed by</value>
+        <value>Changed By</value>
     </labels>
     <labels>
         <fullName>Core_Settings_ColumnNewValue</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: recent changes column for the value after the change</shortDescription>
-        <value>New value</value>
+        <value>New Value</value>
     </labels>
     <labels>
         <fullName>Core_Settings_ColumnOldValue</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: recent changes column for the value before the change</shortDescription>
-        <value>Old value</value>
+        <value>Old Value</value>
     </labels>
     <labels>
         <fullName>Core_Settings_ColumnSetting</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: button that throws away unsaved edits</shortDescription>
-        <value>Discard changes</value>
+        <value>Discard Changes</value>
     </labels>
     <labels>
         <fullName>Core_Settings_DefaultNotSaved</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: button that saves the default a setting shows</shortDescription>
-        <value>Keep this setting</value>
+        <value>Keep This Setting</value>
     </labels>
     <labels>
         <fullName>Core_Settings_KeepDefaultAria</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: link from a setting to its admin guide page</shortDescription>
-        <value>Learn more</value>
+        <value>Learn More</value>
     </labels>
     <labels>
         <fullName>Core_Settings_FeedbackLink</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: footer link to report a problem or give feedback</shortDescription>
-        <value>Report a problem or give feedback</value>
+        <value>Report a Problem or Give Feedback</value>
     </labels>
     <labels>
         <fullName>Core_Settings_FeedbackAria</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: button that opens a module's own settings page</shortDescription>
-        <value>Open this page</value>
+        <value>Open This Page</value>
     </labels>
     <labels>
         <fullName>Core_Settings_OpenNamedButton</fullName>

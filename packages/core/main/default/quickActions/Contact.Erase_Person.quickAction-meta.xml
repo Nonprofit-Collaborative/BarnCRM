@@ -4,7 +4,7 @@
   <description>
     Erase this person on request (right to be forgotten). Needs the Erase People permission.
   </description>
-  <label>Erase person</label>
+  <label>Erase Person</label>
   <lightningWebComponent>personErasure</lightningWebComponent>
   <optionsCreateFeedItem>false</optionsCreateFeedItem>
   <type>LightningWebComponent</type>

@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Books closed through heading</shortDescription>
-        <value>Books closed through</value>
+        <value>Books Closed Through</value>
     </labels>
     <labels>
         <fullName>Giving_Periods_NotClosed</fullName>

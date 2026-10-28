@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete panel title and the Find button that opens it.</shortDescription>
-        <value>Bulk delete</value>
+        <value>Bulk Delete</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_PanelIntro</fullName>
@@ -206,6 +206,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete undo: the button that starts it.</shortDescription>
-        <value>Undo bulk delete</value>
+        <value>Undo Bulk Delete</value>
     </labels>
 </CustomLabels>

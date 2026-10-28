@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub tile: link to the Addresses page of the settings console</shortDescription>
-        <value>Open the Addresses settings</value>
+        <value>Open the Addresses Settings</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_HubTitle</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub tile: heading over the seasonal swap last run</shortDescription>
-        <value>Seasonal addresses last swapped</value>
+        <value>Seasonal Addresses Last Swapped</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_NeverRun</fullName>

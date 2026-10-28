@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: page title</shortDescription>
-        <value>Field utilization</value>
+        <value>Field Utilization</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_PageIntro</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: API name column</shortDescription>
-        <value>API name</value>
+        <value>API Name</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColRecordType</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: Record type column</shortDescription>
-        <value>Record type</value>
+        <value>Record Type</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColFilled</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: With a value column</shortDescription>
-        <value>With a value</value>
+        <value>With a Value</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColRecords</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: Change column</shortDescription>
-        <value>Change (points)</value>
+        <value>Change (Points)</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColSampled</fullName>

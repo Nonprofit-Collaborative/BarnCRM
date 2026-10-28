@@ -86,7 +86,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: column: payment method</shortDescription>
-    <value>Payment method</value>
+    <value>Payment Method</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ColumnReference</fullName>
@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: column: check number</shortDescription>
-    <value>Check number</value>
+    <value>Check Number</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ControlTotalLabel</fullName>

@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the rollup freshness tile on the Hub home page.</shortDescription>
-        <value>Rollups last completed</value>
+        <value>Rollups Last Completed</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_FreshnessNever</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Link from the freshness tile to the Rollups page.</shortDescription>
-        <value>Open the Rollups page</value>
+        <value>Open the Rollups Page</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorInvalidOperator</fullName>

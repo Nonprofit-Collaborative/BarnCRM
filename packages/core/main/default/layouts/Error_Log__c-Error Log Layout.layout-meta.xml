@@ -4,7 +4,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>What happened</label>
+    <label>What Happened</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -37,7 +37,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>Where it happened</label>
+    <label>Where It Happened</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>
@@ -58,7 +58,7 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
-    <label>For a bug report</label>
+    <label>For a Bug Report</label>
     <layoutColumns>
       <layoutItems>
         <behavior>Readonly</behavior>

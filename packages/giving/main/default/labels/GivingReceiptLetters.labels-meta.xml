@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: button, restore the shipped letters</shortDescription>
-    <value>Restore the shipped letters</value>
+    <value>Restore the Shipped Letters</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_LetterPicker</fullName>
@@ -86,7 +86,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: button, switch this letter on</shortDescription>
-    <value>Use this letter</value>
+    <value>Use This Letter</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_PreviewButton</fullName>

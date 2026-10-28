@@ -102,7 +102,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: maximum column</shortDescription>
-    <value>Up to</value>
+    <value>Up To</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_ColumnDonors</fullName>

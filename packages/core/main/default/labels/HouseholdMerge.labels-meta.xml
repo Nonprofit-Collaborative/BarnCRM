@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Comparison column heading for the household being merged away</shortDescription>
-        <value>The other household</value>
+        <value>The Other Household</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ColumnThis</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Comparison column heading for the surviving household</shortDescription>
-        <value>This household</value>
+        <value>This Household</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ConfirmBody</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Button that runs the merge from the confirmation</shortDescription>
-        <value>Merge households</value>
+        <value>Merge Households</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ConfirmHeading</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading above the combined member list</shortDescription>
-        <value>Members after the merge</value>
+        <value>Members After the Merge</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_MergeButton</fullName>
@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading of the split member list</shortDescription>
-        <value>Choose who moves out</value>
+        <value>Choose Who Moves Out</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_SplitNewHousehold</fullName>
@@ -334,6 +334,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Title of the merge and split card</shortDescription>
-        <value>Merge or split households</value>
+        <value>Merge or Split Households</value>
     </labels>
 </CustomLabels>
