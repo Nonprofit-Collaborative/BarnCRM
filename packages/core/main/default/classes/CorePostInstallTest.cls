@@ -211,6 +211,10 @@ private class CorePostInstallTest {
             SettingsService.saveSystemValue('Suite__c', 'community');
             CorePostInstall.runAsSourceDeploy();
             SettingsService.clearCaches();
+            Set<String> loggedValues = new Set<String>();
+            for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
+                loggedValues.add(change.New_Value__c);
+            }
 
             Assert.areEqual(
                 ModuleDetectionService.SUITE_NONPROFIT,
@@ -227,17 +231,10 @@ private class CorePostInstallTest {
                 BarnCRM_Settings__c.getOrgDefaults().Suite__c,
                 'Community is renamed by a source deploy too'
             );
-            Assert.areEqual(
-                0,
-                [
-                    SELECT COUNT()
-                    FROM Setting_Change__c
-                    WHERE
-                        New_Value__c IN (
-                            :ModuleDetectionService.SUITE_STANDARD,
-                            :ModuleDetectionService.SUITE_NONPROFIT
-                        )
-                ],
+            Assert.isTrue(loggedValues.contains('community'), 'The test setting itself was logged');
+            Assert.isFalse(
+                loggedValues.contains(ModuleDetectionService.SUITE_STANDARD) ||
+                loggedValues.contains(ModuleDetectionService.SUITE_NONPROFIT),
                 'Nobody changed the edition, so Recent Changes lists no rename'
             );
         }
