@@ -63,6 +63,11 @@ public with sharing class StewardshipStartController {
             throw refuse(Label.Giving_Stewardship_ErrorOneDonor);
         }
         Boolean isPerson = donorId.getSObjectType() == Contact.SObjectType;
+        // The start runs in system mode, so the person must be able to see the donor first
+        // (2026-10-28 security review, G-L3). Anything but a person is read as an account.
+        if (!canSee(donorId, isPerson)) {
+            throw refuse(Label.Giving_Stewardship_ErrorDonorNotVisible);
+        }
         try {
             return StewardshipService.start(
                     templateId,
@@ -76,6 +81,13 @@ public with sharing class StewardshipStartController {
             ErrorLogger.log(failure, CONTEXT, donorId);
             throw refuse(Label.Giving_Stewardship_ErrorActionFailed);
         }
+    }
+
+    /** Whether the running user can read the donor, in user mode. */
+    private static Boolean canSee(Id donorId, Boolean isPerson) {
+        return isPerson
+            ? [SELECT COUNT() FROM Contact WHERE Id = :donorId WITH USER_MODE] == 1
+            : [SELECT COUNT() FROM Account WHERE Id = :donorId WITH USER_MODE] == 1;
     }
 
     private static Boolean canStart() {
