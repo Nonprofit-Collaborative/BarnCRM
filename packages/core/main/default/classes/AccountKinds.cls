@@ -197,13 +197,17 @@ public with sharing class AccountKinds {
     }
 
     /**
-     * Stores the detected record type when nothing is stored yet: what install and source
-     * deploy run (CorePostInstall), so the setting is never blank and the formula field that
-     * reads it has a value to compare. A stored value, even a stale one, is never overwritten.
+     * Stores the detected record type when nothing usable is stored: blank (a new install), or
+     * a record type since deactivated, deleted or otherwise no longer a candidate. What install
+     * and source deploy run (CorePostInstall), so the setting is never blank and the formula
+     * field `Account.Is_Organization__c`, which reads the stored value, agrees with this class,
+     * which reads a stale value as the detected one. `Master` and a candidate, the values an
+     * administrator can save, are never overwritten.
      */
     @NamespaceAccessible
     public static void storeDetectedIfBlank() {
-        if (String.isNotBlank(storedValue())) {
+        String stored = storedValue();
+        if (NO_RECORD_TYPE.equalsIgnoreCase(stored) || isCandidate(stored)) {
             return;
         }
         SettingsService.saveSystemValue(

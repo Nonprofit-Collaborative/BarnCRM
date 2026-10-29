@@ -103,7 +103,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-07: Merge Two Households (with Cancel)
 
 **Purpose:** merge combines two households after a warning, and cancel leaves both untouched.
-**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (Organization record type).
+**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (an organization: the record type in **Record type for organizations**).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -296,13 +296,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
 
-**Purpose:** an upgrade or redeploy of an org that has BarnCRM's old Organization record type changes nothing users see.
-**Prerequisites:** admin; an org deployed before this change, with organizations of the **Organization** record type (for example the Sales Cloud shape gate org).
+**Purpose:** after BarnCRM stops shipping its Organization record type, an org that ran an earlier version keeps its organizations once **Record type for organizations** is set.
+**Prerequisites:** admin; an org deployed before this change, with organizations and households (for example a test org with sample data).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | After the deploy, open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Organization**. |
-| 2 | Open the **Organizations** tab and the **Households** tab. | Both list the same records as before. |
-| 3 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13). |
+| 1 | Before the deploy, open the **Organizations** tab and note how many records it lists. | A count to compare. |
+| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type or **No record type**, never blank. |
+| 3 | Set **Record type for organizations** to the record type your organizations use (or **No record type** when they have none) and save. | Saved, and listed in **Recent Changes**. |
+| 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
+| 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
 
 **Cleanup:** none.

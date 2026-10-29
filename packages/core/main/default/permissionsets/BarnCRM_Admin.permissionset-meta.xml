@@ -1604,10 +1604,6 @@
     <object>Setting_Change__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
-  <recordTypeVisibilities>
-    <recordType>Account.Organization</recordType>
-    <visible>true</visible>
-  </recordTypeVisibilities>
   <tabSettings>
     <tab>Address__c</tab>
     <visibility>Visible</visibility>

@@ -316,7 +316,8 @@ saves it, so the row is never blank:
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as
-organizations changes.
+organizations changes. If you later deactivate or delete the chosen record type, BarnCRM
+picks again the same way on its next upgrade, so check this row after one.
 
 ## You Never Type an Identifier
 

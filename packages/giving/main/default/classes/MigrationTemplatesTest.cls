@@ -518,13 +518,12 @@ private class MigrationTemplatesTest {
             Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
             Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, why(row));
             Account foundation = [
-                SELECT Id, RecordType.DeveloperName
+                SELECT Id, RecordTypeId
                 FROM Account
                 WHERE Name = 'Riverside Foundation'
             ];
-            Assert.areEqual(
-                'Organization',
-                foundation.RecordType.DeveloperName,
+            Assert.isTrue(
+                AccountKinds.isOrganization(foundation.RecordTypeId),
                 'Created as an organization.'
             );
             Gift__c gift = giftsByExternalId().get('6gt-3001');
@@ -924,13 +923,12 @@ private class MigrationTemplatesTest {
             Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
             Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, why(row));
             Account organization = [
-                SELECT Id, RecordType.DeveloperName
+                SELECT Id, RecordTypeId
                 FROM Account
                 WHERE Name = 'Hillside Rotary Club'
             ];
-            Assert.areEqual(
-                'Organization',
-                organization.RecordType.DeveloperName,
+            Assert.isTrue(
+                AccountKinds.isOrganization(organization.RecordTypeId),
                 'An organization.'
             );
             Gift__c gift = giftsByExternalId().get('a0B-0101');
