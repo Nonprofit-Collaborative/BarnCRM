@@ -126,8 +126,10 @@ household records, names, greetings, member counts, and Members panel.
 3. On the household record, check the formal and informal greeting fields. They read
    naturally, for example "Mr. and Mrs." followed by the names, and a first-names-only
    informal greeting, because they were computed by the naming rules from the sample
-   household's members. The names and greetings are computed by household automation as
-   the people are added, so they only appear if household naming is turned on.
+   household's members. The load works out every sample household's name, greetings and
+   member count as the people are added, even while **Household Upkeep** is off, so the
+   sample set always arrives fully named. Your own households are only kept up to date
+   while Household Upkeep is on.
 4. Still on the Garcia household, look at the **Gifts** related list (Giving installed).
    The family has given in each of the last three years, which is what a renewing donor
    looks like in the retention report.

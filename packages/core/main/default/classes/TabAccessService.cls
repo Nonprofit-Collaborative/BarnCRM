@@ -324,7 +324,8 @@ public with sharing class TabAccessService {
         List<PermissionSetAssignment> toDelete,
         String context
     ) {
-        List<String> refusals = new List<String>();
+        List<PermissionSetAssignment> refused = new List<PermissionSetAssignment>();
+        List<List<String>> refusedErrors = new List<List<String>>();
         Integer refusedInserts = 0;
         if (!toInsert.isEmpty()) {
             List<Database.SaveResult> saved = Database.insert(
@@ -332,12 +333,14 @@ public with sharing class TabAccessService {
                 false,
                 AccessLevel.SYSTEM_MODE
             );
-            for (Database.SaveResult result : saved) {
+            for (Integer i = 0; i < saved.size(); i++) {
+                Database.SaveResult result = saved[i];
                 if (result.isSuccess() || isDuplicate(result.getErrors())) {
                     continue;
                 }
                 refusedInserts++;
-                addErrors(refusals, result.getErrors());
+                refused.add(toInsert[i]);
+                refusedErrors.add(messagesOf(result.getErrors()));
             }
         }
         if (!toDelete.isEmpty()) {
@@ -346,14 +349,69 @@ public with sharing class TabAccessService {
                 false,
                 AccessLevel.SYSTEM_MODE
             );
-            for (Database.DeleteResult result : deleted) {
-                addErrors(refusals, result.isSuccess() ? null : result.getErrors());
+            for (Integer i = 0; i < deleted.size(); i++) {
+                if (!deleted[i].isSuccess()) {
+                    refused.add(toDelete[i]);
+                    refusedErrors.add(messagesOf(deleted[i].getErrors()));
+                }
             }
         }
-        if (!refusals.isEmpty()) {
-            ErrorLogger.logMessages(refusals, context, ErrorLogger.SEVERITY_WARNING);
+        if (!refused.isEmpty()) {
+            ErrorLogger.logMessages(
+                refusalMessages(refused, refusedErrors),
+                context,
+                ErrorLogger.SEVERITY_WARNING
+            );
         }
         return refusedInserts;
+    }
+
+    /**
+     * One line per error, naming the permission set and the user it was for, so the Warning
+     * says which assignment to look at rather than only what the platform answered.
+     */
+    @TestVisible
+    private static List<String> refusalMessages(
+        List<PermissionSetAssignment> refused,
+        List<List<String>> errors
+    ) {
+        Set<Id> setIds = new Set<Id>();
+        for (PermissionSetAssignment assignment : refused) {
+            setIds.add(assignment.PermissionSetId);
+        }
+        Map<Id, String> setNames = new Map<Id, String>();
+        for (PermissionSet row : [
+            SELECT Id, Name
+            FROM PermissionSet
+            WHERE Id IN :setIds
+            WITH SYSTEM_MODE
+        ]) {
+            setNames.put(row.Id, row.Name);
+        }
+        List<String> messages = new List<String>();
+        for (Integer i = 0; i < refused.size(); i++) {
+            PermissionSetAssignment assignment = refused[i];
+            String setName = setNames.get(assignment.PermissionSetId);
+            String detail = String.format(
+                Label.Core_Access_TabRefusalDetail,
+                new List<Object>{
+                    setName == null ? String.valueOf(assignment.PermissionSetId) : setName,
+                    assignment.AssigneeId
+                }
+            );
+            for (String error : errors[i]) {
+                messages.add(error + ' ' + detail);
+            }
+        }
+        return messages;
+    }
+
+    private static List<String> messagesOf(List<Database.Error> errors) {
+        List<String> messages = new List<String>();
+        for (Database.Error error : errors) {
+            messages.add(error.getMessage());
+        }
+        return messages;
     }
 
     private static Boolean isDuplicate(List<Database.Error> errors) {
@@ -363,15 +421,6 @@ public with sharing class TabAccessService {
             }
         }
         return !errors.isEmpty();
-    }
-
-    private static void addErrors(List<String> refusals, List<Database.Error> errors) {
-        if (errors == null) {
-            return;
-        }
-        for (Database.Error error : errors) {
-            refusals.add(error.getMessage());
-        }
     }
 
     /** This package's tab sets and audience sets, by name. */
@@ -458,7 +507,7 @@ public with sharing class TabAccessService {
     private static Map<Id, PermissionSetAssignment> directHolders(Id tabSetId) {
         Map<Id, PermissionSetAssignment> held = new Map<Id, PermissionSetAssignment>();
         for (PermissionSetAssignment row : [
-            SELECT Id, AssigneeId
+            SELECT Id, AssigneeId, PermissionSetId
             FROM PermissionSetAssignment
             WHERE PermissionSetId = :tabSetId
             WITH SYSTEM_MODE

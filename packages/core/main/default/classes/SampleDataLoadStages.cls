@@ -128,6 +128,14 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
                 firstPersonByHousehold(contactsToInsert, householdIds)
             );
         }
+        // Sample data always arrives settled: member count, primary, name and both greetings.
+        // The triggers that settle a household do not run while Household Upkeep is off (or
+        // an administrator has switched one of them off), which would leave every household
+        // named "Household". So the chunk's households are settled here whatever the switch
+        // says; when the triggers did run this finds nothing to change and saves nothing.
+        Set<Id> chunkHouseholds = new Set<Id>(householdIds);
+        chunkHouseholds.remove(null);
+        HouseholdService.afterMembershipChange(chunkHouseholds, false);
         return contactsToInsert.size();
     }
 
@@ -204,8 +212,8 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
             acct.Custom_Name__c = true;
             acct.Name = (String) household.get('name');
         } else {
-            // Placeholder; the household naming trigger recomputes Name, the formal
-            // greeting, and the informal greeting once members are attached (R-H4).
+            // Placeholder; each contact stage settles Name, the formal greeting and the
+            // informal greeting once members are attached (R-H4), Household Upkeep on or off.
             acct.Name = 'Household';
         }
         return acct;

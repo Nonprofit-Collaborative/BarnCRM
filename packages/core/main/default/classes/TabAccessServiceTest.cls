@@ -18,6 +18,37 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
+    static void aRefusedAssignmentNamesItsPermissionSetAndUser() {
+        System.runAs(TestUsers.admin()) {
+            PermissionSet tabSet = [
+                SELECT Id, Name
+                FROM PermissionSet
+                WHERE Name = 'BarnCRM_Tab_Import'
+                LIMIT 1
+            ];
+            Id userId = UserInfo.getUserId();
+            List<PermissionSetAssignment> refused = new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = tabSet.Id)
+            };
+
+            Test.startTest();
+            List<String> messages = TabAccessService.refusalMessages(
+                refused,
+                new List<List<String>>{ new List<String>{ 'delete failed for this entity' } }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, messages.size(), 'One line per error');
+            Assert.isTrue(
+                messages[0].startsWith('delete failed for this entity'),
+                'Keeps what the platform said: ' + messages[0]
+            );
+            Assert.isTrue(messages[0].contains(tabSet.Name), 'Names the permission set');
+            Assert.isTrue(messages[0].contains(String.valueOf(userId)), 'Names the user');
+        }
+    }
+
+    @IsTest
     static void givesPriyaTheTabsHerExtraPermissionUsedToShow() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();
