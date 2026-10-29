@@ -1,4 +1,4 @@
-@IsTest
+@IsTest(testFor='ApexClass:CompanyInformation, ApexClass:SettingsController')
 private class CompanyInformationTest {
     @TestSetup
     static void createUsers() {
