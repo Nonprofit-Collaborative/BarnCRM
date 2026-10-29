@@ -6,9 +6,13 @@ BarnCRM Settings is the one page where
 everything about how BarnCRM behaves is changed: how households are named, which
 automations run, who has access, and how this org fits alongside anything you already had.
 Settings are grouped into sections on the left, and on each section's page into boxes, each
-with its own heading (see "Sections and their boxes" below). Every setting has a
-plain-language description under it, and there is a search box for when you
-remember the word but not the section.
+with its own heading (see "Sections and their boxes" below). The section list is grouped under
+short headings (Organization, People, Data, Fundraising, Programs, System), and each section
+has its own icon. Every setting has a plain-language description: click the info icon under
+the setting to read it, and **Learn More** beside the icon opens this guide's page for it in a
+new tab. There is a search box for when you remember the word but not the section.
+
+Every setting applies to the whole organization, never to one person.
 
 You never need Salesforce Setup for a normal day. When something genuinely can only be
 done in Setup, the setup checklist on the Hub home page sends you there with instructions,
@@ -161,10 +165,13 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM Admin** (or **BarnCRM Admin
    Console**). It opens on the **BarnCRM Settings** tab.
 2. The console opens with the section list on the
-   left and the first section showing on the right. The sections are General, Modules,
-   Organization, People and Households, Duplicate Matching, Addresses, Giving, Receipts,
-   Rollups, Volunteers, Automation, Error Log, Access, Import, Org Optimizer, Integrations, and
-   Health. Each section's settings sit in bordered boxes with a heading, such as **People** and
+   left and the first section showing on the right. The page name shows once, in the page
+   header. The sections are listed in groups: **Organization** (General, Organization),
+   **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching, Org
+   Optimizer), **Fundraising** (Giving, Receipts, Rollups), **Programs** (Volunteers) and
+   **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
+   module adds that is not in these groups is listed under **More**, before System, so Error
+   Log is always last. Each section's settings sit in bordered boxes with a heading, such as **People** and
    **Households** on People and Households. You only see
    the ones that have something in them, and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
@@ -188,8 +195,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    the formal greeting pattern, watch the preview update, then click the panel's **Save**.
    A confirmation appears saying the patterns are saved. The new value is in effect
    immediately: the next contact you add gets the new greeting, with no waiting and no
-   cache to clear. The settings console's own **Save** button is for the other settings in
-   the section, such as whether people who have died stay in the household name.
+   cache to clear. The settings console's own save bar is for the other settings in
+   the section, such as whether people who have died stay in the household name (see
+   "Saving Your Changes" below).
 6. Open the **General** section and scroll to **Recent Changes** at the bottom of the page.
    It shows on **General** only, whichever section the change was made in. Your change is the first row,
    showing the setting by the name you see on this page, the old value, the new value, your
@@ -203,8 +211,21 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Settings. He opens the same tab and sees the same sections and the same values, with a
    notice across the top: "You can read these settings but not change them. Ask your
    administrator for the Manage BarnCRM Settings permission." Every control is greyed
-   out and there is no Save button. He can still read every description and follow every
-   Learn more link.
+   out and no save bar appears. He can still open every description from its info icon and
+   follow every Learn More link.
+
+## Saving Your Changes
+
+Changes are not saved as you make them. As soon as you change a setting, a bar docks to the
+bottom of the screen saying how many changes are not saved yet, with **Discard** and
+**Save**. **Save** saves every changed setting, including changes made in another section
+before you moved on; **Discard** puts them all back. The bar goes away once nothing is
+unsaved. While anything is unsaved, closing or reloading the browser tab asks you first;
+moving to another tab inside Salesforce does not ask, so save before you leave the page.
+
+Panels with their own **Save** button (such as household naming or the organization address)
+save on their own and do not count in the bar. The **Integrations** section has nothing to
+save, so it has no save bar.
 
 ## Sections and Their Boxes
 
@@ -312,19 +333,25 @@ shows the mode BarnCRM detects as right for your org, and stays unconfirmed unti
 one and save. Settings that point at a record (such as a default fund), a list of record
 types, or a date have no default to show and stay empty until you choose.
 
-A setting showing a default nobody has saved says **Default, not yet saved.** under it. If you
-agree with the value shown, click **Keep This Setting** beside that note: it saves exactly the
+A setting showing a default nobody has saved carries a **Default** badge under it. When a
+section has any such setting, a banner at the top of the section says **These Are Defaults**
+and that you can keep them all or change any. **Keep All Defaults** in that banner saves every
+default the section shows at once, in one save, each exactly as shown and each with its own
+**Recent Changes** row. It skips any setting you have already changed on the page and any
+setting with no button (see below). To keep just one, click **Keep This Setting** beside its
+badge: it saves exactly the
 value shown, as if you had chosen it yourself, with the same permission, checks and **Recent
 Changes** row, and anything choosing it by hand sets off (keeping **Coexistence mode**, for
 example, confirms that mode and completes its Setup Assistant step). Changes you have not saved
-yet stay on the page. A setting already saved shows no note, and people without Manage BarnCRM
-Settings see the note but no button. **How people belong to a household** has no button when
+yet stay on the page. A setting already saved shows no badge, and people without Manage
+BarnCRM Settings see the badge and the banner but no buttons. **How people belong to a household** has no button when
 BarnCRM would choose differently for your org (with Person Accounts or Nonprofit Cloud it
-moves a household choice nobody made to the flexible way): the note stays, and you choose the
+moves a household choice nobody made to the flexible way): the badge stays, and you choose the
 way you want from the list and save.
 
-The description of each setting is read out by a screen reader together with the control,
-so every setting is explained the same way however you use the page.
+Each setting's info icon is a button: a screen reader names it with the setting and reads the
+description when it is opened, and each setting is a labelled group, so the Learn More link
+beside it is read with the setting's name.
 
 ## Values That Come From Setup
 
@@ -347,12 +374,13 @@ custom periods while BarnCRM totals stay in whole years (see
 
 BarnCRM avoids Salesforce Setup wherever it can. A few features still depend on something only
 Setup can change, usually because Salesforce keeps that switch for itself. When a section has
-one, a note at the top of the section says, before any setting:
+one, a short note at the top of the section says, before any setting:
 
-- **what** to change in Setup,
-- **why** BarnCRM needs it, in one sentence,
-- the **steps**, 2 to 4 numbered clicks once you are on the Setup page,
-- an **Open in Setup** button that opens that Setup page in a new tab, so this page stays open.
+- **what** to change in Setup, in one line under the heading **Needs a Change in Setup**,
+- an **Open in Setup** button that opens that Setup page in a new tab, so this page stays open,
+- **Show Steps**, which opens **why** BarnCRM needs it, in one sentence, and the **steps**, 2
+  to 4 numbered clicks once you are on the Setup page. The steps start closed so the
+  settings stay near the top.
 
 Where BarnCRM can read the answer without any extra permission, the note also says whether it
 is already done: **Done** with a green tick, or **Not done yet** with a warning icon, and a
@@ -397,8 +425,8 @@ no note. Accounting Export has no Setup note.
   If the controls are greyed out, read the notice at the top of the page. It names the
   exact permission to ask for: Manage BarnCRM Settings.
 - **Editing values and leaving the page without saving.** The console does not save as you
-  type. Changed settings are held until you click **Save**, and leaving the page discards
-  them. If you are not sure whether a change went in, check **Recent Changes** on **General**.
+  type. Changed settings are held until you click **Save** in the bar docked at the bottom of
+  the screen, which counts them, and leaving the page discards them. If you are not sure whether a change went in, check **Recent Changes** on **General**.
 - **Worrying that two people saving at once undo each other.** They do not. A save writes
   only the settings you changed, compared with what is stored at that moment, so a setting
   someone else saved after you opened the page is kept. If you both changed the same

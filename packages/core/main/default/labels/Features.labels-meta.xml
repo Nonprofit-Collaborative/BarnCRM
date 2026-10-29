@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Data Manager feature covers.</shortDescription>
-        <value>Import, find, update and delete records in bulk: the Data Manager, Import, Find and Bulk Update tabs.</value>
+        <value>Import, find, update and delete records in bulk, all from Data Manager.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_DuplicateReview_Name</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Duplicate Matching feature covers.</shortDescription>
-        <value>The Duplicate Matching tab: suggests people and households that look like duplicates, for you to review and merge, and lets you choose what pairs them.</value>
+        <value>Suggests people and households that look like duplicates, for you to review and merge, and lets you choose what pairs them.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_OrgOptimizer_Name</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Org Optimizer and Health Check feature covers.</shortDescription>
-        <value>Checks your org's setup and data and suggests fixes: the Org Optimizer tab and Health Check.</value>
+        <value>Checks your org's setup and data and suggests fixes, in Org Optimizer and Health Check.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_HouseholdUpkeep_Name</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Body of the confirmation before a feature is turned on. {0} is its name.</shortDescription>
-        <value>{0} will be turned on for everyone, with its tabs, settings and automations. It can't be turned off again.</value>
+        <value>{0} will be turned on for everyone, with its pages, settings and automations. It can't be turned off again.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_Cancel</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message after a feature is turned on. {0} is its name.</shortDescription>
-        <value>{0} is on. Its tabs appear for the right people within a few minutes.</value>
+        <value>{0} is on. Its pages appear for the right people within a few minutes.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_LoadError</fullName>

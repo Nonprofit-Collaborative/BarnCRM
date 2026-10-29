@@ -19,7 +19,7 @@ There is nothing to turn on.
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**.
 2. Click **BarnCRM Settings**, then **Integrations** in the left navigation.
 
-Everyone who can open BarnCRM Settings sees the page. It has no settings to change, so it shows no **Save** or **Discard Changes** buttons.
+Everyone who can open BarnCRM Settings sees the page. It has no settings to change, so it shows no save bar.
 
 ## What the Page Shows
 

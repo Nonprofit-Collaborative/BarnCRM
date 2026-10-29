@@ -4,8 +4,7 @@
   <isExposed>true</isExposed>
   <masterLabel>BarnCRM Settings</masterLabel>
   <description>
-    Every BarnCRM setting on one page, grouped into sections, searchable, with a
-    description under each control.
+    Every BarnCRM setting on one page, grouped into sections, searchable, with help beside each control.
   </description>
   <capabilities>
     <capability>lightning__dynamicComponent</capability>

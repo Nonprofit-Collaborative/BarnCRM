@@ -17,14 +17,18 @@
             <div class="slds-media__body">
                 <p class="slds-text-title_bold">{labels.heading}</p>
                 <p>{note.what}</p>
-                <p class="slds-text-color_weak">{note.why}</p>
-                <template lwc:if={note.hasSteps}>
-                    <ol class="slds-list_ordered slds-var-m-vertical_x-small" data-id="steps">
-                        <template for:each={note.stepList} for:item="step">
-                            <li key={step}>{step}</li>
-                        </template>
-                    </ol>
-                </template>
+                <!-- Why and the steps start closed so the settings stay near the top (UX PR 6). -->
+                <details class="slds-var-m-top_xx-small" data-id="details">
+                    <summary class="slds-text-link">{labels.showSteps}</summary>
+                    <p class="slds-text-color_weak">{note.why}</p>
+                    <template lwc:if={note.hasSteps}>
+                        <ol class="slds-list_ordered slds-var-m-vertical_x-small" data-id="steps">
+                            <template for:each={note.stepList} for:item="step">
+                                <li key={step}>{step}</li>
+                            </template>
+                        </ol>
+                    </template>
+                </details>
                 <template lwc:if={note.hasStatus}>
                     <p class="slds-text-title_bold" data-id="status">{note.statusText}</p>
                 </template>

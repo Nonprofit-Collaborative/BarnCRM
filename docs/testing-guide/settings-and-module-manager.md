@@ -14,10 +14,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | A card titled **BarnCRM Settings** opens. A **Search settings** box and a **Sections** list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the **Sections** list. | It includes **General**, **Modules**, **Organization**, **People and Households**, **Duplicate Matching**, **Addresses**, **Automation**, **Error Log**, **Access**, **Import**, **Org Optimizer**, **Integrations** and **Health** (in that order), plus **Giving** and **Receipts** with Giving installed, **Rollups** with Rollup Builder installed, and **Volunteers** with Volunteers installed (a Core-only org has no **Rollups** section). |
-| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show, each with a plain description. A **Needs a Change in Setup** note at the top has numbered steps and an **Open in Setup** button (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). |
-| 4 | Click **Learn More** under any setting. | A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
+| 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | The page name **BarnCRM Settings** shows once, in the page header, with the line "Choose how BarnCRM works for your whole organization." under it. A **Search settings** box and the section list are on the left; the first section shows on the right. No read-only notice is shown. |
+| 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Org Optimizer**), **Fundraising** (**Giving** and **Receipts** with Giving installed, **Rollups** with Rollup Builder installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
+| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show. No description is printed under a row: each row has an info icon, and clicking it shows the plain description. A **Needs a Change in Setup** note at the top shows one line, an **Open in Setup** button and **Show Steps** (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). In **Features**, no description says "tab" or "Data Hygiene". |
+| 4 | Click **Learn More** beside the info icon of any setting. | **Learn More** stands apart from any text, with a new-window icon. A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old Value**, **New Value**, **Changed By**, **Changed At**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
 | 7 | Click **People and Households**, then scroll to the bottom of the page. | There is no **Recent Changes** heading or table on **People and Households**. Click **Automation**, **Access** and **Organization** in turn: none shows **Recent Changes**. |
@@ -46,11 +46,11 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Error Log**. Change **Days to keep Error Log entries** to `90`. | **Save** and **Discard Changes** become enabled. |
-| 2 | Click **Discard Changes**. | The value returns to what it was. **Save** is disabled again. Nothing is added to **Recent Changes** (shown on **General** only). |
+| 1 | Open **BarnCRM Settings**, **Error Log**. Change **Days to keep Error Log entries** to `90`. | A bar docks to the bottom of the screen: "1 unsaved change", **Discard** and **Save**. Change **Digest frequency** too: the bar says "2 unsaved changes". |
+| 2 | Click **Discard**. | Both values return to what they were and the bar goes away. Nothing is added to **Recent Changes** (shown on **General** only). |
 | 3 | Change the value to `5000` and click **Save**. | The box is marked as out of range and the page says "A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again." |
 | 4 | Change the value to `90` and click **Save**. | "Your settings are saved." Open **General**: the top row of **Recent Changes** shows **Days to keep Error Log entries**, old value 180, new value 90, your name and the time. |
-| 5 | Open **Error Log** and click **Save** again without changing anything, then open **General**. | No new row appears in **Recent Changes**. |
+| 5 | Open **Error Log** without changing anything, then open **General**. | No save bar shows while nothing is unsaved, and no new row appears in **Recent Changes**. |
 | 6 | Reload the page and open **Error Log**. | The box shows 90. |
 
 **Cleanup:** set **Days to keep Error Log entries** back to 180 and save.
@@ -219,7 +219,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and there is no **Save** or **Discard Changes**. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
+| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
 | 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
 | 4 | Open **Automation**. | "You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
@@ -280,7 +280,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 7 | Click **Propose an Integration for Your Product**. | The GitHub form **Integration proposal from a solution provider** opens in a new tab and asks for a role only, not a name or email. Close it without submitting. |
 | 8 | In Setup, open **Custom Metadata Types**, **Integration App**, **Manage Integration App**, and edit **Volunteers for Salesforce (V4S)**: set **Show Only When Installed** off. Save, then click **Check again** on the page. | **Alternatives to BarnCRM Modules** appears with **Volunteers for Salesforce (V4S)**, **Not installed**, and its note says to use one or the other, not both, and that BarnCRM may offer a migration path in a future release. |
 | 9 | Set **Show Only When Installed** back on, save and click **Check again**. | The **Alternatives to BarnCRM Modules** heading is gone again. |
-| 10 | As an admin, look below the **Request an Integration** section. | There is no **Save** or **Discard Changes** button on this page (other sections still show them to an admin). |
+| 10 | As an admin, look below the **Request an Integration** section. | Change a setting in another section, then come back: no save bar shows on this page (other sections show it to an admin while anything is unsaved). |
 | 11 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
 
 **Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.
@@ -292,7 +292,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** comes right after **Organization**, then **Duplicate Matching**. There is no **Households** and no **Relationships** section. |
+| 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
 | 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create a household automatically**), **Households** (**Delete a household once it is empty**, **Keep the households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
 | 3 | Tick **Keep the households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update all household names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
@@ -310,13 +310,14 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Error Log**. | **Digest frequency** shows **Daily**, with "Default, not yet saved." under it and a **Keep This Setting** button beside the note, inside the **Error Digest** box. A setting already saved shows no note. |
-| 2 | Click **Keep This Setting** under **Digest frequency**. | "Your settings are saved." The note and the button are gone, and **Digest frequency** still shows **Daily**. |
+| 1 | Open **BarnCRM Settings**, **Error Log**. | A banner at the top of the section reads **These Are Defaults** with **Keep All Defaults**. **Digest frequency** shows **Daily**, with a **Default** badge under it and a **Keep This Setting** button beside the badge, inside the **Error Digest** box. A setting already saved shows no badge. |
+| 2 | Click **Keep This Setting** under **Digest frequency**. | "Your settings are saved." The badge and the button are gone, and **Digest frequency** still shows **Daily**. |
 | 3 | Open **General** and read **Recent Changes**. | The top row is **Digest frequency**, old value empty, new value **Daily**, with your name. |
-| 4 | Open **Org Optimizer**. Change **Days before a user is unused** to `120` without saving. | Its note and button are gone; **Years before a person is not changed** still shows **5** with its note and button. |
-| 5 | Click **Keep This Setting** under **Years before a person is not changed**. | "Your settings are saved." Its note is gone, **Days before a user is unused** still shows `120` and **Save** is still available. Click **Discard Changes**: it shows **90** again, with its note. |
-| 6 | Sign in as the read-only user and open **Org Optimizer**. | **Days before a user is unused** says "Default, not yet saved." with no **Keep This Setting** button. |
-| 7 | As an admin in an org with Person Accounts where **How people belong to a household** was never saved, open **People and Households**. | In the **People** box it shows **One household per person (simple)** with "Default, not yet saved." under it and no **Keep This Setting** button, because BarnCRM would choose the flexible way for this org. In an org without Person Accounts or Nonprofit Cloud the same row has the button. |
+| 4 | Open **Org Optimizer**. Change **Days before a user is unused** to `120` without saving. | Its badge and button are gone; **Years before a person is not changed** still shows **5** with its badge and button. |
+| 5 | Click **Keep This Setting** under **Years before a person is not changed**. | "Your settings are saved." Its badge is gone, **Days before a user is unused** still shows `120` and the save bar still says "1 unsaved change". Click **Discard**: it shows **90** again, with its badge. |
+| 6 | Sign in as the read-only user and open **Org Optimizer**. | The **These Are Defaults** banner shows with no **Keep All Defaults**, and **Days before a user is unused** has its **Default** badge with no **Keep This Setting** button. |
+| 7 | As an admin in an org with Person Accounts where **How people belong to a household** was never saved, open **People and Households**. | In the **People** box it shows **One household per person (simple)** with a **Default** badge under it and no **Keep This Setting** button, because BarnCRM would choose the flexible way for this org. In an org without Person Accounts or Nonprofit Cloud the same row has the button. |
+| 8 | Still on **People and Households**, change one setting that has a **Default** badge without saving, then click **Keep All Defaults** in the banner. | "Your settings are saved." Every other badge with a **Keep This Setting** button is gone, and each kept setting has its own **Recent Changes** row. The changed setting is still unsaved in the save bar, and **How people belong to a household** (in the Person Accounts org) keeps its badge. |
 
 **Cleanup:** none. The values kept are the defaults BarnCRM was already using, so nothing behaves differently.
 
@@ -346,7 +347,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test has one sentence on why and 2 to 4 numbered steps above the button. |
+| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test shows one line under **Needs a Change in Setup**, the button, and **Show Steps**, closed; opening **Show Steps** shows one sentence on why and 2 to 4 numbered steps. |
 | 2 | Click **Duplicate Matching**, then **Open in Setup**. | A new tab opens **Duplicate Rules**. |
 | 3 | Click **Rollups** (Rollup Builder installed), then **Open in Setup**. | A new tab opens **Object Manager**; the first step says to click the object the rollup totals onto. |
 | 4 | Click **Error Log**, then **Open in Setup**. | A new tab opens **Deliverability**. The note shows **Done** or **Not done yet** and a **Check Again** button. |

@@ -5,15 +5,13 @@ import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
 import SECTIONS_HEADING from '@salesforce/label/c.Core_Settings_SectionsHeading';
-import SAVE_BUTTON from '@salesforce/label/c.Core_Settings_SaveButton';
-import DISCARD_BUTTON from '@salesforce/label/c.Core_Settings_DiscardButton';
+import PURPOSE from '@salesforce/label/c.Core_Settings_Purpose';
 import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
 import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
 import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Settings_LoadErrorMessage';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
-import LEARN_MORE from '@salesforce/label/c.Core_Settings_LearnMoreLink';
-import LEARN_MORE_ARIA from '@salesforce/label/c.Core_Settings_LearnMoreAria';
+import HELP_ARIA from '@salesforce/label/c.Core_Settings_HelpAria';
 import EMPTY_SECTION from '@salesforce/label/c.Core_Settings_EmptySectionMessage';
 import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeading';
 import RECENT_EMPTY from '@salesforce/label/c.Core_Settings_RecentChangesEmpty';
@@ -32,13 +30,17 @@ import OPEN_NAMED from '@salesforce/label/c.Core_Settings_OpenNamedButton';
 import FEEDBACK_LINK from '@salesforce/label/c.Core_Settings_FeedbackLink';
 import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
-import DEFAULT_NOT_SAVED from '@salesforce/label/c.Core_Settings_DefaultNotSaved';
+import DEFAULT_BADGE from '@salesforce/label/c.Core_Settings_DefaultBadge';
+import DEFAULTS_TITLE from '@salesforce/label/c.Core_Settings_DefaultsBannerTitle';
+import DEFAULTS_TEXT from '@salesforce/label/c.Core_Settings_DefaultsBannerText';
+import KEEP_ALL_DEFAULTS from '@salesforce/label/c.Core_Settings_KeepAllDefaults';
 import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
 import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';
+import { navigationGroups } from './settingsNavigation';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
@@ -138,14 +140,12 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   labels = {
     title: TITLE,
     sectionsHeading: SECTIONS_HEADING,
-    save: SAVE_BUTTON,
-    discard: DISCARD_BUTTON,
+    purpose: PURPOSE,
     saved: SAVED_MESSAGE,
     saveError: SAVE_ERROR,
     outOfRange: OUT_OF_RANGE,
     loadError: LOAD_ERROR,
     readOnly: READ_ONLY_NOTICE,
-    learnMore: LEARN_MORE,
     emptySection: EMPTY_SECTION,
     recentHeading: RECENT_HEADING,
     recentEmpty: RECENT_EMPTY,
@@ -156,7 +156,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     feedbackLink: FEEDBACK_LINK,
     feedbackAria: FEEDBACK_ARIA,
     feedbackUrl: FEEDBACK_URL,
-    defaultNotSaved: DEFAULT_NOT_SAVED,
+    defaultBadge: DEFAULT_BADGE,
+    defaultsTitle: DEFAULTS_TITLE,
+    defaultsText: DEFAULTS_TEXT,
+    keepAllDefaults: KEEP_ALL_DEFAULTS,
     keepDefault: KEEP_DEFAULT
   };
 
@@ -195,6 +198,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   message;
   messageIsError = false;
   loading = true;
+  saving = false;
   componentTypes = {};
   requestedSection;
   enclosingTabId;
@@ -240,11 +244,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     labelTab(this, label, TAB_ICON);
   }
 
-  get navigationItems() {
-    return this.sections.map((section) => ({
-      name: section.name,
-      label: section.name
-    }));
+  /** The section list in short groups, each section with its icon, Error Log last. */
+  get navigationGroups() {
+    return navigationGroups(this.sections.map((section) => section.name));
   }
 
   get currentSection() {
@@ -306,8 +308,22 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return this.canEdit && this.selectedSection !== INTEGRATIONS_SECTION;
   }
 
-  get saveDisabled() {
-    return !this.canEdit || !this.isDirty;
+  /** How many settings have unsaved edits, in any section: the save bar's count. */
+  get dirtyCount() {
+    return Object.keys(this.pending).length;
+  }
+
+  /** The section's rows that show a default nobody saved. */
+  get unsavedDefaultRows() {
+    return this.currentSettings.filter((row) => row.showsUnsavedDefault);
+  }
+
+  get hasUnsavedDefaults() {
+    return !this.loading && this.unsavedDefaultRows.length > 0;
+  }
+
+  get canKeepAllDefaults() {
+    return this.unsavedDefaultRows.some((row) => row.canKeepDefault);
   }
 
   get messageClass() {
@@ -338,8 +354,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isSetupValue: setting.dataType === 'SetupValue',
       // The Setup page that changes it, opened in a new tab (D-137).
       setupUrl: setting.dataType === 'SetupValue' ? setupValuePath(setting.key) : undefined,
-      hasHelp: Boolean(setting.helpUrl),
-      learnMoreLabel: LEARN_MORE_ARIA.replace('{0}', setting.label),
+      // The description sits behind an info icon, with Learn More beside it (UX PR 6).
+      hasHelpContent: Boolean(setting.description || setting.helpUrl),
+      showsHelpLine: Boolean(setting.description || setting.helpUrl || showsUnsavedDefault),
+      helpLabel: HELP_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,
@@ -358,9 +376,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       // No one-click keep for a default BarnCRM's detection would replace (a Person Account org's
       // household membership): the admin chooses it by hand instead.
       canKeepDefault: showsUnsavedDefault && this.canEdit && !setting.detectionMayChange,
-      keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label),
-      // Ties the description to the control for a screen reader; ids are scoped to this template.
-      descriptionId: setting.description ? `description-${setting.key}` : undefined
+      keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label)
     };
   }
 
@@ -622,8 +638,27 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     await this.send({ [key]: setting.value });
   }
 
+  /**
+   * Keeps every default the section shows in one save, each exactly as shown, through the same
+   * save as Keep This Setting. A row with an unsaved edit, or whose default detection may
+   * replace, is left alone.
+   */
+  async handleKeepAllDefaults() {
+    const values = {};
+    this.unsavedDefaultRows
+      .filter((row) => row.canKeepDefault)
+      .forEach((row) => {
+        values[row.key] = row.value;
+      });
+    if (!this.canEdit || Object.keys(values).length === 0) {
+      return;
+    }
+    await this.send(values);
+  }
+
   /** Saves the given values, then leaves on the page only the edits that were not sent. */
   async send(values) {
+    this.saving = true;
     try {
       const model = await saveSettings({ values });
       this.applyModel(model);
@@ -637,6 +672,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     } catch (error) {
       this.messageIsError = true;
       this.message = this.readError(error) || this.labels.saveError;
+    } finally {
+      this.saving = false;
     }
   }
 

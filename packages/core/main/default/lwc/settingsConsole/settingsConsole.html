@@ -1,7 +1,12 @@
 <template>
     <c-first-run-setup onsetupfinished={handleSetupFinished}></c-first-run-setup>
-    <lightning-card title={labels.title} icon-name="standard:settings">
-        <div class="slds-var-p-horizontal_medium">
+    <!-- The App Page prints the name above this component, so the shell's title is for screen readers only. -->
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.purpose}
+        title-hidden
+    >
+        <div>
             <template lwc:if={loading}>
                 <lightning-spinner
                     alternative-text={labels.title}
@@ -22,21 +27,52 @@
                         class="slds-var-p-top_small"
                         selected-item={selectedSection}
                         onselect={handleSectionSelect}
+                        aria-label={labels.sectionsHeading}
                     >
-                        <lightning-vertical-navigation-section label={labels.sectionsHeading}>
-                            <template for:each={navigationItems} for:item="item">
-                                <lightning-vertical-navigation-item
-                                    key={item.name}
-                                    label={item.label}
-                                    name={item.name}
-                                ></lightning-vertical-navigation-item>
-                            </template>
-                        </lightning-vertical-navigation-section>
+                        <template for:each={navigationGroups} for:item="group">
+                            <lightning-vertical-navigation-section
+                                key={group.name}
+                                label={group.label}
+                            >
+                                <template for:each={group.items} for:item="item">
+                                    <lightning-vertical-navigation-item-icon
+                                        key={item.name}
+                                        label={item.label}
+                                        name={item.name}
+                                        icon-name={item.iconName}
+                                    ></lightning-vertical-navigation-item-icon>
+                                </template>
+                            </lightning-vertical-navigation-section>
+                        </template>
                     </lightning-vertical-navigation>
                 </div>
 
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4">
                     <c-settings-setup-notes section={selectedSection}></c-settings-setup-notes>
+
+                    <template lwc:if={hasUnsavedDefaults}>
+                        <div
+                            class="slds-scoped-notification slds-scoped-notification_light slds-media slds-media_center slds-var-m-bottom_small"
+                            data-id="defaults-banner"
+                        >
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <p class="slds-text-title_bold">{labels.defaultsTitle}</p>
+                                <p>{labels.defaultsText}</p>
+                            </div>
+                            <template lwc:if={canKeepAllDefaults}>
+                                <div class="slds-media__figure slds-media__figure_reverse">
+                                    <lightning-button
+                                        label={labels.keepAllDefaults}
+                                        data-id="keep-all"
+                                        onclick={handleKeepAllDefaults}
+                                    ></lightning-button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
 
                     <template lwc:if={sectionIsEmpty}>
                         <p class="slds-text-color_weak">{labels.emptySection}</p>
@@ -63,7 +99,6 @@
                             class="slds-form-element slds-var-m-bottom_medium"
                             role="group"
                             aria-label={row.label}
-                            aria-describedby={row.descriptionId}
                         >
                             <template lwc:if={row.isCheckbox}>
                                 <lightning-input
@@ -212,42 +247,35 @@
                                 </template>
                             </template>
 
-                            <template lwc:if={row.showsUnsavedDefault}>
-                                <p
-                                    class="slds-text-body_small slds-text-color_weak"
-                                    data-default-note={row.key}
-                                >
-                                    {labels.defaultNotSaved}
-                                    <template lwc:if={row.canKeepDefault}>
-                                        <lightning-button
-                                            class="slds-var-m-left_x-small"
-                                            variant="base"
-                                            label={labels.keepDefault}
-                                            aria-label={row.keepDefaultLabel}
-                                            data-keep={row.key}
-                                            onclick={handleKeepDefault}
-                                        ></lightning-button>
-                                    </template>
-                                </p>
-                            </template>
-
-                            <template lwc:if={row.description}>
-                                <p
-                                    class="slds-form-element__help slds-text-color_weak"
-                                    id={row.descriptionId}
-                                >
-                                    {row.description}
-                                    <template lwc:if={row.hasHelp}>
-                                        <a
-                                            class="slds-var-m-left_x-small"
-                                            href={row.helpUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            aria-label={row.learnMoreLabel}
-                                            >{labels.learnMore}</a
+                            <template lwc:if={row.showsHelpLine}>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-top_xx-small">
+                                    <template lwc:if={row.showsUnsavedDefault}>
+                                        <span
+                                            class="slds-var-m-right_small"
+                                            data-default-note={row.key}
                                         >
+                                            <lightning-badge label={labels.defaultBadge}></lightning-badge>
+                                            <template lwc:if={row.canKeepDefault}>
+                                                <lightning-button
+                                                    class="slds-var-m-left_x-small"
+                                                    variant="base"
+                                                    label={labels.keepDefault}
+                                                    aria-label={row.keepDefaultLabel}
+                                                    data-keep={row.key}
+                                                    onclick={handleKeepDefault}
+                                                ></lightning-button>
+                                            </template>
+                                        </span>
                                     </template>
-                                </p>
+                                    <template lwc:if={row.hasHelpContent}>
+                                        <c-barn-help
+                                            content={row.description}
+                                            learn-more-url={row.helpUrl}
+                                            alternative-text={row.helpLabel}
+                                            data-help={row.key}
+                                        ></c-barn-help>
+                                    </template>
+                                </div>
                             </template>
                         </div>
                     </template>
@@ -259,20 +287,12 @@
                     </template>
 
                     <template lwc:if={showSaveBar}>
-                        <div class="slds-var-m-top_medium">
-                            <lightning-button
-                                variant="brand"
-                                label={labels.save}
-                                disabled={saveDisabled}
-                                onclick={handleSave}
-                            ></lightning-button>
-                            <lightning-button
-                                class="slds-var-m-left_x-small"
-                                label={labels.discard}
-                                disabled={saveDisabled}
-                                onclick={handleDiscard}
-                            ></lightning-button>
-                        </div>
+                        <c-barn-save-bar
+                            dirty-count={dirtyCount}
+                            saving={saving}
+                            onsave={handleSave}
+                            ondiscard={handleDiscard}
+                        ></c-barn-save-bar>
                     </template>
                 </div>
             </div>
@@ -304,5 +324,5 @@
                 >{labels.feedbackLink}</a
             >
         </p>
-    </lightning-card>
+    </c-barn-page-shell>
 </template>

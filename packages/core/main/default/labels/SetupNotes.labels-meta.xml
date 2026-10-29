@@ -9,6 +9,14 @@
         <value>Check Again</value>
     </labels>
     <labels>
+        <fullName>Core_SetupNote_ShowSteps</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings setup note: toggle that shows why and the steps</shortDescription>
+        <value>Show Steps</value>
+    </labels>
+    <labels>
         <fullName>Core_SetupNote_Done</fullName>
         <categories>Core</categories>
         <language>en_US</language>
