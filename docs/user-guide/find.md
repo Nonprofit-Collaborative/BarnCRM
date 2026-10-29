@@ -32,7 +32,7 @@ You should see: the **Households** list with the household name, **Member Count*
 
 ## To Build and Run a Query in Find
 
-1. Open the **Data Manager** tab and choose **Open** on the **Find and Export Records** card.
+1. Open the **Data Manager** tab and choose the **Find and Export Records** tile.
    The **Find** tab opens.
 2. In **Object**, choose what to look for, for example **Contact** or **Account**.
 3. In **Columns**, move the fields you want from **Available fields** to **Columns, in

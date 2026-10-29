@@ -6,11 +6,17 @@ import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_DataManager_Title';
 import INTRO from '@salesforce/label/c.Core_DataManager_Intro';
-import TOOLS_HEADING from '@salesforce/label/c.Core_DataManager_ToolsHeading';
+import HELP_CHANGE from '@salesforce/label/c.Core_DataManager_HelpChange';
+import HELP_DELETE from '@salesforce/label/c.Core_DataManager_HelpDelete';
+import GROUP_BRING_IN from '@salesforce/label/c.Core_DataManager_GroupBringIn';
+import GROUP_FIND_CHANGE from '@salesforce/label/c.Core_DataManager_GroupFindChange';
+import GROUP_CHECK from '@salesforce/label/c.Core_DataManager_GroupCheck';
+import GROUP_CAREFUL from '@salesforce/label/c.Core_DataManager_GroupCareful';
 import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
 import IMPORT_TEXT from '@salesforce/label/c.Core_DataManager_ImportText';
 import FIND_TITLE from '@salesforce/label/c.Core_DataManager_FindTitle';
@@ -22,14 +28,13 @@ import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
 import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
 import DELETE_CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
 import DELETE_CANCEL from '@salesforce/label/c.Core_DataManager_DeleteCancel';
-import BarnConfirmModal from 'c/barnConfirmModal';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_DataManager_OptimizerTitle';
 import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
-import OPEN from '@salesforce/label/c.Core_DataManager_Open';
-import OPEN_ARIA from '@salesforce/label/c.Core_DataManager_OpenAria';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';
 import MAPPINGS_INTRO from '@salesforce/label/c.Core_DataManager_MappingsIntro';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
+import MAPPINGS_EMPTY_HINT from '@salesforce/label/c.Core_DataManager_MappingsEmptyHint';
+import CREATE_TEMPLATE from '@salesforce/label/c.Core_DataManager_CreateTemplate';
 import COLUMN_NAME from '@salesforce/label/c.Core_DataManager_ColumnName';
 import COLUMN_LOADS from '@salesforce/label/c.Core_DataManager_ColumnLoads';
 import COLUMN_SOURCE from '@salesforce/label/c.Core_DataManager_ColumnSource';
@@ -37,49 +42,77 @@ import COLUMN_LAST_LOADED from '@salesforce/label/c.Core_DataManager_ColumnLastL
 import LOADS_PEOPLE from '@salesforce/label/c.Core_DataManager_LoadsPeople';
 import SALESFORCE_HEADING from '@salesforce/label/c.Core_DataManager_SalesforceHeading';
 import WEEKLY_EXPORT from '@salesforce/label/c.Core_DataManager_WeeklyExport';
+import WEEKLY_EXPORT_TEXT from '@salesforce/label/c.Core_DataManager_WeeklyExportText';
 import RECYCLE_BIN from '@salesforce/label/c.Core_DataManager_RecycleBin';
+import RECYCLE_BIN_TEXT from '@salesforce/label/c.Core_DataManager_RecycleBinText';
 import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportWizard';
+import DATA_IMPORT_WIZARD_TEXT from '@salesforce/label/c.Core_DataManager_DataImportWizardText';
 
-/** The tabs the cards open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
+/** The tabs the tiles open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
   import: 'Import',
   find: 'Find',
-  optimizer: 'Data_Hygiene'
+  update: 'Find',
+  optimizer: 'Data_Hygiene',
+  delete: 'Find'
 };
-/** The cards that open Find for a bulk tool, and the tool Find's note names. */
+/** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { update: 'update', delete: 'delete' };
 
-/** Salesforce's own pages, linked for administrators. */
-const SALESFORCE_LINKS = [
-  { key: 'export', label: WEEKLY_EXPORT, url: '/lightning/setup/DataManagementExport/home' },
-  { key: 'recycle', label: RECYCLE_BIN, url: '/lightning/o/DeleteEvent/home' },
+const LEARN_MORE_URL =
+  'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/data-manager.md';
+
+/** Salesforce's own pages, for administrators; each opens in a new browser tab. */
+const SALESFORCE_TILES = [
   {
-    key: 'wizard',
+    name: 'export',
+    label: WEEKLY_EXPORT,
+    description: WEEKLY_EXPORT_TEXT,
+    iconName: 'standard:dataset',
+    href: '/lightning/setup/DataManagementExport/home',
+    newTab: true
+  },
+  {
+    name: 'recycle',
+    label: RECYCLE_BIN,
+    description: RECYCLE_BIN_TEXT,
+    iconName: 'standard:recycle_bin',
+    href: '/lightning/o/DeleteEvent/home',
+    newTab: true
+  },
+  {
+    name: 'wizard',
     label: DATA_IMPORT_WIZARD,
-    url: '/lightning/setup/DataManagementDataImporter/home'
+    description: DATA_IMPORT_WIZARD_TEXT,
+    iconName: 'standard:data_mapping',
+    href: '/lightning/setup/DataManagementDataImporter/home',
+    newTab: true
   }
 ];
 
 /**
- * The Data Manager tab (admin guide data-manager.md): a card for each data tool the person may
- * use, the import templates, every data job with its undo (c-data-job-history), and links to
- * Salesforce's own export and Recycle Bin. Each tool keeps its own permission check; the cards
- * only hide what the tool would refuse. The bulk delete card is last and marked destructive: a
- * red Open button that first shows, in a confirmation box, that the records go to the Recycle
- * Bin and can be undone; only Continue opens the tool (D-135). Find, Import and Bulk Update are
- * in no app's navigation, so these cards are how they are reached.
+ * The Data Manager tab (admin guide data-manager.md), built on the UX kit: a hub of tool tiles
+ * in groups, the import templates, every data job with its undo (c-data-job-history), and tiles
+ * for Salesforce's own export, Recycle Bin and Data Import Wizard. Each tool keeps its own
+ * permission check; the tiles only hide what the tool would refuse. Delete Many Records is last,
+ * alone in the Careful group, and first shows in a confirmation box that the records go to the
+ * Recycle Bin and can be undone; only Continue opens the tool (D-135). Find, Import and Bulk
+ * Update are in no app's navigation, so these tiles are how they are reached.
  */
 export default class DataManager extends NavigationMixin(LightningElement) {
   labels = {
     title: TITLE,
     intro: INTRO,
-    toolsHeading: TOOLS_HEADING,
-    open: OPEN,
+    helpChange: HELP_CHANGE,
+    helpDelete: HELP_DELETE,
     mappingsHeading: MAPPINGS_HEADING,
     mappingsIntro: MAPPINGS_INTRO,
     mappingsEmpty: MAPPINGS_EMPTY,
-    salesforceHeading: SALESFORCE_HEADING
+    mappingsEmptyHint: MAPPINGS_EMPTY_HINT,
+    createTemplate: CREATE_TEMPLATE
   };
+
+  learnMoreUrl = LEARN_MORE_URL;
 
   mappingColumns = [
     { label: COLUMN_NAME, fieldName: 'name' },
@@ -95,6 +128,9 @@ export default class DataManager extends NavigationMixin(LightningElement) {
 
   mappings = [];
   mappingsError;
+
+  /** Find's tool state key, with the namespace's prefix (never a literal `c__`). */
+  toolStateKey;
 
   get isAdmin() {
     return Boolean(canManageSettings);
@@ -114,50 +150,6 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     }
   }
 
-  get tools() {
-    const tools = [];
-    if (canManageSettings) {
-      tools.push({ key: 'import', title: IMPORT_TITLE, text: IMPORT_TEXT, tab: TABS.import });
-    }
-    if (canFind) {
-      tools.push({ key: 'find', title: FIND_TITLE, text: FIND_TEXT, tab: TABS.find });
-    }
-    if (canBulkUpdate) {
-      tools.push({ key: 'update', title: UPDATE_TITLE, text: UPDATE_TEXT, tab: TABS.find });
-    }
-    if (canFind || canManageSettings) {
-      tools.push({
-        key: 'optimizer',
-        title: OPTIMIZER_TITLE,
-        text: OPTIMIZER_TEXT,
-        tab: TABS.optimizer
-      });
-    }
-    // Always last: the one destructive tool.
-    if (canBulkDelete) {
-      tools.push({
-        key: 'delete',
-        title: DELETE_TITLE,
-        text: DELETE_TEXT,
-        tab: TABS.find,
-        destructive: true
-      });
-    }
-    return tools.map((tool) => ({
-      ...tool,
-      openLabel: OPEN_ARIA.replace('{0}', tool.title),
-      // A destructive tool reads as one: a red Open button that confirms first.
-      buttonVariant: tool.destructive ? 'destructive-text' : 'neutral'
-    }));
-  }
-
-  get hasMappings() {
-    return this.mappings.length > 0;
-  }
-
-  /** Find's tool state key, with the namespace's prefix (never a literal `c__`). */
-  toolStateKey;
-
   @wire(findToolStateKey)
   wiredToolStateKey({ data }) {
     if (data) {
@@ -165,13 +157,52 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     }
   }
 
-  get salesforceLinks() {
-    return SALESFORCE_LINKS;
+  /** The tool tiles, grouped, for the tools the person may use. Empty groups are left out. */
+  get toolGroups() {
+    const bringIn = [];
+    if (canManageSettings) {
+      bringIn.push(tile('import', IMPORT_TITLE, IMPORT_TEXT, 'standard:data_streams'));
+    }
+    const findChange = [];
+    if (canFind) {
+      findChange.push(tile('find', FIND_TITLE, FIND_TEXT, 'standard:search'));
+    }
+    if (canBulkUpdate) {
+      findChange.push(tile('update', UPDATE_TITLE, UPDATE_TEXT, 'standard:record_update'));
+    }
+    const check = [];
+    if (canFind || canManageSettings) {
+      check.push(
+        tile('optimizer', OPTIMIZER_TITLE, OPTIMIZER_TEXT, 'standard:data_integration_hub')
+      );
+    }
+    // Always last: the one destructive tool.
+    const careful = [];
+    if (canBulkDelete) {
+      careful.push(tile('delete', DELETE_TITLE, DELETE_TEXT, 'standard:record_delete'));
+    }
+    return [
+      { name: 'bringIn', label: GROUP_BRING_IN, tiles: bringIn },
+      { name: 'findChange', label: GROUP_FIND_CHANGE, tiles: findChange },
+      { name: 'check', label: GROUP_CHECK, tiles: check },
+      { name: 'careful', label: GROUP_CAREFUL, tiles: careful }
+    ];
   }
 
-  async handleOpen(event) {
-    const { tab, id } = event.currentTarget.dataset;
-    if (id === 'delete') {
+  get salesforceGroups() {
+    return [{ name: 'salesforce', label: SALESFORCE_HEADING, tiles: SALESFORCE_TILES }];
+  }
+
+  get hasMappings() {
+    return this.mappings.length > 0;
+  }
+
+  async handleSelect(event) {
+    const name = event.detail && event.detail.name;
+    if (!TABS[name]) {
+      return;
+    }
+    if (name === 'delete') {
       const confirmed = await BarnConfirmModal.open({
         size: 'small',
         label: DELETE_TITLE,
@@ -184,11 +215,23 @@ export default class DataManager extends NavigationMixin(LightningElement) {
         return;
       }
     }
-    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: tab } };
-    // The bulk cards open Find with a note saying where the bulk tool is (D-135).
-    if (BULK_TOOLS[id] && this.toolStateKey) {
-      pageReference.state = { [this.toolStateKey]: BULK_TOOLS[id] };
+    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: TABS[name] } };
+    // The bulk tiles open Find with a note saying where the bulk tool is (D-135).
+    if (BULK_TOOLS[name] && this.toolStateKey) {
+      pageReference.state = { [this.toolStateKey]: BULK_TOOLS[name] };
     }
     this[NavigationMixin.Navigate](pageReference);
   }
+
+  /** A template is made in Import's One Kind of Record step, so the empty state opens Import. */
+  handleCreateTemplate() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: TABS.import }
+    });
+  }
+}
+
+function tile(name, label, description, iconName) {
+  return { name, label, description, iconName };
 }

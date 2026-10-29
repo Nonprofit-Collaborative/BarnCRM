@@ -17,7 +17,7 @@ that remembers how far you got, and the places you go most: your households, you
 your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
 **Import**, **Find** and **Bulk Update** are not in any app's navigation: open them from the
-cards on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
+tiles on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
 after any pages a module adds. In the everyday apps, **Data Manager** is the last Core tab and
 a module's pages follow it.
 
@@ -148,7 +148,7 @@ they keep the records you are working on open side by side in tabs across the to
   Relationships, Affiliations and Household Members follow Organizations, and Data Manager
   ends the Core part of that menu. In **BarnCRM
   Admin Console** the menu holds BarnCRM Settings, Data Manager, Org Optimizer, Duplicate
-  Matching and Error Log. Find and Import open as tabs from their Data Manager cards.
+  Matching and Error Log. Find and Import open as tabs from their Data Manager tiles.
 - **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
   still there when you come back.
 - **On a phone**, the Salesforce mobile app shows each BarnCRM app as an ordinary app without

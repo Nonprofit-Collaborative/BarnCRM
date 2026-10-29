@@ -164,11 +164,11 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Data Manager** and choose **Open** on **Update Many Records**. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." |
+| 1 | Open **Data Manager** and choose the **Update Many Records** tile. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." |
 | 2 | Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Bulk Update**. | The **Bulk Update** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
 | 3 | Choose **Title**, **Set to a value**, type `x`, and select **Preview**. | The path moves to **Confirm**. Select **Close**; nothing changed. |
 | 4 | Choose **Change Records**, **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel's path **Preview**, **Confirm**, **Run** is on **Confirm**. Any related records deleted with them show as badges. **Download a Backup First** has an info icon whose popover says what the file holds. Select **Close** without typing the count. |
-| 5 | Open **Data Manager**, choose **Open** on **Delete Many Records**, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
+| 5 | Open **Data Manager**, choose the **Delete Many Records** tile, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
 | 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with the Bulk Update note from step 1. |
 
 **Cleanup:** none (nothing was changed or deleted).

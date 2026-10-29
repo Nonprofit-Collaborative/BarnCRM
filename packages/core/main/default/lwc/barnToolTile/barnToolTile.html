@@ -1,11 +1,22 @@
 <template>
     <template lwc:if={isLink}>
-        <a class={tileClass} href={href} data-id="tile" onclick={handleClick}>
+        <a class={tileClass} href={href} target={linkTarget} rel={linkRel} data-id="tile" onclick={handleClick}>
             <span class="tile__figure">
                 <lightning-icon icon-name={iconName} size="medium" data-id="icon"></lightning-icon>
             </span>
             <span class="tile__body">
-                <span class="tile__name slds-text-heading_small" data-id="name">{label}</span>
+                <span class="tile__name slds-text-heading_small" data-id="name">
+                    {label}
+                    <template lwc:if={newTab}>
+                        <lightning-icon
+                            class="slds-var-m-left_xx-small"
+                            icon-name="utility:new_window"
+                            size="xx-small"
+                            data-id="new-window"
+                        ></lightning-icon>
+                        <span class="slds-assistive-text" data-id="new-tab">{newTabText}</span>
+                    </template>
+                </span>
                 <span class="tile__line slds-text-body_small" data-id="line">{lineText}</span>
                 <template lwc:if={hasBadge}>
                     <lightning-badge class={badgeClass} label={badgeLabel} data-id="badge"></lightning-badge>

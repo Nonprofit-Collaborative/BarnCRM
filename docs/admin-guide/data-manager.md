@@ -6,7 +6,7 @@
 ## 1. What It Does
 
 **Data Manager** is the one place to start any data task and to answer "what changed last
-week, and can I undo it?" It has a card for each data tool you may use, your import templates,
+week, and can I undo it?" It has a tile for each data tool you may use, your import templates,
 and one list of every data job: imports, bulk updates and bulk deletes, newest first, each with
 its counts and its **Undo**.
 
@@ -23,19 +23,24 @@ BarnCRM app (BarnCRM, BarnCRM Console, BarnCRM Admin and BarnCRM Admin Console) 
 the **BarnCRM Admin** role or one of the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
 or **BarnCRM Bulk Delete** permission sets.
 
-The cards under **Start a Task** are listed in this order, and each card and each kind of job
-is shown only to people who may use it:
+The page opens with one tile per tool, in short groups. Each tile has an icon, the tool's name
+and one line; the whole tile is the control, so select anywhere on it. **About This Tool**,
+under the page name, holds the longer help: it is open on your first visit and stays closed
+after that unless you open it again (your browser remembers this, for you only). Each tile,
+section and kind of job is shown only to people who may use it:
 
-| Card | Needs a file? | Opens | Who sees it |
-|---|---|---|---|
-| **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
-| **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
-| **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
-| **Org Optimizer** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
-| **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
-| **Import Templates** | | The templates you import with, and when each recurring file was last loaded | Administrators |
-| **Data Jobs** | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
-| **Salesforce's Own Tools** | | Weekly Data Export (your backup), the Recycle Bin, and the Data Import Wizard for records BarnCRM does not load | Administrators |
+| Group | Tile or section | Needs a file? | Opens | Who sees it |
+|---|---|---|---|---|
+| **Bring Data In** | **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
+| **Find and Change** | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
+| **Find and Change** | **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
+| **Check and Tidy** | **Org Optimizer** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
+| **Careful** | **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
+| | **Import Templates** section | | The templates you import with, and when each recurring file was last loaded | Administrators |
+| | **Data Jobs** section | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
+| **Salesforce's Own Tools** | **Weekly Data Export** (your backup), **Recycle Bin**, **Data Import Wizard** (records BarnCRM does not load) | | Salesforce's own page, in a new browser tab | Administrators |
+
+A group with no tile you may use is left out.
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries.
@@ -47,8 +52,8 @@ spreadsheet, each row with its own values, use **Import a File**. To delete reco
 spreadsheet lists by record ID, an administrator who also has **Bulk Delete Records** uses
 **Import a File**, then the **Delete the Records a File Lists** card ([Bulk delete](bulk-delete.md)).
 
-**Delete Many Records** is the last card and is marked as destructive: its **Open** button is
-red. Choosing **Open** shows a **Delete Many Records** box that reads "Deleted records go to the
+**Delete Many Records** is the last tile, alone in the **Careful** group. Choosing it shows a
+**Delete Many Records** box that reads "Deleted records go to the
 Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days."
 **Continue** opens the Find tab to choose the records; **Cancel** (or Escape) closes the box and
 nothing else happens. Nothing is deleted for good: a bulk delete, and a delete by file, go to
@@ -64,7 +69,9 @@ Record** in the first step (**What Are You Importing?**): choose the object, typ
 or gift file, choose a template and select **Start a New Template From This One**
 ([Importing](importing.md), section 6). There is no separate save step: the
 column matches, changes and row rules you settle on are saved to the template each time you
-import with it.
+import with it. On the page the section shows one line and a **Learn More** link to this guide;
+with no template yet it shows **No Import Templates Yet** and a **Create a Template** button,
+which opens **Import a File**.
 
 The **Import**, **Find** and **Bulk Update** tabs are not in the apps' navigation: open them
 from here (the **Bulk Update** tab lists recent bulk updates, which **Data Jobs** below shows
@@ -75,7 +82,7 @@ too). Bookmarks to them still work, and so do the links that open Find from else
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. Open the **Data Manager** tab. The cards at the top are the tools you can use.
+1. Open the **Data Manager** tab. The tiles at the top are the tools you can use.
 2. Choose **Import a File**. The Import tab opens. Import a five-row file as
    [Importing](importing.md) describes, then come back to **Data Manager**.
 3. Under **Data Jobs** your import is first, with its file name, **Complete**, how many people
