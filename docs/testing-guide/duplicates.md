@@ -61,7 +61,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On **Home**, click **New household**, then edit it: the same **Account Name** as **The Garcia Family** and Billing Street `6830 Sunset Ln`, City `Springfield`, Zip `62756`. Save past the warning. | The household saves. |
-| 2 | Scan and refresh **Duplicates**. | A pair of two households, each with **Household:** and its detail, with **Merge Households** and **Not a Duplicate**. |
+| 2 | Scan and refresh **Duplicates**. | A pair of two households side by side, each marked **Household** with its billing street, city, postal code and phone; a value that differs between the two has a **Different** badge (the streets match, so they have none). **Merge Households** (blue) and **Not a Duplicate** are at the top of the card. |
 | 3 | Click **Merge Households**. | A box **Merge Two Households**: **Members, related records, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.**, a **Household to keep** list, the fields where they differ, and **To choose field by field, use Merge or split on the household record instead.** |
 | 4 | In **Household to keep**, choose the sample household (the one with members). | The list of differing fields marks which values are kept and which dropped. |
 | 5 | Click **Merge these two**. | **The two households are now one.** The pair is gone. |
@@ -168,8 +168,22 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Duplicate Matching**, **Review**. | **Possible Duplicates** has a badge with the number waiting (for example **40**, or **50+**). 10 pair cards, each with the reason, the records and the buttons on the right. Under them **Showing 10 of 40 suggestions, newest first.** and **Show More**. |
+| 1 | Open **Duplicate Matching**, **Review**. | The tab reads **Review (40)** (or **Review (50+)**), and **Possible Duplicates** has a badge with the same number. 10 pair cards, each with the reason and buttons at the top and the two records side by side under them. Under the cards **Showing 10 of 40 suggestions, newest first.** and **Show More**. |
 | 2 | Count the line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** | Once, above the list (only when a shown pair is two people). |
 | 3 | With the keyboard, tab to **Show More** and press Enter. | 10 more pairs; focus is on the first new pair's first name; the line says **Showing 20 of 40**. Repeat until all show: **Show More** and the line go away (unless the badge reads **50+**). |
 | 4 | Click **Not a Duplicate** on the third pair, then **Cancel**. | The **Not a Duplicate** box opens inside the third pair's card, with focus on its heading; **Cancel** closes it. |
-| 5 | In the org with no pairs, open **Review**. | No badge. An illustration with **No Possible Duplicates** and **No possible duplicates are waiting. Scan again after a large import.** |
+| 5 | In the org with no pairs, open **Review**. | The tab reads **Review**, with no number, and there is no badge. An illustration with **No Possible Duplicates** and **No possible duplicates are waiting. Scan again after a large import.** |
+
+## T-DUP-12: Comparing a Pair Side by Side
+
+**Purpose:** Confirm a pair shows its two records side by side with differing values marked, and stacks on a phone.
+**Prerequisites:** admin; T-DUP-01 done with at least one pair of two people waiting.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Review**, find a pair of two people with different emails (on oi-test the sample data gives several). | Two columns, each starting with the person's name as a link and **Person**, then **Email**, **Phone**, **Mailing Street**, **Mailing City**, **Mailing Zip/Postal Code** and **Household**. An empty value reads **Blank**. |
+| 2 | Compare the two **Email** values. | Each differing value has a **Different** badge on both sides; values that match have none. A screen reader reads the badge with the value. |
+| 3 | Click the first name. | The person opens (as a subtab in the console app). |
+| 4 | Narrow the window to phone width (or open the page on a phone). | The two records stack, one above the other; nothing scrolls sideways. |
+
+**Cleanup:** None.

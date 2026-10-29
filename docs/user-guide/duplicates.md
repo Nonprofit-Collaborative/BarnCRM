@@ -50,11 +50,13 @@ households this way, never with Salesforce's own account merge. The full steps a
 
 ## To Work Through the Duplicates List (Admins)
 
-1. Open the **Duplicate Matching** tab. The **Review** list opens.
-2. Under **Possible Duplicates** (the badge says how many are waiting), read each pair. It is
-   marked **Person** or **Household**, and says why it was suggested (see below). The list
-   shows 10 pairs at a time; click **Show More** for the next 10. Press **Refresh** to see the
-   latest.
+1. Open the **Duplicate Matching** tab. The **Review** list opens; the tab name says how many
+   pairs are waiting, for example **Review (40)**.
+2. Under **Possible Duplicates**, read each pair. It says why it was suggested (see below),
+   then shows the two records side by side, each marked **Person** or **Household**, with
+   their email, phone and address. A value that differs between the two has a **Different**
+   badge. The list shows 10 pairs at a time; click **Show More** for the next 10. Press
+   **Refresh** to see the latest.
 3. For two people, open either one and use **Compare and merge**, as above. The note above the
    list reminds you: "To merge two people, open either one and use Compare and merge on the
    Potential Duplicates card."

@@ -365,30 +365,86 @@ public with sharing class DuplicateSelector {
             .keySet();
     }
 
-    /** The households among these identifiers, as the panel names them. */
+    /** The fields two households are compared on, side by side, in the order shown. */
+    public static final List<Schema.SObjectField> HOUSEHOLD_COMPARED = new List<Schema.SObjectField>{
+        Account.BillingStreet,
+        Account.BillingCity,
+        Account.BillingPostalCode,
+        Account.Phone
+    };
+
+    /** The fields two people are compared on, side by side, in the order shown. */
+    public static final List<Schema.SObjectField> PERSON_COMPARED = new List<Schema.SObjectField>{
+        Contact.Email,
+        Contact.Phone,
+        Contact.MailingStreet,
+        Contact.MailingCity,
+        Contact.MailingPostalCode
+    };
+
+    /**
+     * The compared fields this person can read. Only those are queried beside the fields the
+     * panel always read, so a field hidden from them neither fails the query nor shows.
+     */
+    public static List<Schema.DescribeFieldResult> readable(List<Schema.SObjectField> fields) {
+        List<Schema.DescribeFieldResult> result = new List<Schema.DescribeFieldResult>();
+        for (Schema.SObjectField field : fields) {
+            Schema.DescribeFieldResult describe = field.getDescribe();
+            if (describe.isAccessible()) {
+                result.add(describe);
+            }
+        }
+        return result;
+    }
+
+    /** The households among these identifiers, with the readable compared fields. */
     public static List<Account> householdsByIds(Set<Id> recordIds) {
         Id householdType = HouseholdService.householdRecordTypeId();
         if (recordIds == null || recordIds.isEmpty() || householdType == null) {
             return new List<Account>();
         }
-        return [
-            SELECT Id, Name, BillingCity, BillingPostalCode
-            FROM Account
-            WHERE Id IN :recordIds AND RecordTypeId = :householdType
-            WITH USER_MODE
-        ];
+        return Database.queryWithBinds(
+            'SELECT ' +
+                selectList(
+                    new List<String>{ 'Id', 'Name', 'BillingCity', 'BillingPostalCode' },
+                    HOUSEHOLD_COMPARED
+                ) +
+                ' FROM Account WHERE Id IN :recordIds AND RecordTypeId = :householdType',
+            new Map<String, Object>{ 'recordIds' => recordIds, 'householdType' => householdType },
+            AccessLevel.USER_MODE
+        );
     }
 
-    /** The people among these identifiers, as the panel names them. */
+    /** The people among these identifiers, with the readable compared fields. */
     public static List<Contact> contactsByIds(Set<Id> recordIds) {
         if (recordIds == null || recordIds.isEmpty()) {
             return new List<Contact>();
         }
-        return [
-            SELECT Id, Name, Email, MailingPostalCode, Account.Name
-            FROM Contact
-            WHERE Id IN :recordIds
-            WITH USER_MODE
-        ];
+        return Database.queryWithBinds(
+            'SELECT ' +
+                selectList(
+                    new List<String>{ 'Id', 'Name', 'Email', 'MailingPostalCode', 'Account.Name' },
+                    PERSON_COMPARED
+                ) +
+                ' FROM Contact WHERE Id IN :recordIds',
+            new Map<String, Object>{ 'recordIds' => recordIds },
+            AccessLevel.USER_MODE
+        );
+    }
+
+    /** The fields always read, then each readable compared field not among them. */
+    private static String selectList(List<String> always, List<Schema.SObjectField> compared) {
+        Set<String> seen = new Set<String>();
+        List<String> names = new List<String>();
+        for (String name : always) {
+            seen.add(name.toLowerCase());
+            names.add(name);
+        }
+        for (Schema.DescribeFieldResult field : readable(compared)) {
+            if (seen.add(field.getName().toLowerCase())) {
+                names.add(field.getName());
+            }
+        }
+        return String.join(names, ', ');
     }
 }

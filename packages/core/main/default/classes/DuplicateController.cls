@@ -42,6 +42,19 @@ public with sharing class DuplicateController {
         public String detail;
         @AuraEnabled
         public Boolean isHousehold;
+        /** The fields the pair is compared on side by side, in order; blank values included. */
+        @AuraEnabled
+        public List<FieldView> fields = new List<FieldView>();
+    }
+
+    /** One compared field of a record: the panel marks the values the two records differ on. */
+    public class FieldView {
+        @AuraEnabled
+        public String fieldName;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String value;
     }
 
     /** One suggestion: records the org's rules say are the same person or household. */
@@ -347,27 +360,65 @@ public with sharing class DuplicateController {
         }
         accountIds.removeAll(HouseholdSelector.accountsWithNativeHouseholdGroups(accountIds));
         contactIds.removeAll(DuplicateSelector.personContactIds(contactIds));
+        List<Schema.DescribeFieldResult> householdFields = DuplicateSelector.readable(
+            DuplicateSelector.HOUSEHOLD_COMPARED
+        );
         for (Account household : DuplicateSelector.householdsByIds(accountIds)) {
-            result.put(
+            RecordView view = recordView(
                 household.Id,
-                recordView(
-                    household.Id,
-                    household.Name,
-                    place(household.BillingCity, household.BillingPostalCode),
-                    true
+                household.Name,
+                place(household.BillingCity, household.BillingPostalCode),
+                true
+            );
+            addFields(view, household, householdFields);
+            result.put(household.Id, view);
+        }
+        List<Schema.DescribeFieldResult> personFields = DuplicateSelector.readable(
+            DuplicateSelector.PERSON_COMPARED
+        );
+        for (Contact person : DuplicateSelector.contactsByIds(contactIds)) {
+            String householdName = person.Account == null ? null : person.Account.Name;
+            String detail = String.isNotBlank(person.Email)
+                ? person.Email
+                : place(householdName, person.MailingPostalCode);
+            RecordView view = recordView(person.Id, person.Name, detail, false);
+            addFields(view, person, personFields);
+            view.fields.add(
+                fieldView(
+                    'Account.Name',
+                    System.Label.Core_Duplicates_ObjectHousehold,
+                    householdName
+                )
+            );
+            result.put(person.Id, view);
+        }
+        return result;
+    }
+
+    /** The compared fields of one record, in order, from what the selector read. */
+    private static void addFields(
+        RecordView view,
+        SObject record,
+        List<Schema.DescribeFieldResult> fields
+    ) {
+        for (Schema.DescribeFieldResult field : fields) {
+            Object value = record.get(field.getName());
+            view.fields.add(
+                fieldView(
+                    field.getName(),
+                    field.getLabel(),
+                    value == null ? null : String.valueOf(value)
                 )
             );
         }
-        for (Contact person : DuplicateSelector.contactsByIds(contactIds)) {
-            String detail = String.isNotBlank(person.Email)
-                ? person.Email
-                : place(
-                      person.Account == null ? null : person.Account.Name,
-                      person.MailingPostalCode
-                  );
-            result.put(person.Id, recordView(person.Id, person.Name, detail, false));
-        }
-        return result;
+    }
+
+    private static FieldView fieldView(String fieldName, String label, String value) {
+        FieldView field = new FieldView();
+        field.fieldName = fieldName;
+        field.label = label;
+        field.value = value;
+        return field;
     }
 
     private static RecordView recordView(

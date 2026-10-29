@@ -62,10 +62,16 @@ Metadata Admin** (see [Access](access.md)).
 Run the scan again after a large import: Salesforce checks a record against the others when
 it is saved, but an import that saved past a warning leaves the pair for the scan to find.
 
-**The review list.** **Possible Duplicates** shows a badge with how many pairs are waiting
-(for example 40, or 50+ when there are more than the list reads at once), then the first 10
-pairs, newest first. Each pair is one compact card: why it was suggested, the records with
-their detail, and its buttons on the right. **Show More** adds the next 10, and the line
+**The review list.** The **Review** tab and **Possible Duplicates** both show how many pairs
+are waiting (for example **Review (40)**, or 50+ when there are more than the list reads at
+once), then the first 10 pairs, newest first. Each pair is one card: why it was suggested and
+its buttons at the top (**Merge Households** is the main button on a household pair), then the
+records side by side. Each side shows the record's name (a link to it), Person or Household,
+and the fields compared: for a person the email, phone, mailing street, city and postal code,
+and household; for a household the billing street, city and postal code, and phone. Only
+fields you can read are shown. A value that is not the same on both sides carries a
+**Different** badge, so you see at a glance what sets the two apart. On a narrow screen the
+sides stack. **Show More** adds the next 10, and the line
 under the list says how many are showing. The note on merging two people is shown once, above
 the list, not on every pair. **Not a Duplicate** and **Merge Households** open their short
 form inside the pair's own card. When nothing is waiting the list shows **No Possible

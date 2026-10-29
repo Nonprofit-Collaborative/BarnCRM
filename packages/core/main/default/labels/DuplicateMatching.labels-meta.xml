@@ -25,6 +25,14 @@
         <value>Review</value>
     </labels>
     <labels>
+        <fullName>Core_DuplicateMatching_ReviewCount</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Matching: review tab name with the pairs waiting; {0} the count</shortDescription>
+        <value>Review ({0})</value>
+    </labels>
+    <labels>
         <fullName>Core_DuplicateMatching_NoAccess</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
