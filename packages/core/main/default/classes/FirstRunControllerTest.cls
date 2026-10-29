@@ -69,7 +69,7 @@ private class FirstRunControllerTest {
             Test.stopTest();
 
             Assert.isTrue(queued > 0, 'The tab access sync is queued though nothing was newly on');
-            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the nightly check is running');
+            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the hourly check is running');
         }
     }
 

@@ -78,7 +78,7 @@ earlier release keeps every feature on and is not held.
   its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
   Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
-  a few minutes, and starts the nightly tab access check if it is not already scheduled. What
+  a few minutes, and starts the hourly tab access check if it is not already scheduled. What
   you unticked stays off, and you can turn it on later in **General**.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
   either page. No module is installed by first-run setup: install modules later from the
@@ -138,9 +138,9 @@ BarnCRM gives it, once the feature is on, to the people who should see the tab: 
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
 Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Bulk Update and
 Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
-permission is given or removed on the Access page, after every upgrade, and every night (for
+permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
-up. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them from
+up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
 The Households tab works the same way. **Household Upkeep** carries the **BarnCRM Households**

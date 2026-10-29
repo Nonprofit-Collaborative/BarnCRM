@@ -60,7 +60,7 @@ public with sharing class FirstRunController {
 
     /**
      * Gives the tool tabs of the features now on to everyone holding a BarnCRM role, and starts
-     * the nightly tab access check unless it is running. Turning features on queues the sync
+     * the hourly tab access check unless it is running. Turning features on queues the sync
      * only when one is newly on, and on an org built from source every feature was already on,
      * so finishing would otherwise leave the tool tabs hidden until somebody changed a role on
      * the Access page. Neither step throws: the sync logs its own failure, and a check that
@@ -78,7 +78,7 @@ public with sharing class FirstRunController {
         }
     }
 
-    /** Test seam: true lets a test see the nightly tab access check started. */
+    /** Test seam: true lets a test see the hourly tab access check started. */
     @TestVisible
     private static Boolean startTabCheckInTests = false;
 

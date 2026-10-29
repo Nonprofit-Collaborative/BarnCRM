@@ -216,7 +216,7 @@ private class CorePostInstallTest {
                     FROM CronTrigger
                     WHERE CronJobDetail.Name = :TabAccessScheduler.JOB_NAME
                 ],
-                'An install and an upgrade leave one nightly tab access check'
+                'An install and an upgrade leave one hourly tab access check'
             );
         }
     }
