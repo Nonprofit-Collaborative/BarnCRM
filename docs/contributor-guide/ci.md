@@ -284,7 +284,7 @@ OpenAPI check, the migration kit tests, the em dash scan, `npm run lint`,
 output. The exit status is non-zero if anything failed. If `node_modules` is missing it tells
 you to run `npm ci` and stops.
 
-- `--fast` skips Jest and Code Analyzer.
+- `--fast` skips Jest, the `scripts/ci/tests` suite and Code Analyzer.
 - `--allow-adr-next` counts a `check-adrs.py` failure as a pass when the only problems are
   unnumbered `NEXT-*.md` decision records, so a branch with a new ADR reads clean.
 - `--analyzer` also runs `sf code-analyzer run --severity-threshold 2` on the Apex and
