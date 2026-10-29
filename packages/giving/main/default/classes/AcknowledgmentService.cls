@@ -166,6 +166,7 @@ public with sharing class AcknowledgmentService {
         Set<String> earlierDonors = needsFirstGiftAnswer(rules)
             ? AcknowledgmentRuleService.donorsWithEarlierGifts(gifts, idsOf(gifts))
             : new Set<String>();
+        Set<Id> optedOut = optedOutOfEmail(gifts);
 
         // Pass one: work out who gets what, without writing anything.
         List<Gift__c> sendable = new List<Gift__c>();
@@ -187,6 +188,11 @@ public with sharing class AcknowledgmentService {
             if (recipientId == null) {
                 unreachable.add(gift.Name);
                 counts.errors++;
+                continue;
+            }
+            if (optedOut.contains(gift.Id)) {
+                // The donor asked not to be emailed: no row, no error, and the gift stays queued
+                // for the letter run (R-AK13, ADR-NEXT).
                 continue;
             }
             sendable.add(gift);
@@ -337,6 +343,35 @@ public with sharing class AcknowledgmentService {
             return gift.Donor_Account__r.Primary_Contact__c;
         }
         return null;
+    }
+
+    /**
+     * The gifts, by Id, whose email recipient has Email Opt Out set (R-AK13, ADR-NEXT). The send
+     * skips them, and the letter run and the page treat them as letters, so all three read the
+     * opt-out through this one method. The recipient is `recipientContactIdFor`'s, so for an
+     * organization or household gift it is the primary contact's opt-out that counts.
+     */
+    public static Set<Id> optedOutOfEmail(List<Gift__c> gifts) {
+        Set<Id> giftIds = new Set<Id>();
+        if (gifts == null || gifts.isEmpty()) {
+            return giftIds;
+        }
+        Map<Id, Id> recipientByGift = new Map<Id, Id>();
+        for (Gift__c gift : gifts) {
+            Id recipientId = recipientContactIdFor(gift);
+            if (recipientId != null && gift.Id != null) {
+                recipientByGift.put(gift.Id, recipientId);
+            }
+        }
+        Set<Id> optedOutContacts = AcknowledgmentSelector.optedOutOfEmail(
+            new Set<Id>(recipientByGift.values())
+        );
+        for (Id giftId : recipientByGift.keySet()) {
+            if (optedOutContacts.contains(recipientByGift.get(giftId))) {
+                giftIds.add(giftId);
+            }
+        }
+        return giftIds;
     }
 
     /**

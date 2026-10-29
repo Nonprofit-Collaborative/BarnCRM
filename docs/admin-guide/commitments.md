@@ -80,7 +80,10 @@ marked Overdue is changed; the schedules simply stop being extended and payments
 turning Overdue.
 
 Scheduling and stopping need the **Manage BarnCRM Settings** permission, which comes with
-the BarnCRM Admin permission set. Somebody who has the Giving Admin permission set without
+the BarnCRM Admin permission set. The jobs run as the person who scheduled them and reach
+only the commitments that person can see and edit, so schedule them as a system
+administrator. Commitments are private, like gifts, and Giving Admin does not give View All
+on them (see [Access](access.md)). Somebody who has the Giving Admin permission set without
 it can open the page and see whether the jobs are running; the buttons are disabled.
 
 The **payment schedule** card lives on a commitment's record page, and BarnCRM ships a
@@ -197,6 +200,12 @@ pledge or recurring gift, so it cannot be deleted. Cancel the commitment, or cha
 donor, first." Merging duplicates still works: the commitment moves to the record you keep.
 Erasing a person is not a delete either, so it works with an open pledge: the pledge stays,
 credited to the anonymized record.
+
+**A commitment somebody cannot find.** Commitments are private: a person sees the ones they
+own and the ones your role hierarchy or sharing settings give them, and Giving Admin adds
+nothing to that, exactly as for gifts. If a fundraiser cannot find a pledge a colleague
+entered, give them a role above the owner, add a sharing rule, or use **Sharing** on the
+commitment.
 
 **Editing the amount partway through.** Changing the amount, the frequency, the day of
 month, or the end date rebuilds the payments that are still unpaid and leaves every paid

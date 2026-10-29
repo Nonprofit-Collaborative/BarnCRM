@@ -51,7 +51,7 @@ Enter all the year's gifts first. A donor who already has a statement for the ye
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
 1. Open the **Acknowledgment Queue** tab.
-2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**.
+2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Opted out of email, sent by letter**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**. A donor who has ticked **Email Opt Out** (for an organization, its primary contact) is never emailed a thank-you; their gift goes in the letter file instead.
 3. Click **Send emails now** to send the email queue.
 4. Click **Download letters to merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download the file**, merge it with your letter, and print.
 5. When the letters are posted, click **Mark as sent** on that run.
@@ -114,6 +114,7 @@ Marking gifts posted, and unposting, need the **Post Gifts** permission, which o
 - **Send emails now** is greyed out. The email queue is empty, or you lack **Send Acknowledgments**.
 - "Acknowledging gifts is switched off, so nothing is joining the queue." Your admin turns it on.
 - Gifts sit under **Waiting, matched by no rule**. No rule covers them; tell your admin.
+- Gifts under **Opted out of email, sent by letter** are not emailed. Click **Download letters to merge** to thank those donors by post.
 - **Template not found** beside a rule. Its email template is gone; your admin picks another. The **Failed Acknowledgments** list view on Acknowledgments shows what did not send.
 - "You need the Post Gifts permission to mark gifts posted to accounting or to unpost them."
 

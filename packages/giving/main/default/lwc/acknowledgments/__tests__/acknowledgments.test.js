@@ -120,6 +120,7 @@ const PAGE = {
   letterQueue: 2,
   unmatchedQueue: 1,
   withoutRecipient: 3,
+  optedOutOfEmail: 1,
   queueCapped: false,
   rules: [
     {
@@ -220,6 +221,7 @@ describe('c-acknowledgments', () => {
     expect(element.shadowRoot.querySelector('[data-id="letter-queue"]').textContent).toBe('2');
     expect(element.shadowRoot.querySelector('[data-id="unmatched-queue"]').textContent).toBe('1');
     expect(element.shadowRoot.querySelector('[data-id="without-recipient"]').textContent).toBe('3');
+    expect(element.shadowRoot.querySelector('[data-id="opted-out"]').textContent).toBe('1');
   });
 
   it('names a template a rule points at that this org does not have', async () => {

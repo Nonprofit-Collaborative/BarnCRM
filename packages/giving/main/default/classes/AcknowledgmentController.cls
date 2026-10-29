@@ -95,6 +95,9 @@ public with sharing class AcknowledgmentController {
         public Integer unmatchedQueue;
         @AuraEnabled
         public Integer withoutRecipient;
+        /** Email gifts whose recipient opted out of email, also counted in letterQueue. */
+        @AuraEnabled
+        public Integer optedOutOfEmail;
         @AuraEnabled
         public Boolean queueCapped;
         @AuraEnabled
@@ -212,10 +215,13 @@ public with sharing class AcknowledgmentController {
             new Set<Id>()
         );
 
+        Set<Id> optedOut = AcknowledgmentService.optedOutOfEmail(queued);
+
         Integer emails = 0;
         Integer letters = 0;
         Integer unmatched = 0;
         Integer unreachable = 0;
+        Integer lettersInstead = 0;
         for (Gift__c gift : queued) {
             AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(
                 gift,
@@ -229,6 +235,10 @@ public with sharing class AcknowledgmentController {
             } else if (AcknowledgmentRuleService.CHANNEL_EMAIL.equals(match.channel)) {
                 if (AcknowledgmentService.recipientContactIdFor(gift) == null) {
                     unreachable++;
+                } else if (optedOut.contains(gift.Id)) {
+                    // Counted as a letter too, because the letter run takes it (R-AK13).
+                    lettersInstead++;
+                    letters++;
                 } else {
                     emails++;
                 }
@@ -238,6 +248,7 @@ public with sharing class AcknowledgmentController {
         view.letterQueue = letters;
         view.unmatchedQueue = unmatched;
         view.withoutRecipient = unreachable;
+        view.optedOutOfEmail = lettersInstead;
     }
 
     /**

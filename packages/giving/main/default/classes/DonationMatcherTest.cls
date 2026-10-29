@@ -27,9 +27,14 @@ private class DonationMatcherTest {
         ];
     }
 
-    /** An active pledge of this person with a payment due on each of these days of March. */
+    /**
+     * An active pledge of this person with a payment due on each of these days of March, owned by
+     * Maria: commitments are private and Giving Admin has no View All on them, so she sees the
+     * pledges she owns.
+     */
     private static List<Installment__c> pledge(Id personId, Map<Integer, Decimal> dueDays) {
         Commitment__c pledge = new Commitment__c(
+            OwnerId = maria().Id,
             Type__c = 'Pledge',
             Status__c = 'Active',
             Donor_Contact__c = personId,

@@ -160,6 +160,29 @@ public with sharing class AcknowledgmentSelector {
         );
     }
 
+    /**
+     * Which of these contacts have Email Opt Out set (R-AK13, ADR-NEXT).
+     *
+     * Read in system mode and returned as Ids only: whether a donor is emailed must not depend on
+     * whether the person pressing Send has field access to Email Opt Out, and nothing read here is
+     * shown to them. The Ids come from gifts the caller already read in user mode.
+     */
+    public static Set<Id> optedOutOfEmail(Set<Id> contactIds) {
+        Set<Id> optedOut = new Set<Id>();
+        if (contactIds == null || contactIds.isEmpty()) {
+            return optedOut;
+        }
+        for (Contact person : [
+            SELECT Id
+            FROM Contact
+            WHERE Id IN :contactIds AND HasOptedOutOfEmail = TRUE
+            WITH SYSTEM_MODE
+        ]) {
+            optedOut.add(person.Id);
+        }
+        return optedOut;
+    }
+
     /** The acknowledgments recorded for these gifts, newest first. */
     public static List<Acknowledgment__c> forGifts(Set<Id> giftIds) {
         return [

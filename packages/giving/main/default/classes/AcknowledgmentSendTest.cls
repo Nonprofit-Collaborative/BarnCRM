@@ -396,6 +396,66 @@ private class AcknowledgmentSendTest {
     }
 
     @IsTest
+    static void aDonorWhoOptedOutOfEmailIsNotEmailedAndStaysQueued() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            emailRule();
+            Contact ada = AcknowledgmentTestData.insertDonor('Ada', 'Lovelace', 'ada@example.org');
+            Contact grace = AcknowledgmentTestData.insertDonor('Grace', 'Hopper', 'gh@example.org');
+            Contact mary = AcknowledgmentTestData.insertDonor(
+                'Mary',
+                'Somerville',
+                'm@example.org'
+            );
+            update new List<Contact>{
+                new Contact(Id = grace.Id, HasOptedOutOfEmail = true),
+                new Contact(Id = mary.Id, HasOptedOutOfEmail = true)
+            };
+            // An organization's thank you goes to its primary contact, so hers is the opt-out.
+            Account trust = GivingTestDataFactory.insertOrganization('Riverside Trust');
+            update new Account(Id = trust.Id, Primary_Contact__c = mary.Id);
+            Gift__c toAda = GivingTestDataFactory.buildGift(ada.Id, 250);
+            Gift__c toGrace = GivingTestDataFactory.buildGift(grace.Id, 250);
+            Gift__c toTrust = GivingTestDataFactory.buildAccountGift(trust.Id, 750);
+            insert new List<Gift__c>{ toAda, toGrace, toTrust };
+
+            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            AcknowledgmentService.senderOverride = sender;
+
+            Test.startTest();
+            AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
+                queuedGiftsInMemory(new List<Id>{ toAda.Id, toGrace.Id, toTrust.Id }),
+                null
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                sender.received.size(),
+                'Only Ada, who did not opt out, is emailed.'
+            );
+            Assert.areEqual(1, counts.sent, 'One thank you went.');
+            Assert.areEqual(0, counts.errors, 'An opt-out is not an error (R-AK13).');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Acknowledgment__c WHERE Gift__c IN (:toGrace.Id, :toTrust.Id)],
+                'Nothing was attempted for the opted-out donors, so no row is written.'
+            );
+            Assert.areEqual(
+                2,
+                [
+                    SELECT COUNT()
+                    FROM Gift__c
+                    WHERE
+                        Id IN (:toGrace.Id, :toTrust.Id)
+                        AND Acknowledgment_Status__c = :AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE
+                ],
+                'Both stay in the queue for the letter run.'
+            );
+        }
+    }
+
+    @IsTest
     static void nothingIsQueuedWhileTheFeatureIsOff() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             emailRule();

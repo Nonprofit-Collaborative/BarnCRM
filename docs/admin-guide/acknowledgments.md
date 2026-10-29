@@ -9,7 +9,8 @@ arrives into the right queue.
 
 Emailed thank yous are sent for you, in a batch you press or overnight if you want it. Letter
 thank yous come out as a spreadsheet you merge with your own letter in Word or Google Docs
-and print. Every thank you that goes out is recorded on its own record: which letter, to
+and print. A donor who has opted out of email is thanked by letter instead (see "A donor
+who opted out of email" below). Every thank you that goes out is recorded on its own record: which letter, to
 which address, on what date, and whether it failed, so nobody has to guess in January.
 
 An acknowledgment is not a receipt. A receipt is the tax document with a number on it, which
@@ -99,6 +100,16 @@ primary contact has no email address to send to. The run counts it under **could
 sent**, names it in one Error Log entry, and leaves the gift in the queue, which usually
 means it should have been a letter. Either give the organization a primary contact or write a
 rule that sends organization gifts by letter.
+
+**A donor who opted out of email.** BarnCRM never emails a thank you to a contact whose
+**Email Opt Out** is ticked. For a person's gift that is the donor; for an organization or
+household gift it is the account's primary contact, the person the email would have gone to.
+The gift is left in the queue with no acknowledgment record and no error, and the
+Acknowledgments page counts it on its own line, **Opted out of email, sent by letter**. Those
+gifts are also counted in **Letters ready to merge**, and the next **Download letters to
+merge** puts them in the file, so the donor is still thanked. If you do not send letters,
+they wait in the queue until you do, or until someone sets the gift's acknowledgment status
+by hand.
 
 **Thanking somebody twice.** BarnCRM will not do it on its own: a gift that has been
 acknowledged is never returned to the queue by a rule, an edit, or a re-run of a failed

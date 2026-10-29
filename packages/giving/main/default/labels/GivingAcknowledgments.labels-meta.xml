@@ -161,6 +161,14 @@
     <value>Could not be sent, nobody to email</value>
   </labels>
   <labels>
+    <fullName>Giving_Acknowledgments_OptedOut</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: email gifts whose donor opted out of email</shortDescription>
+    <value>Opted out of email, sent by letter</value>
+  </labels>
+  <labels>
     <fullName>Giving_Acknowledgments_QueueCapped</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
