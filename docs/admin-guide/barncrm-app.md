@@ -44,7 +44,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
 
-The home page's **Modules** list names each installed module, with an **Open the app** link
+The home page's **Modules** list names each installed module, with an **Open the App** link
 for a module that has an app of its own. The Rollup Builder module has no app of its own: its
 **Rollup Builder** tab is in the admin apps.
 

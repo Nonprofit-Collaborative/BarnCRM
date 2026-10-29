@@ -80,6 +80,11 @@ jest.mock(
   }
 );
 jest.mock(
+  '@salesforce/label/c.Core_DataJobs_ImportSummaryOne',
+  () => ({ default: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.' }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_DataJobs_ImportSummary',
   () => ({ default: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.' }),
   { virtual: true }
@@ -185,6 +190,15 @@ describe('c-data-job-history', () => {
       'Update',
       'Delete'
     ]);
+  });
+
+  it('says "1 row" for a one-row import', async () => {
+    getRecentBatches.mockResolvedValue([{ ...IMPORT_JOB, rowCount: 1, created: 1 }]);
+    const element = await render();
+
+    const text = rows(element).find((row) => row.dataset.kind === 'Import').textContent;
+    expect(text).toContain('1 row: 1 created');
+    expect(text).not.toContain('1 rows');
   });
 
   it('filters the list to one kind', async () => {

@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: link to an installed module's own app</shortDescription>
-        <value>Open the app</value>
+        <value>Open the App</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_StatusOff</fullName>

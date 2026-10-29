@@ -40,12 +40,12 @@ Cy,Dupe,cy.dupe@example.org,Active
 | 3 | Select **Next**. | **Upload File** is current on the path, with an **Upload file** control. **Back** shows at the bottom left. |
 | 4 | Upload `import-test-1.csv`. | **Check Columns** is current on the path. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
 | 5 | Select **Next**. | **Match Rows** is current on the path. A collapsed **More Options** section sits below the matching choices. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
-| 6 | Select **Preview**. | **Preview** is current on the path. Counts as big numbers: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 5 (Dee) with a reason naming the missing last name ("Required value missing: last name..."). |
+| 6 | Select **Preview**. | **Preview** is current on the path. Counts as big numbers: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 6 (Dee; the file's header line is row 1, so the fifth person is row 6) with a reason naming the missing last name ("Required value missing: last name..."). |
 | 7 | Search the org for "Testa Rivera". | No record found: the preview wrote nothing. |
 | 8 | Back on the Import tab, select **Import These Rows**. | "Working through the file. This page updates as it goes." shows, then **Results** is current on the path, with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
 | 9 | Open the new contact Testa Rivera from global search, then open their household. | The household exists and its **Created By Import Batch** field links to this import. |
 | 10 | Open Harper Garcia. | Unchanged: the matched row created nothing and cleared nothing (empty cells never clear a person's fields). |
-| 11 | Back on the Import tab, open the **Download** menu (beside **Import Another File**, the main button) and select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 1 to 3 read Created, row 4 Matched, row 5 Rejected with its reason. |
+| 11 | Back on the Import tab, open the **Download** menu (beside **Import Another File**, the main button) and select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 2 to 4 read Created, row 5 Matched, row 6 Rejected with its reason (the header line is row 1). |
 
 **Cleanup:** keep the import for T-IMP-02 and T-IMP-03; T-IMP-03 undoes it.
 
@@ -122,7 +122,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 |---|---|---|
 | 1 | Run `import-test-1.csv` through **Generic contact list** to the **Preview** step. | The four preview counts as in T-IMP-01, and a **Try the First Rows** section with **Rows to try** (25 by default). |
 | 2 | Set **Rows to try** to `2` and select **Import the First Rows**. | "The first 2 rows were imported. Check them above, then import the remaining 3 rows into the same import. If they are wrong, undo the import from Recent imports instead." |
-| 3 | Search for Testa Rivera and Cara Lind. | Testa Rivera exists (row 1); Cara Lind (row 3) does not yet. |
+| 3 | Search for Testa Rivera and Cara Lind. | Testa Rivera exists (first person in the file); Cara Lind (third) does not yet. |
 | 4 | Select **Import the Remaining Rows**. | Results for the whole file: **Created** 3, **Matched, nothing changed** 1, **Rejected** 1. |
 | 5 | Open **Recent Imports**. | One import for the file, not two. |
 | 6 | Select **Undo**, then **Undo This Import**, and **Refresh** until **Undone**. | **People to remove** was 3. Testa Rivera, Ben Okoro and Cara Lind are all gone. |

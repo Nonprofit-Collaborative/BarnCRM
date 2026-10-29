@@ -145,6 +145,14 @@
         <value>No record type</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_RecordUnavailable</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Recent Changes: a record the user cannot view or that is gone</shortDescription>
+        <value>A record you cannot view</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_NoRecordTypeNotAllowed</fullName>
         <categories>Core</categories>
         <language>en_US</language>
