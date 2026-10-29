@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: add a skip rule</shortDescription>
-        <value>Add a rule</value>
+        <value>Add a Rule</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesRemoveRule</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: remove a skip rule</shortDescription>
-        <value>Remove rule</value>
+        <value>Remove Rule</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesColumn</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the key columns for one row per key</shortDescription>
-        <value>One row per</value>
+        <value>One Row Per</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesUniqueHelp</fullName>

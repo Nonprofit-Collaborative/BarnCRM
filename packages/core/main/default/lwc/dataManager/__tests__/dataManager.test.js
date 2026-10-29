@@ -300,7 +300,7 @@ describe('c-data-manager', () => {
     });
   });
 
-  it('lists the import templates, a people template as people', async () => {
+  it('lists the import templates with what the server says each loads, never an API name', async () => {
     const element = await render();
     getMappings.emit([
       { id: 'a01', name: 'Generic contact list', isRecurring: false },
@@ -308,17 +308,22 @@ describe('c-data-manager', () => {
         id: 'a02',
         name: 'Program sessions',
         targetObject: 'Session__c',
+        loads: 'Sessions',
         isRecurring: true,
         sourceName: 'Monthly export',
         lastImportDate: '2026-10-01'
-      }
+      },
+      { id: 'a03', name: 'Gift list', loads: 'Gifts', isRecurring: false }
     ]);
     await flush();
 
     const table = one(element, 'mappings');
-    expect(table.data).toHaveLength(2);
-    expect(table.data[0].loads).toBe('c.Core_DataManager_LoadsPeople');
-    expect(table.data[1].loads).toBe('Session__c');
+    expect(table.data).toHaveLength(3);
+    expect(table.data.map((row) => row.loads)).toEqual([
+      'c.Core_DataManager_LoadsPeople',
+      'Sessions',
+      'Gifts'
+    ]);
     expect(one(element, 'mappings-empty')).toBeNull();
   });
 

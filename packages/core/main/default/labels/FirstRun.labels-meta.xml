@@ -73,6 +73,14 @@
         <value>Finish Setup</value>
     </labels>
     <labels>
+        <fullName>Core_FirstRun_Close</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the close button someone who cannot finish setup sees</shortDescription>
+        <value>Close</value>
+    </labels>
+    <labels>
         <fullName>Core_FirstRun_StandardLine</fullName>
         <categories>Core</categories>
         <language>en_US</language>

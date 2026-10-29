@@ -30,6 +30,23 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentInstanceProperties>
+          <name>placement</name>
+          <value>Top</value>
+        </componentInstanceProperties>
+        <componentName>hubSetup</componentName>
+        <identifier>hubSetupTop</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>hubErrors</componentName>
         <identifier>hubErrors1</identifier>
         <visibilityRule>

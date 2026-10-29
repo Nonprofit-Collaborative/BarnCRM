@@ -12,7 +12,8 @@
 
     <p class="slds-text-body_small slds-var-m-bottom_small">
         <strong>{labels.recommended}:</strong>
-        <span data-id="recommended">{recommendedText}</span>
+        <!-- LWC drops the space between the two elements, so the margin keeps them apart. -->
+        <span class="slds-var-m-left_xx-small" data-id="recommended">{recommendedText}</span>
     </p>
 
     <lightning-combobox

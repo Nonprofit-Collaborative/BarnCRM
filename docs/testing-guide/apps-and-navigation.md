@@ -77,3 +77,22 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 7 | Open **BarnCRM Console**, then **Households**, **Organizations** and an address. | People for households, a building for organizations, a map for the address. |
 
 **Cleanup:** none.
+
+## T-APP-05: Home Works From the First Day, on Any Screen
+
+**Purpose:** confirm the Households quick link, the setup checklist on a phone, the first-run
+window's close button and the Storage and Limits icon.
+**Prerequisites:** admin; a staff user who has never opened **Households** (a new user is
+best); for step 5, an org where first-run setup is not finished.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the new staff user, open the **BarnCRM** home page and click the **Households** quick link. | The households list opens, even though the user has no **Households** tab yet. |
+| 2 | As admin, in an org where a setup step is still **To Do**, open the home page in the Salesforce mobile app or a browser window about 400 pixels wide. | The **Setup Checklist** is the first card on the page, above the welcome. It shows once. |
+| 3 | Widen the window past 768 pixels. | The checklist moves to the side column. It shows once. |
+| 4 | In an org where setup is finished, repeat step 2. | The **Setup Complete** tile is at the bottom of the page, not the top. |
+| 5 | In an org where first-run setup is not finished, open the home page as admin, then as staff. | Admin: the setup window's close button is greyed out and Escape does nothing. Staff: "An administrator needs to finish setting up BarnCRM." with a **Close** button; **Close**, the close button and Escape each close the window. |
+| 6 | Open **Org Optimizer**, **Overview**. | The **Storage and Limits** tile shows an icon, not an empty square. |
+| 7 | Open **BarnCRM Settings**, **Integrations**, in an org without DLRS. | DLRS is not listed. In an org with DLRS installed, it is listed under **Complementary Apps** as **Installed in this org**. |
+
+**Cleanup:** none.

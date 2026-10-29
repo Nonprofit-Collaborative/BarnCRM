@@ -59,4 +59,14 @@
             ></lightning-button>
         </lightning-modal-footer>
     </template>
+    <template lwc:else>
+        <!-- Someone who cannot finish setup is never trapped: they read why and close. -->
+        <lightning-modal-footer>
+            <lightning-button
+                label={labels.close}
+                data-id="close"
+                onclick={handleClose}
+            ></lightning-button>
+        </lightning-modal-footer>
+    </template>
 </template>

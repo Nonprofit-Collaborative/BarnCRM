@@ -8,16 +8,20 @@ import SETTINGS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkSettingsLin
 import HOUSEHOLDS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholdsLine';
 import ORGANIZATIONS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizationsLine';
 
+const HOUSEHOLDS_TAB = 'Households';
+/** The Account list view the Households tab shows (objects/Account/listViews). */
+const HOUSEHOLDS_LIST_VIEW = 'Households';
+
 /**
  * The places people go most from the BarnCRM home page, as icon tiles (c-barn-tool-tile),
- * opened by tab rather than by URL.
+ * opened by page reference rather than by URL.
  */
 export default class HubQuickLinks extends NavigationMixin(LightningElement) {
   labels = { heading: HEADING };
 
   links = [
     {
-      tab: 'Households',
+      tab: HOUSEHOLDS_TAB,
       label: HOUSEHOLDS,
       line: HOUSEHOLDS_LINE,
       iconName: 'standard:household'
@@ -32,9 +36,22 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
   ];
 
   handleOpen(event) {
+    const name = event.detail.name;
+    if (name === HOUSEHOLDS_TAB) {
+      // The Households tab is the Households list view in a page, and a person may not have
+      // the tab yet: it arrives with the BarnCRM Households permission set, which the nightly
+      // Tab Access Check assigns. The list view itself needs only read access to accounts, so
+      // the link opens it directly and works for everyone from the first day.
+      this[NavigationMixin.Navigate]({
+        type: 'standard__objectPage',
+        attributes: { objectApiName: 'Account', actionName: 'list' },
+        state: { filterName: HOUSEHOLDS_LIST_VIEW }
+      });
+      return;
+    }
     this[NavigationMixin.Navigate]({
       type: 'standard__navItemPage',
-      attributes: { apiName: event.detail.name }
+      attributes: { apiName: name }
     });
   }
 }

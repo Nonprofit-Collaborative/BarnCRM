@@ -42,12 +42,13 @@
     </template>
 
     <template lwc:if={showPanels}>
-        <h2 class="slds-assistive-text" id="setup-assistant-heading">{labels.heading}</h2>
+        <!-- The Home card that holds this list is titled Setup Checklist, so the list is named
+             by aria-label rather than a second heading screen readers would read twice. -->
         <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="progress">
             {progressText}
         </p>
 
-        <ol class="slds-setup-assistant" aria-labelledby="setup-assistant-heading">
+        <ol class="slds-setup-assistant" aria-label={labels.heading} data-id="steps">
             <template for:each={stepRows} for:item="step">
                 <li key={step.key} class="slds-setup-assistant__item" data-id="step">
                     <article class="slds-setup-assistant__step">

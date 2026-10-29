@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: too many skip rules or key columns; {0} is the most of each</shortDescription>
-        <value>A template can have at most {0} Skip rows rules and {0} One row per columns.</value>
+        <value>A template can have at most {0} Skip Rows Where rules and {0} One Row Per columns.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorSkipRule</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: a skip rule is incomplete</shortDescription>
-        <value>Each Skip rows rule needs a column, a test (equals, contains or is empty) and, unless it tests for empty, the text to compare (at most 255 characters).</value>
+        <value>Each Skip Rows Where rule needs a column, a test (equals, contains or is empty) and, unless it tests for empty, the text to compare (at most 255 characters).</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorUniqueBy</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: a key column has no name</shortDescription>
-        <value>One row per needs the name of each column it compares.</value>
+        <value>One Row Per needs the name of each column it compares.</value>
     </labels>
     <labels>
         <fullName>Core_Import_SkippedByRule</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import row: skipped by a skip rule; {0} is the column</shortDescription>
-        <value>Skipped: the {0} column matched a Skip rows rule.</value>
+        <value>Skipped: the {0} column matched a Skip Rows Where rule.</value>
     </labels>
     <labels>
         <fullName>Core_Import_SkippedRepeat</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: rows skipped by the row rules; {0} is the count</shortDescription>
-        <value>{0} rows were skipped by Skip rows or One row per. They are listed with the file&apos;s rows, not as rejected.</value>
+        <value>{0} rows were skipped by Skip Rows Where or One Row Per. They are listed with the file&apos;s rows, not as rejected.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogWouldClear</fullName>
