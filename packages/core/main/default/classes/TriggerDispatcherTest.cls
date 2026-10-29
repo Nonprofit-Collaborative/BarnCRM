@@ -294,6 +294,99 @@ private class TriggerDispatcherTest {
         }
     }
 
+    /** Records how many handlers had run each time it ran; fails when told to. */
+    private class RecordingDeferred implements TriggerDispatcher.Deferred {
+        List<Integer> handlersRunBefore = new List<Integer>();
+        Boolean shouldFail = false;
+
+        public void run() {
+            handlersRunBefore.add(TestRegisteredHandler.runCount);
+            if (shouldFail) {
+                throw new IllegalArgumentException('Deferred failure for the test');
+            }
+        }
+    }
+
+    private static void registerTwoHandlers() {
+        List<Automation_Registry__mdt> entries = new List<Automation_Registry__mdt>();
+        for (String name : new List<String>{ 'Registered_First', 'Registered_Second' }) {
+            Automation_Registry__mdt entry = TestDataFactory.registryEntry(name, true);
+            entry.Handler_Class__c = 'TestRegisteredHandler';
+            entry.Object_Name__c = 'Error_Log__c';
+            entries.add(entry);
+        }
+        AutomationRegistrySelector.registryOverride = entries;
+    }
+
+    @IsTest
+    static void deferredWorkRunsOnceEveryHandlerOfTheRunHasRun() {
+        System.runAs(TestUsers.admin()) {
+            TestRegisteredHandler.reset();
+            registerTwoHandlers();
+            RecordingDeferred deferred = new RecordingDeferred();
+            TestRegisteredHandler.toDefer = deferred;
+
+            Test.startTest();
+            TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<Integer>{ 2, 2 },
+                deferred.handlersRunBefore,
+                'Each handler deferred it once, and it ran only after both handlers.'
+            );
+        }
+    }
+
+    @IsTest
+    static void deferredWorkOutsideATriggerRunRunsAtOnce() {
+        System.runAs(TestUsers.admin()) {
+            TestRegisteredHandler.reset();
+            RecordingDeferred deferred = new RecordingDeferred();
+
+            Test.startTest();
+            TriggerDispatcher.afterHandlers(deferred);
+            TriggerDispatcher.afterHandlers(null);
+            Test.stopTest();
+
+            Assert.areEqual(1, deferred.handlersRunBefore.size(), 'It ran straight away.');
+        }
+    }
+
+    @IsTest
+    static void aDeferredFailureIsLoggedAndReported() {
+        System.runAs(TestUsers.admin()) {
+            TestRegisteredHandler.reset();
+            registerTwoHandlers();
+            RecordingDeferred deferred = new RecordingDeferred();
+            deferred.shouldFail = true;
+            TestRegisteredHandler.toDefer = deferred;
+            Boolean reported = false;
+
+            Test.startTest();
+            try {
+                TriggerDispatcher.run(
+                    'Error_Log__c',
+                    contextFor(System.TriggerOperation.AFTER_INSERT)
+                );
+            } catch (TriggerDispatcher.TriggerDispatcherException expected) {
+                reported = true;
+            }
+            Test.stopTest();
+
+            Assert.isTrue(reported, 'A failure after the save is reported to the user.');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'Trigger dispatch: Error_Log__c'
+                ],
+                'The failure is in the Error Log.'
+            );
+        }
+    }
+
     @IsTest
     static void aRegisteredAutomationRespectsItsOwnSwitch() {
         System.runAs(TestUsers.admin()) {

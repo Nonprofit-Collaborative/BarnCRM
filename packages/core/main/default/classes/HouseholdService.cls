@@ -1652,19 +1652,105 @@ public with sharing class HouseholdService {
      * Contact mode: the person a household was just created for is its Primary Contact, as
      * junction mode already does by marking them the primary member (R-H2, PEOPLE-27).
      * Called after insert, once the person has an id.
+     *
+     * Saved once every handler of the same Contact trigger run has run, so a new household
+     * the address propagation saves in that run (its billing address, R-AD3) is saved once,
+     * carrying its Primary Contact (see saveAccountCopiesAsUser), rather than twice (D-143).
      */
     @NamespaceAccessible
     public static void seedPrimaryContactsOfNewHouseholds(List<Contact> contacts) {
         if (contacts == null || HOUSEHOLDS_AWAITING_PRIMARY.isEmpty()) {
             return;
         }
-        List<Account> updates = new List<Account>();
+        List<Id> householdIds = new List<Id>();
         for (Contact record : contacts) {
             if (record.Id != null && HOUSEHOLDS_AWAITING_PRIMARY.remove(record.AccountId)) {
-                updates.add(new Account(Id = record.AccountId, Primary_Contact__c = record.Id));
+                PRIMARY_CONTACTS_TO_SAVE.put(
+                    record.AccountId,
+                    new Account(Id = record.AccountId, Primary_Contact__c = record.Id)
+                );
+                householdIds.add(record.AccountId);
             }
         }
-        writePrimaryContacts(updates);
+        if (!householdIds.isEmpty()) {
+            TriggerDispatcher.afterHandlers(new PrimaryContactSave(householdIds));
+        }
+    }
+
+    /** New households' Primary Contacts not saved yet, by household id. */
+    private static final Map<Id, Account> PRIMARY_CONTACTS_TO_SAVE = new Map<Id, Account>();
+
+    /** Saves the seeded Primary Contacts no other save has carried, as package upkeep. */
+    private with sharing class PrimaryContactSave implements TriggerDispatcher.Deferred {
+        private List<Id> householdIds;
+
+        public PrimaryContactSave(List<Id> householdIds) {
+            this.householdIds = householdIds;
+        }
+
+        public void run() {
+            List<Account> updates = new List<Account>();
+            for (Id householdId : householdIds) {
+                Account pending = PRIMARY_CONTACTS_TO_SAVE.remove(householdId);
+                if (pending != null) {
+                    updates.add(pending);
+                }
+            }
+            writePrimaryContacts(updates);
+        }
+    }
+
+    /**
+     * Saves account copies another service writes as the user (the billing address the address
+     * propagation copies, R-AD3), all or none as before. A copy for a new household still waiting
+     * for its Primary Contact carries it, so the household is saved once (D-143), when the user
+     * may edit Primary Contact. A household whose combined save is refused is saved as it was
+     * before: its copy as the user, which fails as it always did when the copy was the cause,
+     * and its Primary Contact afterwards as package upkeep.
+     */
+    public static void saveAccountCopiesAsUser(List<SObject> copies) {
+        Map<Id, Id> carried = new Map<Id, Id>();
+        if (
+            !PRIMARY_CONTACTS_TO_SAVE.isEmpty() &&
+            Schema.SObjectType.Account.fields.Primary_Contact__c.isUpdateable()
+        ) {
+            for (SObject copy : copies) {
+                Account waiting = PRIMARY_CONTACTS_TO_SAVE.get(copy.Id);
+                if (waiting != null) {
+                    carried.put(copy.Id, waiting.Primary_Contact__c);
+                }
+            }
+        }
+        if (carried.isEmpty()) {
+            Database.update(copies, AccessLevel.USER_MODE);
+            return;
+        }
+        List<SObject> combined = new List<SObject>();
+        for (SObject copy : copies) {
+            SObject write = copy.clone(true, false, false, false);
+            if (carried.containsKey(copy.Id)) {
+                write.put(Account.Primary_Contact__c, carried.get(copy.Id));
+            }
+            combined.add(write);
+        }
+        List<Database.SaveResult> saves;
+        writingPrimaryContacts = true;
+        try {
+            saves = Database.update(combined, false, AccessLevel.USER_MODE);
+        } finally {
+            writingPrimaryContacts = false;
+        }
+        List<SObject> refused = new List<SObject>();
+        for (Integer i = 0; i < saves.size(); i++) {
+            if (saves[i].isSuccess()) {
+                PRIMARY_CONTACTS_TO_SAVE.remove(copies[i].Id);
+            } else {
+                refused.add(copies[i]);
+            }
+        }
+        if (!refused.isEmpty()) {
+            Database.update(refused, AccessLevel.USER_MODE);
+        }
     }
 
     /**

@@ -12,15 +12,21 @@
 public class TestRegisteredHandler extends TriggerHandler {
     public static Integer runCount = 0;
     public static Set<Id> handledIds = new Set<Id>();
+    /** Handed to TriggerDispatcher.afterHandlers on each run, when set. */
+    public static TriggerDispatcher.Deferred toDefer;
 
     public static void reset() {
         runCount = 0;
         handledIds = new Set<Id>();
+        toDefer = null;
         TriggerHandler.clearRunClaims();
     }
 
     public override void afterInsert() {
         runCount++;
+        if (toDefer != null) {
+            TriggerDispatcher.afterHandlers(toDefer);
+        }
         Map<Id, SObject> records = newRecordsById();
         if (records != null) {
             handledIds.addAll(claimRunFor('afterInsert', records.keySet()));
