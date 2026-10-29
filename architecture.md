@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-29 (landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
+Last verified 2026-10-29 (landing/batch-14 on main at batch 13, 15d8bebf; ADR-0144 acknowledgments honor email opt-out; landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
 
 ## Pointers
 
@@ -199,4 +199,6 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - `barn-npc` rejects unpackaged Protected custom settings and custom metadata; release deploys there use a local copy with 9 such objects set to Public (repo unchanged).
 - A manifest deploy resolves CustomLabels across every package folder in `sfdx-project.json`, so a Core-only kit must limit `packageDirectories` (how about 640 Giving and 161 Mirror labels reached `mwdbdevsb` on 2026-10-28).
 - RT5 (#712): a source deploy never deletes a record type, so gate orgs keep BarnCRM's old Organization record type until a destructive deploy. BarnCRM permission sets give no Account record type. A `SYSTEM_MODE` insert with `RecordTypeId` explicitly null is refused for a master-only user (leave it unset). An insert with the master record type Id fails `INVALID_CROSS_REFERENCE_KEY` when the user has other record types; no `RecordTypeId` takes the user's default. Custom settings are invisible in tests, so tests run on detection.
+- Commitment nightly jobs (#722, G-L5): the installment top up and the overdue pass run in user mode as the scheduling user, and no Giving permission set has View All on `Gift__c` or `Commitment__c`, so schedule them as a system administrator.
+- Email opt-out (#722, ADR-0144): Salesforce does not apply `Contact.HasOptedOutOfEmail` to a single Apex email; BarnCRM checks it in the acknowledgment send (`AcknowledgmentService`, `AcknowledgmentSelector`).
 - Module security (#720): `RollupDefinitionGuard` runs from `RollupDefinitionTrigger` itself (no handler bypass) and trusts only `RollupWriter.insertDefinitions`; `check-apex-access-modes.py` checks inner async jobs in every package.

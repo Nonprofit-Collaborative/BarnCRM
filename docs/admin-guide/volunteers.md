@@ -464,7 +464,10 @@ that org builds its own lapsing report on an account-based report type.
 the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all
 and a Team Member sees the hours they can open. The folders ship public read only, and all four
 Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
-can also create and edit them.
+can also create reports and dashboards of their own, and change the shipped ones by saving a copy
+into a folder they can write to. No Volunteers set edits or deletes everything in public folders:
+to let someone change the shipped folders themselves, share those folders with them as Manager in
+Salesforce.
 
 **How to change the running user.** If your edition does not offer the dashboard viewer, or your
 org has used up its allowance of dashboards that read that way, open the dashboard, choose

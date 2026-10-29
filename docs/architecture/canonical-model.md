@@ -4296,6 +4296,12 @@ rewritten, because a gift already refers to them.
 ### Salesforce implementation
 
 - **Object:** `Commitment__c`, auto-number Name with format `CM-{000000}`.
+- **Record access:** sharing model Private, like `Gift__c`. No Giving permission set grants
+  View All or Modify All on either (2026-10-29 security review, G-L5): a person sees the
+  commitments they own and those their role hierarchy or sharing gives them. `Installment__c`
+  is controlled by its commitment. The nightly top up and overdue pass read in user mode, so
+  they reach the commitments the person who scheduled them can see, which is why they are
+  scheduled by someone with org-wide access (a system administrator).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -5285,6 +5291,13 @@ package cannot know whether a letter was printed, so it does not pretend to.
 on Giving Settings and shown on the Acknowledgments page, the same freshness promise the
 seasonal address swap makes (R-AD8), so an administrator can see that last night's send
 happened without finding the run record.
+
+**R-AK13 An opted-out donor is thanked by letter, never by email (ADR-0144).** When the contact
+an email would go to (R-AK9: the donor contact, or the account's primary contact) has Email Opt
+Out set, the email run sends nothing, writes no row and counts no error, and the gift stays To
+acknowledge. The letter run takes that gift as a letter, with the email rule on its row, and
+the Acknowledgments page counts these gifts on their own line so staff can see why. The flag is
+read in system mode at send time, so the check does not depend on the sender's field access.
 
 ### Salesforce implementation
 
@@ -9131,6 +9144,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-28 | Import templates (plan D-136). No object or field added. R-IT5: Core ships `organization_list` and `couples_and_households`; the shipped `generic_contact_list` is labelled "People and Organizations List" for new materializations only; a people or gift template can be copied under a new name with key `copy_` and a random number. |
 | v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
+| v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 
 ---
 ## 32. Entity ownership by package

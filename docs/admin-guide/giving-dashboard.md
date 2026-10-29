@@ -28,7 +28,9 @@ else sees.
    the Access page's Extra Permissions, the **Giving Read Only** permission set. Without one of the Giving
    permission sets a person cannot read gifts, so the dashboard has nothing to show them.
    The report and dashboard folders themselves ship as
-   public read only, so nothing has to be shared by hand.
+   public read only, so nothing has to be shared by hand. **Giving Admin** builds reports and
+   dashboards of its own and changes a shipped one by saving a copy; it does not edit or delete
+   everything in public folders.
 4. Optional, and worth the ten seconds: with the dashboard open, choose **Subscribe** and
    have it emailed to yourself on the first of the month.
 

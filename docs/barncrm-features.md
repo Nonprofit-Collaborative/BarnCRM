@@ -383,7 +383,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Commitments | Major | Tracks pledges and recurring gifts in one place, with real installment records, paid to date and balance. | Shipped | G-07 |
+| Commitments | Major | Tracks pledges and recurring gifts in one place, with real installment records, paid to date and balance. Commitments are private like gifts: no Giving permission set gives View All on them, so people see the ones they own or that roles and sharing give them (2026-10-29 security review, G-L5). | Shipped | G-07 |
 | Pledge balance rollups | Minor | Pledge balance on households, organizations and people, plus paid amounts on commitments and installments. | Shipped | G-11 |
 | Commitment list views | Minor | Overdue, Upcoming 30 days, Active pledges and Active recurring. | Shipped | G-07 |
 | Apply to oldest unpaid installment | Minor | A gift naming a commitment but no installment is applied to the oldest unpaid one (a setting). | Shipped | G-07 |
@@ -423,6 +423,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Rule criteria | Minor | Acknowledgment rules match on amount range, gift type, appeal and first gift only. | Shipped | G-12 |
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |
 | No double thanks | Minor | A gift cannot be thanked twice, even if a batch is retried. | Shipped | G-12 |
+| Email opt-out honored | Minor | A donor (or an organization's primary contact) with Email Opt Out is never emailed a thank-you; the gift is counted on its own queue line and goes in the letter file instead (2026-10-29 security review, G-L4). | Shipped | G-12, ADR-0144 |
 | Send Acknowledgments permission | Minor | Separate permission for sending thank-yous. | Shipped | G-12 |
 | Thank-you greets "friend" | Minor | The thank-you email greets "friend" when the person has no first name. | Shipped | G-12 (UX pass) |
 | Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Shipped | G-12, G-15 (UX pass) |
@@ -488,7 +489,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Giving dashboard | Major | A packaged dashboard and reports: gifts this month, giving by month, by fund, by appeal, top donors and recent gifts, with relative dates. | Shipped | G-06 |
+| Giving dashboard | Major | A packaged dashboard and reports: gifts this month, giving by month, by fund, by appeal, top donors and recent gifts, with relative dates. Giving Admin and Volunteers Admin build their own reports and dashboards but no longer hold the rights to edit, delete or create every public folder's contents (2026-10-28 security review, G-M1). | Shipped | G-06 |
 | Retention reports | Major | LYBUNT, SYBUNT, new versus retained, and first-to-second gift conversion, each with written definitions, counting donors not gifts. | Shipped | G-16, ADR-0026 |
 | Giving totals on donors | Major | Total giving, gift count, first, last and largest gift, this year, last year, two years ago, soft credit totals and in-kind totals on households, organizations and people. | Shipped | G-02 |
 | Fund and appeal totals | Minor | Total raised, this year, gift count and last gift date on funds; total raised and gift count on appeals. | Shipped | G-02 |

@@ -1323,7 +1323,7 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Commitment__c</object>
-    <viewAllRecords>true</viewAllRecords>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
@@ -1571,10 +1571,6 @@
   </userPermissions>
   <userPermissions>
     <enabled>true</enabled>
-    <name>CreateDashboardFolders</name>
-  </userPermissions>
-  <userPermissions>
-    <enabled>true</enabled>
     <name>EditMyDashboards</name>
   </userPermissions>
   <userPermissions>
@@ -1583,15 +1579,7 @@
   </userPermissions>
   <userPermissions>
     <enabled>true</enabled>
-    <name>ManageDashbdsInPubFolders</name>
-  </userPermissions>
-  <userPermissions>
-    <enabled>true</enabled>
     <name>CreateCustomizeReports</name>
-  </userPermissions>
-  <userPermissions>
-    <enabled>true</enabled>
-    <name>CreateReportFolders</name>
   </userPermissions>
   <userPermissions>
     <enabled>true</enabled>
@@ -1604,9 +1592,5 @@
   <userPermissions>
     <enabled>true</enabled>
     <name>ViewPublicReports</name>
-  </userPermissions>
-  <userPermissions>
-    <enabled>true</enabled>
-    <name>ManageReportsInPubFolders</name>
   </userPermissions>
 </PermissionSet>

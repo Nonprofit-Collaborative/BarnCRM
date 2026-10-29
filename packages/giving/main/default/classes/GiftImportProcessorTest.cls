@@ -14,12 +14,16 @@ private class GiftImportProcessorTest {
     @TestSetup
     static void createTestUser() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            TestDataFactory.createUser(
+            User maria = TestDataFactory.createUser(
                 'Maria',
                 new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
             );
             fund('General', null, true);
-            AccountKindsTestData.useRecordTypeTheUserCanUse();
+            // As Maria, who runs the imports: her profile, not the admin's, decides which
+            // record type for organizations she can use.
+            System.runAs(maria) {
+                AccountKindsTestData.useRecordTypeTheUserCanUse();
+            }
         }
     }
 

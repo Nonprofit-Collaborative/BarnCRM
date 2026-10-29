@@ -87,6 +87,7 @@ You should see: the unpaid payments rebuilt; paid and partly paid ones are left 
 - "That payment is no longer open, or is not this donor's. Nothing was saved." Choose again in **Pays a scheduled payment**, or None.
 - "A gift of goods cannot pay a scheduled payment. Choose None." In-kind gifts never pay a pledge.
 - The **Overdue** list is empty. Payments turn Overdue in a nightly job your admin switches on ([Commitments](../admin-guide/commitments.md)).
+- You cannot find a pledge a colleague entered. Commitments are private, like gifts: you see your own and those your role or sharing gives you. Ask your admin ([Access](../admin-guide/access.md)).
 - A suggested payment was wrong and the gift is saved. Open the gift, click **Edit**, and clear **Installment** and **Commitment**; the payment is owed again.
 
 ## Related

@@ -232,3 +232,20 @@ For every script on this page:
 | 5 | Open **Stewardship Plans**. | **All Stewardship Plans**, **Running Plans** and **My Stewardship Plans** are listed. A plan you start shows in **My Stewardship Plans**. |
 
 **Cleanup:** none.
+
+## T-RCPT-14: A Donor Who Opted Out of Email Is Thanked by Letter
+
+**Purpose:** Confirm an opted-out donor is never emailed a thank-you and their gift goes in the letter file instead.
+**Prerequisites:** admin for steps 1 and 2, staff for steps 3 to 7. T-RCPT-08 done.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the Acknowledgments page, **Edit** `Test email` and tick **Active**. Select **Save**. | The rule is listed as active (Email, 7777 to 7777). |
+| 2 | Open **Rosa Hall**, tick **Email Opt Out**, select **Save**. | Saved. |
+| 3 | As staff, enter a gift from **Rosa Hall** for 7777. Open the Acknowledgments page. | **Opted out of email, sent by letter** is at least 1, and **Letters ready to merge** counts it too. **Emails ready to send** does not. |
+| 4 | If **Send emails now** is enabled, select it and refresh after the run finishes (it is greyed out when Rosa's gift is the only email gift waiting). | Any new run shows **Did Not Go** 0. The 7777 gift has no row in its **Acknowledgments** list and its **Acknowledgment Status** is still **To acknowledge**. Rosa receives no email. |
+| 5 | Select **Download letters to merge**, then **Download the file**. | The CSV has a row for Rosa's 7777 gift, with **Rule** `Test email`. |
+| 6 | Select **Mark as sent** on that run. | The 7777 gift's **Acknowledgment Status** is **Acknowledged**; its acknowledgment row has **Channel** Letter. |
+| 7 | Open an organization with a primary contact, tick **Email Opt Out** on that contact, and enter a 7777 gift from the organization. Open the Acknowledgments page. | The gift is counted under **Opted out of email, sent by letter**: an organization's thank-you follows its primary contact's opt-out. |
+
+**Cleanup:** As admin, **Edit** `Test email` and clear **Active**. Clear **Email Opt Out** on Rosa Hall and the primary contact, and mark the step 7 gift **Do not acknowledge**.
