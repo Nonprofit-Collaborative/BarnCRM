@@ -94,6 +94,69 @@ private class AddressMoveControllerTest {
     }
 
     @IsTest
+    static void aMoveLeavesOutTheDeceasedAndTellsApartPeopleWithOneName() {
+        System.runAs(TestUsers.admin()) {
+            Account ortiz = household('The Ortiz Family');
+            Database.insert(ortiz, AccessLevel.SYSTEM_MODE);
+            Contact andre = AddressTestDataFactory.newContact('Andre', 'Ortiz', ortiz.Id);
+            Contact omarSenior = AddressTestDataFactory.newContact('Omar', 'Ortiz', ortiz.Id);
+            Contact omarBorn = AddressTestDataFactory.newContact('Omar', 'Ortiz', ortiz.Id);
+            Contact omarEmail = AddressTestDataFactory.newContact('Omar', 'Ortiz', ortiz.Id);
+            omarSenior.Deceased__c = true;
+            omarBorn.Birthdate = Date.newInstance(1980, 3, 4);
+            omarEmail.Email = 'omar.ortiz@example.org';
+            // Saved past an org duplicate rule that only alerts: the Omars share a name on purpose.
+            Database.DMLOptions allowDuplicates = new Database.DMLOptions();
+            allowDuplicates.DuplicateRuleHeader.AllowSave = true;
+            Database.insert(
+                new List<Contact>{ andre, omarSenior, omarBorn, omarEmail },
+                allowDuplicates,
+                AccessLevel.USER_MODE
+            );
+            Address__c andresOwn = ownAddress(andre.Id);
+            insert andresOwn;
+
+            Test.startTest();
+            AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
+                ortiz.Id
+            );
+            AddressMoveController.useForWholeHousehold(andresOwn.Id, ortiz.Id);
+            Test.stopTest();
+
+            Set<String> moving = new Set<String>();
+            Set<Id> listed = new Set<Id>();
+            for (AddressMoveController.Choice choice : preview.moving) {
+                moving.add(choice.name);
+                listed.add(choice.id);
+            }
+            for (AddressMoveController.Choice choice : preview.withTheirOwn) {
+                listed.add(choice.id);
+            }
+            Assert.isFalse(listed.contains(omarSenior.Id), 'The deceased Omar is not listed.');
+            Assert.areEqual(
+                new Set<String>{
+                    String.format(
+                        System.Label.Core_Address_SameNameBorn,
+                        new List<Object>{ 'Omar Ortiz', omarBorn.Birthdate.format() }
+                    ),
+                    String.format(
+                        System.Label.Core_Address_SameNameEmail,
+                        new List<Object>{ 'Omar Ortiz', 'omar.ortiz@example.org' }
+                    )
+                },
+                moving,
+                'Each living Omar is told apart; Andre has his own address.'
+            );
+            Assert.areEqual(OWN_STREET, mailingStreetOf(omarBorn.Id), 'The living move.');
+            Assert.areNotEqual(
+                OWN_STREET,
+                mailingStreetOf(omarSenior.Id),
+                'The deceased keeps the address on their record.'
+            );
+        }
+    }
+
+    @IsTest
     static void useForWholeHouseholdMovesTheHousehold() {
         System.runAs(TestUsers.admin()) {
             Account garcia = household('The Garcia Family');

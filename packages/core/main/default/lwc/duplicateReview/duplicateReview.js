@@ -53,6 +53,8 @@ import SHOW_MORE from '@salesforce/label/c.Core_Duplicates_ShowMore';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
 import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
 import DIFFERENT from '@salesforce/label/c.Core_Duplicates_Different';
+import DIFFERENT_FROM from '@salesforce/label/c.Core_Duplicates_DifferentFrom';
+import COMPARED_WITH_FIRST from '@salesforce/label/c.Core_Duplicates_ComparedWithFirst';
 import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
@@ -103,9 +105,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     different: DIFFERENT
   };
 
-  /** How many pairs are shown; Show More adds a page. The server sends at most 50. */
+  /** How many suggestions are shown; Show More adds a page. The server sends at most 50. */
   visibleCount = PAGE_SIZE;
-  /** Set by Show More: the index of the first newly shown pair, focused after the render. */
+  /** Set by Show More: the index of the first newly shown suggestion, focused after the render. */
   focusFrom;
 
   setupUrl = SETUP_DUPLICATE_RULES;
@@ -224,7 +226,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return !this.canReviewSuggestions;
   }
 
-  /** Every pair waiting, as counted by the server; never fewer than the pairs it sent. */
+  /** Every suggestion waiting, as counted by the server; never fewer than it sent. */
   get totalCount() {
     if (!this.view) {
       return 0;
@@ -282,34 +284,48 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     if (!this.view || !this.view.suggestions) {
       return [];
     }
-    return this.view.suggestions.map((suggestion) => ({
-      setId: suggestion.setId,
-      reason: suggestion.reason,
-      canMerge: suggestion.canMerge === true,
-      dismissOpen: this.dismissing === suggestion.setId,
-      mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
-      records: this.sideBySide(suggestion.records)
-    }));
+    return this.view.suggestions.map((suggestion) => {
+      const records = suggestion.records || [];
+      const first = records.length ? records[0].name : '';
+      return {
+        setId: suggestion.setId,
+        reason: suggestion.reason,
+        canMerge: suggestion.canMerge === true,
+        dismissOpen: this.dismissing === suggestion.setId,
+        mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
+        // A suggestion can hold three or more records: each is compared with the first.
+        isGroup: records.length > 2,
+        comparedWithFirst: COMPARED_WITH_FIRST.replace('{0}', first),
+        records: this.sideBySide(records)
+      };
+    });
   }
 
   /**
-   * The records of one pair for the side-by-side card: each compared field with its value,
-   * marked when the records do not all hold the same value (spaces and capitals aside).
+   * The records of one suggestion for the side-by-side card: each compared field with its
+   * value. A suggestion may hold more than two records, so every record after the first is
+   * compared with the first, and a value it holds differently (spaces and capitals aside) is
+   * marked Different, with "from" and the first record's name for screen readers. The first
+   * record carries no marks: it is what the others are compared with.
    */
   sideBySide(records) {
-    const valuesByField = {};
-    records.forEach((record) => {
-      (record.fields || []).forEach((field) => {
-        const value = (field.value || '').trim().toLowerCase();
-        (valuesByField[field.fieldName] = valuesByField[field.fieldName] || new Set()).add(value);
-      });
+    const comparable = (value) => (value || '').trim().toLowerCase();
+    const base = {};
+    ((records[0] && records[0].fields) || []).forEach((field) => {
+      base[field.fieldName] = comparable(field.value);
     });
-    return records.map((record) => {
+    const differentFrom = DIFFERENT_FROM.replace('{0}', records[0] ? records[0].name : '');
+    // Two records sit side by side; three or more wrap in up to three columns.
+    const sizeClass =
+      records.length > 2
+        ? 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-m-bottom_x-small'
+        : 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small';
+    return records.map((record, index) => {
       const fields = (record.fields || []).map((field) => ({
         key: `${record.recordId}-${field.fieldName}`,
         label: field.label,
         text: field.value || BLANK,
-        differs: records.length > 1 && valuesByField[field.fieldName].size > 1
+        differs: index > 0 && comparable(field.value) !== (base[field.fieldName] || '')
       }));
       return {
         recordId: record.recordId,
@@ -317,6 +333,8 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         kind: record.isHousehold ? OBJECT_HOUSEHOLD : OBJECT_PERSON,
         detail: record.detail,
         url: `/lightning/r/${record.recordId}/view`,
+        sizeClass,
+        differentFrom,
         fields,
         hasFields: fields.length > 0
       };

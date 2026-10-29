@@ -209,11 +209,56 @@ public with sharing class AddressMoveController {
             }
         }
         Map<Id, String> names = AddressSelector.selectNames(contactIds, accountIds);
+        Map<Id, Contact> details = AddressSelector.selectDistinguishingDetails(
+            sharingANameAmong(names, contactIds)
+        );
         List<Choice> choices = new List<Choice>();
         for (Id personId : names.keySet()) {
-            choices.add(new Choice(personId, names.get(personId)));
+            choices.add(new Choice(personId, told(names.get(personId), details.get(personId))));
         }
         return choices;
+    }
+
+    /** The contacts listed under a name somebody else in the list has too. */
+    private static Set<Id> sharingANameAmong(Map<Id, String> names, Set<Id> contactIds) {
+        Map<String, Integer> timesSeen = new Map<String, Integer>();
+        for (String name : names.values()) {
+            String key = name == null ? '' : name.trim().toLowerCase();
+            timesSeen.put(key, (timesSeen.containsKey(key) ? timesSeen.get(key) : 0) + 1);
+        }
+        Set<Id> result = new Set<Id>();
+        for (Id personId : names.keySet()) {
+            String name = names.get(personId);
+            String key = name == null ? '' : name.trim().toLowerCase();
+            if (timesSeen.get(key) > 1 && contactIds.contains(personId)) {
+                result.add(personId);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * A name, with what tells it apart when another person in the list shares it: the
+     * birthdate, else the email, whichever the user may read. As it is when neither is there.
+     */
+    private static String told(String name, Contact detail) {
+        if (detail == null) {
+            return name;
+        }
+        Map<String, Object> fields = detail.getPopulatedFieldsAsMap();
+        if (fields.containsKey('Birthdate') && detail.Birthdate != null) {
+            return String.format(
+                System.Label.Core_Address_SameNameBorn,
+                new List<Object>{ name, detail.Birthdate.format() }
+            );
+        }
+        if (fields.containsKey('Email') && String.isNotBlank(detail.Email)) {
+            return String.format(
+                System.Label.Core_Address_SameNameEmail,
+                new List<Object>{ name, detail.Email }
+            );
+        }
+        return name;
     }
 
     /**

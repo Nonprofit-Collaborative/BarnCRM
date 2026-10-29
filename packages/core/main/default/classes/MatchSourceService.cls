@@ -75,8 +75,29 @@ public with sharing class MatchSourceService {
         return result;
     }
 
+    /**
+     * Injected by the tests: object names (lower case) to treat as not in the org, as on a
+     * Platform-only org or one without the Data Protection and Privacy objects, where the
+     * shipped contact point sources name objects that do not exist.
+     */
+    @TestVisible
+    private static Set<String> objectsAbsentOverride;
+
+    /** The object a source names, by describe; null when the org does not have it. */
+    @TestVisible
+    private static Schema.SObjectType objectTypeOf(String objectName) {
+        if (
+            objectsAbsentOverride != null &&
+            objectName != null &&
+            objectsAbsentOverride.contains(objectName.trim().toLowerCase())
+        ) {
+            return null;
+        }
+        return NamespaceUtil.objectType(objectName);
+    }
+
     private static Source resolve(Match_Source__mdt row) {
-        Schema.SObjectType type = NamespaceUtil.objectType(row.Object_Name__c);
+        Schema.SObjectType type = objectTypeOf(row.Object_Name__c);
         if (type == null || String.isBlank(row.Normalization__c)) {
             return null;
         }

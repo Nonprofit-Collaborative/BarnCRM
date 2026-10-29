@@ -308,4 +308,59 @@ public with sharing class AddressSelector {
         }
         return names;
     }
+
+    /**
+     * Which of these people are marked deceased, so a move someone chooses leaves them out
+     * (R-AD9). System mode on purpose, for this one flag used only to leave records out: a
+     * person who may move addresses without field access to Deceased must not have the move
+     * fail on it, and nothing read here is shown.
+     */
+    public static Set<Id> selectDeceased(Set<Id> contactIds, Set<Id> accountIds) {
+        Set<Id> deceased = new Set<Id>();
+        if (contactIds != null && !contactIds.isEmpty()) {
+            for (Contact person : [
+                SELECT Id
+                FROM Contact
+                WHERE Id IN :contactIds AND Deceased__c = TRUE
+                WITH SYSTEM_MODE
+                LIMIT 10000
+            ]) {
+                deceased.add(person.Id);
+            }
+        }
+        if (accountIds != null && !accountIds.isEmpty()) {
+            for (Account record : [
+                SELECT Id
+                FROM Account
+                WHERE Id IN :accountIds AND Deceased__c = TRUE
+                WITH SYSTEM_MODE
+                LIMIT 10000
+            ]) {
+                deceased.add(record.Id);
+            }
+        }
+        return deceased;
+    }
+
+    /**
+     * The birthdate and email of these contacts, for telling apart people listed with the same
+     * name (R-AD9). The ids are ones the user was just shown by name in user mode; fields the
+     * user may not read are stripped, so a hidden birthdate or email is never shown.
+     */
+    public static Map<Id, Contact> selectDistinguishingDetails(Set<Id> contactIds) {
+        if (contactIds == null || contactIds.isEmpty()) {
+            return new Map<Id, Contact>();
+        }
+        SObjectAccessDecision readable = Security.stripInaccessible(
+            AccessType.READABLE,
+            [
+                SELECT Id, Birthdate, Email
+                FROM Contact
+                WHERE Id IN :contactIds
+                WITH SYSTEM_MODE
+                LIMIT 10000
+            ]
+        );
+        return new Map<Id, Contact>((List<Contact>) readable.getRecords());
+    }
 }

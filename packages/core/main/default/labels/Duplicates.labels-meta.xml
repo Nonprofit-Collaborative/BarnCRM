@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismiss dialog explanation</shortDescription>
-        <value>The records stay as they are and this pair is not suggested again. Say why, for the next person who wonders.</value>
+        <value>The records stay as they are and this suggestion does not come back. Say why, for the next person who wonders.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_DismissButton</fullName>
@@ -70,15 +70,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismiss done</shortDescription>
-        <value>Noted. This pair will not be suggested again.</value>
+        <value>Noted. This suggestion will not come back.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_DismissedCount</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates panel: dismissed pair count label</shortDescription>
-        <value>Dismissed pairs</value>
+        <shortDescription>Duplicates panel: dismissed suggestion count label</shortDescription>
+        <value>Dismissed suggestions</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Empty</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates: refusal when a merge names records the suggestion does not.</shortDescription>
-        <value>Those two households are not the pair in this suggestion. Refresh the page and try again.</value>
+        <value>Those households are not the ones in this suggestion. Refresh the page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ErrorPermissionRequired</fullName>
@@ -389,8 +389,24 @@
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates panel: badge on a value the two records of a pair differ on</shortDescription>
+        <shortDescription>Duplicates panel: badge on a value that differs from the first record</shortDescription>
         <value>Different</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_DifferentFrom</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: screen reader text after Different; {0} first record</shortDescription>
+        <value>from {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_ComparedWithFirst</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: line on a suggestion of three or more; {0} first record</shortDescription>
+        <value>Each record is compared with {0}, the first one.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Blank</fullName>
@@ -406,7 +422,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: screen reader text for the count badge; {0} the count</shortDescription>
-        <value>{0} pairs waiting</value>
+        <value>{0} suggestions waiting</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_SuggestionsHeading</fullName>

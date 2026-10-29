@@ -120,6 +120,13 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
         }
         if (junctionMembership) {
             HouseholdService.addMembers(peopleByHousehold(contactsToInsert, householdIds));
+        } else {
+            // A household made by adding its first person has that person as its Primary
+            // Contact. These households were made empty in stage one, so each gets the first
+            // of its people in the file, as the product path would have given it.
+            HouseholdService.seedMissingPrimaryContacts(
+                firstPersonByHousehold(contactsToInsert, householdIds)
+            );
         }
         return contactsToInsert.size();
     }
@@ -153,6 +160,18 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
                 result.put(householdId, new Set<Id>());
             }
             result.get(householdId).add(people[i].Id);
+        }
+        return result;
+    }
+
+    /** The first inserted person of this chunk in each household, in file order. */
+    private static Map<Id, Id> firstPersonByHousehold(List<Contact> people, List<Id> householdIds) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        for (Integer i = 0; i < people.size(); i++) {
+            Id householdId = householdIds[i];
+            if (householdId != null && people[i].Id != null && !result.containsKey(householdId)) {
+                result.put(householdId, people[i].Id);
+            }
         }
         return result;
     }
