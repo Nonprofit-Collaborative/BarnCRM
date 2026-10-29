@@ -1,0 +1,32 @@
+<template>
+    <lightning-progress-indicator
+        type="path"
+        variant="base"
+        current-step={currentStep}
+        data-id="path"
+    >
+        <template for:each={steps} for:item="step">
+            <lightning-progress-step
+                key={step.value}
+                label={step.label}
+                value={step.value}
+            ></lightning-progress-step>
+        </template>
+    </lightning-progress-indicator>
+    <h2 class="slds-assistive-text" data-id="heading">{headingText}</h2>
+
+    <div class="slds-var-m-top_medium" data-id="body">
+        <slot></slot>
+    </div>
+
+    <div class="flow__footer slds-var-m-top_medium" data-id="footer">
+        <div>
+            <template lwc:if={canGoBack}>
+                <lightning-button label={labels.back} data-id="back" onclick={handleBack}></lightning-button>
+            </template>
+        </div>
+        <div class="flow__actions">
+            <slot name="actions"></slot>
+        </div>
+    </div>
+</template>

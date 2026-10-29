@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: one choice from a few as icon cards on a native radio group, used by the Import
+    wizard's What Are You Importing? step.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

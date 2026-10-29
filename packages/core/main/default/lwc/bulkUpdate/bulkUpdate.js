@@ -36,6 +36,15 @@ import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
 import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
+import PATH_CHANGES from '@salesforce/label/c.Core_BulkUpdate_PathChanges';
+import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
+import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
+
+const STEPS = [
+  { value: 'changes', label: PATH_CHANGES },
+  { value: 'confirm', label: PATH_CONFIRM },
+  { value: 'run', label: PATH_RUN }
+];
 
 // BulkUpdateService.MAX_CHANGES. The server refuses more; this only disables Add change.
 const MAX_CHANGES = 5;
@@ -117,6 +126,16 @@ export default class BulkUpdate extends LightningElement {
   }
 
   /* ---------- what the template reads ---------- */
+
+  steps = STEPS;
+
+  /** The path: Choose Changes until a preview, Confirm while it shows, Run once a job started. */
+  get currentStep() {
+    if (this.job) {
+      return 'run';
+    }
+    return this.preview ? 'confirm' : 'changes';
+  }
 
   get hasError() {
     return Boolean(this.errorMessage);

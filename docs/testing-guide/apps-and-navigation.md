@@ -17,7 +17,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** are listed, each with the blue barn logo; the two admin apps' barn carries a navy gear badge. With the modules deployed, **Fundraising** shows the barn with a red heart badge and **BarnCRM Volunteers** with a green person badge. |
 | 2 | Open **BarnCRM**. | Standard navigation (tabs across the top, no workspace tabs). Tabs: **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**. **Find** is not in the navigation. |
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
-| 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**. |
+| 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
 | 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Error Log** (last). **Import** and **Bulk Update** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same five tabs, opening as workspace tabs, with **Error Log** last. With a module deployed (for example the Rollup Builder), its admin tabs come before **Error Log**. |
@@ -58,5 +58,22 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup", then the App Manager steps. A module not installed lists no pages. |
 | 8 | On the **BarnCRM Console** home page, look at **Modules**. | **BarnCRM Giving** has an **Open the app** link that opens **Fundraising**; **BarnCRM Rollup Builder** has none. |
 | 9 | As staff, open **BarnCRM**. | The Giving pages show only if the staff user's access allows them; no admin page is listed. |
+
+**Cleanup:** none.
+
+## T-APP-04: Tab Icons Match Their Pages, and Each Page Name Shows Once
+
+**Purpose:** confirm each Core page shows an icon that fits it, the same in the navigation, the page header and the console tab, and prints its name once.
+**Prerequisites:** admin user. Open **BarnCRM Admin Console**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**. | The page header shows a gear, as do the console tab and the settings card. No airplane. |
+| 2 | Open **Data Manager**. | Building blocks in the page header. The name **Data Manager** shows once, in the page header; below it the first line is "Start a data task, or see and undo what changed." with no second **Data Manager** title. |
+| 3 | On **Data Manager**, click **Open** on **Import a File**. | The **Import** page header shows a form (a document), not an alarm clock. The page name shows once; the wizard starts straight under the header. |
+| 4 | Back on **Data Manager**, click **Open** on **Find and Export Records**, then on **Update Many Records**. | Both open **Find**, with a telescope in the page header and the name **Find** once, followed by its purpose line. |
+| 5 | Open **Org Optimizer**, then **Duplicate Matching**. | A stethoscope, then scales, in the page header. Each name shows once, followed by its purpose line and then the tabs. |
+| 6 | Open **Error Log**. | A bell in the page header, not a trophy. **Error Log** is the last tab in the navigation menu. |
+| 7 | Open **BarnCRM Console**, then **Households**, **Organizations** and an address. | People for households, a building for organizations, a map for the address. |
 
 **Cleanup:** none.

@@ -71,6 +71,21 @@ import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
 import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
 import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
+import PURPOSE from '@salesforce/label/c.Core_Find_Purpose';
+import GUIDE_URL from '@salesforce/label/c.Core_Find_GuideUrl';
+import EMPTY_HEADING from '@salesforce/label/c.Core_Find_EmptyHeading';
+import EMPTY_MESSAGE from '@salesforce/label/c.Core_Find_EmptyMessage';
+import NO_RESULTS_HEADING from '@salesforce/label/c.Core_Find_NoResultsHeading';
+import SHOW_QUERY from '@salesforce/label/c.Core_Find_ShowQuery';
+import RESULTS from '@salesforce/label/c.Core_Find_Results';
+import SHOW_MORE from '@salesforce/label/c.Core_Find_ShowMore';
+import SHOWING_OF from '@salesforce/label/c.Core_Find_ShowingOf';
+import EXPORT_MENU from '@salesforce/label/c.Core_Find_ExportMenu';
+import CHANGE_RECORDS from '@salesforce/label/c.Core_Find_ChangeRecords';
+import SAVE_HEADING from '@salesforce/label/c.Core_Find_SaveHeading';
+import MORE_QUERY_ACTIONS from '@salesforce/label/c.Core_Find_MoreQueryActions';
+import START_UPDATE from '@salesforce/label/c.Core_Find_StartUpdate';
+import START_DELETE from '@salesforce/label/c.Core_Find_StartDelete';
 
 const XLSX_TYPES = {
   currency: CELL_TYPES.NUMBER,
@@ -98,8 +113,13 @@ const EDITABLE_TYPES = new Set([
 const TABLE_EDIT_TYPES = { email: 'email', phone: 'phone', url: 'url' };
 /** The page state key a link to a saved query uses: `c__savedQueryId`, or the namespace's. */
 const SAVED_QUERY_STATE = '__savedQueryId';
+/** The state key the Data Manager's bulk cards use, matched by suffix: "update" or "delete" (D-135). */
+const TOOL_STATE = '__tool';
+const START_NOTES = { update: START_UPDATE, delete: START_DELETE };
 
 const DEFAULT_ROWS = 200;
+/** Rows the table shows at first and adds on each Show More; exports never use it. */
+const PAGE_SIZE = 25;
 /** How long typing must pause before the SOQL preview asks the server (FINDA-4). */
 const PREVIEW_DEBOUNCE_MS = 300;
 const OFFERED_TYPES = new Set(['address', 'location', 'base64']);
@@ -168,8 +188,27 @@ export default class FindRecords extends LightningElement {
     saveAs: SAVE_AS,
     delete: DELETE_LABEL,
     newQuery: NEW_QUERY,
-    loading: LOADING
+    loading: LOADING,
+    purpose: PURPOSE,
+    guideUrl: GUIDE_URL,
+    emptyHeading: EMPTY_HEADING,
+    emptyMessage: EMPTY_MESSAGE,
+    noResultsHeading: NO_RESULTS_HEADING,
+    showQuery: SHOW_QUERY,
+    results: RESULTS,
+    showMore: SHOW_MORE,
+    exportMenu: EXPORT_MENU,
+    changeRecords: CHANGE_RECORDS,
+    saveHeading: SAVE_HEADING,
+    moreQueryActions: MORE_QUERY_ACTIONS
   };
+
+  /** Show Query starts closed: the SOQL is for checking, not for every visit. */
+  closedSections = [];
+  /** How many result rows the table shows; Show More adds PAGE_SIZE. */
+  shownCount = PAGE_SIZE;
+  /** The note Find shows when a Data Manager bulk card opened it. */
+  startNote;
 
   objectOptions = [];
   page;
@@ -233,6 +272,8 @@ export default class FindRecords extends LightningElement {
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
     const state = (pageReference && pageReference.state) || {};
+    const toolKey = Object.keys(state).find((name) => name.endsWith(TOOL_STATE));
+    this.startNote = toolKey ? START_NOTES[state[toolKey]] : undefined;
     const key = Object.keys(state).find((name) => name.endsWith(SAVED_QUERY_STATE));
     if (key && state[key]) {
       this.requestedSavedQueryId = state[key];
@@ -413,6 +454,35 @@ export default class FindRecords extends LightningElement {
       }
       return shown;
     });
+  }
+
+  /** The rows on screen: the first `shownCount` of those the run read. */
+  get visibleRows() {
+    return this.tableRows.slice(0, this.shownCount);
+  }
+
+  get hasMore() {
+    return !!this.rows && this.rows.length > this.shownCount;
+  }
+
+  get showingLine() {
+    return format(
+      SHOWING_OF,
+      String(Math.min(this.shownCount, this.rows.length)),
+      String(this.rows.length)
+    );
+  }
+
+  get hasStartNote() {
+    return Boolean(this.startNote);
+  }
+
+  get canChangeRecords() {
+    return this.canBulkUpdate || this.canBulkDelete;
+  }
+
+  handleShowMore() {
+    this.shownCount += PAGE_SIZE;
   }
 
   get tableRows() {
@@ -738,9 +808,25 @@ export default class FindRecords extends LightningElement {
       const result = await runQuery({ queryJson: this.queryDocument() });
       this.soql = result.soql;
       this.rows = result.rows;
+      this.shownCount = PAGE_SIZE;
       this.draftValues = [];
       this.tableErrors = undefined;
     });
+  }
+
+  /** The Export, Change Records and query menus: each item's value names its action. */
+  handleMenuSelect(event) {
+    const actions = {
+      export: () => this.handleExport(),
+      'export-excel': () => this.handleExportExcel(),
+      'export-files': () => this.handleExportFiles(),
+      'bulk-update': () => this.handleBulkUpdate(),
+      'bulk-delete': () => this.handleBulkDelete(),
+      'save-as': () => this.handleSaveAs(),
+      delete: () => this.handleDelete()
+    };
+    const action = actions[event.detail.value];
+    return action ? action() : undefined;
   }
 
   handleExport() {

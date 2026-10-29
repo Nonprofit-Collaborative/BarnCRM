@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: a multi-step flow with the SLDS path, the step body, and one footer with Back on the
+    left and the step's actions on the right, used by Import and the bulk tools.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -28,6 +28,15 @@ import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
+import PATH_PREVIEW from '@salesforce/label/c.Core_BulkUpdate_PathPreview';
+import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
+import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
+
+const STEPS = [
+  { value: 'preview', label: PATH_PREVIEW },
+  { value: 'confirm', label: PATH_CONFIRM },
+  { value: 'run', label: PATH_RUN }
+];
 
 function format(template, ...values) {
   return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
@@ -77,6 +86,16 @@ export default class BulkDelete extends LightningElement {
 
   disconnectedCallback() {
     this.stopPolling();
+  }
+
+  steps = STEPS;
+
+  /** The path: Preview until one shows, Confirm while it shows, Run once a job started. */
+  get currentStep() {
+    if (this.job) {
+      return 'run';
+    }
+    return this.preview ? 'confirm' : 'preview';
   }
 
   get intro() {

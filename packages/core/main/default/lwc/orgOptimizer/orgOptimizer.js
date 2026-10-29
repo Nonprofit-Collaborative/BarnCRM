@@ -1,10 +1,15 @@
 import { LightningElement } from 'lwc';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
+import getErrorTile from '@salesforce/apex/ErrorLogController.getTile';
+import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 
 import TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
 import INTRO from '@salesforce/label/c.Core_OrgOptimizer_Intro';
+import HELP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HelpText';
 import OVERVIEW from '@salesforce/label/c.Core_OrgOptimizer_Overview';
+import GROUP_DATA from '@salesforce/label/c.Core_OrgOptimizer_GroupData';
+import GROUP_SETUP from '@salesforce/label/c.Core_OrgOptimizer_GroupSetup';
 import QUALITY from '@salesforce/label/c.Core_OrgOptimizer_Quality';
 import QUALITY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_QualityText';
 import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilization';
@@ -17,25 +22,45 @@ import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
-import OPEN from '@salesforce/label/c.Core_OrgOptimizer_Open';
-import OPEN_ARIA from '@salesforce/label/c.Core_OrgOptimizer_OpenAria';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
+import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckNotRunHeading';
+import BADGE_ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
+import BADGE_NEW from '@salesforce/label/c.Core_OrgOptimizer_BadgeNew';
+import BADGE_NEED_ATTENTION from '@salesforce/label/c.Core_OrgOptimizer_BadgeNeedAttention';
+import BADGE_ERRORS from '@salesforce/label/c.Core_OrgOptimizer_BadgeErrors';
+import BADGE_WARNINGS from '@salesforce/label/c.Core_OrgOptimizer_BadgeWarnings';
+import BADGE_PASSED from '@salesforce/label/c.Core_OrgOptimizer_BadgePassed';
+import BADGE_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
+import BADGE_DATA_STORAGE from '@salesforce/label/c.Core_OrgOptimizer_BadgeDataStorage';
 
 const OVERVIEW_TAB = 'overview';
+const LEARN_MORE_URL =
+  'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/org-optimizer.md';
+/** Storage use at or above these percentages is shown in warning and error colors. */
+const STORAGE_WARNING = 80;
+const STORAGE_ERROR = 95;
+
+function badge(label, variant) {
+  return { badgeLabel: label, badgeVariant: variant };
+}
 
 /**
  * The Org Optimizer page (ADR-0103 org-optimizer-and-data-manager-pages, admin guide
- * org-optimizer.md): one vertical tab per section. A section's component is created only when
- * its tab is first opened, and Health Check only on Run Health Check, so opening the page runs
- * no check (core review ADMIN-7). Data quality needs Find and Export Records; the other
- * sections need Manage BarnCRM Settings. Each embedded component keeps its own server check.
- * Duplicates moved to the Duplicate Matching tab (ADR-0139).
+ * org-optimizer.md), on the UX kit (D-140): a page shell, an Overview of tool tiles, and one
+ * vertical tab per section. A section's component is created only when its tab is first opened,
+ * and Health Check only on Run Health Check, so opening the page runs no check (core review
+ * ADMIN-7). Tile badges show only what is already known: the unread error count and the last
+ * Health Check run (two small reads, administrators only), and the Data Quality and Storage
+ * results once those sections have reported them. Data Quality needs Find and Export Records;
+ * the other sections need Manage BarnCRM Settings. Each embedded component keeps its own server
+ * check. Duplicates moved to the Duplicate Matching tab (ADR-0139).
  */
 export default class OrgOptimizer extends LightningElement {
   labels = {
     title: TITLE,
     intro: INTRO,
+    helpText: HELP_TEXT,
     overview: OVERVIEW,
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
@@ -43,15 +68,25 @@ export default class OrgOptimizer extends LightningElement {
     errors: ERRORS,
     storage: STORAGE,
     setup: SETUP,
-    open: OPEN,
     runHealthCheck: RUN_HEALTH_CHECK,
-    healthCheckIntro: HEALTH_CHECK_INTRO
+    healthCheckIntro: HEALTH_CHECK_INTRO,
+    healthCheckNotRun: HEALTH_CHECK_NOT_RUN
   };
 
+  learnMoreUrl = LEARN_MORE_URL;
   activeSection = OVERVIEW_TAB;
   /** The sections opened so far; a section stays loaded once opened. */
   opened = {};
   healthCheckRequested = false;
+  /** Tile badges by section name, each { badgeLabel, badgeVariant }. */
+  badges = {};
+
+  connectedCallback() {
+    if (canManageSettings) {
+      this.readErrorBadge();
+      this.readHealthCheckBadge();
+    }
+  }
 
   get canSeeQuality() {
     return Boolean(canFind);
@@ -61,25 +96,95 @@ export default class OrgOptimizer extends LightningElement {
     return Boolean(canManageSettings);
   }
 
-  /** The Overview's list: one line per section the person may open. */
-  get overviewSections() {
-    const sections = [];
+  /** The Overview's tiles, grouped, for the sections the person may open. */
+  get overviewGroups() {
+    const dataTiles = [];
     if (canFind) {
-      sections.push({ name: 'quality', title: QUALITY, text: QUALITY_TEXT });
+      dataTiles.push(this.tile('quality', QUALITY, QUALITY_TEXT, 'standard:data_integration_hub'));
     }
+    const setupTiles = [];
     if (canManageSettings) {
-      sections.push(
-        { name: 'fieldUtilization', title: FIELD_UTILIZATION, text: FIELD_UTILIZATION_TEXT },
-        { name: 'healthCheck', title: HEALTH_CHECK, text: HEALTH_CHECK_TEXT },
-        { name: 'errors', title: ERRORS, text: ERRORS_TEXT },
-        { name: 'storage', title: STORAGE, text: STORAGE_TEXT },
-        { name: 'setup', title: SETUP, text: SETUP_TEXT }
+      dataTiles.push(
+        this.tile('fieldUtilization', FIELD_UTILIZATION, FIELD_UTILIZATION_TEXT, 'standard:metrics')
+      );
+      setupTiles.push(
+        this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
+        this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
+        this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:storage'),
+        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings')
       );
     }
-    return sections.map((section) => ({
-      ...section,
-      openLabel: OPEN_ARIA.replace('{0}', section.title)
-    }));
+    return [
+      { name: 'data', label: GROUP_DATA, tiles: dataTiles },
+      { name: 'setup', label: GROUP_SETUP, tiles: setupTiles }
+    ];
+  }
+
+  tile(name, label, description, iconName) {
+    return { name, label, description, iconName, ...(this.badges[name] || {}) };
+  }
+
+  setBadge(name, value) {
+    this.badges = { ...this.badges, [name]: value };
+  }
+
+  async readErrorBadge() {
+    try {
+      const tile = await getErrorTile({ rowCount: 1 });
+      const count = (tile && tile.newCount) || 0;
+      const shown = tile && tile.newCountCapped ? `${count}+` : String(count);
+      this.setBadge(
+        'errors',
+        count > 0
+          ? badge(BADGE_NEW.replace('{0}', shown), 'warning')
+          : badge(BADGE_ALL_CLEAR, 'success')
+      );
+    } catch {
+      // A badge is a hint: without it the tile still opens the section, which says what failed.
+    }
+  }
+
+  async readHealthCheckBadge() {
+    try {
+      const last = await getLastRun();
+      let value = badge(BADGE_NOT_RUN, '');
+      if (last && last.ranAt) {
+        if (last.errors > 0) {
+          value = badge(BADGE_ERRORS.replace('{0}', last.errors), 'error');
+        } else if (last.warnings > 0) {
+          value = badge(BADGE_WARNINGS.replace('{0}', last.warnings), 'warning');
+        } else {
+          value = badge(BADGE_PASSED, 'success');
+        }
+      }
+      this.setBadge('healthCheck', value);
+    } catch {
+      // As above: the Health Check section itself reports a failure to read.
+    }
+  }
+
+  handleQualitySummary(event) {
+    const needsAttention = (event.detail && event.detail.needsAttention) || 0;
+    this.setBadge(
+      'quality',
+      needsAttention > 0
+        ? badge(BADGE_NEED_ATTENTION.replace('{0}', needsAttention), 'warning')
+        : badge(BADGE_ALL_CLEAR, 'success')
+    );
+  }
+
+  handleStorageSummary(event) {
+    const percent = event.detail && event.detail.dataStoragePercent;
+    if (percent === undefined || percent === null) {
+      return;
+    }
+    let variant = '';
+    if (percent >= STORAGE_ERROR) {
+      variant = 'error';
+    } else if (percent >= STORAGE_WARNING) {
+      variant = 'warning';
+    }
+    this.setBadge('storage', badge(BADGE_DATA_STORAGE.replace('{0}', percent), variant));
   }
 
   get qualityOpened() {
@@ -107,17 +212,22 @@ export default class OrgOptimizer extends LightningElement {
   }
 
   handleActive(event) {
-    const name = event.target.value;
+    this.openSection(event.target.value);
+  }
+
+  handleSelectTool(event) {
+    this.openSection(event.detail.name);
+  }
+
+  openSection(name) {
     this.activeSection = name;
     if (!this.opened[name]) {
       this.opened = { ...this.opened, [name]: true };
     }
-  }
-
-  handleOpenSection(event) {
-    const name = event.currentTarget.dataset.section;
-    this.activeSection = name;
-    this.opened = { ...this.opened, [name]: true };
+    // Back on the Overview after a run, the Health Check tile shows that run.
+    if (name === OVERVIEW_TAB && canManageSettings && this.healthCheckRequested) {
+      this.readHealthCheckBadge();
+    }
   }
 
   handleRunHealthCheck() {

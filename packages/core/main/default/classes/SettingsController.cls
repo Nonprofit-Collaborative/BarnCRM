@@ -270,7 +270,10 @@ public with sharing class SettingsController {
         try {
             Map<String, String> labels = labelsByStoredName();
             Map<String, Map<String, String>> choices = choiceLabelsByStoredName();
-            for (Setting_Change__c record : SettingChangeSelector.getRecent(limitCount)) {
+            List<Setting_Change__c> recent = SettingChangeSelector.getRecent(limitCount);
+            Set<String> recordSettings = recordSettingsByStoredName();
+            Map<Id, String> recordNames = recordNamesFor(recent, recordSettings);
+            for (Setting_Change__c record : recent) {
                 ChangeModel change = new ChangeModel();
                 change.id = record.Id;
                 String stored = record.Setting_Name__c == null
@@ -281,6 +284,10 @@ public with sharing class SettingsController {
                     : record.Setting_Name__c;
                 change.oldValue = shownValue(record.Old_Value__c, choices.get(stored));
                 change.newValue = shownValue(record.New_Value__c, choices.get(stored));
+                if (recordSettings.contains(stored)) {
+                    change.oldValue = shownRecordName(record.Old_Value__c, recordNames);
+                    change.newValue = shownRecordName(record.New_Value__c, recordNames);
+                }
                 change.changedBy = record.Changed_By__r == null ? null : record.Changed_By__r.Name;
                 change.changedAt = record.Changed_At__c;
                 changes.add(change);
@@ -334,6 +341,89 @@ public with sharing class SettingsController {
             }
         );
         return choices;
+    }
+
+    /** The stored names (lower case) of the settings that hold one record's Id, such as the default fund. */
+    private static Set<String> recordSettingsByStoredName() {
+        Set<String> stored = new Set<String>();
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+            if (
+                String.isNotBlank(definition.Setting_Key__c) &&
+                SettingsService.RECORD.equalsIgnoreCase(definition.Data_Type__c)
+            ) {
+                stored.add(storedNameOf(definition));
+            }
+        }
+        return stored;
+    }
+
+    /**
+     * The names of the records that Record settings logged, by Id, read now so a renamed record
+     * reads its current name. A record the user cannot read, or that is gone, is left out and
+     * shows as stored.
+     */
+    private static Map<Id, String> recordNamesFor(
+        List<Setting_Change__c> changes,
+        Set<String> recordSettings
+    ) {
+        Map<Schema.SObjectType, Set<Id>> idsByType = new Map<Schema.SObjectType, Set<Id>>();
+        for (Setting_Change__c change : changes) {
+            if (
+                change.Setting_Name__c == null ||
+                !recordSettings.contains(change.Setting_Name__c.toLowerCase())
+            ) {
+                continue;
+            }
+            for (String value : new List<String>{ change.Old_Value__c, change.New_Value__c }) {
+                Id recordId = asId(value);
+                if (recordId != null) {
+                    Schema.SObjectType type = recordId.getSobjectType();
+                    if (!idsByType.containsKey(type)) {
+                        idsByType.put(type, new Set<Id>());
+                    }
+                    idsByType.get(type).add(recordId);
+                }
+            }
+        }
+        Map<Id, String> names = new Map<Id, String>();
+        for (Schema.SObjectType type : idsByType.keySet()) {
+            try {
+                String query =
+                    'SELECT Id, Name FROM ' +
+                    type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                    ' WHERE Id IN :ids';
+                for (
+                    SObject record : Database.queryWithBinds(
+                        query,
+                        new Map<String, Object>{ 'ids' => idsByType.get(type) },
+                        AccessLevel.USER_MODE
+                    )
+                ) {
+                    names.put(record.Id, (String) record.get('Name'));
+                }
+            } catch (Exception e) {
+                // An object with no Name field or no read access: its rows show the stored Id.
+                continue;
+            }
+        }
+        return names;
+    }
+
+    /** A logged Id as its record's name when the record is still readable, otherwise as stored. */
+    private static String shownRecordName(String stored, Map<Id, String> names) {
+        Id recordId = asId(stored);
+        return recordId != null && names.containsKey(recordId) ? names.get(recordId) : stored;
+    }
+
+    private static Id asId(String value) {
+        if (String.isBlank(value)) {
+            return null;
+        }
+        try {
+            return Id.valueOf(value.trim());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** The name an audit row stores for a definition's setting, in lower case. */

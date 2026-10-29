@@ -8,6 +8,33 @@ import undoUpdate from '@salesforce/apex/BulkUpdateController.undo';
 import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
+
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
@@ -196,6 +223,17 @@ describe('c-data-job-history', () => {
     const element = await render('Update,Delete');
 
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
+  it('opens Find, where a bulk update starts, with the note that says where (D-135)', async () => {
+    const element = await render('Update,Delete');
+    findToolStateKey.emit('ns__tool');
+    one(element, 'open-find').click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { ns__tool: 'update' }
+    });
   });
 
   it('says so when there are no jobs yet', async () => {

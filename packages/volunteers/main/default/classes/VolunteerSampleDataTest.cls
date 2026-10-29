@@ -13,6 +13,12 @@
     testFor='ApexClass:VolunteersSampleData, ApexClass:VolunteerSampleDataLoader, ApexClass:VolunteerSampleDataStages, ApexClass:VolunteerSampleDataRemoveStages, ApexClass:VolunteerSampleDataSelector'
 )
 private class VolunteerSampleDataTest {
+    /** The admin, created once and found again by every method. */
+    @TestSetup
+    static void makeAdmin() {
+        TestUsers.adminWith(VolunteersTestData.ADMIN);
+    }
+
     private static User admin() {
         return TestUsers.adminWith(VolunteersTestData.ADMIN);
     }

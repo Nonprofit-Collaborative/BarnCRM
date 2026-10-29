@@ -837,6 +837,50 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void recentChangesShowARecordSettingByTheRecordsName() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Preferred_Account',
+                    MasterLabel = 'Preferred account',
+                    Setting_Key__c = 'Preferred_Account__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.RECORD,
+                    Record_Object__c = 'Account',
+                    Sort_Order__c = 1
+                )
+            };
+            Account account = new Account(Name = 'Riverside Test Trust');
+            insert account;
+            // A well formed Account Id that no record has (the local `account` shadows the Account type).
+            String gone = String.valueOf(account.Id).left(3) + '000000000001';
+            String stored = SettingsService.CORE_SETTINGS_OBJECT + '.Preferred_Account__c';
+            insert new List<Setting_Change__c>{
+                new Setting_Change__c(
+                    Setting_Name__c = stored,
+                    Old_Value__c = gone,
+                    New_Value__c = String.valueOf(account.Id),
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now()
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Assert.areEqual(1, changes.size(), 'The change is listed');
+            Assert.areEqual(
+                'Riverside Test Trust',
+                changes[0].newValue,
+                'The record reads by name'
+            );
+            Assert.areEqual(gone, changes[0].oldValue, 'A record that is gone reads as stored');
+        }
+    }
+
+    @IsTest
     static void recentChangesShowAChoiceByItsLabel() {
         System.runAs(TestUsers.admin()) {
             stubDefinitions();

@@ -27,7 +27,7 @@ administrators only.
 
 **BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Data
 Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships**,
-**Affiliations** and **Household Members** at the end of its navigation menu. The admin apps
+**Affiliations** and **Household Members** just before **Data Manager**. The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Bulk Update** are not in the navigation: open them from their cards on the
@@ -142,9 +142,9 @@ or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
 | Card | Opens |
 |---|---|
 | **Find and Export Records** | The **Find** tab |
-| **Update Many Records** | **Find**: run a query, then press **Bulk Update** (no file needed) |
-| **Tidy and Check Your Data** | The **Org Optimizer** tab |
-| **Delete Many Records** (last) | **Find**: run a query, then press **Bulk Delete** (no file needed) |
+| **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
+| **Org Optimizer** | The **Org Optimizer** tab |
+| **Delete Many Records** (last) | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 
 Deleted records go to the Recycle Bin, not away for good: choosing **Open** on **Delete Many
 Records** first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to

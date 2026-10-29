@@ -192,6 +192,47 @@ public with sharing class AddressSelector {
         );
     }
 
+    /**
+     * The stored values of the named fields on these records, for deciding whether an address
+     * copied onto their standard fields would change anything. Only names the object really
+     * has are read. System mode (ADR-0021): the answer decides whether a write is sent and
+     * never reaches a screen; the write itself is made in user mode.
+     *
+     * @param objectType the object the records belong to
+     * @param fieldNames the fields to read, as written on the copies
+     * @param recordIds the records
+     */
+    public static List<SObject> selectStoredValues(
+        Schema.SObjectType objectType,
+        Set<String> fieldNames,
+        Set<Id> recordIds
+    ) {
+        if (objectType == null || recordIds == null || recordIds.isEmpty()) {
+            return new List<SObject>();
+        }
+        Map<String, Schema.SObjectField> known = objectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .fields
+            .getMap();
+        List<String> fields = new List<String>{ 'Id' };
+        for (String fieldName : fieldNames == null ? new Set<String>() : fieldNames) {
+            Schema.SObjectField field = known.get(fieldName.toLowerCase());
+            if (field != null && !fieldName.equalsIgnoreCase('Id')) {
+                fields.add(field.getDescribe().getName());
+            }
+        }
+        return Database.queryWithBinds(
+            'SELECT ' +
+                String.join(fields, ', ') +
+                ' FROM ' +
+                objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+                ' WHERE Id IN :recordIds',
+            new Map<String, Object>{ 'recordIds' => recordIds },
+            AccessLevel.SYSTEM_MODE
+        );
+    }
+
     /** The mailing address in the standard fields of these contacts. */
     public static List<Contact> selectContactMailingAddresses(Set<Id> contactIds) {
         if (contactIds == null || contactIds.isEmpty()) {

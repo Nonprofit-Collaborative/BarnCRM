@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>What the Org Optimizer and Health Check feature covers.</shortDescription>
-        <value>Checks your org's setup and data and suggests fixes: the Data Hygiene tab and Health Check.</value>
+        <value>Checks your org's setup and data and suggests fixes: the Org Optimizer tab and Health Check.</value>
     </labels>
     <labels>
         <fullName>Core_Feature_HouseholdUpkeep_Name</fullName>

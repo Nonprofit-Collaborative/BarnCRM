@@ -16,8 +16,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows shown." |
-| 2 | Select **Bulk Update**. | A panel **Bulk Update** opens below the results: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you preview and confirm the number of records." |
+| 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows found." |
+| 2 | Open **Change Records** and choose **Bulk Update**. | A panel **Bulk Update** opens under the buttons, with the path **Choose Changes**, **Confirm**, **Run**: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm." |
 | 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New Value**. | The change is complete. **Add a change** is enabled. |
 | 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. The four columns are equal width, and a long value wraps onto more lines inside its cell instead of stretching the table past the panel. |
 | 5 | Type a number other than N in **Type the number of records to confirm**. | The **Update N records** button stays disabled. |
@@ -98,9 +98,9 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In Find, query **Contact** where **Last Name** **equals** `Bulkdeltest` with column **First Name**, and **Run**. | Three rows: Del1, Del2, Del3. |
-| 2 | Select **Bulk Delete**. | A panel **Bulk Delete**: "Delete every record this query returns, with your own access. Deleted records go to the Recycle Bin..." |
-| 3 | Select **Preview**. | A line saying 3 records match, "The first ones:" with the three names, and any related records Salesforce deletes with them under "Salesforce also deletes these related records with them, and brings them back with an undo:". |
-| 4 | Select **Download these records first**. | "Reading records for the download..." then "Downloaded 3 records. Nothing has been deleted yet." A CSV with the three contacts and every field you can see downloads. |
+| 2 | Open **Change Records** and choose **Bulk Delete**. | A panel **Bulk Delete** with the path **Preview**, **Confirm**, **Run**: "Delete every record this query returns, with your own access. They go to the Recycle Bin, and Data Jobs in the Data Manager can undo it." |
+| 3 | Select **Preview**. | A line saying 3 records match, "The first ones:" with the three names, and any related records Salesforce deletes with them, as badges, under "Salesforce also deletes these related records with them, and brings them back with an undo:". |
+| 4 | Select **Download a Backup First**. | "Reading records for the download..." then "Downloaded 3 records. Nothing has been deleted yet." A CSV with the three contacts and every field you can see downloads. |
 | 5 | Type `2` in **Type the number of records to confirm**. | **Delete 3 records** stays disabled. |
 | 6 | Type `3` and select **Delete 3 records**. | "The bulk delete started..." then "Deleting: X of Y chunks done." and finally "3 matched: 3 deleted, 0 refused." with "To bring these records back, use Undo next to the job under Data Jobs on the Data Manager tab." |
 | 7 | Run the Find query again. | "No records match these conditions." Their three households still exist (emptied households are kept). |
@@ -149,10 +149,26 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 2 | Log in as read-only. Search the App Launcher for "Find", "Bulk Update" and "Data Manager". | None of these BarnCRM tabs is found. |
 | 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Bulk Update** nor **Bulk Delete** is offered. No **Bulk Update** tab in the App Launcher. |
 | 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Bulk Update** is offered, and the **Bulk Update** tab is available. |
-| 5 | As staff, open the **Bulk Update** tab. | **Data Jobs** with "Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo." Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
+| 5 | As staff, open the **Bulk Update** tab. | **Data Jobs** with "A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
 | 6 | As admin, open the **Bulk Update** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
 | 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Bulk Update** and **Data Manager** tabs are gone. |
 
 **Cleanup:** none (step 9 resets staff).
+
+## T-BULK-10: The Bulk Path from Data Manager
+
+**Purpose:** confirm the way into Bulk Update and Bulk Delete is obvious, and each panel shows its steps.
+**Prerequisites:** admin with **BarnCRM Bulk Delete**; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** and choose **Open** on **Update Many Records**. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." |
+| 2 | Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Bulk Update**. | The **Bulk Update** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
+| 3 | Choose **Title**, **Set to a value**, type `x`, and select **Preview**. | The path moves to **Confirm**. Select **Close**; nothing changed. |
+| 4 | Choose **Change Records**, **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel's path **Preview**, **Confirm**, **Run** is on **Confirm**. Any related records deleted with them show as badges. **Download a Backup First** has an info icon whose popover says what the file holds. Select **Close** without typing the count. |
+| 5 | Open **Data Manager**, choose **Open** on **Delete Many Records**, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
+| 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with the Bulk Update note from step 1. |
+
+**Cleanup:** none (nothing was changed or deleted).

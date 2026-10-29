@@ -5,6 +5,7 @@ import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_DataManager_Title';
@@ -45,6 +46,8 @@ const TABS = {
   find: 'Find',
   optimizer: 'Data_Hygiene'
 };
+/** The cards that open Find for a bulk tool, and the tool Find's note names. */
+const BULK_TOOLS = { update: 'update', delete: 'delete' };
 
 /** Salesforce's own pages, linked for administrators. */
 const SALESFORCE_LINKS = [
@@ -152,6 +155,16 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     return this.mappings.length > 0;
   }
 
+  /** Find's tool state key, with the namespace's prefix (never a literal `c__`). */
+  toolStateKey;
+
+  @wire(findToolStateKey)
+  wiredToolStateKey({ data }) {
+    if (data) {
+      this.toolStateKey = data;
+    }
+  }
+
   get salesforceLinks() {
     return SALESFORCE_LINKS;
   }
@@ -171,9 +184,11 @@ export default class DataManager extends NavigationMixin(LightningElement) {
         return;
       }
     }
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: tab }
-    });
+    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: tab } };
+    // The bulk cards open Find with a note saying where the bulk tool is (D-135).
+    if (BULK_TOOLS[id] && this.toolStateKey) {
+      pageReference.state = { [this.toolStateKey]: BULK_TOOLS[id] };
+    }
+    this[NavigationMixin.Navigate](pageReference);
   }
 }

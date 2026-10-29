@@ -49,9 +49,13 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpecte
 import NO_ACCESS from '@salesforce/label/c.Core_Duplicates_NoSuggestionAccessNotice';
 import SHOWING_COUNT from '@salesforce/label/c.Core_Duplicates_ShowingCount';
 import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCountMore';
+import SHOW_MORE from '@salesforce/label/c.Core_Duplicates_ShowMore';
+import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
+import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
 import { setupPath } from 'c/setupLinks';
 
 const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
+const PAGE_SIZE = 10;
 
 /**
  * The review list on the Duplicate Matching tab (C-20, ADR-0139).
@@ -89,8 +93,15 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     viewDismissed: VIEW_DISMISSED,
     readOnly: READ_ONLY,
     noAccess: NO_ACCESS,
-    cancel: CANCEL
+    cancel: CANCEL,
+    showMore: SHOW_MORE,
+    emptyHeading: EMPTY_HEADING
   };
+
+  /** How many pairs are shown; Show More adds a page. The server sends at most 50. */
+  visibleCount = PAGE_SIZE;
+  /** Set by Show More: the index of the first newly shown pair, focused after the render. */
+  focusFrom;
 
   setupUrl = SETUP_DUPLICATE_RULES;
 
@@ -134,6 +145,18 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       }
     }
     this.focusedHeading = open;
+
+    // After Show More, keyboard and screen reader users land on the first new pair.
+    if (this.focusFrom !== undefined) {
+      const cards = this.template.querySelectorAll('[data-id="suggestion"]');
+      const link = cards[this.focusFrom]
+        ? cards[this.focusFrom].querySelector('[data-id="record-link"]')
+        : undefined;
+      this.focusFrom = undefined;
+      if (link) {
+        link.focus();
+      }
+    }
   }
 
   async load() {
@@ -195,18 +218,43 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return !this.canReviewSuggestions;
   }
 
-  /** "Showing 50 of 120", only when there are more than are listed. */
+  /** Every pair waiting, as counted by the server; never fewer than the pairs it sent. */
+  get totalCount() {
+    if (!this.view) {
+      return 0;
+    }
+    return Math.max(this.view.totalSuggestions || 0, (this.view.suggestions || []).length);
+  }
+
+  get moreNotCounted() {
+    return !!(this.view && this.view.moreNotCounted);
+  }
+
+  /** "Showing 10 of 40", only when more are waiting than are shown. */
   get showingCount() {
     if (!this.view) {
       return undefined;
     }
-    const shown = (this.view.suggestions || []).length;
-    const total = this.view.totalSuggestions || 0;
-    if (!this.view.moreNotCounted && total <= shown) {
+    const shown = this.visibleSuggestions.length;
+    const total = this.totalCount;
+    if (!this.moreNotCounted && total <= shown) {
       return undefined;
     }
-    const template = this.view.moreNotCounted ? SHOWING_COUNT_MORE : SHOWING_COUNT;
+    const template = this.moreNotCounted ? SHOWING_COUNT_MORE : SHOWING_COUNT;
     return template.replace('{0}', shown).replace('{1}', total);
+  }
+
+  get hasCount() {
+    return this.canReviewSuggestions && this.totalCount > 0;
+  }
+
+  /** The badge beside Possible Duplicates: "40", or "50+" past what the server counted. */
+  get countLabel() {
+    return `${this.totalCount}${this.moreNotCounted ? '+' : ''}`;
+  }
+
+  get countAlt() {
+    return COUNT_ALT.replace('{0}', this.countLabel);
   }
 
   get dismissedCount() {
@@ -225,7 +273,8 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       setId: suggestion.setId,
       reason: suggestion.reason,
       canMerge: suggestion.canMerge === true,
-      showPeopleNotice: suggestion.canMerge !== true,
+      dismissOpen: this.dismissing === suggestion.setId,
+      mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
       records: suggestion.records.map((record) => ({
         recordId: record.recordId,
         name: record.name,
@@ -236,8 +285,26 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     }));
   }
 
+  get visibleSuggestions() {
+    return this.suggestions.slice(0, this.visibleCount);
+  }
+
   get hasSuggestions() {
     return this.suggestions.length > 0;
+  }
+
+  get hasMoreToShow() {
+    return this.suggestions.length > this.visibleCount;
+  }
+
+  /** The note on merging two people, shown once above the list when a shown pair is people. */
+  get showAnyPeopleNotice() {
+    return this.visibleSuggestions.some((suggestion) => !suggestion.canMerge);
+  }
+
+  handleShowMore() {
+    this.focusFrom = this.visibleCount;
+    this.visibleCount += PAGE_SIZE;
   }
 
   /** The controller checks this again; this only keeps buttons from offering what fails. */

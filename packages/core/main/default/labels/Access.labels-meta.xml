@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: what BarnCRM Find and Export grants</shortDescription>
-        <value>Build, run, save and export Find queries and use Data Hygiene, seeing only the records the person can already see.</value>
+        <value>Build, run, save and export Find queries and use Org Optimizer's Data Quality checks, seeing only the records the person can already see.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnLabel</fullName>

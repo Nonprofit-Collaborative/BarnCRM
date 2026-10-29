@@ -196,7 +196,7 @@ Bin with it, and the import that created it keeps its record. It leaves the hous
 when anything else is still linked to it: gifts, pledges, relationships, tasks, files, the
 past membership of someone who moved out (or was erased), or any other record, whichever
 product made it. Those households stay on the "households with nobody in them" lists in
-Health Check and Data Hygiene for you to review. Households emptied before this
+Health Check and Org Optimizer's Data Quality for you to review. Households emptied before this
 tidy-up was added, and households a merge or a move emptied, are never part of it. Schedule
 it with Health Check's **Nightly jobs are not scheduled** fix.
 

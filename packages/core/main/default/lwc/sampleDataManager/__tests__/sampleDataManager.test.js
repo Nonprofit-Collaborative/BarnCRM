@@ -103,6 +103,19 @@ describe('c-sample-data-manager', () => {
     expect(buttons(element).length).toBe(0);
   });
 
+  it('says so inline, with no toast, when only the status read fails', async () => {
+    canManageSampleData.mockResolvedValue(true);
+    getStatus.mockRejectedValue({ body: { message: 'No such column' } });
+
+    const element = createManager();
+    await flushPromises();
+
+    expect(Toast.show).not.toHaveBeenCalled();
+    const note = element.shadowRoot.querySelector('[data-id="status-error"]');
+    expect(note).not.toBeNull();
+    expect(note.textContent).toContain('c.Core_SampleData_StatusError');
+  });
+
   it('says how sample data arrives in a junction membership org, and still offers it', async () => {
     canManageSampleData.mockResolvedValue(true);
     getStatus.mockResolvedValue({ ...NOT_LOADED_STATUS, junctionMembership: true });

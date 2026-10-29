@@ -14,15 +14,26 @@ private class ImportRetryRejectsTest {
     /** Every tenth row of the file has no last name, so 20 rows are rejected. */
     private static final Integer REJECTS = 20;
 
+    /**
+     * The committed import every test starts from, built once: its preview and commit are
+     * driven synchronously and start no async work, and they run as the same admin user each
+     * test runs as (TestUsers finds the setup user again), so Committed By is that user.
+     */
     @TestSetup
     static void setUp() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
+            commitFile();
         }
     }
 
-    /** A 200-row file of new people, previewed and committed, with 20 rows rejected. */
+    /** The import setup committed. */
     private static Import_Batch__c committed() {
+        return ImportBatchSelector.selectById([SELECT Id FROM Import_Batch__c LIMIT 1].Id);
+    }
+
+    /** A 200-row file of new people, previewed and committed, with 20 rows rejected. */
+    private static void commitFile() {
         Import_Template__c template = ImportTestDataFactory.template(
             ImportTestDataFactory.donorMapping(),
             ImportTemplateService.RULE_EMAIL
@@ -42,7 +53,6 @@ private class ImportRetryRejectsTest {
         ImportTestDataFactory.rows(batch, values);
         drive(batch.Id, true);
         drive(batch.Id, false);
-        return ImportBatchSelector.selectById(batch.Id);
     }
 
     /** The rejected rows with their last names put right, as the fixed file holds them. */

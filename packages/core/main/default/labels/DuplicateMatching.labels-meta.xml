@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicate Matching: one line under the title</shortDescription>
-        <value>Review people and households that may be in your database twice, and choose what pairs them alongside your Salesforce duplicate rules.</value>
+        <value>Review possible duplicate people and households, and choose what pairs them.</value>
     </labels>
     <labels>
         <fullName>Core_DuplicateMatching_Review</fullName>

@@ -16,13 +16,14 @@ import COULD_NOT_CHECK from '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_OrgOptimizer_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 
 function format(template, ...values) {
   return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
 }
 
 /**
- * Org Optimizer's Unused setup section (admin guide org-optimizer.md): one line per check with
+ * Org Optimizer's Unused Setup section (admin guide org-optimizer.md): one line per check with
  * its count, up to five names, and a link to its Setup page. Read only; read when the section
  * is opened and on Refresh. Admin only: the shell shows it only with Manage BarnCRM Settings,
  * and the controller checks again.
@@ -32,7 +33,8 @@ export default class OptimizerSetup extends LightningElement {
     title: SETUP,
     intro: SETUP_INTRO,
     openInSetup: OPEN_IN_SETUP,
-    refresh: REFRESH
+    refresh: REFRESH,
+    newTab: NEW_TAB
   };
 
   result;
@@ -83,7 +85,8 @@ export default class OptimizerSetup extends LightningElement {
     const cap = this.result ? this.result.countCap : 0;
     return ((this.result && this.result.findings) || []).map((finding) => {
       let countText = String(finding.count);
-      let countClass = finding.count > 0 ? 'slds-text-title_bold' : '';
+      // A count is a badge, in warning colors when the check found something.
+      let countClass = finding.count > 0 ? 'slds-badge slds-theme_warning' : 'slds-badge';
       if (finding.failed) {
         countText = COULD_NOT_CHECK;
         countClass = 'slds-text-color_weak';

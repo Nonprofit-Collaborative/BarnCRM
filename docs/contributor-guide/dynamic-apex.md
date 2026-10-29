@@ -26,7 +26,7 @@ private static final String CAMPAIGN_OBJECT = 'Campaign';
 
 public static Schema.SObjectType campaignType() {
     if (!typeResolved) {
-        resolvedType = Schema.getGlobalDescribe().get(CAMPAIGN_OBJECT);
+        resolvedType = NamespaceUtil.globalDescribe().get(CAMPAIGN_OBJECT);
         typeResolved = true;
     }
     return resolvedType; // null on a Platform-only org: the feature does nothing
@@ -183,8 +183,11 @@ private static Map<String, Schema.SObjectField> fieldsOf(Schema.SObjectType type
 }
 ```
 
-- `Schema.getGlobalDescribe()` once per transaction per question: `OrgShapeDetector`
-  (`cachedShape`), `CampaignSyncService.campaignType()` (`typeResolved`).
+- The global describe comes from `NamespaceUtil.globalDescribe()`, never from
+  `Schema.getGlobalDescribe()` directly: it is read once per transaction and running user
+  (about 10 ms of CPU each time in an org with a thousand objects) and every class shares it.
+  Callers read the map and never change it. Derived answers are still kept per question:
+  `OrgShapeDetector` (`cachedShape`), `CampaignSyncService.campaignType()` (`typeResolved`).
 - `getDescribe(SObjectDescribeOptions.DEFERRED)` for object describes; field describes are
   taken only for the fields used.
 - Derived answers are cached too (`ImportRowProcessor.storedNames`,

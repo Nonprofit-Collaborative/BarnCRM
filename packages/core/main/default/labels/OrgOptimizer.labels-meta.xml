@@ -13,8 +13,112 @@
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Org Optimizer: one line under the title</shortDescription>
-        <value>What in your org needs attention. Each section runs only when you open it.</value>
+        <shortDescription>Org Optimizer: purpose line in the page header</shortDescription>
+        <value>What in your org needs attention, one section at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HelpText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: About This Tool text</shortDescription>
+        <value>Each section runs only when you open it, so the page opens quickly however large your org is. Health Check runs only when you press Run Health Check. Nothing changes unless you press a button that says so.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_GroupData</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview group heading for record checks</shortDescription>
+        <value>Check Your Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_GroupSetup</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview group heading for setup checks</shortDescription>
+        <value>Check Your Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeAllClear</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: badge when a section found nothing to fix</shortDescription>
+        <value>All Clear</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNew</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Errors tile badge; {0} unread entries</shortDescription>
+        <value>{0} New</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNeedAttention</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Data Quality tile badge; {0} checks that found records</shortDescription>
+        <value>{0} Need Attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeErrors</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge; {0} errors in the last run</shortDescription>
+        <value>Errors: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeWarnings</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge; {0} warnings in the last run</shortDescription>
+        <value>Warnings: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgePassed</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge when the last run found no problem</shortDescription>
+        <value>Passed</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeNotRun</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check tile badge before any full run</shortDescription>
+        <value>Not Run Yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_BadgeDataStorage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Storage tile badge; {0} percent of data storage used</shortDescription>
+        <value>Data Storage {0}%</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_NearLimit</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: badge on a limit 80 percent or more used</shortDescription>
+        <value>Near Limit</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HealthCheckNotRunHeading</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: heading in the Health Check section before it runs</shortDescription>
+        <value>Health Check Runs When You Ask</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_Overview</fullName>
@@ -29,8 +133,8 @@
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Org Optimizer: Data quality section name</shortDescription>
-        <value>Data quality</value>
+        <shortDescription>Org Optimizer: Data Quality section name</shortDescription>
+        <value>Data Quality</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_QualityText</fullName>
@@ -46,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Field utilization section name</shortDescription>
-        <value>Field utilization</value>
+        <value>Field Utilization</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_FieldUtilizationText</fullName>
@@ -71,22 +175,6 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: what the Health Check section answers</shortDescription>
         <value>Whether BarnCRM is set up the way it should be.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_Open</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: button that opens a section from Overview</shortDescription>
-        <value>Open</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_OpenAria</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: screen reader name of an Overview button; {0} is the section</shortDescription>
-        <value>Open {0}</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_RunHealthCheck</fullName>
@@ -134,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Storage and limits section name</shortDescription>
-        <value>Storage and limits</value>
+        <value>Storage and Limits</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_StorageText</fullName>
@@ -142,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: what the Storage and limits section answers</shortDescription>
-        <value>How much storage and how many daily limits are used, and what BarnCRM adds.</value>
+        <value>Storage and daily limits used, and what BarnCRM adds.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitsHeading</fullName>
@@ -166,7 +254,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: name of the data storage limit, in MB</shortDescription>
-        <value>Data storage (MB)</value>
+        <value>Data Storage (MB)</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitFileStorage</fullName>
@@ -174,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: name of the file storage limit, in MB</shortDescription>
-        <value>File storage (MB)</value>
+        <value>File Storage (MB)</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitApiRequests</fullName>
@@ -182,7 +270,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: name of the daily API request limit</shortDescription>
-        <value>API requests in the last 24 hours</value>
+        <value>API Requests in the Last 24 Hours</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitAsyncApex</fullName>
@@ -190,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: name of the daily background job limit</shortDescription>
-        <value>Background jobs (asynchronous Apex) in the last 24 hours</value>
+        <value>Background Jobs (Asynchronous Apex) in the Last 24 Hours</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitSingleEmail</fullName>
@@ -198,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: name of the daily single email limit</shortDescription>
-        <value>Single emails sent today</value>
+        <value>Single Emails Sent Today</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_OwnHeading</fullName>
@@ -262,7 +350,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Unused setup section name</shortDescription>
-        <value>Unused setup</value>
+        <value>Unused Setup</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_SetupText</fullName>
@@ -270,7 +358,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Overview line for Unused setup</shortDescription>
-        <value>Users, permission sets, reports, email templates, flows and jobs nobody seems to use. Read only.</value>
+        <value>Users, permission sets, reports, flows and jobs nobody seems to use.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_SetupIntro</fullName>
@@ -286,7 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title; {0} is the number of days</shortDescription>
-        <value>Active users who have not logged in for {0} days</value>
+        <value>Active Users Who Have Not Logged In for {0} Days</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckUnassignedPermissionSets</fullName>
@@ -294,7 +382,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, permission sets with nobody assigned</shortDescription>
-        <value>Permission sets nobody is assigned</value>
+        <value>Permission Sets Nobody Is Assigned</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckStaleReports</fullName>
@@ -302,7 +390,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title; {0} is the number of days</shortDescription>
-        <value>Reports not run for {0} days</value>
+        <value>Reports Not Run for {0} Days</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckUnusedEmailTemplates</fullName>
@@ -310,7 +398,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, email templates never used</shortDescription>
-        <value>Email templates never used</value>
+        <value>Email Templates Never Used</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckInactiveFlows</fullName>
@@ -318,7 +406,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, flows left inactive</shortDescription>
-        <value>Inactive flows</value>
+        <value>Inactive Flows</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckJobsOfInactiveUsers</fullName>
@@ -326,7 +414,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, scheduled jobs owned by inactive users</shortDescription>
-        <value>Scheduled jobs owned by inactive users</value>
+        <value>Scheduled Jobs Owned by Inactive Users</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CouldNotCheck</fullName>
@@ -350,7 +438,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, objects near their custom field limit</shortDescription>
-        <value>Objects near their custom field limit</value>
+        <value>Objects Near Their Custom Field Limit</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckRecordTypes</fullName>
@@ -358,7 +446,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, record types unused or inactive</shortDescription>
-        <value>Record types no record uses, or inactive</value>
+        <value>Record Types No Record Uses, or Inactive</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_FieldLimitExample</fullName>

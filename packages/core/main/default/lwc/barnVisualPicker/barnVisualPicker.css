@@ -1,0 +1,40 @@
+.picker__card {
+  display: flex;
+  flex: auto;
+  align-items: flex-start;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  cursor: pointer;
+}
+
+.picker__card:hover {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.picker__input:checked + .picker__card {
+  border-color: var(--slds-g-color-accent-1, #0250d9);
+  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px) var(--slds-g-color-accent-1, #0250d9);
+}
+
+.picker__input:focus-visible + .picker__card {
+  box-shadow: var(--slds-g-shadow-outline-focus-1, 0 0 0 2px #0b5cab);
+}
+
+.picker__figure {
+  flex: none;
+}
+
+.picker__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  min-width: 0;
+}
+
+.picker__name {
+  color: var(--slds-g-color-on-surface-3, #181818);
+}

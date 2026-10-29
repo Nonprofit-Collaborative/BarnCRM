@@ -80,8 +80,13 @@ describe('c-optimizer-setup', () => {
     expect(users.textContent).toContain('Active users who have not logged in for 90 days');
     expect(users.querySelector('[data-id="count"]').textContent).toBe('2');
     expect(users.querySelector('[data-id="examples"]').textContent).toBe('Ana Lopez, Sam Reed');
-    expect(users.querySelector('[data-id="setup-link"]').getAttribute('href')).toBe(
-      '/lightning/setup/ManageUsers/home'
+    const link = users.querySelector('[data-id="setup-link"]');
+    expect(link.getAttribute('href')).toBe('/lightning/setup/ManageUsers/home');
+    // The new-tab cue: an icon, and words for screen readers.
+    expect(link.querySelector('lightning-icon').iconName).toBe('utility:new_window');
+    expect(link.querySelector('.slds-assistive-text')).not.toBeNull();
+    expect(users.querySelector('[data-id="count"]').classList.contains('slds-theme_warning')).toBe(
+      true
     );
 
     const reports = element.shadowRoot.querySelector('[data-id="staleReports"]');

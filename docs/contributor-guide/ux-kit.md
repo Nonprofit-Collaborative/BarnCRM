@@ -26,5 +26,24 @@ Notes:
 - The About This Tool region opens on a person's first visit and stays closed after that. With `help-storage-key` the person's own choice is remembered in their browser only; it is a convenience, not a setting.
 - A disabled tile stays focusable so a screen reader reads why it is disabled.
 - Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers.
+- A hub page that must open without running anything (Org Optimizer) badges a tile only from what is cheap or already known, and lets a section report its own result with a `summary` event once it has been opened.
+- A component placed inside the shell drops its own `lightning-card` and opens with an `h2` and its actions, unless it is also exposed for Home or record pages, where it keeps its card.
 
-Each component has Jest tests written as stories (one case per variant a screen uses). Add a story when you add a variant. Part 2 (step flow, visual picker, stat tile) and the save bar follow in later pull requests.
+## Part 2 Components
+
+| Component | Use it for | Main properties |
+|---|---|---|
+| `c-barn-step-flow` | A wizard: the SLDS path, the step body, and one footer with Back left and the step's actions right (Import, Bulk Update, Bulk Delete) | `steps` (each `value`, `label`), `current-step`, `can-go-back`; slot `actions` and the default body; fires `back` |
+| `c-barn-visual-picker` | One choice from a few as icon cards (Import's What Are You Importing?, the first-run edition) | `label` (the legend), `options` (each `value`, `label`, `description`, `iconName`, `warning`), `value`; fires `change` with `detail.value` |
+| `c-barn-stat-tile` | One count as a big number over a label (import preview and results, Org Optimizer counts) | `label`, `value` (a number is formatted; text is shown as given), `badge-label`, `badge-variant` |
+| `c-barn-save-bar` | The save footer of a settings form, docked to the bottom while anything is unsaved | `dirty-count`, `saving`; fires `save` and `discard` |
+| `c-barn-confirm-modal` | A yes or no question in a platform modal; open it with `BarnConfirmModal.open({...})` | `label`, `message`, `details`, `confirmLabel`, `cancelLabel`, `confirmVariant` (`destructive` for a red button), `typeToConfirm` and `typeToConfirmLabel` for a large or lasting change |
+
+Notes:
+
+- The step flow's path names each step, so the screen drops its own step heading; the flow keeps an `h2` ("Step 2 of 6: Upload File") for screen readers. Step labels are Title Case and short.
+- The visual picker is a native radio group, so the arrow keys change the choice. Keep the picker on screen after a choice and show what follows from it below; never move to another screen on `change`.
+- The save bar asks before the browser tab closes or reloads while anything is unsaved. It cannot stop a move to another Lightning tab.
+- Use `typeToConfirm` (for example the record count) only for deletes and other changes that are hard to undo; the confirm button stays disabled until the text matches.
+
+Each component has Jest tests written as stories (one case per variant a screen uses). Add a story when you add a variant.

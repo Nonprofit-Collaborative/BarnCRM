@@ -117,10 +117,10 @@ public with sharing class DataHygieneService {
         } catch (System.QueryException noAccess) {
             // Usually the user-mode refusal of a field or object, but a timeout on a large
             // count reads the same way, so it is logged for whoever looks into it.
-            ErrorLogger.log(noAccess, 'Data hygiene check ' + key);
+            ErrorLogger.log(noAccess, 'Data Quality check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_NoAccess;
         } catch (Exception unexpected) {
-            ErrorLogger.log(unexpected, 'Data hygiene check ' + key);
+            ErrorLogger.log(unexpected, 'Data Quality check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_CheckFailed;
         }
         return result;
@@ -166,6 +166,59 @@ public with sharing class DataHygieneService {
                 new List<Object>{ title(key) }
             )
             .left(80);
+    }
+
+    /** The name prefix "Open in Find" used before the tool was named Data Quality (D-140). */
+    @TestVisible
+    private static final String LEGACY_QUERY_PREFIX = 'Data hygiene: ';
+
+    /**
+     * Renames each saved query "Data hygiene: <check>" to "Data Quality: <check>", so "Open in
+     * Find" keeps updating it after the rename (D-140). Run by CorePostInstall on every install,
+     * upgrade and source deploy; running it again finds nothing to rename. When the owner already
+     * has a "Data Quality: <check>" query, that newer one is kept and the old one is left as it is.
+     * Names compare without case, as SOQL does. Returns how many were renamed.
+     */
+    public static Integer renameLegacySavedQueries() {
+        String prefix = System.Label.Core_DataHygiene_SavedQueryName.substringBefore('{0}');
+        String pattern = LEGACY_QUERY_PREFIX + '%';
+        List<Saved_Query__c> legacy = [
+            SELECT Id, Name, OwnerId
+            FROM Saved_Query__c
+            WHERE Name LIKE :pattern
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate
+            LIMIT 10000
+        ];
+        if (legacy.isEmpty()) {
+            return 0;
+        }
+        Set<String> targets = new Set<String>();
+        Set<Id> owners = new Set<Id>();
+        for (Saved_Query__c query : legacy) {
+            targets.add(prefix + query.Name.substring(LEGACY_QUERY_PREFIX.length()));
+            owners.add(query.OwnerId);
+        }
+        Set<String> taken = new Set<String>();
+        for (Saved_Query__c existing : [
+            SELECT Name, OwnerId
+            FROM Saved_Query__c
+            WHERE Name IN :targets AND OwnerId IN :owners
+            WITH SYSTEM_MODE
+        ]) {
+            taken.add(existing.OwnerId + '|' + existing.Name.toLowerCase());
+        }
+        List<Saved_Query__c> renamed = new List<Saved_Query__c>();
+        for (Saved_Query__c query : legacy) {
+            String name = prefix + query.Name.substring(LEGACY_QUERY_PREFIX.length());
+            // add() is false when the owner already has that name, or an earlier old query
+            // of theirs just took it.
+            if (taken.add(query.OwnerId + '|' + name.toLowerCase())) {
+                renamed.add(new Saved_Query__c(Id = query.Id, Name = name));
+            }
+        }
+        Database.update(renamed, AccessLevel.SYSTEM_MODE);
+        return renamed.size();
     }
 
     /**

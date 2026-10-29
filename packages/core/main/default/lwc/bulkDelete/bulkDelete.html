@@ -1,7 +1,22 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:delete">
-        <lightning-button slot="actions" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
-        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+    <section class="slds-box slds-is-relative" aria-labelledby="bulk-delete-title" data-id="panel">
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <lightning-icon icon-name="utility:delete" size="small" class="slds-var-m-right_x-small"></lightning-icon>
+            <h2 class="slds-text-heading_small slds-col" id="bulk-delete-title">{labels.title}</h2>
+            <lightning-button data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+        </div>
+        <lightning-progress-indicator
+            class="slds-var-m-bottom_small"
+            data-id="path"
+            type="path"
+            variant="base"
+            current-step={currentStep}
+        >
+            <template for:each={steps} for:item="step">
+                <lightning-progress-step key={step.value} label={step.label} value={step.value}></lightning-progress-step>
+            </template>
+        </lightning-progress-indicator>
+        <div>
             <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
@@ -41,10 +56,12 @@
                     </ul>
                     <template lwc:if={hasCascades}>
                         <div class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small" data-id="cascades">
-                            <p>{labels.cascades}</p>
-                            <ul class="slds-list_dotted">
+                            <p class="slds-var-m-bottom_x-small">{labels.cascades}</p>
+                            <ul class="slds-list_horizontal slds-wrap">
                                 <template for:each={preview.cascades} for:item="cascade">
-                                    <li key={cascade}>{cascade}</li>
+                                    <li key={cascade} class="slds-var-m-right_xx-small slds-var-m-bottom_xx-small">
+                                        <lightning-badge label={cascade} data-id="cascade"></lightning-badge>
+                                    </li>
                                 </template>
                             </ul>
                         </div>
@@ -59,7 +76,7 @@
                             day="numeric"
                         ></lightning-formatted-date-time>
                     </p>
-                    <div class="slds-var-m-bottom_small">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
                         <lightning-button
                             data-id="backup"
                             icon-name="utility:download"
@@ -67,7 +84,12 @@
                             disabled={busy}
                             onclick={handleBackup}
                         ></lightning-button>
-                        <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.backupHelp}</p>
+                        <c-barn-help
+                            class="slds-var-m-left_x-small"
+                            data-id="backup-help"
+                            content={labels.backupHelp}
+                            alternative-text={labels.backup}
+                        ></c-barn-help>
                     </div>
                     <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
                         <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
@@ -115,5 +137,5 @@
                 </section>
             </template>
         </div>
-    </lightning-card>
+    </section>
 </template>

@@ -1,15 +1,18 @@
 <template>
-  <lightning-card title={labels.pageTitle} icon-name="standard:data_integration_hub">
-    <lightning-button
-      slot="actions"
-      label={labels.recount}
-      onclick={handleRecount}
-      disabled={busy}
-      data-id="recount"
-    ></lightning-button>
-    <div class="slds-p-horizontal_medium slds-is-relative">
-      <p class="slds-m-bottom_xx-small">{labels.intro}</p>
-      <p class="slds-text-color_weak slds-m-bottom_medium">{labels.healthCheckNote}</p>
+  <div class="slds-is-relative">
+    <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-m-bottom_xx-small">
+      <h2 class="slds-text-heading_medium slds-m-right_x-small">{labels.pageTitle}</h2>
+      <c-barn-help content={labels.healthCheckNote} data-id="help"></c-barn-help>
+      <lightning-button
+        class="slds-col_bump-left"
+        label={labels.recount}
+        onclick={handleRecount}
+        disabled={busy}
+        data-id="recount"
+      ></lightning-button>
+    </div>
+    <div>
+      <p class="slds-m-bottom_small">{labels.intro}</p>
       <template lwc:if={errorMessage}>
         <div class="slds-text-color_error slds-m-bottom_small" role="alert" data-id="error">
           {errorMessage}
@@ -23,7 +26,7 @@
           <li key={check.key} class="slds-item" data-key={check.key}>
             <section aria-labelledby={check.headingId}>
               <lightning-layout multiple-rows vertical-align="center">
-                <lightning-layout-item size="12" medium-device-size="8" padding="around-small">
+                <lightning-layout-item size="12" medium-device-size="7" padding="around-small">
                   <h3 class="slds-text-heading_small" id={check.headingId}>{check.title}</h3>
                   <p>{check.description}</p>
                   <template lwc:if={check.note}>
@@ -37,10 +40,15 @@
                     </p>
                   </template>
                 </lightning-layout-item>
-                <lightning-layout-item size="6" medium-device-size="2" padding="around-small">
+                <lightning-layout-item size="6" medium-device-size="3" padding="around-small">
                   <template lwc:if={check.hasCount}>
                     <p class="slds-text-heading_medium" data-id="count">{check.countLabel}</p>
                     <p class="slds-text-body_small slds-text-color_weak">{labels.recordsFound}</p>
+                    <lightning-badge
+                      class={check.badgeClass}
+                      label={check.badgeLabel}
+                      data-id="badge"
+                    ></lightning-badge>
                   </template>
                 </lightning-layout-item>
                 <lightning-layout-item size="6" medium-device-size="2" padding="around-small">
@@ -60,5 +68,5 @@
         </template>
       </ul>
     </div>
-  </lightning-card>
+  </div>
 </template>

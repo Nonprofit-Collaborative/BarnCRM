@@ -24,9 +24,35 @@
     testFor='ApexClass:QuickGiftEntryController, ApexClass:SoftCreditController, ApexClass:TributeController, ApexClass:CommitmentController, ApexClass:GiftController'
 )
 private class GivingUserModeTest {
+    /**
+     * The three people, the default fund and the donor are the same in every test, so they are
+     * built once here and looked up by each test rather than built again by each.
+     */
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // Maria, who configures BarnCRM.
+            TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
+            );
+            // David, who enters the gifts.
+            TestDataFactory.createUser(
+                'David',
+                new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
+            );
+            // Tom, on the board, who may look but not touch.
+            TestDataFactory.createUser(
+                'Tom',
+                new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
+            );
+            insert new Fund__c(Name = 'General', Active__c = true, Is_Default__c = true);
+            // A donor who is the only person in her household, so that the gift she gives implies
+            // no automatic household soft credits. This class is about the controllers, not about
+            // recognition, and a second household member would drag recognition into every
+            // assertion.
+            insert new Contact(FirstName = 'Ana', LastName = 'Garcia');
+        }
     }
 
     private static final String ROLE_INFLUENCER = 'Influencer';
@@ -36,47 +62,44 @@ private class GivingUserModeTest {
      * Maria, who configures BarnCRM.
      */
     private static User administrator() {
-        return TestDataFactory.createUser(
-            'Maria',
-            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-        );
+        return personNamed('Maria');
     }
 
     /**
      * David, who enters the gifts.
      */
     private static User fundraiser() {
-        return TestDataFactory.createUser(
-            'David',
-            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-        );
+        return personNamed('David');
     }
 
     /**
      * Tom, on the board, who may look but not touch.
      */
     private static User boardMember() {
-        return TestDataFactory.createUser(
-            'Tom',
-            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-        );
+        return personNamed('Tom');
+    }
+
+    /** One of the people the setup built, found by the username TestUsers gives a last name. */
+    private static User personNamed(String lastName) {
+        String usernameStart = 'barn-test.' + lastName.toLowerCase() + '.';
+        return [
+            SELECT Id
+            FROM User
+            WHERE Username LIKE :(usernameStart + '%') AND LastName = :lastName
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
     }
 
     private static Fund__c defaultFund() {
-        Fund__c fund = new Fund__c(Name = 'General', Active__c = true, Is_Default__c = true);
-        insert fund;
-        return fund;
+        return [SELECT Id FROM Fund__c WHERE Name = 'General' AND Is_Default__c = TRUE LIMIT 1];
     }
 
     /**
-     * A donor who is the only person in her household, so that the gift she gives implies no
-     * automatic household soft credits. This class is about the controllers, not about
-     * recognition, and a second household member would drag recognition into every assertion.
+     * The donor the setup built, alone in her household.
      */
     private static Contact donor() {
-        Contact person = new Contact(FirstName = 'Ana', LastName = 'Garcia');
-        insert person;
-        return person;
+        return [SELECT Id FROM Contact WHERE FirstName = 'Ana' AND LastName = 'Garcia' LIMIT 1];
     }
 
     /**

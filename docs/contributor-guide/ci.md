@@ -367,8 +367,8 @@ gate run test the same org and cannot disagree because of a difference between o
    credential, exactly like the Dev Hub one, so pipe it straight into the secret rather than
    displaying it:
    `sf org display --target-org oi-test --verbose --json | jq -r .result.sfdxAuthUrl | gh secret set SF_TEST_ORG_AUTH_URL --repo Nonprofit-Collaborative/BarnCRM`
-3. **Run `scripts/org/run-org-tests.sh oi-test`** on a pushed commit (see "The org test
-   gate"), or dispatch the CI workflow by hand to have `org-tests` deploy both packages into
+3. **Run `scripts/org/run-org-tests.sh oi-test --release`** on a pushed commit (see "The org
+   test gate"), or dispatch the CI workflow by hand to have `org-tests` deploy both packages into
    the org and run the Apex tests there.
 4. **Check the shape it reports.** The run prints what shape the org actually is, read from
    the org itself, before it deploys anything. Confirm it says the shape you meant to create.
@@ -422,29 +422,92 @@ going forward:
    `landing/batch-N` branch (the first was PR #219, "Landing batch 7"). Conflicts are resolved
    once, `docs/product-plan.md` is refreshed from BMemory once, and the root docs
    (`architecture.md`, `changelog.md`, `roadmap.md`, `memory.md`) are written there.
-3. **Both org gates run in parallel on the landing head:** the full run on `barn-sales` and the
-   full run on `oi-test`, each from its own clean detached worktree and under its own org lock,
-   at the same time.
-4. **Failures are fixed on the landing branch**, and both gates rerun on the new head.
-5. **The landing pull request is squash-merged only after both gates pass.** The feature pull
+3. **The incremental org gate runs on the landing head**, on `barn-sales` only, from a clean
+   detached worktree under that org's lock (see "The incremental gate" below).
+4. **Failures are fixed on the landing branch**, and the gate reruns on the new head.
+5. **The landing pull request is squash-merged only after the gate passes.** The feature pull
    requests it carried are then closed as landed.
 
-Full gates still run on every batch: a speedup never drops coverage that catches real failures.
+**Increments are tested fast; each version is tested end to end (owner decision, 2026-10-28,
+plan D-142, amending D-141).** "I'd mostly like these initial tests to be as fast as possible
+with an end-to-end test of the entire new version once a significant new version's initial
+development is done and integrated. I don't want as much testing for all the incremental
+changes." So there are two gates, and both post the one status the ruleset requires, `Org tests
+(local)`, from your machine, not from a GitHub runner:
+
+| | Incremental gate | Release gate |
+| --- | --- | --- |
+| When | Every landing batch | Once a significant version's development is done and integrated |
+| Command | `scripts/org/run-org-tests.sh barn-sales` | `scripts/org/run-org-tests.sh <alias> --release`, on `barn-sales` and `oi-test` in parallel |
+| Deploy | Staged; packages unchanged since the last deploy to that org are skipped | Every package, every stage |
+| Tests | The changed Apex and its relevant tests, plus the `critical=true` classes (`RunRelevantTests`) | Every test class in the commit's source |
+| Coverage floor | No | Yes |
+| Status description | Starts "Incremental:" | Starts "Release:" |
+| Time (estimate) | About 6 to 10 minutes | About 24 minutes (both orgs at once) |
+
+**The incremental gate uses `barn-sales`** because it is the faster gate (about 18 minutes for a
+full run against about 24 on `oi-test`), its Sales Cloud contacts shape is the one most installs
+have, and it has DLRS installed for coexistence. `oi-test` (Person Accounts shape) is covered by
+the release gate.
+
+**Accepted risk of the incremental gate (D-142).** `RunRelevantTests` is beta and follows direct
+Apex references only. It can miss a test that reaches the changed code indirectly, and it selects
+nothing for a change to an object, a flow, a permission set, custom metadata or a label that an
+unselected test depends on. The `testFor` and `critical` annotations (see "Relevant tests" below)
+narrow the gap; the release gate closes it before a version ships.
+
+### The incremental gate
+
+```
+scripts/org/run-org-tests.sh barn-sales
+```
+
+It deploys the commit you have checked out with `scripts/org/deploy-packages.sh` (skipping the
+packages that have not changed since the last deploy to that org, see "Skipping unchanged
+packages" below), then deploys again only the Apex changed since the merge base with
+`origin/main` (`RELEVANT_BASE` to change it; on a landing batch that is every change it
+carries), plus the `critical=true` test classes, with `sf project deploy start --test-level
+RunRelevantTests`. Salesforce runs the tests in that payload, the tests that depend directly on
+it, and the classes whose `testFor` names something in it. `RunRelevantTests` exists only for
+deployments, not for `sf apex run test`, which is why this mode deploys. No coverage floor is
+checked. It posts `Org tests (local)` with a description such as "Incremental: relevant tests on
+barn-sales: 412/412 passed (no coverage floor)". Results go to
+`test-results/org-tests-relevant.json`. Jest is not part of the gate: the required `Static
+checks` job runs it on the same head.
+
+`--full-deploy` deploys every package even when unchanged. The `--light` mode (deploy plus Jest,
+no Apex test, for screen-only changes) was retired on 2026-10-28: the incremental gate does the
+same job and also runs the relevant Apex tests.
+
+### The release gate (version end to end)
+
+When a significant version's development is done and integrated:
+
+1. **Run the release gate on both gate orgs in parallel**, each from its own clean detached
+   worktree under its own org lock:
+
+   ```
+   scripts/org/run-org-tests.sh barn-sales --release
+   scripts/org/run-org-tests.sh oi-test --release
+   ```
+
+2. **Re-validate and deploy to `barn-npc`** (Nonprofit Cloud trial, production edition; see the
+   gotchas in the root `architecture.md`: Public visibility for custom settings and metadata,
+   and a destructive pre-step for components deleted since its last deploy).
+3. **Re-validate and deploy to `mwdbdevsb`** (the real-org sandbox). Check-only first, and each
+   deploy there needs Brandon's approval.
+4. **QA and UX testing** of the version.
+
+`--release` is a flag on purpose, so nobody runs the long gate for an increment by accident.
 Because both orgs post the same `Org tests (local)` context on the same commit, a passing run
 never replaces a failure that the other org posted there: it prints "Held" and posts nothing, so
 the failure stays visible until it is fixed (a new head) or that org's gate is rerun.
 
-That last one is posted from your machine, not by a GitHub runner:
-
-```
-scripts/org/run-org-tests.sh <org alias>
-```
-
-It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, runs every
+The release run always deploys every package (it implies `--full-deploy`), runs every
 Apex test class in that commit's source (assigning no permission set to you first: see "Tests
 run as a user they create" below), and
-posts `Org tests (local)` on that commit: success only when every test passed, failure
-otherwise. Its description starts "Full run:". It names the test classes rather than running
+posts `Org tests (local)` on that commit: success only when every test passed and coverage is
+over the floor, failure otherwise. Its description starts "Release:". It names the test classes rather than running
 every test in the org, because the test org is shared: another branch's deploy can leave its
 own test classes behind, and those would fail on code this commit does not contain. The
 vendored rollup engine's own tests (531 methods, about 70 seconds) are left out: no BarnCRM
@@ -452,7 +515,7 @@ runtime path calls the engine, ADR-0082 deletes it in slice S9, and they test th
 project. Its classes are still deployed.
 The results are written to `test-results/org-tests.json`, which git ignores.
 
-**Every full run checks code coverage.** The tests are enqueued with coverage on, so the org
+**Every release run checks code coverage.** The tests are enqueued with coverage on, so the org
 records it, and the run is followed by polling its `AsyncApexJob` every `TEST_POLL_SECONDS`
 (15) for up to `TEST_WAIT_MINUTES` (90). The results are then fetched without coverage, and
 coverage is read separately from the org's per-class totals (`ApexCodeCoverageAggregate`
@@ -469,63 +532,10 @@ fails, with every test passed, when:
 
 Per-class figures (covered lines, total lines, percent, floor, result) are written to
 `test-results/coverage.tsv`, and the status description carries the total and the count of
-classes under their floor, for example "Full run: 2700/2700 passed on oi-test, coverage 90%, 0
+classes under their floor, for example "Release: 2700/2700 passed on oi-test, coverage 90%, 0
 class(es) under floor". The org-wide figure (`ApexOrgWideCoverage`) is recorded in that file
 for information only: it counts the vendored engine, whose tests the gate no longer runs, and
 anything other branches left in the org, so it cannot judge one commit.
-
-**The relevant-tests run, for iteration.** `scripts/org/run-org-tests.sh <alias> --relevant`
-(or `ORG_TESTS_MODE=relevant`) does the same staged deploy, then deploys again only the Apex
-the branch changed since its merge base with `origin/main` (`RELEVANT_BASE` to change it), plus
-the `critical=true` test classes, with `sf project deploy start --test-level RunRelevantTests`.
-Salesforce runs the tests in that payload, the tests that depend directly on it, and the
-classes whose `testFor` names something in it (see "Relevant tests" below). `RunRelevantTests`
-exists only for deployments, not for `sf apex run test`, which is why this mode deploys. It
-posts a different status, `Org tests (relevant, local)`, whose description starts "Relevant
-tests only, not the merge gate", and the `main` ruleset does not require it: a relevant run can
-never stand in for the full gate. Results go to `test-results/org-tests-relevant.json`.
-
-The full run stays the merge gate. `RunRelevantTests` is beta, follows direct Apex references
-only, and selects nothing for a change to an object, a flow, a permission set or a label, all
-of which a Core test can fail on. Use the relevant run while a branch is moving, if an org is
-free; the full runs happen on the landing batch.
-
-**The light run, for screen-only changes.** `scripts/org/run-org-tests.sh <alias> --light` (or
-`ORG_TESTS_MODE=light`) is the lighter check the owner approved on 2026-10-26 for a change that
-touches only screens, labels or docs, so it does not need the full run of about 3,600 tests.
-Since batch testing (2026-10-28, D-141) feature pull requests take no org gate at all, so the
-light run is no longer part of the normal process; it stays available for a one-off check. It
-posts the same required status, `Org tests (local)`, but its description starts "Light gate:" and
-reads "no Apex-affecting changes; deploy and Jest passed", so a reviewer can tell it from a
-"Full run:". Before any deploy it lists the files changed since the merge base with
-`origin/main` (`RELEVANT_BASE` to change it) and refuses, with exit 1 and no status, unless every
-one is on the allow-list. It then does the same staged deploy the full run does (a real deploy,
-no Apex test, so the org ends in the same state) and runs `npx jest --silent` for the whole
-repo. It posts success only when both pass, and failure otherwise. It needs `node_modules`
-(`npm ci`).
-
-The allow-list is `LIGHT_ALLOWED_PATTERNS` in the script, in one place, with the reason for each
-entry beside it. Each is a path that cannot change an Apex test result:
-
-- `packages/*/main/default/lwc/**` and `aura/**` (browser-side bundles; Jest covers the LWC ones)
-- `packages/*/main/default/labels/**` (a test fails on a label only if it asserts the label's text)
-- `packages/*/main/default/flexipages/**` and `contentassets/**`
-- `packages/*/test/jest-mocks/**`
-- `docs/**` and any `*.md`
-- `.github/ISSUE_TEMPLATE/**`
-
-Everything else needs the full run: classes, triggers, objects and fields, permission sets and
-groups, custom metadata, flows, layouts, tabs, applications, scripts, config and
-`sfdx-project.json`. Static resources stay off the list because Apex reads `SampleData` and
-`GivingSampleData`. A mixed change is refused, and the refusal prints the paths that need the
-full run.
-
-**Every landing batch gets the full run on both gate orgs before merge.** A landing batch is
-never gated with the light run, because the batch is what reaches `main`.
-
-`bash scripts/org/run-org-tests.sh --light-selfcheck` runs the allow-list against sample path
-lists with no org and no GitHub (the `Static checks` job runs it through
-`scripts/ci/tests/test_run_org_tests_light.py`). Run it after changing the list.
 
 Four rules make the status worth trusting:
 
@@ -870,8 +880,44 @@ clean, so both are now the defaults:
   about 1 MB of log per run). Set it to 1 to bring the list back. A failed stage still prints
   its full report and its component failures.
 
-If the opaque fault comes back, run with `STAGE_PAUSE_SECONDS=15 DATA_MODEL_STAGES=per-object`
-and record in this section and the script header what the run showed.
+- `CONFIG_STAGES` defaults to `combined` (2026-10-28, D-141 amendment): Core's custom metadata,
+  labels, static resources, custom permissions and notification types in one request, falling
+  back to the three old stages only when it fails with no component error. `separate` always
+  uses the three stages.
+- `MODULE_STAGES` defaults to `combined` (2026-10-28): Rollup Builder, Giving, Volunteers (when it
+  holds metadata) and Mirror in one request, falling back to one module per stage, in dependency
+  order, only when it fails with no component error. `separate` always deploys one per stage.
+
+If the opaque fault comes back, run with `STAGE_PAUSE_SECONDS=15 DATA_MODEL_STAGES=per-object
+CONFIG_STAGES=separate MODULE_STAGES=separate` and record in this section and the script header
+what the run showed.
+
+**Skipping unchanged packages (2026-10-28, D-141 amendment; D-56 allows "deploy only changed
+metadata").** A package whose source is identical to what the last successful
+`deploy-packages.sh` run put in the same org is not deployed again. Its Apex still deploys
+(`DEPLOY_APEX_ALWAYS=1`, the default), because the release gate's coverage check relies on the
+deploy recompiling every class; the incremental gate checks no coverage and passes 0.
+
+- **Where the record lives:** one JSON file per org, named by the org id, in
+  `~/.local/state/barncrm/deploy-state/<org id>.json` (`DEPLOY_STATE_DIR` to change it). It is
+  outside every repository and worktree, so every gate worktree on the machine shares it and a
+  fresh worktree does not lose it. It holds the org id, the git tree id of each deployed
+  package, a fingerprint of `sfdx-project.json`, `.forceignore` and `scripts/org`, and the id of
+  the org's newest `DeployRequest` when the run finished.
+- **Any doubt means a full deploy:** no record, an unreadable one, or one for another org id; a
+  changed fingerprint; a `DeployRequest` in the org newer than the recorded one (anyone deployed
+  anything since, from any machine or branch); uncommitted or untracked files under `packages/`
+  or the deploy inputs; or `--full` (`DEPLOY_FULL=1`; `run-org-tests.sh --full-deploy`).
+- **The record is deleted before the first stage** and written only after every stage deployed,
+  so a run that fails partway leaves none. The incremental gate's own `RunRelevantTests` deploy
+  sends Apex the staged deploy just put there, so the gate keeps the record valid for it
+  (`deploy-packages.sh <alias> --adopt <deploy id>`), and only when nothing else deployed in
+  between.
+- **Not detected:** a change made by hand in Setup to packaged metadata. After one, run with
+  `--full-deploy`, or delete the record.
+
+`scripts/ci/tests/test_deploy_skip_unchanged.py` (run by `Static checks`) drives these rules
+with a fake `sf`.
 
 Two things constrain when it runs, both because there is one org rather than one per run.
 
@@ -1218,5 +1264,5 @@ does not track the repository), after the Dev Hub or the Salesforce release chan
 and before the snapshot's own expiry. The script warns when `packages/` changed after the
 snapshot date. Sample data is seeded into the source org before the snapshot, so it carries over.
 
-**After creating an org from a snapshot,** run `scripts/org/run-org-tests.sh <alias>` once and
+**After creating an org from a snapshot,** run `scripts/org/run-org-tests.sh <alias> --release` once and
 check the shape line it prints, as for any new org.
