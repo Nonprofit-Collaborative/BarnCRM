@@ -203,6 +203,26 @@ private class AccountKindsTest {
     }
 
     @IsTest
+    static void theIsOrganizationFieldFollowsTheSetting() {
+        System.runAs(TestUsers.admin()) {
+            store(AccountKinds.organizationRecordTypeName());
+            Account organization = AddressTestDataFactory.newOrganization('Zztest Formula Org');
+            Account household = HouseholdTestDataFactory.newHousehold('The Zztest Family');
+            Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
+
+            Set<Id> ids = new Set<Id>{ organization.Id, household.Id };
+            Map<Id, Account> read = new Map<Id, Account>(
+                [SELECT Id, Is_Organization__c FROM Account WHERE Id IN :ids WITH SYSTEM_MODE]
+            );
+            Assert.isTrue(
+                read.get(organization.Id).Is_Organization__c,
+                'An account of the chosen record type is an organization.'
+            );
+            Assert.isFalse(read.get(household.Id).Is_Organization__c, 'A household never is.');
+        }
+    }
+
+    @IsTest
     static void installStoresTheDetectedValueOnceAndNeverOverwrites() {
         System.runAs(TestUsers.admin()) {
             AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>();

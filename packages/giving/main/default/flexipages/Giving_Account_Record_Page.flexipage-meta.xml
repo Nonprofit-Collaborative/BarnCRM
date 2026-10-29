@@ -188,9 +188,9 @@
         <identifier>RecordField_Website</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+            <leftValue>{!Record.Is_Organization__c}</leftValue>
             <operator>EQUAL</operator>
-            <rightValue>Organization</rightValue>
+            <rightValue>true</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -337,9 +337,9 @@
                   <rightValue>Household</rightValue>
                 </criteria>
                 <criteria>
-                  <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
-                  <operator>NE</operator>
-                  <rightValue>Organization</rightValue>
+                  <leftValue>{!Record.Is_Organization__c}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>false</rightValue>
                 </criteria>
               </visibilityRule>
             </valueListItems>
@@ -391,9 +391,9 @@
         <identifier>affiliationPanel</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+            <leftValue>{!Record.Is_Organization__c}</leftValue>
             <operator>EQUAL</operator>
-            <rightValue>Organization</rightValue>
+            <rightValue>true</rightValue>
           </criteria>
         </visibilityRule>
       </componentInstance>
@@ -582,9 +582,9 @@
         <identifier>givingOrganizationGiftsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+            <leftValue>{!Record.Is_Organization__c}</leftValue>
             <operator>EQUAL</operator>
-            <rightValue>Organization</rightValue>
+            <rightValue>true</rightValue>
           </criteria>
         </visibilityRule>
       </componentInstance>
@@ -724,9 +724,9 @@
         <identifier>givingOrganizationCommitmentsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+            <leftValue>{!Record.Is_Organization__c}</leftValue>
             <operator>EQUAL</operator>
-            <rightValue>Organization</rightValue>
+            <rightValue>true</rightValue>
           </criteria>
         </visibilityRule>
       </componentInstance>
@@ -918,9 +918,9 @@
         <identifier>givingOrganizationReceiptsList</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+            <leftValue>{!Record.Is_Organization__c}</leftValue>
             <operator>EQUAL</operator>
-            <rightValue>Organization</rightValue>
+            <rightValue>true</rightValue>
           </criteria>
         </visibilityRule>
       </componentInstance>
