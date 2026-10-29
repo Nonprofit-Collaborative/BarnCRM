@@ -5,6 +5,7 @@ import HEADING from '@salesforce/label/c.Core_SetupNote_Heading';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import NEW_TAB from '@salesforce/label/c.Core_SetupNote_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SetupNote_CheckAgain';
+import SHOW_STEPS from '@salesforce/label/c.Core_SetupNote_ShowSteps';
 import DONE from '@salesforce/label/c.Core_SetupNote_Done';
 import NOT_DONE from '@salesforce/label/c.Core_SetupNote_NotDone';
 import METADATA_WHAT from '@salesforce/label/c.Core_SetupNote_Metadata_What';
@@ -93,7 +94,8 @@ export default class SettingsSetupNotes extends LightningElement {
     heading: HEADING,
     openInSetup: OPEN_IN_SETUP,
     newTab: NEW_TAB,
-    checkAgain: CHECK_AGAIN
+    checkAgain: CHECK_AGAIN,
+    showSteps: SHOW_STEPS
   };
 
   _notes;

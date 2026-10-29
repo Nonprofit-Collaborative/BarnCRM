@@ -57,22 +57,6 @@
         <value>Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_DiscardButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: button that throws away unsaved edits</shortDescription>
-        <value>Discard Changes</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_DefaultNotSaved</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: note under a setting that shows a default nobody saved</shortDescription>
-        <value>Default, not yet saved.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_KeepDefaultButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -137,14 +121,6 @@
         <value>A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_LearnMoreLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: link from a setting to its admin guide page</shortDescription>
-        <value>Learn More</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_FeedbackLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -167,14 +143,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: address the feedback link opens (GitHub support page)</shortDescription>
         <value>https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_LearnMoreAria</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: screen reader name of a Learn more link; {0} is the setting</shortDescription>
-        <value>Learn more about {0} (opens a new tab)</value>
     </labels>
     <labels>
         <fullName>Core_Settings_LoadErrorMessage</fullName>
@@ -233,14 +201,6 @@
         <value>Recent Changes</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_SaveButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: button that saves the changed settings</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_SaveErrorMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -279,5 +239,109 @@
         <protected>true</protected>
         <shortDescription>Settings console: a setting sent from the page does not exist in this org</shortDescription>
         <value>That setting does not exist in this org, so nothing was saved. Refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_Purpose</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: one-line purpose under the page header</shortDescription>
+        <value>Choose how BarnCRM works for your whole organization.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_HelpAria</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: screen reader name of a setting info icon; {0} is the setting</shortDescription>
+        <value>About {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_DefaultBadge</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: badge on a setting that shows a default nobody saved</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_DefaultsBannerTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: title of the banner on a section with unsaved defaults</shortDescription>
+        <value>These Are Defaults</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_DefaultsBannerText</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: line of the banner on a section with unsaved defaults</shortDescription>
+        <value>Settings marked Default show the value BarnCRM already uses. Keep them all, or change any.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_KeepAllDefaults</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: button that saves every default the section shows</shortDescription>
+        <value>Keep All Defaults</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_Organization</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>Organization</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_People</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>People</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_Data</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_Fundraising</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>Fundraising</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_Programs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>Programs</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_More</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading for sections no group names</shortDescription>
+        <value>More</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NavGroup_System</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: section list group heading</shortDescription>
+        <value>System</value>
     </labels>
 </CustomLabels>
