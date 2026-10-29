@@ -16,6 +16,53 @@ public with sharing class GiftService {
     public static Boolean suppressDefaultAllocations = false;
 
     /**
+     * The gifts whose allocations the package itself is saving right now (a new gift's default
+     * allocation, a single allocation moved with its gift's amount), as the Gift trigger holds
+     * them, by Id. The allocation handlers of that one save read the gift from here instead of
+     * querying it again (D-143): after the gift's save these are its stored values. Set only
+     * around that save, and restored after it.
+     */
+    private static Map<Id, Gift__c> giftsInHand = new Map<Id, Gift__c>();
+
+    /**
+     * The gifts asked for that are in hand. The caller queries the rest, so a gift saved by
+     * anyone else is always read from the database.
+     */
+    public static Map<Id, Gift__c> giftsInHandAmong(Set<Id> giftIds) {
+        Map<Id, Gift__c> found = new Map<Id, Gift__c>();
+        if (giftsInHand.isEmpty() || giftIds == null) {
+            return found;
+        }
+        for (Id giftId : giftIds) {
+            Gift__c gift = giftsInHand.get(giftId);
+            if (gift != null) {
+                found.put(giftId, gift);
+            }
+        }
+        return found;
+    }
+
+    /** The gifts asked for: those in hand, and the rest read with their amounts. */
+    private static Map<Id, Gift__c> giftAmounts(Set<Id> giftIds) {
+        Map<Id, Gift__c> giftsById = giftsInHandAmong(giftIds);
+        if (giftsById.size() == giftIds.size()) {
+            return giftsById;
+        }
+        Set<Id> toRead = new Set<Id>(giftIds);
+        toRead.removeAll(giftsById.keySet());
+        giftsById.putAll(GiftSelector.selectAmountsById(toRead));
+        return giftsById;
+    }
+
+    /** Puts these gifts in hand for the save the caller is about to make; answers what was. */
+    private static Map<Id, Gift__c> holdGifts(Map<Id, Gift__c> gifts) {
+        Map<Id, Gift__c> was = giftsInHand;
+        giftsInHand = new Map<Id, Gift__c>(was);
+        giftsInHand.putAll(gifts);
+        return was;
+    }
+
+    /**
      * The gifts whose receipt number the receipting feature is writing right now, by Id.
      *
      * ADR-0033: a receipt number only ever comes from `ReceiptNumberSequence`, so the lock refuses
@@ -461,6 +508,7 @@ public with sharing class GiftService {
                 )
             );
         }
+        Map<Id, Gift__c> held = holdGifts(candidates);
         try {
             Database.insert(allocations, AccessLevel.USER_MODE);
         } catch (Exception allocationError) {
@@ -468,6 +516,8 @@ public with sharing class GiftService {
             for (Gift__c gift : candidates.values()) {
                 gift.addError(Label.Giving_Gift_DefaultAllocationFailed);
             }
+        } finally {
+            giftsInHand = held;
         }
     }
 
@@ -652,7 +702,7 @@ public with sharing class GiftService {
         if (giftIds.isEmpty()) {
             return;
         }
-        Map<Id, Gift__c> giftsById = GiftSelector.selectAmountsById(giftIds);
+        Map<Id, Gift__c> giftsById = giftAmounts(giftIds);
 
         Map<Id, List<Gift_Allocation__c>> percentEntered = new Map<Id, List<Gift_Allocation__c>>();
         for (Gift_Allocation__c allocation : allocations) {
@@ -744,7 +794,7 @@ public with sharing class GiftService {
             return problems;
         }
 
-        Map<Id, Gift__c> giftsById = GiftSelector.selectAmountsById(giftIds);
+        Map<Id, Gift__c> giftsById = giftAmounts(giftIds);
         Map<Id, Decimal> totals = new Map<Id, Decimal>();
         for (Id giftId : giftsById.keySet()) {
             totals.put(giftId, 0);
@@ -817,7 +867,14 @@ public with sharing class GiftService {
         for (Id giftId : byGift.keySet()) {
             List<Gift_Allocation__c> allocations = byGift.get(giftId);
             Gift__c gift = changed.get(giftId);
-            if (allocations.size() == 1) {
+            if (
+                allocations.size() == 1 &&
+                allocations[0].Amount__c == gift.Amount__c &&
+                allocations[0].Percent__c == 100
+            ) {
+                // Already what the move would write: nothing to save.
+                continue;
+            } else if (allocations.size() == 1) {
                 // Only the fields being changed: a user mode update of the row as read would
                 // also carry the master detail to the gift, which nobody may edit.
                 toUpdate.add(
@@ -832,6 +889,7 @@ public with sharing class GiftService {
             }
         }
         if (!toUpdate.isEmpty()) {
+            Map<Id, Gift__c> held = holdGifts(changed);
             try {
                 Database.update(toUpdate, AccessLevel.USER_MODE);
             } catch (Exception allocationError) {
@@ -839,6 +897,8 @@ public with sharing class GiftService {
                 for (Gift__c gift : changed.values()) {
                     gift.addError(Label.Giving_Gift_AllocationUpdateFailed);
                 }
+            } finally {
+                giftsInHand = held;
             }
         }
     }
