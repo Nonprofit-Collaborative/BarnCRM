@@ -649,6 +649,11 @@ So every test is self-contained:
   `TestDataFactory.createUser` users. The `standardUser*` helpers and `peopleReaderWith` never
   get it, because their tests prove least privilege. A test that uses a new optional standard
   field adds it to the list rather than relying on the org's profile.
+- No user is given the Household record type (ADR-0141), and a plain `insert` under
+  `System.runAs` checks the running user's record types, so it refuses a household with
+  "Record Type ID: this ID value isn't valid for the user". Test data inserts households with
+  `Database.insert(household, AccessLevel.SYSTEM_MODE)`; a test of what a person may create
+  uses `HouseholdTestDataFactory.insertHouseholds` (BarnCRM's own `HouseholdWriter` path).
 - Users and permission set assignments are setup objects. `TestUsers` writes them in a
   context of their own; a test that creates more people does the same with a nested
   `System.runAs(new User(Id = UserInfo.getUserId()))`, as before.
