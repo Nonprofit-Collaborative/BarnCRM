@@ -7738,6 +7738,16 @@ the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coo
 Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
 the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
+**View All and Modify All, and why (2026-10-28 security review, V-L1).** Each grant is stated in
+its object's description too. Volunteer Hours: Admin and Coordinator, to approve and correct
+anyone's entry (R-VG7). Skill and Volunteer Skill (sharing Read): Admin and Coordinator, to
+correct and delete a row someone else added; Read Write sharing is not used instead, because
+deleting another person's row still needs Modify All, and on Volunteer Skill it would let every
+staff member edit every row. Volunteer Requirement (sharing Private): Admin and Coordinator, the
+only sets with any access, who track onboarding for every volunteer (R-VQ4). Volunteer Letter
+Template (sharing Read): Admin only, to edit or retire a template another admin or the install
+created; the Coordinator reads them.
+
 **Health Check.** `VolunteersHealthCheckExtension`, registered in
 `HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds five findings to Core's one report,
 read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
