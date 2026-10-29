@@ -91,7 +91,7 @@ every night; do not assign them by hand.
 By default everyone sees both styles and picks the one they like. To show only one:
 
 1. Open **BarnCRM Settings** (in **BarnCRM Admin**) and click **General**.
-2. Set **App Navigation Style** to **Standard navigation only** or **Console navigation only**.
+2. Set **App navigation style** to **Standard navigation only** or **Console navigation only**.
    **Both (each person chooses)** is the default.
 3. Click **Save**. Within a minute or two the other style's apps leave everyone's App Launcher.
    Set it back to **Both (each person chooses)** to show them again.

@@ -6,6 +6,23 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-29
 
+### Landing batch 12 (branch `landing/batch-12`; incremental gate on `barn-sales`)
+
+Merges #703, #704, #705 and #706; root-doc entries for #702 (already in `main`, 906960b2).
+
+- #702 (What's New 0.11): `Release_Note.V0_11_Whats_New` (Version 0.11, Core, headline plus 9 lines, read by SOQL so not cut at 255) added; 0.6 kept; `v0.11-draft-whats-new.md` and T-SET-11 updated.
+- #703 (release blocker): #681 had brought the removed `Integration_App__mdt.Install_Url__c` (#666, D-138) back into `IntegrationAppService` SOQL, so the `barn-npc` check-only deploy failed to compile. Removed. New offline check `scripts/ci/check-field-references.py` (Static checks and `run-offline-checks.sh`) fails on any reference to a BarnCRM custom field or object no package defines; allowlist file; 20 unittest tests. `run-offline-checks.sh` (full run, not `--fast`) also runs `scripts/ci/tests`.
+- #704 (QA v0.11 UI): Org Optimizer storage icon `standard:data_model` plus an icon-name Jest check; first-run close disabled for admins (non-admins can close the needs-an-admin notice); Data Manager Loads column shows object labels; Households quick link opens the Households list view; Setup Checklist heading once and at the top of Home on phones (second `hubSetup`, placement Top); Title Case fixes; DLRS shown only when installed.
+- #705 (QA v0.11 data): sample households get a Primary Contact (contact mode); chosen address moves leave out deceased members, same-named members show birthdate or email (R-AD9); duplicate review says "suggestion" and handles groups of 3+; Contact Point match sources proven safe without those objects.
+- #706 (QA v0.11 defaults): blank Core and Organization-page text settings show an in-box default ("Not set"; digest recipients "Everyone with the Manage BarnCRM Settings permission"); Company Information offered for legal name and address with Use This Value (fills only, saves on Save).
+- BMemory plan 11.5 module findings from QA v0.11 (6405a9d, b0a5da2); `docs/product-plan.md` refreshed from BMemory.
+
+### Version 0.11 release checks
+
+- Release gate on `main` cbf35753 (`--release`, `barn-sales` and `oi-test` in parallel): both 4,005 of 4,005, coverage 93%, 0 classes under floor; "Org tests (local)" success.
+- `barn-npc` check-only deploy 0Afhk000001zpeXCAQ failed to compile on the removed `Install_Url__c` field (fixed by #703, above).
+- QA v0.11 and UX screen comparison: 0 blockers, 1 major (Mirror, module), 12 minor, 9 cosmetic; 30 screens same or better. Core findings fixed in #704 to #706; module findings in plan 11.5.
+
 ### Landing batch 11 (#701, branch `landing/batch-11b`; incremental gate on `barn-sales`)
 
 Merges #697, #699 (contains #697) and #698.

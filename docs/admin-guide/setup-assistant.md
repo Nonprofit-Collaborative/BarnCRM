@@ -47,6 +47,12 @@ shows how many steps you finished. The tile has a **Reopen Setup** button, so th
 is always one click away, and it opens straight back on the first step rather than on the
 completion screen.
 
+On a phone or other narrow screen, where the home page's columns stack, the **Setup
+Checklist** shows at the top of the page while setup is unfinished, so it is the first thing
+an administrator sees. Once setup is finished, the **Setup Complete** tile shows in its usual
+place at the bottom. The home page holds the checklist twice for this (a **Placement** of
+**Top** and of **Side**); if you rearrange the page in App Builder, keep both, or remove both.
+
 You need the **Manage BarnCRM Settings** permission to change anything in the assistant.
 Everyone else sees the same steps, reads the same explanations, and cannot save. If you can
 read but not save, the assistant says so at the top and names the permission you are

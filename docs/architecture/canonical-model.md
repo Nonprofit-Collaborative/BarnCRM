@@ -6531,6 +6531,10 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
   members with a primary address of their own. Those are left alone unless ticked; a ticked
   member's own primary stops being primary, kept as history, and they take the household's
   address from then on. A member for whom this is not their household is not listed.
+- Both chosen moves leave out a member marked deceased: they are not moved and not listed.
+  The automatic copy of R-AD3 is unchanged. In the confirmation, members who share a name are
+  told apart by their birthdate, or their email when there is no birthdate, where the user
+  can read it.
 
 ### Salesforce implementation
 

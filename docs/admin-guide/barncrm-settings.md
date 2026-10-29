@@ -46,7 +46,8 @@ how greetings are configured before he asks Maria to change them.
 ## First-Run Setup
 
 Until BarnCRM's first-run setup is finished, the BarnCRM home page and this page both show
-the same setup window in front of everything else, and nothing behind it can be used.
+the same setup window in front of everything else. An administrator cannot close it without
+finishing; anyone else can close it (see below).
 
 **On a new install, BarnCRM's automation does nothing until first-run setup is finished.**
 Every Core feature starts off, so its automation is held: no household is created for a new
@@ -73,8 +74,8 @@ earlier release keeps every feature on and is not held.
      usual choice), or **Let me choose features**, which lists the features described below,
      all ticked, each with a help icon. Untick what you do not want yet.
 
-  The window is a standard Salesforce dialog: focus stays inside it, and Escape does not close
-  it. Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
+  The window is a standard Salesforce dialog: focus stays inside it, and neither Escape nor
+  its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
   Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
   a few minutes, and starts the nightly tab access check if it is not already scheduled. What
@@ -82,8 +83,9 @@ earlier release keeps every feature on and is not held.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
   either page. No module is installed by first-run setup: install modules later from the
   **Modules** section.
-- **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and nothing
-  else, on both pages, until an administrator finishes.
+- **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and a **Close**
+  button. **Close**, the close button or Escape closes the window, and it shows again the next
+  time they open either page, until an administrator finishes.
 
 An org that had already chosen an edition before this release never sees the window, and an
 upgraded org with no edition is given the recommended one by the upgrade. If someone set the
@@ -354,6 +356,23 @@ BarnCRM Settings see the badge and the banner but no buttons. **How people belon
 BarnCRM would choose differently for your org (with Person Accounts or Nonprofit Cloud it
 moves a household choice nobody made to the flexible way): the badge stays, and you choose the
 way you want from the list and save.
+
+A text setting that is blank says what the blank means, in grey in its empty box, with the
+**Default** badge and no button, since there is nothing to keep:
+
+- **Digest recipients** (Error Log) reads **Everyone with the Manage BarnCRM Settings
+  permission**, which is who gets the digest while it is blank.
+- The organization details on **Organization** (the legal name, the address parts, and with
+  Giving the tax identification number and receipt details) read **Not set**: a blank detail
+  is left off letters and receipts, and Giving will not produce a receipt without a legal
+  name.
+
+When Salesforce Setup's Company Information has a value BarnCRM can use, the blank setting
+offers it: under **Organization legal name**, "Company Information in Salesforce Setup has
+(the company name)." with **Use This Value**; above a blank **Organization Address**, the
+company address with **Use This Address** (offered only when it has a street, city, state and
+postal code; a second street line goes to **Street 2**). Either fills in the boxes without
+saving: check them, then save. Nothing uses the Company Information value until you do.
 
 Each setting's info icon is a button: a screen reader names it with the setting and reads the
 description when it is opened, and each setting is a labelled group, so the Learn More link

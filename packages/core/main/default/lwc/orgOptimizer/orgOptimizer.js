@@ -107,7 +107,7 @@ export default class OrgOptimizer extends LightningElement {
       setupTiles.push(
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
-        this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:storage'),
+        this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
         this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings')
       );
     }

@@ -216,6 +216,17 @@ describe('c-setup-assistant', () => {
     expect(element.shadowRoot.querySelectorAll(OPEN_STEP)).toHaveLength(1);
   });
 
+  it('adds no heading of its own under the titled Home card, and names its list instead', async () => {
+    const element = build();
+    await settle();
+
+    const root = element.shadowRoot;
+    expect(root.querySelectorAll('h2')).toHaveLength(0);
+    expect(root.querySelector('[data-id="steps"]').getAttribute('aria-label')).toBe(
+      'c.Core_SetupAssistant_Heading'
+    );
+  });
+
   it('lists every step with a ring and a badge, and opens only one', async () => {
     getState.mockResolvedValue(
       state({ completedKeys: ['coexistence'], skippedKeys: ['moduledefaults'] })

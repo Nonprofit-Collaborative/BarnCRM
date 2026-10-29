@@ -299,3 +299,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Untick both and save. | The extra fields are gone after a refresh. |
 
 **Cleanup:** none.
+
+## T-ADDR-20: A Chosen Move Leaves Out the Deceased and Tells Same Names Apart
+
+**Purpose:** confirm Update Everyone's Address neither moves nor lists a deceased member, and
+shows a birthdate or email beside people who share a name.
+**Prerequisites:** admin; the sample data loaded; **Address Updates** set to **Nobody moves until you choose**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open a sample household with a deceased member (five have one). Give a living member an address of their own. | Saved. |
+| 2 | On the household's primary address card, select **Update Everyone's Address**. | The deceased member is in neither list. The living member with their own address has a tick box. |
+| 3 | Select **Cancel**. Add a contact to the household with the same first and last name as a member who has their own address, a different birthdate, and an address of their own. Select **Update Everyone's Address** again. | The two people who share a name each show their birthdate in brackets after the name. A person with no birthdate shows their email instead. |
+| 4 | Tick nobody and select **Update Everyone's Address**. | The living members without an address of their own read the household's address. The deceased member's address has not changed. |
+
+**Cleanup:** delete the contact added in step 3 and the address added in step 1, and set **Address Updates** back to **Everyone in the household moves together**.

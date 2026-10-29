@@ -62,19 +62,23 @@ Metadata Admin** (see [Access](access.md)).
 Run the scan again after a large import: Salesforce checks a record against the others when
 it is saved, but an import that saved past a warning leaves the pair for the scan to find.
 
-**The review list.** The **Review** tab and **Possible Duplicates** both show how many pairs
-are waiting (for example **Review (40)**, or 50+ when there are more than the list reads at
-once), then the first 10 pairs, newest first. Each pair is one card: why it was suggested and
-its buttons at the top (**Merge Households** is the main button on a household pair), then the
-records side by side. Each side shows the record's name (a link to it), Person or Household,
+**The review list.** The page calls each possible duplicate a suggestion: usually a pair, and
+sometimes three or more records a duplicate rule reported together. The **Review** tab and
+**Possible Duplicates** both show how many suggestions are waiting (for example **Review
+(40)**, or 50+ when there are more than the list reads at once), then the first 10
+suggestions, newest first. Each suggestion is one card: why it was suggested and its buttons
+at the top (**Merge Households** is the main button on a household pair), then the records
+side by side. A card with three or more records says "Each record is compared with (the first
+record's name), the first one.", and each **Different** badge on the others means different
+from that first record. Each side shows the record's name (a link to it), Person or Household,
 and the fields compared: for a person the email, phone, mailing street, city and postal code,
 and household; for a household the billing street, city and postal code, and phone. Only
 fields you can read are shown. A value that is not the same on both sides carries a
 **Different** badge, so you see at a glance what sets the two apart. On a narrow screen the
 sides stack. **Show More** adds the next 10, and the line
 under the list says how many are showing. The note on merging two people is shown once, above
-the list, not on every pair. **Not a Duplicate** and **Merge Households** open their short
-form inside the pair's own card. When nothing is waiting the list shows **No Possible
+the list, not on every card. **Not a Duplicate** and **Merge Households** open their short
+form inside the suggestion's own card. When nothing is waiting the list shows **No Possible
 Duplicates** with a reminder to scan after a large import.
 
 ### Settings
@@ -210,8 +214,8 @@ choose to save anyway.
    side by side, the fields where they disagree, and which one is kept. Choose the household to
    keep and choose **Merge These Two**. You see "The two households are now one."
 7. For a pair that is not the same person, for example twin sisters at one address, choose
-   **Not a Duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
-   suggested again." Scan again and check that the pair does not come back. It stays off the
+   **Not a Duplicate**, type a short reason, and confirm. You see "Noted. This suggestion will
+   not come back." Scan again and check that the pair does not come back. It stays off the
    panel even when a duplicate rule reports the pair again as someone saves one of the two.
    A suggestion that names three or more records (one a duplicate rule wrote as someone saved)
    is dismissed as a whole: every pair in it is noted. If two of them are in fact the same
@@ -325,6 +329,6 @@ lists it under **Households have nobody in them**. Merge it into the kept person
 from this panel or with **Merge or Split** on the household's page.
 
 **You dismissed a pair and now want it back.** Dismissals are records. On the panel, choose
-**View** next to **Dismissed pairs**, pick the **All Duplicate Dismissals** list, find the pair
+**View** next to **Dismissed suggestions**, pick the **All Duplicate Dismissals** list, find the pair
 by its reason, and delete it. The next scan suggests that pair again. Anyone with BarnCRM
 Admin can delete a dismissal, whoever made it: a dismissal is the organization's decision.

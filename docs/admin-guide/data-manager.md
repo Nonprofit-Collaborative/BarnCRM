@@ -69,7 +69,11 @@ Record** in the first step (**What Are You Importing?**): choose the object, typ
 or gift file, choose a template and select **Start a New Template From This One**
 ([Importing](importing.md), section 6). There is no separate save step: the
 column matches, changes and row rules you settle on are saved to the template each time you
-import with it. On the page the section shows one line and a **Learn More** link to this guide;
+import with it. The table's **Loads** column says in words what each template loads:
+**People and organizations** for a people file, **Gifts** for a gift file, and for a
+one-object template the object's plural name, for example **Addresses** (or its API name when
+the object is no longer in the org).
+On the page the section shows one line and a **Learn More** link to this guide;
 with no template yet it shows **No Import Templates Yet** and a **Create a Template** button,
 which opens **Import a File**.
 

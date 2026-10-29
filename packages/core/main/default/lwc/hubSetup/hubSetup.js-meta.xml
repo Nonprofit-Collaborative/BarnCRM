@@ -5,9 +5,15 @@
   <masterLabel>BarnCRM Home: Setup Checklist</masterLabel>
   <description>
     The setup checklist for the BarnCRM home page, collapsing to a Setup complete tile once
-    every step is done. Shown to administrators.
+    every step is done. Shown to administrators. Placed twice: Side shows on a wide screen,
+    and Top shows on a narrow screen while setup is unfinished.
   </description>
   <targets>
     <target>lightning__AppPage</target>
   </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage">
+      <property name="placement" type="String" label="Placement" description="Side: the side column, shown on a wide screen. Top: the top of the main column, shown on a narrow screen while setup is unfinished." datasource="Side,Top" default="Side" />
+    </targetConfig>
+  </targetConfigs>
 </LightningComponentBundle>

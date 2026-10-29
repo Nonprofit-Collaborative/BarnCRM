@@ -143,6 +143,56 @@ private class MatchSourceServiceTest {
         }
     }
 
+    /**
+     * ADR-0013: Core runs on a Platform-only org and on one without the Data Protection and
+     * Privacy objects (a real org sandbox was found without the contact point address,
+     * individual and consent objects).
+     * The shipped contact point sources name their objects only as metadata text, resolved by
+     * describe, so where those objects are missing the sources are skipped and the scan runs
+     * on what remains, with no error.
+     */
+    @IsTest
+    static void theShippedContactPointSourcesAreSkippedWhereTheirObjectsAreMissing() {
+        System.runAs(TestUsers.admin()) {
+            MatchSourceService.objectsAbsentOverride = new Set<String>{
+                'contactpointemail',
+                'contactpointphone',
+                'contactpointaddress',
+                'individual',
+                'contactpointconsent'
+            };
+            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+                new List<Contact>{
+                    new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
+                    new Contact(FirstName = 'Ben', LastName = 'Okafor')
+                }
+            );
+
+            Test.startTest();
+            List<MatchSourceService.Source> sources = MatchSourceService.usableSources();
+            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+                new List<Id>{ people[0].Id, people[1].Id }
+            );
+            Test.stopTest();
+
+            Set<String> names = new Set<String>();
+            for (MatchSourceService.Source source : sources) {
+                names.add(source.developerName);
+            }
+            for (
+                String contactPoint : new List<String>{
+                    'Contact_Point_Email',
+                    'Contact_Point_Phone',
+                    'Contact_Point_Address'
+                }
+            ) {
+                Assert.isFalse(names.contains(contactPoint), contactPoint + ' is skipped');
+            }
+            Assert.isTrue(names.contains('Address_Person'), 'Core\'s own sources still run');
+            Assert.isTrue(pairs.isEmpty(), 'The scan runs on what remains: ' + pairs);
+        }
+    }
+
     // ------------------------------------------------------------------ matching
 
     private static Set<String> keysOf(List<DuplicateService.Pair> pairs) {

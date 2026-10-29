@@ -155,6 +155,8 @@ Last refreshed from BMemory 2026-10-28 (landing batch 9; through D-144, D-142 to
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
+Claude-decided calls from QA v0.11 (2026-10-29; reversible, told Brandon): chosen address moves leave out deceased members (the automatic copy is unchanged); Company Information is offered for blank organization details and never used until saved (receipts refuse a blank legal name); "suggestion" is the single duplicate review term. Open: junction-mode sample households still lack a Primary Contact.
+
 ## Open questions still open (plan Section 11.2)
 
 - 1: Namespace registration (deferred; blocks package versions only). Settled after a v1.0 pilot (D-87).

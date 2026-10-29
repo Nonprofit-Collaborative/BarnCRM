@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-29 (landing/batch-11; main at #695, be5aa6f30; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
+Last verified 2026-10-29 (landing/batch-12; main at #702, 906960b2; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
 
 ## Pointers
 
@@ -186,4 +186,9 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - The UX kit new-tab pattern: every Core link that opens a new tab shows the new-tab icon plus the shared label `Core_Kit_NewTab` ("(opens in a new tab)") (#698).
 - Settings section groups and icons live in `settingsConsole/settingsNavigation.js`; a section no group names goes in More, before System, so Error Log stays last (#683).
 - Every `LightningModal` subclass shares the Jest stub's single static `open` mock; tests tell modals apart by the arguments to `open` (#685). `barnConfirmModal` resolves `true`, or `{ choice, checked }` when given choices or checks.
+- The What's New card shows the newest `Version__c`; each release needs a new `Release_Note` record; `check-whats-new.py --release` enforces it (#702).
+- Dev gate orgs (`oi-test`, `barn-sales`) keep every field ever deployed, so references to removed fields compile and gates pass; only the `barn-npc` check-only deploy and `scripts/ci/check-field-references.py` catch them (#703).
+- Code Analyzer flags `getDescribe()` on an SObjectType as High even in tests; use `SObjectDescribeOptions.DEFERRED` (#704).
+- `check-test-relevance.py` is not in `--fast`; new test classes need `@IsTest(testFor=...)` (#706).
+- `BarnCRM_Home` holds two `hubSetup` instances (Side and Top, the Top one for phones); keep both or remove both (#704).
 - `utility:health_check` is not a valid SLDS icon (renders an empty gap); check icon names against `@salesforce-ux/sds-metadata/current/icons.json` (#691).

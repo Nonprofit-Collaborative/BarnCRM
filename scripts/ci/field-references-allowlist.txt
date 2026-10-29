@@ -1,0 +1,9 @@
+# Exceptions for scripts/ci/check-field-references.py, one per line:
+#
+#   <repo path> <token as the check prints it>  # reason
+#
+# for example:
+#   packages/core/main/default/classes/Foo.cls Bar__c.Baz__c  # reason it is safe
+#
+# Every entry needs a reason. Prefer removing the reference: an entry here is a field or
+# object the repo does not define, which a clean org refuses at deploy.

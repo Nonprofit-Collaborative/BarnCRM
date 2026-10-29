@@ -25,6 +25,12 @@ public with sharing class AddressService {
     @TestVisible
     private static Boolean isPropagating = false;
 
+    /**
+     * True during a move someone chose and its confirmation (R-AD9), which leave out members
+     * marked deceased. The automatic copy of a household address (R-AD3) leaves it false.
+     */
+    private static Boolean leavingOutDeceased = false;
+
     @TestVisible
     private static final String BEHAVIOR_UPDATE_HOUSEHOLD = 'Update household';
     @TestVisible
@@ -728,10 +734,15 @@ public with sharing class AddressService {
             }
         }
         Map<Id, Set<Id>> keptBack = new Map<Id, Set<Id>>();
-        Map<Id, Set<Id>> taking = membersWhoTakeTheHouseholdAddress(
-            membersOf(householdIds),
-            keptBack
-        );
+        Map<Id, Set<Id>> taking;
+        // The confirmation lists who the move would reach, and the move leaves out the dead.
+        Boolean deceasedWereLeftOut = leavingOutDeceased;
+        leavingOutDeceased = true;
+        try {
+            taking = membersWhoTakeTheHouseholdAddress(membersOf(householdIds), keptBack);
+        } finally {
+            leavingOutDeceased = deceasedWereLeftOut;
+        }
         for (Id householdId : householdIds) {
             HouseholdMove move = moves.get(householdId);
             if (taking.get(householdId) != null) {
@@ -793,6 +804,8 @@ public with sharing class AddressService {
         List<Address__c> primaries
     ) {
         Boolean movesWereChosen = chooseHouseholdMoves(true);
+        Boolean deceasedWereLeftOut = leavingOutDeceased;
+        leavingOutDeceased = true;
         isPropagating = true;
         try {
             // The household moves and the released people are saved in one write below.
@@ -821,6 +834,7 @@ public with sharing class AddressService {
             applyToStandardFields(primaries);
         } finally {
             isPropagating = false;
+            leavingOutDeceased = deceasedWereLeftOut;
             chooseHouseholdMoves(movesWereChosen);
         }
     }
@@ -1231,6 +1245,10 @@ public with sharing class AddressService {
      * person account carries one, captured from its mailing fields (R-AD5), so the first rule
      * would stop every household move reaching people held as accounts.
      *
+     * On a move someone chose (R-AD9), and in its confirmation, a member marked deceased is
+     * left out too: the move is for the living, and their record keeps the address it has.
+     * The automatic copy (R-AD3) is unchanged.
+     *
      * One query for the personal addresses, and in junction mode one for the households,
      * whatever the number of households. Returns new sets: the map given is not changed.
      * When `keptForTheirOwn` is given, each household's members left out only for an address
@@ -1276,6 +1294,9 @@ public with sharing class AddressService {
         Map<Id, Id> ownHouseholdByPerson = HouseholdService.isJunctionMode()
             ? HouseholdService.getHouseholdIdsFor(personIds)
             : new Map<Id, Id>();
+        Set<Id> deceased = leavingOutDeceased
+            ? AddressSelector.selectDeceased(contactIds, accountIdsAmong(personIds))
+            : new Set<Id>();
         Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
         for (Id householdId : membersByHousehold.keySet()) {
             Set<Id> taking = new Set<Id>();
@@ -1284,7 +1305,12 @@ public with sharing class AddressService {
             for (Id memberId : memberIds == null ? new Set<Id>() : memberIds) {
                 Id ownHousehold = ownHouseholdByPerson.get(memberId);
                 Boolean livesElsewhere = ownHousehold != null && ownHousehold != householdId;
-                if (livesElsewhere || memberId == null || memberId == householdId) {
+                if (
+                    livesElsewhere ||
+                    memberId == null ||
+                    memberId == householdId ||
+                    deceased.contains(memberId)
+                ) {
                     continue;
                 }
                 if (withAnAddressOfTheirOwn.contains(memberId)) {
@@ -1299,6 +1325,17 @@ public with sharing class AddressService {
             }
         }
         return result;
+    }
+
+    /** The ids among these that are account records (people held as accounts). */
+    private static Set<Id> accountIdsAmong(Set<Id> personIds) {
+        Set<Id> accountIds = new Set<Id>();
+        for (Id personId : personIds) {
+            if (personId.getSObjectType() == Account.SObjectType) {
+                accountIds.add(personId);
+            }
+        }
+        return accountIds;
     }
 
     /** The members that are account records rather than contacts, households excluded. */

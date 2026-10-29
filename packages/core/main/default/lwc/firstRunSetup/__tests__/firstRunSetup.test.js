@@ -79,7 +79,7 @@ describe('c-first-run-setup', () => {
     expect(element.shadowRoot.querySelector('[data-id="load-error"]').textContent).toBe('nope');
   });
 
-  it('opens the setup window with the state it read', async () => {
+  it('opens the setup window with the state it read, closable only by finishing', async () => {
     getState.mockResolvedValue(ADMIN_STATE);
     FirstRunModal.open.mockResolvedValue(undefined);
     await build();
@@ -87,8 +87,21 @@ describe('c-first-run-setup', () => {
     expect(FirstRunModal.open).toHaveBeenCalledWith({
       size: 'small',
       label: 'c.Core_FirstRun_Title',
-      state: ADMIN_STATE
+      state: ADMIN_STATE,
+      disableClose: true
     });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('lets someone who cannot finish setup close the window', async () => {
+    const state = { ...ADMIN_STATE, canFinish: false };
+    getState.mockResolvedValue(state);
+    FirstRunModal.open.mockResolvedValue(undefined);
+    await build();
+
+    expect(FirstRunModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ state, disableClose: false })
+    );
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 

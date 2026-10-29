@@ -44,4 +44,17 @@ describe('c-hub-quick-links', () => {
       attributes: { apiName: 'Organizations' }
     });
   });
+
+  it('opens Households as its list view, which works before the person has the tab', () => {
+    const element = createElement('c-hub-quick-links', { is: HubQuickLinks });
+    document.body.appendChild(element);
+
+    const tile = element.shadowRoot.querySelector('[data-id="quick-link"]');
+    tile.dispatchEvent(new CustomEvent('select', { detail: { name: 'Households' } }));
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Account', actionName: 'list' },
+      state: { filterName: 'Households' }
+    });
+  });
 });

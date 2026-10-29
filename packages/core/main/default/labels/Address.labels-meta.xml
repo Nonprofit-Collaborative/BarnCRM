@@ -376,4 +376,20 @@
         <shortDescription>Address panel: an address status change could not be saved</shortDescription>
         <value>The address status could not be saved. You may not have access to change it.</value>
     </labels>
+    <labels>
+        <fullName>Core_Address_SameNameBorn</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address moves: same-named person; {0} is the name, {1} the birthdate</shortDescription>
+        <value>{0} (born {1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_SameNameEmail</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address moves: same-named person; {0} is the name, {1} the email</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
 </CustomLabels>

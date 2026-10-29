@@ -30,7 +30,17 @@ public with sharing class DataManagerController {
         public String sourceName;
         @AuraEnabled
         public Date lastImportDate;
+        /**
+         * What the mapping loads, as the Loads column says it: the object's label for a
+         * one-object mapping, Gifts for a people file with gift columns, else people and
+         * organizations. Never an API name.
+         */
+        @AuraEnabled
+        public String loads;
     }
+
+    /** The row entity a gift file's columns name (Core stages it, a module loads it, R-IR6). */
+    private static final String GIFT_ENTITY = 'Gift';
 
     /** The active import mappings, by name; none for a person who cannot import. */
     @AuraEnabled(cacheable=true)
@@ -49,6 +59,7 @@ public with sharing class DataManagerController {
                 mapping.isRecurring = template.Is_Recurring__c == true;
                 mapping.sourceName = template.Source_Name__c;
                 mapping.lastImportDate = template.Last_Import_Date__c;
+                mapping.loads = loadsOf(template);
                 result.add(mapping);
             }
             return result;
@@ -65,6 +76,27 @@ public with sharing class DataManagerController {
     @AuraEnabled(cacheable=true)
     public static String findToolStateKey() {
         return NamespaceUtil.stateKey('tool');
+    }
+
+    /**
+     * The Loads column for one mapping. A one-object mapping names its object by its plural
+     * label from describe (the API name only when the object is not in this org); a people
+     * file whose columns load gifts reads Gifts, as the import wizard's Gifts choice does.
+     */
+    @TestVisible
+    private static String loadsOf(Import_Template__c template) {
+        if (ImportObjectSchema.loadsOneObject(template)) {
+            Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+            return type == null
+                ? template.Target_Object__c
+                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+        }
+        Boolean loadsGifts = ImportMapping.parse(template.Column_Mapping_JSON__c)
+            .mappedEntities()
+            .contains(GIFT_ENTITY);
+        return loadsGifts
+            ? System.Label.Core_DataManager_LoadsGifts
+            : System.Label.Core_DataManager_LoadsPeople;
     }
 
     private static Boolean canImport() {

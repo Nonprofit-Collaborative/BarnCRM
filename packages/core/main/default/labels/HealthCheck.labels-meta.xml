@@ -862,7 +862,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown where the last result goes when Health Check has never run.</shortDescription>
-        <value>Health Check has not run yet. Click Run now to check this org.</value>
+        <value>Health Check has not run yet. Click Run Now to check this org.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RunNowButton</fullName>

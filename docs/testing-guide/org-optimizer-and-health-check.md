@@ -100,12 +100,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HC-07: Health Check's Last Result on Home
 
-**Purpose:** Confirm Home shows the last full run instead of running each time, and Run now refreshes it.
+**Purpose:** Confirm Home shows the last full run instead of running each time, and Run Now refreshes it.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, or **Health Check has not run yet. Click Run now to check this org.** |
+| 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, or **Health Check has not run yet. Click Run Now to check this org.** |
 | 2 | Click **Run Now**. | **Reading your org**, then the whole report in the tile. |
 | 3 | Reload the home page. | **Last Run** shows the time of step 2, with its counts. |
 

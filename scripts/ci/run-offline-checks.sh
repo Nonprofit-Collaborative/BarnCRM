@@ -4,7 +4,7 @@
 #
 #   bash scripts/ci/run-offline-checks.sh [--fast] [--allow-adr-next] [--analyzer]
 #
-#   --fast            skip Jest and Code Analyzer
+#   --fast            skip Jest, the scripts/ci/tests suite and Code Analyzer
 #   --allow-adr-next  a check-adrs.py failure caused only by unnumbered ADR-NEXT files passes
 #   --analyzer        also run Code Analyzer on files changed against origin/main
 #                     (--severity-threshold 2); slow, so off by default
@@ -109,6 +109,9 @@ for f in scripts/ci/check-*.sh; do
 done
 run "scripts/ci/check-apex-offline.sh" bash scripts/ci/check-apex-offline.sh
 [ -f scripts/ci/check-openapi.js ] && run "scripts/ci/check-openapi.js" node scripts/ci/check-openapi.js
+if [ "$FAST" -eq 0 ]; then
+  run "CI check tests" python3 -m unittest discover -s scripts/ci/tests
+fi
 [ -d scripts/migration/tests ] && run "migration kit tests" python3 -m unittest discover -s scripts/migration/tests
 [ -d scripts/data/tests ] && run "scale data generator tests" python3 -m unittest discover -s scripts/data/tests
 run "em dash characters" no_em_dashes

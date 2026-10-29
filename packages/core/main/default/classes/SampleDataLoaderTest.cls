@@ -386,6 +386,39 @@ private class SampleDataLoaderTest {
     }
 
     @IsTest
+    static void testEverySampleHouseholdStartsWithItsFirstPersonAsPrimaryContact() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            SettingsService.clearCaches();
+
+            Test.startTest();
+            loadEverything(buildJson(3, 2, false));
+            Test.stopTest();
+
+            List<Account> households = [
+                SELECT Id, Primary_Contact__r.Sample_Data_Key__c, Primary_Contact__r.AccountId
+                FROM Account
+                WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Household'
+            ];
+            System.assertEquals(3, households.size(), 'three sample households');
+            for (Account household : households) {
+                System.assert(
+                    household.Primary_Contact__r != null &&
+                    household.Primary_Contact__r.Sample_Data_Key__c.endsWith('-1'),
+                    'the first person in the file is the Primary Contact, as a household made ' +
+                        'by adding its first person has: ' +
+                        household
+                );
+                System.assertEquals(
+                    household.Id,
+                    household.Primary_Contact__r.AccountId,
+                    'and is one of its members'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void testRemoveInJunctionModeTakesTheMembershipRowsWithIt() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);

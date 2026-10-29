@@ -7,18 +7,36 @@ import SAVED from '@salesforce/label/c.Core_OrganizationAddress_Saved';
 import FILL_REQUIRED from '@salesforce/label/c.Core_OrganizationAddress_FillRequired';
 import LOAD_ERROR from '@salesforce/label/c.Core_OrganizationAddress_LoadError';
 import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
+import getCompanyAddress from '@salesforce/apex/SettingsController.getCompanyAddress';
+import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
+import COMPANY_SUGGESTION from '@salesforce/label/c.Core_OrganizationAddress_CompanySuggestion';
+import USE_COMPANY from '@salesforce/label/c.Core_OrganizationAddress_UseCompany';
+
+/** The address parts in the order they are printed. */
+const PRINT_ORDER = [
+  'Organization_Street__c',
+  'Organization_Street_2__c',
+  'Organization_City__c',
+  'Organization_State__c',
+  'Organization_Postal_Code__c',
+  'Organization_Country__c'
+];
 
 /**
  * The organization address in the settings console: one grouped address block and its own Save
  * button, a Component row beside the other Organization settings. It saves through the same
  * `saveSettings` the console uses, so the server's all-or-nothing rule applies (R-OA1), and tells
  * the console what it saved so Recent changes can refresh.
+ *
+ * A blank part says "Not set" in its box. While no address is saved, a complete Company
+ * Information address is offered: Use This Address fills the block, and Save saves it.
  */
 export default class OrganizationAddressSettings extends LightningElement {
-  labels = { save: SAVE };
+  labels = { save: SAVE, notSet: NOT_SET, useCompany: USE_COMPANY };
 
   values = {};
   saved = {};
+  companyAddress = {};
   message;
   messageIsError = false;
 
@@ -48,6 +66,19 @@ export default class OrganizationAddressSettings extends LightningElement {
     return this.load();
   }
 
+  /** Offered while nothing is saved or typed, to someone who can save it. */
+  get showsCompanyAddress() {
+    const empty = (parts) => !Object.values(parts).some((value) => value);
+    return this.canEdit && !empty(this.companyAddress) && empty(this.saved) && empty(this.values);
+  }
+
+  get companyAddressText() {
+    const oneLine = PRINT_ORDER.map((key) => this.companyAddress[key])
+      .filter((value) => value)
+      .join(', ');
+    return COMPANY_SUGGESTION.replace('{0}', oneLine);
+  }
+
   async load() {
     try {
       const parts = (await getOrganizationAddress()) || {};
@@ -55,7 +86,22 @@ export default class OrganizationAddressSettings extends LightningElement {
       this.values = { ...parts };
     } catch {
       this.showError(LOAD_ERROR);
+      return;
     }
+    if (this.canEdit) {
+      try {
+        this.companyAddress = (await getCompanyAddress()) || {};
+      } catch {
+        // Only a suggestion: without it the block works as before.
+        this.companyAddress = {};
+      }
+    }
+  }
+
+  /** Fills the block from Company Information; nothing is saved until Save. */
+  handleUseCompanyAddress() {
+    this.values = { ...this.values, ...this.companyAddress };
+    this.message = undefined;
   }
 
   handlePartChange(event) {

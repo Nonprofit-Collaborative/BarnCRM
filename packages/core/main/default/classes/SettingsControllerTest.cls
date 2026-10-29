@@ -1447,6 +1447,54 @@ private class SettingsControllerTest {
         );
     }
 
+    @IsTest
+    static void aBlankTextRowSaysWhatItMeansAndOffersCompanyInformation() {
+        System.runAs(TestUsers.admin()) {
+            Setting_Definition__mdt legalName = effectiveDefaultRow(
+                'Test_Legal_Name',
+                'Organization_Legal_Name__c',
+                'Text'
+            );
+            legalName.Section__c = SettingSections.ORGANIZATION;
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                legalName,
+                effectiveDefaultRow('Test_Recipients', 'Error_Digest_Recipients__c', 'Text'),
+                effectiveDefaultRow('Test_Pattern', 'Household_Name_Pattern__c', 'Text')
+            };
+            CompanyInformation.companyOverride = (Organization) JSON.deserialize(
+                '{"Name":"Barn Rescue Inc"}',
+                Organization.class
+            );
+            Map<String, SettingsController.SettingModel> blank = rowsByKey(
+                SettingsController.getConsoleModel()
+            );
+
+            SettingsController.SettingModel name = blank.get('Organization_Legal_Name__c');
+            Assert.isTrue(String.isBlank(name.value), 'Nothing is filled in for the admin');
+            Assert.areEqual(System.Label.Core_Settings_NotSet, name.defaultText, 'Says Not set');
+            Assert.isTrue(name.unsavedDefault, 'Marked Default, as every blank row is');
+            Assert.areEqual('Barn Rescue Inc', name.suggestedValue, 'Company Information offered');
+            SettingsController.SettingModel recipients = blank.get('Error_Digest_Recipients__c');
+            Assert.areEqual(
+                System.Label.Core_Settings_DigestRecipientsDefault,
+                recipients.defaultText,
+                'A blank list sends the digest to every settings administrator, and says so'
+            );
+            Assert.isNull(recipients.suggestedValue, 'Nothing to suggest for recipients');
+            SettingsController.SettingModel pattern = blank.get('Household_Name_Pattern__c');
+            Assert.isNull(pattern.defaultText, 'A row with a default value shows that value');
+
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Organization_Legal_Name__c' => 'Barn Rescue Society' }
+            );
+            SettingsController.SettingModel saved = rowsByKey(SettingsController.getConsoleModel())
+                .get('Organization_Legal_Name__c');
+            Assert.isNull(saved.defaultText, 'A saved name is shown as itself');
+            Assert.isNull(saved.suggestedValue, 'And nothing is offered over it');
+            Assert.isFalse(saved.unsavedDefault, 'No longer a default');
+        }
+    }
+
     private static Setting_Definition__mdt effectiveDefaultRow(
         String developerName,
         String key,
