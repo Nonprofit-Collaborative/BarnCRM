@@ -15,7 +15,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open the **Contacts** tab, select **New**, enter Salutation `Ms.`, First Name `Ada`, Last Name `Testwell`, leave the account blank, and save. | The person saves. In the simple way the account field names **The Testwell Family**; in the flexible way it stays blank. |
 | 2 | Look at the **Household** panel on Ada's page. | It links to **The Testwell Family**, reads **1 member**, and shows **Formal greeting: Ms. Ada Testwell**. |
 | 3 | Select the household name in the panel. | The household page opens. The **Members** panel lists Ada Testwell with a **Primary** badge. **Name and Greetings** shows Formal Greeting **Ms. Ada Testwell**, Informal Greeting **Ada**, Member Count **1**, Primary Contact **Ada Testwell**. |
-| 4 | Open **Home**, then select **New household**. | A household named **New Household** is created and its page opens, with no record type prompt. Delete it. |
+| 4 | Open **Home**, then select **New Household**. | A household named **New Household** is created and its page opens, with no record type prompt. Delete it. |
 
 **Cleanup:** keep Ada and The Testwell Family for T-HH-02 to T-HH-07.
 
@@ -265,10 +265,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | As the staff user, open the **BarnCRM** app. | No **Households** tab. |
 | 2 | As the staff user, open Accounts and click **New**. | No record type choice; the new account form opens straight away. |
 | 3 | As admin, in Setup, open Object Manager, Account, Record Types. | **Household** is listed and active. No **Organization** record type. |
-| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation says Household Upkeep adds the Households tab and that households are created with **New household** on BarnCRM Home, not the standard **New** button. |
+| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation says Household Upkeep adds the Households tab and that households are created with **New Household** on BarnCRM Home, not the standard **New** button. |
 | 5 | Wait a few minutes. As the staff user, reload the **BarnCRM** app. | The **Households** tab is there. |
 | 6 | As the staff user, open Accounts and click **New**. | Still no record type choice and no **Household**; the account saves with no record type and appears on **Organizations**, not **Households**. |
-| 7 | As the staff user, click **New household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
+| 7 | As the staff user, click **New Household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
 | 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
