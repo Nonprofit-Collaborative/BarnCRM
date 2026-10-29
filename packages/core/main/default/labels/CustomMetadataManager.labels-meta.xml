@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Custom metadata page: button that reloads the list and the save's outcome</shortDescription>
-        <value>Check again</value>
+        <value>Check Again</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_MatchSources</fullName>

@@ -93,7 +93,7 @@ them.
   be restored. To remove it for good, delete it in Setup (Custom Metadata Types,
   Relationship Type, Manage Records).
 - **Leaving the page before "Saved".** The change carries on in the background. Come back
-  and click **Check again**. If it failed, the reason is in the Error Log.
+  and click **Check Again**. If it failed, the reason is in the Error Log.
 - **Adding the same entry twice before the first save finishes** (in a second tab, or
   after the page says it is still saving). Each new entry gets a short code at the end of
   its API name in Setup, for example `Org_Mentor_k3x9`, so the second add never overwrites

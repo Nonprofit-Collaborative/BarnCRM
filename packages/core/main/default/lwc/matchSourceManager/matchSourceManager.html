@@ -1,7 +1,14 @@
 <template>
   <div class="slds-var-p-around_medium">
-    <p class="slds-var-m-bottom_x-small">{labels.intro}</p>
-    <p class="slds-text-body_small slds-var-m-bottom_small">{labels.rulesNote}</p>
+    <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+      <p data-id="intro">{labels.intro}</p>
+      <c-barn-help
+        class="slds-var-m-left_xx-small"
+        content={helpText}
+        alternative-text={labels.helpAlt}
+        data-id="help"
+      ></c-barn-help>
+    </div>
 
     <template lwc:if={errorMessage}>
       <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
@@ -27,7 +34,6 @@
       </p>
     </template>
     <template lwc:if={canEdit}>
-      <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.shippedNote}</p>
       <lightning-button
         data-id="add"
         label={labels.add}
@@ -39,50 +45,78 @@
     <ul class="slds-var-m-top_small">
       <template for:each={sources} for:item="source">
         <li key={source.developerName} data-id="source" class="slds-box slds-box_x-small slds-var-m-bottom_x-small">
-          <h3 class="slds-text-heading_x-small">
-            {source.label}
-            <span class="slds-text-body_small slds-var-m-left_x-small" data-id="status-text">{source.statusText}</span>
-            <template lwc:if={source.shipped}>
-              <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small">{labels.shipped}</span>
+          <div class="slds-grid slds-wrap slds-grid_align-spread slds-grid_vertical-align-center">
+            <div class="slds-col slds-var-p-right_small">
+              <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                <h2 class="slds-text-heading_small slds-var-m-right_x-small">{source.label}</h2>
+                <template lwc:if={source.shipped}>
+                  <lightning-badge label={labels.shipped} data-id="shipped"></lightning-badge>
+                </template>
+                <template lwc:if={showReadOnly}>
+                  <lightning-badge
+                    class={source.statusClass}
+                    label={source.statusText}
+                    data-id="status-badge"
+                  ></lightning-badge>
+                </template>
+              </div>
+              <p class="slds-text-body_small" data-id="summary">{source.summary}</p>
+            </div>
+            <template lwc:if={canEdit}>
+              <div class="slds-col slds-no-flex">
+                <lightning-input
+                  type="toggle"
+                  data-id="toggle"
+                  data-name={source.developerName}
+                  label={source.switchLabel}
+                  variant="label-hidden"
+                  message-toggle-active={labels.active}
+                  message-toggle-inactive={labels.inactive}
+                  checked={source.active}
+                  disabled={busy}
+                  onchange={handleToggle}
+                ></lightning-input>
+              </div>
             </template>
-          </h3>
-          <dl class="slds-dl_horizontal slds-text-body_small">
-            <dt class="slds-dl_horizontal__label">{labels.object}</dt>
-            <dd class="slds-dl_horizontal__detail" data-id="object">{source.objectText}</dd>
-            <dt class="slds-dl_horizontal__label">{labels.valueField}</dt>
-            <dd class="slds-dl_horizontal__detail">{source.valueText}</dd>
-            <template lwc:if={source.isAddress}>
-              <dt class="slds-dl_horizontal__label">{labels.postalField}</dt>
-              <dd class="slds-dl_horizontal__detail">{source.postalText}</dd>
-            </template>
-            <dt class="slds-dl_horizontal__label">{labels.linksTo}</dt>
-            <dd class="slds-dl_horizontal__detail" data-id="links-to">{source.linksTo}</dd>
-            <dt class="slds-dl_horizontal__label">{labels.parentField}</dt>
-            <dd class="slds-dl_horizontal__detail">{source.parentText}</dd>
-            <dt class="slds-dl_horizontal__label">{labels.compare}</dt>
-            <dd class="slds-dl_horizontal__detail" data-id="compare">{source.compareText}</dd>
-          </dl>
+          </div>
           <template lwc:if={source.notUsable}>
             <p class="slds-text-body_small slds-text-color_weak" data-id="not-usable">{labels.notUsable}</p>
           </template>
+          <template lwc:if={source.showDetails}>
+            <dl class="slds-dl_horizontal slds-text-body_small slds-var-m-top_x-small" data-id="details">
+              <dt class="slds-dl_horizontal__label">{labels.object}</dt>
+              <dd class="slds-dl_horizontal__detail" data-id="object">{source.objectText}</dd>
+              <dt class="slds-dl_horizontal__label">{labels.valueField}</dt>
+              <dd class="slds-dl_horizontal__detail">{source.valueText}</dd>
+              <template lwc:if={source.isAddress}>
+                <dt class="slds-dl_horizontal__label">{labels.postalField}</dt>
+                <dd class="slds-dl_horizontal__detail">{source.postalText}</dd>
+              </template>
+              <dt class="slds-dl_horizontal__label">{labels.linksTo}</dt>
+              <dd class="slds-dl_horizontal__detail" data-id="links-to">{source.linksTo}</dd>
+              <dt class="slds-dl_horizontal__label">{labels.parentField}</dt>
+              <dd class="slds-dl_horizontal__detail">{source.parentText}</dd>
+              <dt class="slds-dl_horizontal__label">{labels.compare}</dt>
+              <dd class="slds-dl_horizontal__detail" data-id="compare">{source.compareText}</dd>
+            </dl>
+          </template>
           <div class="slds-var-m-top_x-small">
+            <lightning-button
+              variant="base"
+              data-id="details-toggle"
+              data-name={source.developerName}
+              label={source.detailsLabel}
+              aria-expanded={source.detailsExpanded}
+              onclick={handleDetailsToggle}
+            ></lightning-button>
             <template lwc:if={source.canChange}>
               <lightning-button
+                class="slds-var-m-left_small"
                 data-id="edit"
                 data-name={source.developerName}
                 label={labels.edit}
                 disabled={busy}
                 onclick={handleEdit}
-              ></lightning-button>
-            </template>
-            <template lwc:if={canEdit}>
-              <lightning-button
-                class="slds-var-m-left_x-small"
-                data-id="toggle"
-                data-name={source.developerName}
-                label={source.toggleLabel}
-                disabled={busy}
-                onclick={handleToggle}
               ></lightning-button>
             </template>
             <lightning-button
