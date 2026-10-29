@@ -1,5 +1,7 @@
 # ADR-0046: Two suites from the same packages, a tentative name, unlocked now and managed at listing
 
+> Naming note: the suite names in this ADR are superseded by ADR-0122. The Impact Suite is now the Nonprofit Edition and the Community Suite is now the Standard Edition. The text below keeps the names as decided on 2026-09-23.
+
 **Status:** Accepted
 **Date:** 2026-09-23
 **Source:** product owner decision (Brandon), plan Section 3 "Suites and packaging", Section 8.3,

@@ -1,5 +1,7 @@
 # ADR-0072: The suite choice is a Core setting the Setup Assistant asks first
 
+> Naming note: the suite names in this ADR are superseded by ADR-0122. The Community Suite is now the Standard Edition and the Impact Suite is now the Nonprofit Edition. The text below keeps the names as decided on 2026-10-12.
+
 **Status:** Accepted (builder decision, under owner decisions of 2026-09-23 and 2026-10-12)
 **Date:** 2026-10-12
 **Source:** C-30; plan Section 4.1 "Suites and packaging"; ADR-0046; owner decisions (Brandon,

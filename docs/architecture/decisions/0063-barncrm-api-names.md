@@ -52,7 +52,7 @@ release notes, and history rows in the canonical model.
   `Core_Admin`.** Rejected by the owner: the BarnCRM names match the labels an administrator
   already reads, and a module's names (`Giving_Settings__c`) already carry their module.
 - **Keep the API names and change only labels.** Rejected: the names surface in Setup, URLs
-  and reports for every Community Suite org, and this is the last cheap moment.
+  and reports for every Standard Edition org, and this is the last cheap moment.
 - **Rename after the first version.** Not possible for packaged components.
 
 ## Consequences

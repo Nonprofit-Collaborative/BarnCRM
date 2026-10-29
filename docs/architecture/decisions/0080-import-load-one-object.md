@@ -11,7 +11,7 @@ amends R-IT1, R-IB8, R-IB9, R-IJ3 and Section 17A (a journal phase for created r
 
 C-14 to C-32 load a row as a household, up to two people, an organization and an affiliation,
 and hand the rest to an entity processor. Three kinds of file do not fit: an export fixed in
-Excel and loaded back into the object it came from, a Community Suite org's own objects, and
+Excel and loaded back into the object it came from, a Standard Edition org's own objects, and
 the module templates the plan builds on this feature (V-06 volunteer hours, P-06 program
 rosters). The plan asks for one object at a time, any object including custom ones, with the
 same batch, dry run, journal and undo, every read and write in the running user's own access,
