@@ -324,6 +324,12 @@ private class ImportRowProcessorTest {
             // As install does, so the count is of the import, not of detecting the record type
             // for organizations (ADR-0141), which an org with the setting saved never runs.
             AccountKinds.storeDetectedIfBlank();
+            // Nor of the Nonprofit Cloud guard (ADR-0036, ADR-0130): where native households
+            // may exist, two queries a chunk ask whether a household has native dependents.
+            // A Nonprofit Cloud org runs them for a test user who cannot read the native
+            // group, which counts as unknown; elsewhere they never run. The guard is
+            // tested in HouseholdSelectorTest, so here no household has any.
+            HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>();
 
             Test.startTest();
             Integer queriesBefore = Limits.getQueries();
