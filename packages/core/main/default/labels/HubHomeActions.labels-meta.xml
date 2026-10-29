@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub home: button that creates a household and opens it</shortDescription>
-        <value>New household</value>
+        <value>New Household</value>
     </labels>
     <labels>
         <fullName>Core_HubHomeActions_NewHouseholdFailed</fullName>

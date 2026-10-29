@@ -9,6 +9,10 @@ import PAUSED_BANNER from '@salesforce/label/c.Core_HubHome_AutomationPausedBann
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold';
 import NEW_HOUSEHOLD_FAILED from '@salesforce/label/c.Core_HubHomeActions_NewHouseholdFailed';
+import RESUME from '@salesforce/label/c.Core_HubHome_ResumeAutomationLink';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
+
+const AUTOMATION_SECTION = 'Automation';
 
 /**
  * The top of the BarnCRM home page, for everyone: the welcome, the New household button and
@@ -22,7 +26,8 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
   labels = {
     welcomeHeading: WELCOME_HEADING,
     pausedBanner: PAUSED_BANNER,
-    newHousehold: NEW_HOUSEHOLD
+    newHousehold: NEW_HOUSEHOLD,
+    resume: RESUME
   };
 
   model;
@@ -57,6 +62,25 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
 
   get automationPaused() {
     return Boolean(this.model && this.model.automationPaused);
+  }
+
+  /** Resume is an administrator's action, on the Automation section of BarnCRM Settings. */
+  get canResume() {
+    return Boolean(this.model && this.model.canEdit);
+  }
+
+  // The tab and the section key are qualified for the org's namespace in Apex.
+  async handleResume() {
+    try {
+      const link = await getSettingsLink();
+      this[NavigationMixin.Navigate]({
+        type: 'standard__navItemPage',
+        attributes: { apiName: link.tabApiName },
+        state: { [link.sectionKey]: AUTOMATION_SECTION }
+      });
+    } catch {
+      this.errorMessage = LOAD_ERROR;
+    }
   }
 
   /** Only for someone who can create and edit accounts, in an org with the Household record type. */

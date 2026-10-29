@@ -23,13 +23,13 @@ from the **Household** card or the **Households** tab.
 
 ## To Start From a Household
 
-1. On the **Home** tab, click **New household**.
+1. On the **Home** tab, click **New Household**.
 2. The household is created and opens. Add people with **Add member** (below).
 
 You should see: a household with a placeholder name, renamed automatically once it has a
 member.
 
-**New household** is the only way to start a household by hand. The **New** button on the
+**New Household** is the only way to start a household by hand. The **New** button on the
 **Households** tab or on Accounts never offers **Household**, and an account can't be changed
 into a household.
 

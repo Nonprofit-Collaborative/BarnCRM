@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
+import { healthCheckBadge } from 'c/healthCheckBadge';
 
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
@@ -50,6 +51,12 @@ const SEVERITY_DISPLAY = {
 };
 
 const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
+
+const BADGE_THEMES = {
+  success: 'slds-theme_success',
+  warning: 'slds-theme_warning',
+  error: 'slds-theme_error'
+};
 
 /**
  * Health Check: what BarnCRM found in this org and what to do about it (feature C-11).
@@ -137,6 +144,15 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
 
   get lastRunResult() {
     return this.hasLastRun ? this.lastRun.result : '';
+  }
+
+  /** The summary's badge: the same rule as the Health Check tile in Org Optimizer. */
+  get lastRunBadge() {
+    return healthCheckBadge(this.lastRun);
+  }
+
+  get lastRunBadgeClass() {
+    return BADGE_THEMES[this.lastRunBadge.badgeVariant] || '';
   }
 
   /** Run now before the first full run where the last result shows; Re-run after. */

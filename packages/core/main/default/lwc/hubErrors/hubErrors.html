@@ -1,11 +1,18 @@
 <template>
-    <lightning-card title={labels.heading}>
+    <lightning-card title={labels.heading} icon-name="standard:incident">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
                 <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
             </template>
             <template lwc:else>
                 <p class="slds-text-heading_large" data-id="error-count">{errorCountText}</p>
+                <template lwc:if={allClear}>
+                    <lightning-badge
+                        class="slds-theme_success"
+                        label={labels.allClear}
+                        data-id="all-clear"
+                    ></lightning-badge>
+                </template>
             </template>
             <template lwc:if={hasInstallStatus}>
                 <template lwc:if={installHadProblems}>

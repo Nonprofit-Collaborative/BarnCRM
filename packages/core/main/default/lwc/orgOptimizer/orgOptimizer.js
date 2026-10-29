@@ -3,6 +3,7 @@ import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Setti
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import getErrorTile from '@salesforce/apex/ErrorLogController.getTile';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
+import { healthCheckBadge } from 'c/healthCheckBadge';
 
 import TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
 import INTRO from '@salesforce/label/c.Core_OrgOptimizer_Intro';
@@ -28,10 +29,6 @@ import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCh
 import BADGE_ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import BADGE_NEW from '@salesforce/label/c.Core_OrgOptimizer_BadgeNew';
 import BADGE_NEED_ATTENTION from '@salesforce/label/c.Core_OrgOptimizer_BadgeNeedAttention';
-import BADGE_ERRORS from '@salesforce/label/c.Core_OrgOptimizer_BadgeErrors';
-import BADGE_WARNINGS from '@salesforce/label/c.Core_OrgOptimizer_BadgeWarnings';
-import BADGE_PASSED from '@salesforce/label/c.Core_OrgOptimizer_BadgePassed';
-import BADGE_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
 import BADGE_DATA_STORAGE from '@salesforce/label/c.Core_OrgOptimizer_BadgeDataStorage';
 
 const OVERVIEW_TAB = 'overview';
@@ -146,18 +143,8 @@ export default class OrgOptimizer extends LightningElement {
 
   async readHealthCheckBadge() {
     try {
-      const last = await getLastRun();
-      let value = badge(BADGE_NOT_RUN, '');
-      if (last && last.ranAt) {
-        if (last.errors > 0) {
-          value = badge(BADGE_ERRORS.replace('{0}', last.errors), 'error');
-        } else if (last.warnings > 0) {
-          value = badge(BADGE_WARNINGS.replace('{0}', last.warnings), 'warning');
-        } else {
-          value = badge(BADGE_PASSED, 'success');
-        }
-      }
-      this.setBadge('healthCheck', value);
+      // One badge rule, shared with the Health Check summary on BarnCRM Home.
+      this.setBadge('healthCheck', healthCheckBadge(await getLastRun()));
     } catch {
       // As above: the Health Check section itself reports a failure to read.
     }

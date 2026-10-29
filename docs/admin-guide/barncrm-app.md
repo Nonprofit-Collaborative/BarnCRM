@@ -106,9 +106,9 @@ person what they can act on:
 |---|---|
 | **What's New in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
 | **Welcome to BarnCRM** and the paused automation banner | Everyone |
-| **New household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
+| **New Household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
 | **Setup Checklist** (or the **Setup Complete** tile once it is finished) | Administrators |
-| **Health Check** | Administrators |
+| **Health Check** (a summary of its last run; the full list of findings after **Run Now**) | Administrators |
 | **Errors to Review** | Administrators |
 | **Rollups Last Completed** | Administrators |
 | **Seasonal Addresses Last Swapped** | Administrators |
@@ -118,7 +118,7 @@ person what they can act on:
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
-**New household** button, and the quick links. They are not shown a checklist they cannot
+**New Household** button, and the quick links. They are not shown a checklist they cannot
 finish or an error count for a log they cannot open. The page does not work those numbers
 out for staff at all, so it loads faster for them; if you edit the page to show an
 administrator tile to staff, it shows nothing to count.
@@ -162,41 +162,45 @@ Admin role.
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM** (or **BarnCRM Console**). The home page
    opens with the heading **Welcome to BarnCRM** and the sentence "Start with the setup
    checklist below."
-2. Read the **Setup Checklist**. It opens on the first step you have not finished, with
-   one sentence saying what that step is for and the count of how far you have got, for
-   example "3 of 8" (eight steps with Core alone, nine with Giving). The steps are guided:
-   each one is done here, on the home page, not somewhere else.
-3. The first step, **Choose your edition**, asks whether you want the Standard Edition or
-   the Nonprofit Edition. Choose **Standard Edition** and click **Confirm and Continue**.
-4. The next step, **Confirm how BarnCRM fits your existing org**, says what it found in
+2. Read the **Setup Checklist**. It lists every step with a progress ring and a **Done**,
+   **Skipped** or **To Do** badge, opens the first step you have not finished, and counts how
+   far you have got, for example "3 of 9 steps done" (eight steps with Core alone, nine with
+   Giving). The steps are guided: each one is done here, on the home page.
+3. The first step, **Choose Your Edition**, is already **Done**: you chose the edition in the
+   first-run setup window, and the step only shows that answer.
+4. The next step, **Confirm How BarnCRM Fits Your Org**, says what it found in
    your org and recommends a fit. On a fresh org it says "This looks like a fresh org, with
    no other household model and no Person Accounts. BarnCRM can run on its own." and
    recommends **Standalone**. If your org uses Person Accounts, it says so plainly, and
    household membership uses one record per person so that what you already have keeps
    working. Click **Confirm and Continue**.
-5. Use **Next**, **Back**, and **Skip for Now** to move around. Skipping does not mark a
-   step done: it moves the step out of the way and offers it to you again next time. The
-   full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-6. Below the checklist, **Health Check** shows its last result: when it last ran and how
-   many findings it had. Click **Run Now** to check the org again and see every finding,
-   with a button to fix it where it can. The full guide is
-   [health-check.md](health-check.md).
-7. Look at the **Errors to Review** tile. On a fresh org it says `0`. If it ever shows a
-   number, click **Open the Error Log** and read the plain-language message on each row.
-   The tile counts up to 999; past that it says `999+`, so a flooded Error Log never slows
-   the home page down.
+5. Use **Next** and **Skip for Now**, or click any step's name, to move around. Skipping
+   does not mark a step done: it moves the step out of the way and offers it to you again
+   next time. The full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
+6. Below the checklist, **Health Check** shows a summary of its last run: a badge (**Not
+   Run Yet**, **Passed**, or how many errors or warnings it found) and when it ran. Click
+   **Run Now** to check the org again and see every finding as a row, with a button to fix it
+   where it can. These are the same rows as the Health Check tab of Org Optimizer. The full
+   guide is [health-check.md](health-check.md).
+7. Look at the status tiles, each with an icon and a badge. **Errors to Review** shows the
+   count of new errors, with **All Clear** when there are none. If it ever shows a number,
+   click **Open the Error Log** and read the plain-language message on each row. The tile
+   counts up to 999; past that it says `999+`, so a flooded Error Log never slows the home
+   page down.
 8. Look at **Rollups Last Completed** and **Seasonal Addresses Last Swapped**. Each says
-   when that nightly job last finished. If one is more than 36 hours late, the tile says so
-   in words, next to a warning icon, and its link opens the settings page where you can run
-   it.
-9. If someone has paused automation (for example during a large import), a banner under
-   the welcome says BarnCRM automation is paused. It disappears by itself when the pause
-   expires.
+   when that nightly job last finished. Before a job has ever run, the tile says so with a
+   **Not Run Yet** badge and no warning. If a job that has run before is more than 36 hours
+   late, the tile shows an **Overdue** badge and says so in words, and its link opens the
+   settings page where you can run it.
+9. If someone has paused automation (for example during a large import), a warning under
+   the welcome says BarnCRM automation is paused; administrators also get a **Resume
+   Automation** link to the Automation section of BarnCRM Settings. The warning disappears by
+   itself when the pause expires.
 10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
     Giving, that is Giving), and says for each whether it is on or installed and off. Click
     **Open the Module Manager** to turn a module on or off.
-11. Use **Quick Links** to open Households, Organizations, or BarnCRM Settings without
-    going back to the app launcher.
+11. Use **Quick Links**, three icon tiles, to open Households, Organizations, or BarnCRM
+    Settings without going back to the app launcher.
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
 whether anything went wrong.

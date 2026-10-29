@@ -23,11 +23,22 @@
 
         <template lwc:if={automationPaused}>
             <div
-                class="slds-box slds-theme_warning slds-var-m-top_small"
+                class="slds-notify slds-notify_alert slds-alert_warning slds-var-m-top_small"
                 data-id="paused-banner"
                 role="status"
             >
-                {labels.pausedBanner}
+                <h2>
+                    {labels.pausedBanner}
+                    <template lwc:if={canResume}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="base"
+                            label={labels.resume}
+                            data-id="resume-link"
+                            onclick={handleResume}
+                        ></lightning-button>
+                    </template>
+                </h2>
             </div>
         </template>
 

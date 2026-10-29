@@ -8,6 +8,8 @@ import STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import LINK from '@salesforce/label/c.Core_Rollups_FreshnessLink';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
+import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
+import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
 
 const ROLLUPS_SECTION = 'Rollups';
 
@@ -17,7 +19,15 @@ const ROLLUPS_SECTION = 'Rollups';
  * with another tool sees no tile.
  */
 export default class HubRollups extends NavigationMixin(LightningElement) {
-  labels = { heading: HEADING, never: NEVER, stale: STALE, link: LINK, warning: WARNING };
+  labels = {
+    heading: HEADING,
+    never: NEVER,
+    stale: STALE,
+    link: LINK,
+    warning: WARNING,
+    notRun: NOT_RUN,
+    overdue: OVERDUE
+  };
 
   lastCalculated;
   stale = false;
@@ -35,7 +45,9 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
     if (data) {
       this.installed = Boolean(data.rollupsInstalled);
       this.lastCalculated = data.rollupsLastCalculated;
-      this.stale = Boolean(data.rollupsStale);
+      // Late only once rollups have run at all: before the first run the tile says Not Run Yet,
+      // not that a run is overdue (screenshot review 2026-10-28).
+      this.stale = Boolean(data.rollupsStale && data.rollupsLastCalculated);
       this.errorMessage = undefined;
       this.loaded = true;
     } else if (error) {

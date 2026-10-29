@@ -19,7 +19,7 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set as primary, make primary, remove (the cards do not show these buttons) |
 | Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
 | Household merge and split | Open **Merge or Split** and read it | Merge or split |
-| Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New household** (it is hidden) |
+| Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New Household** (it is hidden) |
 | BarnCRM Settings | Read every setting and its **Learn More** link | Change anything |
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
 | Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |

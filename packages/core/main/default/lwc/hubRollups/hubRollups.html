@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={shown}>
-        <lightning-card title={labels.heading} data-id="rollups-card">
+        <lightning-card title={labels.heading} icon-name="standard:metrics" data-id="rollups-card">
             <div class="slds-var-p-horizontal_medium">
                 <template lwc:if={errorMessage}>
                     <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
@@ -18,10 +18,21 @@
                     </p>
                 </template>
                 <template lwc:elseif={loaded}>
-                    <p data-id="rollups-never">{labels.never}</p>
+                    <c-barn-empty-state
+                        data-id="rollups-never"
+                        illustration="setup"
+                        size="small"
+                        heading={labels.notRun}
+                        message={labels.never}
+                    ></c-barn-empty-state>
                 </template>
                 <template lwc:if={stale}>
-                    <p class="slds-text-color_error" data-id="rollups-stale" role="status" aria-live="polite">
+                    <lightning-badge
+                        class="slds-theme_warning"
+                        label={labels.overdue}
+                        data-id="rollups-overdue"
+                    ></lightning-badge>
+                    <p data-id="rollups-stale" role="status" aria-live="polite">
                         <lightning-icon
                             icon-name="utility:warning"
                             size="x-small"

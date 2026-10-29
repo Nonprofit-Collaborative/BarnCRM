@@ -145,7 +145,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Home**, click **New household**, rename it `Empty Test Household`, and add nobody. | The household saves. |
+| 1 | On **Home**, click **New Household**, rename it `Empty Test Household`, and add nobody. | The household saves. |
 | 2 | On **Org Optimizer**, **Data Quality**, click **Recount**. | **Households with Nobody in Them** has gone up by 1. |
 | 3 | Open it in Find. | `Empty Test Household` is in the list. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Years before a person is not changed** to `25` and click **Save**. | Nothing is saved: the value is marked and the page says **A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.** (or the server message **Years before a person is not changed takes a number from 1 to 20, so nothing was saved. Change it and save again.**). |

@@ -33,7 +33,7 @@ the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 type, **Household**. Setup lists it on every install, because a package cannot leave out a
 record type it ships, but BarnCRM never gives it to anyone, so nobody is ever offered it when
 creating an account and your users' record type choices stay as they were. Households are
-made only by BarnCRM: automatically for new people, with **New household** on BarnCRM Home,
+made only by BarnCRM: automatically for new people, with **New Household** on BarnCRM Home,
 and by merge and split. Staff open and edit a household like any account. Do not add the
 Household record type to profiles or permission sets yourself: anyone who has it, and whose
 profile has no default Account record type, gets Household for every account they create.
@@ -96,7 +96,7 @@ Maria does this from the sample data.
 That is the whole lifecycle: created for you, named for you, counted for you, and tidied
 up for you if you ask.
 
-To start from the household instead of the person, click **New household** on the Hub
+To start from the household instead of the person, click **New Household** on the Hub
 home. BarnCRM creates the household straight away, with a placeholder name that the naming
 automation replaces once you add a member, and opens it. There is no record type to choose
 and no name to invent.
@@ -157,7 +157,7 @@ role within a few minutes. Someone without a BarnCRM role needs the **BarnCRM Ho
 permission set added by hand.
 
 **"Nobody can choose Household when creating an account."**
-That is by design. Create households with **New household** on BarnCRM Home, or add a person
+That is by design. Create households with **New Household** on BarnCRM Home, or add a person
 and let BarnCRM make their household. An account can't be changed to Household either.
 
 **"Every new account someone creates turns into a household."**
