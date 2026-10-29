@@ -406,6 +406,46 @@ private class HouseholdServiceTest {
     }
 
     /**
+     * A household made empty and filled after (the sample data load) gets the person named
+     * for it as Primary Contact, as one made by adding its first person does; one that has a
+     * Primary Contact keeps it, and a person who is not a member is never named.
+     */
+    @IsTest
+    static void aHouseholdWithNoPrimaryContactIsSeededWithTheNamedMember() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact lee = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Lee');
+            insert new List<Contact>{ maria, lee };
+            Id mariaHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id leeHousehold = [SELECT AccountId FROM Contact WHERE Id = :lee.Id].AccountId;
+            update new List<Account>{
+                new Account(Id = mariaHousehold, Primary_Contact__c = null),
+                new Account(Id = leeHousehold, Primary_Contact__c = null)
+            };
+
+            Test.startTest();
+            HouseholdService.seedMissingPrimaryContacts(
+                new Map<Id, Id>{ mariaHousehold => maria.Id, leeHousehold => maria.Id }
+            );
+            HouseholdService.seedMissingPrimaryContacts(
+                new Map<Id, Id>{ mariaHousehold => lee.Id }
+            );
+            Test.stopTest();
+
+            Map<Id, Account> after = new Map<Id, Account>(
+                [
+                    SELECT Primary_Contact__c
+                    FROM Account
+                    WHERE Id IN :new List<Id>{ mariaHousehold, leeHousehold }
+                ]
+            );
+            Assert.areEqual(maria.Id, after.get(mariaHousehold).Primary_Contact__c, 'Seeded');
+            Assert.isNull(after.get(leeHousehold).Primary_Contact__c, 'Not a member: left alone');
+        }
+    }
+
+    /**
      * R-C1: every person gets a household. A household the platform refuses (a validation
      * rule, a required field, here a value too long for its field, sent by the writer's test
      * seam since naming now fits every value) must not leave the person saved with none and

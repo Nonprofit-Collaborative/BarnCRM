@@ -146,12 +146,18 @@
               </div>
             </div>
 
-            <!-- The records side by side; they stack below the medium breakpoint. -->
+            <template lwc:if={suggestion.isGroup}>
+              <p class="slds-text-body_small slds-var-m-top_x-small" data-id="compared-with-first">
+                {suggestion.comparedWithFirst}
+              </p>
+            </template>
+            <!-- The records side by side; they stack below the medium breakpoint, and three or
+                 more wrap in up to three columns. -->
             <ul class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_x-small">
               <template for:each={suggestion.records} for:item="record">
                 <li
                   key={record.recordId}
-                  class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small"
+                  class={record.sizeClass}
                   data-id="side"
                 >
                   <p class="slds-text-body_regular">
@@ -179,6 +185,7 @@
                                 label={labels.different}
                                 data-id="differs"
                               ></lightning-badge>
+                              <span class="slds-assistive-text">{record.differentFrom}</span>
                             </template>
                           </dd>
                         </div>

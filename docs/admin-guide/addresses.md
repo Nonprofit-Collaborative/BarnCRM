@@ -181,6 +181,10 @@ replaces stays on the card as history.
   **Update Everyone's Address** in the confirmation to go ahead, or **Cancel**. In the flexible
   way of belonging, a person whose own household is another one is not listed.
 
+Neither move reaches someone marked **Deceased**: they are not moved and not listed. When
+two people in the list share a name, each shows their birthdate, for example "Sam Lee (born
+4/2/1961)", or their email when there is no birthdate, so you can tell them apart.
+
 Both confirmations open in a dialog over the page, so nothing on the card moves while you
 decide; **Escape** or **Cancel** closes it with nothing changed.
 

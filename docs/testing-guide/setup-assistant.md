@@ -140,7 +140,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 3 | Wait for it to finish. | Status **Loaded** and a "Sample data loaded." toast. **Households** 200, **Contacts** 440, **Organizations** 25; **Relationships** and **Affiliations** above zero. |
 | 4 | Open the bell. | One notification, **Sample data load finished**: "200 households, 440 people and 25 organizations are ready to explore." |
 | 5 | Click the notification. | **BarnCRM Settings** opens on **General**. |
-| 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. |
+| 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
 | 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
 
 **Cleanup:** None (leave sample data loaded).

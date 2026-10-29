@@ -406,7 +406,7 @@ describe('c-duplicate-review', () => {
     expect(counts).toEqual(['50+', '']);
   });
 
-  it('shows the two records side by side and marks the values they differ on', async () => {
+  it('shows the two records side by side and marks on both sides where they differ', async () => {
     const field = (fieldName, label, value) => ({ fieldName, label, value });
     const pair = {
       ...PEOPLE_PAIR,
@@ -438,22 +438,51 @@ describe('c-duplicate-review', () => {
     const rows = (side) =>
       Array.from(side.querySelectorAll('[data-id="field"]')).map((row) => ({
         label: row.querySelector('dt').textContent,
-        value: row.querySelector('[data-id="value"]').textContent.trim(),
+        value: row.querySelector('[data-id="value"]').firstChild.textContent.trim(),
         differs: row.querySelector('[data-id="differs"]') !== null
       }));
-    // Spaces and capitals aside the emails agree; a blank and a phone differ, as do the cities.
+    // In a pair each side is compared with the other, so both carry the marks.
     expect(rows(sides[0])).toEqual([
       { label: 'Email', value: 'ann@example.org', differs: false },
       { label: 'Phone', value: 'c.Core_Duplicates_Blank', differs: true },
       { label: 'Mailing City', value: 'Springfield', differs: true }
     ]);
-    expect(rows(sides[1])[2]).toEqual({
-      label: 'Mailing City',
-      value: 'Shelbyville',
-      differs: true
-    });
-    expect(sides[0].querySelector('[data-id="differs"]').label).toBe('c.Core_Duplicates_Different');
+    // Spaces and capitals aside the emails agree; a phone against a blank differs, as do cities.
+    expect(rows(sides[1])).toEqual([
+      { label: 'Email', value: 'ANN@example.org', differs: false },
+      { label: 'Phone', value: '555 0100', differs: true },
+      { label: 'Mailing City', value: 'Shelbyville', differs: true }
+    ]);
+    expect(sides[1].querySelector('[data-id="differs"]').label).toBe('c.Core_Duplicates_Different');
+    expect(sides[1].querySelector('.slds-assistive-text').textContent).toBe(
+      'c.Core_Duplicates_DifferentFrom'
+    );
     expect(sides[0].querySelector('[data-id="detail"]')).toBeNull();
+    expect(q(element, 'compared-with-first')).toBeNull();
+  });
+
+  it('compares every record of a larger suggestion with the first, in up to three columns', async () => {
+    const field = (value) => [{ fieldName: 'BillingPostalCode', label: 'Zip', value }];
+    const records = ['A', 'B', 'C', 'D'].map((letter, index) => ({
+      ...HOUSEHOLD_PAIR.records[0],
+      recordId: `001${letter}`,
+      name: `The ${letter} Family`,
+      fields: field(index === 2 ? '18150' : '18149')
+    }));
+    const element = await mount(
+      viewWith({ suggestions: [{ ...HOUSEHOLD_PAIR, records }], totalSuggestions: 1 })
+    );
+
+    const sides = qa(element, 'side');
+    expect(sides).toHaveLength(4);
+    expect(sides[0].className).toContain('slds-large-size_1-of-3');
+    // Two records holding the first one's zip are not marked; only the one that differs is.
+    expect(
+      Array.from(sides).map((side) => side.querySelector('[data-id="differs"]') !== null)
+    ).toEqual([false, false, true, false]);
+    expect(q(element, 'compared-with-first').textContent.trim()).toBe(
+      'c.Core_Duplicates_ComparedWithFirst'
+    );
   });
 
   it('falls back to the one-line detail when the server sends no compared fields', async () => {

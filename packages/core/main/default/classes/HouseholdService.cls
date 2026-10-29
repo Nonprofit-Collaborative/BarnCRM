@@ -2615,6 +2615,39 @@ public with sharing class HouseholdService {
         writePrimaryContacts(updates);
     }
 
+    /**
+     * Gives each household that has no Primary Contact the person named for it, as a household
+     * made by adding its first person gets that person (`seedPrimaryContactsOfNewHouseholds`).
+     * For a caller that makes the households first and adds the people after, such as the
+     * sample data load. Contact mode only, as that seeding is: there the field is the mark
+     * itself; in junction mode it mirrors the membership marked primary. A household that
+     * already has one, or a person who is not one of its members, is left alone.
+     *
+     * @param personByHousehold the person each household should start with, by household id
+     */
+    @NamespaceAccessible
+    public static void seedMissingPrimaryContacts(Map<Id, Id> personByHousehold) {
+        if (personByHousehold == null || personByHousehold.isEmpty() || isJunctionMode()) {
+            return;
+        }
+        Id recordTypeId = householdRecordTypeId();
+        Map<Id, Set<Id>> members = getMemberPersonIds(personByHousehold.keySet());
+        List<Account> updates = new List<Account>();
+        for (Account household : HouseholdSelector.getHouseholdsByIds(personByHousehold.keySet())) {
+            Id personId = personByHousehold.get(household.Id);
+            Set<Id> current = members.get(household.Id);
+            if (
+                household.RecordTypeId == recordTypeId &&
+                household.Primary_Contact__c == null &&
+                current != null &&
+                current.contains(personId)
+            ) {
+                updates.add(new Account(Id = household.Id, Primary_Contact__c = personId));
+            }
+        }
+        writePrimaryContacts(updates);
+    }
+
     /** The id of the first current member marked primary, in member order (R-H5). */
     private static Id firstPrimaryId(List<Person> members) {
         List<Person> primaries = new List<Person>();
