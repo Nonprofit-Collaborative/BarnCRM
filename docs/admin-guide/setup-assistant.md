@@ -35,6 +35,13 @@ finish it.
 2. Type `BarnCRM` and choose **BarnCRM**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
+The **Setup Checklist** card lists every step at once, with how many are done ("3 of 9 steps
+done") under the title. Each step has a progress ring (a check mark when it is done, a warning
+mark when you skipped it) and a **Done**, **Skipped** or **To Do** badge. The open step expands
+in place under its name; click any other step's name to open that one instead. An open step has
+**Skip for Now**, then **Next** (**Finish** on the last step), and a **Where This Lives in
+Settings** link to the settings section its answers live in.
+
 When every step is done, the assistant collapses to a small **Setup Complete** tile that
 shows how many steps you finished. The tile has a **Reopen Setup** button, so the assistant
 is always one click away, and it opens straight back on the first step rather than on the
@@ -325,8 +332,9 @@ module's own gift entry screen: enter one gift, save it, and you have proved the
 works, from donor to household to gift. Come back to the home page afterwards and click
 **Finish**.
 
-Click **Finish**. The assistant shows the completion screen: every step with its status,
-and how long setup took, measured from the first change you made.
+Click **Finish**. The assistant shows the completion screen: a **You Are Ready** heading with a
+check illustration, every step with its status, and how long setup took, measured from the
+first change you made.
 
 **What Maria sees:** **You Are Ready**, her nine steps, and "Time taken: 21 minutes". Two buttons sit
 under the summary: **Reopen Setup** walks the steps again with her answers intact, and

@@ -11,13 +11,10 @@ import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepVa
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
 
 import HEADING from '@salesforce/label/c.Core_SetupAssistant_Heading';
-import PROGRESS_LABEL from '@salesforce/label/c.Core_SetupAssistant_ProgressLabel';
-import STEP_COUNTER from '@salesforce/label/c.Core_SetupAssistant_StepCounterLabel';
 import DONE_BADGE from '@salesforce/label/c.Core_SetupAssistant_DoneBadge';
 import TODO_BADGE from '@salesforce/label/c.Core_SetupAssistant_ToDoBadge';
 import SKIPPED_BADGE from '@salesforce/label/c.Core_SetupAssistant_SkippedBadge';
 import NEXT from '@salesforce/label/c.Core_SetupAssistant_NextButton';
-import BACK from '@salesforce/label/c.Core_SetupAssistant_BackButton';
 import SKIP from '@salesforce/label/c.Core_SetupAssistant_SkipButton';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
 import SAVE from '@salesforce/label/c.Core_SetupAssistant_SaveButton';
@@ -53,8 +50,10 @@ const AUTOMATIC_ACCESS_GUIDE =
 const IMPORT_TAB = 'Import';
 
 /**
- * The guided Setup Assistant: one step open at a time, Back and Next, Skip for now, and it
- * opens on the step Maria stopped at. Steps that belong to another feature render that
+ * The guided Setup Assistant in the SLDS Setup Assistant layout: every step listed with a
+ * progress ring and a Done, Skipped or To Do badge, one step open in place (any step opens
+ * on click), Skip for Now and Next, and it opens on the step Maria stopped at. It reloads when
+ * the page is refreshed, so finishing the first-run window marks the edition step done. Steps that belong to another feature render that
  * feature's component dynamically, so a step whose module is not installed shows a notice
  * instead of breaking the page. A step's fields, including the ones a module adds, come from
  * Apex and are shown by one field panel (ADR-0059, C-29).
@@ -82,10 +81,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
 
   labels = {
     heading: HEADING,
-    progress: PROGRESS_LABEL,
-    stepCounter: STEP_COUNTER,
     next: NEXT,
-    back: BACK,
     skip: SKIP,
     finish: FINISH,
     save: SAVE,
@@ -120,10 +116,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     unregisterRefreshHandler(this.refreshHandlerId);
   }
 
-  /**
-   * The page asked to refresh. First-run setup asks when it finishes, so the edition step
-   * shows the answer just given instead of asking it again.
-   */
+  /** The page asked to refresh (first-run setup asks when it finishes). */
   refreshHandler() {
     return this.load().then(() => true);
   }
@@ -227,10 +220,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
       : '';
   }
 
-  get counterText() {
-    return this.state ? `${this.activeIndex + 1} / ${this.state.stepsTotal}` : '';
-  }
-
   get showCompletionScreen() {
     if (!this.state || !this.state.isComplete) {
       return false;
@@ -242,10 +231,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return Boolean(this.state) && !this.showCompletionScreen;
   }
 
-  get isFirstStep() {
-    return this.activeIndex === 0;
-  }
-
   get isLastStep() {
     return this.state ? this.activeIndex >= this.state.stepsTotal - 1 : true;
   }
@@ -254,12 +239,33 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return this.isLastStep ? this.labels.finish : this.labels.next;
   }
 
-  get summaryRows() {
-    return this.steps.map((step) => ({
-      ...step,
-      badge: step.completed ? DONE_BADGE : step.skipped ? SKIPPED_BADGE : TODO_BADGE,
-      badgeClass: step.completed ? 'slds-badge slds-theme_success' : 'slds-badge slds-badge_inverse'
-    }));
+  /** Every step with its ring, badge and whether it is the open one. */
+  get stepRows() {
+    return this.steps.map((step, index) => {
+      const isActive = index === this.activeIndex;
+      let badge = TODO_BADGE;
+      let badgeClass = '';
+      let ringVariant = 'base';
+      if (step.completed) {
+        badge = DONE_BADGE;
+        badgeClass = 'slds-theme_success';
+        ringVariant = 'base-autocomplete';
+      } else if (step.skipped) {
+        badge = SKIPPED_BADGE;
+        badgeClass = 'slds-theme_warning';
+        ringVariant = 'warning';
+      }
+      return {
+        ...step,
+        index,
+        isActive,
+        expanded: isActive ? 'true' : 'false',
+        badge,
+        badgeClass,
+        ringVariant,
+        ringValue: step.completed ? 100 : 0
+      };
+    });
   }
 
   get elapsedText() {
@@ -361,9 +367,11 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return this.showSampleData && !this.sampleDataType;
   }
 
-  handleBack() {
-    if (this.activeIndex > 0) {
-      this.moveTo(this.activeIndex - 1);
+  /** Opens the step whose name was clicked, in place. */
+  handleOpenStep(event) {
+    const index = Number(event.currentTarget.dataset.index);
+    if (index !== this.activeIndex) {
+      this.moveTo(index);
     }
   }
 
@@ -411,12 +419,12 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     this.moveTo(0);
   }
 
-  /** Moves focus to the new step's heading, so a screen reader announces the change. */
+  /** Moves focus to the open step's name, so a screen reader announces the change. */
   renderedCallback() {
     if (!this.focusStepHeading) {
       return;
     }
-    const heading = this.template.querySelector('[data-id="step-label"]');
+    const heading = this.template.querySelector('[data-id="step-toggle"][aria-expanded="true"]');
     if (heading) {
       this.focusStepHeading = false;
       heading.focus();
