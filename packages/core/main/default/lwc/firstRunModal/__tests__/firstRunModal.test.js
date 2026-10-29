@@ -15,7 +15,7 @@ const FEATURES = [
 const ADMIN_STATE = {
   needsSetup: true,
   canFinish: true,
-  recommendedSuite: 'Community',
+  recommendedSuite: 'Standard',
   features: FEATURES
 };
 
@@ -64,7 +64,7 @@ describe('c-first-run-modal', () => {
       'c.Core_FirstRun_Title'
     );
     const picker = byId(element, 'edition');
-    expect(picker.value).toBe('Community');
+    expect(picker.value).toBe('Standard');
     expect(picker.options.map((option) => option.label)).toEqual([
       'c.Core_SuiteChoice_StandardName',
       'c.Core_SuiteChoice_NonprofitName'
@@ -103,7 +103,7 @@ describe('c-first-run-modal', () => {
     const element = await build({ ...ADMIN_STATE, recommendedSuite: undefined });
 
     expect(byId(element, 'finish').disabled).toBe(true);
-    choose(element, 'edition', 'Impact');
+    choose(element, 'edition', 'Nonprofit');
     await settle();
     expect(byId(element, 'finish').disabled).toBe(false);
   });
@@ -118,7 +118,7 @@ describe('c-first-run-modal', () => {
     await settle();
 
     expect(finish).toHaveBeenCalledWith({
-      suite: 'Community',
+      suite: 'Standard',
       featureKeys: ['DataManager', 'Relationships', 'Addresses']
     });
     expect(closed.mock.calls[0][0].detail).toEqual({ finished: true });
@@ -128,7 +128,7 @@ describe('c-first-run-modal', () => {
   it('lists every feature ticked when choosing, and leaves an unticked one off', async () => {
     const element = await build(ADMIN_STATE);
 
-    choose(element, 'edition', 'Impact');
+    choose(element, 'edition', 'Nonprofit');
     choose(element, 'mode', 'choose');
     await settle();
     const boxes = all(element, 'feature');
@@ -141,7 +141,7 @@ describe('c-first-run-modal', () => {
     await settle();
 
     expect(finish).toHaveBeenCalledWith({
-      suite: 'Impact',
+      suite: 'Nonprofit',
       featureKeys: ['DataManager', 'Addresses']
     });
   });

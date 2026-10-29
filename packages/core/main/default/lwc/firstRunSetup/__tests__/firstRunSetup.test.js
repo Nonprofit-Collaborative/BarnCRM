@@ -40,7 +40,7 @@ jest.mock('@salesforce/apex/FirstRunController.finish', () => ({ default: jest.f
 const ADMIN_STATE = {
   needsSetup: true,
   canFinish: true,
-  recommendedSuite: 'Community',
+  recommendedSuite: 'Standard',
   features: []
 };
 

@@ -151,8 +151,8 @@ public with sharing class SetupAssistantController {
     private static String knownSuite(String suite) {
         String chosen = suite == null ? '' : suite.trim();
         Set<String> suites = new Set<String>{
-            ModuleDetectionService.SUITE_COMMUNITY,
-            ModuleDetectionService.SUITE_IMPACT
+            ModuleDetectionService.SUITE_STANDARD,
+            ModuleDetectionService.SUITE_NONPROFIT
         };
         if (!suites.contains(chosen)) {
             throw asAuraException(System.Label.Core_SuiteChoice_UnknownSuiteError);

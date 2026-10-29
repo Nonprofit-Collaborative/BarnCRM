@@ -330,7 +330,7 @@ public with sharing class SettingsController {
     /**
      * Each choice setting's labels by stored value (lower case), keyed like
      * `labelsByStoredName`, so Recent Changes shows what the setting's own picker shows: the
-     * Edition row reads "Nonprofit Edition", not the stored code "Impact". Translated when read,
+     * Edition row reads "Nonprofit Edition", not the stored code "Nonprofit". Translated when read,
      * so rows logged before a label changed read the current label too.
      */
     private static Map<String, Map<String, String>> choiceLabelsByStoredName() {
@@ -345,13 +345,19 @@ public with sharing class SettingsController {
             }
         }
         // The Edition row is a component with its own picker, which names the stored codes with
-        // these labels (editionSetting): Community is the Standard Edition, Impact the Nonprofit.
+        // these labels (editionSetting). Rows logged before ADR-NEXT hold the old codes, which
+        // read as the editions that replaced them.
+        Map<String, String> editionLabels = new Map<String, String>{
+            ModuleDetectionService.SUITE_STANDARD.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,
+            ModuleDetectionService.SUITE_NONPROFIT.toLowerCase() => System.Label.Core_SuiteChoice_NonprofitName
+        };
+        for (String oldValue : ModuleDetectionService.SUITE_BY_OLD_VALUE.keySet()) {
+            String renamed = ModuleDetectionService.SUITE_BY_OLD_VALUE.get(oldValue);
+            editionLabels.put(oldValue, editionLabels.get(renamed.toLowerCase()));
+        }
         choices.put(
             (SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(),
-            new Map<String, String>{
-                ModuleDetectionService.SUITE_COMMUNITY.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,
-                ModuleDetectionService.SUITE_IMPACT.toLowerCase() => System.Label.Core_SuiteChoice_NonprofitName
-            }
+            editionLabels
         );
         return choices;
     }

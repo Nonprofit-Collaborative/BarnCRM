@@ -367,7 +367,7 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
             HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_COMMUNITY }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_STANDARD }
             );
 
             System.assertEquals(
@@ -384,7 +384,7 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
             HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
             );
 
             HealthCheckService.Finding finding = find(

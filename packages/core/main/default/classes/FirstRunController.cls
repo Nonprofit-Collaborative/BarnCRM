@@ -100,8 +100,8 @@ public with sharing class FirstRunController {
     private static String knownSuite(String suite) {
         String chosen = suite == null ? '' : suite.trim();
         if (
-            chosen != ModuleDetectionService.SUITE_COMMUNITY &&
-            chosen != ModuleDetectionService.SUITE_IMPACT
+            chosen != ModuleDetectionService.SUITE_STANDARD &&
+            chosen != ModuleDetectionService.SUITE_NONPROFIT
         ) {
             throw asAuraException(System.Label.Core_SuiteChoice_UnknownSuiteError);
         }

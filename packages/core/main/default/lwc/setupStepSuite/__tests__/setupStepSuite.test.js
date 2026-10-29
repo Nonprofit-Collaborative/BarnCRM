@@ -24,7 +24,7 @@ describe('c-setup-step-suite', () => {
   });
 
   it('never asks the edition itself: the first-run window does', () => {
-    const element = build({ currentSuite: null, recommendedSuite: 'Impact', giving: {} });
+    const element = build({ currentSuite: null, recommendedSuite: 'Nonprofit', giving: {} });
 
     expect(find(element, 'choose-in-first-run').textContent).toBe(
       'c.Core_SuiteChoice_ChooseInFirstRun'
@@ -36,7 +36,7 @@ describe('c-setup-step-suite', () => {
 
   it('links to the Giving installer in a new tab when the Nonprofit Edition needs it', () => {
     const element = build({
-      currentSuite: 'Impact',
+      currentSuite: 'Nonprofit',
       giving: { present: false, docsUrl: DOCS, installUrl: INSTALLER }
     });
 
@@ -49,7 +49,7 @@ describe('c-setup-step-suite', () => {
 
   it('says so when no Giving version is published, and links its description', () => {
     const element = build({
-      currentSuite: 'Impact',
+      currentSuite: 'Nonprofit',
       giving: { present: false, docsUrl: DOCS, installUrl: null }
     });
 
@@ -59,7 +59,7 @@ describe('c-setup-step-suite', () => {
   });
 
   it('asks the page to check again after an install', () => {
-    const element = build({ currentSuite: 'Impact', giving: { present: false, docsUrl: DOCS } });
+    const element = build({ currentSuite: 'Nonprofit', giving: { present: false, docsUrl: DOCS } });
     const handler = jest.fn();
     element.addEventListener('checkagain', handler);
 
@@ -69,7 +69,7 @@ describe('c-setup-step-suite', () => {
   });
 
   it('says Giving is installed and offers nothing to install', () => {
-    const element = build({ currentSuite: 'Impact', giving: { present: true, docsUrl: DOCS } });
+    const element = build({ currentSuite: 'Nonprofit', giving: { present: true, docsUrl: DOCS } });
 
     expect(find(element, 'giving-installed')).not.toBeNull();
     expect(find(element, 'install-link')).toBeNull();
@@ -77,14 +77,14 @@ describe('c-setup-step-suite', () => {
   });
 
   it('shows nothing about Giving with the Standard Edition saved', () => {
-    const element = build({ currentSuite: 'Community', giving: { present: false } });
+    const element = build({ currentSuite: 'Standard', giving: { present: false } });
 
     expect(find(element, 'giving-needed')).toBeNull();
     expect(find(element, 'giving-installed')).toBeNull();
   });
 
   it('shows a saved edition read-only', () => {
-    const element = build({ currentSuite: 'Community', giving: {} });
+    const element = build({ currentSuite: 'Standard', giving: {} });
 
     expect(find(element, 'choose-in-first-run')).toBeNull();
     expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_StandardName');
@@ -94,7 +94,7 @@ describe('c-setup-step-suite', () => {
   });
 
   it('names the Nonprofit Edition when it is saved', () => {
-    const element = build({ currentSuite: 'Impact', giving: { present: true, docsUrl: DOCS } });
+    const element = build({ currentSuite: 'Nonprofit', giving: { present: true, docsUrl: DOCS } });
 
     expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_NonprofitName');
   });

@@ -361,7 +361,7 @@ public with sharing class SetupAssistantService {
         Boolean nonprofitProduct =
             shape != null && (shape.hasNpsp == true || shape.hasIndustriesNonprofit == true);
         return ModuleDetectionService.isGivingPresent() || nonprofitProduct
-            ? ModuleDetectionService.SUITE_IMPACT
+            ? ModuleDetectionService.SUITE_NONPROFIT
             : null;
     }
 
