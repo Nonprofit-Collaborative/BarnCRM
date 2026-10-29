@@ -416,6 +416,85 @@ last_failure_opaque() {
   [[ "$errors" =~ ^[0-9]+$ ]] && [[ "$errors" -eq 0 ]]
 }
 
+# SCHEDULED JOBS. Salesforce refuses to deploy a schedulable class that has a scheduled job
+# ("This schedulable class has jobs pending or in progress") unless the org's DeploymentSettings
+# doesSkipAsyncApexValidation is on. Post-install schedules the hourly "BarnCRM Tab Access Check"
+# (TabAccessScheduler) in every org, and an administrator may schedule others (Error Digest,
+# Import Row Cleanup, Seasonal Addresses, Rollups), so without this every upgrade deploy over a
+# set-up org without that setting failed at the first Apex stage. The refusal is not only for the
+# scheduled class itself: a validation on barn-platform (2026-10-29) that sent TabAccessService
+# but not TabAccessScheduler was refused on TabAccessService, a class the job uses. So a job of
+# any BarnCRM class can block any Apex stage (a module's job uses Core classes). Before each Apex
+# stage, every live scheduled job whose class is in any of the packages is recorded and aborted,
+# and straight after the stage (deployed or not) each is scheduled again under its own name and
+# cron expression, so an administrator's schedule is kept. Post-install would schedule the Tab Access Check again even if
+# that restore failed; it finds the restored one by name and does not double it. A job is
+# restored with its class's no-argument constructor, so one that was scheduled with arguments
+# (the Rollup Builder's one-off full run, the automation pause's resume job) comes back as the
+# class's default run, or, with no such constructor, is named as not scheduled again.
+PAUSED_JOBS_FILE=""
+pause_scheduled_jobs() {
+  local classes capture apex
+  classes="$(find "$@" -name '*.cls' 2> /dev/null | sed -e 's#.*/##' -e 's/\.cls$//' | sort -u)"
+  [[ -n "$classes" ]] || return 0
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf data query --target-org "$ALIAS" --json \
+    --query "SELECT CronTriggerId, CronTrigger.CronJobDetail.Name, CronTrigger.CronExpression, CronTrigger.State, ApexClass.Name FROM AsyncApexJob WHERE JobType = 'ScheduledApex' AND CronTriggerId != null AND ApexClass.NamespacePrefix = null LIMIT 2000"
+  PAUSED_JOBS_FILE="$(mktemp)"
+  if ! python3 - "$capture" "$PAUSED_JOBS_FILE" "$classes" <<'PYEOF'; then
+import json, sys
+capture, out, classes = sys.argv[1], sys.argv[2], set(sys.argv[3].split())
+records = json.load(open(capture, encoding="utf-8"))["result"]["records"]
+live = {"WAITING", "ACQUIRED", "EXECUTING", "PAUSED", "BLOCKED", "PAUSED_BLOCKED"}
+seen, rows = set(), []
+for r in records:
+    trigger = r.get("CronTrigger") or {}
+    cls = (r.get("ApexClass") or {}).get("Name")
+    name = (trigger.get("CronJobDetail") or {}).get("Name")
+    if r["CronTriggerId"] in seen or cls not in classes or trigger.get("State") not in live or not name:
+        continue
+    seen.add(r["CronTriggerId"])
+    rows.append("\t".join([r["CronTriggerId"], name, trigger["CronExpression"], cls]))
+open(out, "w", encoding="utf-8").write("".join(row + "\n" for row in rows))
+PYEOF
+    echo "== Could not read ${ALIAS}'s scheduled jobs; deploying without pausing them =="
+    : > "$PAUSED_JOBS_FILE"
+  fi
+  rm -f "$capture"
+  [[ -s "$PAUSED_JOBS_FILE" ]] || return 0
+  echo "== Pausing scheduled jobs whose class this stage deploys: $(cut -f2 "$PAUSED_JOBS_FILE" | paste -sd, -) =="
+  apex="$(cut -f1 "$PAUSED_JOBS_FILE" | sed "s/.*/System.abortJob('&');/")"
+  if ! printf '%s\n' "$apex" | sf apex run --target-org "$ALIAS" > /dev/null; then
+    echo "== The scheduled jobs could not be aborted; the stage may fail with \"jobs pending\" =="
+  fi
+}
+restore_scheduled_jobs() {
+  local apex output status
+  [[ -n "$PAUSED_JOBS_FILE" && -s "$PAUSED_JOBS_FILE" ]] || { rm -f "$PAUSED_JOBS_FILE"; return 0; }
+  # Each job in its own try, so one whose class is gone does not stop the others.
+  apex="$(python3 - "$PAUSED_JOBS_FILE" <<'PYEOF'
+import sys
+q = lambda s: "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
+for line in open(sys.argv[1], encoding="utf-8"):
+    _, name, cron, cls = line.rstrip("\n").split("\t")
+    print("try { System.schedule(%s, %s, (Schedulable) Type.forName(%s).newInstance()); } "
+          "catch (Exception e) { System.debug(LoggingLevel.ERROR, 'NOT_RESCHEDULED ' + %s + ': ' + e.getMessage()); }"
+          % (q(name), q(cron), q(cls), q(name)))
+PYEOF
+)"
+  echo "== Scheduling the paused jobs again: $(cut -f2 "$PAUSED_JOBS_FILE" | paste -sd, -) =="
+  # A failure is caught in the Apex (an uncaught one would undo the jobs that did schedule), so
+  # it is found in the log rather than by the exit status.
+  output="$(printf '%s\n' "$apex" | sf apex run --target-org "$ALIAS" 2>&1)" && status=0 || status=$?
+  if [[ "$status" -ne 0 ]] || grep -q "NOT_RESCHEDULED" <<< "$output"; then
+    grep "NOT_RESCHEDULED" <<< "$output" | sed 's/.*NOT_RESCHEDULED/Not scheduled again:/'
+    echo "Check Scheduled Jobs in Setup. To schedule a missing job again, run as anonymous Apex:"
+    printf '%s\n' "$apex"
+  fi
+  rm -f "$PAUSED_JOBS_FILE"
+  PAUSED_JOBS_FILE=""
+}
+
 # SKIPPING UNCHANGED PACKAGES (D-141 amendment, 2026-10-28; D-56 allows "deploy only changed
 # metadata"). A package whose source is identical to what the last successful run of this script
 # put in this same org is not deployed again, except its Apex: run-org-tests.sh reads coverage
@@ -751,10 +830,13 @@ else
   deploy_config || exit $?
 fi
 if ! package_skipped core || [[ "$DEPLOY_APEX_ALWAYS" == "1" ]]; then
+  pause_scheduled_jobs packages/*/main/default/classes
   deploy_stage "Core (Apex)" \
     "${CORE_DIR}/classes" \
     "${CORE_DIR}/triggers" \
-    "${CORE_DIR}/PlatformEventSubscriberConfigs" || exit $?
+    "${CORE_DIR}/PlatformEventSubscriberConfigs" && status=0 || status=$?
+  restore_scheduled_jobs
+  [[ "$status" -eq 0 ]] || exit "$status"
 fi
 if ! package_skipped core; then
   # After Apex, which a flow can call, and before the UI, which can launch a flow.
@@ -775,11 +857,26 @@ fi
 # A deployment is not an install, so CorePostInstall never runs and the org would start with
 # every feature on before first-run setup, automatic households on, no hourly tab access check,
 # no Automation switches or import templates, and nobody able to open BarnCRM Settings. This runs
-# the same steps, as the person deploying. After the UI and permissions stage, because it gives
-# that person the BarnCRM Admin permission set. Safe on an org that already has BarnCRM: one with
+# the same steps, as the person deploying. After the UI and permissions stage, because that is
+# where the BarnCRM Admin permission set this person is given first arrives. Safe on an org that already has BarnCRM: one with
 # saved settings or a household is treated as an upgrade, so nothing an administrator chose
 # changes, and a second run changes nothing.
 if [[ "$SOURCE_POST_INSTALL" == "1" ]]; then
+  # The person deploying needs Manage BarnCRM Settings before the steps run, not after. The
+  # steps can only queue the BarnCRM Admin grant (a setup object write cannot share their
+  # transaction), so on a first deploy every settings save in them (coexistence mode, the
+  # organization record type, the new-install feature list, each module's setup) was refused
+  # with "You need the Manage BarnCRM Settings permission" and left in the Error Log. Assigned
+  # here, in its own transaction; an assignment already held is reported as a duplicate.
+  echo ""
+  echo "== Giving the person deploying the BarnCRM Admin permission set =="
+  output="$(sf org assign permset --name BarnCRM_Admin --target-org "$ALIAS" 2>&1)" && status=0 || status=$?
+  if grep -q "Duplicate PermissionSetAssignment" <<< "$output"; then
+    echo "Already assigned: BarnCRM_Admin"
+  elif [[ "$status" -ne 0 ]]; then
+    echo "$output"
+    echo "BarnCRM_Admin was not assigned, so the post-install steps below may log permission errors."
+  fi
   echo ""
   echo "== Running Core's post-install steps =="
   if ! printf '%s\n' 'CorePostInstall.runAsSourceDeploy();' | sf apex run --target-org "$ALIAS"; then
@@ -829,21 +926,30 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
       deploy_stage "Module ${module}" "${dirs[@]}" || return $?
     done
   }
-  if [[ "$MODULE_STAGES" == "combined" ]]; then
-    ALL_MODULE_DIRS=()
-    for module in "${MODULES[@]}"; do
-      while IFS= read -r dir; do [[ -n "$dir" ]] && ALL_MODULE_DIRS+=("$dir"); done < <(module_dirs "$module")
-    done
-    if [[ ${#ALL_MODULE_DIRS[@]} -eq 0 ]]; then
-      echo "== Skipping the modules: every one is unchanged since the last deploy to ${ALIAS} =="
-    elif ! deploy_stage "Modules (${MODULES[*]}) in one request" "${ALL_MODULE_DIRS[@]}"; then
-      last_failure_opaque || exit 1
-      echo "== The one-request module deploy failed with no component error. Falling back to one module per stage =="
-      deploy_modules_separately || exit $?
+  deploy_modules() {
+    if [[ "$MODULE_STAGES" == "combined" ]]; then
+      ALL_MODULE_DIRS=()
+      for module in "${MODULES[@]}"; do
+        while IFS= read -r dir; do [[ -n "$dir" ]] && ALL_MODULE_DIRS+=("$dir"); done < <(module_dirs "$module")
+      done
+      if [[ ${#ALL_MODULE_DIRS[@]} -eq 0 ]]; then
+        echo "== Skipping the modules: every one is unchanged since the last deploy to ${ALIAS} =="
+      elif ! deploy_stage "Modules (${MODULES[*]}) in one request" "${ALL_MODULE_DIRS[@]}"; then
+        last_failure_opaque || return 1
+        echo "== The one-request module deploy failed with no component error. Falling back to one module per stage =="
+        deploy_modules_separately || return $?
+      fi
+    else
+      deploy_modules_separately || return $?
     fi
-  else
-    deploy_modules_separately || exit $?
-  fi
+  }
+  # A scheduled job (the Rollup Builder's "BarnCRM Rollups", Giving's acknowledgments) blocks a
+  # module's deploy as Core's does, so the jobs are paused around the module stages the same way
+  # (see SCHEDULED JOBS). Post-install has rescheduled the Tab Access Check by now.
+  pause_scheduled_jobs packages/*/main/default/classes
+  deploy_modules && status=0 || status=$?
+  restore_scheduled_jobs
+  [[ "$status" -eq 0 ]] || exit "$status"
 
   # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its

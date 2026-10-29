@@ -307,5 +307,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
 | 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
 | 6 | If step 3 kept **Organization**: before giving it to your profile, run **Health Check**, then load sample data. Then give **Organization** to your profile (Setup, Profiles, Record Type Settings) and run Health Check again. | Before: Health Check warns **You cannot use the record type for organizations**, naming Organization, and **Load Sample Data** refuses with a message naming it. After: no such warning. |
+| 7 | If step 3 chose another record type: move any accounts still on **Organization** to it, then in Setup, Object Manager, Account, Record Types, deactivate **Organization**. Reopen **BarnCRM Settings**, **General**. | **Record type for organizations** still shows your choice, and Organization is no longer among its choices. The Organizations tab lists the same records as in step 1. |
 
 **Cleanup:** none.
