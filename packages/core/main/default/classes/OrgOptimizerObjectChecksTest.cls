@@ -42,7 +42,10 @@ private class OrgOptimizerObjectChecksTest {
             Integer unusedBefore = before.count;
             Assert.isTrue(unusedBefore >= 1, 'With no records, the Household type is unused.');
 
-            Database.insert(HouseholdTestDataFactory.newHousehold('The Used Household'), AccessLevel.SYSTEM_MODE);
+            Database.insert(
+                HouseholdTestDataFactory.newHousehold('The Used Household'),
+                AccessLevel.SYSTEM_MODE
+            );
 
             OrgOptimizerSetupController.Finding after = OrgOptimizerObjectChecks.unusedRecordTypes();
             Assert.areEqual(unusedBefore - 1, after.count, 'A household now uses its type.');

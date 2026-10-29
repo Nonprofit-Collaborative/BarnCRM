@@ -15,7 +15,10 @@ private class HouseholdMergeControllerTest {
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account duplicate = HouseholdTestDataFactory.newHousehold('Garcia Household');
             Account organization = new Account(Name = 'Garcia Family Foundation');
-            Database.insert(new List<Account>{ household, duplicate, organization }, AccessLevel.SYSTEM_MODE);
+            Database.insert(
+                new List<Account>{ household, duplicate, organization },
+                AccessLevel.SYSTEM_MODE
+            );
 
             Test.startTest();
             List<HouseholdMergeController.HouseholdOption> options = HouseholdMergeController.searchHouseholds(
@@ -40,7 +43,10 @@ private class HouseholdMergeControllerTest {
             Account plain = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account percent = HouseholdTestDataFactory.newHousehold('100% Garcia');
             Account underscore = HouseholdTestDataFactory.newHousehold('Garcia_Lee');
-            Database.insert(new List<Account>{ plain, percent, underscore }, AccessLevel.SYSTEM_MODE);
+            Database.insert(
+                new List<Account>{ plain, percent, underscore },
+                AccessLevel.SYSTEM_MODE
+            );
 
             Test.startTest();
             List<HouseholdMergeController.HouseholdOption> byPercent = HouseholdMergeController.searchHouseholds(

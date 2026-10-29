@@ -127,7 +127,10 @@ private class AddressPropagationTest {
             Account personLikeAccount = AddressTestDataFactory.newHousehold('Ana Garcia');
             personLikeAccount.BillingStreet = MEMBER_OWN_STREET;
             personLikeAccount.BillingCity = MEMBER_OWN_CITY;
-            Database.insert(new List<Account>{ garcia, personLikeAccount }, AccessLevel.SYSTEM_MODE);
+            Database.insert(
+                new List<Account>{ garcia, personLikeAccount },
+                AccessLevel.SYSTEM_MODE
+            );
 
             Test.startTest();
             AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{

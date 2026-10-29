@@ -492,7 +492,10 @@ private class MergeSettlementTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account keptHousehold = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account otherHousehold = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(new List<Account>{ keptHousehold, otherHousehold }, AccessLevel.SYSTEM_MODE);
+            Database.insert(
+                new List<Account>{ keptHousehold, otherHousehold },
+                AccessLevel.SYSTEM_MODE
+            );
             insert new List<Contact>{
                 AddressTestDataFactory.newContact('Maria', 'Garcia', keptHousehold.Id),
                 AddressTestDataFactory.newContact('Wei', 'Lee', otherHousehold.Id)

@@ -488,4 +488,66 @@ private class HouseholdWriterTest {
             );
         }
     }
+
+    /**
+     * ADR-0141, D-134 adjustment A: no role set gives the Household record type, yet a staff
+     * member adding a person still gets them a household, may edit it, and may not create one
+     * past BarnCRM with a user mode insert.
+     */
+    @IsTest
+    static void aStaffMemberWithoutTheHouseholdRecordTypeStillGetsAHouseholdForANewPerson() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User maria = staff('Hwnort');
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Nortega');
+            Boolean recordTypeOffered;
+            Boolean editSaved;
+            Boolean directInsertRefused = false;
+
+            Test.startTest();
+            System.runAs(maria) {
+                recordTypeOffered = Schema.SObjectType.Account.getRecordTypeInfosById()
+                    .get(HouseholdService.householdRecordTypeId())
+                    .isAvailable();
+                Database.insert(ana, AccessLevel.USER_MODE);
+                Id householdId = [
+                    SELECT AccountId
+                    FROM Contact
+                    WHERE Id = :ana.Id
+                    WITH USER_MODE
+                ]
+                .AccountId;
+                editSaved = Database.update(
+                        new Account(Id = householdId, Phone = '555-0100'),
+                        AccessLevel.USER_MODE
+                    )
+                    .isSuccess();
+                try {
+                    Database.insert(
+                        HouseholdTestDataFactory.newHousehold('Past BarnCRM'),
+                        AccessLevel.USER_MODE
+                    );
+                } catch (DmlException refused) {
+                    directInsertRefused = true;
+                }
+            }
+            Test.stopTest();
+
+            Assert.isFalse(recordTypeOffered, 'BarnCRM Staff does not give Household');
+            Contact saved = [
+                SELECT Account.RecordTypeId, Account.Phone
+                FROM Contact
+                WHERE Id = :ana.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(
+                HouseholdService.householdRecordTypeId(),
+                saved.Account.RecordTypeId,
+                'Ana was given a household'
+            );
+            Assert.isTrue(editSaved, 'Maria may edit the household');
+            Assert.areEqual('555-0100', saved.Account.Phone, 'The edit was saved');
+            Assert.isTrue(directInsertRefused, 'A user mode household insert is refused');
+        }
+    }
 }
