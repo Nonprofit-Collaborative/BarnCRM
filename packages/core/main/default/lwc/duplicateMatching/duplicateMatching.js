@@ -6,6 +6,7 @@ import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metad
 import TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
 import INTRO from '@salesforce/label/c.Core_DuplicateMatching_Intro';
 import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
+import REVIEW_COUNT from '@salesforce/label/c.Core_DuplicateMatching_ReviewCount';
 import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
 import NO_ACCESS from '@salesforce/label/c.Core_DuplicateMatching_NoAccess';
 
@@ -31,6 +32,17 @@ export default class DuplicateMatching extends LightningElement {
   activeArea;
   /** The areas opened so far; an area stays loaded once opened. */
   opened = {};
+  /** The pairs waiting, as the review list counted them ("40", "50+"); empty for none. */
+  reviewCount = '';
+
+  /** "Review (40)" once the list has loaded with pairs waiting, else "Review". */
+  get reviewLabel() {
+    return this.reviewCount ? REVIEW_COUNT.replace('{0}', this.reviewCount) : REVIEW;
+  }
+
+  handleCountChange(event) {
+    this.reviewCount = (event.detail && event.detail.count) || '';
+  }
 
   connectedCallback() {
     const first = this.areas[0];

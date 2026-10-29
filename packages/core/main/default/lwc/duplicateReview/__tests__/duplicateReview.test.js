@@ -387,6 +387,83 @@ describe('c-duplicate-review', () => {
     expect(q(element, 'empty').heading).toBe('c.Core_Duplicates_EmptyHeading');
   });
 
+  it('tells the tab how many pairs are waiting, and again after an action', async () => {
+    getView.mockResolvedValue(
+      viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 50, moreNotCounted: true })
+    );
+    dismissSuggestion.mockResolvedValue(viewWith({}));
+    const counts = [];
+    const element = createElement('c-duplicate-review', { is: DuplicateReview });
+    element.addEventListener('countchange', (event) => counts.push(event.detail.count));
+    document.body.appendChild(element);
+    await flush();
+    expect(counts).toEqual(['50+']);
+
+    q(element, 'dismiss-button').click();
+    await flush();
+    q(element, 'dismiss-confirm').click();
+    await flush();
+    expect(counts).toEqual(['50+', '']);
+  });
+
+  it('shows the two records side by side and marks the values they differ on', async () => {
+    const field = (fieldName, label, value) => ({ fieldName, label, value });
+    const pair = {
+      ...PEOPLE_PAIR,
+      records: [
+        {
+          ...PEOPLE_PAIR.records[0],
+          fields: [
+            field('Email', 'Email', 'ann@example.org'),
+            field('Phone', 'Phone', null),
+            field('MailingCity', 'Mailing City', 'Springfield')
+          ]
+        },
+        {
+          ...PEOPLE_PAIR.records[1],
+          fields: [
+            field('Email', 'Email', 'ANN@example.org '),
+            field('Phone', 'Phone', '555 0100'),
+            field('MailingCity', 'Mailing City', 'Shelbyville')
+          ]
+        }
+      ]
+    };
+    const element = await mount(viewWith({ suggestions: [pair], totalSuggestions: 1 }));
+
+    const sides = qa(element, 'side');
+    expect(sides).toHaveLength(2);
+    expect(sides[0].className).toContain('slds-medium-size_1-of-2');
+    expect(sides[0].className).toContain('slds-size_1-of-1');
+    const rows = (side) =>
+      Array.from(side.querySelectorAll('[data-id="field"]')).map((row) => ({
+        label: row.querySelector('dt').textContent,
+        value: row.querySelector('[data-id="value"]').textContent.trim(),
+        differs: row.querySelector('[data-id="differs"]') !== null
+      }));
+    // Spaces and capitals aside the emails agree; a blank and a phone differ, as do the cities.
+    expect(rows(sides[0])).toEqual([
+      { label: 'Email', value: 'ann@example.org', differs: false },
+      { label: 'Phone', value: 'c.Core_Duplicates_Blank', differs: true },
+      { label: 'Mailing City', value: 'Springfield', differs: true }
+    ]);
+    expect(rows(sides[1])[2]).toEqual({
+      label: 'Mailing City',
+      value: 'Shelbyville',
+      differs: true
+    });
+    expect(sides[0].querySelector('[data-id="differs"]').label).toBe('c.Core_Duplicates_Different');
+    expect(sides[0].querySelector('[data-id="detail"]')).toBeNull();
+  });
+
+  it('falls back to the one-line detail when the server sends no compared fields', async () => {
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 1 }));
+    const sides = qa(element, 'side');
+    expect(sides[0].querySelector('[data-id="detail"]').textContent).toBe('Springfield');
+    expect(sides[0].querySelector('[data-id="field"]')).toBeNull();
+    expect(q(element, 'merge-button').variant).toBe('brand');
+  });
+
   it('shows a plain message when loading fails without one', async () => {
     getView.mockRejectedValue({});
     const element = createElement('c-duplicate-review', { is: DuplicateReview });

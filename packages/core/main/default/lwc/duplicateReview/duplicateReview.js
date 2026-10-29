@@ -52,6 +52,8 @@ import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCount
 import SHOW_MORE from '@salesforce/label/c.Core_Duplicates_ShowMore';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
 import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
+import DIFFERENT from '@salesforce/label/c.Core_Duplicates_Different';
+import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import { setupPath } from 'c/setupLinks';
 
 const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
@@ -95,7 +97,8 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     noAccess: NO_ACCESS,
     cancel: CANCEL,
     showMore: SHOW_MORE,
-    emptyHeading: EMPTY_HEADING
+    emptyHeading: EMPTY_HEADING,
+    different: DIFFERENT
   };
 
   /** How many pairs are shown; Show More adds a page. The server sends at most 50. */
@@ -164,6 +167,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     try {
       this.view = await getView();
       this.errorMessage = undefined;
+      this.announceCount();
     } catch (error) {
       this.errorMessage = this.messageFrom(error);
     } finally {
@@ -257,6 +261,13 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return COUNT_ALT.replace('{0}', this.countLabel);
   }
 
+  /** Tells the Duplicate Matching tab the count for its Review tab name; empty for none. */
+  announceCount() {
+    this.dispatchEvent(
+      new CustomEvent('countchange', { detail: { count: this.hasCount ? this.countLabel : '' } })
+    );
+  }
+
   get dismissedCount() {
     return this.view ? this.view.dismissedCount : 0;
   }
@@ -275,14 +286,39 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       canMerge: suggestion.canMerge === true,
       dismissOpen: this.dismissing === suggestion.setId,
       mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
-      records: suggestion.records.map((record) => ({
+      records: this.sideBySide(suggestion.records)
+    }));
+  }
+
+  /**
+   * The records of one pair for the side-by-side card: each compared field with its value,
+   * marked when the records do not all hold the same value (spaces and capitals aside).
+   */
+  sideBySide(records) {
+    const valuesByField = {};
+    records.forEach((record) => {
+      (record.fields || []).forEach((field) => {
+        const value = (field.value || '').trim().toLowerCase();
+        (valuesByField[field.fieldName] = valuesByField[field.fieldName] || new Set()).add(value);
+      });
+    });
+    return records.map((record) => {
+      const fields = (record.fields || []).map((field) => ({
+        key: `${record.recordId}-${field.fieldName}`,
+        label: field.label,
+        text: field.value || BLANK,
+        differs: records.length > 1 && valuesByField[field.fieldName].size > 1
+      }));
+      return {
         recordId: record.recordId,
         name: record.name,
         kind: record.isHousehold ? OBJECT_HOUSEHOLD : OBJECT_PERSON,
         detail: record.detail,
-        url: `/lightning/r/${record.recordId}/view`
-      }))
-    }));
+        url: `/lightning/r/${record.recordId}/view`,
+        fields,
+        hasFields: fields.length > 0
+      };
+    });
   }
 
   get visibleSuggestions() {
@@ -492,6 +528,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     try {
       this.view = await promise;
       this.noticeMessage = notice;
+      this.announceCount();
     } catch (error) {
       this.errorMessage = this.messageFrom(error);
     } finally {

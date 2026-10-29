@@ -84,6 +84,24 @@ private class DuplicateControllerTest {
                 suggestion.records[0].detail.endsWith('@example.org'),
                 'A person is told apart by their email address.'
             );
+            Map<String, String> compared = new Map<String, String>();
+            for (DuplicateController.FieldView field : suggestion.records[0].fields) {
+                compared.put(field.fieldName, field.value);
+            }
+            Assert.isTrue(
+                compared.get('Email').endsWith('@example.org'),
+                'The email is among the fields compared side by side.'
+            );
+            Assert.isTrue(
+                compared.containsKey('Account.Name'),
+                'The household is compared too, blank or not.'
+            );
+            Assert.areEqual(
+                Schema.SObjectType.Contact.fields.Phone.isAccessible(),
+                compared.containsKey('Phone'),
+                'A readable compared field is listed even when blank, so the two sides line up.'
+            );
+            Assert.isNull(compared.get('Phone'), 'Neither person has a phone.');
             for (DuplicateController.RuleView rule : view.rules) {
                 Assert.isTrue(
                     rule.objectName == 'Contact' || rule.objectName == 'Account',
@@ -102,6 +120,11 @@ private class DuplicateControllerTest {
             }
             DuplicateController.DuplicateView before = DuplicateController.getView();
             Assert.isTrue(before.suggestions[0].canMerge, 'Two households can be merged here.');
+            Assert.areEqual(
+                DuplicateSelector.HOUSEHOLD_COMPARED.size(),
+                before.suggestions[0].records[0].fields.size(),
+                'A household is compared on its billing address and phone.'
+            );
 
             HouseholdMergeService.MergePreview preview = DuplicateController.previewMerge(
                 households[0].Id,

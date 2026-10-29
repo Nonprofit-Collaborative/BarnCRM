@@ -18,6 +18,13 @@ jest.mock(
   }),
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/label/c.Core_DuplicateMatching_ReviewCount',
+  () => ({ default: 'Review ({0})' }),
+  {
+    virtual: true
+  }
+);
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -55,6 +62,21 @@ describe('c-duplicate-matching for an administrator', () => {
     expect(element.shadowRoot.querySelector('lightning-tabset').activeTabValue).toBe('review');
     expect(element.shadowRoot.querySelector('c-duplicate-review')).not.toBeNull();
     expect(element.shadowRoot.querySelector('c-match-source-manager')).toBeNull();
+  });
+
+  it('names the Review tab with the pairs waiting, as the review list counts them', async () => {
+    const element = await render();
+    const tab = element.shadowRoot.querySelector('[data-id="tab-review"]');
+    const review = element.shadowRoot.querySelector('c-duplicate-review');
+    expect(tab.label).toBe('c.Core_DuplicateMatching_Review');
+
+    review.dispatchEvent(new CustomEvent('countchange', { detail: { count: '50+' } }));
+    await flush();
+    expect(tab.label).toBe('Review (50+)');
+
+    review.dispatchEvent(new CustomEvent('countchange', { detail: { count: '' } }));
+    await flush();
+    expect(tab.label).toBe('c.Core_DuplicateMatching_Review');
   });
 
   it('sits in the page shell with the title for screen readers only', async () => {

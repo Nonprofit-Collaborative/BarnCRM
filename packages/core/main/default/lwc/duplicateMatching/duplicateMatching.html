@@ -4,9 +4,9 @@
       <template lwc:if={hasAnyArea}>
         <lightning-tabset active-tab-value={activeArea}>
           <template lwc:if={canSeeReview}>
-            <lightning-tab label={labels.review} value="review" onactive={handleActive} data-id="tab-review">
+            <lightning-tab label={reviewLabel} value="review" onactive={handleActive} data-id="tab-review">
               <template lwc:if={reviewOpened}>
-                <c-duplicate-review></c-duplicate-review>
+                <c-duplicate-review oncountchange={handleCountChange}></c-duplicate-review>
               </template>
             </lightning-tab>
           </template>
