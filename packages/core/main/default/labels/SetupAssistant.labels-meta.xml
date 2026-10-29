@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: heading of the final screen</shortDescription>
-        <value>You are ready</value>
+        <value>You Are Ready</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_CompleteTileHeading</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step one</shortDescription>
-        <value>Confirm how BarnCRM fits your existing org</value>
+        <value>Confirm How BarnCRM Fits Your Org</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step2Description</fullName>
@@ -438,7 +438,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step two</shortDescription>
-        <value>Confirm how households are named</value>
+        <value>Confirm How Households Are Named</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step4Description</fullName>
@@ -454,7 +454,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step four</shortDescription>
-        <value>Give your colleagues access</value>
+        <value>Give Your Colleagues Access</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step5Label</fullName>
@@ -462,7 +462,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step five</shortDescription>
-        <value>Set your organization's identity</value>
+        <value>Set Your Organization's Identity</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step6Description</fullName>
@@ -478,7 +478,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step six</shortDescription>
-        <value>Choose which modules to turn on</value>
+        <value>Choose Which Modules to Turn On</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step7Description</fullName>
@@ -494,7 +494,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step seven</shortDescription>
-        <value>Bring in your data</value>
+        <value>Bring In Your Data</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step8Label</fullName>
@@ -502,7 +502,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step eight</shortDescription>
-        <value>Check that everything works</value>
+        <value>Check That Everything Works</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_StepCounterLabel</fullName>
@@ -518,7 +518,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: badge on a step that is not finished</shortDescription>
-        <value>To do</value>
+        <value>To Do</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_TooLongError</fullName>
