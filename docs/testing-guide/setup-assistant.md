@@ -142,6 +142,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 5 | Click the notification. | **BarnCRM Settings** opens on **General**. |
 | 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
 | 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
+| 8 | On an org where **Household Upkeep** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
 
 **Cleanup:** None (leave sample data loaded).
 
